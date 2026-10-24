@@ -86,9 +86,9 @@ rendered previews are never authority. One multi-cell/multi-deck volume is one
 project. Unbuilt neighbors cannot supply structural support. Interior versus
 hull-affecting consequences determine airborne permissions.
 
-Projects expose requirements/duration for inspection but contain no material,
-progress or installed mass. There is no separate worksite or Start action.
-Cancellation removes the unfunded reservation; #543 owns physical intake/refunds,
+Projects capture requirements/duration and exact #543 material receipts/progress.
+There is no separate worksite or Start action.
+Cancellation atomically returns physical unconsumed material; #543 owns intake/refunds,
 #544 progress, #545 geometry and #546 flight interlocks. Domain schema-1 validation
 and the whole-session boundary are documented in the
 [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
@@ -103,3 +103,6 @@ Persistent finishes #579: [canonical ownership, schema 13, bounded render factor
 
 
 Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.

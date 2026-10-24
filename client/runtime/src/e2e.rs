@@ -11,6 +11,7 @@ use crate::session::GameplaySession;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    ConstructionMaterials,
     ScoutMounts,
     ScoutCabin,
     ScoutFinishes,
@@ -53,6 +54,7 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "construction-materials" => Ok(Self::ConstructionMaterials),
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
             "scout-cabin-table" => Ok(Self::ScoutCabinTable),
@@ -99,6 +101,7 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::ConstructionMaterials => "construction-materials",
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
             Self::ScoutCabinTable => "scout-cabin-table",
@@ -255,6 +258,9 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ConstructionMaterials => {
+            crate::session::construction::evidence_initial_conditions(app)?
+        }
         Scenario::ScoutCoreUpgrade | Scenario::ScoutCoreUpgradePowered => {
             crate::session::core_upgrades::evidence_initial_conditions(
                 app,

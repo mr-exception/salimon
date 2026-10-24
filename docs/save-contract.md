@@ -492,3 +492,8 @@ Five room groups and exact furniture overrides now use the [bounded finish contr
 ## Instant direct-material Core upgrades (#548)
 
 The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.
+
+
+## Construction material ownership (#543)
+
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and pending economy approval. Timed work and completed geometry remain #544/#545.

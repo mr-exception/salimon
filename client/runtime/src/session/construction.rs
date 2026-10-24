@@ -236,6 +236,165 @@ fn ray_distance(eye: [f64; 3], direction: [f64; 3], space: Envelope) -> Option<f
 }
 
 impl GameplaySession {
+    pub(super) fn contribute_construction(&mut self) {
+        if self.mining.carry_blocked
+            || !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
+        {
+            return;
+        }
+        let Some(id) = self.aimed_construction() else {
+            self.feedback = Some("Aim at a reachable placeholder");
+            return;
+        };
+        let approved = self.building.catalog.approved_economy;
+        let Ok(p) = self.building.source.projects.funding_mut(id, OWNER) else {
+            return;
+        };
+        use salimon_ship::structure::funding::FundingError::*;
+        self.feedback = Some(
+            match p.funding.contribute(
+                &mut self.mining.session,
+                &p.blueprint.requirements,
+                approved,
+            ) {
+                Ok(()) => {
+                    if p.funding.funded(&p.blueprint.requirements) {
+                        "Materials funded - automatic construction awaits its implementation"
+                    } else {
+                        "Material delivered to placeholder"
+                    }
+                }
+                Err(Unapproved) => "Construction economy awaits owner approval; nothing consumed",
+                Err(Oversized) => {
+                    "Fragment exceeds remaining cost; bring a smaller piece (nothing consumed)"
+                }
+                Err(WrongMaterial) => "Placeholder requires a different material",
+                _ => "Cannot accept this material; check carry slot and whole-milligram quantity",
+            },
+        );
+        self.sync_carried();
+        self.sync_fabricator_mass();
+    }
+    fn cancel_construction(&mut self, id: PlaceholderId) -> Result<(), ()> {
+        let job = self.building.source.projects.inspect(id).ok_or(())?;
+        let mut refunds = job
+            .funding
+            .refunds(&job.blueprint.requirements)
+            .map_err(|_| ())?;
+        let state = self.snapshot();
+        let frame = character_ship_frame(state.ship.pose);
+        let eye = frame.world_to_local(state.character.eye_position_meters);
+        let mut solids = self.cabin_solids();
+        if self.cargo_door.open_fraction < 1. {
+            solids.push(salimon_character::cargo::cargo_door_bounds(
+                self.cargo_door.open_fraction,
+            ));
+        }
+        let mut placed: Vec<([f64; 3], f64)> = Vec::new();
+        for f in &mut refunds {
+            let radius = salimon_world::resource_size::fragment_contact_radius_meters(f.material());
+            let mut destination = None;
+            'search: for x in -6..=6 {
+                for z in -6..=6 {
+                    let requested = [
+                        eye[0] + f64::from(x) * 0.5,
+                        SHIP_FLOOR_HEIGHT_METERS,
+                        eye[2] + f64::from(z) * 0.5,
+                    ];
+                    let Some(p) = salimon_character::ship_floor_placement(requested, radius) else {
+                        continue;
+                    };
+                    if (p[0] - eye[0]).hypot(p[2] - eye[2]) < radius + 0.5
+                        || salimon_math::length(salimon_math::sub(p, eye)) > REACH_METERS
+                        || salimon_character::ship_sight_obstruction(
+                            eye,
+                            p,
+                            super::door_passable(state.ship),
+                        )
+                        .is_some_and(|d| d + 0.02 < salimon_math::length(salimon_math::sub(p, eye)))
+                        || solids
+                            .iter()
+                            .any(|b| salimon_character::cargo::sphere_overlaps_box(p, radius, *b))
+                        || self.mining.session.fragments().iter().any(|other| {
+                            salimon_math::length(salimon_math::sub(
+                                p,
+                                frame.world_to_local(other.transform().position().meters()),
+                            )) < radius + crate::fragment_physics::sphere_radius(*other) + 0.01
+                        })
+                        || placed.iter().any(|(q, r)| {
+                            salimon_math::length(salimon_math::sub(p, *q)) < radius + r + 0.01
+                        })
+                    {
+                        continue;
+                    }
+                    destination = Some(p);
+                    break 'search;
+                }
+            }
+            let p = destination.ok_or(())?;
+            placed.push((p, radius));
+            let w = frame.local_to_world(p);
+            f.set_transform(
+                salimon_world::resources::ResourceTransform::new(
+                    salimon_world::WorldPosition::new(w[0], w[1], w[2]),
+                    f.transform().orientation_xyzw(),
+                )
+                .map_err(|_| ())?,
+            );
+        }
+        // Both owners preflight before publication; no fallible geometry or partial return afterward.
+        if !self.mining.session.return_reserved_loose(&refunds) {
+            return Err(());
+        }
+        let p = self
+            .building
+            .source
+            .projects
+            .funding_mut(id, OWNER)
+            .map_err(|_| ())?;
+        p.funding = Default::default();
+        self.building
+            .source
+            .projects
+            .cancel(id, OWNER)
+            .map_err(|_| ())?;
+        self.sync_carried();
+        self.sync_fabricator_mass();
+        Ok(())
+    }
+    pub(super) fn validate_construction_receipts(
+        &self,
+    ) -> Result<(), salimon_persistence::SaveError> {
+        use salimon_persistence::invalid;
+        let next = self.mining.session.save_state().next_id;
+        let core_ids: std::collections::HashSet<_> = self
+            .core_upgrades
+            .pending
+            .iter()
+            .chain(
+                self.core_upgrades
+                    .applied
+                    .iter()
+                    .flat_map(|a| a.receipts.iter()),
+            )
+            .map(|f| f.id())
+            .collect();
+        let mut ids = std::collections::HashSet::new();
+        for p in self.building.source.projects.jobs() {
+            for f in &p.funding.receipts {
+                if !ids.insert(f.id())
+                    || core_ids.contains(&f.id())
+                    || f.id().0 > next
+                    || self.mining.session.fragment(f.id()).is_some()
+                {
+                    return Err(invalid(
+                        "construction receipt duplicates an owner or exceeds allocator",
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
     fn construction_inputs(&self) -> ([f64; 3], [f64; 3], Vec<Obstacle>, FlightPermission, bool) {
         let snapshot = self.snapshot();
         let frame = character_ship_frame(snapshot.ship.pose);
@@ -457,7 +616,7 @@ impl GameplaySession {
         if matches!(action, BuildAction::Cancel) {
             let nearest = self.aimed_construction();
             self.feedback = Some(if let Some(id) = nearest {
-                if self.building.source.projects.cancel(id, OWNER).is_ok() {
+                if self.cancel_construction(id).is_ok() {
                     "Placeholder cancelled"
                 } else {
                     "Cannot cancel this placeholder"
@@ -501,14 +660,18 @@ impl GameplaySession {
             })
             .collect::<Vec<_>>()
             .join(" / ");
-        let status = if hovered.is_some() {
-            "PLANNED".to_string()
+        let status = if let Some(job) = hovered {
+            if job.funding.funded(&job.blueprint.requirements) {
+                "FUNDED - awaiting construction".to_string()
+            } else {
+                format!("WAITING | supplied {:.3}kg", job.funding.mass_kg())
+            }
         } else {
             p.rejection
                 .map_or_else(|| "CLEAR".to_string(), |e| format!("{e:?}"))
         };
         Some(format!(
-            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | RMB cancel | C close",
+            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | C close",
             hovered.map_or_else(
                 || blueprint.name.clone(),
                 |job| format!("Project #{} {}", job.id.0, blueprint.name)
@@ -549,3 +712,57 @@ impl GameplaySession {
 
 #[cfg(test)]
 mod tests;
+
+/// Explicit evidence setup: trusted test catalog, placed stool, half-kg carried
+/// sphere. This does not enable the unapproved catalog in ordinary gameplay.
+pub(crate) fn evidence_initial_conditions(s: &mut GameplaySession) -> Result<(), String> {
+    use super::{Command, ControlKey};
+    s.command(Command::Control(ControlKey::Right, true));
+    s.advance_automation(std::time::Duration::from_millis(72 * 16));
+    s.command(Command::Control(ControlKey::Right, false));
+    let snapshot = s.snapshot();
+    let frame = character_ship_frame(snapshot.ship.pose);
+    let eye = frame.world_to_local(snapshot.character.eye_position_meters);
+    let d = salimon_math::sub([-1.4, SHIP_FLOOR_HEIGHT_METERS, 3.2], eye);
+    s.command(Command::Look(
+        d[2].atan2(d[0]) / 0.0022,
+        -d[1].atan2(d[0].hypot(d[2])) / 0.0022,
+    ));
+    s.command(Command::Build(BuildAction::Toggle));
+    s.command(Command::Build(BuildAction::Place));
+    s.building.catalog.approved_economy = true;
+    use salimon_world::{resources::*, spherical_mining::*};
+    let w = frame.local_to_world([-1., 1.3, 2.5]);
+    let pose = ResourceTransform::new(
+        salimon_world::WorldPosition::new(w[0], w[1], w[2]),
+        [0., 0., 0., 1.],
+    )
+    .map_err(|e| e.to_string())?;
+    let mut deposit = ResourceDeposit::new(
+        DepositId {
+            body: salimon_world::CelestialBodyId::Earth,
+            local: 543,
+        },
+        RawMaterial::new(ResourceId::IronOre, 0.5).map_err(|e| e.to_string())?,
+        pose.position(),
+        0.5,
+    )
+    .map_err(|e| e.to_string())?;
+    let id = (0..400)
+        .find_map(|_| {
+            s.mining.session.tick_spherical(
+                true,
+                Some(&mut deposit),
+                SPHERE_TICK,
+                MiningConfig::default(),
+                pose,
+            )
+        })
+        .ok_or("evidence sphere absent")?;
+    if !s.mining.session.pick_up(id) {
+        return Err("evidence carry occupied".into());
+    }
+    s.equipment.stow();
+    s.sync_carried();
+    Ok(())
+}

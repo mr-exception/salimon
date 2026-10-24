@@ -98,3 +98,5 @@ Persistent finishes #579: [canonical ownership, schema 13, bounded render factor
 
 
 Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+Schema 15 adds exact construction funding receipts/progress; legacy unfunded placeholders migrate empty and cross-owner material IDs reject before publication. See [construction material contract](../../docs/construction-materials.md).

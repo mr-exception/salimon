@@ -349,3 +349,5 @@ example; real-scale playable startup and native verification remain downstream.
 Cabin controls: aim + E operates furniture; X sits/lies or gets up; U secures/releases the restraint. See [cabin mechanisms](docs/cabin-mechanisms.md).
 
 Room appearance: aim at galley/door controls and use V to select group, O to cycle color, Z to reset. O/Z on bunk, seat, table or locker controls that item. See [room finishes](docs/room-finishes.md).
+
+Core upgrades: aim at Core, I switches Fuel/Upgrade Materials; E contributes, Y applies a complete upgrade instantly, N recovers a pending fragment. See [tiers and material costs](docs/core-upgrades.md).

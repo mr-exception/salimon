@@ -172,6 +172,15 @@ impl ShipController {
         }
     }
 
+    /// Capacity-only transaction: no charge, reservation or input mutation.
+    pub fn increase_core_capacity(
+        &mut self,
+        expected: u64,
+        capacity: u64,
+    ) -> Result<(), crate::InvalidEnergy> {
+        self.energy_core.increase_capacity(expected, capacity)
+    }
+
     pub fn configure_energy_core(
         &mut self,
         config: crate::EnergyConfig,

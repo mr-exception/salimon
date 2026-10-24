@@ -276,6 +276,32 @@ impl MiningSession {
         self.fragments.drain_changes()
     }
 
+    /// Reclaim one original reserved receipt into the existing single carry slot.
+    /// Reservation owners validate receipts against their source before this boundary.
+    pub fn return_reserved_fragment(&mut self, fragment: ResourceFragment) -> bool {
+        if self.carried_object().is_some()
+            || self.attached_sphere_id.is_some()
+            || !crate::resources::RawMaterial::new(
+                fragment.material().resource(),
+                fragment.material().mass_kg(),
+            )
+            .is_ok_and(|m| m.volume_m3() == fragment.material().volume_m3())
+            || crate::resources::ResourceTransform::new(
+                fragment.transform().position(),
+                fragment.transform().orientation_xyzw(),
+            )
+            .is_err()
+            || !self.fragments.return_reserved(fragment)
+        {
+            return false;
+        }
+        assert!(
+            self.pick_up(fragment.id()),
+            "reserved return passed single-slot admission"
+        );
+        true
+    }
+
     /// Physical despawn/Core consumption; never reuse an entity identity.
     pub fn remove_fragment(&mut self, id: crate::resources::FragmentId) -> bool {
         if self.carried_id() == Some(id) {

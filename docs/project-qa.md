@@ -131,3 +131,8 @@ hull cell 20 kg / 120 s; deck cell 15 kg / 90 s; two-deck room 40 kg / 300 s;
 utility module 3 kg / 60 s. These are review proposals, not approved balance.
 Fine-grid pitch is per blueprint (currently 0.5 m); the structural lattice stays
 3 m. B02 does not authorize occupied-room demolition or structural completion.
+
+
+## Core upgrade balance — owner direction 2026-10-24 (#548)
+
+The owner answered the unresolved-values question with “guess them yourself” and asked for balanced costs so play is neither too grindy nor too easy. This explicitly authorizes the reviewable data catalog: 90/120/180 GJ, incremental iron/silicate costs 20/10, 30/10, 40/20 kg. Rationale, exact source/transaction semantics and limits are in [Core upgrades](core-upgrades.md). These are selected gameplay parameters, not empirical material measurements, a measured playtest, or blanket approval of the unrelated construction economy.

@@ -14,6 +14,8 @@ pub(crate) enum Scenario {
     ScoutMounts,
     ScoutCabin,
     ScoutFinishes,
+    ScoutCoreUpgrade,
+    ScoutCoreUpgradePowered,
     ScoutFinishesBlackout,
     ScoutCabinBunk,
     ScoutCabinLocker,
@@ -54,6 +56,8 @@ impl Scenario {
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
             "scout-cabin-table" => Ok(Self::ScoutCabinTable),
+            "scout-core-upgrade" => Ok(Self::ScoutCoreUpgrade),
+            "scout-core-upgrade-powered" => Ok(Self::ScoutCoreUpgradePowered),
             "scout-finishes" => Ok(Self::ScoutFinishes),
             "scout-finishes-blackout" => Ok(Self::ScoutFinishesBlackout),
             "scout-cabin" => Ok(Self::ScoutCabin),
@@ -98,6 +102,8 @@ impl Scenario {
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
             Self::ScoutCabinTable => "scout-cabin-table",
+            Self::ScoutCoreUpgrade => "scout-core-upgrade",
+            Self::ScoutCoreUpgradePowered => "scout-core-upgrade-powered",
             Self::ScoutFinishes => "scout-finishes",
             Self::ScoutFinishesBlackout => "scout-finishes-blackout",
             Self::ScoutCabin => "scout-cabin",
@@ -249,6 +255,12 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ScoutCoreUpgrade | Scenario::ScoutCoreUpgradePowered => {
+            crate::session::core_upgrades::evidence_initial_conditions(
+                app,
+                config.scenario == Scenario::ScoutCoreUpgradePowered,
+            )?;
+        }
         Scenario::ScoutFinishes | Scenario::ScoutFinishesBlackout => {
             crate::session::cabin::evidence_initial_conditions(app, "scout-finishes")?;
             if config.scenario == Scenario::ScoutFinishesBlackout {

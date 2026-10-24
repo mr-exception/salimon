@@ -389,3 +389,6 @@ Normal-play runtime now persists complete world state through
 depletion and physical fragment identities. E2E/benchmark launches still begin
 isolated sessions. World itself never performs disk IO. The original
 in-session streaming tests remain distinct from native filesystem restart tests.
+
+
+Reserved Core material #548 remains owned by exact receipt while absent from loose world output. Returning that reservation preserves the original ID/material and uses the one carry slot; activation retires its spendable material while keeping a nonspendable installed audit. The caller validates ownership/high-water; the world return boundary rejects duplicate live identities and occupied slots. See [Core upgrades](../../docs/core-upgrades.md).

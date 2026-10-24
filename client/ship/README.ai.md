@@ -49,8 +49,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 For approved flight/Core choices and historical supersession, follow the
 [owned review](../../docs/spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
-Future upgrade/module-load/inertial-cabin/orbit/manual-power features remain out
-of scope; do not interpret tuning setters as progression mechanics.
+Thruster/landing upgrades, future module-load/inertial-cabin/orbit/manual-power features remain deferred. The explicit instant Core capacity progression is implemented by #548; tuning setters alone do not grant a paid upgrade.
 
 #493 replaces independent force capacities with funded Core impulse. Read the
 [math/safety/switch contract](architecture.md#funded-core-impulse-and-engine-switch-493).
@@ -101,3 +100,6 @@ Read the physical mount contract before changing rail identity/compatibility or 
 
 
 Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.

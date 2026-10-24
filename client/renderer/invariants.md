@@ -166,8 +166,8 @@ cool visibility floor without adding power/gameplay authority. Glass blending,
 depth, immutable geometry and the 160-byte uniform size remain unchanged.
 
 Scout machinery (#464) consumes finite normalized immutable feedback only; no
-simulation/clock/save authority. The current ship uniform is 192 bytes and vertex
-stride 76 bytes. Named role tags cannot animate structural supports, hull, ramp
+simulation/clock/save authority. The current ship uniform is 352 bytes and vertex
+stride 80 bytes. Named role tags cannot animate structural supports, hull, ramp
 or colliders. Electrical cues obey explicit bus state; tray output remains
 independent of power. The original #463 layout statement above describes its
 foundation; #464 extends that layout.
@@ -265,3 +265,6 @@ Physical rail, clamp and shelf instances retain stable caller IDs. Secured state
 
 
 Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.

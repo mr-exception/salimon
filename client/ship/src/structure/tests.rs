@@ -522,3 +522,39 @@ fn all_connected_two_by_two_by_two_layouts_obey_cut_and_damage_contracts() {
     }
     assert!(checked > 200);
 }
+
+#[test]
+fn opening_a_shared_divider_preserves_independent_room_finishes() {
+    use crate::finishes::{Finishes, Group};
+    let mut s = ship();
+    s.add_part(part(2, &[[1, 0, 0]])).unwrap();
+    s.add_room(Room {
+        id: StructureId(700),
+        cells: vec![Cell::new(0, 0, 0)],
+    })
+    .unwrap();
+    s.add_room(Room {
+        id: StructureId(701),
+        cells: vec![Cell::new(1, 0, 0)],
+    })
+    .unwrap();
+    let mut f = Finishes::default();
+    assert!(f.add_room(700));
+    assert!(f.add_room(701));
+    f.cycle_group(700, Group::Walls);
+    f.cycle_group(701, Group::Floor);
+    let before = f.clone();
+    s.set_face(
+        StructureId(1),
+        Cell::new(0, 0, 0),
+        Direction::Forward,
+        Some(FaceKind::Wall),
+    )
+    .unwrap();
+    s.set_face(StructureId(1), Cell::new(0, 0, 0), Direction::Forward, None)
+        .unwrap();
+    assert_eq!(f, before);
+    assert_ne!(f.rooms[&700], f.rooms[&701]);
+    let restored: Finishes = serde_json::from_slice(&serde_json::to_vec(&f).unwrap()).unwrap();
+    assert_eq!(restored, f);
+}

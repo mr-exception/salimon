@@ -413,7 +413,7 @@ existing reviewed baseline images are never automatically replaced.
 ## Scout machinery surfaces (#464)
 
 `machinery.rs` owns typed presentation DTOs and named-surface tagging. The ship
-vertex stride is 76 bytes; its uniform is now 192 bytes. Power, role, progress,
+vertex stride is 80 bytes; its uniform is now 352 bytes. Power, role, progress,
 charge, ramped rudder and active phase drive the existing shader/draws without
 new geometry or gameplay dependencies. See the [canonical feedback contract](../../docs/scout-presentation.md#machinery-feedback-boundary-464).
 
@@ -524,3 +524,6 @@ Runtime maps physical rail/mount/clamp source into existing immutable Shelf temp
 
 
 Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.

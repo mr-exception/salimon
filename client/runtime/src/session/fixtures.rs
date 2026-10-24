@@ -102,6 +102,18 @@ impl GameplaySession {
             }
         }
         nodes.extend(self.cabin_fixture_nodes(ship.power_available));
+        use salimon_ship::finishes::{CABIN_ROOM, Group};
+        for n in &mut nodes {
+            let (id, group) = match n.mesh {
+                FixtureMesh::Bunk => (1001, Group::Upholstery),
+                FixtureMesh::SeatPad | FixtureMesh::SeatBack => (3002, Group::Upholstery),
+                FixtureMesh::Table => (3001, Group::Cabinetry),
+                FixtureMesh::LockerDoor | FixtureMesh::LockerShell => (3020, Group::Cabinetry),
+                // Structural rails, clamps, restraints and functional hardware keep authored colors.
+                _ => continue,
+            };
+            n.tint = self.finishes.item_tint(CABIN_ROOM, id, group);
+        }
         salimon_renderer::resolve_fixture_hierarchy(
             FixturePose {
                 position_meters: ship.pose.position_meters,

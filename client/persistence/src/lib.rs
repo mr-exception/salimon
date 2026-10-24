@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::{fmt, time::Duration};
 
-pub const SCHEMA_VERSION: u32 = 12;
+pub const SCHEMA_VERSION: u32 = 13;
 pub const FORMAT: &str = "salimon.save";
 pub const MAX_SAVE_BYTES: usize = 64 * 1024 * 1024;
 

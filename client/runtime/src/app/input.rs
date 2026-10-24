@@ -295,6 +295,18 @@ pub(crate) fn dispatch_session_key(
         Some(Command::Throttle(direction, true))
     } else if let Some(slot) = toolbar_slot(key) {
         Some(Command::Select(slot))
+    } else if key == PhysicalKey::Code(KeyCode::KeyV) {
+        Some(Command::Finish(
+            crate::session::finishes::FinishAction::SelectGroup,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyO) {
+        Some(Command::Finish(
+            crate::session::finishes::FinishAction::Next,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyZ) {
+        Some(Command::Finish(
+            crate::session::finishes::FinishAction::Reset,
+        ))
     } else if key == PhysicalKey::Code(KeyCode::KeyG) {
         Some(Command::Mount(crate::session::mounts::MountAction::Place))
     } else if key == PhysicalKey::Code(KeyCode::KeyX) {

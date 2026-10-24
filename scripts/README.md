@@ -706,3 +706,24 @@ focused window, viewable map state and geometry; it does not certify physical
 input or scanout. Every repeated frozen capture must have the same PNG hash.
 See [matched cloud lighting evidence](../reports/issue-566/README.md) for commands,
 all failures, expression-only control lineage and hardware-counter limitations.
+
+
+## Bounded native capture polling (#568)
+
+`--screenshot-command '["native"]'` requests the actual completed GPU color
+surface. The runner first requests real window restoration, then schedules the
+capture and polls `{"op":"inspect","scope":"capture"}`. Current executables
+return only `capture_status`, avoiding repeated large world/fragment snapshots;
+older executables ignore the optional scope and retain compatible full inspection.
+All envelopes, timeout limits, E2E gates and actual display/occlusion admission
+remain in force. Restoration is an actual logged window operation, never a
+synthetic focus flag. GPU images do not certify physical OS-input delivery.
+
+The native marker is never an external executable. After a scenario/protocol
+failure the runner retains checkpoint images, original error and last state;
+it reports a new native failure screenshot unavailable because a timed-out
+response may still be outstanding. It never issues a second request into a
+possibly desynchronized channel or hides the original failure with a PATH error.
+Contract tests cover bounded polling payload, original PNG validation, the native
+marker and failure-state preservation. Actual native corpus captures remain a
+separate required test. See [the #568 report](../reports/issue-568/README.md).

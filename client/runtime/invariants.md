@@ -587,3 +587,12 @@ real parent IDs and local poses through this boundary. See
 Continuous audio verification: `native_audio/mix/tests.rs` covers callback-size
 invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
 device telemetry are opt-in. Linux builds require ALSA development headers.
+
+
+Capture verification (#568): native `inspect` with `scope: capture` returns only
+readback status after the usual E2E envelope/admission checks. It is observational
+and never builds the world snapshot. Ordinary inspection is unchanged; old
+executables may ignore the optional scope and return the full snapshot. The
+runner restores the real window before GPU capture and logs that OS request;
+it does not fake focus, disable occlusion or grant physical input qualification.
+See [runner protocol](../../scripts/README.md#bounded-native-capture-polling-568).

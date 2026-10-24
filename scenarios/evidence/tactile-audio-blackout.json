@@ -1,0 +1,121 @@
+{
+  "setup": {
+    "scenario": "scout-lighting-blackout",
+    "seed": 583,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "screenshot": "before",
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "audio_output.preview_only",
+        "equals": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 10
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "actual-travel",
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.17",
+        "gt": 0
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 10
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 10
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "reversed",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 85
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "stopped",
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_events.26",
+        "gte": 1
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_events.21",
+        "gte": 1
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.17",
+        "equals": 0
+      },
+      "timeout_ms": 30000
+    }
+  ]
+}

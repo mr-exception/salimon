@@ -477,6 +477,7 @@ impl GameplaySession {
         if restored.survival.snapshot().terminal {
             restored.freeze_terminal();
         }
+        restored.audio_epoch = self.audio_epoch.wrapping_add(1);
         *self = restored;
         Ok(())
     }

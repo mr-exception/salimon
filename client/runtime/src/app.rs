@@ -767,8 +767,15 @@ impl ClientApplication {
                 && self.benchmark.is_none(),
         );
         let condition_cue = self.condition_feedback.take_audio_cue();
-        self.scout_audio
-            .update(audio, self.condition_feedback.settings, condition_cue);
+        if self.e2e_config.is_some() {
+            self.scout_audio.preview(
+                crate::scout_audio::Observation::capture(&self.session, true),
+                self.condition_feedback.settings,
+            );
+        } else {
+            self.scout_audio
+                .update(audio, self.condition_feedback.settings, condition_cue);
+        }
         if self.scout_audio.unavailable() {
             self.condition_feedback.message =
                 "Ship audio unavailable - check audio device/output".into();

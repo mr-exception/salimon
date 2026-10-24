@@ -13,6 +13,8 @@ pub(crate) enum Scenario {
     LandedEarth,
     ScoutMounts,
     ScoutCabin,
+    ScoutFinishes,
+    ScoutFinishesBlackout,
     ScoutCabinBunk,
     ScoutCabinLocker,
     ScoutCabinTable,
@@ -52,6 +54,8 @@ impl Scenario {
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
             "scout-cabin-table" => Ok(Self::ScoutCabinTable),
+            "scout-finishes" => Ok(Self::ScoutFinishes),
+            "scout-finishes-blackout" => Ok(Self::ScoutFinishesBlackout),
             "scout-cabin" => Ok(Self::ScoutCabin),
             "scout-mounts" => Ok(Self::ScoutMounts),
             "scout-fabricator" => Ok(Self::ScoutFabricator),
@@ -94,6 +98,8 @@ impl Scenario {
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
             Self::ScoutCabinTable => "scout-cabin-table",
+            Self::ScoutFinishes => "scout-finishes",
+            Self::ScoutFinishesBlackout => "scout-finishes-blackout",
             Self::ScoutCabin => "scout-cabin",
             Self::ScoutMounts => "scout-mounts",
             Self::ScoutFabricator => "scout-fabricator",
@@ -243,6 +249,12 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ScoutFinishes | Scenario::ScoutFinishesBlackout => {
+            crate::session::cabin::evidence_initial_conditions(app, "scout-finishes")?;
+            if config.scenario == Scenario::ScoutFinishesBlackout {
+                app.ship.set_stored_core_energy_joules(0);
+            }
+        }
         Scenario::ScoutCabin
         | Scenario::ScoutCabinBunk
         | Scenario::ScoutCabinLocker

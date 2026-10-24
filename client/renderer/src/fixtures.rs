@@ -126,7 +126,7 @@ pub fn resolve_fixture_hierarchy(
             || !valid_pose(n.local)
             || n.tint
                 .iter()
-                .any(|v| !v.is_finite() || !(0.0..=1.0).contains(v))
+                .any(|v| !v.is_finite() || !(0.0..=4.0).contains(v))
         {
             return Err(fail());
         }
@@ -362,7 +362,7 @@ fn prepare_instances(
             || !valid_pose(n.pose)
             || n.tint
                 .iter()
-                .any(|v| !v.is_finite() || !(0.0..=1.0).contains(v))
+                .any(|v| !v.is_finite() || !(0.0..=4.0).contains(v))
         {
             return Err(RendererError::new(
                 "fixture instance",

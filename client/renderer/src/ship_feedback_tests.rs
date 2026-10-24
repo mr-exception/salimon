@@ -298,6 +298,7 @@ fn scout_feedback_gpu_evidence() {
             light: None,
             held_item: None,
             ship: Some(ShipMeshInstance {
+                finish_tints: [[[1.; 3]; 5]; 2],
                 position_meters: [0.; 3],
                 orientation: [0., 0., 0., 1.],
                 door_open_fraction: door,

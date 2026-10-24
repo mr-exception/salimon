@@ -98,3 +98,6 @@ Tests live in `structure/placement/tests.rs`.
 ## Physical mounts (#576)
 
 Read the physical mount contract before changing rail identity/compatibility or existing-equipment dry-mass transfers. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.

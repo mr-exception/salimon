@@ -25,7 +25,7 @@ fn maps_machinery_transitions_without_repeating_alerts() {
     let mut m = Mixer::default();
     let mut o = observation();
     assert!(m.observe(o, settings));
-    assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+    assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
     o.now += Duration::from_millis(16);
     o.conversion = true;
     o.fabrication = true;
@@ -75,19 +75,19 @@ fn silence_and_resume_clear_queued_events_and_run_changes_do_not_replay() {
         assert!(!m.observe(suppressed, s));
         assert!(m.voices(s).is_empty());
         m.observe(o, settings);
-        assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+        assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
     }
     m.queue(Cue::Blackout);
     let mut fresh = o;
     fresh.serial = 2;
     m.observe(fresh, settings);
-    assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+    assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
     fresh.now = Duration::from_secs(2);
     m.observe(fresh, settings);
     m.queue(Cue::Blackout);
     fresh.now = Duration::ZERO;
     m.observe(fresh, settings);
-    assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+    assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
 }
 #[test]
 fn footsteps_follow_local_distance_and_reject_drift_and_teleports() {

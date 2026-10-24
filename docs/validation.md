@@ -396,19 +396,24 @@ Run workspace tests/build/Clippy/fmt for its public mass/save boundaries. The
 foundation is not composed into native gameplay; no visual, Metal/M1 or
 construction-interaction acceptance is claimed by these headless tests.
 
-## Scout audio cloud verification (#485)
+## Scout continuous audio verification (#582)
 
-`cargo test -p salimon-client --locked scout_audio` covers production walking,
-Core intake/restoration, Fabricator funded/paused/blocked work, engines, ramp,
-EVA/surface silence, terminal/restart/restore, spatial PCM and bounded lifecycle.
-Unix real-child tests cover missing player, disk failure, nonzero exit, timeout,
-suppression, no overlapping child and drop/file cleanup without an audio device.
-Run `SALIMON_AUDIO_EVIDENCE=/absolute/new/directory cargo test --release
--p salimon-client --locked cloud_audio_evidence_485 -- --ignored --nocapture`
-serially for stereo WAVs and matched synthesis/substitute-process diagnostics.
-The directory must not exist. Exports are original PCM, not device recordings;
-#561 owns listening/continuity, #557 physical backend checks, #563 hardware budgets.
-See [evidence and limitations](../reports/issue-485/README.md).
+`cargo test -p salimon-client --locked scout_audio` covers production ship cues,
+EVA/surface silence, save/focus/terminal admission and spatial mapping.
+`cargo test -p salimon-client --locked native_audio` covers continuous callback
+chunk invariance, mute/reset/watchdog event retirement and finite headroom.
+`condition_feedback` tests retain the survival threshold/settings owner.
+
+Run `SALIMON_AUDIO_EVIDENCE=/absolute/output cargo test --release -p salimon-client
+--locked continuous_audio_evidence_582 -- --ignored --nocapture` for original
+10-second stereo PCM and 60 Hz synthesis timings. Run the separate
+`native_continuous_output_582` opt-in test with the same variable only when an
+actual default output device is available; it retains callback telemetry and
+fails explicitly if unavailable. Offline exports are not speaker recordings.
+Human listening #561, physical backend/device switching #557 and hardware
+budgets #563 require their separate evidence. Historical #485 reports remain
+valid for their archived subprocess revision. See the maintained
+[soundscape contract](scout-presentation.md#soundscape-boundary-465).
 
 ## Scout machinery cloud walkthrough (#489)
 

@@ -1,4 +1,5 @@
 //! Observational ship soundscape. No simulation, save or power authority.
+#[cfg(test)]
 mod synth;
 #[cfg(test)]
 mod tests;
@@ -9,12 +10,9 @@ use crate::{
     session::{GameplaySession, ViewMode},
 };
 use salimon_character::CharacterLocation;
-use std::{
-    collections::VecDeque,
-    path::{Path, PathBuf},
-    process::Child,
-    time::{Duration, Instant},
-};
+use std::{collections::VecDeque, time::Duration};
+#[cfg(test)]
+use std::{path::PathBuf, time::Instant};
 
 const MAX_EVENTS: usize = 4;
 const MAX_VOICES: usize = 8;
@@ -25,6 +23,7 @@ const RAMP: [f64; 3] = [-7.1, 1.34, 0.0];
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Cue {
     Core,
+    Ventilation,
     Conversion,
     Fabricator,
     Thrust,
@@ -199,7 +198,8 @@ impl Mixer {
             add(cue, source, 0.35);
         }
         if o.powered {
-            add(Cue::Core, CORE, 0.12);
+            add(Cue::Core, CORE, 0.065);
+            add(Cue::Ventilation, [1., 2.3, 0.], 0.035);
             if o.conversion {
                 add(Cue::Conversion, CORE, 0.18);
             }
@@ -237,84 +237,94 @@ fn spatial(eye: [f64; 3], right: [f64; 3], source: [f64; 3]) -> (f64, f64) {
 #[derive(Default)]
 pub(crate) struct Presenter {
     mixer: Mixer,
-    child: Option<(Child, Instant)>,
-    file: Option<PathBuf>,
-    failed: bool,
-    sequence: u64,
+    output: crate::native_audio::Output,
+    epoch: u64,
+    last_run: Option<(u64, Duration)>,
 }
 impl Presenter {
+    pub(crate) fn telemetry(&self) -> serde_json::Value {
+        self.output.telemetry()
+    }
     pub(crate) fn unavailable(&self) -> bool {
-        self.failed
+        self.output.unavailable()
     }
     pub(crate) fn stop(&mut self) {
-        if let Some((mut child, _)) = self.child.take() {
-            let _ = child.kill();
-            let _ = child.wait();
-        }
         self.mixer = Mixer::default();
-        self.failed = false;
+        self.last_run = None;
+        self.epoch = self.epoch.wrapping_add(1);
+        self.output.silence(self.epoch);
     }
-    pub(crate) fn update(&mut self, o: Observation, settings: Settings, path: Option<&Path>) {
-        self.update_with_player(o, settings, path, crate::native_audio::spawn);
-    }
-    // Keep process creation at the boundary so lifecycle/failure contracts can
-    // exercise real child processes without changing PATH or requiring a device.
-    fn update_with_player(
+    pub(crate) fn update(
         &mut self,
         o: Observation,
         settings: Settings,
-        path: Option<&Path>,
-        spawn: impl FnOnce(&Path) -> std::io::Result<Child>,
+        condition: Option<crate::condition_feedback::Cue>,
     ) {
-        if !self.mixer.observe(o, settings) || path.is_none() {
+        let reset = self
+            .last_run
+            .is_some_and(|(serial, now)| serial != o.serial || o.now < now);
+        if reset {
+            self.stop();
+        }
+        self.last_run = Some((o.serial, o.now));
+        let active = o.active && !settings.master_mute;
+        let scene = self.mixer.observe(o, settings);
+        if !active {
             self.stop();
             return;
         }
-        if self.failed {
-            return;
-        }
-        if let Some((child, started)) = &mut self.child {
-            match child.try_wait() {
-                Ok(Some(status)) if status.success() => self.child = None,
-                Ok(None) if started.elapsed() < Duration::from_secs(3) => return,
-                result => {
-                    log::warn!("Scout audio stopped: {result:?}");
-                    self.stop();
-                    self.failed = true;
-                    return;
-                }
-            }
-        }
-        let voices = self.mixer.voices(settings);
-        if voices.is_empty() {
-            return;
-        }
-        let file = path
-            .expect("checked settings path")
-            .with_file_name(format!("scout-audio-{}.wav", std::process::id()));
-        self.file = Some(file.clone());
-        let result = (|| {
-            if let Some(parent) = file.parent() {
-                std::fs::create_dir_all(parent)?;
-            }
-            std::fs::write(&file, synth::wav(&voices, self.sequence))?;
-            spawn(&file)
-        })();
-        self.sequence = self.sequence.wrapping_add(1);
-        match result {
-            Ok(child) => self.child = Some((child, Instant::now())),
-            Err(e) => {
-                log::warn!("Scout audio unavailable: {e}");
-                self.failed = true;
-            }
-        }
+        let voices = if scene {
+            self.mixer.voices(settings)
+        } else {
+            Vec::new()
+        };
+        self.output
+            .update(controls(voices, self.epoch, scene, condition, settings));
     }
 }
-impl Drop for Presenter {
-    fn drop(&mut self) {
-        self.stop();
-        if let Some(file) = &self.file {
-            let _ = std::fs::remove_file(file);
-        }
+
+fn controls(
+    voices: Vec<Voice>,
+    epoch: u64,
+    scene: bool,
+    condition: Option<crate::condition_feedback::Cue>,
+    settings: Settings,
+) -> crate::native_audio::Control {
+    let mut control = crate::native_audio::Control {
+        epoch,
+        enabled: if scene { (1 << 10) - 1 } else { 0 },
+        ..Default::default()
+    };
+    if settings.condition_audio {
+        control.enabled |= 7 << 10;
     }
+    for v in voices {
+        let index = match v.cue {
+            Cue::Core => 0,
+            Cue::Ventilation => 1,
+            Cue::Conversion => 2,
+            Cue::Fabricator => 3,
+            Cue::Thrust => 4,
+            Cue::Ramp => 5,
+            Cue::Footstep => 6,
+            Cue::Blackout => 7,
+            Cue::Restored => 8,
+            Cue::LowPower => 9,
+        };
+        control.gains[index] = v.gain as f32;
+        control.pans[index] = v.pan as f32;
+        control.events[index] = index >= 6;
+    }
+    if settings.condition_audio
+        && let Some(cue) = condition
+    {
+        let index = match cue {
+            crate::condition_feedback::Cue::Heart => 10,
+            crate::condition_feedback::Cue::Hunger => 11,
+            crate::condition_feedback::Cue::Breath => 12,
+        };
+        control.gains[index] = 0.125;
+        control.events[index] = true;
+    }
+    control
 }

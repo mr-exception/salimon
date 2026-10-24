@@ -213,6 +213,9 @@ impl Default for ClientApplication {
 }
 
 impl ClientApplication {
+    pub(crate) fn audio_telemetry(&self) -> serde_json::Value {
+        self.scout_audio.telemetry()
+    }
     pub(crate) fn fixture_batch_stats(&self) -> Option<salimon_renderer::FixtureBatchStats> {
         self.renderer.as_ref().map(Renderer::fixture_batch_stats)
     }
@@ -760,14 +763,12 @@ impl ClientApplication {
                 && self.e2e_config.is_none()
                 && self.benchmark.is_none(),
         );
-        self.scout_audio.update(
-            audio,
-            self.condition_feedback.settings,
-            self.condition_feedback.settings_path(),
-        );
+        let condition_cue = self.condition_feedback.take_audio_cue();
+        self.scout_audio
+            .update(audio, self.condition_feedback.settings, condition_cue);
         if self.scout_audio.unavailable() {
             self.condition_feedback.message =
-                "Ship audio unavailable - check OS player/output".into();
+                "Ship audio unavailable - check audio device/output".into();
         }
         if let Some(checkpoints) = &mut self.checkpoints {
             checkpoints.poll(&self.session);

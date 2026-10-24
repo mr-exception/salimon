@@ -180,26 +180,27 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             let upload_times = app.terrain_upload_times();
             let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
             let native = json!({ "native_input_isolated":app.e2e_input_isolated, "terrain_upload_preparation_micros": upload_times,
-            "visual_context": app.visual_context(),
-                    "survival_details_open":app.survival_hud.details_open,
-            "window": app.window_state(),
-            "capture_status": app.capture_status,
+                "visual_context": app.visual_context(),
+                        "survival_details_open":app.survival_hud.details_open,
+                "window": app.window_state(),
+                "capture_status": app.capture_status,
+                "audio_output":app.audio_telemetry(),
             "fixtures": app.fixture_batch_stats().map(|s| {json!({"layout_version":salimon_renderer::FIXTURE_LAYOUT_VERSION,"draws":s.draw_calls,"visible_instances":s.visible_instances,"triangles":s.triangles,"resident_geometry_bytes":s.resident_geometry_bytes,"instance_capacity_bytes":s.instance_capacity_bytes,"upload_bytes":s.upload_bytes,"prepare_micros":s.prepare_time.as_micros()})}),
-            "performance": app.observations.snapshot(),
-            "terrain": { "mode": format!("{:?}", app.session.mining.terrain), "active_patches": app.terrain_stream.active.len(),
-                "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
-                "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
-                "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
-                "selection_last_frame_micros": app.terrain_stream.selection_micros,
-                "preparation_last_frame_micros": app.terrain_stream.preparation_micros,
-                "preparation_peak_micros": app.terrain_stream.preparation_peak_micros,
-                "preparation_overruns": app.terrain_stream.preparation_overruns,
-                "generation_last_frame_micros": app.terrain_stream.generation_micros,
-                "generation_peak_micros":app.terrain_stream.generation_peak_micros,
-                "generation_total_micros":app.terrain_stream.generation_total_micros,
-                "generated_peak":app.terrain_stream.generated_peak, "uploaded_last_frame_bytes":uploaded_bytes, "peak_upload_bytes":peak_upload_bytes, "total_generated": app.terrain_stream.total_generated },
+                "performance": app.observations.snapshot(),
+                "terrain": { "mode": format!("{:?}", app.session.mining.terrain), "active_patches": app.terrain_stream.active.len(),
+                    "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
+                    "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
+                    "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
+                    "selection_last_frame_micros": app.terrain_stream.selection_micros,
+                    "preparation_last_frame_micros": app.terrain_stream.preparation_micros,
+                    "preparation_peak_micros": app.terrain_stream.preparation_peak_micros,
+                    "preparation_overruns": app.terrain_stream.preparation_overruns,
+                    "generation_last_frame_micros": app.terrain_stream.generation_micros,
+                    "generation_peak_micros":app.terrain_stream.generation_peak_micros,
+                    "generation_total_micros":app.terrain_stream.generation_total_micros,
+                    "generated_peak":app.terrain_stream.generated_peak, "uploaded_last_frame_bytes":uploaded_bytes, "peak_upload_bytes":peak_upload_bytes, "total_generated": app.terrain_stream.total_generated },
 
-                });
+                    });
             for (key, value) in native.as_object().expect("native observation object") {
                 result[key] = value.clone();
             }

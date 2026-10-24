@@ -1,0 +1,3018 @@
+[
+  {
+    "case": "shutter",
+    "step": 14,
+    "capture": "stopped",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.024180641397833824,
+        0.011006386950612068,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1022.682458,
+        "mean_ms": 99.99573229032258,
+        "min_ms": 1.512006,
+        "p95_ms": 994.8091949999999,
+        "samples": 31
+      },
+      "cpu_update": {
+        "max_ms": 9.7022,
+        "mean_ms": 1.965520806451613,
+        "min_ms": 1.170615,
+        "p95_ms": 6.799304,
+        "samples": 31
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 87.59733,
+        "mean_ms": 75.52140346666668,
+        "min_ms": 52.554543,
+        "p95_ms": 86.448566,
+        "samples": 30
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 100.3713429032258,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 31
+      },
+      "samples": 31
+    }
+  },
+  {
+    "case": "shutter",
+    "step": 12,
+    "capture": "reversed",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.024180641397833824,
+        0.011006386950612068,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.09100506454706192,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.8666666666666669,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1022.682458,
+        "mean_ms": 84.11686512,
+        "min_ms": 1.512006,
+        "p95_ms": 994.8091949999999,
+        "samples": 25
+      },
+      "cpu_update": {
+        "max_ms": 9.7022,
+        "mean_ms": 2.13313984,
+        "min_ms": 1.171908,
+        "p95_ms": 6.799304,
+        "samples": 25
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 87.59733,
+        "mean_ms": 78.78908054166666,
+        "min_ms": 52.656515,
+        "p95_ms": 86.448566,
+        "samples": 24
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 99.24737152000002,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 25
+      },
+      "samples": 25
+    }
+  },
+  {
+    "case": "shutter",
+    "step": 6,
+    "capture": "actual-travel",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.024180641397833824,
+        0.011006386950612068,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.09100506454706192,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.8666666666666669,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 994.8091949999999,
+        "mean_ms": 87.97603733333334,
+        "min_ms": 1.542905,
+        "p95_ms": 994.8091949999999,
+        "samples": 12
+      },
+      "cpu_update": {
+        "max_ms": 9.7022,
+        "mean_ms": 2.5416025833333333,
+        "min_ms": 1.171908,
+        "p95_ms": 9.7022,
+        "samples": 12
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 85.390617,
+        "mean_ms": 74.03323463636363,
+        "min_ms": 52.656515,
+        "p95_ms": 85.390617,
+        "samples": 11
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 93.21208608333335,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 12
+      },
+      "samples": 12
+    }
+  },
+  {
+    "case": "shutter",
+    "step": 1,
+    "capture": "before",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.024180641397833824,
+        0.011006386950612068,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 41.17216,
+        "mean_ms": 41.17216,
+        "min_ms": 41.17216,
+        "p95_ms": 41.17216,
+        "samples": 1
+      },
+      "cpu_update": {
+        "max_ms": 9.7022,
+        "mean_ms": 9.7022,
+        "min_ms": 9.7022,
+        "p95_ms": 9.7022,
+        "samples": 1
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": null,
+      "presented_interval": {
+        "max_ms": 0.0,
+        "mean_ms": 0.0,
+        "min_ms": 0.0,
+        "p95_ms": 0.0,
+        "samples": 1
+      },
+      "samples": 1
+    }
+  },
+  {
+    "case": "blackout",
+    "step": 14,
+    "capture": "stopped",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1000.066066,
+        "mean_ms": 99.64761922580644,
+        "min_ms": 1.388565,
+        "p95_ms": 998.044854,
+        "samples": 31
+      },
+      "cpu_update": {
+        "max_ms": 9.923615,
+        "mean_ms": 1.8016701612903228,
+        "min_ms": 1.152762,
+        "p95_ms": 2.20721,
+        "samples": 31
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 104.790256,
+        "mean_ms": 83.00902489999999,
+        "min_ms": 60.483621,
+        "p95_ms": 90.13263500000001,
+        "samples": 30
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 106.9178675483871,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 31
+      },
+      "samples": 31
+    }
+  },
+  {
+    "case": "blackout",
+    "step": 12,
+    "capture": "reversed",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.09100506454706192,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.8666666666666669,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 998.044854,
+        "mean_ms": 83.08115864,
+        "min_ms": 1.388565,
+        "p95_ms": 986.126632,
+        "samples": 25
+      },
+      "cpu_update": {
+        "max_ms": 9.923615,
+        "mean_ms": 1.9144883199999998,
+        "min_ms": 1.165857,
+        "p95_ms": 2.20721,
+        "samples": 25
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 104.790256,
+        "mean_ms": 83.05649983333332,
+        "min_ms": 60.483621,
+        "p95_ms": 90.007303,
+        "samples": 24
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 103.62013472000001,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 25
+      },
+      "samples": 25
+    }
+  },
+  {
+    "case": "blackout",
+    "step": 6,
+    "capture": "actual-travel",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.09100506454706192,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.8666666666666669,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 998.044854,
+        "mean_ms": 89.0117075,
+        "min_ms": 1.454148,
+        "p95_ms": 998.044854,
+        "samples": 12
+      },
+      "cpu_update": {
+        "max_ms": 9.923615,
+        "mean_ms": 2.2297840833333336,
+        "min_ms": 1.194882,
+        "p95_ms": 9.923615,
+        "samples": 12
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 104.790256,
+        "mean_ms": 83.82882609090909,
+        "min_ms": 61.037989,
+        "p95_ms": 104.790256,
+        "samples": 11
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 99.94496583333334,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 12
+      },
+      "samples": 12
+    }
+  },
+  {
+    "case": "blackout",
+    "step": 1,
+    "capture": "before",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 31.271798000000004,
+        "mean_ms": 31.271798000000004,
+        "min_ms": 31.271798000000004,
+        "p95_ms": 31.271798000000004,
+        "samples": 1
+      },
+      "cpu_update": {
+        "max_ms": 9.923615,
+        "mean_ms": 9.923615,
+        "min_ms": 9.923615,
+        "p95_ms": 9.923615,
+        "samples": 1
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788392,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": null,
+      "presented_interval": {
+        "max_ms": 0.0,
+        "mean_ms": 0.0,
+        "min_ms": 0.0,
+        "p95_ms": 0.0,
+        "samples": 1
+      },
+      "samples": 1
+    }
+  },
+  {
+    "case": "locker",
+    "step": 14,
+    "capture": "stopped",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.015230583027005196,
+        0.004908881150186062,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1003.5559579999999,
+        "mean_ms": 98.87519587096774,
+        "min_ms": 1.3111780000000002,
+        "p95_ms": 995.9798509999999,
+        "samples": 31
+      },
+      "cpu_update": {
+        "max_ms": 9.757181000000001,
+        "mean_ms": 1.437216290322581,
+        "min_ms": 0.956534,
+        "p95_ms": 1.842393,
+        "samples": 31
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26826040,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 81.361222,
+        "mean_ms": 65.63929103333334,
+        "min_ms": 46.852571000000005,
+        "p95_ms": 79.295733,
+        "samples": 30
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 92.0796525483871,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 31
+      },
+      "samples": 31
+    }
+  },
+  {
+    "case": "locker",
+    "step": 12,
+    "capture": "reversed",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.015230583027005196,
+        0.004908881150186062,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.05662606656551361,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.7384615384615382,
+          "opening": true
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1003.5559579999999,
+        "mean_ms": 81.85614376,
+        "min_ms": 1.3111780000000002,
+        "p95_ms": 968.682931,
+        "samples": 25
+      },
+      "cpu_update": {
+        "max_ms": 9.757181000000001,
+        "mean_ms": 1.51850004,
+        "min_ms": 1.036283,
+        "p95_ms": 1.842393,
+        "samples": 25
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26826040,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 81.361222,
+        "mean_ms": 66.27371566666667,
+        "min_ms": 46.852571000000005,
+        "p95_ms": 79.295733,
+        "samples": 24
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 88.03672072,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 25
+      },
+      "samples": 25
+    }
+  },
+  {
+    "case": "locker",
+    "step": 6,
+    "capture": "actual-travel",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.015230583027005196,
+        0.004908881150186062,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.05662606656551361,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.2461538461538462,
+          "opening": true
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1003.5559579999999,
+        "mean_ms": 88.23344608333332,
+        "min_ms": 1.3111780000000002,
+        "p95_ms": 1003.5559579999999,
+        "samples": 12
+      },
+      "cpu_update": {
+        "max_ms": 9.757181000000001,
+        "mean_ms": 1.8253360833333334,
+        "min_ms": 1.040731,
+        "p95_ms": 9.757181000000001,
+        "samples": 12
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26826040,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 81.361222,
+        "mean_ms": 68.92884663636364,
+        "min_ms": 49.585609000000005,
+        "p95_ms": 81.361222,
+        "samples": 11
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 85.25317483333333,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 12
+      },
+      "samples": 12
+    }
+  },
+  {
+    "case": "locker",
+    "step": 1,
+    "capture": "before",
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.015230583027005196,
+        0.004908881150186062,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 40.697171999999995,
+        "mean_ms": 40.697171999999995,
+        "min_ms": 40.697171999999995,
+        "p95_ms": 40.697171999999995,
+        "samples": 1
+      },
+      "cpu_update": {
+        "max_ms": 9.757181000000001,
+        "mean_ms": 9.757181000000001,
+        "min_ms": 9.757181000000001,
+        "p95_ms": 9.757181000000001,
+        "samples": 1
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26826040,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": null,
+      "presented_interval": {
+        "max_ms": 0.0,
+        "mean_ms": 0.0,
+        "min_ms": 0.0,
+        "p95_ms": 0.0,
+        "samples": 1
+      },
+      "samples": 1
+    }
+  },
+  {
+    "case": "table",
+    "step": 14,
+    "capture": "stopped",
+    "audio_output": {
+      "area": "cockpit",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.018824832513928413,
+        0.016151651740074158,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1027.6880669999998,
+        "mean_ms": 101.85698274193548,
+        "min_ms": 1.303084,
+        "p95_ms": 1020.635983,
+        "samples": 31
+      },
+      "cpu_update": {
+        "max_ms": 10.523786,
+        "mean_ms": 1.371386709677419,
+        "min_ms": 0.9202560000000001,
+        "p95_ms": 1.437255,
+        "samples": 31
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27030712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 80.476,
+        "mean_ms": 59.3859804,
+        "min_ms": 42.970945,
+        "p95_ms": 74.053532,
+        "samples": 30
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 84.33959429032257,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 31
+      },
+      "samples": 31
+    }
+  },
+  {
+    "case": "table",
+    "step": 12,
+    "capture": "reversed",
+    "audio_output": {
+      "area": "cockpit",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.018824832513928413,
+        0.016151651740074158,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.06079591438174248,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.2285714285714286,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1020.635983,
+        "mean_ms": 84.64393416000001,
+        "min_ms": 1.303084,
+        "p95_ms": 1013.753987,
+        "samples": 25
+      },
+      "cpu_update": {
+        "max_ms": 10.523786,
+        "mean_ms": 1.4332590399999998,
+        "min_ms": 0.9202560000000001,
+        "p95_ms": 1.337338,
+        "samples": 25
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27030712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 74.053532,
+        "mean_ms": 59.48565145833334,
+        "min_ms": 43.035360000000004,
+        "p95_ms": 73.465503,
+        "samples": 24
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 80.72930975999999,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 25
+      },
+      "samples": 25
+    }
+  },
+  {
+    "case": "table",
+    "step": 6,
+    "capture": "actual-travel",
+    "audio_output": {
+      "area": "cockpit",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.018824832513928413,
+        0.016151651740074158,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.06079591438174248,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.22857142857142856,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1020.635983,
+        "mean_ms": 89.90303758333334,
+        "min_ms": 1.303084,
+        "p95_ms": 1020.635983,
+        "samples": 12
+      },
+      "cpu_update": {
+        "max_ms": 10.523786,
+        "mean_ms": 1.8467608333333334,
+        "min_ms": 0.939051,
+        "p95_ms": 10.523786,
+        "samples": 12
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27030712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 73.465503,
+        "mean_ms": 57.67014154545454,
+        "min_ms": 43.035360000000004,
+        "p95_ms": 73.465503,
+        "samples": 11
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 77.50506166666666,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 12
+      },
+      "samples": 12
+    }
+  },
+  {
+    "case": "table",
+    "step": 1,
+    "capture": "before",
+    "audio_output": {
+      "area": "cockpit",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "frames": 0,
+      "mailbox_bytes": 568,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 2736,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scene_gains": [
+        0.018824832513928413,
+        0.016151651740074158,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "voices": 27
+    },
+    "cabin": {
+      "bunk_harness": false,
+      "motions": [
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 1.0,
+          "opening": true
+        },
+        {
+          "fraction": 0.0,
+          "opening": false
+        }
+      ],
+      "rest": null,
+      "seat_harness": false
+    },
+    "cargo_door": {
+      "open_fraction": 1.0,
+      "opening": true
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 43.314851000000004,
+        "mean_ms": 43.314851000000004,
+        "min_ms": 43.314851000000004,
+        "p95_ms": 43.314851000000004,
+        "samples": 1
+      },
+      "cpu_update": {
+        "max_ms": 10.523786,
+        "mean_ms": 10.523786,
+        "min_ms": 10.523786,
+        "p95_ms": 10.523786,
+        "samples": 1
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27030712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": null,
+      "presented_interval": {
+        "max_ms": 0.0,
+        "mean_ms": 0.0,
+        "min_ms": 0.0,
+        "p95_ms": 0.0,
+        "samples": 1
+      },
+      "samples": 1
+    }
+  }
+]

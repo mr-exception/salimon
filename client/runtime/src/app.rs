@@ -767,8 +767,15 @@ impl ClientApplication {
                 && self.benchmark.is_none(),
         );
         let condition_cue = self.condition_feedback.take_audio_cue();
-        self.scout_audio
-            .update(audio, self.condition_feedback.settings, condition_cue);
+        if self.e2e_config.is_some() {
+            self.scout_audio.preview(
+                crate::scout_audio::Observation::capture(&self.session, true),
+                self.condition_feedback.settings,
+            );
+        } else {
+            self.scout_audio
+                .update(audio, self.condition_feedback.settings, condition_cue);
+        }
         if self.scout_audio.unavailable() {
             self.condition_feedback.message =
                 "Ship audio unavailable - check audio device/output".into();
@@ -966,7 +973,11 @@ impl ClientApplication {
                 text: text.to_owned(),
                 placement: OverlayPlacement::BottomCenter,
             })
-        } else if let Some(text) = self.session.finish_hint() {
+        } else if let Some(text) = self
+            .session
+            .light_hint()
+            .or_else(|| self.session.finish_hint())
+        {
             Some(crate::resource_context::Prompt {
                 fragment: None,
                 text,
@@ -1024,6 +1035,7 @@ impl ClientApplication {
             crate::benchmark::Recorder::window_title,
         ));
         if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(scene::room_lamps(&self.session, presentation.ship));
             scene_instances.extend(scene::cargo_door(&self.session, presentation.ship));
         }
         let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
@@ -1040,6 +1052,7 @@ impl ClientApplication {
             }
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.independent_interior = true;
+            mesh.lighting = self.session.lighting_dto();
             mesh.finish_tints = self.session.finish_palette();
             mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
             mesh.fabricator_output_present = self.session.fabricator_output_present();

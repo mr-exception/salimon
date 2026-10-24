@@ -12,6 +12,11 @@ use crate::session::GameplaySession;
 pub(crate) enum Scenario {
     LandedEarth,
     ConstructionMaterials,
+    ScoutLighting,
+    ScoutLightingShutter,
+    ScoutLightingBlackout,
+    ScoutLightingBroken,
+    ScoutLightingDark,
     ScoutMounts,
     ScoutCabin,
     ScoutFinishes,
@@ -54,6 +59,11 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "scout-lighting" => Ok(Self::ScoutLighting),
+            "scout-lighting-shutter" => Ok(Self::ScoutLightingShutter),
+            "scout-lighting-blackout" => Ok(Self::ScoutLightingBlackout),
+            "scout-lighting-broken" => Ok(Self::ScoutLightingBroken),
+            "scout-lighting-dark" => Ok(Self::ScoutLightingDark),
             "construction-materials" => Ok(Self::ConstructionMaterials),
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
@@ -101,6 +111,11 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::ScoutLighting => "scout-lighting",
+            Self::ScoutLightingShutter => "scout-lighting-shutter",
+            Self::ScoutLightingBlackout => "scout-lighting-blackout",
+            Self::ScoutLightingBroken => "scout-lighting-broken",
+            Self::ScoutLightingDark => "scout-lighting-dark",
             Self::ConstructionMaterials => "construction-materials",
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
@@ -258,6 +273,42 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ScoutLighting
+        | Scenario::ScoutLightingShutter
+        | Scenario::ScoutLightingBlackout
+        | Scenario::ScoutLightingBroken
+        | Scenario::ScoutLightingDark => {
+            let shutter = matches!(
+                config.scenario,
+                Scenario::ScoutLightingShutter | Scenario::ScoutLightingBlackout
+            );
+            crate::session::cabin::evidence_initial_conditions(
+                app,
+                if shutter {
+                    "scout-lighting-shutter"
+                } else {
+                    "scout-finishes"
+                },
+            )?;
+            if matches!(
+                config.scenario,
+                Scenario::ScoutLightingBlackout | Scenario::ScoutLightingDark
+            ) {
+                app.ship.set_stored_core_energy_joules(0);
+            }
+            if config.scenario == Scenario::ScoutLightingBroken {
+                app.lighting.rooms.get_mut(&1).unwrap().operable[2] = false;
+            }
+            if config.scenario == Scenario::ScoutLightingDark {
+                let mut pose = app.ship.snapshot().pose;
+                pose.position_meters[2] += 100_000_000.;
+                app.ship = ShipController::flying(pose, 0);
+                app.ship.set_stored_core_energy_joules(0);
+                app.habitation.cabin.as_mut().unwrap().motions[3].fraction = 0.;
+                app.habitation.cabin.as_mut().unwrap().motions[3].opening = false;
+            }
+        }
+
         Scenario::ConstructionMaterials => {
             crate::session::construction::evidence_initial_conditions(app)?
         }
@@ -442,6 +493,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     if matches!(
         config.scenario,
         Scenario::FlightRegression
+            | Scenario::ScoutLightingDark
             | Scenario::CargoFlight
             | Scenario::CargoBlackout
             | Scenario::CoreRestart

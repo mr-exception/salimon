@@ -59,6 +59,8 @@ pub struct FixtureNode {
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FixtureInstance {
+    /// Explicit effective light, or None for legacy authored fill.
+    pub illumination: Option<[f32; 3]>,
     pub id: u64,
     pub mesh: FixtureMesh,
     pub pose: FixturePose,
@@ -161,6 +163,7 @@ pub fn resolve_fixture_hierarchy(
         .iter()
         .zip(poses)
         .map(|(n, p)| FixtureInstance {
+            illumination: None,
             id: n.id,
             mesh: n.mesh,
             pose: p.expect("resolved"),
@@ -331,7 +334,7 @@ pub struct FixtureBatchStats {
 }
 
 // Three vec4 attributes: camera-relative center/scale, quaternion, linear tint.
-const INSTANCE_BYTES: usize = 48;
+const INSTANCE_BYTES: usize = 64;
 
 #[derive(Default)]
 struct InstanceBatch {
@@ -358,7 +361,10 @@ fn prepare_instances(
     }
     let mut ids = std::collections::HashSet::new();
     for n in instances {
-        if !ids.insert(n.id)
+        if n.illumination.is_some_and(|rgb| {
+            rgb.iter()
+                .any(|v| !v.is_finite() || !(0.0..=2.0).contains(v))
+        }) || !ids.insert(n.id)
             || !valid_pose(n.pose)
             || n.tint
                 .iter()
@@ -397,6 +403,8 @@ fn prepare_instances(
             .chain(n.pose.orientation_xyzw.map(|v| v as f32))
             .chain(n.tint)
             .chain([f32::from(n.powered)])
+            .chain(n.illumination.unwrap_or([0.; 3]))
+            .chain([f32::from(n.illumination.is_some())])
         {
             batches[n.mesh.index()]
                 .staging
@@ -509,8 +517,7 @@ impl FixtureMeshRenderer {
         let attributes = wgpu::vertex_attr_array![
             0 => Float32x3, 1 => Float32x4, 2 => Float32x3
         ];
-        let instance_attributes =
-            wgpu::vertex_attr_array![3 => Float32x4, 4 => Float32x4, 5 => Float32x4];
+        let instance_attributes = wgpu::vertex_attr_array![3 => Float32x4, 4 => Float32x4, 5 => Float32x4, 6 => Float32x4];
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Fixture mesh pipeline"),
             layout: Some(&pipeline_layout),
@@ -761,6 +768,7 @@ mod tests {
             near_plane_meters: 0.05,
         };
         let instance = FixtureInstance {
+            illumination: None,
             id: 7,
             mesh: FixtureMesh::Shelf,
             pose: FixturePose {

@@ -924,6 +924,7 @@ pub(crate) fn evidence_initial_conditions(
     s.habitation = super::habitation::Habitation::starter();
     use super::interaction::InteractionTarget::*;
     let (eye, target) = match scenario {
+        "scout-lighting-shutter" => ([-0.8, 1.9973, -2.2], shutter_handle()),
         "scout-finishes" => (
             [0.65, 1.9973, 1.8],
             super::interaction::habitation_position(Galley),

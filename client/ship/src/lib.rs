@@ -66,3 +66,5 @@ pub use controller::persistence::ShipSaveState;
 pub mod finishes;
 
 pub mod core_upgrades;
+
+pub mod lighting;

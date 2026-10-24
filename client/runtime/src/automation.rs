@@ -550,6 +550,12 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "wheel_confirm" => Some(KeyCode::Enter),
         "engines" => Some(KeyCode::KeyB),
         "build" => Some(KeyCode::KeyC),
+        "light_preset" => Some(KeyCode::F4),
+        "light_master" => Some(KeyCode::F5),
+        "light_fixture" => Some(KeyCode::F6),
+        "light_brightness" => Some(KeyCode::F7),
+        "light_general" => Some(KeyCode::F9),
+        "light_warmth" => Some(KeyCode::F8),
         "rotate_blueprint" => Some(KeyCode::KeyR),
         "blueprint_6" => Some(KeyCode::Digit6),
         "blueprint_7" => Some(KeyCode::Digit7),
@@ -819,6 +825,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["habitation"] = json!({"bunk_open_fraction":app.habitation.bunk_open_fraction,"bunk_deploying":app.habitation.bunk_deploying});
     observation["cargo_door"] =
         json!({"open_fraction":app.cargo_door.open_fraction,"opening":app.cargo_door.opening});
+    observation["lighting"] = app.light_inspect();
     observation["construction"] = app.construction_inspect();
     observation["ship"]["engines_enabled"] = ship.engines_enabled.into();
     observation["archive"] =

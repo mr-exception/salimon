@@ -1618,3 +1618,6 @@ mod glb_candidate_tests {
             .expect("offline candidate must exist; run process_glb.py all first")
     }
 }
+
+mod cabin_lighting;
+pub use cabin_lighting::CabinLighting;

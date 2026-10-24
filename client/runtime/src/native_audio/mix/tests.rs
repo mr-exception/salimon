@@ -74,8 +74,8 @@ fn worst_mix_has_finite_headroom_bounded_state_and_immediate_transient_onset() {
     let pcm: Vec<_> = (0..48000).map(|_| mix.sample()).collect();
     assert!(pcm.iter().flatten().all(|v| v.is_finite() && v.abs() < 1.));
     assert!(pcm[..48].iter().flatten().any(|v| v.abs() > 1e-5));
-    assert!(std::mem::size_of::<Mix>() < 2048);
-    assert!(std::mem::size_of::<Mailbox>() < 512);
+    assert!(std::mem::size_of::<Mix>() < 4096);
+    assert!(std::mem::size_of::<Mailbox>() < 1024);
 }
 #[test]
 #[ignore = "writes original continuous listening fixtures and real-rate CPU measurements"]

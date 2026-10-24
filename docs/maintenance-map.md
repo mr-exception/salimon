@@ -451,3 +451,11 @@ correction. See [the report](../reports/issue-515/README.md) and renderer archit
   `bootstrap.wgsl` own validated quaternion upload/projection.
 - Integration: `scenarios/evidence/blueprint-placement.json`, portable construction
   restore/transaction tests, native input admission and actual wgpu captures.
+
+
+Modular interior presentation (#575): [contract](modular-interior-fixtures.md),
+[renderer](../client/renderer/src/fixtures.rs),
+[runtime mapping](../client/runtime/src/session/fixtures.rs),
+[template source](../models/assets/fixtures/scout-interior-kit/README.md).
+Physical attachment/construction/damage/aging authority remains with their
+existing domain owners; this renderer layer consumes observations only.

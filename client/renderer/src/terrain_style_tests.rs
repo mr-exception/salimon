@@ -148,6 +148,7 @@ fn terrain_style_reference() {
                 camera,
                 instances: &[],
                 resource_meshes: &[],
+                fixtures: &[],
                 spheres: &bodies,
                 terrain: &patches,
                 terrain_mask: None,

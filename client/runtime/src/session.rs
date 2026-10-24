@@ -6,6 +6,7 @@ pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
 pub(crate) mod crafting_ui;
 mod fabrication;
+mod fixtures;
 pub(crate) mod frames;
 mod habitation;
 pub(crate) mod interaction;

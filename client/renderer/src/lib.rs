@@ -4,6 +4,11 @@
 //! has no dependency on world, character, or ship state.
 
 mod capture;
+mod fixtures;
+pub use fixtures::{
+    FIXTURE_LAYOUT_VERSION, FixtureBatchStats, FixtureInstance, FixtureMesh, FixtureNode,
+    FixturePose, resolve_fixture_hierarchy,
+};
 mod cockpit_instruments;
 mod consumable_wheel;
 mod equipment_toolbar;
@@ -133,6 +138,7 @@ pub struct SceneFrame<'a> {
     pub camera: CameraFrame,
     pub instances: &'a [SceneInstance],
     pub resource_meshes: &'a [ResourceMeshInstance],
+    pub fixtures: &'a [FixtureInstance],
     pub spheres: &'a [SphereInstance],
     pub terrain: &'a [std::sync::Arc<TerrainPatch>],
     pub terrain_mask: Option<TerrainMask>,
@@ -667,6 +673,8 @@ pub struct Renderer {
     spheres: spheres::SphereRenderer,
     terrain: terrain::TerrainRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
+    fixtures: fixtures::FixtureMeshRenderer,
+    last_fixture_batch: FixtureBatchStats,
     held_item: held_item::HeldItemRenderer,
     resource_meshes: resource_mesh::ResourceMeshRenderer,
     gpu_timer: Option<GpuTimer>,
@@ -911,6 +919,7 @@ impl Renderer {
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let terrain = terrain::TerrainRenderer::new(&device, configuration.format, &spheres);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
+        let fixtures = fixtures::FixtureMeshRenderer::new(&device, configuration.format)?;
         let held_item = held_item::HeldItemRenderer::new(&device, &queue, configuration.format)?;
         let resource_meshes =
             resource_mesh::ResourceMeshRenderer::new(&device, configuration.format)?;
@@ -937,6 +946,8 @@ impl Renderer {
             spheres,
             terrain,
             ship_mesh,
+            fixtures,
+            last_fixture_batch: Default::default(),
             held_item,
             resource_meshes,
             gpu_timer,
@@ -952,6 +963,11 @@ impl Renderer {
     }
 
     #[must_use]
+    /// Last prepared fixture workload; independent of hardware budget approval.
+    pub const fn fixture_batch_stats(&self) -> FixtureBatchStats {
+        self.last_fixture_batch
+    }
+
     pub const fn info(&self) -> &RendererInfo {
         &self.info
     }
@@ -1045,6 +1061,14 @@ impl Renderer {
 
         self.ship_mesh
             .prepare(&self.queue, scene, prepared_scene.view_projection)?;
+        self.last_fixture_batch = self.fixtures.prepare(
+            &self.device,
+            &self.queue,
+            scene.camera,
+            prepared_scene.view_projection,
+            aspect_ratio,
+            scene.fixtures,
+        )?;
         self.held_item
             .prepare(&self.queue, scene.camera, aspect_ratio, scene.held_item)?;
         let resource_batch = self.resource_meshes.prepare(
@@ -1188,8 +1212,10 @@ impl Renderer {
             }
             self.spheres.draw(&mut render_pass);
             self.terrain.draw(&mut render_pass);
-            self.ship_mesh.draw(&mut render_pass);
+            self.ship_mesh.draw_opaque(&mut render_pass);
+            self.fixtures.draw(&mut render_pass);
             self.resource_meshes.draw(&mut render_pass);
+            self.ship_mesh.draw_glass(&mut render_pass);
             self.held_item.draw(&mut render_pass);
         }
         {
@@ -1268,12 +1294,14 @@ impl Renderer {
             + scene_draw_calls(self.spheres.count())
             + self.terrain.count()
             + self.ship_mesh.draw_count()
+            + self.fixtures.draw_count()
             + self.held_item.count()
             + self.resource_meshes.draw_count();
         let object_count = prepared_scene.instance_count
             + self.spheres.count()
             + self.terrain.count()
             + self.ship_mesh.count()
+            + self.fixtures.object_count()
             + self.held_item.count()
             + self.resource_meshes.object_count();
         Ok(RenderOutcome::Presented(RenderStats {
@@ -1398,6 +1426,7 @@ mod tests {
             SceneFrame {
                 camera: local_camera,
                 resource_meshes: &[],
+                fixtures: &[],
                 instances: &local_instances,
                 spheres: &[],
                 terrain: &[],
@@ -1426,6 +1455,7 @@ mod tests {
             SceneFrame {
                 camera: translated_camera,
                 resource_meshes: &[],
+                fixtures: &[],
                 instances: &translated_instances,
                 spheres: &[],
                 terrain: &[],
@@ -1473,6 +1503,7 @@ mod tests {
                 SceneFrame {
                     camera: coincident_camera,
                     resource_meshes: &[],
+                    fixtures: &[],
                     instances: &[],
                     spheres: &[],
                     terrain: &[],
@@ -1497,6 +1528,7 @@ mod tests {
                 SceneFrame {
                     camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                     resource_meshes: &[],
+                    fixtures: &[],
                     instances: &invalid_instances,
                     spheres: &[],
                     terrain: &[],
@@ -1543,6 +1575,7 @@ mod tests {
             SceneFrame {
                 camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                 resource_meshes: &[],
+                fixtures: &[],
                 instances: &instances,
                 spheres: &[],
                 terrain: &[],

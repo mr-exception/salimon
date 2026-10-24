@@ -273,3 +273,11 @@ The #540 berth preserves named `Starter_BunkFrame`/`Starter_BunkCushion` source
 identity and the existing walking reserve. `habitation-geometry.json` in the
 [Scout source](../../../models/assets/ships/salimon-scout/README.md#base-fold-away-berth-540)
 owns the hinge and generates consumer bounds; the renderer applies rigid motion.
+
+
+The [version-1 interior map](interior-layout-v1.json) migrates the paired berth
+nodes into a stable independently transformed fixture while preserving saved
+habitation, named source meshes and current collision. Other authored ship
+geometry stays in the validated combined export. New reusable templates are
+[separate assets](../../../models/assets/fixtures/scout-interior-kit/README.md);
+room instances reuse them without re-exporting the hull.

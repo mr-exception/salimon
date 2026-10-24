@@ -17,6 +17,7 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
         orientation: ship.pose.orientation.map(|value| value as f32),
         door_open_fraction: ship.door_open_fraction as f32,
         bunk_open_fraction: 0.0,
+        independent_interior: false,
         instruments: CockpitInstruments {
             engines_off: !ship.engines_enabled,
             fabricator: Default::default(),

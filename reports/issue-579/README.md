@@ -19,7 +19,7 @@ not proof of a walked route or physical pointer/device qualification.
 - `python3 scripts/salimon-test run scenarios/evidence/room-finishes.json --binary target/debug/salimon-client --artifacts artifacts/579/room-final --screenshot-command '["native"]' --summary`: 27/27 pass.
 - Same runner for `room-finishes-blackout.json`: 27/27 pass; `furniture-finish.json`: 13/13 pass. Exact commands/results are in [results](native/results.json), [original protocol](native/protocol.zip), and [validation logs](validation.zip).
 
-![Original room](native/room-final-step-005-original.png)
+![Original room](native/room-final-step-006-original.png)
 ![Five independent Slate room groups](native/room-final-step-027-slate-groups.png)
 ![Same groups in real Core blackout](native/blackout-final-step-027-slate-groups.png)
 ![Independent seat upholstery](native/furniture-final-step-013-seat-slate.png)

@@ -1518,3 +1518,6 @@ See [runner protocol](../../scripts/README.md#bounded-native-capture-polling-568
 ## Physical mounts (#576)
 
 `session/mounts.rs` composes G placement, K explicit restraint, J empty accessory movement, shared physical carry identity, frame transport and schema-11 save validation. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.

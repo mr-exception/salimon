@@ -3,9 +3,10 @@
 use crate::{CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s};
 use wgpu::util::DeviceExt;
 const FLOATS: usize = 10;
-const TEMPLATE_COUNT: usize = 5;
+const TEMPLATE_COUNT: usize = 15;
 pub const FIXTURE_LAYOUT_VERSION: u32 = 1;
 const SHIP: &[u8] = crate::ship_mesh::SHIP_GLB;
+const CABIN: &[u8] = include_bytes!("../../assets/fixtures/scout-habitation-kit/model.glb");
 const KIT: &[u8] = include_bytes!("../../assets/fixtures/scout-interior-kit/model.glb");
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -15,6 +16,16 @@ pub enum FixtureMesh {
     Seat,
     Panel,
     PanelDamaged,
+    Table,
+    ScreenPanel,
+    Shutter,
+    LockerShell,
+    LockerDoor,
+    SeatBase,
+    Harness,
+    SeatPad,
+    SeatBack,
+    ShutterHandle,
 }
 impl FixtureMesh {
     fn index(self) -> usize {
@@ -158,6 +169,25 @@ pub fn resolve_fixture_hierarchy(
         })
         .collect())
 }
+/// Read-only authoring audit. Gameplay collision still comes from its physical owner.
+pub fn fixture_template_bounds(mesh: FixtureMesh) -> Result<[f64; 6], RendererError> {
+    let mut b = [
+        f64::INFINITY,
+        f64::NEG_INFINITY,
+        f64::INFINITY,
+        f64::NEG_INFINITY,
+        f64::INFINITY,
+        f64::NEG_INFINITY,
+    ];
+    for v in geometry(mesh.index())? {
+        for i in 0..3 {
+            b[2 * i] = b[2 * i].min(f64::from(v[i]));
+            b[2 * i + 1] = b[2 * i + 1].max(f64::from(v[i]));
+        }
+    }
+    Ok(b)
+}
+
 fn geometry(index: usize) -> Result<Vec<[f32; FLOATS]>, RendererError> {
     let (bytes, names, pivot): (&[u8], &[&str], [f64; 3]) = match index {
         0 => (
@@ -169,6 +199,16 @@ fn geometry(index: usize) -> Result<Vec<[f32; FLOATS]>, RendererError> {
         2 => (KIT, &["Seat"], [0.; 3]),
         3 => (KIT, &["Panel"], [0.; 3]),
         4 => (KIT, &["PanelDamaged"], [0.; 3]),
+        5 => (CABIN, &["Table"], [0.; 3]),
+        6 => (CABIN, &["ScreenPanel"], [0.; 3]),
+        7 => (CABIN, &["Shutter"], [0.; 3]),
+        8 => (CABIN, &["LockerShell"], [0.; 3]),
+        9 => (CABIN, &["LockerDoor"], [0.; 3]),
+        10 => (CABIN, &["SeatBase"], [0.; 3]),
+        11 => (CABIN, &["Harness"], [0.; 3]),
+        12 => (CABIN, &["SeatPad"], [0.; 3]),
+        13 => (CABIN, &["SeatBack"], [0.; 3]),
+        14 => (CABIN, &["ShutterHandle"], [0.; 3]),
         _ => unreachable!(),
     };
     named_geometry(bytes, names, pivot)
@@ -699,7 +739,8 @@ mod tests {
     #[test]
     fn independent_templates_share_geometry_and_damage_is_an_explicit_distinct_variant() {
         let meshes: Vec<_> = (0..TEMPLATE_COUNT).map(|i| geometry(i).unwrap()).collect();
-        assert_eq!(meshes.iter().map(|v| v.len() / 3).sum::<usize>(), 84);
+        assert_eq!(meshes[..5].iter().map(|v| v.len() / 3).sum::<usize>(), 84);
+        assert!(meshes[5..].iter().map(|v| v.len() / 3).sum::<usize>() <= 200);
         assert_ne!(meshes[3], meshes[4]);
         assert!(
             meshes

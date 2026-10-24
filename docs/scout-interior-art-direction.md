@@ -147,3 +147,8 @@ This document records owner decisions; implementation follows **separate develop
 | [#583](https://github.com/mr-exception/salimon/issues/583) | Tactile sound events and lightweight cargo-door/privacy-screen acoustic boundaries |
 
 Human signoff remains required when a reviewer is asked to approve actual art or sound: [#561](https://github.com/mr-exception/salimon/issues/561). Performance thresholds are governed by [#563](https://github.com/mr-exception/salimon/issues/563), not implied by this design approval. The palette values are proposals pending actual render approval.
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.

@@ -131,6 +131,19 @@ impl CharacterController {
         local
     }
 
+    /// Caller admits the furniture support/clearance; no clock, benefit or look change.
+    pub fn set_supported_pose(&mut self, local: [f64; 3]) -> bool {
+        if !matches!(self.position, PositionState::Inside { .. })
+            || local.iter().any(|v| !v.is_finite())
+        {
+            return false;
+        }
+        self.position = PositionState::Inside { local };
+        self.interior_velocity = [0.; 3];
+        self.vertical_speed = 0.;
+        true
+    }
+
     pub fn set_ship_gravity_enabled(&mut self, enabled: bool) {
         if matches!(self.position, PositionState::Inside { .. }) {
             if self.ship_gravity_enabled && !enabled {

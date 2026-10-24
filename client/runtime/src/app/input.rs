@@ -297,6 +297,12 @@ pub(crate) fn dispatch_session_key(
         Some(Command::Select(slot))
     } else if key == PhysicalKey::Code(KeyCode::KeyG) {
         Some(Command::Mount(crate::session::mounts::MountAction::Place))
+    } else if key == PhysicalKey::Code(KeyCode::KeyX) {
+        Some(Command::Cabin(crate::session::cabin::CabinAction::Rest))
+    } else if key == PhysicalKey::Code(KeyCode::KeyU) {
+        Some(Command::Cabin(
+            crate::session::cabin::CabinAction::Restraint,
+        ))
     } else if key == PhysicalKey::Code(KeyCode::KeyJ) {
         Some(Command::Mount(
             crate::session::mounts::MountAction::MoveAccessory,

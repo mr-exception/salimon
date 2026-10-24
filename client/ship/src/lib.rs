@@ -9,6 +9,7 @@ use std::time::Duration;
 
 pub mod attachments;
 mod conversion;
+pub mod mechanism;
 pub use conversion::{ConversionConfig, IntakeResult};
 mod energy;
 pub use energy::{EnergyConfig, EnergyCore, InvalidEnergy};

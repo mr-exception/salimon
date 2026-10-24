@@ -1,0 +1,72 @@
+{
+  "fixtures": {
+    "draws": 4,
+    "instance_capacity_bytes": 928,
+    "layout_version": 1,
+    "prepare_micros": 645,
+    "resident_geometry_bytes": 18128,
+    "triangles": 124,
+    "upload_bytes": 64,
+    "visible_instances": 8
+  },
+  "performance": {
+    "cpu_render": {
+      "max_ms": 2776.4096670000004,
+      "mean_ms": 163.7864495263158,
+      "min_ms": 6.178875000000001,
+      "p95_ms": 2776.4096670000004,
+      "samples": 19
+    },
+    "cpu_update": {
+      "max_ms": 28.707666,
+      "mean_ms": 3.128004421052631,
+      "min_ms": 1.267792,
+      "p95_ms": 28.707666,
+      "samples": 19
+    },
+    "drawable_pixels": [
+      1280,
+      800
+    ],
+    "gpu_allocator": null,
+    "gpu_pass": {
+      "max_ms": 3.6072919999999997,
+      "mean_ms": 1.210828666666667,
+      "min_ms": 0.5395000000000001,
+      "p95_ms": 3.6072919999999997,
+      "samples": 18
+    },
+    "presented_interval": {
+      "max_ms": 250.0,
+      "mean_ms": 92.29847368421053,
+      "min_ms": 0.0,
+      "p95_ms": 250.0,
+      "samples": 19
+    },
+    "samples": 19
+  },
+  "window": {
+    "focused": false,
+    "inner_size": [
+      1280,
+      800
+    ],
+    "minimized": false,
+    "occluded": false
+  },
+  "audio_output": {
+    "available": false,
+    "backend": "cpal-0.18.2",
+    "callback_cpu_overruns": 0,
+    "callbacks": 0,
+    "channels": 0,
+    "device_id": null,
+    "frames": 0,
+    "mailbox_bytes": 240,
+    "max_callback_frames": 0,
+    "max_callback_ns": 0,
+    "mixer_bytes": 1080,
+    "sample_rate": 0,
+    "voices": 13
+  }
+}

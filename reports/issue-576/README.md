@@ -15,10 +15,10 @@ Host: macOS / Apple M1; exact toolchain and base in [environment](environment.js
 - `cargo test --workspace --locked`: pass, including 373 runtime tests (16 ignored), 94 ship tests (1 ignored), 73 character tests and 80 renderer tests (15 ignored). Final focused `session::mounts` (4/4) plus ship/character tests pass after the final restore/placement safeguards.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo fmt --all -- --check`, `git diff --check` and `python3 scripts/check_docs.py`: pass.
 - `python3 -m unittest discover -s scripts -p test_salimon_test.py`: 21/21 pass.
-- `python3 scripts/salimon-test run scenarios/evidence/physical-mounts.json --binary target/debug/salimon-client --artifacts artifacts/576/native --screenshot-command '["native"]' --summary`: all 17 steps pass. Original [result](native/result.json), [protocol/state archive](native/protocol.zip) and [hash inventory](native/sha256.json) are retained.
+- `python3 scripts/salimon-test run scenarios/evidence/physical-mounts.json --binary target/debug/salimon-client --artifacts artifacts/576/native --screenshot-command '["native"]' --summary`: all 17 steps pass. Compact [result](native/result.json), [protocol/state archive](native/protocol.zip) and [hash inventory](native/sha256.json) are retained.
 
 ![Carried sample and physical shelf](native/step-002-sample-carried.png)
-![Placed loose sample](native/step-007-sample-placed-loose.png)
+![Placed loose sample](native/step-006-sample-placed-loose.png)
 ![Secured clamp state](native/step-011-sample-secured.png)
 
 These are direct production-wgpu 1280×800 images. The initial condition explicitly

@@ -7,6 +7,7 @@ pub(crate) mod consumables;
 pub(crate) mod crafting_ui;
 mod fabrication;
 pub(crate) mod frames;
+mod habitation;
 pub(crate) mod interaction;
 pub(crate) mod journey;
 pub(crate) mod lifecycle;
@@ -39,6 +40,7 @@ use std::time::Duration;
 pub(crate) struct GameplaySession {
     paused: bool,
     pub(crate) cargo_door: cargo::CargoDoor,
+    pub(crate) habitation: habitation::Habitation,
     pub(crate) tutorial: tutorial::Tutorial,
     pub(crate) building: construction::Building,
     pub(crate) archive: archive::Archive,
@@ -97,6 +99,7 @@ impl Default for GameplaySession {
         Self {
             paused: false,
             cargo_door: Default::default(),
+            habitation: Default::default(),
             building: Default::default(),
             archive: Default::default(),
             recovery: Default::default(),
@@ -235,6 +238,11 @@ impl GameplaySession {
                     return;
                 }
                 match interaction {
+                    Some(InteractionTarget::Bunk) => self.toggle_bunk(),
+                    Some(InteractionTarget::Galley) => self.use_galley(),
+                    Some(InteractionTarget::Hygiene) => {
+                        self.feedback = Some("Compact wash station; no water or hygiene needs")
+                    }
                     Some(InteractionTarget::CargoDoor) => self.toggle_cargo_door(),
                     Some(InteractionTarget::Archive) => self.open_archive(),
                     Some(InteractionTarget::FabricatorTray) => self.collect_fabricator_output(),
@@ -317,6 +325,9 @@ impl GameplaySession {
         match available_interaction_target(self.character.location(), local_eye, local_look)
             .filter(|target| self.permitted_interaction(*target))
         {
+            Some(InteractionTarget::Bunk) => Some("bunk"),
+            Some(InteractionTarget::Galley) => Some("galley"),
+            Some(InteractionTarget::Hygiene) => Some("hygiene"),
             Some(InteractionTarget::CargoDoor) => Some("cargo_door"),
             Some(InteractionTarget::Archive) => Some("archive"),
             Some(InteractionTarget::FabricatorTray) => Some("fabricator_tray"),
@@ -530,6 +541,7 @@ impl GameplaySession {
                 .eye_position_meters;
             self.character.set_nearby_surface(self.nearby_terrain(eye));
             self.advance_cargo_door(delta);
+            self.advance_habitation(delta);
             self.character
                 .set_ramp_moving(ship.door_open_fraction > 0.0 && ship.door_open_fraction < 1.0);
             self.character.advance_with_motion(

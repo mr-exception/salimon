@@ -19,6 +19,7 @@ sys.path.insert(0, str(REPO / 'models/tools'))
 from export_asset import ExportError, contained_path, resolve_manifest
 from validate_asset import read_document, validate_manifest
 from validate import REGISTRIES, validate_preservation
+from habitation_geometry import rust_source as habitation_rust_source
 from spatial_contracts import (
     build_spatial_contracts,
     landing_rust_source,
@@ -98,6 +99,7 @@ def export(blender=None, glb_profile=None):
             os.replace(staged / destination.name, destination)
         (REPO / 'client/ship/src/landing_geometry.rs').write_text(landing_rust_source(support))
         for crate in ('character', 'renderer'):
+            (REPO / f'client/{crate}/src/habitation_geometry.rs').write_text(habitation_rust_source())
             (REPO / f'client/{crate}/src/ramp_geometry.rs').write_text(ramp_rust_source(spatial['boardingRamp']))
         (ASSET / 'export-report.json').write_text(json.dumps(report, indent=2) + '\n')
         return report

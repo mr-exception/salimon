@@ -267,3 +267,9 @@ standing eyes on both sides, plus existing lower-window/monitor visibility.
 A deliberately extended shoulder fails those rays. `repair_cockpit_shoulders.py`
 records the one-time source migration; `preview_seams.py -- corners <output>`
 uses the actual seated eye and creates read-only interior/exterior references.
+
+
+The #540 berth preserves named `Starter_BunkFrame`/`Starter_BunkCushion` source
+identity and the existing walking reserve. `habitation-geometry.json` in the
+[Scout source](../../../models/assets/ships/salimon-scout/README.md#base-fold-away-berth-540)
+owns the hinge and generates consumer bounds; the renderer applies rigid motion.

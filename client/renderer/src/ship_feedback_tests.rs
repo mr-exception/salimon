@@ -300,6 +300,7 @@ fn scout_feedback_gpu_evidence() {
                 position_meters: [0.; 3],
                 orientation: [0., 0., 0., 1.],
                 door_open_fraction: door,
+                bunk_open_fraction: 0.0,
                 fabricator_output_present: output,
                 fabricator_output_medical: false,
                 fabricator_output_component: false,

@@ -439,3 +439,16 @@ Deliberate limits: 6,900 triangles, 140 primitives, 600 KiB GLB, 180 nodes;
 the ship still uses one opaque and one glass draw. This is an asset budget
 change, not hardware performance approval. Review of the original cloud views
 belongs to #561 and hardware budgets to #563.
+
+
+## Base fold-away berth (#540)
+
+`author_habitation.py` edits only the linked cabin-owned frame/cushion meshes,
+preserving fixture names, parents, materials and all authored collision/anchor
+interfaces. `habitation-geometry.json` is the single hinge/size/clearance source;
+the category exporter generates renderer/character consumers. Use supported
+Blender 4.5.3, then the normal category export/source/asset checks. The frame and
+cushion have a 5 mm source gap; no surface-overlap exemption is added. Runtime
+rigid rotation stays inside the pre-existing berth reserve. Source geometry and
+the actual deployed renderer image must both be reviewed; a stowed source check
+does not prove animated appearance. Expanded fixtures remain #577.

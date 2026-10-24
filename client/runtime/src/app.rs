@@ -992,6 +992,7 @@ impl ClientApplication {
                 camera = view.camera(presentation.ship.pose);
             }
             let mut mesh = map_ship_to_renderer(presentation.ship);
+            mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
             mesh.fabricator_output_component = self.session.fabricator_output_component();

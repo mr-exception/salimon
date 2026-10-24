@@ -472,3 +472,17 @@ and the identical test harness/instrumentation on both builds. See the report
 for exact checkout/build commands. Current layout results are separate controls,
 not silently the historical v1 population. Query/contact/activation timings
 include instrumentation; software/CPU results do not establish hardware FPS.
+
+
+## Exact contact stress (#592)
+
+Run physics and math tests, workspace tests/build, Clippy and documentation gates
+for changes to the shared arithmetic/contact boundary. The retained
+`iteration_oracle` compares exact old ground/pair response and warm continuation;
+spatial all-pairs, correction-created contact and sleep/retained-projection tests
+remain required. The [serial reproducer](../reports/issue-592/reproduce.sh) builds
+an isolated archived-layout fixture and records every sample with immutable
+binary/source inventories. Never run builds, render workloads or other timing
+lanes concurrently with its release measurements. Diagnostic prefix snapshots
+cannot replace the required 100 completed moving intervals. Historical failed
+300-step preparations and native/frame-budget failures remain failures.

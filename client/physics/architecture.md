@@ -399,3 +399,23 @@ The grid width uses twice the upper-quartile radius, reducing bucket enumeration
 for ordinary larger mixed members while retaining the existing exact large-body
 fallback for outliers. Cell width only chooses candidate enumeration; exact
 AABBs and narrow phase remain authoritative. No physical tolerance changes.
+
+
+## Exact impulse fixed points (#592)
+
+One-point ground/pair response loops retain the sixteen-iteration policy. After
+one complete iteration, the implementation may elide the remaining iterations
+only if every mutable iterative input has identical IEEE bits: both linear and
+angular velocities (one body for ground), accumulated normal impulse, tangent
+impulse and rolling torque. Normal/arms/targets, mass/inertia and all geometric
+inputs remain constant within this pure loop; position/environment processing
+stays outside it. An exact fixed point deterministically repeats the same state.
+No epsilon, approximate convergence, active/sleep/contact rule, damping or time
+budget changes. Multi-point manifolds retain every original iteration.
+
+`iteration_oracle.rs` retains the old sixteen-iteration ground/pair response for
+exact serialized-state and warm-continuation checks. Existing spatial all-pairs,
+correction-created contact, retained projection and sleep regressions remain.
+Small shared arithmetic primitives are inlinable across the crate boundary;
+their expressions and IEEE ordering are unchanged. See the #592 report for
+archived mass/radius-bit pools, partial/timeouts, profiles and exact comparisons.

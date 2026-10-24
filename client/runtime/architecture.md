@@ -1494,3 +1494,14 @@ real parent IDs and local poses through this boundary. See
 Continuous audio verification: `native_audio/mix/tests.rs` covers callback-size
 invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
 device telemetry are opt-in. Linux builds require ALSA development headers.
+
+
+Archived solver stress (#592) remains separate from current Scout gameplay.
+`sphere_workloads.rs` accepts `SALIMON_STRESS_PREFIX_SAMPLES=1..100` only for
+explicit diagnostic terminal snapshots. Values below 100 emit
+`diagnostic-prefix`, never a completed 100-sample pool. Ordinary workloads retain
+100 moving samples, exact archived radius/mass bits and natural 300-step
+preparation; no sleep flags are installed. Reproduction uses a disposable
+historical-layout checkout and current production physics, preserving the actual
+current cabin/physical geometry in gameplay. Query clocks remain a subset of
+contact clocks; retain every timeout, partial sample and failed preparation.

@@ -1,0 +1,27 @@
+{
+  "generated_utc": "2026-10-23T23:56:55.539339+00:00",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "cpu": "arm64",
+  "rustc": "rustc 1.89.0 (29483883e 2025-08-04)\nbinary: rustc\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\ncommit-date: 2025-08-04\nhost: aarch64-apple-darwin\nrelease: 1.89.0\nLLVM version: 20.1.7\n",
+  "historical_checkout": "2ecb271ff4af43ad102367cdea91c8cb08e375ec",
+  "before_source_parent": "b640e6a",
+  "commands": "reproduce.sh; source timing runs used original harness before and after-inline, current prefix-capable harness for fixed/final; default target remains 100",
+  "source_hashes": {
+    "client/math/src/lib.rs": "32ae32b23c7e25bf620812bde4771c3ea985573dd505b225b3b617c3fa63702c",
+    "client/physics/src/lib.rs": "0b1cf647ce3154d2757981dbc9c5c808b91601d3636af4067ed07c4de78ddc9b",
+    "client/physics/src/iteration_oracle.rs": "ce6fc16768d97731b0e6b176190cad60516da70ed328e89e010f6b2728c05361",
+    "client/runtime/src/sphere_workloads.rs": "dac2ec6a6b07abf0c2f137c5be27ed88b50fb193738acc1816227c01c60f212d",
+    "client/runtime/src/sphere_workloads/historical-inputs.json": "73ffdd6b0b8ab35e66740b247b014472842c4b81d20c2a62743df79c43484747"
+  },
+  "physics_gameplay_geometry": "unchanged current Scout; archived geometry only in detached diagnostic checkout",
+  "timing_overhead": "same profiled per-query clocks/counters, JSONL flush between calls; separate sampled diagnostic excluded from distributions",
+  "compiled_fixture_source_sha256": {
+    "client/math/src/lib.rs": "32ae32b23c7e25bf620812bde4771c3ea985573dd505b225b3b617c3fa63702c",
+    "client/physics/src/lib.rs": "0b1cf647ce3154d2757981dbc9c5c808b91601d3636af4067ed07c4de78ddc9b",
+    "client/physics/src/broad_phase.rs": "592de104721122493b6fe4302d79bcbc93ff64c4e372536c2f508bf8ea84bed5",
+    "client/physics/src/iteration_oracle.rs": "3119a7f53d5336a3a8fa886d9bc61fd73d77a0338d96d26c6e18db262bb0e56c",
+    "client/runtime/src/sphere_workloads.rs": "dac2ec6a6b07abf0c2f137c5be27ed88b50fb193738acc1816227c01c60f212d",
+    "client/runtime/src/sphere_workloads/historical-inputs.json": "73ffdd6b0b8ab35e66740b247b014472842c4b81d20c2a62743df79c43484747"
+  },
+  "compiled_fixture_patch": "compiled-fixture.patch retains exact measured source against archived checkout; root patch may differ only in test formatting"
+}

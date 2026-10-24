@@ -1,0 +1,1 @@
+could not create workflow dispatch event: HTTP 403: Must have admin rights to Repository. (https://api.github.com/repos/mr-exception/salimon/actions/workflows/386706362/dispatches)

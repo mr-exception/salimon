@@ -1,0 +1,49 @@
+{
+  "revision": "88703d8372efe231c1647229b9438a821a43dafc",
+  "images": 128,
+  "fixture_temporal_summaries": {
+    "core": {
+      "passed": true,
+      "comparisons": 2
+    },
+    "contacts": {
+      "passed": true,
+      "comparisons": 4
+    },
+    "resources": {
+      "passed": true,
+      "comparisons": 22
+    },
+    "moving": {
+      "passed": true,
+      "comparisons": 16
+    },
+    "cockpit": {
+      "passed": true,
+      "comparisons": 16
+    },
+    "exterior": {
+      "passed": true,
+      "comparisons": 2
+    },
+    "static": {
+      "passed": true,
+      "comparisons": 4
+    },
+    "ramp": {
+      "passed": true,
+      "comparisons": 10
+    },
+    "interior": {
+      "passed": true,
+      "comparisons": 10
+    }
+  },
+  "experience": {
+    "passed": 12,
+    "blocked": 14,
+    "status": "pending"
+  },
+  "balance_tests_passed": 6,
+  "review_coverage": "pending human approval"
+}

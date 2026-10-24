@@ -519,7 +519,8 @@ identity; only live production ticks do so, including after disk relaunch.
 character geometry, individual physical cargo and protected starter escape/service
 lanes. `catalogs/blueprints.json` declares seven furniture/wall/door/hull/deck/room/
 module entries. Its costs/durations are **proposed estimates**, with
-`approved_economy=false`; they authorize no resource debit or construction progress.
+`approved_economy=true` following the explicit owner decision on 2026-10-24.
+#543 accepts physical materials; timed progress still belongs to #544.
 #537 owns economy approval before #543/#544 integration. Fine pitch is per-entry
 data (currently 0.5 m), not a mandatory global furnishing rule.
 

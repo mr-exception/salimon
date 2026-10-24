@@ -7,12 +7,15 @@ physical return before removing the project. Schema 15 validates original IDs
 across world, Core and projects and reconstructs the material mass ledger.
 See [the maintained contract](../../docs/construction-materials.md).
 
-The ordinary catalog remains `approved_economy:false`: #543's existing comment
-requires explicit #537 owner approval. This PR delivers the mechanism behind that
-gate. Native evidence explicitly enables only its isolated test catalog and seeds
-a 0.5 kg carried sphere; this is not approval or a measured mining/acquisition
-route. #544 retains timed energy/animation work; #545 geometry completion. A funded
-project waits for those implementations; no free timer/solid object is invented.
+The owner explicitly approved the listed proposed catalog in this chat on
+2026-10-24. Ordinary construction intake is now enabled with `approved_economy:true`;
+all costs/durations remain exactly as proposed. This is separate approval of
+construction economics, not a blanket source-rights or other #537 decision.
+[Project Q&A](../../docs/project-qa.md) records the exact values.
+
+Native evidence seeds a 0.5 kg carried sphere; it is not a measured mining route.
+#544 retains timed energy/animation work and #545 geometry completion. A funded
+project needs no Start action but awaits those implementations.
 
 ## Validation
 
@@ -40,3 +43,7 @@ now return their exact original material rather than a reconstructed equivalent.
 The first broad workspace run included the pre-fix intake tests and failed those
 two cases; the final focused rerun passes all eight. Broad suite results are not
 reported as a pass for that earlier revision.
+
+After explicit catalog approval, the final construction suite was rerun against
+the enabled production catalog. The subsequent stack also has a passing complete
+workspace run including the final receipt/refund tests.

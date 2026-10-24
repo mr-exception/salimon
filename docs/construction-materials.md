@@ -7,8 +7,10 @@ apply. Only a required resource with a whole-milligram mass fitting the remainin
 cost is accepted. Oversized pieces are rejected unchanged; there is no 20 kg
 Fabricator cap, splitting, remote cargo debit or separate Start control.
 
-The catalog's `approved_economy` gate must be true before any intake. Proposed
-costs are retained in `client/runtime/catalogs/blueprints.json`; #537 owns approval.
+The catalog's `approved_economy` gate must be true before any intake. The owner
+explicitly approved the proposed costs/durations in this chat on 2026-10-24;
+`client/runtime/catalogs/blueprints.json` now enables that approved catalog.
+The exact values and decision are recorded in [Project Q&A](project-qa.md).
 A fully supplied project is ready for automatic Building, without another action.
 Timed Core-funded work remains #544; final structural geometry remains #545.
 This change adds their authoritative monotone `set_progress` transaction seam,

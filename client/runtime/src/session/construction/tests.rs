@@ -112,7 +112,7 @@ fn normal_ship_and_placeholders_do_not_install_structure_or_consume_resources() 
     s.advance_automation(Duration::from_secs(10));
     assert_eq!(s.building.structure.parts().count(), parts);
     assert_eq!(s.building.source.projects.jobs().count(), 1);
-    assert!(!s.building.catalog.approved_economy);
+    assert!(s.building.catalog.approved_economy);
     assert_eq!(
         s.ship.snapshot().total_mass_kg,
         salimon_ship::STARTER_DRY_MASS_KG

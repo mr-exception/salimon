@@ -1,5 +1,8 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
+> **Additional approved exterior direction (2026-10-24; future scope):** [Planetary environmental art direction](planetary-environment-art-direction.md) specifies coherent geology/regions, time-dependent regional weather and atmospheric effects, rare fixed biospheres, visible biological harvesting, natural landmarks, suit observations and exterior acoustics. These do not claim new runtime functionality or alter the five-second scanner, 1:1 shared clock, landing physics, published geography or unknown Earth route. Surface hydrology requires a separate design.
+
+
 Verification ownership was revised by the owner on 2026-10-23:
 [cloud checks and instructed human evidence](verification-workflow.md) replace
 blanket M1-only issue completion. Feature/science contracts and hardware-specific

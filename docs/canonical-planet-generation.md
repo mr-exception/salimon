@@ -1,5 +1,8 @@
 # Canonical planetary generation and multi-seed world identity
 
+> **Planned geology, weather, biology and discoveries (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) establishes owner-approved future environmental identity, stable interactive organism/landmark placement, weather-versus-baseline ownership, biological harvesting and field observation/planetary chart behavior. Domain seeds and climate/biome entries below remain architectural extension points, **not implemented climate or vegetation**. Hydrology is separate/unapproved.
+
+
 Status: **approved architectural direction and owner policies (2026-10-21), documentation-only; future universe/catalog and multiplayer implementations are not shipped by this document**. This is the authoritative contract for stable, versioned base-world identity; the current compressed six-body prototype and its version-1 terrain/resource generators retain their existing behaviors until deliberately migrated. See [approved universe expansion](universe-expansion-approved-design.md), [world and realism](world-and-realism.md), [terrain contract](../client/world/terrain-contract.md), [resource contracts](../client/world/resource-contracts.md), and [multiplayer](multiplayer-and-npc-interaction.md).
 
 ## Player-visible invariant

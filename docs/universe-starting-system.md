@@ -1,5 +1,8 @@
 # Permanent awakening system — U11 (#412)
 
+> **Environmental preservation clarification (2026-10-24):** The approved [planetary environmental art direction](planetary-environment-art-direction.md) must preserve Vesper as the established **airless frozen mineral starting world**, not populate it with living vegetation, atmospheric wind/clouds or inferred organisms merely because provisional organic/medicinal resource keys exist. Fixed landing area, terrain, physical anchors and canonical palette remain authoritative until an explicitly approved compatible migration.
+
+
 The portable offline publication freezes **Nacre Reach**, its star **Nacre** and
 starting planet **Vesper**. Scientific-style IDs remain separate from names:
 

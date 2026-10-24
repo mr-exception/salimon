@@ -16,6 +16,7 @@ pub enum MassObjectId {
 #[derive(Clone, Debug)]
 pub struct ShipMass {
     objects: BTreeMap<MassObjectId, f64>,
+    absent_dry_equipment: BTreeMap<u64, f64>,
     total_kg: f64,
     cargo_partials: Vec<f64>,
 }
@@ -23,12 +24,37 @@ impl Default for ShipMass {
     fn default() -> Self {
         Self {
             objects: BTreeMap::new(),
+            absent_dry_equipment: BTreeMap::new(),
             total_kg: STARTER_DRY_MASS_KG,
             cargo_partials: Vec::new(),
         }
     }
 }
 impl ShipMass {
+    /// Existing installed equipment is already in the dry hull. Boundary transfers
+    /// subtract it once; return clears the same stable identity without cargo duplication.
+    pub fn set_dry_equipment_absent(
+        &mut self,
+        id: u64,
+        mass: Option<f64>,
+    ) -> Result<(), InvalidFlightMotion> {
+        if id != 2001 || mass.is_some_and(|m| m != crate::attachments::PORTABLE_SHELF_MASS_KG) {
+            return Err(InvalidFlightMotion);
+        }
+        let mut next = self.absent_dry_equipment.clone();
+        if let Some(m) = mass {
+            next.insert(id, m);
+        } else {
+            next.remove(&id);
+        }
+        let base = STARTER_DRY_MASS_KG - next.values().sum::<f64>();
+        if base <= 0. || !base.is_finite() {
+            return Err(InvalidFlightMotion);
+        }
+        self.absent_dry_equipment = next;
+        self.total_kg = base + self.cargo_partials.iter().sum::<f64>();
+        Ok(())
+    }
     pub fn total_kg(&self) -> f64 {
         self.total_kg
     }
@@ -58,7 +84,7 @@ impl ShipMass {
             cargo.clear();
         }
         let cargo_kg: f64 = cargo.iter().sum();
-        let next = STARTER_DRY_MASS_KG + cargo_kg;
+        let next = STARTER_DRY_MASS_KG - self.absent_dry_equipment.values().sum::<f64>() + cargo_kg;
         if !next.is_finite() || cargo_kg < 0.0 {
             return Err(InvalidFlightMotion);
         }

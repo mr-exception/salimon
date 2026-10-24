@@ -1514,3 +1514,7 @@ executables may ignore the optional scope and return the full snapshot. The
 runner restores the real window before GPU capture and logs that OS request;
 it does not fake focus, disable occlusion or grant physical input qualification.
 See [runner protocol](../../scripts/README.md#bounded-native-capture-polling-568).
+
+## Physical mounts (#576)
+
+`session/mounts.rs` composes G placement, K explicit restraint, J empty accessory movement, shared physical carry identity, frame transport and schema-11 save validation. See [the canonical contract](../../docs/physical-mounts.md).

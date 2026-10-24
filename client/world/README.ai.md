@@ -73,3 +73,7 @@ run golden/codec/compatibility tests and affected cross-domain/native regression
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+## Physical mounts (#576)
+
+The shared carry slot also accepts externally owned physical fixture IDs; fixture source/motion/attachments remain with ship/runtime owners. See [the canonical contract](../../docs/physical-mounts.md).

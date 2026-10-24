@@ -260,7 +260,30 @@ pub(crate) fn advance_measured(
             position,
             radius,
             if blocking { 0.0 } else { 1.0 },
-        )
+        ) && tool.mount_geometry.mounts.iter().all(|m| {
+            let p = m.position();
+            !salimon_character::cargo::sphere_overlaps_box(
+                position,
+                (radius - 0.00001).max(0.),
+                [
+                    p[0] - 0.5,
+                    p[0] + 0.5,
+                    p[1] - 0.03,
+                    p[1] + 0.03,
+                    p[2] - 0.175,
+                    p[2] + 0.175,
+                ],
+            )
+        }) && tool.secured.iter().all(|id| {
+            tool.session.fragment(*id).is_none_or(|f| {
+                let p = tool
+                    .ship_fragments
+                    .get(id)
+                    .map(|p| p.meters())
+                    .unwrap_or_else(|| frame.world_to_local(f.transform().position().meters()));
+                length(sub(position, p)) >= radius + sphere_radius(*f)
+            })
+        })
     };
     measurements.solver = salimon_physics::advance_with_sleep(
         &mut tool.fragment_sleep,
@@ -349,7 +372,9 @@ fn snapshots_into(
             .iter()
             .copied()
             .filter(|p| {
-                Some(p.id()) != carried && Some(p.id()) != tool.session.attached_sphere_id()
+                Some(p.id()) != carried
+                    && Some(p.id()) != tool.session.attached_sphere_id()
+                    && !tool.secured.contains(&p.id())
             })
             .filter(|p| {
                 // Ship advancement precedes final session-pose synchronization.
@@ -401,7 +426,8 @@ fn snapshots_into(
                         surface: if ship {
                             if tool.ship_gravity_disabled {
                                 Surface::UnpoweredFloor {
-                                    height_meters: salimon_character::cargo::cargo_support_height(
+                                    height_meters: fixture_support_height(
+                                        tool,
                                         position,
                                         sphere_radius(p),
                                     ),
@@ -409,7 +435,8 @@ fn snapshots_into(
                                 }
                             } else {
                                 Surface::Floor {
-                                    height_meters: salimon_character::cargo::cargo_support_height(
+                                    height_meters: fixture_support_height(
+                                        tool,
                                         position,
                                         sphere_radius(p),
                                     ),
@@ -470,6 +497,20 @@ fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
             center: body.center.meters(),
             radius: body.radius_meters,
         })
+}
+
+fn fixture_support_height(tool: &ResourceGameplay, position: [f64; 3], radius: f64) -> f64 {
+    let mut height = salimon_character::cargo::cargo_support_height(position, radius);
+    for m in &tool.mount_geometry.mounts {
+        let p = m.position();
+        if (position[0] - p[0]).abs() + radius <= 0.5
+            && (position[2] - p[2]).abs() + radius <= 0.175
+            && position[1] >= p[1] + 0.03 + radius - 0.001
+        {
+            height = height.max(p[1] + 0.03);
+        }
+    }
+    height
 }
 
 #[cfg(test)]

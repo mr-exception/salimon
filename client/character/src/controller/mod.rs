@@ -58,6 +58,8 @@ pub struct CharacterController {
     ship_gravity_enabled: bool,
     #[serde(skip)]
     cargo_door_blocking: bool,
+    #[serde(skip)]
+    interior_obstacles: Vec<[f64; 6]>,
 }
 
 impl Default for CharacterController {
@@ -79,6 +81,7 @@ impl Default for CharacterController {
             ramp_moving: false,
             ship_gravity_enabled: true,
             cargo_door_blocking: false,
+            interior_obstacles: Vec::new(),
         }
     }
 }
@@ -103,6 +106,29 @@ impl CharacterController {
     }
     fn walk_speed(&self) -> f64 {
         WALK_SPEED_METERS_PER_SECOND * self.movement_scale
+    }
+
+    /// Installed physical fixtures are supplied by composition, never derived from GPU meshes.
+    pub fn set_interior_obstacles(&mut self, bounds: Vec<[f64; 6]>) {
+        self.interior_obstacles = bounds;
+    }
+    fn slide_installed(&self, previous: [f64; 3], mut local: [f64; 3]) -> [f64; 3] {
+        let bottom = local[1] - PLAYER_EYE_HEIGHT_METERS;
+        for b in &self.interior_obstacles {
+            if bottom < b[3] && bottom + PLAYER_BODY_HEIGHT_METERS > b[2] {
+                local = crate::collision::slide_around_obstacles(
+                    previous,
+                    local,
+                    &[[
+                        b[0] - PLAYER_RADIUS_METERS,
+                        b[1] + PLAYER_RADIUS_METERS,
+                        b[4] - PLAYER_RADIUS_METERS,
+                        b[5] + PLAYER_RADIUS_METERS,
+                    ]],
+                );
+            }
+        }
+        local
     }
 
     pub fn set_ship_gravity_enabled(&mut self, enabled: bool) {

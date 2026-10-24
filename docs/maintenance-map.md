@@ -470,3 +470,8 @@ rules. Hardware cadence/frame budgets remain #563 and physical checks #557.
 ## Physical mounts (#576)
 
 Source: `client/ship/src/attachments.rs`, `client/runtime/src/session/mounts.rs`, world carrying and character installed obstacles. Checks: `session::mounts`, ship attachment tests and `scenarios/evidence/physical-mounts.json`. See [the canonical contract](physical-mounts.md).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.

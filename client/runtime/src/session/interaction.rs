@@ -11,6 +11,11 @@ pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "[E] Use cockpit";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum InteractionTarget {
+    CabinTable,
+    CabinSeat,
+    PrivacyScreen,
+    ObservationShutter,
+    CabinLocker,
     Bunk,
     Galley,
     Hygiene,

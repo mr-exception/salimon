@@ -86,3 +86,5 @@ No water/hygiene meter, sleep-time advancement or additional survival benefit is
 introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
 remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+Whole-session schema 12 adds the optional runtime-owned cabin mechanisms and posture source. The storage envelope/atomic generation protocol is unchanged; see [cabin save semantics](../../docs/cabin-mechanisms.md#save-and-verification).

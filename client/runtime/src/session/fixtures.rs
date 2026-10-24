@@ -101,6 +101,7 @@ impl GameplaySession {
                 }
             }
         }
+        nodes.extend(self.cabin_fixture_nodes(ship.power_available));
         salimon_renderer::resolve_fixture_hierarchy(
             FixturePose {
                 position_meters: ship.pose.position_meters,
@@ -122,7 +123,7 @@ mod tests {
         s.habitation.bunk_open_fraction = 0.375;
         let bytes = s.save_bytes(100).unwrap();
         let before = s.fixture_instances(s.ship.snapshot());
-        assert_eq!(before.len(), 11);
+        assert_eq!(before.len(), 26);
         assert_eq!(before[0].id, 1001);
         assert_eq!(s.save_bytes(100).unwrap(), bytes);
         let mass = s.ship.snapshot().total_mass_kg;

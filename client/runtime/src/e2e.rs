@@ -12,6 +12,10 @@ use crate::session::GameplaySession;
 pub(crate) enum Scenario {
     LandedEarth,
     ScoutMounts,
+    ScoutCabin,
+    ScoutCabinBunk,
+    ScoutCabinLocker,
+    ScoutCabinTable,
     ScoutFabricator,
     ScoutWorkBlackout,
     ScoutArchive,
@@ -45,6 +49,10 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
+            "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
+            "scout-cabin-table" => Ok(Self::ScoutCabinTable),
+            "scout-cabin" => Ok(Self::ScoutCabin),
             "scout-mounts" => Ok(Self::ScoutMounts),
             "scout-fabricator" => Ok(Self::ScoutFabricator),
             "scout-work-blackout" => Ok(Self::ScoutWorkBlackout),
@@ -83,6 +91,10 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::ScoutCabinBunk => "scout-cabin-bunk",
+            Self::ScoutCabinLocker => "scout-cabin-locker",
+            Self::ScoutCabinTable => "scout-cabin-table",
+            Self::ScoutCabin => "scout-cabin",
             Self::ScoutMounts => "scout-mounts",
             Self::ScoutFabricator => "scout-fabricator",
             Self::ScoutWorkBlackout => "scout-work-blackout",
@@ -231,6 +243,12 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ScoutCabin
+        | Scenario::ScoutCabinBunk
+        | Scenario::ScoutCabinLocker
+        | Scenario::ScoutCabinTable => {
+            crate::session::cabin::evidence_initial_conditions(app, config.scenario.name())?;
+        }
         Scenario::ScoutMounts => {
             crate::session::mounts::evidence_initial_conditions(app)?;
         }

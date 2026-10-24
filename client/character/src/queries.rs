@@ -42,7 +42,17 @@ pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
 /// Inputs are ship-local; the returned distance is in meters along a unit ray.
 #[must_use]
 pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) -> Option<f64> {
-    sight_obstruction(eye, target, door_open, false)
+    sight_obstruction(eye, target, door_open, false, false)
+}
+
+/// Runtime supplies the independently moving bunk's exact bounds separately.
+#[must_use]
+pub fn habitation_sight_obstruction(
+    eye: [f64; 3],
+    target: [f64; 3],
+    door_open: bool,
+) -> Option<f64> {
+    sight_obstruction(eye, target, door_open, false, true)
 }
 
 /// The input port is recessed behind its own conservative tray/fixture envelope.
@@ -55,7 +65,7 @@ pub fn fabricator_input_sight_obstruction(eye: [f64; 3]) -> Option<f64> {
 /// Authored machine surfaces omit only their own conservative fixture envelope.
 #[must_use]
 pub fn fabricator_sight_obstruction(eye: [f64; 3], target: [f64; 3]) -> Option<f64> {
-    sight_obstruction(eye, target, true, true)
+    sight_obstruction(eye, target, true, true, false)
 }
 
 fn sight_obstruction(
@@ -63,6 +73,7 @@ fn sight_obstruction(
     target: [f64; 3],
     door_open: bool,
     input_face: bool,
+    independent_bunk: bool,
 ) -> Option<f64> {
     let direction = sub(target, eye);
     let length = dot(direction, direction).sqrt();
@@ -107,6 +118,7 @@ fn sight_obstruction(
             INTERIOR_OBSTACLES
                 .iter()
                 .filter(|b| !input_face || **b != FABRICATOR_OBSTACLE)
+                .filter(|b| !independent_bunk || **b != INTERIOR_OBSTACLES[12])
                 .map(|b| {
                     [
                         b[0],

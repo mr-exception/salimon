@@ -97,6 +97,10 @@ fn legacy_migration_invalid_state_and_missing_source_are_transactional() {
         let mut old: serde_json::Value = serde_json::from_slice(&before).unwrap();
         old["schema_version"] = version.into();
         old["state"].as_object_mut().unwrap().remove("mounts");
+        old["state"]["habitation"]
+            .as_object_mut()
+            .unwrap()
+            .remove("cabin");
         old["state"].as_object_mut().unwrap().remove("tutorial");
         if version == 1 {
             old["state"].as_object_mut().unwrap().remove("survival");

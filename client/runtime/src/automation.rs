@@ -575,6 +575,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "4" | "slot_4" => Some(KeyCode::Digit4),
         "5" | "slot_5" => Some(KeyCode::Digit5),
         "6" => Some(KeyCode::Digit6),
+        "rest_furniture" => Some(KeyCode::KeyX),
+        "restraint" => Some(KeyCode::KeyU),
         "move_accessory" => Some(KeyCode::KeyJ),
         "place_object" => Some(KeyCode::KeyG),
         "secure_object" => Some(KeyCode::KeyK),
@@ -802,6 +804,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
+    observation["cabin"] = serde_json::to_value(&app.habitation.cabin).expect("validated cabin");
     observation["mounts"] = serde_json::to_value(&app.mounts).expect("validated attachment state");
     observation["habitation"] = json!({"bunk_open_fraction":app.habitation.bunk_open_fraction,"bunk_deploying":app.habitation.bunk_deploying});
     observation["cargo_door"] =

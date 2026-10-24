@@ -477,3 +477,8 @@ shared one-object slot and colliders before publishing, and rejects conflicts
 atomically. Schemas 1–10 migrate without new installed fixtures, preserving old
 player/cargo clearance. Hand motion does not trigger discrete autosaves. See the
 [physical mount contract](physical-mounts.md).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.

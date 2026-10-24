@@ -31,6 +31,8 @@ pub(crate) struct MiningTool {
 
 #[derive(Default)]
 pub(crate) struct ResourceGameplay {
+    pub(crate) carry_blocked: bool,
+    pub(crate) interior_solids: Vec<[f64; 6]>,
     pub(crate) mount_geometry: salimon_ship::attachments::Attachments,
     pub(crate) secured: std::collections::HashSet<salimon_world::resources::FragmentId>,
     pub(crate) ship_gravity_disabled: bool,

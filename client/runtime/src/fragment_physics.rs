@@ -274,6 +274,8 @@ pub(crate) fn advance_measured(
                     p[2] + 0.175,
                 ],
             )
+        }) && tool.interior_solids.iter().all(|b| {
+            !salimon_character::cargo::sphere_overlaps_box(position, (radius - 0.00001).max(0.), *b)
         }) && tool.secured.iter().all(|id| {
             tool.session.fragment(*id).is_none_or(|f| {
                 let p = tool
@@ -508,6 +510,16 @@ fn fixture_support_height(tool: &ResourceGameplay, position: [f64; 3], radius: f
             && position[1] >= p[1] + 0.03 + radius - 0.001
         {
             height = height.max(p[1] + 0.03);
+        }
+    }
+    for b in &tool.interior_solids {
+        if position[0] - radius >= b[0]
+            && position[0] + radius <= b[1]
+            && position[2] - radius >= b[4]
+            && position[2] + radius <= b[5]
+            && position[1] >= b[3] + radius - 0.001
+        {
+            height = height.max(b[3]);
         }
     }
     height

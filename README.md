@@ -345,3 +345,5 @@ The [permanent awakening definition](docs/universe-starting-system.md) freezes
 Nacre Reach / Vesper, its >=30 ly Earth-distance proof and versioned starting
 surface/resources. Reproduce its manifest/audit with the portable `starting_system`
 example; real-scale playable startup and native verification remain downstream.
+
+Cabin controls: aim + E operates furniture; X sits/lies or gets up; U secures/releases the restraint. See [cabin mechanisms](docs/cabin-mechanisms.md).

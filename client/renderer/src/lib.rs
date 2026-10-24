@@ -7,7 +7,7 @@ mod capture;
 mod fixtures;
 pub use fixtures::{
     FIXTURE_LAYOUT_VERSION, FixtureBatchStats, FixtureInstance, FixtureMesh, FixtureNode,
-    FixturePose, resolve_fixture_hierarchy,
+    FixturePose, fixture_template_bounds, resolve_fixture_hierarchy,
 };
 mod cockpit_instruments;
 mod consumable_wheel;

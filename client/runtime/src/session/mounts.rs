@@ -123,10 +123,27 @@ impl GameplaySession {
             self.feedback = Some("Mount occupied or object too large");
             return;
         }
-        let height = mount.map_or(salimon_character::SHIP_FLOOR_HEIGHT_METERS, |m| {
+        let mut height = mount.map_or(salimon_character::SHIP_FLOOR_HEIGHT_METERS, |m| {
             m.position()[1] + 0.03
         }) + r
             + 0.005;
+        if mount.is_none() && d[1] < -1e-9 {
+            for b in &self.mining.interior_solids {
+                let top = b[3] + r + 0.005;
+                let t = (top - eye[1]) / d[1];
+                let x = eye[0] + t * d[0];
+                let z = eye[2] + t * d[2];
+                if t > 0.
+                    && top > height
+                    && x - r >= b[0]
+                    && x + r <= b[1]
+                    && z - r >= b[4]
+                    && z + r <= b[5]
+                {
+                    height = top;
+                }
+            }
+        }
         let t = (height - eye[1]) / d[1];
         if !t.is_finite() || t <= 0. || length(d) * t > 2.5 {
             self.feedback = Some("Aim down at a reachable clear surface - F to drop");
@@ -153,6 +170,11 @@ impl GameplaySession {
             .is_some_and(|d| d < length(sub(p, eye)) - r - 0.01)
         });
         if player_overlap
+            || self.mining.interior_solids.iter().any(|b| {
+                salimon_character::cargo::sphere_overlaps_box(p, r, *b)
+                    || salimon_character::cargo::box_sight_obstruction(eye, p, *b)
+                        .is_some_and(|hit| hit < length(sub(p, eye)) - r - 0.01)
+            })
             || fixture_obstruction
             || !salimon_character::cargo::cargo_position_allowed(
                 p,
@@ -449,6 +471,12 @@ impl GameplaySession {
                 bounds.push([p[0] - r, p[0] + r, p[1] - r, p[1] + r, p[2] - r, p[2] + r]);
             }
         }
+        let cabin = self.cabin_solids();
+        bounds.extend_from_slice(&cabin);
+        if !self.mining.interior_solids.is_empty() && self.mining.interior_solids != cabin {
+            self.mining.fragment_sleep = Default::default();
+        }
+        self.mining.interior_solids = cabin;
         self.character.set_interior_obstacles(bounds);
     }
 }
@@ -654,6 +682,10 @@ mod tests {
         assert_eq!(s.save_bytes(100).unwrap(), good);
         v["schema_version"] = 10.into();
         v["state"].as_object_mut().unwrap().remove("mounts");
+        v["state"]["habitation"]
+            .as_object_mut()
+            .unwrap()
+            .remove("cabin");
         s.restore_bytes(&serde_json::to_vec(&v).unwrap()).unwrap();
         assert!(s.mounts.mounts.is_empty());
     }

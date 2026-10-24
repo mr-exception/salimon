@@ -64,7 +64,12 @@ impl GameplaySession {
 
     pub(super) fn interaction_action(target: InteractionTarget) -> Action {
         match target {
-            InteractionTarget::Archive
+            InteractionTarget::CabinTable
+            | InteractionTarget::CabinSeat
+            | InteractionTarget::PrivacyScreen
+            | InteractionTarget::ObservationShutter
+            | InteractionTarget::CabinLocker
+            | InteractionTarget::Archive
             | InteractionTarget::Bunk
             | InteractionTarget::Galley
             | InteractionTarget::Hygiene => Action::Menu,

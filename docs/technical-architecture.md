@@ -628,4 +628,4 @@ The owner-authorized capacity tiers, exact receipt accounting, separate fuel/mat
 
 ## Construction material ownership (#543)
 
-See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and pending economy approval. Timed work and completed geometry remain #544/#545.
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Timed work and completed geometry remain #544/#545.

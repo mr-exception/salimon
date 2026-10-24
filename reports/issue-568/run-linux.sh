@@ -55,7 +55,7 @@ run_step experience python scripts/experience_suite.py --output artifacts/experi
 export SALIMON_BALANCE_REPORT=/source/artifacts/verification-568/balance.json
 export SALIMON_AVAILABILITY_REPORT=/source/artifacts/verification-568/availability.json
 run_step balance cargo test -p salimon-client survival_balance --locked
-run_step tracked-clean git status --porcelain --untracked-files=no
+run_step tracked-clean bash -c 'git status --porcelain --untracked-files=no; test -z "$(git status --porcelain --untracked-files=no)"'
 python - "$out/status.jsonl" <<'PY'
 import json,sys
 rows=[json.loads(l) for l in open(sys.argv[1])]

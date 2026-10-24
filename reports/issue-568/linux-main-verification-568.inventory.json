@@ -1,0 +1,9 @@
+{
+  "archive_sha256": "68544e8a5eed8bd8691b9abec7fb44af0d1b6d96483fdc5ef9e35b286ddad4ee",
+  "file_count": 27,
+  "archived_files": 27,
+  "deduplicated_files": 4,
+  "full_inventory": "linux-main-verification-568.inventory.json.gz",
+  "full_inventory_sha256": "3ff60e21d8414df410711221524ed85d40b50262abd2c87628cb700c4c5df365",
+  "archive": "linux-main-verification-568.tar.xz"
+}

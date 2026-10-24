@@ -296,7 +296,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=14, Some(state)) => state,
+            (2..=15, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -308,22 +308,22 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=14, Some(tutorial)) => tutorial,
+            (4..=15, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let archive = match (save.schema_version, save.state.archive) {
-            (6..=14, Some(archive)) => archive,
+            (6..=15, Some(archive)) => archive,
             (1..=5, _) => Default::default(),
             _ => return Err(invalid("archive source missing for save schema")),
         };
         let recovery = match (save.schema_version, save.state.recovery) {
-            (7..=14, Some(recovery)) => recovery,
+            (7..=15, Some(recovery)) => recovery,
             (1..=6, _) => Default::default(),
             _ => return Err(invalid("recovery source missing for schema 7")),
         };
         let construction = match (save.schema_version, save.state.construction) {
-            (8..=14, Some(source)) => source,
+            (8..=15, Some(source)) => source,
             (1..=7, None) => Default::default(),
             (1..=7, Some(source)) if source.projects.jobs().next().is_none() => Default::default(),
             _ => {
@@ -332,8 +332,16 @@ impl GameplaySession {
                 ));
             }
         };
+        if save.schema_version < 15
+            && construction
+                .projects
+                .jobs()
+                .any(|p| !p.funding.receipts.is_empty() || p.funding.progress_ppm != 0)
+        {
+            return Err(invalid("funded construction requires schema 15"));
+        }
         let cargo_door = match (save.schema_version, save.state.cargo_door) {
-            (9..=14, Some(door)) => door,
+            (9..=15, Some(door)) => door,
             (1..=8, None) => Default::default(),
             (1..=8, Some(door)) if door.open_fraction == 1.0 && door.opening => Default::default(),
             _ => {
@@ -343,7 +351,7 @@ impl GameplaySession {
             }
         };
         let habitation = match (save.schema_version, save.state.habitation) {
-            (10..=14, Some(h)) => h,
+            (10..=15, Some(h)) => h,
             (1..=9, None) => Default::default(),
             (1..=9, Some(h)) if h.bunk_open_fraction == 0.0 && !h.bunk_deploying => {
                 Default::default()
@@ -367,7 +375,7 @@ impl GameplaySession {
         }
         let physical = save.state.physical.restore()?;
         let mounts = match (save.schema_version, save.state.mounts) {
-            (11..=14, Some(m)) => m,
+            (11..=15, Some(m)) => m,
             (1..=10, None) => Default::default(),
             (1..=10, Some(m)) if m == Default::default() => Default::default(),
             _ => return Err(invalid("mount source missing/incompatible with schema")),
@@ -430,6 +438,7 @@ impl GameplaySession {
             &restored.mining.session,
             &restored.ship,
         )?;
+        restored.validate_construction_receipts()?;
         restored.validate_finishes()?;
         restored.validate_cabin_restore()?;
         restored.validate_mounts()?;

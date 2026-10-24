@@ -99,6 +99,8 @@ impl Rotation {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Placeholder {
+    #[serde(default)]
+    pub funding: super::funding::Funding,
     pub id: PlaceholderId,
     pub owner: u64,
     pub blueprint: Blueprint,
@@ -506,6 +508,7 @@ impl Placements {
         self.jobs.insert(
             id,
             Placeholder {
+                funding: Default::default(),
                 id,
                 owner: c.owner,
                 blueprint: preview.blueprint,
@@ -519,6 +522,20 @@ impl Placements {
         self.next_id = next;
         Ok(id)
     }
+    pub fn funding_mut(
+        &mut self,
+        id: PlaceholderId,
+        actor: u64,
+    ) -> Result<&mut Placeholder, PlacementError> {
+        let p = self
+            .jobs
+            .get_mut(&id)
+            .ok_or(PlacementError::MissingPlaceholder)?;
+        if actor == 0 || p.owner != actor {
+            return Err(PlacementError::Unauthorized);
+        }
+        Ok(p)
+    }
     pub fn cancel(&mut self, id: PlaceholderId, actor: u64) -> Result<Placeholder, PlacementError> {
         let job = self
             .jobs
@@ -526,6 +543,9 @@ impl Placements {
             .ok_or(PlacementError::MissingPlaceholder)?;
         if actor == 0 || actor != job.owner {
             return Err(PlacementError::Unauthorized);
+        }
+        if !job.funding.receipts.is_empty() || job.funding.progress_ppm != 0 {
+            return Err(PlacementError::Occupied);
         }
         self.jobs
             .remove(&id)
@@ -566,6 +586,9 @@ impl Placements {
         }
         for (id, p) in &self.jobs {
             p.blueprint.validate()?;
+            p.funding
+                .validate(&p.blueprint.requirements)
+                .map_err(|_| PlacementError::InvalidIdentity)?;
             if *id != p.id || id.0 == 0 || id.0 >= self.next_id || p.owner == 0 {
                 return Err(PlacementError::InvalidIdentity);
             }

@@ -302,6 +302,38 @@ impl MiningSession {
         true
     }
 
+    /// Atomically return a validated reservation batch as loose physical pieces.
+    /// The caller owns receipt provenance and collision-free destination admission.
+    pub fn return_reserved_loose(&mut self, pieces: &[ResourceFragment]) -> bool {
+        let mut ids = std::collections::HashSet::new();
+        let next = self.save_state().next_id;
+        if pieces.iter().any(|f| {
+            f.id().0 == 0
+                || f.id().0 > next
+                || !ids.insert(f.id())
+                || self.fragment(f.id()).is_some()
+                || !crate::resources::RawMaterial::new(
+                    f.material().resource(),
+                    f.material().mass_kg(),
+                )
+                .is_ok_and(|m| m == f.material())
+                || crate::resources::ResourceTransform::new(
+                    f.transform().position(),
+                    f.transform().orientation_xyzw(),
+                )
+                .is_err()
+        }) {
+            return false;
+        }
+        for f in pieces {
+            assert!(
+                self.fragments.return_reserved(*f),
+                "batch preflight admitted receipt"
+            );
+        }
+        true
+    }
+
     /// Physical despawn/Core consumption; never reuse an entity identity.
     pub fn remove_fragment(&mut self, id: crate::resources::FragmentId) -> bool {
         if self.carried_id() == Some(id) {

@@ -231,6 +231,10 @@ impl GameplaySession {
             return;
         }
         self.enforce_survival_restrictions();
+        if self.building.active {
+            self.contribute_construction();
+            return;
+        }
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface = self.terrain_frame(ship_snapshot);
@@ -792,7 +796,7 @@ impl GameplaySession {
                 }
             }
             Interact if self.building.active => {
-                self.feedback = Some("Project inspected");
+                self.contribute_construction();
             }
             Interact => {
                 let location = self.character.location();

@@ -519,7 +519,8 @@ identity; only live production ticks do so, including after disk relaunch.
 character geometry, individual physical cargo and protected starter escape/service
 lanes. `catalogs/blueprints.json` declares seven furniture/wall/door/hull/deck/room/
 module entries. Its costs/durations are **proposed estimates**, with
-`approved_economy=false`; they authorize no resource debit or construction progress.
+`approved_economy=true` following the explicit owner decision on 2026-10-24.
+#543 accepts physical materials; timed progress still belongs to #544.
 #537 owns economy approval before #543/#544 integration. Fine pitch is per-entry
 data (currently 0.5 m), not a mandatory global furnishing rule.
 
@@ -609,3 +610,6 @@ Persistent finishes #579: [canonical ownership, schema 13, bounded render factor
 
 
 Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.

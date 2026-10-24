@@ -729,3 +729,5 @@ marker and failure-state preservation. Actual native corpus captures remain a
 separate required test. See [the #568 report](../reports/issue-568/README.md).
 
 Cabin evidence: `python3 scripts/salimon-test run scenarios/evidence/habitation-use.json --binary target/debug/salimon-client --screenshot-command '["native"]'` uses the explicit `scout-cabin` camera setup and production E/X/U commands.
+
+Finish evidence: `room-finishes.json`, `room-finishes-blackout.json`, and `furniture-finish.json` under `scenarios/evidence/` use production V/O/Z input after explicit camera setups. Named diagnostic views in `scenarios/visual/scout-finish-cameras.json` change presentation only. Native inspection reports actual ship resident vertex/uniform bytes and draw/triangle counts.

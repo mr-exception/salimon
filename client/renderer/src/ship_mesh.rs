@@ -7,9 +7,9 @@ use crate::{CockpitInstruments, DEPTH_FORMAT, RendererError, SceneFrame, encode_
 
 pub(crate) const SHIP_GLB: &[u8] =
     include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
-const VERTEX_FLOATS: usize = 19;
+const VERTEX_FLOATS: usize = 20;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
-const UNIFORM_SIZE: u64 = 192;
+const UNIFORM_SIZE: u64 = 352;
 use crate::ramp_geometry::{
     RAMP_ANGLE_RADIANS, RAMP_EXTENSION_METERS, RAMP_FACE_OFFSET_METERS, RAMP_HINGE,
 };
@@ -19,6 +19,8 @@ const DOOR_HINGE_Y_METERS: f32 = RAMP_HINGE[1] as f32;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
+    /// Bounded linear cosmetic factors: cabin/cargo × five finish groups.
+    pub finish_tints: [[[f32; 3]; 5]; 2],
     pub machinery: crate::MachineryFeedback,
     pub position_meters: [f64; 3],
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.
@@ -42,6 +44,38 @@ struct ShipGeometry {
     glass_vertices: Vec<f32>,
     opaque_vertex_count: u32,
     glass_vertex_count: u32,
+}
+
+/// Explicit authored cosmetic allowlist: functional and safety surfaces are excluded.
+fn finish_group(name: Option<&str>) -> f32 {
+    match name {
+        Some(
+            "Wall_Port_Inner"
+            | "Wall_Starboard_Inner"
+            | "Aft_Bulkhead_Port"
+            | "Aft_Bulkhead_Starboard"
+            | "Ceiling_Inner"
+            | "Starter_CargoBulkhead",
+        ) => 1.,
+        Some("Deck_Walkable") => 2.,
+        Some(
+            "Ceiling_Copper_Ribs"
+            | "Deck_Copper_Inlay"
+            | "Window_Port_Sill"
+            | "Window_Starboard_Sill",
+        ) => 3.,
+        Some(
+            "Starter_Galley" | "Starter_GalleyWorktop" | "Starter_Hygiene" | "Starter_CargoBins",
+        ) => 4.,
+        Some(
+            "Starter_BunkCushion"
+            | "Cabin_Woven_Runners"
+            | "Pilot_Seat_Bolsters"
+            | "Pilot_Seat_Cushions"
+            | "Pilot_Seat_Headrest",
+        ) => 5.,
+        _ => 0.,
+    }
 }
 
 fn load_geometry() -> Result<ShipGeometry, RendererError> {
@@ -218,6 +252,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                     uv[1],
                     display_flag,
                     crate::machinery::surface_role(node.name()),
+                    finish_group(node.name()),
                 ]);
             }
         }
@@ -359,6 +394,11 @@ fn create_pipeline(
                         offset: 72,
                         shader_location: 7,
                     },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32,
+                        offset: 76,
+                        shader_location: 8,
+                    },
                 ],
             })],
             compilation_options: wgpu::PipelineCompilationOptions::default(),
@@ -392,6 +432,15 @@ fn create_pipeline(
 }
 
 impl ShipMeshRenderer {
+    pub(crate) fn resource_stats(&self) -> [u64; 4] {
+        [
+            self.opaque_vertices.size() + self.glass_vertices.size(),
+            self.uniform.size(),
+            u64::from(self.opaque_vertex_count + self.glass_vertex_count) / 3,
+            if self.visible { 2 } else { 0 },
+        ]
+    }
+
     pub(crate) fn new(
         device: &wgpu::Device,
         format: wgpu::TextureFormat,
@@ -564,7 +613,7 @@ impl ShipMeshRenderer {
                 },
             );
         }
-        let mut values = Vec::with_capacity(48);
+        let mut values = Vec::with_capacity(88);
         values.extend_from_slice(&view_projection);
         let fraction = ship.door_open_fraction;
         let hinge_fraction = (fraction / 0.6).clamp(0.0, 1.0);
@@ -603,6 +652,20 @@ impl ShipMeshRenderer {
             },
         ]);
         values.extend_from_slice(&ship.machinery.uniforms()?);
+        for room in ship.finish_tints {
+            for tint in room {
+                if tint
+                    .iter()
+                    .any(|v| !v.is_finite() || !(0.0..=4.).contains(v))
+                {
+                    return Err(RendererError::new(
+                        "ship finish",
+                        "unbounded cosmetic factor",
+                    ));
+                }
+                values.extend_from_slice(&[tint[0], tint[1], tint[2], 0.]);
+            }
+        }
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         self.visible = true;
         Ok(())

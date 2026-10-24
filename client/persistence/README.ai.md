@@ -88,3 +88,6 @@ remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
 
 Whole-session schema 12 adds the optional runtime-owned cabin mechanisms and posture source. The storage envelope/atomic generation protocol is unchanged; see [cabin save semantics](../../docs/cabin-mechanisms.md#save-and-verification).
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.

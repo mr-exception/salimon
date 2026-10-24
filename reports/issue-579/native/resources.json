@@ -1,0 +1,265 @@
+{
+  "room-final": {
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 352
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1136,
+      "layout_version": 1,
+      "prepare_micros": 72,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 689.53225,
+        "mean_ms": 11.83111437804878,
+        "min_ms": 2.144708,
+        "p95_ms": 3.940291,
+        "samples": 82
+      },
+      "cpu_update": {
+        "max_ms": 10.178916,
+        "mean_ms": 1.4458450243902439,
+        "min_ms": 0.610916,
+        "p95_ms": 2.856459,
+        "samples": 82
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": null,
+      "gpu_pass": {
+        "max_ms": 5.382958,
+        "mean_ms": 1.7764885802469144,
+        "min_ms": 0.63125,
+        "p95_ms": 4.129291,
+        "samples": 81
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 19.31389837804878,
+        "min_ms": 0.0,
+        "p95_ms": 20.514667,
+        "samples": 82
+      },
+      "samples": 82
+    },
+    "window": {
+      "focused": true,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    },
+    "finishes": {
+      "items": {},
+      "rooms": {
+        "1": {
+          "groups": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "2": {
+          "groups": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  },
+  "blackout-final": {
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 352
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1136,
+      "layout_version": 1,
+      "prepare_micros": 248,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 2671.244208,
+        "mean_ms": 55.00623359016393,
+        "min_ms": 5.401584,
+        "p95_ms": 25.36125,
+        "samples": 61
+      },
+      "cpu_update": {
+        "max_ms": 40.940875,
+        "mean_ms": 6.496314213114754,
+        "min_ms": 1.720416,
+        "p95_ms": 13.972167,
+        "samples": 61
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": null,
+      "gpu_pass": {
+        "max_ms": 8.423207999999999,
+        "mean_ms": 1.579755566666667,
+        "min_ms": 0.591834,
+        "p95_ms": 3.053292,
+        "samples": 60
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 100.88071859016394,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 61
+      },
+      "samples": 61
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    },
+    "finishes": {
+      "items": {},
+      "rooms": {
+        "1": {
+          "groups": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "2": {
+          "groups": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  },
+  "furniture-final": {
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 352
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1136,
+      "layout_version": 1,
+      "prepare_micros": 192,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "performance": {
+      "cpu_render": {
+        "max_ms": 2897.386625,
+        "mean_ms": 99.42536791428572,
+        "min_ms": 5.908834,
+        "p95_ms": 247.175875,
+        "samples": 35
+      },
+      "cpu_update": {
+        "max_ms": 77.96641699999999,
+        "mean_ms": 6.724633314285713,
+        "min_ms": 1.882583,
+        "p95_ms": 18.630833,
+        "samples": 35
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": null,
+      "gpu_pass": {
+        "max_ms": 6.212292000000001,
+        "mean_ms": 1.3885171470588233,
+        "min_ms": 0.5854159999999999,
+        "p95_ms": 4.441834,
+        "samples": 34
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 61.22738688571428,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 35
+      },
+      "samples": 35
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    },
+    "finishes": {
+      "items": {
+        "3002": {
+          "room": 1,
+          "style": 1
+        }
+      },
+      "rooms": {
+        "1": {
+          "groups": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "2": {
+          "groups": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  }
+}

@@ -188,6 +188,7 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
                 "window": app.window_state(),
                 "capture_status": app.capture_status,
                 "audio_output":app.audio_telemetry(),
+            "ship_resources":app.ship_resource_stats().map(|s|json!({"resident_vertex_bytes":s[0],"uniform_bytes":s[1],"triangles":s[2],"draws":s[3]})),
             "fixtures": app.fixture_batch_stats().map(|s| {json!({"layout_version":salimon_renderer::FIXTURE_LAYOUT_VERSION,"draws":s.draw_calls,"visible_instances":s.visible_instances,"triangles":s.triangles,"resident_geometry_bytes":s.resident_geometry_bytes,"instance_capacity_bytes":s.instance_capacity_bytes,"upload_bytes":s.upload_bytes,"prepare_micros":s.prepare_time.as_micros()})}),
                 "performance": app.observations.snapshot(),
                 "terrain": { "mode": format!("{:?}", app.session.mining.terrain), "active_patches": app.terrain_stream.active.len(),
@@ -576,6 +577,9 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "5" | "slot_5" => Some(KeyCode::Digit5),
         "6" => Some(KeyCode::Digit6),
         "rest_furniture" => Some(KeyCode::KeyX),
+        "finish_group" => Some(KeyCode::KeyV),
+        "finish_next" => Some(KeyCode::KeyO),
+        "finish_reset" => Some(KeyCode::KeyZ),
         "restraint" => Some(KeyCode::KeyU),
         "move_accessory" => Some(KeyCode::KeyJ),
         "place_object" => Some(KeyCode::KeyG),
@@ -804,6 +808,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
+    observation["finishes"] = serde_json::to_value(&app.finishes).expect("validated finishes");
     observation["cabin"] = serde_json::to_value(&app.habitation.cabin).expect("validated cabin");
     observation["mounts"] = serde_json::to_value(&app.mounts).expect("validated attachment state");
     observation["habitation"] = json!({"bunk_open_fraction":app.habitation.bunk_open_fraction,"bunk_deploying":app.habitation.bunk_deploying});

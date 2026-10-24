@@ -216,6 +216,9 @@ impl ClientApplication {
     pub(crate) fn audio_telemetry(&self) -> serde_json::Value {
         self.scout_audio.telemetry()
     }
+    pub(crate) fn ship_resource_stats(&self) -> Option<[u64; 4]> {
+        self.renderer.as_ref().map(Renderer::ship_resource_stats)
+    }
     pub(crate) fn fixture_batch_stats(&self) -> Option<salimon_renderer::FixtureBatchStats> {
         self.renderer.as_ref().map(Renderer::fixture_batch_stats)
     }
@@ -957,6 +960,12 @@ impl ClientApplication {
                 text: text.to_owned(),
                 placement: OverlayPlacement::BottomCenter,
             })
+        } else if let Some(text) = self.session.finish_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
         } else if fragment_interaction {
             resource_context.or(ship_context)
         } else {
@@ -1024,6 +1033,7 @@ impl ClientApplication {
             }
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.independent_interior = true;
+            mesh.finish_tints = self.session.finish_palette();
             mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();

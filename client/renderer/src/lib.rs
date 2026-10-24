@@ -968,6 +968,11 @@ impl Renderer {
         self.last_fixture_batch
     }
 
+    /// Actual resident ship buffers, uniform bytes, triangles and current draw count.
+    pub fn ship_resource_stats(&self) -> [u64; 4] {
+        self.ship_mesh.resource_stats()
+    }
+
     pub const fn info(&self) -> &RendererInfo {
         &self.info
     }

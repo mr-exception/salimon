@@ -8,6 +8,7 @@ struct ShipUniform {
     padding: vec4<f32>,
     activity: vec4<f32>, // conversion, signed thrust, Fabricator mode, active phase
     detail: vec4<f32>, // Core charge, recipe progress, cockpit authority, ramped rudder yaw
+    finishes: array<vec4<f32>, 10>,
 };
 
 @group(0) @binding(0)
@@ -26,6 +27,7 @@ struct VertexOutput {
     @location(4) @interpolate(flat) display_flag: u32,
     @location(5) local: vec3<f32>,
     @location(6) @interpolate(flat) machinery_role: u32,
+    @location(7) @interpolate(flat) finish_group: u32,
 };
 
 @vertex
@@ -38,6 +40,7 @@ fn vs_main(
     @location(5) interior_flag: f32,
     @location(6) display: vec3<f32>,
     @location(7) machinery_role: f32,
+    @location(8) finish_group: f32,
 ) -> VertexOutput {
     let ramp_flag = select(0.0, door_flag, door_flag < 2.5);
     let angle = ship.door_pose.x * min(ramp_flag, 1.0);
@@ -83,6 +86,7 @@ fn vs_main(
     output.clip_position = ship.view_projection * vec4<f32>(relative, 1.0);
     if door_flag == 3.0 && ship.port.w > 0.5 {output.clip_position=vec4<f32>(2.0,2.0,0.0,1.0);}
     output.color = color;
+    output.finish_group = u32(finish_group);
     let key = normalize(vec3<f32>(0.35, 0.82, 0.44));
     let exterior_light = vec3<f32>(0.82, 0.90, 1.0)
         * (0.28 + 0.62 * abs(dot(normal, key)));
@@ -167,5 +171,10 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     }
     // Keep lamps, displays, and engine/core accents self-lit instead of
     // clamping their emission into the base color and then darkening it.
-    return vec4<f32>(input.color.rgb * input.light + input.emissive, input.color.a);
+    var base = input.color.rgb;
+    if input.finish_group > 0u {
+        let room = select(0u, 1u, input.local.x < -4.65);
+        base = min(base * ship.finishes[room * 5u + input.finish_group - 1u].rgb, vec3<f32>(1.0));
+    }
+    return vec4<f32>(base * input.light + input.emissive, input.color.a);
 }

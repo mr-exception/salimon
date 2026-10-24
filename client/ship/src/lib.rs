@@ -62,3 +62,5 @@ pub const DEFAULT_CORE_ENERGY_STORED_JOULES: u64 = 45_000_000_000;
 pub const DOOR_HINGE_ANIMATION_DURATION: Duration = Duration::from_millis(700);
 
 pub use controller::persistence::ShipSaveState;
+
+pub mod finishes;

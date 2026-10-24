@@ -7,6 +7,7 @@ pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
 pub(crate) mod crafting_ui;
 mod fabrication;
+pub(crate) mod finishes;
 mod fixtures;
 pub(crate) mod frames;
 mod habitation;
@@ -42,6 +43,8 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) finishes: salimon_ship::finishes::Finishes,
+    pub(crate) finish_group: usize,
     pub(crate) mounts: salimon_ship::attachments::Attachments,
     pub(crate) cargo_door: cargo::CargoDoor,
     pub(crate) habitation: habitation::Habitation,
@@ -102,6 +105,8 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            finishes: Default::default(),
+            finish_group: 0,
             mounts: Default::default(),
             cargo_door: Default::default(),
             habitation: Default::default(),
@@ -157,6 +162,7 @@ pub(crate) enum Command {
     Build(construction::BuildAction),
     Mount(mounts::MountAction),
     Cabin(cabin::CabinAction),
+    Finish(finishes::FinishAction),
     TogglePause,
     InspectVitals,
     SkipTutorial,
@@ -762,6 +768,7 @@ impl GameplaySession {
             Build(action) => self.construction_action(action),
             Mount(action) => self.mount_action(action),
             Cabin(action) => self.cabin_action(action),
+            Finish(action) => self.finish_action(action),
             Control(key, pressed) => self.control(key, pressed),
             Throttle(direction, pressed) => {
                 if !pressed

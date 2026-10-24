@@ -1,4 +1,5 @@
 //! Base habitation fixtures; no new hygiene, water, sleep or survival authority.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_persistence::{SaveError, Validate, invalid};
 use std::time::Duration;
@@ -48,7 +49,7 @@ impl GameplaySession {
         !self.mining.session.fragments().iter().any(|p| {
             salimon_character::cargo::sphere_overlaps_box(
                 frame.world_to_local(p.transform().position().meters()),
-                salimon_world::resource_size::fragment_contact_radius_meters(p.material()),
+                p.contact_radius_meters(),
                 b,
             )
         })
@@ -96,10 +97,14 @@ impl GameplaySession {
         } else {
             (p - step).max(0.0)
         };
+        self.surface_age
+            .travel(1001, p, self.habitation.bunk_open_fraction);
     }
     pub(super) fn use_galley(&mut self) {
         // Reuse exact existing inventory/effect transactions. No free food,
         // water reserve, duplicate fabrication or sleep-time acceleration.
+        self.surface_age
+            .contact(salimon_ship::surface_age::GALLEY, Duration::from_secs(1));
         self.wheel_action(super::consumable_wheel::WheelAction::Hold(true));
         self.feedback = Some("Galley: choose carried food; prepare meals at Fabricator");
     }

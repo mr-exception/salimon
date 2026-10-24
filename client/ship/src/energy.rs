@@ -99,6 +99,23 @@ impl Default for EnergyCore {
     }
 }
 impl EnergyCore {
+    pub(crate) fn increase_capacity(
+        &mut self,
+        expected: u64,
+        capacity: u64,
+    ) -> Result<(), InvalidEnergy> {
+        if self.config.capacity_joules != expected || capacity <= expected {
+            return Err(InvalidEnergy);
+        }
+        let config = EnergyConfig {
+            capacity_joules: capacity,
+            ..self.config
+        }
+        .validate()?;
+        self.config = config;
+        Ok(())
+    }
+
     pub fn new(config: EnergyConfig, stored_joules: f64) -> Result<Self, InvalidEnergy> {
         let config = config.validate()?;
         if !stored_joules.is_finite() || stored_joules < 0.0 {

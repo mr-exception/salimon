@@ -288,6 +288,10 @@ fn scout_feedback_gpu_evidence() {
             near_plane_meters: 0.05,
         };
         let scene = SceneFrame {
+            sky: None,
+            atmosphere: None,
+            weather: None,
+            organisms: &[],
             camera,
             instances: &[],
             spheres: &[],
@@ -298,6 +302,8 @@ fn scout_feedback_gpu_evidence() {
             light: None,
             held_item: None,
             ship: Some(ShipMeshInstance {
+                lighting: Default::default(),
+                surface_ages: [0.; 8],
                 finish_tints: [[[1.; 3]; 5]; 2],
                 position_meters: [0.; 3],
                 orientation: [0., 0., 0., 1.],

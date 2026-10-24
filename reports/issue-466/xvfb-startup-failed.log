@@ -1,9 +1,0 @@
-_XSERVTransSocketOpenCOTSServer: Unable to open socket for local
-_XSERVTransOpen: transport open failed for local/38fc075571f8:96
-_XSERVTransMakeAllCOTSServerListeners: failed to open listener for local
-_XSERVTransSocketOpenCOTSServer: Unable to open socket for unix
-_XSERVTransOpen: transport open failed for unix/38fc075571f8:96
-_XSERVTransMakeAllCOTSServerListeners: failed to open listener for unix
-(EE) 
-Fatal server error:
-(EE) Cannot establish any listening sockets - Make sure an X server isn't already running(EE) 

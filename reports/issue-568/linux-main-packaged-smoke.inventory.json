@@ -1,9 +1,0 @@
-{
-  "archive_sha256": "55268d56e14351164c1a61159a6ea5a99312026d1e31395eef336645046a0c0c",
-  "file_count": 8,
-  "archived_files": 8,
-  "deduplicated_files": 3,
-  "full_inventory": "linux-main-packaged-smoke.inventory.json.gz",
-  "full_inventory_sha256": "8b564a4b31a055fe5f61c98d8e16630530c037af5cf22c86638b68251104a547",
-  "archive": "linux-main-packaged-smoke.tar.xz"
-}

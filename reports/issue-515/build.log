@@ -1,9 +1,0 @@
-   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
-error[E0616]: field `recovery` of struct `GameplaySession` is private
-   --> client/runtime/src/automation.rs:787:41
-    |
-787 |     observation["recovery"] = json!(app.recovery);
-    |                                         ^^^^^^^^ private field
-
-For more information about this error, try `rustc --explain E0616`.
-error: could not compile `salimon-client` (bin "salimon-client") due to 1 previous error

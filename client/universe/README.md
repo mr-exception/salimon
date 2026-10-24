@@ -43,3 +43,28 @@ distance/physical screening, full versioned starting-world surface/resource/visu
 inputs and a reproducible manifest. Run `cargo run -p salimon-universe --example
 starting_system --locked -- --audit` for candidate evidence. Portable definition
 publication does not change playable startup; U24 owns that migration.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Bounded read-only pack queries (#414)
+
+See the [implemented contract](../../docs/universe-reader.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Time-addressable ephemeris models (#415)
+
+See the [implemented contract](../../docs/universe-ephemerides.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Dominant-source celestial gravity (#416)
+
+See the [implemented contract](../../docs/universe-gravity.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Gravity-aware ship trajectory (#417)
+
+See the [implemented contract](../../docs/universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

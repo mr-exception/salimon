@@ -1,9 +1,0 @@
-{
-  "archive_sha256": "fb08c37e798887e0a54ec28486ebcee7be73e088914b65ca205cbae9a540d09e",
-  "file_count": 1365,
-  "archived_files": 1365,
-  "deduplicated_files": 714,
-  "full_inventory": "metal-stack-evidence.inventory.json.gz",
-  "full_inventory_sha256": "80d64794683d4188a0db5c07bbbab4284b79b7e5dafa23cfe1f4565778064161",
-  "archive": "metal-stack-evidence.tar.xz"
-}

@@ -80,6 +80,45 @@ acceleration. Cockpit-to-nose traversal and airlock collision checks cover the r
 Run this evidence group manually against a locally staged release binary.
 See [historical issue discussion](https://github.com/mr-exception/salimon/issues/39) for results and screenshots.
 
+## Integrated Scout and construction acceptance (#551)
+
+Run the complete maintained capture group against a newly built native binary:
+
+```sh
+python3 scripts/salimon-test suite --group scout-construction --evidence \
+  --binary target/debug/salimon-client --artifacts artifacts/scout-construction \
+  --screenshot-command '["native"]' --summary
+```
+
+This group always selects the evidence routes, including when `--evidence` is
+omitted. Its explicit inventory fails on missing files, launch, action, state or
+capture failures. Keep capture enabled for acceptance. It covers cockpit/flight,
+Core, cargo door/ramp/carrying, habitation, galley inspection and lighting,
+Core upgrades, blueprint placement/intake/completion, two-deck traversal,
+module installation/upgrade/restoration, damage/detachment, stop/takeoff and
+offline resume. The three cancellation routes use a declared 20 kg hull-cell input
+and ordinary work/control commands at exactly 0/50/99%; they assert no early
+installed colliders and one physical iron refund of 20/10/0.2 kg. Fixtures do
+not establish actual mining/acquisition balance or physical device input.
+
+For full machinery/Archive coverage also rerun the retained production drivers:
+
+```sh
+python3 reports/issue-489/walkthrough.py --binary target/debug/salimon-client \
+  --output artifacts/scout-machinery
+python3 reports/issue-505/verify.py --binary target/debug/salimon-client \
+  --output artifacts/scout-archive --scale 1
+python3 reports/issue-505/verify.py --binary target/debug/salimon-client \
+  --output artifacts/scout-archive-power --power
+```
+
+Use fresh output directories and the Linux Xvfb/software-Vulkan setup in
+[validation](../docs/validation.md#native-graphical-gates). Preserve per-step state,
+protocol/process logs, original images and source/binary hashes. The current
+[#551 report](../reports/issue-551/README.md) records coverage, actual failures and
+human/platform/performance handoffs. These fixed-step protocol routes do not
+establish human appearance approval, Metal compatibility or physical 60 FPS.
+
 ## Resource collection suite (#51)
 
 Run the complete resource regression suite, then its synchronized visual routes:
@@ -731,3 +770,149 @@ separate required test. See [the #568 report](../reports/issue-568/README.md).
 Cabin evidence: `python3 scripts/salimon-test run scenarios/evidence/habitation-use.json --binary target/debug/salimon-client --screenshot-command '["native"]'` uses the explicit `scout-cabin` camera setup and production E/X/U commands.
 
 Finish evidence: `room-finishes.json`, `room-finishes-blackout.json`, and `furniture-finish.json` under `scenarios/evidence/` use production V/O/Z input after explicit camera setups. Named diagnostic views in `scenarios/visual/scout-finish-cameras.json` change presentation only. Native inspection reports actual ship resident vertex/uniform bytes and draw/triangle counts.
+
+Core upgrade evidence: `core-upgrade-blackout.json` and `core-upgrade-powered.json` under `scenarios/evidence/` use explicit two-receipt/one-carried-fragment seeds, then production I/E/Y inputs. They prove transaction/presentation behavior, not a mining or walked acquisition route.
+
+
+Construction flight readiness (#546): protocol key `construction_stop_resume` maps to native T while the C builder is active, using the same reachable project admission. Run `scenarios/evidence/construction-interlocks.json` for paid Stop/Resume/refund and `scenarios/evidence/construction-interlocks-cockpit.json` for cockpit takeoff refusal. See [the canonical contract](../docs/construction-flight-safety.md).
+
+
+Optional modules (#547): protocol `construction_module` maps to native G in the C builder. Run `scenarios/evidence/construction-module.json`, `construction-module-upgrade.json` and `construction-module-restore.json` for seeded installation, upgrade downtime/Stop/Resume and physical restoration. Each uses real E intake, paid work and commissioning. See [controls and setup limits](../docs/non-core-modules.md).
+
+Persistent surface-age evidence #581: run `scenarios/evidence/surface-age-used.json`
+with the normal native capture command (and the matching new/idle/recolor/blackout/
+reload/damage/repair routes). The used setup executes 600 actual locker open/close
+cycles before the first frame; the other declared seeds and independent renderer
+stress workload are documented in [the surface-age contract](../docs/surface-age.md).
+
+## Source review preparation (#537)
+
+```sh
+python3 scripts/prepare_source_review.py --output artifacts/source-review
+python3 -m unittest discover -s scripts -p 'test_*source*.py'
+```
+
+This offline command freezes verified bytes and a deliberately unapproved human
+review form without changing production eligibility. Existing output is preserved;
+corrupt inputs leave no published partial packet. Use the
+[source contract](../docs/universe-sources.md#preparing-the-human-source-review-537)
+and [decision checklist](../reports/issue-537/README.md) for current limitations,
+provider access, exact source/snapshot approval and physical balance evidence.
+
+Canonical terrain orbit/surface/face-edge captures use `scenarios/evidence/universe-terrain.json`;
+see [canonical geometry and bounds](../docs/universe-terrain.md). This explicit
+render fixture uses fixed light/cameras and does not change a playable save.
+
+Canonical gameplay routes: [boarding](../scenarios/evidence/universe-boarding.json),
+[mining/carry/reload](../scenarios/evidence/universe-mining.json) and
+[takeoff/landing](../scenarios/evidence/universe-flight.json); see
+[contracts and fixture boundaries](../docs/universe-gameplay.md).
+
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+
+
+## Navigation forecasts (#421)
+
+See the [bounded prediction contract](../docs/universe-navigation.md): `ship/src/prediction.rs` (split-coordinate coasting gravity) and `ship/src/preview.rs` (actual playable power/contact model), `runtime/src/session/navigation.rs` disposable cache, `app/scene.rs` / `automation/inspection.rs` observation mapping, and renderer `cockpit_instruments.rs`. Run ship/runtime navigation and renderer tests, all-target Clippy/fmt/docs, runner tests and `scenarios/evidence/universe-navigation.json` in production software-Vulkan. No autopilot, source-energy mutation, chart reveal or certified arrival/error bound is introduced.
+
+## Scanner cockpit evidence (#430)
+
+`scenarios/evidence/scanner-hologram.json` uses the existing `canonical-flight`
+landed cockpit fixture and the `scanner` reference camera. It exercises automatic
+paid discovery, M selection and production GPU screenshots. Fixture placement and
+protocol keys do not establish physical input or normal-play travel. Run with
+Xvfb/Mesa software Vulkan and retain original images and state logs.
+
+## Player-known chart evidence (#469)
+
+`scenarios/evidence/player-chart.json` uses the canonical cockpit and dedicated
+scanner reference view. P switches chart/scanner view, M selects a discovered
+entry, Enter records a voluntary observed route. Assertions retain source and
+route history through real save/restore and scanner expiry, with empty/observed/
+historical production captures. Catalog loading never seeds player chart data.
+
+## Scanner integration evidence
+
+`salimon-test suite --group scanner --binary target/debug/salimon-client
+--screenshot-command '["native"]' --summary` runs the required scanner integration,
+hologram and cockpit collision evidence routes (join as one shell line).
+`review_scanner_captures.py RESULT_JSON ... --output REVIEW_JSON` checks original
+GPU capture dimensions/provenance, engineering-camera selection visibility and
+exact frozen repeats. It needs Pillow from `visual-requirements.txt` and rejects
+failed scenarios, changed repeats, missing files and OS screenshots. Details,
+scale limitations and evidence mapping are in the
+[scanner contract](../docs/universe-scanner.md#cloud-scanner-acceptance-438).
+
+
+## Personal planetary chart (#626)
+
+Run `scripts/salimon-test run scenarios/evidence/planetary-chart.json`. The explicit
+`planetary-chart` fixture creates suit marks through production actions, then sets
+cockpit review initial conditions. `chart_text` submits text to the admitted session
+editor; `surface_chart` and `inspect_site` key aliases map real Backslash/Comma.
+[Source, UI controls, limits and verification](../docs/planetary-chart.md).
+
+## Environmental audio (#627)
+
+`scenarios/evidence/environment-audio.json` checks silent device-preview gains,
+Vesper vacuum, pause/settings toggles and GPU settings captures. `key` aliases
+`settings`, `environment_audio`, `environment_volume`, `environment_cues` invoke
+focused native pause-menu keys, not simulation mutations. See
+[contract](../docs/planetary-audio.md).
+
+## Biological harvesting (#621)
+
+`scenarios/evidence/biological-harvest.json` and `biological-mining.json` exercise
+explicit fictional representative-Moon-geometry sources through ordinary F/tool
+commands, pause/reload, original natural-object drawing and depletion. They do
+not populate canonical Vesper or claim actual Moon life. See
+[source and evidence contract](../docs/biological-harvesting.md).
+
+
+## Canonical render acceptance (#436)
+
+See the [cloud render acceptance contract](../docs/universe-terrain.md#cloud-integration-acceptance-436) for the required
+`universe-render` suite, native frozen/revisit pixel checks, canonical stitched
+seam tests and bounded raw frame/draw observations. Measurements remain
+observational; missing GPU counters stay null and software timings do not
+establish hardware FPS.
+
+## Planetary environment matrix (#628)
+
+Build the production client, configure Linux Xvfb/Mesa as in the validation guide,
+then run (Pillow is required from `scripts/visual-requirements.txt`):
+
+```sh
+python3 scripts/planetary_environment.py --binary target/debug/salimon-client --output artifacts/environment-new
+```
+
+The output directory must be new. Nine mandatory native capture routes cover
+canonical geology orbit/surface/edge/revisit, Vesper vacuum day/night, sterile
+sources, biological detachment/mining/save/reopen, suit field marks, personal
+chart history/manual bearings and suit/Scout audio/settings. Native input uses
+the production protocol; this does not certify physical input devices.
+
+World/runtime weather, organism, natural-site and geological-landmark exports
+repeat in independent processes and require exact byte equality. These exact
+DTOs feed production wgpu pipelines; callback PCM exports exercise suit, open/
+closed Scout and vacuum transmission. Positive atmospheric/biosphere sources
+are explicit fictional fixtures on representative geometry; they do not publish
+life or atmosphere on Vesper or the observed Moon. Component probes isolate
+optics/materials; they are not one fully populated canonical planet or a claim
+of seamless navigation between their separate fixtures.
+
+`matrix.json` retains commands, source/binary hashes, each native context and
+raw-derived median/p95/max frame, draw and available GPU measurements. Original
+results retain memory/cache metrics and simulation coordinates/time. Missing GPU
+samples remain null; software-GPU timings do not establish M1/Metal FPS. Missing
+routes, failed steps/captures, wrong scenario contracts and differing source
+exports fail. Original PNG/WAV/JSON/log hashes bind the artifact directory.
+The run stops on failure and writes a failed report; it does not overwrite a
+prior packet. #561 owns actual perceptual/listening review, #557 physical input
+and #563 hardware qualification. See the [current report](../reports/issue-628/README.md).
+
+After an interrupted session, `--native-summary /path/to/summary.json` may reuse
+completed results from the same binary. Preserve the source/binary provenance;
+the runner rechecks the complete ordered scenario contracts, steps, GPU originals
+and raw metrics. Incomplete or failed rows cannot satisfy the matrix. A successful
+summary must contain all nine routes before component verification proceeds.

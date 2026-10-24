@@ -69,8 +69,9 @@ impl GameplaySession {
                 .ok_or_else(|| invalid("terminal cause missing"))?,
             position_meters: self.snapshot().character.eye_position_meters,
             journey: self.run.journey.clone(),
-            final_location: super::journey::NamedLocation::at(
+            final_location: super::journey::NamedLocation::with_terrain(
                 self.snapshot().character.eye_position_meters,
+                self.mining.terrain,
             ),
         })
     }
@@ -84,26 +85,17 @@ impl GameplaySession {
             .serial
             .checked_add(1)
             .ok_or_else(|| invalid("run identity exhausted"))?;
-        let mut fresh = Self {
-            seed: self.seed,
-            automation_step: self.automation_step,
-            interpolate_presentation: self.interpolate_presentation,
-            measure_physics: self.measure_physics,
-            run: RunState {
-                serial,
-                ..Default::default()
-            },
-            ..Self::new_run()
+        let mut fresh = if self.mining.terrain == salimon_world::terrain::TerrainMode::Flat {
+            Self::new_run()
+        } else {
+            Self::new_canonical_run().map_err(invalid)?
         };
-        if self.mining.terrain == salimon_world::terrain::TerrainMode::Representative {
-            let earth = *salimon_world::CELESTIAL_BODIES
-                .iter()
-                .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
-                .expect("Earth catalog");
-            fresh
-                .enable_terrain(earth, [0.0, 1.0, 0.0])
-                .map_err(invalid)?;
-        }
+        fresh.seed = self.seed;
+        fresh.policy = self.policy;
+        fresh.run = RunState {
+            serial,
+            ..Default::default()
+        };
         fresh.view_mode = ViewMode::Gameplay;
         Ok(fresh)
     }
@@ -116,13 +108,32 @@ impl GameplaySession {
         #[derive(serde::Deserialize)]
         struct Header {
             saved_at_unix_seconds: u64,
+            schema_version: u32,
         }
-        self.restore_bytes(bytes)?;
+        let mut candidate = GameplaySession {
+            policy: self.policy,
+            ..Default::default()
+        };
+        candidate.restore_bytes(bytes)?;
         let header: Header =
             serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
-        self.survival
+        if header.schema_version >= 22 {
+            let elapsed = launch_utc.saturating_sub(candidate.offline.watermark);
+            candidate.reconcile_construction_offline(Duration::from_secs(elapsed), &[])?;
+            if candidate.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
+                candidate
+                    .scanner
+                    .advance_closed(elapsed.checked_mul(1000).ok_or_else(|| {
+                        salimon_persistence::invalid("scanner offline UTC overflow")
+                    })?)?;
+            }
+        }
+        candidate.offline.watermark = candidate.offline.watermark.max(launch_utc);
+        candidate
+            .survival
             .recover_offline(header.saved_at_unix_seconds, launch_utc);
-        self.enforce_survival_restrictions();
+        candidate.enforce_survival_restrictions();
+        *self = candidate;
         Ok(())
     }
 }

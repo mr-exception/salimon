@@ -29,6 +29,7 @@ pub(crate) struct Output {
     failed: bool,
     rate: u32,
     channels: u16,
+    format: Option<String>,
 }
 impl Output {
     pub(crate) fn unavailable(&self) -> bool {
@@ -94,6 +95,7 @@ impl Output {
         let supported = device.default_output_config().map_err(|e| e.to_string())?;
         self.rate = supported.sample_rate();
         self.channels = supported.channels();
+        self.format = Some(format!("{:?}", supported.sample_format()));
         if self.channels == 0 || self.rate < 8000 {
             return Err("unsupported output channel/rate".into());
         }
@@ -178,7 +180,7 @@ impl Output {
             .map_err(|e| e.to_string())
     }
     pub(crate) fn telemetry(&self) -> serde_json::Value {
-        serde_json::json!({"backend":"cpal-0.18.2","available":self.stream.is_some()&&!self.unavailable(),"device_id":self.device_id,"sample_rate":self.rate,"channels":self.channels,"callbacks":self.counters.callbacks.load(Relaxed),"frames":self.counters.frames.load(Relaxed),"max_callback_ns":self.counters.max_callback_ns.load(Relaxed),"max_callback_frames":self.counters.max_frames.load(Relaxed),"callback_cpu_overruns":self.counters.overruns.load(Relaxed),"voices":mix::VOICES,"mailbox_bytes":std::mem::size_of::<mix::Mailbox>(),"mixer_bytes":std::mem::size_of::<mix::Mix>()})
+        serde_json::json!({"backend":"cpal-0.18.2","available":self.stream.is_some()&&!self.unavailable(),"device_id":self.device_id,"sample_rate":self.rate,"sample_format":self.format,"channels":self.channels,"callbacks":self.counters.callbacks.load(Relaxed),"frames":self.counters.frames.load(Relaxed),"max_callback_ns":self.counters.max_callback_ns.load(Relaxed),"max_callback_frames":self.counters.max_frames.load(Relaxed),"callback_cpu_overruns":self.counters.overruns.load(Relaxed),"voices":mix::VOICES,"mailbox_bytes":std::mem::size_of::<mix::Mailbox>(),"mixer_bytes":std::mem::size_of::<mix::Mix>()})
     }
 }
 
@@ -212,6 +214,42 @@ pub(crate) fn fixture_wav(mut control: Control) -> Vec<u8> {
     wav.extend_from_slice(&(pcm.len() as u32).to_le_bytes());
     wav.extend(pcm);
     wav
+}
+
+/// Original continuous callback PCM from 16 ms production control observations.
+#[cfg(test)]
+pub(crate) fn sequence_wav(controls: &[Control]) -> (Vec<u8>, serde_json::Value) {
+    let mailbox = mix::Mailbox::default();
+    let mut mixer = mix::Mix::new(48000);
+    let mut pcm = Vec::new();
+    let mut peak = 0f32;
+    let start = Instant::now();
+    for (tick, c) in controls.iter().enumerate() {
+        mailbox.publish(*c, tick as u64 * 16);
+        mixer.begin(&mailbox, tick as u64 * 16);
+        for _ in 0..768 {
+            for v in mixer.sample() {
+                peak = peak.max(v.abs());
+                pcm.extend_from_slice(&((v * 32767.) as i16).to_le_bytes());
+            }
+        }
+    }
+    let timing = serde_json::json!({"frames":pcm.len()/4,"sample_rate":48000,"cpu_ns":start.elapsed().as_nanos(),"peak":peak,"mailbox_bytes":std::mem::size_of::<mix::Mailbox>(),"mixer_bytes":std::mem::size_of::<mix::Mix>(),"voices":mix::VOICES});
+    let mut wav = Vec::new();
+    wav.extend_from_slice(b"RIFF");
+    wav.extend_from_slice(&(36 + pcm.len() as u32).to_le_bytes());
+    wav.extend_from_slice(b"WAVEfmt ");
+    wav.extend_from_slice(&16u32.to_le_bytes());
+    wav.extend_from_slice(&1u16.to_le_bytes());
+    wav.extend_from_slice(&2u16.to_le_bytes());
+    wav.extend_from_slice(&48000u32.to_le_bytes());
+    wav.extend_from_slice(&192000u32.to_le_bytes());
+    wav.extend_from_slice(&4u16.to_le_bytes());
+    wav.extend_from_slice(&16u16.to_le_bytes());
+    wav.extend_from_slice(b"data");
+    wav.extend_from_slice(&(pcm.len() as u32).to_le_bytes());
+    wav.extend(pcm);
+    (wav, timing)
 }
 
 #[cfg(test)]

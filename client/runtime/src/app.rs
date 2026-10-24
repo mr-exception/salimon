@@ -1,10 +1,15 @@
+mod atmosphere;
 mod diagnostics;
 pub(crate) mod input;
 #[cfg(test)]
 mod input_tests;
 mod interaction;
 mod native;
+mod organisms;
+mod presentation;
 mod scene;
+mod sky;
+mod weather;
 
 use std::error::Error;
 use std::fmt;
@@ -36,14 +41,13 @@ use diagnostics::{
 use input::{InputPolicy, InputSource, release_cursor_pressed};
 use interaction::{action_bar_context, gameplay_window_title};
 use native::{capture_cursor, release_cursor, surface_size, window_attributes};
-use scene::{map_ship_to_renderer, map_world_to_renderer};
 
 use crate::action_bar::ActionBar;
 use crate::automation::{self, Request};
 use crate::e2e;
 use crate::frame_clock::FrameClock;
+use crate::session::ViewMode;
 use crate::session::interaction::InteractionTarget;
-use crate::session::{ViewMode, door_passable};
 
 const TIMING_LOG_INTERVAL: u64 = 300;
 const RENDER_RETRY_DELAY: Duration = Duration::from_millis(50);
@@ -66,17 +70,24 @@ fn run_config(
     event_loop.set_control_flow(ControlFlow::Wait);
 
     let mut application = ClientApplication::default();
+    if let Some(path) = std::env::var_os("SALIMON_UNIVERSE_PACK") {
+        application.universe_stream = Some(
+            salimon_universe::streaming::Stream::open(
+                std::path::Path::new(&path),
+                Default::default(),
+            )
+            .map_err(|e| RunError::new("open universe stream", e))?,
+        );
+    }
     if config.is_none() && benchmark.is_none() {
         application.condition_feedback = crate::condition_feedback::Presenter::open();
-        application.session = crate::session::GameplaySession::new_run();
-        let earth = *salimon_world::CELESTIAL_BODIES
-            .iter()
-            .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
-            .expect("Earth catalog");
-        application
-            .session
-            .enable_terrain(earth, [0.0, 1.0, 0.0])
-            .map_err(|e| RunError::new("terrain startup failed", e))?;
+        application.session = crate::session::GameplaySession::new_canonical_run()
+            .map_err(|e| RunError::new("canonical journey startup failed", e))?;
+    }
+    // Isolated automation stays off personal preferences unless its caller supplies
+    // an explicit test-owned file. Exercise real settings IO without user saves.
+    if config.is_some() && std::env::var_os("SALIMON_SETTINGS_FILE").is_some() {
+        application.condition_feedback = crate::condition_feedback::Presenter::open();
     }
     if config.is_none() && benchmark.is_none() {
         application.checkpoints = Some(
@@ -96,6 +107,9 @@ fn run_config(
             log::info!(
                 "E2E desktop input isolated; protocol controls retained across focus resets"
             );
+        }
+        if config.scenario == e2e::Scenario::CanonicalTerrain {
+            application.scout_reference = crate::scout_reference::find("universe-orbit");
         }
         e2e::initialize(&mut application.session, config)
             .map(|()| application.e2e_config = Some(config))
@@ -156,6 +170,7 @@ pub(crate) struct ClientApplication {
     e2e_ready_sent: bool,
     pub(crate) e2e_input_isolated: bool,
     automation: Option<Receiver<Request>>,
+    pub(crate) universe_stream: Option<salimon_universe::streaming::Stream>,
     pub(crate) terrain_stream: crate::terrain_patches::TerrainStream,
     pub(crate) observations: crate::terrain_observations::Observations,
     pub(crate) capture_status: String,
@@ -190,6 +205,7 @@ impl Default for ClientApplication {
             e2e_ready_sent: false,
             e2e_input_isolated: false,
             automation: None,
+            universe_stream: None,
             terrain_stream: crate::terrain_patches::TerrainStream::default(),
             observations: crate::terrain_observations::Observations::default(),
             capture_status: "idle".into(),
@@ -214,7 +230,10 @@ impl Default for ClientApplication {
 
 impl ClientApplication {
     pub(crate) fn audio_telemetry(&self) -> serde_json::Value {
-        self.scout_audio.telemetry()
+        let mut v = self.scout_audio.telemetry();
+        v["settings"] =
+            serde_json::to_value(self.condition_feedback.settings).expect("bounded settings");
+        v
     }
     pub(crate) fn ship_resource_stats(&self) -> Option<[u64; 4]> {
         self.renderer.as_ref().map(Renderer::ship_resource_stats)
@@ -277,6 +296,8 @@ impl ClientApplication {
 
         let mut attributes = window_attributes(self.e2e_config.is_some());
         if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Representative
+            || (self.e2e_config.is_none()
+                && self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
             || std::env::var_os("SALIMON_REFERENCE_SIZE").is_some()
         {
             attributes = attributes.with_inner_size(winit::dpi::PhysicalSize::new(1920, 1080));
@@ -497,7 +518,7 @@ impl ClientApplication {
     ) {
         log::trace!(
             "input key={key:?} pressed={pressed} source={source:?} ship_controls={:?} orientation={:?}",
-            self.session.ship_control_input,
+            self.session.input.steering(),
             self.session.ship.snapshot().pose.orientation,
         );
         if self.e2e_input_isolated && matches!(source, InputSource::Native) {
@@ -575,11 +596,27 @@ impl ClientApplication {
                 PhysicalKey::Code(KeyCode::KeyB) if self.condition_feedback.settings_open => {
                     self.condition_feedback.toggle_setting(4)
                 }
+                PhysicalKey::Code(KeyCode::KeyE) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(6)
+                }
+                PhysicalKey::Code(KeyCode::KeyF) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(7)
+                }
+                PhysicalKey::Code(KeyCode::KeyT) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(8)
+                }
                 PhysicalKey::Code(KeyCode::KeyG) if self.condition_feedback.settings_open => {
                     self.condition_feedback.toggle_setting(5)
                 }
                 _ => {}
             }
+        }
+        if pause_key && self.session.surface_chart.open && !self.session.is_paused() {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                self.session
+                    .surface_key(crate::session::input::Key::Cancel, true);
+            }
+            return;
         }
         if pause_key && self.session.building.active && !self.session.is_paused() {
             if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
@@ -681,7 +718,7 @@ impl ClientApplication {
     fn set_input_focus(&mut self, focused: bool) {
         log::debug!(
             "native input focus={focused} ship_controls={:?} orientation={:?}",
-            self.session.ship_control_input,
+            self.session.input.steering(),
             self.session.ship.snapshot().pose.orientation,
         );
         self.native_focused = focused;
@@ -693,7 +730,7 @@ impl ClientApplication {
     fn release_input_capture(&mut self) {
         log::trace!(
             "releasing native input: ship_controls={:?}",
-            self.session.ship_control_input
+            self.session.input.steering()
         );
         self.scout_audio.stop();
         self.cursor_captured = false;
@@ -767,8 +804,15 @@ impl ClientApplication {
                 && self.benchmark.is_none(),
         );
         let condition_cue = self.condition_feedback.take_audio_cue();
-        self.scout_audio
-            .update(audio, self.condition_feedback.settings, condition_cue);
+        if self.e2e_config.is_some() {
+            self.scout_audio.preview(
+                crate::scout_audio::Observation::capture(&self.session, true),
+                self.condition_feedback.settings,
+            );
+        } else {
+            self.scout_audio
+                .update(audio, self.condition_feedback.settings, condition_cue);
+        }
         if self.scout_audio.unavailable() {
             self.condition_feedback.message =
                 "Ship audio unavailable - check audio device/output".into();
@@ -829,563 +873,6 @@ impl ClientApplication {
     fn advance_background(&mut self, now: Instant) {
         let elapsed = self.session.update_clock.step(now);
         self.advance_native(elapsed);
-    }
-
-    fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
-        if self.occluded {
-            self.frame_clock.reset_interval();
-            self.diagnostics.reset_frame_window();
-            return;
-        }
-
-        self.render_attempts = self.render_attempts.saturating_add(1);
-        let render_started_at = Instant::now();
-        let update_started_at = Instant::now();
-        let elapsed = if self.automation.is_some() {
-            Duration::ZERO
-        } else {
-            self.session.update_clock.step(update_started_at)
-        };
-        let (update_delta, ticks) = self.advance_native(elapsed);
-        let simulation_time = update_started_at.elapsed();
-        self.session.sync_carried();
-        self.show_session_feedback();
-        let ship_snapshot = self.session.ship.snapshot();
-        let ship_frame = character_ship_frame(ship_snapshot.pose);
-        let surface_frame = self.session.terrain_frame(ship_snapshot);
-        let world_snapshot = self.session.camera_prototype.snapshot();
-        let (mut camera, mut scene_instances, mut spheres, light) =
-            map_world_to_renderer(world_snapshot);
-        let mut resource_meshes = Vec::new();
-        let character_snapshot = self.session.character.snapshot(ship_frame, surface_frame);
-        let presentation = self.session.presentation();
-        let render_ship_frame = character_ship_frame(presentation.ship.pose);
-        if self.session.view_mode == ViewMode::Gameplay {
-            scene_instances.extend(scene::construction_wireframes(
-                &self.session,
-                render_ship_frame,
-                presentation.ship.pose.orientation.map(|v| v as f32),
-            ));
-        }
-        let monitor_message = self.session.ship.contextual_cockpit_message();
-        let interaction = if self.session.view_mode == ViewMode::Gameplay
-            && character_snapshot.location != CharacterLocation::Cockpit
-        {
-            self.session
-                .available_target(
-                    character_snapshot.location,
-                    ship_frame.world_to_local(character_snapshot.eye_position_meters),
-                    ship_frame.world_to_local(character_snapshot.look_target_meters),
-                )
-                .filter(|target| self.session.permitted_interaction(*target))
-        } else {
-            None
-        };
-        let mining_target = self.session.mining.target(
-            &self.session.equipment,
-            character_snapshot,
-            ship_frame,
-            door_passable(ship_snapshot),
-            self.world_seed(),
-        );
-        let fragment_interaction = !matches!(
-            interaction,
-            Some(
-                InteractionTarget::ExitDoor
-                    | InteractionTarget::Core
-                    | InteractionTarget::Fabricator
-            )
-        ) && (self.session.mining.session.carried_object().is_some()
-            || crate::carrying::target(
-                &self.session.mining,
-                character_snapshot,
-                ship_frame,
-                door_passable(ship_snapshot),
-            )
-            .is_some());
-        let resource_context = crate::resource_context::context(
-            &self.session.mining,
-            &self.session.equipment,
-            character_snapshot,
-            ship_frame,
-            door_passable(ship_snapshot),
-            self.world_seed(),
-        );
-        let ship_context = action_bar_context(monitor_message, interaction).map(|text| {
-            crate::resource_context::Prompt {
-                fragment: None,
-                text: text.to_owned(),
-                placement: if monitor_message
-                    .filter(|message| {
-                        *message != salimon_ship::CockpitMessage::DoorLockedWhileInFlight
-                    })
-                    .is_some()
-                {
-                    OverlayPlacement::BottomCenter
-                } else {
-                    interaction.map_or(OverlayPlacement::BottomCenter, |target| {
-                        self.session.cabin_interaction_anchor(target).map_or_else(
-                            || interaction::prompt_placement(target, render_ship_frame),
-                            |p| OverlayPlacement::World {
-                                anchor_meters: render_ship_frame.local_to_world(p),
-                                radius_meters: 0.15,
-                            },
-                        )
-                    })
-                },
-            }
-        });
-        let contextual_action = if let Some(text) = self.session.construction_hint() {
-            Some(crate::resource_context::Prompt {
-                fragment: None,
-                text,
-                placement: OverlayPlacement::BottomCenter,
-            })
-        } else if let Some(text) = self.session.cabin_hint() {
-            if matches!(
-                interaction,
-                Some(InteractionTarget::PrivacyScreen | InteractionTarget::ObservationShutter)
-            ) {
-                ship_context.or(resource_context)
-            } else {
-                Some(crate::resource_context::Prompt {
-                    fragment: None,
-                    text: text.to_owned(),
-                    placement: OverlayPlacement::BottomCenter,
-                })
-            }
-        } else if let Some(text) = self.session.mount_prompt() {
-            Some(crate::resource_context::Prompt {
-                fragment: None,
-                text: text.to_owned(),
-                placement: OverlayPlacement::BottomCenter,
-            })
-        } else if let Some(text) = self.session.finish_hint() {
-            Some(crate::resource_context::Prompt {
-                fragment: None,
-                text,
-                placement: OverlayPlacement::BottomCenter,
-            })
-        } else if fragment_interaction {
-            resource_context.or(ship_context)
-        } else {
-            ship_context.or(resource_context)
-        };
-        let mut contextual_placement = contextual_action
-            .as_ref()
-            .map_or(OverlayPlacement::BottomCenter, |prompt| prompt.placement);
-        if let OverlayPlacement::World { radius_meters, .. } = contextual_placement
-            && let Some(fragment) = contextual_action
-                .as_ref()
-                .and_then(|prompt| prompt.fragment)
-                .and_then(|id| self.session.mining.session.fragment(id))
-        {
-            contextual_placement = OverlayPlacement::World {
-                anchor_meters: presentation
-                    .fragment_mesh(&self.session, *fragment)
-                    .center_meters,
-                radius_meters,
-            };
-        }
-        if self.session.survival.snapshot().terminal {
-            contextual_placement = OverlayPlacement::BottomCenter;
-        }
-        self.action_bar
-            .set_combined_contextual(self.session.building.active);
-        self.action_bar
-            .set_contextual(if self.session.survival.snapshot().terminal {
-                None
-            } else {
-                contextual_action.map(|prompt| prompt.text).or_else(|| {
-                    (!self.survival_hud.details_open && !self.diagnostics.is_visible())
-                        .then(|| self.session.tutorial_text())
-                        .flatten()
-                })
-            });
-        window.set_title(&self.benchmark.as_ref().map_or_else(
-            || {
-                let title = if self.session.survival.snapshot().terminal {
-                    "Salimon - Journey Ended".to_owned()
-                } else {
-                    gameplay_window_title(monitor_message, interaction)
-                };
-                self.checkpoints
-                    .as_ref()
-                    .and_then(|c| c.warning)
-                    .map_or(title.clone(), |warning| format!("{title} | {warning}"))
-            },
-            crate::benchmark::Recorder::window_title,
-        ));
-        if self.session.view_mode == ViewMode::Gameplay {
-            scene_instances.extend(scene::cargo_door(&self.session, presentation.ship));
-        }
-        let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
-            camera = CameraFrame {
-                position_meters: presentation.character.eye_position_meters,
-                target_meters: presentation.character.look_target_meters,
-                up: presentation.character.up,
-                vertical_fov_radians: 70.0_f32.to_radians(),
-                near_plane_meters: 0.05,
-            };
-            self.condition_feedback.camera(&mut camera);
-            if let Some(view) = &self.scout_reference {
-                camera = view.camera(presentation.ship.pose);
-            }
-            let mut mesh = map_ship_to_renderer(presentation.ship);
-            mesh.independent_interior = true;
-            mesh.finish_tints = self.session.finish_palette();
-            mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
-            mesh.fabricator_output_present = self.session.fabricator_output_present();
-            mesh.fabricator_output_medical = self.session.fabricator_output_medical();
-            mesh.fabricator_output_component = self.session.fabricator_output_component();
-            mesh.instruments.fabricator = self.session.fabricator_instruments();
-            mesh.machinery = crate::scout_feedback::capture(&self.session, presentation.ship);
-            Some(mesh)
-        } else {
-            None
-        };
-        if self.session.view_mode == ViewMode::Gameplay {
-            match self
-                .session
-                .mining
-                .nearby(camera.position_meters, self.world_seed())
-            {
-                Ok(deposits) => {
-                    resource_meshes.extend(deposits.iter().copied().filter_map(|entry| {
-                        crate::resource_presentation::deposit_mesh_with_terrain(
-                            entry,
-                            self.session.mining.terrain,
-                        )
-                    }));
-                }
-                Err(error) => log::error!("deposit presentation query failed: {error:?}"),
-            }
-        }
-        if self.session.view_mode == ViewMode::Gameplay {
-            for fragment in self.session.mining.nearby_fragments(camera.position_meters) {
-                if self.session.mining.session.attached_sphere_id() == Some(fragment.id()) {
-                    continue;
-                }
-                resource_meshes.push(presentation.fragment_mesh(&self.session, fragment));
-            }
-        }
-        if self.session.view_mode == ViewMode::Gameplay
-            && let Some(preview) = self
-                .session
-                .mining
-                .growth_preview(&self.session.equipment, presentation.character)
-        {
-            resource_meshes.push(preview);
-        }
-        let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
-            self.session.mining.terrain
-        } else {
-            salimon_world::terrain::TerrainMode::Flat
-        };
-        if let Err(error) = self
-            .terrain_stream
-            .update(camera.position_meters, render_terrain)
-        {
-            self.fail(event_loop, error);
-            return;
-        }
-        for sphere in &mut spheres {
-            let body = crate::terrain::body_at(sphere.center_meters, sphere.radius_meters);
-            sphere.radius_meters =
-                crate::terrain::far_radius(body, camera.position_meters, render_terrain);
-        }
-        let body_distances = camera_body_distances_with_terrain(
-            world_snapshot,
-            camera.position_meters,
-            render_terrain,
-        );
-        let cpu_update_time = update_started_at.elapsed();
-        let terminal = self.session.survival.snapshot().terminal;
-        let terminal_report = if terminal {
-            match self.session.ended_run() {
-                Ok(report) => Some(crate::journey_ended::Report::from(&report)),
-                Err(error) => {
-                    self.fail(event_loop, error);
-                    return;
-                }
-            }
-        } else {
-            None
-        };
-        let crafting_text = if self.session.is_paused() && self.condition_feedback.settings_open {
-            Some(self.condition_feedback.menu_text())
-        } else {
-            self.pause_menu_text()
-                .or_else(|| self.session.archive_text())
-                .or_else(|| self.session.crafting_text())
-        };
-        let ended_image = self.journey_ended.image(
-            terminal_report,
-            [window.inner_size().width, window.inner_size().height],
-            window.scale_factor(),
-        );
-        let crafting_pixels = crafting_text
-            .as_ref()
-            .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
-        if self.session.wheel.open {
-            self.wheel_raster.update(self.session.wheel_presentation());
-        }
-        let wheel_image = self
-            .session
-            .wheel
-            .open
-            .then(|| self.wheel_raster.image())
-            .flatten();
-        let hud_observation = crate::survival_hud::Observation::capture(&self.session);
-        let hud_visible = hud_observation.visible && !self.diagnostics.is_visible();
-        let hud_frame = self.survival_hud.observe(hud_observation);
-        let hud_image = self.survival_hud.image(
-            hud_frame,
-            [window.inner_size().width, window.inner_size().height],
-            window.scale_factor(),
-            hud_visible,
-        );
-        let gameplay_overlay = crafting_pixels
-            .as_ref()
-            .map(|(width, height, pixels)| RendererOverlayImage {
-                width: *width,
-                height: *height,
-                rgba8: pixels,
-                revision: {
-                    use std::hash::{Hash, Hasher};
-                    let mut hash = std::collections::hash_map::DefaultHasher::new();
-                    crafting_text.hash(&mut hash);
-                    hash.finish()
-                },
-                placement: OverlayPlacement::Center,
-            })
-            .or_else(|| {
-                self.diagnostics
-                    .overlay()
-                    .map(|image| RendererOverlayImage {
-                        width: image.width,
-                        height: image.height,
-                        rgba8: image.rgba8,
-                        revision: image.revision,
-                        placement: OverlayPlacement::TopLeft,
-                    })
-            })
-            .or(hud_image);
-        let overlay_image = if terminal {
-            ended_image
-        } else {
-            wheel_image.or(gameplay_overlay)
-        };
-        // Modal text and the Q wheel own interaction; world prompts/reticle must
-        // not obscure their rows or suggest a competing world action.
-        let world_interaction_visible = self.session.view_mode == ViewMode::Gameplay
-            && !terminal
-            && !self.session.is_paused()
-            && crafting_text.is_none()
-            && !self.session.wheel.open;
-        let action_bar_image = self
-            .action_bar
-            .image(world_interaction_visible)
-            .map(|image| RendererOverlayImage {
-                width: image.width,
-                height: image.height,
-                rgba8: image.rgba8,
-                revision: image.revision,
-                placement: if self.action_bar.has_transient() {
-                    OverlayPlacement::BottomCenter
-                } else {
-                    contextual_placement
-                },
-            });
-        let held_item = (!terminal)
-            .then(|| {
-                self.session
-                    .held_item(presentation.character, mining_target.is_some())
-            })
-            .flatten();
-        let fixture_instances = if self.session.view_mode == ViewMode::Gameplay {
-            self.session.fixture_instances(presentation.ship)
-        } else {
-            Vec::new()
-        };
-        let outcome = match self
-            .renderer
-            .as_mut()
-            .expect("redraws require an initialized renderer")
-            .render(
-                SceneFrame {
-                    camera,
-                    instances: &scene_instances,
-                    resource_meshes: &resource_meshes,
-                    fixtures: &fixture_instances,
-                    spheres: &spheres,
-                    terrain: &self.terrain_stream.active,
-                    terrain_mask: self.terrain_stream.mask,
-                    light: Some(light),
-                    ship: ship_mesh,
-                    held_item,
-                },
-                self.condition_feedback.image(),
-                overlay_image,
-                action_bar_image,
-                crate::reticle::image(world_interaction_visible, &self.session.equipment).or(
-                    if self.session.wheel.open {
-                        hud_image
-                    } else {
-                        None
-                    },
-                ),
-                (self.session.view_mode == ViewMode::Gameplay
-                    && !terminal
-                    && !self.session.is_paused())
-                .then(|| self.session.equipment_presentation()),
-                window.scale_factor(),
-                || window.pre_present_notify(),
-            ) {
-            Ok(outcome) => outcome,
-            Err(error) => {
-                self.fail(event_loop, error);
-                return;
-            }
-        };
-        if self.render_attempts == 1
-            || (!matches!(outcome, RenderOutcome::Presented(_))
-                && self.render_attempts.is_multiple_of(100))
-        {
-            log::debug!(
-                "render attempt {} completed with {outcome:?}",
-                self.render_attempts
-            );
-        }
-
-        if let Some(capture) = self.renderer.as_mut().and_then(Renderer::take_capture) {
-            let result = capture.map_err(|e| e.to_string()).and_then(|bytes| {
-                let path = self.capture_path.take().ok_or("capture path missing")?;
-                let mut file = std::fs::OpenOptions::new()
-                    .write(true)
-                    .create_new(true)
-                    .open(&path)
-                    .map_err(|e| format!("capture {}: {e}", path.display()))?;
-                file.write_all(&bytes)
-                    .map_err(|e| format!("capture {}: {e}", path.display()))
-            });
-            self.capture_status =
-                result.map_or_else(|e| format!("failed: {e}"), |()| "captured".into());
-        }
-        match outcome {
-            RenderOutcome::Presented(render_stats) => {
-                let ready = window.has_focus()
-                    && window.is_visible() == Some(true)
-                    && window.is_minimized() != Some(true)
-                    && !self.occluded;
-                if let Some(benchmark) = self.benchmark.as_mut()
-                    && benchmark.native_readiness_changed(ready)
-                    && let Err(error) = benchmark.observe_native("presented_window_poll", ready)
-                {
-                    self.fail(event_loop, error);
-                    return;
-                }
-                self.retry_at = None;
-                event_loop.set_control_flow(ControlFlow::Wait);
-                let timing = self
-                    .frame_clock
-                    .record_presented(render_started_at, Instant::now());
-                self.observations.record(
-                    timing.frame_interval,
-                    cpu_update_time,
-                    render_stats,
-                    [window.inner_size().width, window.inner_size().height],
-                );
-                self.diagnostics.record_presented(
-                    diagnostics::frame_sample(timing, render_stats, cpu_update_time),
-                    if self.session.view_mode == ViewMode::Gameplay {
-                        gameplay_domain_metrics(
-                            character_snapshot.eye_position_meters,
-                            ship_snapshot,
-                            &body_distances,
-                        )
-                    } else {
-                        camera_domain_metrics(world_snapshot, &body_distances)
-                    },
-                );
-                if timing.frame_number == 1
-                    || timing.frame_number.is_multiple_of(TIMING_LOG_INTERVAL)
-                    || log::log_enabled!(target: "salimon_client::frame", log::Level::Trace)
-                {
-                    log::debug!(
-                        target: "salimon_client::frame",
-                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_update_ms={:.3} cpu_render_ms={:.3} gpu_time={:?} ticks={} backlog_ms={:.3} focused={} occluded={}",
-                        timing.frame_number,
-                        timing.frame_interval.as_secs_f64() * 1_000.0,
-                        timing.submission_wall_time.as_secs_f64() * 1_000.0,
-                        cpu_update_time.as_secs_f64() * 1_000.0,
-                        render_stats.cpu_render_time.as_secs_f64() * 1_000.0,
-                        render_stats.gpu_frame_time,
-                        ticks,
-                        self.session.update_clock.backlog().as_secs_f64() * 1_000.0,
-                        self.native_focused,
-                        self.occluded
-                    );
-                }
-                let done = self.benchmark.as_mut().is_some_and(|benchmark| {
-                    benchmark.record(
-                        update_delta,
-                        cpu_update_time,
-                        simulation_time,
-                        Some(render_stats),
-                    )
-                });
-                if done {
-                    let accounting = crate::benchmark::accounting(&self.session);
-                    let result = self
-                        .benchmark
-                        .as_mut()
-                        .expect("active benchmark")
-                        .finish(accounting);
-                    match result {
-                        Err(error) => self.fail(event_loop, error),
-                        Ok(true) => event_loop.exit(),
-                        Ok(false) => {
-                            if self.benchmark.as_ref().is_some_and(|b| b.switch_camera()) {
-                                self.session
-                                    .character
-                                    .apply_mouse_delta(std::f64::consts::PI / 0.0022, 0.0);
-                            }
-                            window.request_redraw();
-                        }
-                    }
-                    return;
-                }
-                window.request_redraw();
-            }
-            RenderOutcome::Retry => self.schedule_retry(event_loop, RENDER_RETRY_DELAY),
-            RenderOutcome::Idle => {
-                self.frame_clock.reset_interval();
-                self.reset_update_clock();
-                self.diagnostics.reset_frame_window();
-                if surface_size(&window).is_drawable() {
-                    self.schedule_retry(event_loop, IDLE_RETRY_DELAY);
-                } else {
-                    self.retry_at = None;
-                    event_loop.set_control_flow(ControlFlow::Wait);
-                }
-            }
-            RenderOutcome::SurfaceLost => {
-                if let Some(benchmark) = self.benchmark.as_mut()
-                    && let Err(error) = benchmark.observe_native("surface_lost", false)
-                {
-                    self.fail(event_loop, error);
-                    return;
-                }
-                log::warn!("rendering surface was lost; rebuilding renderer");
-                self.renderer = None;
-                if let Err(error) = self.initialize_renderer() {
-                    self.fail(event_loop, error);
-                    return;
-                }
-                self.schedule_retry(event_loop, RENDER_RETRY_DELAY);
-            }
-        }
     }
 }
 
@@ -1698,6 +1185,18 @@ impl ApplicationHandler for ClientApplication {
                 is_synthetic,
                 ..
             } => {
+                if self.session.surface_chart.editing
+                    && event.state == ElementState::Pressed
+                    && !is_synthetic
+                    && self.input_policy().admits_press(InputSource::Native, false)
+                    && let Some(text) = &event.text
+                    && !text.is_empty()
+                    && !text.chars().any(char::is_control)
+                {
+                    let _ = self.session.surface_text(text);
+                    window.request_redraw();
+                    return;
+                }
                 self.dispatch_key(
                     event.physical_key,
                     event.state == ElementState::Pressed,

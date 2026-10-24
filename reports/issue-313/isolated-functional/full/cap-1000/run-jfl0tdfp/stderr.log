@@ -1,8 +1,0 @@
-[2026-10-21T05:11:18Z INFO  salimon_client] starting Salimon native client
-[2026-10-21T05:11:18Z INFO  salimon_client::app] E2E desktop input isolated; protocol controls retained across focus resets
-motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
-fixture preparation: 50 steps, 1000/1000 asleep, 1000 quiet, 0 moving, 4.302 wall seconds
-fixture settled naturally after 50 steps (0.800 simulation seconds, 4.302 wall seconds)
-[2026-10-21T05:11:23Z INFO  salimon_client::app] native window created: physical_size=1280x800 scale_factor=2.00
-[2026-10-21T05:11:23Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
-[2026-10-21T05:11:23Z INFO  salimon_client::app] application resumed

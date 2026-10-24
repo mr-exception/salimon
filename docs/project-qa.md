@@ -97,7 +97,7 @@ acceptance; the minimal shared OS playback seam may need a continuous backend.
 
 Portable balance evidence is [documented](survival-balance.md). Proposed comfortable
 360-second and break-even 720-second one-ration budgets await explicit owner
-approval in [#537](https://github.com/mr-exception/salimon/issues/537) after #496
+approval in [#660](https://github.com/mr-exception/salimon/issues/660) after #496
 evidence delivery. Physical routes/subjective native timing remain unmeasured;
 current non-Earth profiles have no biomass. Approved meter durations are unchanged.
 
@@ -111,23 +111,42 @@ remains #498. Jump Drive N=20% capacity/progression balance stays future, unchan
 
 ## Replacement corpus and production source decisions (#537)
 
-[Follow-up #537](https://github.com/mr-exception/salimon/issues/537) retains human
-image/mask/tolerance approval and exact hosted software-Vulkan verification after
-#518 candidate delivery. Candidate status and native Metal independence remain.
-It also retains source-specific full terms, exact credits/permissions and full
-production snapshot approval after #513 private-development/evidence-gate delivery.
-The owner chose private development only; production eligibility remains blocked
-until the source-review checklist is resolved. Closing either source issue grants
-no appearance or production-data approval.
+On 2026-10-27 the owner authorized proceeding with the verified #537 preparation
+in PR #658 and verifying personally later. This accepts delivery with deferred
+review, not unrun checks or new source permissions. [#659](https://github.com/mr-exception/salimon/issues/659)
+owns source-specific full terms, exact credits/permissions and full production
+snapshot approval; #660 owns measured survival/recovery routes and balance
+choices; #661 owns future full-experience/backend acceptance. #561 retains human
+image/mask/tolerance approval and independent hosted software-Vulkan corpus
+review, with #557 physical platform experiments and #563 hardware qualification.
+The owner permits private development; public/commercial release review remains
+#659. Closing #537 grants no appearance or release-data approval.
 
-## Blueprint estimates awaiting economy approval (#542 → #537)
+## Public astronomy data for private development (2026-10-27)
 
-B02 placement shows proposed catalog estimates, with `approved_economy:false`.
-No resources are consumed and no timer advances. Owner approval in #537 is
-required before #543/#544 turn these estimates into funded construction policy.
+The owner explicitly authorizes acquiring and using public astronomy data in
+this private, noncommercial project, including real-data ingestion, validation
+and locally used offline packs. Legal/ethical and redistribution review is
+deferred to a future public or commercial release under #659. That future gate
+does not require another approval before private development proceeds. This
+supersedes the older fixture-only restriction, while keeping provenance,
+credits, exact input hashes and scientific/implementation checks intact. See the
+[current source policy](universe-sources.md#current-private-development-authorization-2026-10-27).
+
+## Approved construction economy (#543, owner decision 2026-10-24)
+
+The owner explicitly answered “Approve the proposed catalog” in this chat on
+2026-10-24. The catalog is now `approved_economy:true`; #543 may accept physical
+materials. Timed construction still belongs to #544.
 The authored `client/runtime/catalogs/blueprints.json` is the single source:
 stool 1 kg Iron / 10 s; partition 5 kg / 20 s; internal door 5 kg / 30 s;
 hull cell 20 kg / 120 s; deck cell 15 kg / 90 s; two-deck room 40 kg / 300 s;
-utility module 3 kg / 60 s. These are review proposals, not approved balance.
+utility module 3 kg / 60 s. These are approved gameplay parameters, not a measured
+acquisition-route or subjective play-balance result.
 Fine-grid pitch is per blueprint (currently 0.5 m); the structural lattice stays
 3 m. B02 does not authorize occupied-room demolition or structural completion.
+
+
+## Core upgrade balance — owner direction 2026-10-24 (#548)
+
+The owner answered the unresolved-values question with “guess them yourself” and asked for balanced costs so play is neither too grindy nor too easy. This explicitly authorizes the reviewable data catalog: 90/120/180 GJ, incremental iron/silicate costs 20/10, 30/10, 40/20 kg. Rationale, exact source/transaction semantics and limits are in [Core upgrades](core-upgrades.md). These are selected gameplay parameters, not empirical material measurements, a measured playtest, or blanket approval of the unrelated construction economy.

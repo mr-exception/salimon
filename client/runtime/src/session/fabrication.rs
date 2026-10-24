@@ -1,4 +1,5 @@
 //! Physical intake adapter. All validation precedes the infallible single-owner commit.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_fabrication::FabricationError;
 
@@ -73,10 +74,76 @@ impl GameplaySession {
                 .update(id, (mg > 0).then_some(mg as f64 / 1_000_000.0))
                 .expect("bounded stored quantities and validated output mass");
         }
+        let maintenance_mass: f64 = self
+            .building
+            .source
+            .modules
+            .iter()
+            .filter(|(id, _)| {
+                self.building
+                    .source
+                    .projects
+                    .inspect(**id)
+                    .is_some_and(|p| !p.work.destroyed)
+            })
+            .flat_map(|(_, m)| m.receipts())
+            .map(|f| f.material().mass_kg())
+            .sum();
+        let construction_mass: f64 = self
+            .building
+            .source
+            .projects
+            .jobs()
+            .filter(|p| {
+                !p.work.destroyed && !(p.work.completed && super::construction::is_structural(p))
+            })
+            .map(|p| p.funding.mass_kg())
+            .sum();
+        changed |= self
+            .mining
+            .ship_mass
+            .update(
+                salimon_ship::MassObjectId::ConstructionMaterials,
+                (construction_mass + maintenance_mass > 0.)
+                    .then_some(construction_mass + maintenance_mass),
+            )
+            .expect("bounded project receipts");
+        // Destruction must clear old installed entries, including detached cells.
+        for id in &self.building.source.damage.lost {
+            changed |= self
+                .mining
+                .ship_mass
+                .update(salimon_ship::MassObjectId::Structure(id.0), None)
+                .expect("removing installed mass");
+        }
+        for (id, mass) in self.building.structure.mass_entries() {
+            changed |= self
+                .mining
+                .ship_mass
+                .update(id, Some(mass))
+                .expect("validated installed structure mass");
+        }
+        let core_mass = self.core_upgrades.mass_kg();
+        changed |= self
+            .mining
+            .ship_mass
+            .update(
+                salimon_ship::MassObjectId::CoreUpgradeMaterials,
+                (core_mass > 0.).then_some(core_mass),
+            )
+            .expect("bounded Core receipt mass");
         if changed || self.ship.snapshot().total_mass_kg != self.mining.ship_mass.total_kg() {
             self.ship
                 .set_total_mass_kg(self.mining.ship_mass.total_kg())
                 .expect("finite Fabricator and physical cargo ledger");
+        }
+    }
+
+    fn advance_ship_power(&mut self, delta: std::time::Duration) {
+        if self.offline_power {
+            self.ship.advance_offline_power(delta);
+        } else {
+            self.ship.advance(delta);
         }
     }
 
@@ -88,15 +155,17 @@ impl GameplaySession {
                 self.ship
                     .set_fabricator_watts(0.0)
                     .expect("zero load is valid");
-                self.ship.advance(remaining);
+                self.advance_ship_power(remaining);
                 break;
             };
             let active = demand.until_output.min(remaining);
             self.ship
                 .set_fabricator_watts(demand.watts)
                 .expect("validated recipe watts");
-            self.ship.advance(active);
+            self.advance_ship_power(active);
             let funded = self.ship.fabricator_powered_duration(active);
+            self.surface_age
+                .contact(salimon_ship::surface_age::FABRICATOR, funded);
             self.fabricator.step(funded, true);
             if self
                 .fabrication_snapshot()
@@ -115,7 +184,7 @@ impl GameplaySession {
                 self.ship
                     .set_fabricator_watts(0.0)
                     .expect("zero load is valid");
-                self.ship.advance(remaining);
+                self.advance_ship_power(remaining);
                 break;
             }
         }
@@ -361,10 +430,21 @@ mod power_tests {
         );
         assert!(!s.ship.snapshot().power_available);
         let paused = s.fabricator.clone();
+        assert!(
+            s.surface_age
+                .intensity(salimon_ship::surface_age::FABRICATOR)
+                > 0.
+        );
+        let mut exposure = s.surface_age.clone();
+        exposure.advance(Duration::from_millis(160));
         for _ in 0..10 {
             s.advance_game(Duration::from_millis(16));
         }
         assert_eq!(s.fabricator, paused);
+        assert_eq!(
+            s.surface_age, exposure,
+            "unfunded work adds passive age only"
+        );
         s.ship
             .exchange_core_energy_joules(1_000_000.0, 0.0)
             .unwrap();

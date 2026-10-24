@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/mrexception/Documents/Projects/Salimon/salimon/reports/issue-348/native_probe.py", line 52, in <module>
-    if proc.returncode: raise RuntimeError(proc.stderr)
-                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: macOS event posting access is unavailable
-

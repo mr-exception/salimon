@@ -1,8 +1,10 @@
 //! Bounded visible cap of cube-sphere quadtree patches, never a full-planet mesh.
 use salimon_math::{length, scale, sub};
 use salimon_renderer::{TerrainMask, TerrainPatch, TerrainPatchKey, TerrainVertex};
+#[cfg(test)]
+use salimon_world::CELESTIAL_BODIES;
 use salimon_world::{
-    CELESTIAL_BODIES, CelestialBody,
+    CelestialBody,
     terrain::{TerrainDefinition, TerrainMode},
 };
 use std::{
@@ -82,6 +84,7 @@ fn select(
     cell: Cell,
     radius: f64,
     anchor: [f64; 3],
+    whole_planet: bool,
     leaves: &mut BTreeSet<Cell>,
     pending: &mut Vec<Cell>,
 ) {
@@ -96,10 +99,15 @@ fn select(
         .map(|p| length(sub(*p, center)))
         .fold(0.0_f64, f64::max);
     let distance = length(sub(center, anchor));
-    if distance > COVERAGE_METERS + bound * 1.1 {
+    if !whole_planet && distance > COVERAGE_METERS + bound * 1.1 {
         return;
     }
-    if cell.level < 24 && size > (distance * 0.45).clamp(64.0, 4096.0) {
+    let target_size = if whole_planet {
+        ((distance - bound * 1.1).max(0.0) * 3.0).max(64.0)
+    } else {
+        (distance * 0.45).clamp(64.0, 4096.0)
+    };
+    if cell.level < 24 && size > target_size {
         pending.extend(cell.children());
     } else {
         leaves.insert(cell);
@@ -146,7 +154,7 @@ fn balanced_selection(radius: f64, anchor: [f64; 3]) -> Result<BTreeSet<Cell>, S
         })
         .collect();
     while let Some(cell) = pending.pop() {
-        select(cell, radius, anchor, &mut leaves, &mut pending);
+        select(cell, radius, anchor, false, &mut leaves, &mut pending);
     }
     loop {
         let split: Vec<_> = leaves
@@ -181,7 +189,11 @@ fn key(
 ) -> TerrainPatchKey {
     TerrainPatchKey {
         body: body.id as u8,
-        definition: definition.to_bytes(),
+        definition: [
+            b"SLMMAT01".as_slice(),
+            definition.geology().to_bytes().as_slice(),
+        ]
+        .concat(),
         face: cell.face,
         level: cell.level,
         u: cell.u,
@@ -207,12 +219,21 @@ fn generate(
         .expect("cube direction")
         .body_local_position_meters;
     let far_radius = body.radius_meters + definition.elevation_bounds_meters()[0];
+    let geology = definition.geology();
     let vertex = |u, v| {
         let d = cell.direction(u, v);
-        let sample = definition.sample(d).expect("cube direction");
+        let observed = geology.sample(d).expect("cube direction");
+        let sample = observed.surface;
+        let (albedo_factor, strata) = crate::terrain_materials::factors(
+            geology.profile(),
+            &observed.geology,
+            sample.elevation_meters,
+        );
         TerrainVertex {
             offset_meters: sub(sample.body_local_position_meters, anchor).map(|v| v as f32),
             normal: sample.outward_normal.map(|v| v as f32),
+            albedo_factor,
+            strata,
             far_offset_meters: sub(scale(d, far_radius), anchor).map(|v| v as f32),
         }
     };
@@ -275,10 +296,16 @@ fn generate(
         anchor_meters: anchor,
         vertices,
         indices,
-        material: match body.id {
-            salimon_world::CelestialBodyId::Earth => salimon_renderer::SurfaceMaterial::Oceanic,
-            salimon_world::CelestialBodyId::Moon => salimon_renderer::SurfaceMaterial::Slate,
-            _ => salimon_renderer::SurfaceMaterial::Rust,
+        material: if geology.profile() == salimon_world::terrain::geology::GeologyProfile::Ice {
+            salimon_renderer::SurfaceMaterial::Ice
+        } else {
+            match body.id {
+                salimon_world::CelestialBodyId::Earth => salimon_renderer::SurfaceMaterial::Oceanic,
+                salimon_world::CelestialBodyId::Moon | salimon_world::CelestialBodyId::Vesper => {
+                    salimon_renderer::SurfaceMaterial::Slate
+                }
+                _ => salimon_renderer::SurfaceMaterial::Rust,
+            }
         },
     }
 }
@@ -335,6 +362,7 @@ impl SelectionWork {
                             cell,
                             body.radius_meters,
                             self.id.2,
+                            body.id == salimon_world::CelestialBodyId::Vesper,
                             &mut self.leaves,
                             &mut self.pending,
                         );
@@ -415,13 +443,19 @@ impl TerrainStream {
         self.frame += 1;
         self.generated = 0;
         self.generation_micros = 0;
-        let target = CELESTIAL_BODIES
+        let target = mode
+            .bodies()
             .iter()
             .filter_map(|body| {
                 let definition = mode.definition(body.id)?;
                 let local = sub(camera, body.center.meters());
                 let altitude = length(local) - body.radius_meters;
-                (altitude.abs() <= 10_000.0).then_some((*body, definition, local, altitude.abs()))
+                (mode == TerrainMode::Canonical || altitude.abs() <= 10_000.0).then_some((
+                    *body,
+                    definition,
+                    local,
+                    altitude.abs(),
+                ))
             })
             .min_by(|a, b| a.3.total_cmp(&b.3));
         self.has_target = target.is_some();
@@ -443,7 +477,16 @@ impl TerrainStream {
             2.0 * (((u + 1.0) * 0.5 * n).floor() + 0.5) / n - 1.0,
             2.0 * (((v + 1.0) * 0.5 * n).floor() + 0.5) / n - 1.0,
         ));
-        let anchor = scale(direction, body.radius_meters);
+        let anchor = if mode == TerrainMode::Canonical {
+            let altitude = (length(local) - body.radius_meters).max(0.0);
+            let bin = 256.0_f64.max(altitude * 0.125);
+            scale(
+                direction,
+                body.radius_meters + (altitude / bin).floor() * bin,
+            )
+        } else {
+            scale(direction, body.radius_meters)
+        };
         let selection_id = (body.id as u8, definition.to_bytes(), anchor);
         if self.selection_id.as_ref() != Some(&selection_id) {
             let selection_started = Instant::now();
@@ -522,7 +565,11 @@ impl TerrainStream {
             self.mask = Some(TerrainMask {
                 body_center_meters: body.center.meters(),
                 anchor_meters: anchor,
-                radius_meters: MASK_METERS,
+                radius_meters: if mode == TerrainMode::Canonical {
+                    body.radius_meters * 4.0 + length(anchor)
+                } else {
+                    MASK_METERS
+                },
             });
         } else if self
             .mask
@@ -802,53 +849,83 @@ mod topology_tests {
     use super::*;
     #[test]
     fn mixed_lod_and_cross_face_segments_have_no_open_edges_inside_the_mask() {
-        let body = *CELESTIAL_BODIES
-            .iter()
-            .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
-            .unwrap();
-        let definition = TerrainMode::Representative.definition(body.id).unwrap();
-        for direction in [unit([1.0, 1.0, 0.0]), unit([1.0, 1.0, 1.0])] {
-            let anchor = scale(direction, body.radius_meters);
-            let leaves = balanced_selection(body.radius_meters, anchor).unwrap();
-            let mut boundary = std::collections::HashMap::<[[i64; 3]; 2], ([f64; 3], u32)>::new();
-            for cell in &leaves {
-                let patch = generate(body, definition, key(*cell, body, definition, &leaves));
-                let mut local = std::collections::HashMap::<[u32; 2], u32>::new();
-                for tri in patch.indices.as_chunks::<3>().0 {
-                    for i in 0..3 {
-                        let mut edge = [tri[i], tri[(i + 1) % 3]];
-                        edge.sort();
-                        *local.entry(edge).or_default() += 1;
+        for mode in [TerrainMode::Representative, TerrainMode::Canonical] {
+            let body = if mode == TerrainMode::Canonical {
+                salimon_world::canonical::BODIES[0]
+            } else {
+                *CELESTIAL_BODIES
+                    .iter()
+                    .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
+                    .unwrap()
+            };
+            let definition = mode.definition(body.id).unwrap();
+            for direction in [unit([1.0, 1.0, 0.0]), unit([1.0, 1.0, 1.0])] {
+                let anchor = scale(direction, body.radius_meters);
+                let leaves = if mode == TerrainMode::Canonical {
+                    let mut work =
+                        SelectionWork::new((body.id as u8, definition.to_bytes(), anchor));
+                    let mut selected = None;
+                    for _ in 0..5000 {
+                        if let Some(keys) = work.advance(body, definition, Instant::now()).unwrap()
+                        {
+                            selected = Some(
+                                keys.into_iter()
+                                    .map(|k| Cell {
+                                        face: k.face,
+                                        level: k.level,
+                                        u: k.u,
+                                        v: k.v,
+                                    })
+                                    .collect(),
+                            );
+                            break;
+                        }
+                    }
+                    selected.expect("bounded canonical selection")
+                } else {
+                    balanced_selection(body.radius_meters, anchor).unwrap()
+                };
+                let mut boundary =
+                    std::collections::HashMap::<[[i64; 3]; 2], ([f64; 3], u32)>::new();
+                for cell in &leaves {
+                    let patch = generate(body, definition, key(*cell, body, definition, &leaves));
+                    let mut local = std::collections::HashMap::<[u32; 2], u32>::new();
+                    for tri in patch.indices.as_chunks::<3>().0 {
+                        for i in 0..3 {
+                            let mut edge = [tri[i], tri[(i + 1) % 3]];
+                            edge.sort();
+                            *local.entry(edge).or_default() += 1;
+                        }
+                    }
+                    for (edge, count) in local {
+                        if count != 1 {
+                            continue;
+                        }
+                        let points = edge.map(|index| {
+                            std::array::from_fn::<_, 3, _>(|i| {
+                                patch.anchor_meters[i]
+                                    + f64::from(patch.vertices[index as usize].offset_meters[i])
+                            })
+                        });
+                        let mid = salimon_math::scale(salimon_math::add(points[0], points[1]), 0.5);
+                        let mut positions = points.map(|p| {
+                            let cube =
+                                scale(p, 1.0 / p.iter().map(|v| v.abs()).fold(0.0_f64, f64::max));
+                            cube.map(|v| (v * f64::from(1_u32 << 24)).round() as i64)
+                        });
+                        positions.sort();
+                        boundary.entry(positions).or_insert((mid, 0)).1 += 1;
                     }
                 }
-                for (edge, count) in local {
-                    if count != 1 {
-                        continue;
+                let mut checked = 0;
+                for (_, (mid, count)) in boundary {
+                    if length(sub(scale(unit(mid), body.radius_meters), anchor)) < MASK_METERS {
+                        assert_eq!(count, 2, "unpaired near terrain edge at {mid:?}");
+                        checked += 1;
                     }
-                    let points = edge.map(|index| {
-                        std::array::from_fn::<_, 3, _>(|i| {
-                            patch.anchor_meters[i]
-                                + f64::from(patch.vertices[index as usize].offset_meters[i])
-                        })
-                    });
-                    let mid = salimon_math::scale(salimon_math::add(points[0], points[1]), 0.5);
-                    let mut positions = points.map(|p| {
-                        let cube =
-                            scale(p, 1.0 / p.iter().map(|v| v.abs()).fold(0.0_f64, f64::max));
-                        cube.map(|v| (v * f64::from(1_u32 << 24)).round() as i64)
-                    });
-                    positions.sort();
-                    boundary.entry(positions).or_insert((mid, 0)).1 += 1;
                 }
+                assert!(checked > 1000);
             }
-            let mut checked = 0;
-            for (_, (mid, count)) in boundary {
-                if length(sub(scale(unit(mid), body.radius_meters), anchor)) < MASK_METERS {
-                    assert_eq!(count, 2, "unpaired near terrain edge at {mid:?}");
-                    checked += 1;
-                }
-            }
-            assert!(checked > 1000);
         }
     }
 }
@@ -897,5 +974,260 @@ mod selection_work_tests {
             .collect();
         assert_eq!(stream.desired_keys, expected);
         assert!(stream.active.iter().all(|p| p.key.body == body.id as u8));
+    }
+}
+
+#[cfg(test)]
+mod canonical_tests {
+    use super::*;
+    fn selection(body: CelestialBody, anchor: [f64; 3]) -> Vec<TerrainPatchKey> {
+        let d = TerrainMode::Canonical.definition(body.id).unwrap();
+        let mut work = SelectionWork::new((body.id as u8, d.to_bytes(), anchor));
+        for _ in 0..5000 {
+            if let Some(keys) = work.advance(body, d, Instant::now()).unwrap() {
+                return keys;
+            }
+        }
+        panic!("bounded selection did not complete");
+    }
+    #[test]
+    fn canonical_orbit_to_surface_covers_all_faces_and_balances_seams() {
+        let b = salimon_world::canonical::BODIES[0];
+        for altitude in [b.radius_meters * 10., b.radius_meters, 100_000., 1000., 3.] {
+            for d in [[0., 1., 0.], unit([1., 1., 0.]), unit([1., 1., 1.])] {
+                let keys = selection(b, scale(d, b.radius_meters + altitude));
+                assert!(keys.len() <= MAX_ACTIVE_PATCHES);
+                if altitude < 10.0 {
+                    assert!(
+                        keys.iter().any(|k| k.level >= 16),
+                        "surface detail did not refine"
+                    );
+                }
+                assert_eq!(
+                    keys.iter().map(|k| k.face).collect::<BTreeSet<_>>().len(),
+                    6
+                );
+                let leaves: BTreeSet<_> = keys
+                    .iter()
+                    .map(|k| Cell {
+                        face: k.face,
+                        level: k.level,
+                        u: k.u,
+                        v: k.v,
+                    })
+                    .collect();
+                // Sum exact dyadic face areas: all six faces have full coverage.
+                for face in 0..6 {
+                    let area: f64 = leaves
+                        .iter()
+                        .filter(|c| c.face == face)
+                        .map(|c| 4.0_f64.powi(-i32::from(c.level)))
+                        .sum();
+                    assert_eq!(area, 1.);
+                }
+                for c in &leaves {
+                    for edge in 0..4 {
+                        let n = neighbor(*c, edge, &leaves).unwrap();
+                        assert!(c.level.abs_diff(n.level) <= 1);
+                    }
+                }
+                eprintln!(
+                    "canonical altitude={altitude} direction={d:?}: {} patches",
+                    keys.len()
+                );
+            }
+        }
+    }
+    #[test]
+    fn canonical_cpu_residency_eviction_and_revisit_keep_identical_geometry() {
+        let b = salimon_world::canonical::BODIES[0];
+        let mut stream = TerrainStream::default();
+        let cameras = [
+            [0., b.radius_meters + 3., 0.],
+            [b.radius_meters + 3., 0., 0.],
+            [0., b.radius_meters * 3., 0.],
+            [0., b.radius_meters + 3., 0.],
+        ];
+        let mut first = None;
+        for camera in cameras {
+            for _ in 0..5000 {
+                stream.update(camera, TerrainMode::Canonical).unwrap();
+                if stream.pending == 0 && !stream.active.is_empty() {
+                    break;
+                }
+            }
+            assert_eq!(stream.pending, 0);
+            assert!(!stream.active.is_empty());
+            assert!(stream.cached() <= MAX_CACHE_PATCHES);
+            assert!(stream.cpu_bytes() < 48 * 1024 * 1024);
+            let geometry: Vec<_> = stream.active.iter().map(|p| (**p).clone()).collect();
+            if camera == cameras[0] {
+                if let Some(old) = &first {
+                    assert_eq!(&geometry, old);
+                } else {
+                    first = Some(geometry);
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod geology_material_tests {
+    use super::*;
+    #[test]
+    fn shared_world_vertices_keep_material_and_physical_identity_across_lod() {
+        let body = *CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == salimon_world::CelestialBodyId::Moon)
+            .unwrap();
+        let definition = TerrainDefinition::representative(body).unwrap();
+        let parent = Cell {
+            face: 2,
+            level: 8,
+            u: 128,
+            v: 128,
+        };
+        let child = Cell {
+            face: 2,
+            level: 9,
+            u: 256,
+            v: 256,
+        };
+        let patches = [parent, child].map(|cell| {
+            let leaves = BTreeSet::from([cell]);
+            generate(body, &definition, key(cell, body, &definition, &leaves))
+        });
+        assert_eq!(
+            patches[0].vertices[0].albedo_factor,
+            patches[1].vertices[0].albedo_factor
+        );
+        assert_eq!(patches[0].vertices[0].strata, patches[1].vertices[0].strata);
+        assert!(patches[0].key.definition.starts_with(b"SLMMAT01SLMGEO01"));
+        for (cell, patch) in [parent, child].into_iter().zip(patches) {
+            for v in 0..=GRID {
+                for u in 0..=GRID {
+                    let vertex = patch.vertices[(v * (GRID + 1) + u) as usize];
+                    let sample = definition
+                        .sample(cell.direction(
+                            f64::from(u) / f64::from(GRID),
+                            f64::from(v) / f64::from(GRID),
+                        ))
+                        .unwrap();
+                    let position = std::array::from_fn(|i| {
+                        patch.anchor_meters[i] + f64::from(vertex.offset_meters[i])
+                    });
+                    assert!(length(sub(position, sample.body_local_position_meters)) < 0.001);
+                    assert_eq!(vertex.strata[0], sample.elevation_meters as f32);
+                    assert!((0.8..1.0).contains(&vertex.albedo_factor));
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod landmark_tests {
+    use super::*;
+    use salimon_world::environment::landmarks::{Geography, Landmarks, Scale, Signature};
+    fn source() -> (CelestialBody, TerrainDefinition, Cell, Landmarks) {
+        let body = *CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == salimon_world::CelestialBodyId::Moon)
+            .unwrap();
+        let cell = Cell {
+            face: 2,
+            level: 12,
+            u: 2048,
+            v: 2048,
+        };
+        let d = cell.direction(0.5, 0.5);
+        let terrain = TerrainDefinition::new(
+            body,
+            1,
+            91,
+            vec![],
+            vec![salimon_world::terrain::Feature {
+                direction: d,
+                radius_meters: 400.,
+                elevation_meters: -160.,
+            }],
+        )
+        .unwrap();
+        let sites = Landmarks::publish(
+            terrain.geology(),
+            Geography::Observed,
+            0,
+            &[Signature {
+                key: "declared-basin-fixture".into(),
+                direction: d,
+                scale: Scale::Regional,
+            }],
+        )
+        .unwrap();
+        (body, terrain, cell, sites)
+    }
+    #[test]
+    fn landmark_render_lods_and_checkpoint_binding_share_physical_terrain() {
+        let (body, terrain, cell, sites) = source();
+        let binding = sites.binding();
+        let original = terrain.to_bytes();
+        for level in [11, 12, 13] {
+            let c = Cell {
+                level,
+                u: cell.u >> (12 - level.min(12)),
+                v: cell.v >> (12 - level.min(12)),
+                ..cell
+            };
+            let c = if level > 12 {
+                Cell {
+                    u: cell.u * 2,
+                    v: cell.v * 2,
+                    ..c
+                }
+            } else {
+                c
+            };
+            let patches = BTreeSet::from([c]);
+            let p = generate(body, &terrain, key(c, body, &terrain, &patches));
+            for v in &p.vertices {
+                let position =
+                    std::array::from_fn(|i| p.anchor_meters[i] + f64::from(v.offset_meters[i]));
+                let physical = terrain.sample(unit(position)).unwrap();
+                assert!(length(sub(position, physical.body_local_position_meters)) < 0.001);
+            }
+        }
+        let restored = TerrainDefinition::from_bytes(body, &original).unwrap();
+        let site = &sites.sites()[0];
+        let rebuilt = Landmarks::publish(
+            restored.geology(),
+            Geography::Observed,
+            0,
+            &[Signature {
+                key: "declared-basin-fixture".into(),
+                direction: site.direction,
+                scale: Scale::Regional,
+            }],
+        )
+        .unwrap();
+        rebuilt.verify_binding(&binding).unwrap();
+        assert_eq!(terrain.to_bytes(), original);
+        // The publication is authoritative metadata only, never player-known chart input.
+        assert!(salimon_world::canonical::LANDMARKS.sites().is_empty());
+    }
+    #[test]
+    #[ignore = "exports production terrain patch for actual landmark source; set SALIMON_LANDMARK_PATCH_FILE"]
+    fn landmark_production_patch_export() {
+        let (body, terrain, cell, sites) = source();
+        let leaves = BTreeSet::from([cell]);
+        let p = generate(body, &terrain, key(cell, body, &terrain, &leaves));
+        let vertices:Vec<_>=p.vertices.iter().map(|v|serde_json::json!({"offset":v.offset_meters,"normal":v.normal,"far":v.far_offset_meters,"albedo":v.albedo_factor,"strata":v.strata})).collect();
+        let site = &sites.sites()[0];
+        let data = serde_json::json!({"id":site.id,"publication":sites.identity(),"binding":sites.binding(),"geology":terrain.geology().to_bytes(),"anchor":p.anchor_meters,"position":site.position_meters,"radius":site.radius_meters,"relief":site.relief_meters,"vertices":vertices,"indices":p.indices,"definition":p.key.definition});
+        std::fs::write(
+            std::env::var("SALIMON_LANDMARK_PATCH_FILE").unwrap(),
+            serde_json::to_vec_pretty(&data).unwrap(),
+        )
+        .unwrap();
     }
 }

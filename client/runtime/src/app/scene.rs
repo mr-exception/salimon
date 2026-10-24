@@ -9,6 +9,8 @@ use salimon_world::{CelestialBodyId, WorldSnapshot};
 
 pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
     ShipMeshInstance {
+        lighting: Default::default(),
+        surface_ages: [0.; 8],
         finish_tints: [[[1.; 3]; 5]; 2],
         machinery: Default::default(),
         fabricator_output_present: false,
@@ -23,6 +25,7 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
             engines_off: !ship.engines_enabled,
             fabricator: Default::default(),
             navigation: NavigationInstruments {
+                prediction: None,
                 direction_local: ship.navigation.velocity_direction_local,
                 angle_degrees: ship.navigation.heading_velocity_angle_degrees,
                 acceleration: ship.navigation.acceleration_meters_per_second_squared,
@@ -100,6 +103,7 @@ pub(super) fn map_world_to_renderer(
                 CelestialBodyId::Earth => SurfaceMaterial::Oceanic,
                 CelestialBodyId::Moon => SurfaceMaterial::Slate,
                 CelestialBodyId::Mars => SurfaceMaterial::Rust,
+                CelestialBodyId::Vesper => SurfaceMaterial::Slate,
             },
         })
         .collect();
@@ -126,14 +130,95 @@ pub(super) fn map_world_to_renderer(
     (camera, instances, spheres, light)
 }
 
-/// Hollow blueprint edges use the ordinary oriented instance pass. No domain state
-/// is owned here, and these visual markers never become collision geometry.
+/// The engineering camera retains its old scene; ordinary canonical play never
+/// constructs the compressed Solar System or its precision markers.
+pub(super) fn map_session_world(
+    snapshot: WorldSnapshot<'_>,
+    canonical_play: bool,
+) -> (
+    CameraFrame,
+    Vec<SceneInstance>,
+    Vec<SphereInstance>,
+    PointLight,
+) {
+    if !canonical_play {
+        return map_world_to_renderer(snapshot);
+    }
+    let camera = snapshot.camera;
+    (
+        CameraFrame {
+            position_meters: camera.position.meters(),
+            target_meters: camera.target.meters(),
+            up: camera.up.map(|v| v as f32),
+            vertical_fov_radians: camera.vertical_field_of_view_radians as f32,
+            near_plane_meters: camera.physical_near_plane_meters as f32,
+        },
+        Vec::new(),
+        salimon_world::canonical::BODIES
+            .iter()
+            .map(|b| SphereInstance {
+                center_meters: b.center.meters(),
+                radius_meters: b.radius_meters,
+                material: SurfaceMaterial::Slate,
+            })
+            .collect(),
+        // Fixed local illumination is explicitly separate from future ephemeris lighting.
+        PointLight {
+            position_meters: [
+                0.,
+                salimon_world::canonical::START
+                    .manifest()
+                    .physical
+                    .semi_major_axis_meters,
+                0.,
+            ],
+            color: [1., 0.96, 0.88],
+        },
+    )
+}
+
+/// Map paid-progress edges and completed shared structural/furnishing solids into the ordinary
+/// oriented instance pass. Session-owned solids also feed physical collision.
 pub(super) fn construction_wireframes(
     session: &crate::session::GameplaySession,
     frame: salimon_character::ShipFrame,
     orientation: [f32; 4],
 ) -> Vec<SceneInstance> {
     let mut result = Vec::new();
+    for b in session.construction_solids() {
+        // Material bands reveal shared physical deck/panel/tread geometry even
+        // inside an unlit prototype room. Color does not grant collision.
+        let height = b[3] - b[2];
+        let color = if b[0] >= -7.04 {
+            [0.32, 0.36, 0.39, 1.]
+        } else if height > 0.12 && height < 0.22 && b[1] - b[0] < 0.16 && b[5] - b[4] < 0.16 {
+            [0.75, 0.48, 0.18, 1.]
+        } else if height <= 0.111 {
+            if (b[3] - salimon_character::SHIP_FLOOR_HEIGHT_METERS).rem_euclid(3.) < 0.01 {
+                [0.10, 0.14, 0.18, 1.]
+            } else {
+                [0.30, 0.36, 0.39, 1.]
+            }
+        } else if b[1] - b[0] < 0.32 && b[5] - b[4] > 0.9 && height < 3.01 {
+            [0.38, 0.30, 0.20, 1.]
+        } else {
+            [0.15, 0.20, 0.24, 1.]
+        };
+        result.push(SceneInstance {
+            center_meters: frame.local_to_world([
+                (b[0] + b[1]) / 2.,
+                (b[2] + b[3]) / 2.,
+                (b[4] + b[5]) / 2.,
+            ]),
+            half_extents_meters: [
+                ((b[1] - b[0]) / 2.) as f32,
+                ((b[3] - b[2]) / 2.) as f32,
+                ((b[5] - b[4]) / 2.) as f32,
+            ],
+            color,
+            orientation,
+        });
+    }
     for (space, color) in session.construction_boxes() {
         for axis in 0..3 {
             let other: Vec<_> = (0..3).filter(|i| *i != axis).collect();
@@ -155,6 +240,44 @@ pub(super) fn construction_wireframes(
         }
     }
     result
+}
+
+/// Visible housings and diffusers share the effective electrical source state.
+pub(super) fn room_lamps(
+    session: &crate::session::GameplaySession,
+    ship: ShipSnapshot,
+) -> Vec<SceneInstance> {
+    let frame = crate::session::frames::character_ship_frame(ship.pose);
+    let lights = session.lighting_dto();
+    let mut out = Vec::new();
+    for i in 0..5 {
+        let p = crate::session::lighting::POSITIONS[i];
+        for (y, half, color) in [
+            (0., [0.12, 0.025, 0.06], [0.10, 0.11, 0.13, 1.]),
+            (
+                -0.027,
+                [0.09, 0.004, 0.04],
+                [
+                    0.015 + lights.colors[i][0] * 1.7,
+                    0.018 + lights.colors[i][1] * 1.7,
+                    0.02 + lights.colors[i][2] * 1.7,
+                    1.,
+                ],
+            ),
+        ] {
+            out.push(SceneInstance {
+                center_meters: frame.local_to_world([
+                    f64::from(p[0]),
+                    f64::from(p[1] + y),
+                    f64::from(p[2]),
+                ]),
+                half_extents_meters: half,
+                color,
+                orientation: ship.pose.orientation.map(|v| v as f32),
+            });
+        }
+    }
+    out
 }
 
 /// Bounded procedural mechanical leaves and fixed manual release grips. All
@@ -192,6 +315,26 @@ pub(super) fn cargo_door(
         });
     }
     instances
+}
+
+/// Compose observational Scout visuals without changing domain state.
+pub(super) fn gameplay_ship(
+    session: &crate::session::GameplaySession,
+    ship: ShipSnapshot,
+) -> ShipMeshInstance {
+    let mut mesh = map_ship_to_renderer(ship);
+    mesh.independent_interior = true;
+    mesh.lighting = session.lighting_dto();
+    mesh.finish_tints = session.finish_palette();
+    mesh.surface_ages = session.ship_surface_ages();
+    mesh.bunk_open_fraction = session.habitation.bunk_open_fraction as f32;
+    mesh.fabricator_output_present = session.fabricator_output_present();
+    mesh.fabricator_output_medical = session.fabricator_output_medical();
+    mesh.fabricator_output_component = session.fabricator_output_component();
+    mesh.instruments.fabricator = session.fabricator_instruments();
+    mesh.instruments.navigation.prediction = session.navigation_prediction();
+    mesh.machinery = crate::scout_feedback::capture(session, ship);
+    mesh
 }
 
 #[cfg(test)]
@@ -402,5 +545,35 @@ mod tests {
                 body.name
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod canonical_scene_tests {
+    #[test]
+    fn ordinary_scene_has_no_compressed_bodies_or_precision_markers() {
+        let prototype = salimon_world::CameraPrototype::default();
+        let snapshot = prototype.snapshot();
+        let (_, markers, bodies, light) = super::map_session_world(snapshot, true);
+        assert!(markers.is_empty());
+        assert_eq!(bodies.len(), salimon_world::canonical::BODIES.len());
+        assert_eq!(bodies[0].center_meters, [0.; 3]);
+        assert_eq!(
+            bodies[0].radius_meters,
+            salimon_world::canonical::START
+                .manifest()
+                .physical
+                .radius_meters
+        );
+        assert_eq!(
+            light.position_meters[1],
+            salimon_world::canonical::START
+                .manifest()
+                .physical
+                .semi_major_axis_meters
+        );
+        let (_, markers, bodies, _) = super::map_session_world(snapshot, false);
+        assert_eq!(markers.len(), 3);
+        assert_eq!(bodies.len(), 6);
     }
 }

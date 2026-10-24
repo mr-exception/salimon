@@ -1,6 +1,15 @@
 use super::*;
-fn observation() -> Observation {
+pub(super) fn observation() -> Observation {
     Observation {
+        environment: Default::default(),
+        biological_contact: (0, None),
+        extracted_kg: 0.,
+        harvest_material: None,
+        epoch: 0,
+        motions: [0., 0., 0., 1., 1., 0., 1.],
+        restraints: 0,
+        mounts: 0,
+        mount_position: [0.; 3],
         active: true,
         interior: true,
         walking: true,
@@ -9,6 +18,7 @@ fn observation() -> Observation {
         powered: true,
         conversion: false,
         fabrication: false,
+        construction: None,
         thrust: 0.,
         door: 0.,
         low_power: false,
@@ -131,6 +141,7 @@ fn spatial_channels_rotate_with_listener_and_attenuate_with_distance() {
 #[test]
 fn pcm_is_bounded_stereo_and_mute_has_no_samples() {
     let v = Voice {
+        filter: 1.,
         cue: Cue::Core,
         gain: 0.8,
         pan: 1.,
@@ -155,6 +166,7 @@ fn pcm_is_bounded_stereo_and_mute_has_no_samples() {
     assert!(samples.iter().any(|p| p[1] != 0));
     let loud = synth::wav(
         &[Voice {
+            filter: 1.,
             cue: Cue::Thrust,
             gain: 10.,
             pan: 0.,
@@ -181,7 +193,7 @@ fn event_queue_and_mix_are_bounded_with_alert_priority() {
     }
     m.queue(Cue::Blackout);
     assert_eq!(m.pending.len(), MAX_EVENTS);
-    assert_eq!(m.pending.front(), Some(&Cue::Blackout));
+    assert_eq!(m.pending.front().map(|e| e.cue), Some(Cue::Blackout));
     let v = m.voices(s);
     assert!(v.len() <= MAX_VOICES);
     assert_eq!(v[0].cue, Cue::Blackout);
@@ -226,6 +238,7 @@ fn production_core_recovery_and_pause_map_without_authority_changes() {
 #[test]
 fn narration_free_pcm_synthesis_has_fixed_memory_and_measured_cost() {
     let voice = Voice {
+        filter: 1.,
         cue: Cue::Thrust,
         gain: 0.1,
         pan: 0.0,
@@ -240,4 +253,225 @@ fn narration_free_pcm_synthesis_has_fixed_memory_and_measured_cost() {
         start.elapsed().as_micros(),
         synth::WAV_BYTES
     );
+}
+
+#[test]
+fn tactile_events_require_actual_travel_endpoints_and_retire_on_obstruction_reversal_and_load() {
+    let settings = Settings::default();
+    let mut m = Mixer::default();
+    let mut o = observation();
+    m.observe(o, settings);
+    m.voices(settings);
+    // Unchanged source (e.g. a blocked input) never triggers a speculative cue.
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert!(
+        !cues(&m.voices(settings))
+            .iter()
+            .any(|c| matches!(c, Cue::Travel(_) | Cue::Release | Cue::Latch))
+    );
+    o.now += Duration::from_millis(16);
+    o.motions[1] = 0.2;
+    m.observe(o, settings);
+    let v = cues(&m.voices(settings));
+    assert!(v.contains(&Cue::Travel(1)));
+    assert!(v.contains(&Cue::Release));
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert!(
+        !cues(&m.voices(settings)).contains(&Cue::Travel(1)),
+        "blocked at the same fraction"
+    );
+    o.now += Duration::from_millis(16);
+    o.motions[1] = 0.1;
+    m.observe(o, settings);
+    assert!(cues(&m.voices(settings)).contains(&Cue::Release));
+    o.now += Duration::from_millis(16);
+    o.motions[1] = 0.;
+    m.observe(o, settings);
+    assert!(cues(&m.voices(settings)).contains(&Cue::Latch));
+    assert!(!cues(&m.voices(settings)).contains(&Cue::Latch));
+    o.epoch += 1;
+    o.motions[1] = 0.9;
+    m.observe(o, settings);
+    assert!(
+        !cues(&m.voices(settings))
+            .iter()
+            .any(|c| matches!(c, Cue::Travel(_) | Cue::Release | Cue::Latch))
+    );
+}
+#[test]
+fn cargo_door_and_privacy_partitions_filter_actual_spatial_sources() {
+    let settings = Settings::default();
+    let mut o = observation();
+    o.eye = [-6., 1.8, 0.];
+    o.motions[6] = 1.;
+    let mut m = Mixer::default();
+    m.observe(o, settings);
+    let open = m
+        .voices(settings)
+        .into_iter()
+        .find(|v| v.cue == Cue::Core)
+        .unwrap();
+    o.now += Duration::from_millis(16);
+    o.motions[6] = 0.;
+    m.observe(o, settings);
+    let closed = m
+        .voices(settings)
+        .into_iter()
+        .find(|v| v.cue == Cue::Core)
+        .unwrap();
+    assert!((closed.gain / open.gain - 0.22).abs() < 1e-12);
+    assert_eq!(closed.filter, 0.08);
+    assert_eq!(closed.pan, open.pan);
+    o.eye = [-0.8, 1.8, -3.5];
+    o.motions[3] = 0.;
+    m.observe(o, settings);
+    let privacy = m
+        .voices(settings)
+        .into_iter()
+        .find(|v| v.cue == Cue::Core)
+        .unwrap();
+    assert_eq!(privacy.filter, 0.4);
+}
+#[test]
+fn restore_same_simulation_time_resets_epoch_without_replaying_changes() {
+    let mut s = GameplaySession::new_run();
+    crate::session::cabin::evidence_initial_conditions(&mut s, "scout-cabin-table").unwrap();
+    let settings = Settings::default();
+    let mut m = Mixer::default();
+    m.observe(Observation::capture(&s, true), settings);
+    m.voices(settings);
+    let bytes = s.save_bytes(100).unwrap();
+    let old = s.audio_epoch;
+    s.restore_bytes(&bytes).unwrap();
+    assert_ne!(s.audio_epoch, old);
+    assert_eq!(s.save_bytes(100).unwrap(), bytes);
+    m.observe(Observation::capture(&s, true), settings);
+    assert!(
+        !cues(&m.voices(settings))
+            .iter()
+            .any(|c| matches!(c, Cue::Latch | Cue::Mount | Cue::Restraint))
+    );
+}
+#[test]
+fn all_mechanisms_and_manual_latches_survive_blackout_but_machinery_does_not() {
+    let settings = Settings::default();
+    let mut o = observation();
+    let mut m = Mixer::default();
+    m.observe(o, settings);
+    m.voices(settings);
+    o.now += Duration::from_millis(16);
+    o.powered = false;
+    o.motions = [0.5; 7];
+    o.restraints = 1;
+    o.mounts = 31;
+    m.observe(o, settings);
+    let v = m.voices(settings);
+    let c = cues(&v);
+    for i in 0..7 {
+        assert!(c.contains(&Cue::Travel(i)));
+    }
+    assert!(c.contains(&Cue::Mount));
+    assert!(c.contains(&Cue::Restraint));
+    assert!(!c.contains(&Cue::Core));
+    assert!(v.len() <= MAX_VOICES);
+    let controls = controls(v, 0, true, None, settings);
+    assert!(controls.gains[13..20].iter().any(|v| *v > 0.));
+    o.active = false;
+    m.observe(o, settings);
+    assert!(m.voices(settings).is_empty());
+}
+
+#[test]
+fn construction_machine_audio_is_spatial_bounded_and_lifecycle_gated() {
+    let mut o = observation();
+    o.walking = false;
+    o.construction = Some([0., 1., 3.]);
+    let mut m = Mixer::default();
+    let settings = Settings::default();
+    m.observe(o, settings);
+    let v = m.voices(settings);
+    let machine = v.iter().find(|v| v.cue == Cue::Fabricator).unwrap();
+    assert!(machine.pan.abs() > 0.1);
+    assert!(machine.gain < 0.25);
+    o.fabrication = true;
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert_eq!(
+        m.voices(settings)
+            .iter()
+            .filter(|v| v.cue == Cue::Fabricator)
+            .count(),
+        1
+    );
+    o.active = false;
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert!(!cues(&m.voices(settings)).contains(&Cue::Fabricator));
+}
+
+#[test]
+fn environmental_harvest_requires_mass_change_and_restore_does_not_replay() {
+    let mut s = GameplaySession::default();
+    crate::session::canonical::mining_initial_conditions(&mut s).unwrap();
+    let mut p = Presenter::default();
+    p.preview(Observation::capture(&s, true), Settings::default());
+    s.command(crate::session::Command::Select(
+        crate::equipment::ToolbarSlot::One,
+    ));
+    s.command(crate::session::Command::Mining(true));
+    s.advance_automation(Duration::from_millis(64));
+    assert!(s.mining.session.extracted_mass_kg() > 0.);
+    p.preview(Observation::capture(&s, true), Settings::default());
+    assert!(p.last_control.gains[31] > 0.);
+    p.preview(Observation::capture(&s, true), Settings::default());
+    assert_eq!(p.last_control.gains[31], 0.);
+    let bytes = s.save_bytes(100).unwrap();
+    s.restore_bytes(&bytes).unwrap();
+    p.preview(Observation::capture(&s, true), Settings::default());
+    assert_eq!(p.last_control.gains[31], 0.);
+}
+
+#[test]
+#[ignore = "exports actual biological separation observations through the production callback"]
+fn biological_contact_audio_evidence_621() {
+    let root = std::path::PathBuf::from(std::env::var_os("SALIMON_AUDIO_EVIDENCE").unwrap());
+    std::fs::create_dir_all(&root).unwrap();
+    let mut s = GameplaySession::default();
+    crate::session::biology::initialize_fixture(&mut s, false).unwrap();
+    let fixture = &crate::session::biology::FIXTURE;
+    std::fs::write(root.join("source-context.json"),serde_json::to_vec_pretty(&serde_json::json!({
+        "scope":"explicit fictional representative-Moon-geometry publication; no canonical Vesper life",
+        "biosphere_identity":fixture.biosphere.identity(),"population_identity":fixture.population.identity(),
+        "population_binding_sha256":salimon_universe::synthesis::sha256(&fixture.population.binding()),
+        "catalog_identity":fixture.catalog.identity(),"world_origin_meters":crate::session::biology::origin(true),
+        "elapsed_seconds":s.elapsed.as_secs_f64(),"character_eye_meters":s.snapshot().character.eye_position_meters,
+        "sources":fixture.catalog.sources().iter().map(|source|serde_json::json!({"key":source.key,"method":format!("{:?}",source.method),"resource":source.material.key(),"initial_mass_kg":source.initial_mass_kg,"body_fixed_center_meters":source.center,"shape":source.shape})).collect::<Vec<_>>()
+    })).unwrap()).unwrap();
+    let mut presenter = Presenter::default();
+    presenter.preview(Observation::capture(&s, true), Settings::default());
+    s.command(crate::session::Command::GrabDrop(true));
+    s.command(crate::session::Command::GrabDrop(false));
+    let mut controls = Vec::new();
+    let mut contact = false;
+    for _ in 0..125 {
+        s.advance_automation(Duration::from_millis(16));
+        presenter.preview(Observation::capture(&s, true), Settings::default());
+        contact |= presenter.last_control.gains[31] > 0.;
+        controls.push(presenter.last_control);
+    }
+    assert!(contact);
+    assert_eq!(s.mining.session.fragments().len(), 1);
+    let bytes = s.save_bytes(100).unwrap();
+    s.restore_bytes(&bytes).unwrap();
+    presenter.preview(Observation::capture(&s, true), Settings::default());
+    assert_eq!(presenter.last_control.gains[31], 0.);
+    let (wav, metrics) = crate::native_audio::sequence_wav(&controls);
+    std::fs::write(root.join("actual-separation.wav"), wav).unwrap();
+    std::fs::write(
+        root.join("audio-metrics.json"),
+        serde_json::to_vec_pretty(&metrics).unwrap(),
+    )
+    .unwrap();
 }

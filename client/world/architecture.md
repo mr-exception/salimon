@@ -82,7 +82,9 @@ streaming. Runtime maps these domain objects into nearby inspection and authored
 on pickup. Runtime composes hand poses, ship support and fragment motion/contact
 with character collision geometry. Generated deposits can stream out and back
 in without losing modified mass; fragments remain the same physical entities.
-All retention is in memory for the current session, with no disk/backend save.
+Retained source deltas and physical identities survive local streaming and
+validated whole-session checkpoints; world owns logical payloads and runtime
+owns the native persistence adapter. Backend authority remains unimplemented.
 
 ## Integrated terrain
 
@@ -158,3 +160,118 @@ is composed in #365; disk checkpoints remain #366.
 ## Physical mounts (#576)
 
 `WorldObjectId::Fixture` shares the existing CarrySlot with fragments. External fixture owners persist/validate the fixture and reconstruct the slot during whole-session restore. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+## Construction damage (#549)
+
+Follow the [canonical damage, physical salvage and schema-21 contract](../../docs/construction-damage.md). Surviving work preserves paid time and receipts; lost cells and destroyed projects cannot respawn or duplicate salvage. Core identity is protected. Fresh debris IDs, exact material shares, collision/containment and installed mass publish together; restore reconstructs source without reallocating debris.
+
+
+## Canonical terrain streaming (#424)
+
+See the [canonical terrain contract](../../docs/universe-terrain.md) for the exact U11
+evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
+and normal alien-world startup belong to #425/#426.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.
+
+
+## Canonical geology (#612)
+
+World `terrain::geology` owns versioned terrain-bound province/history/substrate
+queries. The returned physical sample is the exact existing terrain; geology
+never displaces ground or reshuffles resource identities. See the
+[geology contract](../../docs/planetary-geology.md) for codec, profiles, compatibility and tests.
+Vesper remains a homogeneous silicate interpretation with unchanged published
+terrain/resources; rendering and later environmental systems retain their owners.
+
+
+## Regional climate and weather (#615)
+
+Follow the [climate contract](../../docs/planetary-climate.md) for immutable geology-bound climate inputs,
+strict versioned publication and stateless TT epoch queries. World owns pressure,
+temperature, coherent storm/cloud/precipitation metadata and body-fixed tangent wind;
+presentation cannot rewrite them. Vacuum has no airborne effects. Existing terrain,
+resource identities, saves and drag physics remain unchanged. Weather visuals are #616.
+
+
+## Active geological sources (#617)
+
+The [active geology contract](../../docs/active-geology.md) owns explicit heat/mechanism inputs,
+stable terrain-bound sites, strict publication restore and shared-TT source levels.
+Spatial queries cannot create/rekey sources. Vacuum permits ballistic plumes and
+contact coupling, never atmospheric wind/sound. Source radii do not add colliders.
+
+
+## Rare biospheres and ecological regions (#618)
+
+Follow the [ecology contract](../../docs/planetary-ecology.md) for independent fixed life decisions,
+geology/climate-bound potential, continuous realms and stable patch/grammar IDs.
+Suitability never grants life; observed bodies retain no procedural life claim
+and Vesper stays sterile. Strict catalog/save bindings reject incompatible
+publications. Organism meshes, physical instances and harvesting remain #619–#621.
+
+
+## Optical atmosphere (#614)
+
+The [atmosphere contract](../../docs/planetary-atmosphere.md) maps immutable climate
+optics, runtime light inputs and depth-limited production scattering. Vacuum
+remains empty; presentation never changes gas physics, weather or canonical identity.
+
+
+## Coherent weather presentation (#616)
+
+See [weather visuals](../../docs/planetary-weather-visuals.md): shared-TT source
+fields, fixed body-frame maps, bounded optical rendering and exact source/quality
+separation. Vacuum stays empty; no terrain, hydrology, weather truth or sound is invented.
+
+
+## Organism family grammar and presentation (#619)
+
+Follow the [organism contract](../../docs/planetary-organisms.md) for stable
+family/part identities, cosmetic tile sampling, neutral segment mapping, bounded
+instanced geometry and source-driven GPU evidence. Physical population remains #620.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+## Geological site identity (#623)
+
+[Landmark source and validation](../../docs/planetary-landmarks.md) binds sparse
+sites to actual published terrain relief. Keep physical source, renderer vertices,
+immutable site IDs and save/reference binding consistent across LOD and eviction.
+No chart/scanner discovery, duplicate terrain surface or invented cave geometry.
+
+## Natural signature sites (#624)
+
+[Biological signature contract](../../docs/biological-signature-sites.md) maps rare
+site metadata onto exact physical organisms and geological/activity provenance.
+No source geometry, collision/LOD anatomy, identity or player knowledge changes;
+strict publication binding survives reconstruction and rejects mismatched sources.
+
+
+## Biological harvesting and schema 29 (#621)
+
+Follow the [yield, atomic transfer, geometry and persistence contract](../../docs/biological-harvesting.md).
+World owns explicit source designations, revision/depletion journals and physical
+publication; runtime composes F/tool input, current anatomy and source-bound restore.
+Schema 29 preserves missing/partial parts and natural object identity. Vesper
+remains sterile; positive sources are explicit fictional geometry fixtures.

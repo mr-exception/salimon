@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/workspace/salimon/reports/issue-498/verify.py", line 85, in <module>
-    run(a.binary, a.output)
-  File "/workspace/salimon/reports/issue-498/verify.py", line 43, in run
-    assert abs(dv - 100_000_000 * .1 / initial['ship']['total_mass_kg']) < 1e-9, dv
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: 96.0

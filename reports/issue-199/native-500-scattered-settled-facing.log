@@ -1,7 +1,0 @@
-[2026-10-15T05:35:17Z INFO  salimon_client] starting Salimon native client
-motion: speed p50/p95 0.00000/0.41988 m/s, spin p50/p95 0.00000/1.31086 rad/s
-fixture preparation: 50 steps, 0/500 asleep, 84 quiet, 187 moving, 34.193 wall seconds
-motion: speed p50/p95 0.00000/1.49749 m/s, spin p50/p95 0.00000/2.14468 rad/s
-fixture preparation: 100 steps, 215/500 asleep, 265 quiet, 234 moving, 83.952 wall seconds
-motion: speed p50/p95 0.00000/1.98546 m/s, spin p50/p95 0.00000/2.41220 rad/s
-fixture preparation: 150 steps, 174/500 asleep, 221 quiet, 224 moving, 119.975 wall seconds

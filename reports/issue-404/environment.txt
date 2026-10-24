@@ -1,4 +1,0 @@
-Linux 6.18.55 x86_64 GNU/Linux
-rustc 1.99.1 (58cf8f9c3 2026-10-13)
-model name	: AMD EPYC 9V45 96-Core Processor
-MemTotal:       10207492 kB

@@ -3,8 +3,10 @@ use super::{ShipController, assist::body_definition};
 use crate::orientation::normalize_or;
 use crate::{COLLISION_RADIUS_METERS, FlightState, SteeringInput};
 use salimon_math::{add, dot, length, scale, sub};
+#[cfg(test)]
+use salimon_world::CELESTIAL_BODIES;
 use salimon_world::{
-    BodyRole, CELESTIAL_BODIES, CelestialBody, CelestialBodyId,
+    BodyRole, CelestialBody, CelestialBodyId,
     terrain::{LayerKind, TerrainMode},
 };
 use std::time::Duration;
@@ -150,7 +152,9 @@ impl ShipController {
         delta: Duration,
     ) {
         let mut first: Option<(f64, CelestialBodyId)> = None;
-        for body in CELESTIAL_BODIES
+        for body in self
+            .terrain
+            .bodies()
             .iter()
             .filter(|body| body.role == BodyRole::Solid)
         {

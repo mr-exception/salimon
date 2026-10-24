@@ -6,6 +6,45 @@ pub const MAX_TRAVERSABLE_SLOPE: f64 = 0.839_099_631_177_28;
 pub const MAX_STEP_HEIGHT_METERS: f64 = 0.3;
 
 impl CharacterController {
+    /// Construct a standing character using the caller's immutable surface.
+    /// Runtime owns authored hull/obstacle clearance and initial facing.
+    pub fn on_surface(surface: SurfaceFrame, hint_meters: [f64; 3]) -> Result<Self, &'static str> {
+        if !surface.radius_meters.is_finite()
+            || surface.radius_meters <= 0.0
+            || surface
+                .body_center_meters
+                .iter()
+                .chain(hint_meters.iter())
+                .any(|v| !v.is_finite())
+            || salimon_math::length(sub(hint_meters, surface.body_center_meters)) <= 0.0
+        {
+            return Err("invalid initial surface frame or position");
+        }
+        let ground = surface.sample(hint_meters);
+        let normal_length = salimon_math::length(ground.normal);
+        if ground
+            .position_meters
+            .iter()
+            .chain(ground.normal.iter())
+            .any(|v| !v.is_finite())
+            || (normal_length - 1.0).abs() > 1e-9
+            || !ground.slope.is_finite()
+            || !(0.0..=MAX_TRAVERSABLE_SLOPE).contains(&ground.slope)
+        {
+            return Err("unsafe initial sampled surface");
+        }
+        let radial = normalize(sub(hint_meters, surface.body_center_meters));
+        let world = add(
+            ground.position_meters,
+            scale(radial, PLAYER_EYE_HEIGHT_METERS),
+        );
+        Ok(Self {
+            position: PositionState::Surface { world },
+            nearby_surface: Some(surface),
+            ..Self::default()
+        })
+    }
+
     pub(super) fn advance_surface(&mut self, mut world: [f64; 3], step: &Step) {
         let Step {
             seconds,
@@ -118,6 +157,17 @@ impl CharacterController {
         if local[0] != before_appendages[0] || local[2] != before_appendages[2] {
             world = surface_eye_at_ship_planar_position(local, ship, surface);
         }
+        let modular = self.sweep_modular_exterior(previous, local);
+        if modular != local {
+            if modular[1] != local[1] {
+                self.vertical_speed = 0.;
+            }
+            local = modular;
+            world = ship.local_to_world(local);
+        }
+        if self.enter_modular_stairs(previous, local) {
+            return;
+        }
         let tip = crate::ramp::tip_x();
         let moving_into_ship = dot(tangent, ship.axes[0]) > 1.0e-6;
         let approaching_tip = previous[0] <= tip + world_round_trip_tolerance(world)
@@ -125,7 +175,7 @@ impl CharacterController {
             && previous[2].abs() <= crate::ramp::side_limit()
             && local[2].abs() <= crate::ramp::side_limit()
             && (local[1] - PLAYER_EYE_HEIGHT_METERS - crate::ramp::floor_at(tip)).abs() < 0.3;
-        if doorway_passable && approaching_tip && moving_into_ship {
+        if !self.modular.aft_port && doorway_passable && approaching_tip && moving_into_ship {
             local[1] = crate::ramp::floor_at(local[0]) + PLAYER_EYE_HEIGHT_METERS;
             self.position = PositionState::Doorway {
                 world: ship.local_to_world(local),
@@ -521,5 +571,52 @@ mod terrain_tests {
         }
         let p = c.snapshot(ship, s).eye_position_meters;
         assert!((p[1] - 0.4 * p[0] - PLAYER_EYE_HEIGHT_METERS).abs() < 1e-6);
+    }
+}
+
+#[cfg(test)]
+mod initial_surface_tests {
+    use super::*;
+    #[test]
+    fn standing_surface_construction_projects_eye_and_resets_motion() {
+        let surface = SurfaceFrame {
+            body_center_meters: [0.; 3],
+            radius_meters: 1000.,
+            query: None,
+        };
+        let character = CharacterController::on_surface(surface, [0., 1005., 0.]).unwrap();
+        let ship = ShipFrame {
+            origin_meters: [0.; 3],
+            axes: [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]],
+        };
+        let snapshot = character.snapshot(ship, surface);
+        assert_eq!(snapshot.location, CharacterLocation::Surface);
+        // Sphere normalization/projected eye may round at f64 precision.
+        assert!(
+            salimon_math::length(sub(
+                snapshot.eye_position_meters,
+                [0., 1000. + PLAYER_EYE_HEIGHT_METERS, 0.]
+            )) < 1e-9
+        );
+        let restored = CharacterController::from_save(character.save_state(), None).unwrap();
+        assert_eq!(restored.snapshot(ship, surface), snapshot);
+        assert!(CharacterController::on_surface(surface, [0.; 3]).is_err());
+        assert!(CharacterController::on_surface(surface, [f64::NAN; 3]).is_err());
+    }
+    #[test]
+    fn standing_surface_construction_rejects_unsafe_sampled_ground() {
+        fn steep(_: SurfaceFrame, _: [f64; 3]) -> crate::GroundSample {
+            crate::GroundSample {
+                position_meters: [0., 1000., 0.],
+                normal: [0., 1., 0.],
+                slope: MAX_TRAVERSABLE_SLOPE + 0.01,
+            }
+        }
+        let surface = SurfaceFrame {
+            body_center_meters: [0.; 3],
+            radius_meters: 1000.,
+            query: Some(steep),
+        };
+        assert!(CharacterController::on_surface(surface, [0., 1005., 0.]).is_err());
     }
 }

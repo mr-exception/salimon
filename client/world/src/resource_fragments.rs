@@ -21,6 +21,37 @@ pub(crate) struct FragmentOutput {
 }
 
 impl FragmentOutput {
+    pub(crate) fn can_allocate(&self) -> bool {
+        self.next_id < u64::MAX
+    }
+    pub(crate) fn import_salvage(
+        &mut self,
+        pieces: &[(crate::resources::DepositId, RawMaterial, ResourceTransform)],
+    ) -> Option<Vec<FragmentId>> {
+        let end = self.next_id.checked_add(pieces.len() as u64)?;
+        if pieces.len() > 16384
+            || pieces.iter().any(|(_, m, p)| {
+                RawMaterial::new(m.resource(), m.mass_kg()).is_err()
+                    || ResourceTransform::new(p.position(), p.orientation_xyzw()).is_err()
+            })
+        {
+            return None;
+        }
+        let mut ids = Vec::with_capacity(pieces.len());
+        for (source, material, pose) in pieces {
+            self.next_id += 1;
+            let id = FragmentId(self.next_id);
+            let f = ResourceFragment::new(id, *source, *material, *pose);
+            self.slots.insert(id, self.fragments.len());
+            self.fragments.push(f);
+            self.sealed.insert(id);
+            self.record(f);
+            ids.push(id);
+        }
+        debug_assert_eq!(self.next_id, end);
+        Some(ids)
+    }
+
     /// Attached spherical output uses the same ID/journal storage, but is sealed
     /// against legacy extraction-tail growth immediately.
     pub(crate) fn upsert_sphere(
@@ -71,6 +102,19 @@ impl FragmentOutput {
         std::mem::take(&mut self.changes)
             .into_iter()
             .map(|(id, p)| (FragmentId(id), p))
+    }
+
+    /// Return a caller-owned reservation, retaining its previously allocated identity.
+    pub(crate) fn return_reserved(&mut self, piece: ResourceFragment) -> bool {
+        if piece.id().0 == 0 || piece.id().0 > self.next_id || self.slots.contains_key(&piece.id())
+        {
+            return false;
+        }
+        self.slots.insert(piece.id(), self.fragments.len());
+        self.fragments.push(piece);
+        self.sealed.insert(piece.id());
+        self.record(piece);
+        true
     }
 
     pub(crate) fn remove(&mut self, id: FragmentId) -> bool {
@@ -140,7 +184,11 @@ impl FragmentOutput {
 
 /// Analytic sphere diameter; solid material volume remains density-derived.
 pub fn diameter_meters(fragment: ResourceFragment) -> f64 {
-    crate::resource_size::fragment_diameter_meters(fragment.material())
+    if fragment.natural_shape().is_some() {
+        2. * fragment.contact_radius_meters()
+    } else {
+        crate::resource_size::fragment_diameter_meters(fragment.material())
+    }
 }
 
 pub(crate) fn spawn_position(deposit: ResourceDeposit) -> WorldPosition {

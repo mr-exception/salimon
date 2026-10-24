@@ -1,5 +1,0 @@
-{
-  "status": "passed",
-  "captures": 6,
-  "input": "production protocol; fixed 96 ms requests / 16 ms ticks"
-}

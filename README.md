@@ -14,13 +14,16 @@ a central Energy Core, warm materials and detailed aft thrusters. Its compact
 nose and shorter cockpit glazing keep the exterior silhouette streamlined.
 One center cockpit console carries one wide monitor showing persistent velocity
 direction/speed, heading angle, signed throttle/acceleration, total mass, Core
-energy, nearby-body relative speed and reverse-braking estimates. A separate
+energy, nearby-body relative speed and reverse-braking estimates. A bounded flight
+preview shows approximate contact or minimum altitude, numerical difference and
+age, with held-input/power validity warnings; it never steers the ship. See the
+[navigation contract](docs/universe-navigation.md). A separate
 physical Core monitor shows conversion, consumption, depletion and warnings. Routes on both sides
 let the player walk past the console into the cockpit nose. Loose fragments can
 be dropped on the cabin deck and pile up; the separate cargo module is removed. See
 the [ship asset guide](client/assets/ship/README.md).
-The native client starts inside the custom
-Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
+The native client starts outside the custom
+Salimon scout landed on Vesper in Nacre Reach (over 30 light-years from Earth), with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed/open-space
 door, and radial surface traversal.
 
@@ -349,3 +352,44 @@ example; real-scale playable startup and native verification remain downstream.
 Cabin controls: aim + E operates furniture; X sits/lies or gets up; U secures/releases the restraint. See [cabin mechanisms](docs/cabin-mechanisms.md).
 
 Room appearance: aim at galley/door controls and use V to select group, O to cycle color, Z to reset. O/Z on bunk, seat, table or locker controls that item. See [room finishes](docs/room-finishes.md).
+
+Core upgrades: aim at Core, I switches Fuel/Upgrade Materials; E contributes, Y applies a complete upgrade instantly, N recovers a pending fragment. See [tiers and material costs](docs/core-upgrades.md).
+
+
+Optional construction: C → 7 places a utility processor; feed 3 kg iron with E and wait 60 active seconds. Aim at its completed case with C open and press G to plan an upgrade or restoration. Fully funded maintenance disables its recovery bonus until commissioning. See [costs, power and saved downtime](docs/non-core-modules.md).
+
+Canonical cockpit scanner: automatic five-second powered scans feed the physical
+3D console hologram. Press **M** in the cockpit to select the next fresh contact;
+the hint shows sampled distance/age and identifies the logarithmic display scale.
+No catalog entry is visible before discovery. See [scanner behavior and limits](docs/universe-scanner.md).
+
+Press **P** in the canonical cockpit to switch the projector to the durable
+player-known chart, **M** to select an entry, and **Enter** to record an observed
+same-frame route. Charting never activates flight controls. Unverified leads keep
+their uncertainty; Earth has no default chart entry or route.
+
+
+## Regional climate and weather (#615)
+
+Follow the [climate contract](docs/planetary-climate.md) for immutable geology-bound climate inputs,
+strict versioned publication and stateless TT epoch queries. World owns pressure,
+temperature, coherent storm/cloud/precipitation metadata and body-fixed tangent wind;
+presentation cannot rewrite them. Vacuum has no airborne effects. Existing terrain,
+resource identities, saves and drag physics remain unchanged. Weather visuals are #616.
+
+
+## Active geological sources (#617)
+
+The [active geology contract](docs/active-geology.md) owns explicit heat/mechanism inputs,
+stable terrain-bound sites, strict publication restore and shared-TT source levels.
+Spatial queries cannot create/rekey sources. Vacuum permits ballistic plumes and
+contact coupling, never atmospheric wind/sound. Source radii do not add colliders.
+
+
+## Rare biospheres and ecological regions (#618)
+
+Follow the [ecology contract](docs/planetary-ecology.md) for independent fixed life decisions,
+geology/climate-bound potential, continuous realms and stable patch/grammar IDs.
+Suitability never grants life; observed bodies retain no procedural life claim
+and Vesper stays sterile. Strict catalog/save bindings reject incompatible
+publications. Organism meshes, physical instances and harvesting remain #619–#621.

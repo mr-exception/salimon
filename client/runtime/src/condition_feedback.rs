@@ -33,10 +33,10 @@ impl Observation {
                 && !v.terminal
                 && s.view_mode == ViewMode::Gameplay,
             walking: s.character.location() != salimon_character::CharacterLocation::Cockpit
-                && (s.movement_input.forward
-                    || s.movement_input.backward
-                    || s.movement_input.left
-                    || s.movement_input.right),
+                && (s.input.movement().forward
+                    || s.input.movement().backward
+                    || s.input.movement().left
+                    || s.input.movement().right),
             now: v.active_time,
             serial: s.run.serial,
         }
@@ -178,6 +178,9 @@ impl Presenter {
             3 => next.master_mute = !next.master_mute,
             4 => next.scene_audio = !next.scene_audio,
             5 => next.scene_volume_percent = (next.scene_volume_percent + 20) % 120,
+            6 => next.environment_audio = !next.environment_audio,
+            7 => next.environment_volume_percent = (next.environment_volume_percent + 20) % 120,
+            8 => next.environment_cues = !next.environment_cues,
             _ => return,
         }
         match self
@@ -198,13 +201,16 @@ impl Presenter {
     pub(crate) fn menu_text(&self) -> String {
         let on = |v| if v { "ON" } else { "OFF" };
         format!(
-            "SALIMON / ACCESSIBILITY\n\nC   CAMERA MOTION: {}\nA   CONDITION AUDIO: {}\nV   HEALTH VIGNETTE: {}\nM   MASTER MUTE: {}\nB   SHIP AUDIO: {}\nG   SHIP VOLUME: {}%\n\nS   BACK TO PAUSE MENU\nENTER / ESC   RESUME\n\n{}",
+            "SALIMON / ACCESSIBILITY\n\nC   CAMERA MOTION: {}\nA   CONDITION AUDIO: {}\nV   HEALTH VIGNETTE: {}\nM   MASTER MUTE: {}\nB   SHIP AUDIO: {}\nG   SHIP VOLUME: {}%\nE   ENVIRONMENT AUDIO: {}\nF   ENVIRONMENT VOLUME: {}%\nT   ENVIRONMENT CUES: {}\n\nS   BACK TO PAUSE MENU\nENTER / ESC   RESUME\n\n{}",
             on(self.settings.camera_motion),
             on(self.settings.condition_audio),
             on(self.settings.vignette),
             on(self.settings.master_mute),
             on(self.settings.scene_audio),
             self.settings.scene_volume_percent,
+            on(self.settings.environment_audio),
+            self.settings.environment_volume_percent,
+            on(self.settings.environment_cues),
             self.message.chars().take(65).collect::<String>()
         )
     }
@@ -342,10 +348,15 @@ mod integration_tests {
         p.toggle_setting(3);
         p.toggle_setting(4);
         p.toggle_setting(5);
+        p.toggle_setting(6);
+        p.toggle_setting(7);
+        p.toggle_setting(8);
         let saved = settings::load(&path).unwrap();
         assert!(saved.master_mute);
         assert!(!saved.scene_audio);
         assert_eq!(saved.scene_volume_percent, 80);
+        assert!(!saved.environment_audio && !saved.environment_cues);
+        assert_eq!(saved.environment_volume_percent, 80);
         for _ in 0..8 {
             p.toggle_setting(5);
             assert!(p.settings.scene_volume_percent <= 100);

@@ -12,7 +12,9 @@ pub(crate) mod cockpit;
 mod collision;
 mod door;
 mod flight;
+mod offline;
 pub mod persistence;
+mod static_obstacles;
 mod steering;
 pub(crate) mod telemetry;
 pub mod throttle;
@@ -26,6 +28,8 @@ pub struct ShipController {
     pub(crate) propulsion: crate::Propulsion,
     pub(crate) terrain: salimon_world::terrain::TerrainMode,
     pub(crate) landing_footprint: Option<crate::LandingFootprint>,
+    #[serde(skip)]
+    surface_obstacles: Option<static_obstacles::ExternalObstacles>,
     pub(crate) flight_state: FlightState,
     door_state: DoorState,
     door_open_fraction: f64,
@@ -64,6 +68,7 @@ impl Default for ShipController {
             propulsion: crate::Propulsion::default(),
             terrain: salimon_world::terrain::TerrainMode::Flat,
             landing_footprint: None,
+            surface_obstacles: None,
             pose: ShipPose {
                 position_meters,
                 orientation: [0.0, 0.0, 0.0, 1.0],
@@ -100,6 +105,7 @@ impl ShipController {
             propulsion: crate::Propulsion::default(),
             terrain: salimon_world::terrain::TerrainMode::Flat,
             landing_footprint: None,
+            surface_obstacles: None,
             pose,
             flight_state: FlightState::Flying,
             door_state: DoorState::Closed,
@@ -228,6 +234,7 @@ impl ShipController {
             self.clear_flight_control_input();
         }
         self.settle_assist_energy(delta);
+        let obstacle_start = self.pose.position_meters;
         match self.flight_state {
             FlightState::Flying => self.advance_powered_flight(
                 delta,
@@ -239,6 +246,7 @@ impl ShipController {
             FlightState::Bouncing { body } => self.advance_bounce(body, delta),
             FlightState::Landed { .. } | FlightState::GroundedAfterCrash { .. } => {}
         }
+        self.constrain_surface_obstacles(obstacle_start);
         self.advance_throttle(delta);
         Ok(())
     }
@@ -269,6 +277,7 @@ impl ShipController {
     pub fn snapshot(&self) -> ShipSnapshot {
         let velocity_meters_per_second = self.velocity_meters_per_second();
         ShipSnapshot {
+            terrain: self.terrain,
             pose: self.pose,
             flight_state: self.flight_state,
             door_state: self.door_state,

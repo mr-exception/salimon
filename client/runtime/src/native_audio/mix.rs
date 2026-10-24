@@ -1,12 +1,13 @@
 //! Fixed-memory callback state. No locks, allocation, logging or platform calls.
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering::SeqCst};
-pub(super) const VOICES: usize = 13;
+pub(super) const VOICES: usize = 32;
 #[derive(Clone, Copy)]
 pub(crate) struct Control {
     pub epoch: u64,
     pub enabled: u32,
     pub gains: [f32; VOICES],
     pub pans: [f32; VOICES],
+    pub filters: [f32; VOICES],
     pub events: [bool; VOICES],
 }
 impl Default for Control {
@@ -16,6 +17,7 @@ impl Default for Control {
             enabled: 0,
             gains: [0.; VOICES],
             pans: [0.; VOICES],
+            filters: [1.; VOICES],
             events: [false; VOICES],
         }
     }
@@ -27,6 +29,7 @@ pub(super) struct Mailbox {
     stamp_ms: AtomicU64,
     gains: [AtomicU32; VOICES],
     pans: [AtomicU32; VOICES],
+    filters: [AtomicU32; VOICES],
     events: [AtomicU64; VOICES],
 }
 #[derive(Clone, Copy, Default)]
@@ -36,6 +39,7 @@ struct Snapshot {
     stamp_ms: u64,
     gains: [f32; VOICES],
     pans: [f32; VOICES],
+    filters: [f32; VOICES],
     events: [u64; VOICES],
 }
 impl Default for Mailbox {
@@ -47,6 +51,7 @@ impl Default for Mailbox {
             stamp_ms: AtomicU64::new(0),
             gains: std::array::from_fn(|_| AtomicU32::new(0)),
             pans: std::array::from_fn(|_| AtomicU32::new(0)),
+            filters: std::array::from_fn(|_| AtomicU32::new(1f32.to_bits())),
             events: std::array::from_fn(|_| AtomicU64::new(0)),
         }
     }
@@ -61,6 +66,7 @@ impl Mailbox {
         for i in 0..VOICES {
             self.gains[i].store(c.gains[i].clamp(0., 1.).to_bits(), SeqCst);
             self.pans[i].store(c.pans[i].clamp(-1., 1.).to_bits(), SeqCst);
+            self.filters[i].store(c.filters[i].clamp(0.005, 1.).to_bits(), SeqCst);
             if c.events[i] {
                 self.events[i].fetch_add(1, SeqCst);
             }
@@ -79,6 +85,7 @@ impl Mailbox {
                 stamp_ms: self.stamp_ms.load(SeqCst),
                 gains: std::array::from_fn(|i| f32::from_bits(self.gains[i].load(SeqCst))),
                 pans: std::array::from_fn(|i| f32::from_bits(self.pans[i].load(SeqCst))),
+                filters: std::array::from_fn(|i| f32::from_bits(self.filters[i].load(SeqCst))),
                 events: std::array::from_fn(|i| self.events[i].load(SeqCst)),
             };
             if rev == self.revision.load(SeqCst) {
@@ -98,6 +105,8 @@ struct Voice {
     phase: f64,
     seen: u64,
     noise: f64,
+    filtered: f64,
+    coefficient: f64,
 }
 impl Default for Voice {
     fn default() -> Self {
@@ -110,6 +119,8 @@ impl Default for Voice {
             phase: 0.,
             seen: 0,
             noise: 0.,
+            filtered: 0.,
+            coefficient: 1.,
         }
     }
 }
@@ -140,10 +151,13 @@ impl Mix {
         }
         let stale = now_ms.saturating_sub(self.snapshot.stamp_ms) > 250;
         for (i, v) in self.voices.iter_mut().enumerate() {
+            v.coefficient = 1.
+                - (1. - f64::from(self.snapshot.filters[i]).clamp(0.005, 1.))
+                    .powf(48000. / self.rate);
             if stale || self.snapshot.enabled & (1 << i) == 0 {
                 v.seen = self.snapshot.events[i];
                 v.level = 0.;
-            } else if i < 6 {
+            } else if loop_voice(i) {
                 v.level = f64::from(self.snapshot.gains[i]);
                 v.target_pan = f64::from(self.snapshot.pans[i]);
             } else if v.seen != self.snapshot.events[i] {
@@ -163,7 +177,9 @@ impl Mix {
             let noise = f64::from(self.seed >> 8) / 8388608. - 1.;
             v.noise += 0.035 * (noise - v.noise);
             let hz = [
-                67., 47., 180., 220., 43., 120., 90., 180., 140., 440., 65., 360., 110.,
+                67., 47., 180., 220., 43., 120., 90., 180., 140., 440., 65., 360., 110., 72., 95.,
+                80., 125., 45., 110., 38., 150., 52., 170., 105., 125., 180., 65., 37., 310., 22.,
+                490., 130.,
             ][i];
             v.phase = (v.phase + dt).rem_euclid(64.);
             let t = v.phase;
@@ -198,12 +214,30 @@ impl Mix {
                             0.
                         }
                 }
-                _ => tone(hz) * (std::f64::consts::PI * a.min(1.)).sin().powi(2) * 0.35,
+                12 => tone(hz) * (std::f64::consts::PI * a.min(1.)).sin().powi(2) * 0.35,
+                13..=19 => v.noise * 0.7 + tone(hz) * 0.06 + tone(hz * 2.13) * 0.025,
+                27 => v.noise * (0.7 + 0.2 * tone(0.7)),
+                28 => noise * 0.35 + v.noise * 0.3,
+                29 => tone(hz) * 0.35 + v.noise * 0.5,
+                30 => noise * 0.2 * (0.6 + 0.4 * tone(3.1)),
+                31 => tone(hz) * 0.25 + noise * 0.2,
+                20..=23 | 25..=26 => {
+                    (noise * 0.65 + tone(hz) * 0.18)
+                        * (-a * if i == 21 || i == 26 { 18. } else { 45. }).exp()
+                }
+                _ => (tone(hz) * 0.25 + v.noise * 0.65) * (-a * 24.).exp(),
             };
-            let level = if i >= 6 && a >= 1. { 0. } else { v.level };
+            let level = if !loop_voice(i) && a >= 1. {
+                0.
+            } else {
+                v.level
+            };
             v.gain += (level - v.gain) * smooth;
             v.pan += (v.target_pan - v.pan) * smooth;
-            let sample = signal * v.gain * 0.36;
+            // One-pole low-pass at the actual callback rate. Partition values are
+            // normalized at 48 kHz so device-rate changes preserve the cutoff.
+            v.filtered += v.coefficient * (signal - v.filtered);
+            let sample = v.filtered * v.gain * 0.36;
             out[0] += sample * ((1. - v.pan) * 0.5).sqrt();
             out[1] += sample * ((1. + v.pan) * 0.5).sqrt();
             v.age = (a + dt).min(2.);
@@ -211,6 +245,9 @@ impl Mix {
         // Smooth saturation preserves headroom without hard sample clipping.
         out.map(|v| v.tanh() as f32)
     }
+}
+fn loop_voice(i: usize) -> bool {
+    i < 6 || (13..20).contains(&i) || i >= 27
 }
 #[cfg(test)]
 mod tests;

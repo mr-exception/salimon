@@ -1,6 +1,0 @@
-[2026-10-23T12:13:48Z ERROR wgpu_hal::gles::egl] EGL 'eglInitialize' code 0x3001: DRI2: failed to load driver
-[2026-10-23T12:13:48Z ERROR wgpu_hal::gles::egl] EGL 'eglInitialize' code 0x3001: DRI2: failed to load driver
-Failed to create /home/agent/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
-Failed to create /home/agent/.cache/mesa_shader_cache_db for shader cache (Read-only file system)---disabling.
-Failed to create /home/agent/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
-Failed to create /home/agent/.cache/mesa_shader_cache_db for shader cache (Read-only file system)---disabling.

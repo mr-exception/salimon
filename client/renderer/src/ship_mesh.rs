@@ -9,7 +9,7 @@ pub(crate) const SHIP_GLB: &[u8] =
     include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
 const VERTEX_FLOATS: usize = 20;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
-const UNIFORM_SIZE: u64 = 352;
+const UNIFORM_SIZE: u64 = 608;
 use crate::ramp_geometry::{
     RAMP_ANGLE_RADIANS, RAMP_EXTENSION_METERS, RAMP_FACE_OFFSET_METERS, RAMP_HINGE,
 };
@@ -19,7 +19,9 @@ const DOOR_HINGE_Y_METERS: f32 = RAMP_HINGE[1] as f32;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
+    pub lighting: crate::CabinLighting,
     /// Bounded linear cosmetic factors: cabin/cargo × five finish groups.
+    pub surface_ages: [f32; 8],
     pub finish_tints: [[[f32; 3]; 5]; 2],
     pub machinery: crate::MachineryFeedback,
     pub position_meters: [f64; 3],
@@ -48,34 +50,45 @@ struct ShipGeometry {
 
 /// Explicit authored cosmetic allowlist: functional and safety surfaces are excluded.
 fn finish_group(name: Option<&str>) -> f32 {
-    match name {
-        Some(
-            "Wall_Port_Inner"
-            | "Wall_Starboard_Inner"
-            | "Aft_Bulkhead_Port"
-            | "Aft_Bulkhead_Starboard"
-            | "Ceiling_Inner"
-            | "Starter_CargoBulkhead",
-        ) => 1.,
-        Some("Deck_Walkable") => 2.,
-        Some(
-            "Ceiling_Copper_Ribs"
-            | "Deck_Copper_Inlay"
-            | "Window_Port_Sill"
-            | "Window_Starboard_Sill",
-        ) => 3.,
-        Some(
-            "Starter_Galley" | "Starter_GalleyWorktop" | "Starter_Hygiene" | "Starter_CargoBins",
-        ) => 4.,
-        Some(
-            "Starter_BunkCushion"
-            | "Cabin_Woven_Runners"
-            | "Pilot_Seat_Bolsters"
-            | "Pilot_Seat_Cushions"
-            | "Pilot_Seat_Headrest",
-        ) => 5.,
+    let age = match name {
+        Some("Deck_Walkable" | "Cabin_Woven_Runners") => 1.,
+        Some("Starter_Galley" | "Starter_GalleyWorktop" | "Starter_Hygiene") => 4.,
+        Some("Pilot_Seat_Bolsters" | "Pilot_Seat_Cushions" | "Pilot_Seat_Headrest") => 5.,
+        Some("Fabricator_Chassis" | "Fabricator_Input" | "Fabricator_Tray") => 3.,
         _ => 0.,
-    }
+    };
+    age * 16.
+        + match name {
+            Some(
+                "Wall_Port_Inner"
+                | "Wall_Starboard_Inner"
+                | "Aft_Bulkhead_Port"
+                | "Aft_Bulkhead_Starboard"
+                | "Ceiling_Inner"
+                | "Starter_CargoBulkhead",
+            ) => 1.,
+            Some("Deck_Walkable") => 2.,
+            Some(
+                "Ceiling_Copper_Ribs"
+                | "Deck_Copper_Inlay"
+                | "Window_Port_Sill"
+                | "Window_Starboard_Sill",
+            ) => 3.,
+            Some(
+                "Starter_Galley"
+                | "Starter_GalleyWorktop"
+                | "Starter_Hygiene"
+                | "Starter_CargoBins",
+            ) => 4.,
+            Some(
+                "Starter_BunkCushion"
+                | "Cabin_Woven_Runners"
+                | "Pilot_Seat_Bolsters"
+                | "Pilot_Seat_Cushions"
+                | "Pilot_Seat_Headrest",
+            ) => 5.,
+            _ => 0.,
+        }
 }
 
 fn load_geometry() -> Result<ShipGeometry, RendererError> {
@@ -525,7 +538,17 @@ impl ShipMeshRenderer {
                 },
             ],
         });
-        let shader = device.create_shader_module(wgpu::include_wgsl!("ship_mesh.wgsl"));
+        let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("ship_mesh"),
+            source: wgpu::ShaderSource::Wgsl(
+                concat!(
+                    include_str!("surface_age.wgsl"),
+                    "\n",
+                    include_str!("ship_mesh.wgsl")
+                )
+                .into(),
+            ),
+        });
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Salimon ship pipeline layout"),
             bind_group_layouts: &[Some(&layout)],
@@ -666,6 +689,15 @@ impl ShipMeshRenderer {
                 values.extend_from_slice(&[tint[0], tint[1], tint[2], 0.]);
             }
         }
+        values.extend(ship.lighting.values()?);
+        if ship
+            .surface_ages
+            .iter()
+            .any(|a| !a.is_finite() || !(0.0..=0.44).contains(a))
+        {
+            return Err(RendererError::new("ship age", "unbounded exposure"));
+        }
+        values.extend(ship.surface_ages);
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         self.visible = true;
         Ok(())
@@ -975,7 +1007,12 @@ mod fabricator_tests {
                 "category artwork needs a noncollapsed full face"
             );
         }
-        let module = wgpu::naga::front::wgsl::parse_str(include_str!("ship_mesh.wgsl")).unwrap();
+        let module = wgpu::naga::front::wgsl::parse_str(concat!(
+            include_str!("surface_age.wgsl"),
+            "\n",
+            include_str!("ship_mesh.wgsl")
+        ))
+        .unwrap();
         wgpu::naga::valid::Validator::new(
             wgpu::naga::valid::ValidationFlags::all(),
             wgpu::naga::valid::Capabilities::all(),

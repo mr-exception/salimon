@@ -18,6 +18,8 @@ pub enum SurfaceMaterial {
     Slate,
     Rust,
     Emissive,
+    /// Slot 6 remains the shared detail texture.
+    Ice = 7,
 }
 
 /// Absolute, renderer-neutral spherical surface. Radius stays f64 until preparation.

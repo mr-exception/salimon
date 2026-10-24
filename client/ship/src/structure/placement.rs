@@ -99,6 +99,10 @@ impl Rotation {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Placeholder {
+    #[serde(default)]
+    pub work: super::construction::Work,
+    #[serde(default)]
+    pub funding: super::funding::Funding,
     pub id: PlaceholderId,
     pub owner: u64,
     pub blueprint: Blueprint,
@@ -380,8 +384,13 @@ impl Placements {
         } else {
             blueprint.fine_pitch_meters
         };
-        let anchor =
+        let mut anchor =
             std::array::from_fn(|i| origin[i] + ((target[i] - origin[i]) / pitch).floor() * pitch);
+        // The trusted host supplies an actual completed support elevation;
+        // horizontal fine snapping must not bury furniture in a new deck.
+        if blueprint.footprint == Footprint::Interior {
+            anchor[1] = target[1];
+        }
         let space = rotated_space(blueprint.space, rotation, anchor)?;
         let cells = covered_cells(space, origin, supplied_limit(blueprint.cells.len()))?;
         let mut preview = Preview {
@@ -473,7 +482,11 @@ impl Placements {
             }
         }
         for job in self.jobs.values() {
-            if Some(job.id) != ignore
+            if !job.work.destroyed
+                && Some(job.id) != ignore
+                && !(preview.blueprint.footprint == Footprint::Interior
+                    && job.work.completed
+                    && job.blueprint.footprint == Footprint::Structural)
                 && (intersects(preview.space, job.space)
                     || (preview.blueprint.footprint == Footprint::Structural
                         && job.blueprint.footprint == Footprint::Structural
@@ -506,6 +519,8 @@ impl Placements {
         self.jobs.insert(
             id,
             Placeholder {
+                work: Default::default(),
+                funding: Default::default(),
                 id,
                 owner: c.owner,
                 blueprint: preview.blueprint,
@@ -519,6 +534,20 @@ impl Placements {
         self.next_id = next;
         Ok(id)
     }
+    pub fn funding_mut(
+        &mut self,
+        id: PlaceholderId,
+        actor: u64,
+    ) -> Result<&mut Placeholder, PlacementError> {
+        let p = self
+            .jobs
+            .get_mut(&id)
+            .ok_or(PlacementError::MissingPlaceholder)?;
+        if actor == 0 || p.owner != actor {
+            return Err(PlacementError::Unauthorized);
+        }
+        Ok(p)
+    }
     pub fn cancel(&mut self, id: PlaceholderId, actor: u64) -> Result<Placeholder, PlacementError> {
         let job = self
             .jobs
@@ -526,6 +555,9 @@ impl Placements {
             .ok_or(PlacementError::MissingPlaceholder)?;
         if actor == 0 || actor != job.owner {
             return Err(PlacementError::Unauthorized);
+        }
+        if !job.funding.receipts.is_empty() || job.funding.progress_ppm != 0 {
+            return Err(PlacementError::Occupied);
         }
         self.jobs
             .remove(&id)
@@ -566,6 +598,12 @@ impl Placements {
         }
         for (id, p) in &self.jobs {
             p.blueprint.validate()?;
+            p.funding
+                .validate(&p.blueprint.requirements)
+                .map_err(|_| PlacementError::InvalidIdentity)?;
+            p.work
+                .validate(&p.funding, &p.blueprint)
+                .map_err(|_| PlacementError::InvalidIdentity)?;
             if *id != p.id || id.0 == 0 || id.0 >= self.next_id || p.owner == 0 {
                 return Err(PlacementError::InvalidIdentity);
             }
@@ -586,7 +624,17 @@ impl Placements {
         let jobs: Vec<_> = self.jobs.values().collect();
         for (i, a) in jobs.iter().enumerate() {
             for b in &jobs[i + 1..] {
-                if intersects(a.space, b.space) {
+                let furnishing_in_room = (a.work.completed
+                    && a.blueprint.footprint == Footprint::Structural
+                    && b.blueprint.footprint == Footprint::Interior)
+                    || (b.work.completed
+                        && b.blueprint.footprint == Footprint::Structural
+                        && a.blueprint.footprint == Footprint::Interior);
+                if !a.work.destroyed
+                    && !b.work.destroyed
+                    && intersects(a.space, b.space)
+                    && !furnishing_in_room
+                {
                     return Err(PlacementError::Overlapping(b.id));
                 }
             }

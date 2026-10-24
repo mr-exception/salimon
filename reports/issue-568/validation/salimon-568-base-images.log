@@ -1,7 +1,0 @@
-#5 [internal] load metadata for docker.io/library/node:22.16.0-bookworm-slim
-#3 [internal] load metadata for docker.io/library/ubuntu:24.04
-#4 [internal] load metadata for docker.io/library/rust:1.89.0-bookworm
-#6 [stage-2 1/7] FROM docker.io/library/ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
-#7 [rust 1/1] FROM docker.io/library/rust:1.89.0-bookworm@sha256:948f9b08a66e7fe01b03a98ef1c7568292e07ec2e4fe90d88c07bb14563c84ff
-#10 [node 1/1] FROM docker.io/library/node:22.16.0-bookworm-slim@sha256:048ed02c5fd52e86fda6fbd2f6a76cf0d4492fd6c6fee9e2c463ed5108da0e34
-#7 [rust 1/1] FROM docker.io/library/rust:1.89.0-bookworm@sha256:948f9b08a66e7fe01b03a98ef1c7568292e07ec2e4fe90d88c07bb14563c84ff

@@ -59,6 +59,10 @@ pub struct FixtureNode {
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FixtureInstance {
+    /// Explicit effective light, or None for legacy authored fill.
+    pub illumination: Option<[f32; 3]>,
+    /// age, material response (paint/metal/fabric/heat), fixed pattern seed, reserved.
+    pub surface_age: [f32; 4],
     pub id: u64,
     pub mesh: FixtureMesh,
     pub pose: FixturePose,
@@ -161,6 +165,8 @@ pub fn resolve_fixture_hierarchy(
         .iter()
         .zip(poses)
         .map(|(n, p)| FixtureInstance {
+            illumination: None,
+            surface_age: [0.; 4],
             id: n.id,
             mesh: n.mesh,
             pose: p.expect("resolved"),
@@ -331,7 +337,7 @@ pub struct FixtureBatchStats {
 }
 
 // Three vec4 attributes: camera-relative center/scale, quaternion, linear tint.
-const INSTANCE_BYTES: usize = 48;
+const INSTANCE_BYTES: usize = 80;
 
 #[derive(Default)]
 struct InstanceBatch {
@@ -358,7 +364,16 @@ fn prepare_instances(
     }
     let mut ids = std::collections::HashSet::new();
     for n in instances {
-        if !ids.insert(n.id)
+        if n.surface_age.iter().any(|v| !v.is_finite())
+            || !(0.0..=0.44).contains(&n.surface_age[0])
+            || !(0.0..=3.).contains(&n.surface_age[1])
+            || !(0.0..=16.).contains(&n.surface_age[2])
+            || n.surface_age[3] != 0.
+            || n.illumination.is_some_and(|rgb| {
+                rgb.iter()
+                    .any(|v| !v.is_finite() || !(0.0..=2.0).contains(v))
+            })
+            || !ids.insert(n.id)
             || !valid_pose(n.pose)
             || n.tint
                 .iter()
@@ -397,6 +412,9 @@ fn prepare_instances(
             .chain(n.pose.orientation_xyzw.map(|v| v as f32))
             .chain(n.tint)
             .chain([f32::from(n.powered)])
+            .chain(n.illumination.unwrap_or([0.; 3]))
+            .chain([f32::from(n.illumination.is_some())])
+            .chain(n.surface_age)
         {
             batches[n.mesh.index()]
                 .staging
@@ -500,7 +518,17 @@ impl FixtureMeshRenderer {
                 resource: uniform.as_entire_binding(),
             }],
         });
-        let shader = device.create_shader_module(wgpu::include_wgsl!("fixtures.wgsl"));
+        let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("fixtures"),
+            source: wgpu::ShaderSource::Wgsl(
+                concat!(
+                    include_str!("surface_age.wgsl"),
+                    "\n",
+                    include_str!("fixtures.wgsl")
+                )
+                .into(),
+            ),
+        });
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Fixture mesh layout"),
             bind_group_layouts: &[Some(&layout)],
@@ -509,8 +537,7 @@ impl FixtureMeshRenderer {
         let attributes = wgpu::vertex_attr_array![
             0 => Float32x3, 1 => Float32x4, 2 => Float32x3
         ];
-        let instance_attributes =
-            wgpu::vertex_attr_array![3 => Float32x4, 4 => Float32x4, 5 => Float32x4];
+        let instance_attributes = wgpu::vertex_attr_array![3 => Float32x4, 4 => Float32x4, 5 => Float32x4, 6 => Float32x4, 7 => Float32x4];
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Fixture mesh pipeline"),
             layout: Some(&pipeline_layout),
@@ -684,7 +711,12 @@ mod tests {
     }
     #[test]
     fn modular_shader_validates_on_the_portable_wgsl_path() {
-        let module = wgpu::naga::front::wgsl::parse_str(include_str!("fixtures.wgsl")).unwrap();
+        let module = wgpu::naga::front::wgsl::parse_str(concat!(
+            include_str!("surface_age.wgsl"),
+            "\n",
+            include_str!("fixtures.wgsl")
+        ))
+        .unwrap();
         wgpu::naga::valid::Validator::new(
             wgpu::naga::valid::ValidationFlags::all(),
             wgpu::naga::valid::Capabilities::all(),
@@ -761,6 +793,8 @@ mod tests {
             near_plane_meters: 0.05,
         };
         let instance = FixtureInstance {
+            illumination: None,
+            surface_age: [0.; 4],
             id: 7,
             mesh: FixtureMesh::Shelf,
             pose: FixturePose {

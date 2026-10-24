@@ -1,1 +1,0 @@
-Initial camera at source 6cc642b was inside the pilot seat. Protocol/state assertions passed, but these images FAIL the visible-pedal evidence requirement. Rejected, not an appearance baseline. Camera corrected in 4b64c15; final clean captures and clips are under ../evidence/walkthrough/ and ../media/.

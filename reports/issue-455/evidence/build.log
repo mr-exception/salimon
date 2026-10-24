@@ -1,6 +1,0 @@
-Building: cargo build --locked -p salimon-client --target aarch64-apple-darwin --message-format json-render-diagnostics --release
-    Blocking waiting for file lock on package cache
-   Compiling salimon-physics v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/physics)
-   Compiling salimon-client v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/runtime)
-    Finished `release` profile [optimized] target(s) in 17.95s
-Built /Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261022/455/build-optimized/salimon-client

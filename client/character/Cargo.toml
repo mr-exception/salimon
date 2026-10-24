@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+salimon-physics = { path = "../physics" }
 serde.workspace = true
 salimon-persistence = { path = "../persistence" }
 salimon-math = { path = "../math" }

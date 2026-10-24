@@ -15,8 +15,14 @@ mod energy;
 pub use energy::{EnergyConfig, EnergyCore, InvalidEnergy};
 mod mass;
 pub use mass::{MassObjectId, ShipMass};
+pub mod atmosphere;
+pub mod contact;
+pub mod prediction;
+pub mod preview;
 mod propulsion;
 pub mod structure;
+pub mod surface;
+pub mod trajectory;
 pub use propulsion::{
     InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_IMPULSE_NS_PER_JOULE,
 };
@@ -64,3 +70,8 @@ pub const DOOR_HINGE_ANIMATION_DURATION: Duration = Duration::from_millis(700);
 pub use controller::persistence::ShipSaveState;
 
 pub mod finishes;
+pub mod surface_age;
+
+pub mod core_upgrades;
+
+pub mod lighting;

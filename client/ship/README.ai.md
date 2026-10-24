@@ -49,8 +49,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 For approved flight/Core choices and historical supersession, follow the
 [owned review](../../docs/spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
-Future upgrade/module-load/inertial-cabin/orbit/manual-power features remain out
-of scope; do not interpret tuning setters as progression mechanics.
+Thruster/landing upgrades, future module-load/inertial-cabin/orbit/manual-power features remain deferred. The explicit instant Core capacity progression is implemented by #548; tuning setters alone do not grant a paid upgrade.
 
 #493 replaces independent force capacities with funded Core impulse. Read the
 [math/safety/switch contract](architecture.md#funded-core-impulse-and-engine-switch-493).
@@ -87,9 +86,9 @@ rendered previews are never authority. One multi-cell/multi-deck volume is one
 project. Unbuilt neighbors cannot supply structural support. Interior versus
 hull-affecting consequences determine airborne permissions.
 
-Projects expose requirements/duration for inspection but contain no material,
-progress or installed mass. There is no separate worksite or Start action.
-Cancellation removes the unfunded reservation; #543 owns physical intake/refunds,
+Projects capture requirements/duration and exact #543 material receipts/progress.
+There is no separate worksite or Start action.
+Cancellation atomically returns physical unconsumed material; #543 owns intake/refunds,
 #544 progress, #545 geometry and #546 flight interlocks. Domain schema-1 validation
 and the whole-session boundary are documented in the
 [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
@@ -101,3 +100,89 @@ Read the physical mount contract before changing rail identity/compatibility or 
 
 
 Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
+
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Construction flight readiness (#546)
+
+Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 contract](../../docs/construction-flight-safety.md). The durable stop latch never clears on landing; actual hull/attachment state governs readiness. Preserve Core/engine/cockpit/ramp authority and inertial momentum.
+
+
+## Cosmetic surface age (#581)
+
+Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+## Real-scale trajectory foundation (#417)
+
+`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. The compressed playable controller and saves remain unchanged; real-scale support, drag and contact compose through the #418–#420 companion APIs below. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](../../docs/universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.
+
+
+## Real-scale atmospheric drag (#419)
+
+See the [atmosphere contract](../../docs/universe-atmosphere.md) for planet-specific density,
+co-rotating gas/wind, atomic online/offline drag integration and physically paid
+assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](../../docs/universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.
+
+
+## Bounded navigation prediction (#421)
+
+Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+## Regional weather composition regression (#615)
+
+`tests/regional_weather.rs` exercises the real world climate evaluator with the
+existing U18 gas and drag operators. See the [climate contract](../../docs/planetary-climate.md).
+Climate wind is body-fixed; the composition owner must rotate it into inertial
+axes exactly once before supplying `Atmosphere::sample`. Density, body motion,
+rotation, passive drag and propulsion/Core energy retain their existing owners.
+The explicit test atmosphere is a fixture, not a newly published lunar atmosphere.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

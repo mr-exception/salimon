@@ -1,4 +1,0 @@
-Building: cargo build --locked -p salimon-client --target aarch64-apple-darwin --message-format json-render-diagnostics --release
-   Compiling salimon-client v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/runtime)
-    Finished `release` profile [optimized] target(s) in 1m 56s
-Built /Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261022/build-fixed/salimon-client

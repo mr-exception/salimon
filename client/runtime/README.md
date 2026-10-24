@@ -366,3 +366,33 @@ The `recovery` key alias maps to R; `inspect.recovery` observes captured config,
 identity, active record and paid joules without modifying them. See the
 [Recovery report](../../reports/issue-515/README.md) for the production craft,
 collection, cabin walk and funded reconstruction route.
+
+### Integrated construction cancellation fixture (#551)
+
+`--e2e --scenario construction-cancellation` declares one reachable hull-cell
+reservation and one carried 20 kg iron input. All subsequent intake, work and
+cancellation use ordinary production commands. The approved 120-second blueprint
+places 50% (60 s) and 99% (118.8 s) exactly on the live 16 ms scheduler, without
+mutating progress or changing the catalog. The [integrated suite](../../scripts/README.md#integrated-scout-and-construction-acceptance-551)
+checks exact physical refunds and absent partial colliders; the fixture does not
+measure real-world acquisition or authorize source, balance or hardware budgets.
+
+
+## Canonical play and engineering saves (#427)
+
+Ordinary launch uses the permanent Vesper journey and accepts only schema 24+
+canonical checkpoints bound to that publication. A prototype/engineering save
+produces an incompatibility error and is left intact. To start a separate journey,
+set `SALIMON_SAVE_DIR` to a new empty directory; do not delete old evidence.
+F2 remains the explicitly separate compressed precision camera; returning to
+gameplay restores the canonical scene. E2E fixtures never import user saves.
+See [canonical gameplay](../../docs/universe-gameplay.md#ordinary-canonical-play-427).
+
+
+Suit field marks (#625): F10 estimated spot, F11 bearing-only mark, F12 navigation power.
+[Controls, uncertainty and persistence](../../docs/suit-observations.md).
+
+
+Planetary chart (#626): Backslash opens cockpit review; M next, R personal note,
+Enter save/manual target, Backspace text edit, Delete personal removal, Escape close.
+Comma inspects a nearby aimed marked source. [Contract and fixture](../../docs/planetary-chart.md).

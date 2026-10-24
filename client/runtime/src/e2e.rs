@@ -11,9 +11,43 @@ use crate::session::GameplaySession;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    CanonicalTerrain,
+    CanonicalSurface,
+    CanonicalMining,
+    CanonicalFlight,
+    CanonicalJourney,
+    PlanetaryChart,
+    BiologicalHarvest,
+    BiologicalMining,
+    NavigationApproach,
+    ConstructionModule,
+    ConstructionModuleUpgrade,
+    ConstructionModuleRestore,
+    ConstructionMaterials,
+    ConstructionBuild,
+    ConstructionRoom,
+    ConstructionCancellation,
+    ConstructionInterlocks,
+    SurfaceAgeOffline,
+    SurfaceAgeReplacement,
+    SurfaceAgeNew,
+    SurfaceAgeUsed,
+    SurfaceAgeIdle,
+    SurfaceAgeRecolor,
+    SurfaceAgeBlackout,
+    SurfaceAgeReload,
+    SurfaceAgeDamage,
+    SurfaceAgeRepair,
+    ScoutLighting,
+    ScoutLightingShutter,
+    ScoutLightingBlackout,
+    ScoutLightingBroken,
+    ScoutLightingDark,
     ScoutMounts,
     ScoutCabin,
     ScoutFinishes,
+    ScoutCoreUpgrade,
+    ScoutCoreUpgradePowered,
     ScoutFinishesBlackout,
     ScoutCabinBunk,
     ScoutCabinLocker,
@@ -51,9 +85,43 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "canonical-terrain" => Ok(Self::CanonicalTerrain),
+            "canonical-surface" => Ok(Self::CanonicalSurface),
+            "canonical-mining" => Ok(Self::CanonicalMining),
+            "canonical-flight" => Ok(Self::CanonicalFlight),
+            "biological-harvest" => Ok(Self::BiologicalHarvest),
+            "biological-mining" => Ok(Self::BiologicalMining),
+            "planetary-chart" => Ok(Self::PlanetaryChart),
+            "canonical-journey" => Ok(Self::CanonicalJourney),
+            "navigation-approach" => Ok(Self::NavigationApproach),
+            "surface-age-offline" => Ok(Self::SurfaceAgeOffline),
+            "surface-age-replacement" => Ok(Self::SurfaceAgeReplacement),
+            "surface-age-new" => Ok(Self::SurfaceAgeNew),
+            "surface-age-used" => Ok(Self::SurfaceAgeUsed),
+            "surface-age-idle" => Ok(Self::SurfaceAgeIdle),
+            "surface-age-recolor" => Ok(Self::SurfaceAgeRecolor),
+            "surface-age-blackout" => Ok(Self::SurfaceAgeBlackout),
+            "surface-age-reload" => Ok(Self::SurfaceAgeReload),
+            "surface-age-damage" => Ok(Self::SurfaceAgeDamage),
+            "surface-age-repair" => Ok(Self::SurfaceAgeRepair),
+            "scout-lighting" => Ok(Self::ScoutLighting),
+            "scout-lighting-shutter" => Ok(Self::ScoutLightingShutter),
+            "scout-lighting-blackout" => Ok(Self::ScoutLightingBlackout),
+            "scout-lighting-broken" => Ok(Self::ScoutLightingBroken),
+            "scout-lighting-dark" => Ok(Self::ScoutLightingDark),
+            "construction-module" => Ok(Self::ConstructionModule),
+            "construction-module-upgrade" => Ok(Self::ConstructionModuleUpgrade),
+            "construction-module-restore" => Ok(Self::ConstructionModuleRestore),
+            "construction-materials" => Ok(Self::ConstructionMaterials),
+            "construction-build" => Ok(Self::ConstructionBuild),
+            "construction-room" => Ok(Self::ConstructionRoom),
+            "construction-cancellation" => Ok(Self::ConstructionCancellation),
+            "construction-interlocks" => Ok(Self::ConstructionInterlocks),
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
             "scout-cabin-table" => Ok(Self::ScoutCabinTable),
+            "scout-core-upgrade" => Ok(Self::ScoutCoreUpgrade),
+            "scout-core-upgrade-powered" => Ok(Self::ScoutCoreUpgradePowered),
             "scout-finishes" => Ok(Self::ScoutFinishes),
             "scout-finishes-blackout" => Ok(Self::ScoutFinishesBlackout),
             "scout-cabin" => Ok(Self::ScoutCabin),
@@ -95,9 +163,34 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::SurfaceAgeOffline => "surface-age-offline",
+            Self::SurfaceAgeReplacement => "surface-age-replacement",
+            Self::SurfaceAgeNew => "surface-age-new",
+            Self::SurfaceAgeUsed => "surface-age-used",
+            Self::SurfaceAgeIdle => "surface-age-idle",
+            Self::SurfaceAgeRecolor => "surface-age-recolor",
+            Self::SurfaceAgeBlackout => "surface-age-blackout",
+            Self::SurfaceAgeReload => "surface-age-reload",
+            Self::SurfaceAgeDamage => "surface-age-damage",
+            Self::SurfaceAgeRepair => "surface-age-repair",
+            Self::ScoutLighting => "scout-lighting",
+            Self::ScoutLightingShutter => "scout-lighting-shutter",
+            Self::ScoutLightingBlackout => "scout-lighting-blackout",
+            Self::ScoutLightingBroken => "scout-lighting-broken",
+            Self::ScoutLightingDark => "scout-lighting-dark",
+            Self::ConstructionModule => "construction-module",
+            Self::ConstructionModuleUpgrade => "construction-module-upgrade",
+            Self::ConstructionModuleRestore => "construction-module-restore",
+            Self::ConstructionMaterials => "construction-materials",
+            Self::ConstructionBuild => "construction-build",
+            Self::ConstructionRoom => "construction-room",
+            Self::ConstructionCancellation => "construction-cancellation",
+            Self::ConstructionInterlocks => "construction-interlocks",
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
             Self::ScoutCabinTable => "scout-cabin-table",
+            Self::ScoutCoreUpgrade => "scout-core-upgrade",
+            Self::ScoutCoreUpgradePowered => "scout-core-upgrade-powered",
             Self::ScoutFinishes => "scout-finishes",
             Self::ScoutFinishesBlackout => "scout-finishes-blackout",
             Self::ScoutCabin => "scout-cabin",
@@ -123,6 +216,15 @@ impl Scenario {
             Self::TerrainMarsCrater => "terrain-mars-crater",
             Self::FragmentPile => "fragment-pile",
             Self::LandedEarth => "landed-earth",
+            Self::CanonicalTerrain => "canonical-terrain",
+            Self::CanonicalSurface => "canonical-surface",
+            Self::CanonicalMining => "canonical-mining",
+            Self::CanonicalFlight => "canonical-flight",
+            Self::BiologicalHarvest => "biological-harvest",
+            Self::BiologicalMining => "biological-mining",
+            Self::PlanetaryChart => "planetary-chart",
+            Self::CanonicalJourney => "canonical-journey",
+            Self::NavigationApproach => "navigation-approach",
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
             Self::ResourceApproach => "resource-approach",
@@ -249,6 +351,96 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::SurfaceAgeOffline
+        | Scenario::SurfaceAgeReplacement
+        | Scenario::SurfaceAgeNew
+        | Scenario::SurfaceAgeUsed
+        | Scenario::SurfaceAgeIdle
+        | Scenario::SurfaceAgeRecolor
+        | Scenario::SurfaceAgeBlackout
+        | Scenario::SurfaceAgeReload
+        | Scenario::SurfaceAgeDamage
+        | Scenario::SurfaceAgeRepair => {
+            crate::session::surface_age::evidence_initial_conditions(app, config.scenario.name())?;
+        }
+        Scenario::ScoutLighting
+        | Scenario::ScoutLightingShutter
+        | Scenario::ScoutLightingBlackout
+        | Scenario::ScoutLightingBroken
+        | Scenario::ScoutLightingDark => {
+            let shutter = matches!(
+                config.scenario,
+                Scenario::ScoutLightingShutter | Scenario::ScoutLightingBlackout
+            );
+            crate::session::cabin::evidence_initial_conditions(
+                app,
+                if shutter {
+                    "scout-lighting-shutter"
+                } else {
+                    "scout-finishes"
+                },
+            )?;
+            if matches!(
+                config.scenario,
+                Scenario::ScoutLightingBlackout | Scenario::ScoutLightingDark
+            ) {
+                app.ship.set_stored_core_energy_joules(0);
+            }
+            if config.scenario == Scenario::ScoutLightingBroken {
+                app.lighting.rooms.get_mut(&1).unwrap().operable[2] = false;
+            }
+            if config.scenario == Scenario::ScoutLightingDark {
+                let mut pose = app.ship.snapshot().pose;
+                pose.position_meters[2] += 100_000_000.;
+                app.ship = ShipController::flying(pose, 0);
+                app.ship.set_stored_core_energy_joules(0);
+                app.habitation.cabin.as_mut().unwrap().motions[3].fraction = 0.;
+                app.habitation.cabin.as_mut().unwrap().motions[3].opening = false;
+            }
+        }
+
+        Scenario::ConstructionModule
+        | Scenario::ConstructionModuleUpgrade
+        | Scenario::ConstructionModuleRestore => {
+            crate::session::construction::evidence_module(
+                app,
+                match config.scenario {
+                    Scenario::ConstructionModuleUpgrade => 1,
+                    Scenario::ConstructionModuleRestore => 2,
+                    _ => 0,
+                },
+            )?;
+        }
+        Scenario::ConstructionCancellation => {
+            crate::session::construction::evidence_cancellation(app)?
+        }
+        Scenario::ConstructionRoom => crate::session::construction::evidence_room(app)?,
+        Scenario::ConstructionInterlocks => {
+            crate::session::construction::evidence_room(app)?;
+            app.command(crate::session::Command::Interact);
+            app.building.active = false;
+            app.ship.toggle_door();
+            app.advance_automation(Duration::from_secs(3));
+            app.character.enter_cockpit();
+            // Explicit fixture view; subsequent takeoff uses production admission.
+            app.command(crate::session::Command::Look(
+                -std::f64::consts::PI / 0.0022,
+                0.,
+            ));
+            app.feedback = None;
+        }
+        Scenario::ConstructionMaterials | Scenario::ConstructionBuild => {
+            crate::session::construction::evidence_initial_conditions(
+                app,
+                config.scenario == Scenario::ConstructionBuild,
+            )?
+        }
+        Scenario::ScoutCoreUpgrade | Scenario::ScoutCoreUpgradePowered => {
+            crate::session::core_upgrades::evidence_initial_conditions(
+                app,
+                config.scenario == Scenario::ScoutCoreUpgradePowered,
+            )?;
+        }
         Scenario::ScoutFinishes | Scenario::ScoutFinishesBlackout => {
             crate::session::cabin::evidence_initial_conditions(app, "scout-finishes")?;
             if config.scenario == Scenario::ScoutFinishesBlackout {
@@ -279,6 +471,63 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         | Scenario::CoreRestart
         | Scenario::CrashRecovery => crate::flight_regression::initialize(app, config.scenario)?,
         Scenario::LandedEarth => {}
+        Scenario::BiologicalHarvest | Scenario::BiologicalMining => {
+            crate::session::biology::initialize_fixture(
+                app,
+                config.scenario == Scenario::BiologicalMining,
+            )?;
+        }
+        Scenario::PlanetaryChart => {
+            *app = GameplaySession::new_canonical_run()?;
+            app.command(crate::session::Command::Control(
+                crate::session::ControlKey::Backward,
+                true,
+            ));
+            app.advance_automation(Duration::from_secs(8));
+            app.command(crate::session::Command::Control(
+                crate::session::ControlKey::Backward,
+                false,
+            ));
+            app.field_action(0);
+            app.field_action(1);
+            // Explicit review initial condition, not a claimed walking/boarding route.
+            app.character = Default::default();
+            app.character.enter_cockpit();
+        }
+        Scenario::CanonicalJourney => {
+            *app = GameplaySession::new_canonical_run()?;
+        }
+        Scenario::NavigationApproach => {
+            crate::session::canonical::initialize(app)?;
+            let pose = app.ship.snapshot().pose;
+            app.ship = ShipController::flying_with_velocity(
+                ShipPose {
+                    position_meters: salimon_math::add(pose.position_meters, [0., 180., 0.]),
+                    ..pose
+                },
+                0,
+                [0., -30., 0.],
+            )
+            .map_err(|e| e.to_string())?;
+            app.ship.configure_terrain(
+                salimon_world::terrain::TerrainMode::Canonical,
+                crate::terrain::landing_footprint(),
+            );
+            app.character.enter_cockpit();
+        }
+        Scenario::CanonicalFlight => {
+            crate::session::canonical::initialize(app)?;
+            app.character.enter_cockpit();
+        }
+        Scenario::CanonicalMining => {
+            crate::session::canonical::mining_initial_conditions(app)?;
+        }
+        Scenario::CanonicalSurface => {
+            crate::session::canonical::initialize(app)?;
+        }
+        Scenario::CanonicalTerrain => {
+            app.mining.terrain = salimon_world::terrain::TerrainMode::Canonical;
+        }
         Scenario::TerrainEarthApproach
         | Scenario::TerrainMoonApproach
         | Scenario::TerrainMarsApproach
@@ -424,6 +673,8 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     if matches!(
         config.scenario,
         Scenario::FlightRegression
+            | Scenario::NavigationApproach
+            | Scenario::ScoutLightingDark
             | Scenario::CargoFlight
             | Scenario::CargoBlackout
             | Scenario::CoreRestart
@@ -458,8 +709,8 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     }
     app.update_clock.set_fixed_step(config.step);
     app.seed = config.seed;
-    app.automation_step = Some(config.step);
-    app.interpolate_presentation = false;
+    app.policy.set_automation_step(Some(config.step));
+    app.policy.set_interpolation(false);
     Ok(())
 }
 

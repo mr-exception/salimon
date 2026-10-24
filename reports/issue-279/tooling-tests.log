@@ -1,7 +1,0 @@
-test_color_changes_allowed_but_missing_coverage_rejected (test_compare_terrain_style.TerrainComparisonTests.test_color_changes_allowed_but_missing_coverage_rejected) ... ok
-test_extra_geometry_cost_rejected (test_compare_terrain_style.TerrainComparisonTests.test_extra_geometry_cost_rejected) ... ok
-
-----------------------------------------------------------------------
-Ran 2 tests in 0.395s
-
-OK

@@ -57,7 +57,7 @@ credited, discarded or buffered. Initial small requests remain valid. See
 
 ## Patch selection and near/far presentation
 
-Cube-sphere quadtree leaves cover a local 8,192 m cap, with 16×16 cells per patch.
+For representative fixtures, cube-sphere quadtree leaves cover a local 8,192 m cap, with 16×16 cells per patch.
 Selection uses actual spherical cell edge lengths; near patches approach 64 m
 width and distant widths grow with distance up to 4,096 m. Selection is cached
 at a stable approximately 128–256 m body-local anchor. Stable keys contain the
@@ -203,3 +203,15 @@ introduced. Run the opt-in CPU traversal probe with:
 CPU observations and measured cold/steady costs are recorded in
 [the #307 report](../reports/issue-307/README.md); hardware budgets/FPS remain
 pending [native #313](https://github.com/mr-exception/salimon/issues/313).
+
+Canonical Vesper adds [planet-wide orbit-to-ground streaming](universe-terrain.md)
+with the same renderer budgets and the exact frozen publication evaluator.
+
+
+## Canonical surface integration (#425)
+
+The [canonical gameplay contract](universe-gameplay.md) maps current body/frame,
+resource/physics/Fabricator integration and schema-24 definition binding to owners
+and tests. It preserves the frozen terrain and explicit historical fixtures.
+
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.

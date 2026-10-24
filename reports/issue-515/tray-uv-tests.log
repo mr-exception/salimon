@@ -1,9 +1,0 @@
-   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.66s
-     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-89e0f0844b1445db)
-
-running 1 test
-test ship_mesh::fabricator_tests::tray_package_has_a_dedicated_conditional_surface_and_valid_shader ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 88 filtered out; finished in 0.03s
-

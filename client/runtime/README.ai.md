@@ -41,8 +41,8 @@ from rendered meshes. Cargo-door/bin mechanics are implemented by #539;
 habitation interactions remain #540.
 
 Start in `app.rs` for native lifecycle, recovery, scheduling and evidence IO.
-Use `session.rs` for typed commands/snapshots, gameplay state and exact cross-domain
-update order; `session/frames.rs` and `session/interaction.rs` own portable adapters.
+Use `session.rs` for typed contracts/domain fields, `session/commands.rs` for
+command admission and `session/tick.rs` for exact cross-domain update order; `session/frames.rs` and `session/interaction.rs` own portable adapters.
 Native key translation stays in `app/input.rs`; scene, diagnostic and prompt
 mapping stay in `app/`. See the [ownership table](architecture.md#internal-composition-modules).
 E2E/benchmark initializers and portable regressions construct `GameplaySession`
@@ -67,7 +67,8 @@ native shell; `execute` adds native-only operations/observations.
   telemetry semantics and keep screen drawing in the renderer.
 - Field-map Core energy and optional nearby-body distance/radial telemetry from
   the same snapshot. Do not select bodies or derive velocity in runtime.
-- Map all six world bodies to spheres, the Sun to a point light, and the three
+- For the explicit engineering camera, map all six fixture bodies to spheres,
+  the Sun to a point light, and the three
   noncanonical markers to separate cuboids; preserve absolute `f64` centers
   and nominal catalog radii. Gameplay far-envelope radii and bounded terrain DTOs
   follow the canonical terrain integration guide; keep material selection here.
@@ -180,7 +181,7 @@ and the sole verified restart path stay in `app.rs`. Read the
 preserve highest overlay priority, stale-pointer invalidation and failed-restart
 terminal authority. Regressions live in `journey_ended/tests.rs` and `app/input_tests.rs`.
 
-Starting supplies (#379): normal launch/restart use `GameplaySession::new_run`;
+Starting supplies (#379): normal launch/restart use `GameplaySession::new_canonical_run`;
 restore and isolated fixtures use empty `Default`. Fabrication allocates grant
 identities and exact recipe reserves; runtime reconciles mass. Read the
 [canonical contract](../../docs/save-contract.md#starting-supplies-379) and preserve
@@ -232,7 +233,8 @@ commands, GPU instruments, realistic-flight routes and human/hardware limits.
 Scout UI #466: prompt and crafting/status glyphs reuse renderer `ui_style`.
 See the [canonical surface matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466);
 retain contextual/expiry and modal admission tests, and keep power/interaction
-rules out of palette/raster changes. Scanner integration is separately #503.
+rules out of palette/raster changes. Scanner integration #503 maps authoritative observations to renderer `ScannerReadout`
+and reuses this action bar, preserving lowercase SI glyphs.
 
 
 Archive #467: follow [the source/persistence/input contract](architecture.md#scout-archive-467).
@@ -265,7 +267,8 @@ input, save schema, physics or interpolation policy.
 character geometry, individual physical cargo and protected starter escape/service
 lanes. `catalogs/blueprints.json` declares seven furniture/wall/door/hull/deck/room/
 module entries. Its costs/durations are **proposed estimates**, with
-`approved_economy=false`; they authorize no resource debit or construction progress.
+`approved_economy=true` following the explicit owner decision on 2026-10-24.
+#543 accepts physical materials; timed progress still belongs to #544.
 #537 owns economy approval before #543/#544 integration. Fine pitch is per-entry
 data (currently 0.5 m), not a mandatory global furnishing rule.
 
@@ -348,3 +351,268 @@ Use `session/mounts.rs` for G/K/J, save source and collider synchronization; shi
 
 
 Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+Tactile sound/acoustics #583: [canonical source-event, partition, callback-budget and evidence contract](../../docs/scout-acoustics.md). Actual travel/attachments trigger cues; restore audio epochs are transient. E2E exposes silent preview mapping and keeps device playback suppressed.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Construction flight readiness (#546)
+
+Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 contract](../../docs/construction-flight-safety.md). The durable stop latch never clears on landing; actual hull/attachment state governs readiness. Preserve Core/engine/cockpit/ramp authority and inertial momentum.
+
+
+## Optional module commissioning (#547)
+
+`session/construction/modules.rs` owns physical processor tiers, activated downtime, maintenance funding/work and actual commissioning faults. `session/recovery.rs` requests real tier-dependent Core watts. Schema 20 validates module/receipt ownership atomically; cancellation never restores activated equipment without paid restoration. Follow the [canonical controls, tuning, source/test and deferred Jump Drive contract](../../docs/non-core-modules.md).
+
+
+## Cosmetic surface age (#581)
+
+Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+## Domain automation ownership (#639)
+
+`automation.rs` owns the line reader, common validated envelope, deadlines,
+paused/modal admission and protocol responses. `automation/native.rs` owns
+native-window/capture observations and commands; `automation/inspection.rs`
+retains the observational snapshot. Registered handlers in `automation/`
+(`survival`, `crafting`, `construction`, `lifecycle`, `clock`, `movement`, `input`)
+own operation parsing and typed production calls. Add operations with their
+owner; update central registration only for a new owner. An unrecognized handler
+returns `None` without effects; recognized validation failures return the same
+protocol error. The native event thread remains the only executor. Legacy
+aliases live in `automation/keys.rs`; tests retain the original scenario corpus.
+
+
+## Domain input bindings (#640)
+
+`app/input.rs` translates physical keys into `session/input::Key` and owns native
+focus/capture/repeat/synthetic-event admission. `session/input/` owns portable
+construction, lighting, ship, equipment and interior bindings. Modal owners
+(Archive, wheel, crafting) retain explicit priority: construction admission,
+Escape/pause, Archive, Q/T, wheel, crafting, then ordinary commands. A domain
+binding change normally edits its owner; a new physical key also needs native
+translation. Native and automation dispatch through the same typed boundary.
+Input reset remains centralized in `GameplaySession::clear_held_controls`.
+
+
+## Domain save adapters (#641)
+
+`session/persistence.rs` retains the explicit serialized section layout and
+ordered decode/validate/reconstruct/publish transaction. Domain `save.rs` modules
+own historical-version admission, source-specific reconstruction and contextual
+rules (survival, construction, cargo/habitation, mounts, fabrication, Archive,
+Recovery, lighting, finishes, Core upgrades, surface age, tutorial and offline
+clock). `session/persistence/physical.rs` owns the physical composition adapter;
+`legacy.rs` isolates historical propulsion compatibility. No schema or field
+layout changed. Keep unknown-field rejection and publish only after all owners
+and cross-domain invariants pass. Generic persistence codec/storage remain
+independent of gameplay domains; there is no dynamic save registry.
+
+
+## Session composition owners (#642)
+
+Held input lives in `session/input/state.rs`; external observers receive Copy
+snapshots through `movement()`/`steering()`, while mutation stays within session
+composition. `session/policy.rs` groups host automation step, interpolation and
+physics measurement flags; copy this single nonserialized value through restore,
+offline reconciliation and restart. `session/init.rs` distinguishes empty
+reconstruction defaults from supply-granting new runs. Command admission and
+interaction details live in `session/commands.rs` and `interaction/actions.rs`.
+
+`session/tick.rs` is the explicit scheduler: admit pause/terminal/offline and
+survival time; begin render history; advance age/camera, steering/Fabricator/ship,
+crash interruption, Recovery then construction; use the completed ship frame for
+character/cargo/habitation; advance mining then loose physics; record journey,
+synchronize carrying/mass, validate UI focus, freeze terminal state and complete
+render history. Stage bodies live in `tick/power.rs`, `character.rs`, `resources.rs`
+and `presentation.rs`. Do not register unordered callbacks or move power consumers
+across these boundaries. Domain-specific behavior normally changes its stage or
+owner, without editing the central session file. New domains/shared contracts
+still require explicit composition review; this is not a generic plugin system.
+
+
+Native presentation (#643): redraw/overlay composition lives in
+`src/app/presentation.rs`, contextual prompt policy in its `prompts.rs` child,
+and Scout visual fields in `src/app/scene.rs::gameplay_ship`. Read the
+[presentation boundary](architecture.md#native-presentation-composition-643)
+before editing lifecycle/input in `app.rs`.
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery or replace gameplay yet.
+
+
+## Canonical terrain streaming (#424)
+
+See the [canonical terrain contract](../../docs/universe-terrain.md) for the exact U11
+evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
+and normal alien-world startup belong to #425/#426.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; normal new-run startup uses the canonical constructor.
+
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit; normal launch rejects prototype saves under #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+
+
+## Bounded navigation prediction (#421)
+
+Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+
+## Scanner delivery (#429)
+
+Universe `scanner/pulses.rs` owns fixed five-second cadence and analytical funded linear-path detection. Runtime `session/scanner.rs` composes ordinary Core funding after construction, samples current body-local state and exposes read-only automation. Unknown orbital phase/velocity is never invented; body-local and galactic observations cannot be mixed.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#431)
+
+Scanner contact checkpoints validate catalog revision, exact IDs/frames, timestamp ordering and bounds before atomic reconstruction. Runtime schema 25 saves canonical scanner parameters, clock/remainder and encounter history; legacy canonical saves migrate empty, current missing/malformed sources reject. Closed-app launch advances freshness once without inventing offline detections.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#430)
+
+Renderer `scanner_hologram.rs` owns bounded depth-tested ship-local 3D projection geometry; runtime `session/scanner/presentation.rs` maps only fresh same-frame discoveries to ship pose. The physical console projector shows logarithmic distance, true 3D direction/elevation and selected contacts. M cycles contacts only in an admitted canonical cockpit; power loss suppresses projection, not history.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#469)
+
+Universe `scanner/chart.rs` owns player-known observations, inferred/transmitted leads with explicit uncertainty, and immutable voluntary route annotations. Runtime `session/chart.rs` owns cockpit P/M/Enter controls and schema-26 pair validation with scanner history. Catalog truth never seeds the chart; observed knowledge outlives contact TTL and source frames are preserved without guessed transforms.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Geological surface materials (#613)
+
+Follow the [geological material contract](../../docs/geological-materials.md) for terrain-bound
+profile mapping, immutable material cache keys, the 52-byte vertex layout,
+filtered stratification and original software-Vulkan evidence. Runtime owns
+geology-to-DTO mapping; renderer owns shading only. Vesper and resource palettes,
+physical queries, geometry and save identities are preserved.
+
+
+## Hybrid astronomical sky (#423)
+
+See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
+split-origin/source validation, explicit frame/epoch limits and production
+verification. Sky visibility grants no scanner/chart knowledge or simulation authority.
+
+
+## Optical atmosphere (#614)
+
+The [atmosphere contract](../../docs/planetary-atmosphere.md) maps immutable climate
+optics, runtime light inputs and depth-limited production scattering. Vacuum
+remains empty; presentation never changes gas physics, weather or canonical identity.
+
+
+## Coherent weather presentation (#616)
+
+See [weather visuals](../../docs/planetary-weather-visuals.md): shared-TT source
+fields, fixed body-frame maps, bounded optical rendering and exact source/quality
+separation. Vacuum stays empty; no terrain, hydrology, weather truth or sound is invented.
+
+
+## Organism family grammar and presentation (#619)
+
+Follow the [organism contract](../../docs/planetary-organisms.md) for stable
+family/part identities, cosmetic tile sampling, neutral segment mapping, bounded
+instanced geometry and source-driven GPU evidence. Physical population remains #620.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+## Biological material response (#622)
+
+[Organism materials](../../docs/planetary-organisms.md#biological-materials-and-weather-response-622)
+map stable species traits and explicit shared-time weather to bounded renderer
+instances. Keep root/physical anatomy, collision envelopes and quality population
+invariant; shader flex stays inside the canonical bounds. Renderer owns shading,
+runtime owns source/weather mapping; neither changes world identities.
+
+## Geological site identity (#623)
+
+[Landmark source and validation](../../docs/planetary-landmarks.md) binds sparse
+sites to actual published terrain relief. Keep physical source, renderer vertices,
+immutable site IDs and save/reference binding consistent across LOD and eviction.
+No chart/scanner discovery, duplicate terrain surface or invented cave geometry.
+
+## Natural signature sites (#624)
+
+[Biological signature contract](../../docs/biological-signature-sites.md) maps rare
+site metadata onto exact physical organisms and geological/activity provenance.
+No source geometry, collision/LOD anatomy, identity or player knowledge changes;
+strict publication binding survives reconstruction and rejects mismatched sources.
+
+
+Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](../../docs/universe-gameplay.md#ordinary-canonical-play-427).
+
+
+## Suit observations (#625)
+
+Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
+Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
+validated reload cannot reveal catalog POIs or invent a target range.
+
+
+## Personal planetary chart (#626)
+
+Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
+Personal edits/targets never mutate canonical sites, suit observations or scanner history.
+
+
+## Planetary environmental audio (#627)
+
+Follow the [observational source, media, lifecycle and accessibility contract](../../docs/planetary-audio.md).
+`environment_audio.rs` maps actual local definitions into five reserved continuous
+callback channels; audio has no simulation/save authority. Preserve vacuum silence,
+physical contact gates and independent environment settings.
+
+
+## Biological harvesting and schema 29 (#621)
+
+Follow the [yield, atomic transfer, geometry and persistence contract](../../docs/biological-harvesting.md).
+World owns explicit source designations, revision/depletion journals and physical
+publication; runtime composes F/tool input, current anatomy and source-bound restore.
+Schema 29 preserves missing/partial parts and natural object identity. Vesper
+remains sterile; positive sources are explicit fictional geometry fixtures.
+
+Combined planetary environment evidence: see the [matrix runner](../../scripts/README.md#planetary-environment-matrix-628).
+`scout_reference.rs` owns the canonical night camera and ground-clearance test;
+positive atmosphere/life evidence remains explicitly fictional component fixtures.

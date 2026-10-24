@@ -1,6 +1,0 @@
-GitHub Actions run 39952588545 / Source build (Ubuntu) job 120410439318
-https://github.com/mr-exception/salimon/actions/runs/39952588545
-2026-10-23T12:20:51.4260948Z client/runtime:1: source changed without owning guide update or scoped no_impact reason in scripts/docs-policy.json
-2026-10-23T12:20:51.4261577Z Documentation: 1 failures; 0 exact historical findings retained.
-2026-10-23T12:20:51.4330708Z Process completed with exit code 1.
-The compile/workspace test steps were skipped in this initial run; no hosted test pass is inferred.

@@ -114,7 +114,8 @@ impl GameplaySession {
             };
             n.tint = self.finishes.item_tint(CABIN_ROOM, id, group);
         }
-        salimon_renderer::resolve_fixture_hierarchy(
+        let lighting = self.lighting_dto();
+        let mut instances: Vec<_> = salimon_renderer::resolve_fixture_hierarchy(
             FixturePose {
                 position_meters: ship.pose.position_meters,
                 orientation_xyzw: ship.pose.orientation,
@@ -123,6 +124,16 @@ impl GameplaySession {
             &nodes,
         )
         .expect("validated ship and habitation source")
+        .into_iter()
+        .map(|mut instance| {
+            instance.surface_age = self.fixture_surface_age(instance.id, instance.mesh);
+            instance.illumination =
+                Some(lighting.sample(frame.world_to_local(instance.pose.position_meters)));
+            instance
+        })
+        .collect();
+        instances.extend(self.construction_surface_instances(ship));
+        instances
     }
 }
 

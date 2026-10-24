@@ -1,9 +1,0 @@
-{
-  "archive_sha256": "6431cc697397915132a561256b5814004363bfdd23e7e4cc638f7091eaed8235",
-  "file_count": 325,
-  "archived_files": 325,
-  "deduplicated_files": 17,
-  "full_inventory": "linux-main-e2e-01.inventory.json.gz",
-  "full_inventory_sha256": "b60b6bddc08f22fa69365688fbd0bfd703474aca6151d8b82eddeb6718a54862",
-  "archive": "linux-main-e2e-01.tar.xz"
-}

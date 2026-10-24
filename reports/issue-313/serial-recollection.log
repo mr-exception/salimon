@@ -1,6 +1,0 @@
-START 313/serial-cap1000-settled
-END 313/serial-cap1000-settled exit 1
-START 313/serial-cap500-active
-END 313/serial-cap500-active exit 1
-START 313/serial-cap1000-active
-END 313/serial-cap1000-active exit 0

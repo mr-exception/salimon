@@ -207,12 +207,9 @@ mod tests {
         );
         assert_eq!(
             gameplay_window_title(None, Some(InteractionTarget::Cockpit)),
-            format!("Salimon — Compressed Solar System — {COCKPIT_INTERACTION_PROMPT}")
+            format!("Salimon — {COCKPIT_INTERACTION_PROMPT}")
         );
-        assert_eq!(
-            gameplay_window_title(None, None),
-            "Salimon — Compressed Solar System"
-        );
+        assert_eq!(gameplay_window_title(None, None), "Salimon");
     }
 
     #[test]

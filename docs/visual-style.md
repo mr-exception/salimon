@@ -1,5 +1,8 @@
 # Salimon visual style
 
+> **Planetary exterior art direction (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) is the approved future environment-specific specification for geological regions, atmospheric effects, alien biological materials/structures and their physically meaningful LOD/harvesting. Keep current prototype recipes and asset budgets until deliberately implemented and validated. No automatic water-body, ecology or shader implementation is implied.
+
+
 This is the authoritative art bible. Initial direction is **Option A: stylized
 low-poly science-fiction**, approved in #273–#276. Low polygon count is a design
 constraint, not a quality rating. Option B is a later stylized hard-surface pass:

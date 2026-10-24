@@ -110,3 +110,17 @@ correction-created contact, retained projection and sleep regressions remain.
 Small shared arithmetic primitives are inlinable across the crate boundary;
 their expressions and IEEE ordering are unchanged. See the #592 report for
 archived mass/radius-bit pools, partial/timeouts, profiles and exact comparisons.
+
+
+Response extraction (#644) preserves the exact ground/pair arithmetic and
+ordered sixteen-iteration/fixed-point policy. Module location never changes
+serialized contact fields, warm continuation, broad-phase order or allocations;
+see [response ownership](architecture.md#contact-response-owner-644).
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

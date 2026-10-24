@@ -1,1 +1,0 @@
-[2026-10-20T08:03:16Z ERROR salimon_client] Salimon client stopped: failed to create native event loop: os error at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/winit-0.30.13/src/platform_impl/linux/mod.rs:765: neither WAYLAND_DISPLAY nor WAYLAND_SOCKET nor DISPLAY is set.

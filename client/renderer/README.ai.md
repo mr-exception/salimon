@@ -204,3 +204,107 @@ See [fixture ownership/budgets](../../docs/modular-interior-fixtures.md).
 
 
 Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+## Cosmetic surface age (#581)
+
+Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+Pipeline ownership (#643): use `src/initialize.rs` for device/pipeline creation,
+`src/surface.rs` for resize/configuration and `src/frame.rs` for ordered draw,
+capture, submission and observations. Keep facade/resource ownership in
+`src/lib.rs`. Follow [pipeline invariants](architecture.md#pipeline-and-frame-owners-643).
+
+
+Resource geometry (#644): pure GLB validation and stable index packing live in
+`src/resource_mesh/geometry.rs`. Keep GPU staging/upload/culling in the parent;
+see [resource ownership](architecture.md#resource-geometry-owner-644).
+
+
+## Canonical terrain masks (#424)
+
+Terrain preparation passes the caller's validated mask radius to the existing
+shader instead of hard-coding the 4,096 m fixture cap. Canonical whole-planet
+meshes retain published relief at orbital LOD; old fixture mask radii and shader
+layouts are unchanged. See [canonical terrain](../../docs/universe-terrain.md).
+
+
+## Bounded navigation prediction (#421)
+
+Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+
+## Scanner delivery (#430)
+
+Renderer `scanner_hologram.rs` owns bounded depth-tested ship-local 3D projection geometry; runtime `session/scanner/presentation.rs` maps only fresh same-frame discoveries to ship pose. The physical console projector shows logarithmic distance, true 3D direction/elevation and selected contacts. M cycles contacts only in an admitted canonical cockpit; power loss suppresses projection, not history.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#469)
+
+Universe `scanner/chart.rs` owns player-known observations, inferred/transmitted leads with explicit uncertainty, and immutable voluntary route annotations. Runtime `session/chart.rs` owns cockpit P/M/Enter controls and schema-26 pair validation with scanner history. Catalog truth never seeds the chart; observed knowledge outlives contact TTL and source frames are preserved without guessed transforms.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Geological surface materials (#613)
+
+Follow the [geological material contract](../../docs/geological-materials.md) for terrain-bound
+profile mapping, immutable material cache keys, the 52-byte vertex layout,
+filtered stratification and original software-Vulkan evidence. Runtime owns
+geology-to-DTO mapping; renderer owns shading only. Vesper and resource palettes,
+physical queries, geometry and save identities are preserved.
+
+
+## Hybrid astronomical sky (#423)
+
+See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
+split-origin/source validation, explicit frame/epoch limits and production
+verification. Sky visibility grants no scanner/chart knowledge or simulation authority.
+
+
+## Optical atmosphere (#614)
+
+The [atmosphere contract](../../docs/planetary-atmosphere.md) maps immutable climate
+optics, runtime light inputs and depth-limited production scattering. Vacuum
+remains empty; presentation never changes gas physics, weather or canonical identity.
+
+
+## Coherent weather presentation (#616)
+
+See [weather visuals](../../docs/planetary-weather-visuals.md): shared-TT source
+fields, fixed body-frame maps, bounded optical rendering and exact source/quality
+separation. Vacuum stays empty; no terrain, hydrology, weather truth or sound is invented.
+
+
+## Organism family grammar and presentation (#619)
+
+Follow the [organism contract](../../docs/planetary-organisms.md) for stable
+family/part identities, cosmetic tile sampling, neutral segment mapping, bounded
+instanced geometry and source-driven GPU evidence. Physical population remains #620.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+## Biological material response (#622)
+
+[Organism materials](../../docs/planetary-organisms.md#biological-materials-and-weather-response-622)
+map stable species traits and explicit shared-time weather to bounded renderer
+instances. Keep root/physical anatomy, collision envelopes and quality population
+invariant; shader flex stays inside the canonical bounds. Renderer owns shading,
+runtime owns source/weather mapping; neither changes world identities.
+
+## Geological site identity (#623)
+
+[Landmark source and validation](../../docs/planetary-landmarks.md) binds sparse
+sites to actual published terrain relief. Keep physical source, renderer vertices,
+immutable site IDs and save/reference binding consistent across LOD and eviction.
+No chart/scanner discovery, duplicate terrain surface or invented cave geometry.

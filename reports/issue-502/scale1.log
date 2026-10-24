@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/workspace/salimon/reports/issue-502/verify.py", line 103, in <module>
-    run(a.binary, a.output, a.scale)
-  File "/workspace/salimon/reports/issue-502/verify.py", line 66, in run
-    assert state()['interaction'] == 'fabricator_screen'
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError

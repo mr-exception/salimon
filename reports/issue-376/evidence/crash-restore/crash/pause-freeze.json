@@ -1,1 +1,0 @@
-{"passed": true, "real_wait_seconds": 1.2, "compared": ["state", "simulated_time", "pending_time"]}

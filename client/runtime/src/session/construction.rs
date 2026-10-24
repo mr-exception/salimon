@@ -1,4 +1,14 @@
 //! Compose blueprint authority with current ship, player and physical cargo.
+mod boarding;
+pub(crate) mod damage;
+mod doors;
+mod evidence;
+pub(super) mod save;
+pub(crate) use evidence::evidence_module;
+mod flight;
+mod installed;
+mod modules;
+mod work;
 use super::{GameplaySession, frames::character_ship_frame};
 use salimon_character::{CharacterLocation, SHIP_FLOOR_HEIGHT_METERS};
 use salimon_ship::structure::placement::*;
@@ -6,6 +16,7 @@ use salimon_ship::structure::{
     Cell, Envelope, MemberShape, ShipStructure, StructuralMass, StructuralPart, StructureId,
 };
 use serde::{Deserialize, Serialize};
+use work::supports_completion;
 
 const OWNER: u64 = 1; // The existing client-only run has one local ship owner.
 const REACH_METERS: f64 = 5.;
@@ -28,28 +39,62 @@ pub(crate) enum BuildAction {
     Rotate,
     Place,
     Cancel,
+    RemovePartition,
+    StopResume,
+    Module,
+    Repair,
+    Dismantle,
 }
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ConstructionSave {
+    #[serde(default)]
+    pub(super) modules: std::collections::BTreeMap<PlaceholderId, modules::Module>,
     pub(crate) projects: Placements,
+    #[serde(default)]
+    pub(crate) damage: damage::Damage,
+    #[serde(default)]
+    pub(crate) removed_partitions: Vec<salimon_ship::structure::shell::PartitionEdit>,
+    #[serde(default)]
+    pub(crate) open_doors: Vec<PlaceholderId>,
 }
 impl salimon_persistence::Validate for ConstructionSave {
     fn validate(&self) -> Result<(), salimon_persistence::SaveError> {
+        self.validate_damage()?;
         self.projects
             .validate_save()
             .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
-        let structure = starter_structure();
-        for job in self.projects.jobs() {
-            if job.owner != OWNER
-                || job.origin_meters != ORIGIN
-                || registered_catalog().find(&job.blueprint.id).ok() != Some(&job.blueprint)
+        let structure = self
+            .structure(None)
+            .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+        let mut door_ids = std::collections::BTreeSet::new();
+        for id in &self.open_doors {
+            if !door_ids.insert(*id)
+                || self.projects.inspect(*id).is_none_or(|p| {
+                    p.work.destroyed || !p.work.completed || p.blueprint.id != "internal-door"
+                })
             {
+                return Err(salimon_persistence::invalid("invalid completed door state"));
+            }
+        }
+        for job in self.projects.jobs() {
+            if job.owner != OWNER || job.origin_meters != ORIGIN || !matches_catalog(job) {
                 return Err(salimon_persistence::invalid(
                     "construction project catalog/owner/origin mismatch",
                 ));
             }
-            let obstacles = static_obstacles(job.blueprint.footprint);
+            if job.work.destroyed {
+                continue;
+            }
+            let mut obstacles = static_obstacles(job.blueprint.footprint);
+            if job.blueprint.footprint == Footprint::Interior {
+                obstacles.extend(structure.parts().filter(|p| p.id.0 >= 1024).flat_map(|p| {
+                    p.collision.iter().map(|b| Obstacle {
+                        kind: ObstacleKind::Installed,
+                        space: *b,
+                    })
+                }));
+            }
             let context = PlacementContext {
                 actor: OWNER,
                 owner: OWNER,
@@ -57,13 +102,39 @@ impl salimon_persistence::Validate for ConstructionSave {
                 eye_meters: job.anchor_meters,
                 reach_meters: REACH_METERS,
                 reachable: true,
-                physical_support: has_physical_support(job.blueprint.footprint, job.space),
+                physical_support: has_physical_support(job.blueprint.footprint, job.space)
+                    || (job.blueprint.footprint == Footprint::Interior
+                        && installed::supported_by(&structure, job.space)),
                 obstacles: &obstacles,
             };
-            self.projects
-                .validate_completion(job.id, &structure, &context)
-                .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+            if job.work.completed && installed::structural(job) {
+                if obstacles.iter().any(|o| {
+                    (0..3).all(|i| {
+                        job.space.min[i] < o.space.max[i] && job.space.max[i] > o.space.min[i]
+                    })
+                }) {
+                    return Err(salimon_persistence::invalid(
+                        "completed structure overlaps authored geometry",
+                    ));
+                }
+            } else {
+                let result = self
+                    .projects
+                    .validate_completion(job.id, &structure, &context);
+                let unsupported_reservation = !job.work.completed
+                    && !self.damage.lost.is_empty()
+                    && matches!(result, Err(PlacementError::Unsupported))
+                    && !obstacles.iter().any(|o| {
+                        (0..3).all(|i| {
+                            job.space.min[i] < o.space.max[i] && job.space.max[i] > o.space.min[i]
+                        })
+                    });
+                if !unsupported_reservation {
+                    result.map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+                }
+            }
         }
+        self.validate_modules()?;
         Ok(())
     }
 }
@@ -73,7 +144,8 @@ pub(crate) struct Building {
     rotation: Rotation,
     pub(crate) source: ConstructionSave,
     catalog: Catalog,
-    structure: ShipStructure,
+    pub(super) structure: ShipStructure,
+    pub(crate) running: Option<[f64; 3]>,
 }
 fn starter_structure() -> ShipStructure {
     let origin = ORIGIN;
@@ -115,6 +187,7 @@ impl Default for Building {
         let structure = starter_structure();
         Self {
             active: false,
+            running: None,
             selected: 0,
             rotation: Rotation::Forward,
             source: Default::default(),
@@ -128,8 +201,12 @@ impl Building {
         source: ConstructionSave,
     ) -> Result<Self, salimon_persistence::SaveError> {
         salimon_persistence::Validate::validate(&source)?;
+        let structure = source
+            .structure(None)
+            .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
         Ok(Self {
             source,
+            structure,
             ..Default::default()
         })
     }
@@ -236,6 +313,215 @@ fn ray_distance(eye: [f64; 3], direction: [f64; 3], space: Envelope) -> Option<f
 }
 
 impl GameplaySession {
+    pub(super) fn contribute_construction(&mut self) {
+        if self.mining.carry_blocked
+            || !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
+        {
+            return;
+        }
+        let Some(id) = self.aimed_construction() else {
+            self.feedback = Some("Aim at a reachable placeholder");
+            return;
+        };
+        if self.building.source.projects.inspect(id).is_some_and(|p| {
+            p.work.completed && !p.work.destroyed && p.blueprint.id == "internal-door"
+        }) {
+            self.toggle_completed_door(id);
+            return;
+        }
+        if self.feed_module(id) {
+            return;
+        }
+        if self
+            .building
+            .source
+            .projects
+            .inspect(id)
+            .is_some_and(|p| p.work.completed)
+        {
+            self.feedback = Some("G: upgrade / restoration / commissioning");
+            return;
+        }
+        let approved = self.building.catalog.approved_economy;
+        let Ok(p) = self.building.source.projects.funding_mut(id, OWNER) else {
+            return;
+        };
+        use salimon_ship::structure::funding::FundingError::*;
+        self.feedback = Some(
+            match p.funding.contribute(
+                &mut self.mining.session,
+                &p.blueprint.requirements,
+                approved,
+            ) {
+                Ok(()) => {
+                    if p.funding.funded(&p.blueprint.requirements) {
+                        "Materials funded - construction starts automatically when safe"
+                    } else {
+                        "Material delivered to placeholder"
+                    }
+                }
+                Err(Unapproved) => "Construction economy awaits owner approval; nothing consumed",
+                Err(Oversized) => {
+                    "Fragment exceeds remaining cost; bring a smaller piece (nothing consumed)"
+                }
+                Err(WrongMaterial) => "Placeholder requires a different material",
+                _ => "Cannot accept this material; check carry slot and whole-milligram quantity",
+            },
+        );
+        self.sync_carried();
+        self.sync_fabricator_mass();
+    }
+    fn return_construction_materials(
+        &mut self,
+        mut refunds: Vec<salimon_world::resources::ResourceFragment>,
+    ) -> Result<(), ()> {
+        let state = self.snapshot();
+        let frame = character_ship_frame(state.ship.pose);
+        let eye = frame.world_to_local(state.character.eye_position_meters);
+        let mut solids = self.cabin_solids();
+        solids.extend(self.construction_solids());
+        if self.cargo_door.open_fraction < 1. {
+            solids.push(salimon_character::cargo::cargo_door_bounds(
+                self.cargo_door.open_fraction,
+            ));
+        }
+        let mut placed: Vec<([f64; 3], f64)> = Vec::new();
+        for f in &mut refunds {
+            let radius = f.contact_radius_meters();
+            let mut destination = None;
+            'search: for x in -6..=6 {
+                for z in -6..=6 {
+                    let requested = [
+                        eye[0] + f64::from(x) * 0.5,
+                        SHIP_FLOOR_HEIGHT_METERS,
+                        eye[2] + f64::from(z) * 0.5,
+                    ];
+                    let Some(p) = salimon_character::ship_floor_placement(requested, radius) else {
+                        continue;
+                    };
+                    if (p[0] - eye[0]).hypot(p[2] - eye[2]) < radius + 0.5
+                        || salimon_math::length(salimon_math::sub(p, eye)) > REACH_METERS
+                        || salimon_character::ship_sight_obstruction(
+                            eye,
+                            p,
+                            super::door_passable(state.ship),
+                        )
+                        .is_some_and(|d| d + 0.02 < salimon_math::length(salimon_math::sub(p, eye)))
+                        || solids
+                            .iter()
+                            .any(|b| salimon_character::cargo::sphere_overlaps_box(p, radius, *b))
+                        || self.mining.session.fragments().iter().any(|other| {
+                            salimon_math::length(salimon_math::sub(
+                                p,
+                                frame.world_to_local(other.transform().position().meters()),
+                            )) < radius + crate::fragment_physics::sphere_radius(*other) + 0.01
+                        })
+                        || placed.iter().any(|(q, r)| {
+                            salimon_math::length(salimon_math::sub(p, *q)) < radius + r + 0.01
+                        })
+                    {
+                        continue;
+                    }
+                    destination = Some(p);
+                    break 'search;
+                }
+            }
+            let p = destination.ok_or(())?;
+            placed.push((p, radius));
+            let w = frame.local_to_world(p);
+            f.set_transform(
+                salimon_world::resources::ResourceTransform::new(
+                    salimon_world::WorldPosition::new(w[0], w[1], w[2]),
+                    f.transform().orientation_xyzw(),
+                )
+                .map_err(|_| ())?,
+            );
+        }
+        // Both owners preflight before publication; no fallible geometry or partial return afterward.
+        if !self.mining.session.return_reserved_loose(&refunds) {
+            return Err(());
+        }
+        Ok(())
+    }
+    fn cancel_construction(&mut self, id: PlaceholderId) -> Result<(), ()> {
+        if self
+            .building
+            .source
+            .modules
+            .get(&id)
+            .is_some_and(|m| m.maintenance.is_some())
+        {
+            return self.cancel_module(id);
+        }
+        let job = self.building.source.projects.inspect(id).ok_or(())?;
+        if job.work.destroyed {
+            return Err(());
+        }
+        let refunds = job
+            .funding
+            .refunds(&job.blueprint.requirements)
+            .map_err(|_| ())?;
+        self.return_construction_materials(refunds)?;
+        let p = self
+            .building
+            .source
+            .projects
+            .funding_mut(id, OWNER)
+            .map_err(|_| ())?;
+        p.funding = Default::default();
+        self.building
+            .source
+            .projects
+            .cancel(id, OWNER)
+            .map_err(|_| ())?;
+        self.building.source.modules.remove(&id);
+        self.sync_carried();
+        self.sync_fabricator_mass();
+        Ok(())
+    }
+    pub(super) fn validate_construction_receipts(
+        &self,
+    ) -> Result<(), salimon_persistence::SaveError> {
+        use salimon_persistence::invalid;
+        let next = self.mining.session.save_state().next_id;
+        let core_ids: std::collections::HashSet<_> = self
+            .core_upgrades
+            .pending
+            .iter()
+            .chain(
+                self.core_upgrades
+                    .applied
+                    .iter()
+                    .flat_map(|a| a.receipts.iter()),
+            )
+            .map(|f| f.id())
+            .collect();
+        let mut ids = std::collections::HashSet::new();
+        for p in self.building.source.projects.jobs() {
+            if p.work.completed && !supports_completion(p) {
+                return Err(invalid("unsupported completed construction"));
+            }
+            for f in p.funding.receipts.iter().chain(
+                self.building
+                    .source
+                    .modules
+                    .get(&p.id)
+                    .into_iter()
+                    .flat_map(|m| m.receipts()),
+            ) {
+                if !ids.insert(f.id())
+                    || core_ids.contains(&f.id())
+                    || f.id().0 > next
+                    || self.mining.session.fragment(f.id()).is_some()
+                {
+                    return Err(invalid(
+                        "construction receipt duplicates an owner or exceeds allocator",
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
     fn construction_inputs(&self) -> ([f64; 3], [f64; 3], Vec<Obstacle>, FlightPermission, bool) {
         let snapshot = self.snapshot();
         let frame = character_ship_frame(snapshot.ship.pose);
@@ -254,36 +540,17 @@ impl GameplaySession {
         // Interior ground-mounted prototypes target the real deck, not eye height.
         let blueprint = &self.building.catalog.blueprints[self.building.selected];
         if blueprint.footprint == Footprint::Interior {
-            target[1] = SHIP_FLOOR_HEIGHT_METERS;
+            target[1] = self
+                .mining
+                .modular_interior
+                .support(
+                    target,
+                    0.01,
+                    eye[1] - salimon_character::PLAYER_EYE_HEIGHT_METERS + 0.21,
+                )
+                .unwrap_or(SHIP_FLOOR_HEIGHT_METERS);
         }
-        let mut obstacles = static_obstacles(blueprint.footprint);
-        let player_bottom = eye[1] - salimon_character::PLAYER_EYE_HEIGHT_METERS;
-        obstacles.push(Obstacle {
-            kind: ObstacleKind::Player,
-            space: Envelope {
-                min: [
-                    eye[0] - salimon_character::PLAYER_RADIUS_METERS,
-                    player_bottom,
-                    eye[2] - salimon_character::PLAYER_RADIUS_METERS,
-                ],
-                max: [
-                    eye[0] + salimon_character::PLAYER_RADIUS_METERS,
-                    player_bottom + salimon_character::PLAYER_BODY_HEIGHT_METERS,
-                    eye[2] + salimon_character::PLAYER_RADIUS_METERS,
-                ],
-            },
-        });
-        for piece in self.mining.session.fragments() {
-            let local = frame.world_to_local(piece.transform().position().meters());
-            let radius = crate::fragment_physics::sphere_radius(*piece);
-            obstacles.push(Obstacle {
-                kind: ObstacleKind::Cargo,
-                space: Envelope {
-                    min: local.map(|p| p - radius),
-                    max: local.map(|p| p + radius),
-                },
-            });
-        }
+        let obstacles = self.construction_obstacles(blueprint.footprint);
         let flight = if matches!(
             snapshot.ship.flight_state,
             salimon_ship::FlightState::Landed { .. }
@@ -332,15 +599,24 @@ impl GameplaySession {
                 },
             )
             .ok();
-        let physical_support = preliminary
-            .as_ref()
-            .is_some_and(|p| has_physical_support(b.footprint, p.space));
+        let physical_support = preliminary.as_ref().is_some_and(|p| {
+            if b.footprint == Footprint::Structural {
+                self.structural_support(p.space)
+            } else {
+                has_physical_support(b.footprint, p.space)
+            }
+        });
         let reachable = salimon_character::ship_sight_obstruction(
             eye,
             target,
             super::door_passable(self.ship.snapshot()),
         )
-        .is_none_or(|hit| hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye)));
+        .is_none_or(|hit| hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye)))
+            && self.construction_solids().iter().all(|b| {
+                salimon_character::cargo::box_sight_obstruction(eye, target, *b).is_none_or(|hit| {
+                    hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye))
+                })
+            });
         PlacementContext {
             actor: if authorized { OWNER } else { 0 },
             owner: OWNER,
@@ -364,6 +640,7 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
+            .filter(|p| !p.work.destroyed && !(p.work.completed && installed::structural(p)))
             .filter_map(|p| ray_distance(eye, direction, p.space).map(|distance| (p.id, distance)))
             .filter(|(_, distance)| {
                 let target = salimon_math::add(
@@ -376,6 +653,10 @@ impl GameplaySession {
                     super::door_passable(snapshot.ship),
                 )
                 .is_none_or(|hit| hit + 0.02 >= *distance)
+                    && self.construction_solids().iter().all(|b| {
+                        ray_distance(eye, direction, envelope(*b))
+                            .is_none_or(|hit| hit + 0.02 >= *distance)
+                    })
             })
             .min_by(|a, b| a.1.total_cmp(&b.1))
             .map(|p| p.0)
@@ -409,8 +690,14 @@ impl GameplaySession {
             self.feedback = Some("Get up before placing construction projects");
             return;
         }
-        if matches!(action, BuildAction::Place)
-            && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
+        if matches!(
+            action,
+            BuildAction::Place
+                | BuildAction::RemovePartition
+                | BuildAction::Module
+                | BuildAction::Repair
+                | BuildAction::Dismantle
+        ) && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
         {
             return;
         }
@@ -454,10 +741,26 @@ impl GameplaySession {
             self.feedback = Some("Leave cockpit control to place or cancel a blueprint");
             return;
         }
+        if matches!(action, BuildAction::Repair | BuildAction::Dismantle) {
+            self.construction_physical_action(action);
+            return;
+        }
+        if matches!(action, BuildAction::Module) {
+            self.module_action();
+            return;
+        }
+        if matches!(action, BuildAction::StopResume) {
+            self.stop_resume_construction();
+            return;
+        }
+        if matches!(action, BuildAction::RemovePartition) {
+            self.remove_partition();
+            return;
+        }
         if matches!(action, BuildAction::Cancel) {
             let nearest = self.aimed_construction();
             self.feedback = Some(if let Some(id) = nearest {
-                if self.building.source.projects.cancel(id, OWNER).is_ok() {
+                if self.cancel_construction(id).is_ok() {
                     "Placeholder cancelled"
                 } else {
                     "Cannot cancel this placeholder"
@@ -488,7 +791,10 @@ impl GameplaySession {
         let hovered = self
             .aimed_construction()
             .and_then(|id| self.building.source.projects.inspect(id));
-        let blueprint = hovered.map_or(&p.blueprint, |job| &job.blueprint);
+        let maintenance_blueprint = hovered.and_then(|job| self.module_blueprint(job.id));
+        let blueprint = maintenance_blueprint
+            .as_ref()
+            .unwrap_or_else(|| hovered.map_or(&p.blueprint, |job| &job.blueprint));
         let resources = blueprint
             .requirements
             .iter()
@@ -501,14 +807,30 @@ impl GameplaySession {
             })
             .collect::<Vec<_>>()
             .join(" / ");
-        let status = if hovered.is_some() {
-            "PLANNED".to_string()
+        let status = if let Some(job) = hovered {
+            if let Some(status) = self.module_status(job.id) {
+                status
+            } else if job.work.completed {
+                if job.blueprint.id == "internal-door" {
+                    "COMPLETED | E open/close".to_string()
+                } else {
+                    "COMPLETED".to_string()
+                }
+            } else if job.work.stopped || job.funding.funded(&job.blueprint.requirements) {
+                format!(
+                    "{} | {:.1}%",
+                    self.construction_status(job),
+                    f64::from(job.funding.progress_ppm) / 10_000.
+                )
+            } else {
+                format!("WAITING | supplied {:.3}kg", job.funding.mass_kg())
+            }
         } else {
             p.rejection
                 .map_or_else(|| "CLEAR".to_string(), |e| format!("{e:?}"))
         };
         Some(format!(
-            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | RMB cancel | C close",
+            "{} | {}\n{} | {}s (estimate)\n1-7 select | R rotate | LMB place | E feed | RMB cancel | T stop | G module | H secure | X dismantle | Del partition | C close",
             hovered.map_or_else(
                 || blueprint.name.clone(),
                 |job| format!("Project #{} {}", job.id.0, blueprint.name)
@@ -519,9 +841,19 @@ impl GameplaySession {
         ))
     }
 
+    pub(in crate::session) fn construction_safety_record(
+        &self,
+    ) -> std::collections::BTreeMap<u64, String> {
+        self.building
+            .source
+            .projects
+            .jobs()
+            .map(|p| (p.id.0, self.construction_status(p)))
+            .collect()
+    }
     pub(crate) fn construction_inspect(&self) -> serde_json::Value {
         let preview = self.construction_preview();
-        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
+        serde_json::json!({"offline_clock":self.offline,"active":self.building.active,"modules":self.building.source.modules,"recovery_multiplier":self.utility_recovery_multiplier(),"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"damage":self.building.source.damage,"structure":self.building.structure.save_state(),"volumes":self.structural_volumes(),"solids":self.structural_solids(),"installed_solids":self.construction_solids(),"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
     }
     pub(crate) fn construction_boxes(&self) -> Vec<(Envelope, [f32; 4])> {
         let mut boxes: Vec<_> = self
@@ -529,8 +861,41 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
-            .map(|p| (p.space, [0.1, 0.7, 0.8, 1.]))
+            .filter(|p| !p.work.completed && !p.work.destroyed)
+            .map(|p| {
+                let mut space = p.space;
+                if p.funding.progress_ppm > 0 {
+                    space.max[1] = space.min[1]
+                        + (space.max[1] - space.min[1])
+                            * (0.08 + 0.92 * f64::from(p.funding.progress_ppm) / 1_000_000.);
+                }
+                (
+                    space,
+                    if p.work.damaged {
+                        [1., 0.15, 0.05, 1.]
+                    } else if p.funding.progress_ppm > 0 {
+                        [0.85, 0.65, 0.25, 1.]
+                    } else {
+                        [0.1, 0.7, 0.8, 1.]
+                    },
+                )
+            })
             .collect();
+        boxes.extend(
+            self.building
+                .structure
+                .parts()
+                .filter(|p| self.building.source.damage.damaged.contains(&p.id))
+                .map(|p| (p.space, [1., 0.15, 0.05, 1.])),
+        );
+        boxes.extend(
+            self.building
+                .source
+                .projects
+                .jobs()
+                .filter(|p| p.work.completed && !p.work.destroyed && p.work.damaged)
+                .map(|p| (p.space, [1., 0.15, 0.05, 1.])),
+        );
         if self.aimed_construction().is_none()
             && let Some(preview) = self.construction_preview()
         {
@@ -548,4 +913,90 @@ impl GameplaySession {
 }
 
 #[cfg(test)]
+pub(in crate::session) mod room_tests;
+#[cfg(test)]
 mod tests;
+
+/// Explicit evidence setup: placed stool and one seeded carried iron sphere.
+/// Full funding uses 1 kg; the earlier material-only route uses 0.5 kg.
+pub(crate) fn evidence_initial_conditions(
+    s: &mut GameplaySession,
+    full: bool,
+) -> Result<(), String> {
+    use super::{Command, ControlKey};
+    s.command(Command::Control(ControlKey::Right, true));
+    s.advance_automation(std::time::Duration::from_millis(72 * 16));
+    s.command(Command::Control(ControlKey::Right, false));
+    let snapshot = s.snapshot();
+    let frame = character_ship_frame(snapshot.ship.pose);
+    let eye = frame.world_to_local(snapshot.character.eye_position_meters);
+    let d = salimon_math::sub([-1.4, SHIP_FLOOR_HEIGHT_METERS, 3.2], eye);
+    s.command(Command::Look(
+        d[2].atan2(d[0]) / 0.0022,
+        -d[1].atan2(d[0].hypot(d[2])) / 0.0022,
+    ));
+    s.command(Command::Build(BuildAction::Toggle));
+    s.command(Command::Build(BuildAction::Place));
+    s.building.catalog.approved_economy = true;
+    use salimon_world::{resources::*, spherical_mining::*};
+    let w = frame.local_to_world([-1., 1.3, 2.5]);
+    let pose = ResourceTransform::new(
+        salimon_world::WorldPosition::new(w[0], w[1], w[2]),
+        [0., 0., 0., 1.],
+    )
+    .map_err(|e| e.to_string())?;
+    let mut deposit = ResourceDeposit::new(
+        DepositId {
+            body: salimon_world::CelestialBodyId::Earth,
+            local: 543,
+        },
+        RawMaterial::new(ResourceId::IronOre, if full { 1. } else { 0.5 })
+            .map_err(|e| e.to_string())?,
+        pose.position(),
+        if full { 1. } else { 0.5 },
+    )
+    .map_err(|e| e.to_string())?;
+    let id = (0..400)
+        .find_map(|_| {
+            s.mining.session.tick_spherical(
+                true,
+                Some(&mut deposit),
+                SPHERE_TICK,
+                MiningConfig::default(),
+                pose,
+            )
+        })
+        .ok_or("evidence sphere absent")?;
+    if !s.mining.session.pick_up(id) {
+        return Err("evidence carry occupied".into());
+    }
+    s.equipment.stow();
+    s.sync_carried();
+    Ok(())
+}
+
+pub(super) fn is_structural(p: &Placeholder) -> bool {
+    installed::structural(p)
+}
+
+fn matches_catalog(job: &Placeholder) -> bool {
+    let Ok(current) = registered_catalog().find(&job.blueprint.id) else {
+        return false;
+    };
+    if current == &job.blueprint {
+        return true;
+    }
+    // Preserve pre-18 two-cell reservations and receipts verbatim. Their unsafe
+    // narrow staircase footprint cannot complete; cancel/replan rather than
+    // silently enlarging an already reserved volume or changing its price.
+    if job.blueprint.id == "two-deck-room" && !job.work.completed {
+        let mut legacy = current.clone();
+        legacy.cells = vec![Cell::new(0, 0, 0), Cell::new(0, 1, 0)];
+        legacy.space.max[0] = 3.;
+        return legacy == job.blueprint;
+    }
+    false
+}
+
+pub(in crate::session) use boarding::boarding_exit;
+pub(crate) use evidence::{evidence_cancellation, evidence_room};

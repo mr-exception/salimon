@@ -13,6 +13,12 @@ pub(crate) struct Settings {
     pub(crate) master_mute: bool,
     #[serde(default = "default_scene_audio")]
     pub(crate) scene_audio: bool,
+    #[serde(default = "default_scene_audio")]
+    pub(crate) environment_audio: bool,
+    #[serde(default = "default_scene_audio")]
+    pub(crate) environment_cues: bool,
+    #[serde(default = "default_scene_volume")]
+    pub(crate) environment_volume_percent: u8,
     #[serde(default = "default_scene_volume")]
     pub(crate) scene_volume_percent: u8,
 }
@@ -31,6 +37,9 @@ impl Default for Settings {
             vignette: true,
             master_mute: false,
             scene_audio: true,
+            environment_audio: true,
+            environment_cues: true,
+            environment_volume_percent: 60,
             scene_volume_percent: 60,
         }
     }
@@ -55,7 +64,8 @@ pub(super) fn load(path: &Path) -> io::Result<Settings> {
                 return Err(io::Error::other("settings file too large"));
             }
             let s: Settings = serde_json::from_slice(&bytes).map_err(io::Error::other)?;
-            if s.version != 1 || s.scene_volume_percent > 100 {
+            if s.version != 1 || s.scene_volume_percent > 100 || s.environment_volume_percent > 100
+            {
                 return Err(io::Error::other(
                     "unsupported settings version or audio volume",
                 ));
@@ -66,7 +76,7 @@ pub(super) fn load(path: &Path) -> io::Result<Settings> {
 }
 pub(super) fn save(path: &Path, s: Settings) -> io::Result<()> {
     use std::io::Write;
-    if s.version != 1 || s.scene_volume_percent > 100 {
+    if s.version != 1 || s.scene_volume_percent > 100 || s.environment_volume_percent > 100 {
         return Err(io::Error::other("invalid settings version or audio volume"));
     }
     let parent = path

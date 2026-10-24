@@ -70,6 +70,8 @@ pub enum CelestialBodyId {
     Earth,
     Moon,
     Mars,
+    /// Permanent canonical awakening world; never an alias for a fixture body.
+    Vesper,
 }
 
 /// Whether a body's compressed volume is solid for collision and landing rules.

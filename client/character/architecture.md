@@ -3,8 +3,8 @@
 ## Internal ownership
 
 The crate root is a stable public facade; callers still import the same types,
-functions and constants from `salimon_character`. Internal modules introduce no
-new crate dependencies or native/platform types.
+functions and constants from `salimon_character`. Controller modules consume the shared portable physics static-sweep kernel;
+no native/platform types cross this boundary.
 
 | Source under `src/` | Responsibility |
 | --- | --- |
@@ -262,3 +262,24 @@ Runtime supplies installed fixture boxes to `set_interior_obstacles`; walking an
 
 
 Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

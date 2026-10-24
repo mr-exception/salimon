@@ -1,9 +1,0 @@
-count,state,path,samples,median_ms,p95_ms,pairs,storage_bytes,growth
-500,settled,sparse_all_pairs,20,248.303174,287.308380,7984000,0,0
-500,settled,spatial,20,27.545914,32.358535,0,0,0
-500,active,sparse_all_pairs,20,253.553708,274.434268,7984000,0,0
-500,active,spatial,20,9.404929,9.784693,0,0,0
-1000,settled,sparse_all_pairs,20,1098.131933,1135.545872,31968000,0,0
-1000,settled,spatial,20,60.636236,67.856325,0,0,0
-1000,active,sparse_all_pairs,20,1046.071675,1069.556468,31968000,0,0
-1000,active,spatial,20,15.071451,20.212489,0,0,0

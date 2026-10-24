@@ -1,9 +1,0 @@
-   Compiling salimon-client v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/runtime)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.17s
-     Running unittests src/main.rs (target/aarch64-apple-darwin/debug/deps/salimon_client-854b74c2b579b955)
-
-running 1 test
-test app::input_tests::isolated_e2e_ignores_desktop_keys_and_preserves_protocol_holds_on_lifecycle_reset ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 265 filtered out; finished in 0.00s
-

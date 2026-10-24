@@ -1,12 +1,19 @@
-//! U01 immutable schema foundation. Not connected to playable world/navigation.
+//! Canonical catalogs, spatial services and player discovery.
+//! Catalog truth never implicitly grants player navigation knowledge.
 pub mod coordinates;
+pub mod ephemerides;
 mod epoch;
+pub mod gravity;
 pub mod inference;
 pub mod ingestion;
+pub mod pack;
 pub mod partitions;
+pub mod reader;
 pub mod reference;
+pub mod scanner;
 pub mod sources;
 pub mod starting_system;
+pub mod streaming;
 pub mod synthesis;
 pub use epoch::Epoch;
 mod identity;
@@ -120,3 +127,9 @@ impl Catalog {
 }
 #[cfg(test)]
 mod tests;
+
+pub mod sky;
+
+pub mod surface_observations;
+
+pub mod surface_chart;

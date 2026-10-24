@@ -143,12 +143,13 @@ fn rotate_vector(vector: [f64; 3], from: ShipFrame, to: ShipFrame) -> [f64; 3] {
 impl GameplaySession {
     pub(crate) fn reset_presentation(&mut self) {
         self.presentation = History::default();
+        self.navigation_cache.get_mut().take();
         self.mining.fragment_previous.clear();
     }
 
     pub(crate) fn presentation(&self) -> Presentation {
         let current = self.snapshot();
-        if self.interpolate_presentation {
+        if self.policy.interpolates() {
             self.presentation
                 .sample(current, self.update_clock.interpolation())
         } else {
@@ -221,6 +222,26 @@ fn lerp_ship_local(
     alpha: f64,
 ) -> salimon_character::ShipLocalPoint {
     salimon_character::ShipLocalPoint::new(lerp(previous.meters(), current.meters(), alpha))
+}
+
+impl GameplaySession {
+    pub(super) fn begin_tick_presentation(&mut self) {
+        if self.policy.interpolates() {
+            self.presentation.begin(self.snapshot());
+            let ship = self.ship.snapshot();
+            let frame = character_ship_frame(ship.pose);
+            let player = self
+                .character
+                .snapshot(frame, self.terrain_frame(ship))
+                .eye_position_meters;
+            crate::fragment_physics::capture_previous(&mut self.mining, frame, player);
+        }
+    }
+    pub(super) fn complete_tick_presentation(&mut self) {
+        if self.policy.interpolates() && !self.presentation.complete(self.snapshot()) {
+            self.mining.fragment_previous.clear();
+        }
+    }
 }
 
 #[cfg(test)]
@@ -373,7 +394,7 @@ mod tests {
         assert_eq!(after.ship.navigation, live.ship.navigation);
         assert_eq!(after.ship.energy_core, live.ship.energy_core);
         assert_ne!(after.ship.pose.orientation, live.ship.pose.orientation);
-        session.interpolate_presentation = false;
+        session.policy.set_interpolation(false);
         assert_eq!(session.presentation().ship, live.ship);
         assert_eq!(session.presentation().character, live.character);
         assert_eq!(session.presentation().alpha, 1.0);

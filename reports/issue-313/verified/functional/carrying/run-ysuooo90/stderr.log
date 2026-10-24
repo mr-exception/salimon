@@ -1,7 +1,0 @@
-[2026-10-20T18:24:45Z INFO  salimon_client] starting Salimon native client
-[2026-10-20T18:24:45Z INFO  salimon_client::app] native window created: physical_size=1280x800 scale_factor=2.00
-[2026-10-20T18:24:45Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
-[2026-10-20T18:24:45Z INFO  salimon_client::app] application resumed
-[2026-10-20T18:24:46Z INFO  salimon_client::session] entered cockpit control
-[2026-10-20T18:24:46Z INFO  salimon_client::session] left cockpit control; ship motion remains autonomous
-[2026-10-20T18:24:47Z INFO  salimon_client::session] exit door is now Open

@@ -1,8 +1,0 @@
-initial {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-relative-mouse-positive {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-relative-mouse-return {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-final {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-Traceback (most recent call last):
-  File "/Users/mrexception/Documents/Projects/Salimon/salimon/reports/issue-312/native_flight.py", line 167, in <module>
-    raise RuntimeError('native probe checks failed: ' + str(checks))
-RuntimeError: native probe checks failed: {'native_relative_mouse_changes_view': False, 'inverse_mouse_restores_view': True}

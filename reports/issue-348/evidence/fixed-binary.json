@@ -1,8 +1,0 @@
-{
-  "sha256": "042f096bebf4f5dffb419896545dd0362eacbccdb21890752bc31726a80ebe71",
-  "source_parent": "ea8b146",
-  "source_changes": [
-    "client/runtime/src/app.rs"
-  ],
-  "note": "release binary includes the modal visibility fix before evidence commit; original binary evidence remains historical"
-}

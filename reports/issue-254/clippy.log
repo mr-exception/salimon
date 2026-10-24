@@ -1,6 +1,0 @@
-    Checking salimon-world v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/world)
-    Checking salimon-physics v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/physics)
-    Checking salimon-renderer v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/renderer)
-    Checking salimon-ship v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/ship)
-    Checking salimon-client v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/runtime)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.15s

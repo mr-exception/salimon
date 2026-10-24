@@ -2,7 +2,6 @@
 
 use salimon_character::{ShipFrame, SurfaceFrame};
 use salimon_ship::{FlightState, ShipPose, ShipSnapshot};
-use salimon_world::CELESTIAL_BODIES;
 
 pub(crate) fn character_ship_frame(pose: ShipPose) -> ShipFrame {
     ShipFrame {
@@ -19,7 +18,8 @@ pub(crate) fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
         | FlightState::AssistedLanding { body }
         | FlightState::AssistedTakeoff { body } => body,
         FlightState::Flying => {
-            CELESTIAL_BODIES
+            ship.terrain
+                .bodies()
                 .iter()
                 .filter(|body| body.role == salimon_world::BodyRole::Solid)
                 .min_by(|left, right| {
@@ -31,9 +31,7 @@ pub(crate) fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
                 .id
         }
     };
-    let body = CELESTIAL_BODIES
-        .iter()
-        .find(|body| body.id == body_id)
+    let body = salimon_world::canonical::body(body_id)
         .expect("ship body identifier belongs to the world catalog");
     SurfaceFrame {
         query: None,

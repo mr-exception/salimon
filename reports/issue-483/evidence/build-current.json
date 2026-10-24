@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "host": "aarch64-apple-darwin",
-  "profile": "release",
-  "rust": "rustc 1.89.0 (29483883e 2025-08-04)",
-  "executable": "salimon-client",
-  "sha256": "0e137f65ed29127ee4c91bbc48c61082f418d10daca308bdb044bea4707ce16c"
-}

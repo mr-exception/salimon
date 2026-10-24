@@ -45,6 +45,7 @@ pub(super) fn wav(voices: &[Voice], sequence: u64) -> Vec<u8> {
                     (std::f64::consts::TAU * (140.0 * t + 160.0 * t * t)).sin() * (-t * 8.0).exp()
                 }
                 Cue::LowPower => tone(440.0) * (-t * 12.0).exp(),
+                _ => noise * 0.2 * (-t * 25.).exp(),
             };
             let pan = voice.pan.clamp(-1.0, 1.0);
             let gain = voice.gain.clamp(0.0, 1.0);

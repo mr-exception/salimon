@@ -293,6 +293,13 @@ impl GameplaySession {
                 return false;
             }
         }
+        if self
+            .construction_solids()
+            .iter()
+            .any(|solid| boxes_overlap(*solid, b, 0.0))
+        {
+            return false;
+        }
         !self.mining.session.fragments().iter().any(|f| {
             salimon_character::cargo::sphere_overlaps_box(
                 frame.world_to_local(f.transform().position().meters()),
@@ -343,6 +350,14 @@ impl GameplaySession {
                         .all(|other| !boxes_overlap(sweep, *other, 0.001))
             });
             if clear {
+                let id = match k {
+                    Furniture::Table => 3001,
+                    Furniture::Seat => 3002,
+                    Furniture::Screen => 3010,
+                    Furniture::Shutter => 3050,
+                    Furniture::Locker => 3020,
+                };
+                self.surface_age.travel(id, old.fraction, next.fraction);
                 self.habitation.cabin.as_mut().unwrap().motions[k as usize] = next;
             } else {
                 self.feedback = Some("Fixture obstructed; reverse or clear player and belongings");
@@ -629,6 +644,14 @@ impl GameplaySession {
     ) -> Option<super::interaction::InteractionTarget> {
         use super::interaction::InteractionTarget::*;
         let base = super::interaction::available_interaction_target(location, eye, look);
+        if matches!(
+            location,
+            salimon_character::CharacterLocation::InsideShip
+                | salimon_character::CharacterLocation::Surface
+        ) && self.modular_gate_target(eye, look)
+        {
+            return Some(ExitDoor);
+        }
         if location != salimon_character::CharacterLocation::InsideShip {
             return base;
         }
@@ -924,6 +947,7 @@ pub(crate) fn evidence_initial_conditions(
     s.habitation = super::habitation::Habitation::starter();
     use super::interaction::InteractionTarget::*;
     let (eye, target) = match scenario {
+        "scout-lighting-shutter" => ([-0.8, 1.9973, -2.2], shutter_handle()),
         "scout-finishes" => (
             [0.65, 1.9973, 1.8],
             super::interaction::habitation_position(Galley),

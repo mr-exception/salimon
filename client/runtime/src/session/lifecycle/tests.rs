@@ -74,6 +74,7 @@ fn schema_one_migrates_only_missing_survival_and_schema_two_requires_complete_st
     let expected = s.snapshot().ship;
     let mut v: serde_json::Value = serde_json::from_slice(&s.save_bytes(10).unwrap()).unwrap();
     v["schema_version"] = json!(1);
+    v["state"].as_object_mut().unwrap().remove("surface_age");
     v["state"].as_object_mut().unwrap().remove("survival");
     let mut restored = GameplaySession::default();
     restored
@@ -106,13 +107,13 @@ fn active_menu_time_advances_but_restore_resets_ui_and_terminal_backlog() {
         Duration::from_millis(992)
     );
     s.crafting_ui.open = true;
-    s.movement_input.forward = true;
+    s.input.movement.forward = true;
     let bytes = s.save_bytes(1).unwrap();
     let mut restored = GameplaySession::default();
     restored.restore_bytes(&bytes).unwrap();
     assert_eq!(restored.view_mode, ViewMode::Gameplay);
     assert!(!restored.crafting_ui.open);
-    assert!(!restored.movement_input.forward);
+    assert!(!restored.input.movement.forward);
     restored
         .survival
         .command(VitalCommand::Damage(Points::FULL))
@@ -132,13 +133,13 @@ fn fresh_restart_rebuilds_state_and_monotonic_run_identity_without_reusing_old_i
     s.survival
         .command(VitalCommand::Damage(Points::FULL))
         .unwrap();
-    s.movement_input.forward = true;
+    s.input.movement.forward = true;
     let fresh = s.fresh_after_death().unwrap();
     assert_eq!(fresh.seed, 371);
     assert_eq!(fresh.run.serial, 2);
     assert_eq!(fresh.run.journey.distance_meters, 0.0);
     assert_eq!(fresh.elapsed, Duration::ZERO);
-    assert!(!fresh.movement_input.forward);
+    assert!(!fresh.input.movement.forward);
     assert_eq!(fresh.survival.snapshot().health, Points::FULL);
     assert!(fresh.mining.session.fragments().is_empty());
     assert_eq!(fresh.consumables, GameplaySession::new_run().consumables);

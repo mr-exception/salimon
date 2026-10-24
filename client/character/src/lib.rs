@@ -9,6 +9,7 @@ mod controller;
 pub mod habitation_geometry;
 mod input;
 mod layout;
+pub mod modular;
 pub use layout::PLAYER_RADIUS_METERS;
 mod math;
 mod queries;

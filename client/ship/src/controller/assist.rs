@@ -8,7 +8,9 @@ use crate::{
     TAKEOFF_ASSIST_DURATION,
 };
 use salimon_math::{add, length as vector_length, scale, sub};
-use salimon_world::{BodyRole, CELESTIAL_BODIES, CelestialBody, CelestialBodyId};
+#[cfg(test)]
+use salimon_world::CELESTIAL_BODIES;
+use salimon_world::{BodyRole, CelestialBody, CelestialBodyId};
 use std::time::Duration;
 
 /// Starter eligibility tuning. Future upgrades remain documentation only.
@@ -115,10 +117,7 @@ impl AssistTransition {
 }
 
 pub(super) fn body_definition(id: CelestialBodyId) -> &'static CelestialBody {
-    CELESTIAL_BODIES
-        .iter()
-        .find(|body| body.id == id)
-        .expect("flight state only stores catalog body identifiers")
+    salimon_world::canonical::body(id).expect("flight state only stores catalog body identifiers")
 }
 
 pub(crate) fn smoothstep(amount: f64) -> f64 {
@@ -226,6 +225,10 @@ impl ShipController {
             assist.destination_distance =
                 vector_length(sub(pose.position_meters, body.center.meters()));
             assist.aligned_orientation = pose.orientation;
+            if !self.external_site_clear(pose) {
+                self.cockpit_message = Some(CockpitMessage::UnsafeLandingSite);
+                return;
+            }
             assist.landing_pose = Some(pose);
         }
         if recovering {
@@ -312,7 +315,7 @@ impl ShipController {
         {
             return None;
         }
-        CELESTIAL_BODIES.iter().find(|body| {
+        self.terrain.bodies().iter().find(|body| {
             body.role == BodyRole::Solid
                 && vector_length(sub(self.pose.position_meters, body.center.meters()))
                     <= body.radius_meters

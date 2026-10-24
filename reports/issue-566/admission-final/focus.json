@@ -1,5 +1,0 @@
-{
-  "returncode": 0,
-  "stdout": "frontmost=57309 target=57309\n{\"pid\": 57309, \"window\": \"2097154\", \"focused_window\": \"2097154\", \"geometry\": \"WINDOW=2097154\\nX=0\\nY=0\\nWIDTH=1280\\nHEIGHT=800\\nSCREEN=0\", \"map_state\": \"IsViewable\", \"display\": \":101\", \"attempt\": 0, \"prior_errors\": []}\n",
-  "stderr": ""
-}

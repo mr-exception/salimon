@@ -1,9 +1,0 @@
-{
-  "archive_sha256": "a5bf67dc2fe6d6c1df4c562c1a7760953060fda665c0372445992c94c979190d",
-  "file_count": 45,
-  "archived_files": 45,
-  "deduplicated_files": 0,
-  "full_inventory": "linux-main-glb.inventory.json.gz",
-  "full_inventory_sha256": "e4917d9f0eb9d097a90d6492a6a448694ef6fee98dbfeee0c5eb8f27582719d2",
-  "archive": "linux-main-glb.tar.xz"
-}

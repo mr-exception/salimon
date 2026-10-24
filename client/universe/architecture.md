@@ -1,10 +1,9 @@
 # Canonical universe schema — U01 (#402)
 
-`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage and sha2 digest dependencies. It is not yet a runtime dependency. `salimon-world`
+`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage and sha2 digest dependencies. Runtime consumes the read-only streaming service; other portable APIs remain explicitly integrated by their owning adapters. `salimon-world`
 continues owning the compressed six-body playable fixture, terrain/resource-v1
 identity and existing saves. Catalog data must never implicitly grant player
-navigation knowledge. No GPU/window/network, source download, real production catalog, orbital integration, OS clock,
-playable world replacement or backend is introduced. U11 adds only the selected
+navigation knowledge. No GPU/window/network, source download, OS clock or backend belongs to this leaf crate. Streaming does not itself replace the playable world. U11 adds only the selected
 world's portable surface query below. U04 adds consumer-supplied Read/Seek
 IO and an in-memory prototype encoder, not a production pack builder.
 
@@ -241,3 +240,82 @@ Tests: `src/starting_system/tests.rs`; independent frozen manifest/request:
 `examples/starting_system.rs`. Run universe/workspace gates and repeated example
 output; macOS/Windows CI runs debug/release U11 goldens. These are portable CPU
 definitions and physical screens, not M1 rendering/contact/survival acceptance.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Bounded read-only pack queries (#414)
+
+See the [implemented contract](../../docs/universe-reader.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Time-addressable ephemeris models (#415)
+
+See the [implemented contract](../../docs/universe-ephemerides.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Dominant-source celestial gravity (#416)
+
+See the [implemented contract](../../docs/universe-gravity.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Gravity-aware ship trajectory (#417)
+
+See the [implemented contract](../../docs/universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery or replace gameplay yet.
+
+
+## Scanner contacts (#428)
+
+`client/universe/src/scanner.rs` owns bounded player discovery, exact sampled
+celestial states, three-hour freshness and durable encounter history. Unknown
+catalog entries are never revealed implicitly; batches validate before mutation.
+See the [scanner contract](../../docs/universe-scanner.md) for ownership, clock semantics, tests and downstream integration.
+
+
+## Scanner delivery (#429)
+
+Universe `scanner/pulses.rs` owns fixed five-second cadence and analytical funded linear-path detection. Runtime `session/scanner.rs` composes ordinary Core funding after construction, samples current body-local state and exposes read-only automation. Unknown orbital phase/velocity is never invented; body-local and galactic observations cannot be mixed.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#431)
+
+Scanner contact checkpoints validate catalog revision, exact IDs/frames, timestamp ordering and bounds before atomic reconstruction. Runtime schema 25 saves canonical scanner parameters, clock/remainder and encounter history; legacy canonical saves migrate empty, current missing/malformed sources reject. Closed-app launch advances freshness once without inventing offline detections.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#469)
+
+Universe `scanner/chart.rs` owns player-known observations, inferred/transmitted leads with explicit uncertainty, and immutable voluntary route annotations. Runtime `session/chart.rs` owns cockpit P/M/Enter controls and schema-26 pair validation with scanner history. Catalog truth never seeds the chart; observed knowledge outlives contact TTL and source frames are preserved without guessed transforms.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Hybrid astronomical sky (#423)
+
+See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
+split-origin/source validation, explicit frame/epoch limits and production
+verification. Sky visibility grants no scanner/chart knowledge or simulation authority.
+
+
+## Suit observations (#625)
+
+Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
+Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
+validated reload cannot reveal catalog POIs or invent a target range.
+
+
+## Personal planetary chart (#626)
+
+Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
+Personal edits/targets never mutate canonical sites, suit observations or scanner history.

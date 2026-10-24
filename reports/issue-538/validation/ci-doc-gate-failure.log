@@ -1,4 +1,0 @@
-2026-10-23T17:06:52.4841911Z   DOCS_BASE: 2ecb271ff4af43ad102367cdea91c8cb08e375ec
-2026-10-23T17:06:52.9151304Z client/renderer:1: source changed without owning guide update or scoped no_impact reason in scripts/docs-policy.json
-2026-10-23T17:06:52.9151976Z client/runtime:1: source changed without owning guide update or scoped no_impact reason in scripts/docs-policy.json
-2026-10-23T17:06:52.9152789Z Documentation: 2 failures; 0 exact historical findings retained.

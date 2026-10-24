@@ -6,6 +6,7 @@
 //! This crate deliberately has no windowing or GPU dependency.
 
 mod camera;
+pub mod canonical;
 mod catalog;
 mod coordinates;
 mod geometry;
@@ -13,6 +14,7 @@ mod precision;
 mod proximity;
 
 pub mod carrying;
+pub mod environment;
 pub mod mining;
 pub mod resource_distribution;
 pub mod resource_fragments;

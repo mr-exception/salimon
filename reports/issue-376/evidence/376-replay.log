@@ -1,6 +1,0 @@
-{"case": "landed", "status": "passed", "scope": "native launch/render/H-or-terminal/R/save/exit; fixture, not travel or natural death"}
-{"case": "cockpit", "status": "passed", "scope": "native launch/render/H-or-terminal/R/save/exit; fixture, not travel or natural death"}
-{"case": "moving", "status": "passed", "scope": "native launch/render/H-or-terminal/R/save/exit; fixture, not travel or natural death"}
-{"case": "eva", "status": "passed", "scope": "native launch/render/H-or-terminal/R/save/exit; fixture, not travel or natural death"}
-{"case": "terminal", "status": "passed", "scope": "native launch/render/H-or-terminal/R/save/exit; fixture, not travel or natural death"}
-{"case": "fallback", "status": "passed", "scope": "native launch/render/H-or-terminal/R/save/exit; fixture, not travel or natural death"}

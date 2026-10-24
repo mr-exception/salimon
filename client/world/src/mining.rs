@@ -1,15 +1,18 @@
 //! Portable aimed extraction. Runtime supplies proximity candidates and obstruction distance.
 use std::time::Duration;
 
+#[path = "biological_session.rs"]
+mod biological_session;
 #[path = "mining_save.rs"]
 mod save;
 #[path = "sphere_session.rs"]
 mod sphere_session;
+pub use biological_session::HarvestError;
 pub use save::MiningSaveState;
 
 use crate::resource_generation::SurfaceDeposit;
 use crate::resources::{DepositId, DepositState, ResourceDeposit, ResourceFragment};
-use crate::{BodyRole, CELESTIAL_BODIES, WorldPosition};
+use crate::{BodyRole, WorldPosition};
 
 pub const MINING_RANGE_METERS: f64 = 4.0;
 pub const MINING_RATE_KG_PER_SECOND: f64 = 2.0;
@@ -205,7 +208,12 @@ impl MiningSession {
     }
 
     pub fn pick_up(&mut self, id: crate::resources::FragmentId) -> bool {
-        if self.attached_sphere_id == Some(id)
+        if self.fragments.get(id).is_some_and(|f| {
+            f.natural_shape().is_some()
+                && (f.contact_radius_meters()
+                    > crate::environment::harvest::MAX_CARRY_RADIUS_METERS
+                    || f.material().mass_kg() > crate::environment::harvest::MAX_CARRY_MASS_KG)
+        }) || self.attached_sphere_id == Some(id)
             || self.fragments.get(id).is_none()
             || !self
                 .carry
@@ -276,6 +284,77 @@ impl MiningSession {
         self.fragments.drain_changes()
     }
 
+    /// Reclaim one original reserved receipt into the existing single carry slot.
+    /// Reservation owners validate receipts against their source before this boundary.
+    pub fn return_reserved_fragment(&mut self, fragment: ResourceFragment) -> bool {
+        if self.carried_object().is_some()
+            || self.attached_sphere_id.is_some()
+            || !crate::resources::RawMaterial::new(
+                fragment.material().resource(),
+                fragment.material().mass_kg(),
+            )
+            .is_ok_and(|m| m.volume_m3() == fragment.material().volume_m3())
+            || crate::resources::ResourceTransform::new(
+                fragment.transform().position(),
+                fragment.transform().orientation_xyzw(),
+            )
+            .is_err()
+            || !self.fragments.return_reserved(fragment)
+        {
+            return false;
+        }
+        assert!(
+            self.pick_up(fragment.id()),
+            "reserved return passed single-slot admission"
+        );
+        true
+    }
+
+    /// Atomically return a validated reservation batch as loose physical pieces.
+    /// The caller owns receipt provenance and collision-free destination admission.
+    pub fn return_reserved_loose(&mut self, pieces: &[ResourceFragment]) -> bool {
+        let mut ids = std::collections::HashSet::new();
+        let next = self.save_state().next_id;
+        if pieces.iter().any(|f| {
+            f.id().0 == 0
+                || f.id().0 > next
+                || !ids.insert(f.id())
+                || self.fragment(f.id()).is_some()
+                || !crate::resources::RawMaterial::new(
+                    f.material().resource(),
+                    f.material().mass_kg(),
+                )
+                .is_ok_and(|m| m == f.material())
+                || crate::resources::ResourceTransform::new(
+                    f.transform().position(),
+                    f.transform().orientation_xyzw(),
+                )
+                .is_err()
+        }) {
+            return false;
+        }
+        for f in pieces {
+            assert!(
+                self.fragments.return_reserved(*f),
+                "batch preflight admitted receipt"
+            );
+        }
+        true
+    }
+
+    /// Transfer externally owned salvage into sealed physical objects. The caller
+    /// must remove the source mass atomically; extraction totals do not increase.
+    pub fn import_salvage(
+        &mut self,
+        pieces: &[(
+            crate::resources::DepositId,
+            crate::resources::RawMaterial,
+            crate::resources::ResourceTransform,
+        )],
+    ) -> Option<Vec<crate::resources::FragmentId>> {
+        self.fragments.import_salvage(pieces)
+    }
+
     /// Physical despawn/Core consumption; never reuse an entity identity.
     pub fn remove_fragment(&mut self, id: crate::resources::FragmentId) -> bool {
         if self.carried_id() == Some(id) {
@@ -314,7 +393,8 @@ pub fn terrain_obstruction(
     terrain: crate::terrain::TerrainMode,
     range: f64,
 ) -> Option<f64> {
-    CELESTIAL_BODIES
+    terrain
+        .bodies()
         .iter()
         .filter(|body| body.role == BodyRole::Solid)
         .filter_map(|body| {

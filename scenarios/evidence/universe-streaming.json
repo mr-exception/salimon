@@ -1,0 +1,38 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 240000,
+  "steps": [
+    {
+      "wait": {
+        "path": "universe_stream.ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "universe_stream.active_cells",
+        "equals": 1
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "universe_stream.io.catalog_blob_reads",
+        "equals": 1
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      },
+      "timeout_ms": 30000
+    }
+  ]
+}

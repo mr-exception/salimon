@@ -22,9 +22,9 @@ belong in this definition. Inputs and outputs use body-local f64 meters. Current
 bodies do not rotate; any future rotation must be applied by the frame owner
 before/after querying. No player-relative seed or mutable RNG is used.
 
-### Future canonical multi-seed planet definitions (documentation only)
+### Canonical multi-seed planet definitions
 
-The approved future shared-world contract is [canonical planetary generation](../../docs/canonical-planet-generation.md): each planet's **published** record has independent versioned domain seeds for terrain, resources, visual appearance and future geology/biomes/discoveries, alongside a stable body ID, full-definition hashes and authored/scientific inputs. The current version-1 `TerrainDefinition` **already** has a deterministic `u64` terrain seed and generator version; keep its codec, numerical rules, representative fixture seeds and cache identity unchanged. Do not insert new fields into the version-1 binary envelope or assume it can represent arbitrary future galactic IDs. A future versioned catalog/terrain adapter must make any new domain seeds and body identity explicit, without silently reinterpreting visited worlds or altering resource IDs. **Approved future policy:** published fictional terrain may only be revised using an explicit versioned migration that preserves or safely remaps terrain anchors, gameplay state and resource IDs. For **all real observed solid bodies**, preserve physical terrain/collision from their **first authoritative real-scale publication** (not today's compressed six-body representative fixtures); improve scientific/visual detail only without displacement, unless separately approved. Future geology is a versioned input to **one canonical physical terrain evaluator**, not a second competing surface; resources may intentionally consume published biome/geology inputs under explicit dependency and migration rules. Seeded on-demand evaluation is allowed; client/session/clock-driven selection of permanent terrain is not.
+The [implemented frozen-world adapter](../../docs/universe-terrain.md) now evaluates the exact U11 Vesper publication with a distinct codec and immutable full-world digest. General future publication/migration work still follows the approved shared-world contract: [canonical planetary generation](../../docs/canonical-planet-generation.md): each planet's **published** record has independent versioned domain seeds for terrain, resources, visual appearance and future geology/biomes/discoveries, alongside a stable body ID, full-definition hashes and authored/scientific inputs. The current version-1 `TerrainDefinition` **already** has a deterministic `u64` terrain seed and generator version; keep its codec, numerical rules, representative fixture seeds and cache identity unchanged. Do not insert new fields into the version-1 binary envelope or assume it can represent arbitrary future galactic IDs. A future versioned catalog/terrain adapter must make any new domain seeds and body identity explicit, without silently reinterpreting visited worlds or altering resource IDs. **Approved future policy:** published fictional terrain may only be revised using an explicit versioned migration that preserves or safely remaps terrain anchors, gameplay state and resource IDs. For **all real observed solid bodies**, preserve physical terrain/collision from their **first authoritative real-scale publication** (not today's compressed six-body representative fixtures); improve scientific/visual detail only without displacement, unless separately approved. Future geology is a versioned input to **one canonical physical terrain evaluator**, not a second competing surface; resources may intentionally consume published biome/geology inputs under explicit dependency and migration rules. Seeded on-demand evaluation is allowed; client/session/clock-driven selection of permanent terrain is not.
 
 `height(unit_direction)` returns signed elevation above nominal radius.
 `sample(unit_direction)` also returns body-local surface position, outward unit
@@ -139,3 +139,13 @@ Linux-only evidence is not evidence for the integrated M1 implementation.
 Caves, tunnels, overhangs and holes through rock require volumetric geometry;
 they remain deferred until after Phase 0, with a separate design and
 implementation phase. No placeholder cave mechanics are introduced.
+
+
+## Canonical geology (#612)
+
+World `terrain::geology` owns versioned terrain-bound province/history/substrate
+queries. The returned physical sample is the exact existing terrain; geology
+never displaces ground or reshuffles resource identities. See the
+[geology contract](../../docs/planetary-geology.md) for codec, profiles, compatibility and tests.
+Vesper remains a homogeneous silicate interpretation with unchanged published
+terrain/resources; rendering and later environmental systems retain their owners.

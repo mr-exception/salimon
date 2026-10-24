@@ -1,4 +1,5 @@
 //! Versioned body-local terrain contract shared by native rendering and gameplay.
+pub mod geology;
 mod query;
 mod surface;
 mod wire;
@@ -45,6 +46,7 @@ pub enum TerrainError {
 /// Validated immutable definition. Center/orbit/material remain caller-owned.
 #[derive(Clone, Debug, PartialEq)]
 pub struct TerrainDefinition {
+    canonical: Option<salimon_universe::starting_system::FrozenStart>,
     body: CelestialBodyId,
     version: u16,
     seed: u64,
@@ -105,6 +107,7 @@ impl TerrainDefinition {
             return Err(TerrainError::InvalidDefinition);
         }
         Ok(Self {
+            canonical: None,
             body: body.id,
             version,
             seed,
@@ -113,6 +116,22 @@ impl TerrainDefinition {
             features,
             bounds_meters: bounds,
         })
+    }
+    /// Exact published U11 height evaluator, not a regenerated noise approximation.
+    pub fn canonical_start() -> Self {
+        let start = crate::canonical::START.clone();
+        let radius = start.manifest().physical.radius_meters;
+        let height = start.manifest().terrain.ridge_height_meters;
+        Self {
+            canonical: Some(start),
+            body: CelestialBodyId::Vesper,
+            version: GENERATOR_VERSION,
+            seed: 0,
+            radius_meters: radius,
+            layers: Vec::new(),
+            features: Vec::new(),
+            bounds_meters: [0.0, height],
+        }
     }
     pub fn body(&self) -> CelestialBodyId {
         self.body

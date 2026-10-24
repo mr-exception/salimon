@@ -1,3 +1,0 @@
-posted PID=65352 operation=mouse -389 261
-COLLECT {'recipe': 'food-ration', 'job': 3, 'unit': 1, 'mass': 300000, 'category': 'Food'} {'food': [None, {'recipe': 'food-ration', 'job': 1, 'unit': 2, 'mass': 300000, 'category': 'Food'}, None], 'medical': [{'recipe': 'medkit', 'job': 2, 'unit': 1, 'mass': 200000, 'category': 'Medical'}, None]}
-MED {'food': [None, {'recipe': 'food-ration', 'job': 1, 'unit': 2, 'mass': 300000, 'category': 'Food'}, None], 'medical': [None, None]}

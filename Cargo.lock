@@ -1958,6 +1958,7 @@ version = "0.1.0"
 dependencies = [
  "salimon-math",
  "salimon-persistence",
+ "salimon-physics",
  "serde",
 ]
 
@@ -1978,6 +1979,7 @@ dependencies = [
  "salimon-renderer",
  "salimon-ship",
  "salimon-survival",
+ "salimon-universe",
  "salimon-world",
  "serde",
  "serde_json",
@@ -2037,6 +2039,8 @@ version = "0.1.0"
 dependencies = [
  "salimon-math",
  "salimon-persistence",
+ "salimon-physics",
+ "salimon-universe",
  "salimon-world",
  "serde",
  "serde_json",
@@ -2057,6 +2061,7 @@ version = "0.1.0"
 dependencies = [
  "crc32fast",
  "flate2",
+ "salimon-math",
  "serde",
  "serde_json",
  "sha2",
@@ -2067,6 +2072,7 @@ name = "salimon-world"
 version = "0.1.0"
 dependencies = [
  "salimon-persistence",
+ "salimon-universe",
  "serde",
 ]
 

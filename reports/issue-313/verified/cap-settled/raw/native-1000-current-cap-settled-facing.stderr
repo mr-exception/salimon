@@ -1,8 +1,0 @@
-[2026-10-20T18:23:02Z INFO  salimon_client] starting Salimon native client
-motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
-fixture preparation: 50 steps, 1000/1000 asleep, 1000 quiet, 0 moving, 4.742 wall seconds
-fixture settled naturally after 50 steps (0.800 simulation seconds, 4.742 wall seconds)
-[2026-10-20T18:23:07Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00
-[2026-10-20T18:23:07Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
-[2026-10-20T18:23:07Z INFO  salimon_client::app] application resumed
-[2026-10-20T18:23:19Z INFO  salimon_client::app] application exiting cleanly

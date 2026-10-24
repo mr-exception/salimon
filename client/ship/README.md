@@ -75,3 +75,29 @@ The independent [portable structural foundation](architecture.md#portable-struct
 implements the 3 m Core-rooted grid, room/equipment footprints, safe removal,
 damage partition data and domain save validation (#541). It does not yet enable
 player building or migrate the current authored Scout.
+
+
+## Real-scale trajectory foundation (#417)
+
+`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. The compressed playable controller and saves remain unchanged; real-scale support, drag and contact compose through the #418–#420 companion APIs below. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](../../docs/universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.
+
+
+## Real-scale atmospheric drag (#419)
+
+See the [atmosphere contract](../../docs/universe-atmosphere.md) for planet-specific density,
+co-rotating gas/wind, atomic online/offline drag integration and physically paid
+assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](../../docs/universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.

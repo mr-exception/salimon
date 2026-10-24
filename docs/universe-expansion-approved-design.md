@@ -1,11 +1,14 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
+> **Additional approved exterior direction (2026-10-24; future scope):** [Planetary environmental art direction](planetary-environment-art-direction.md) specifies coherent geology/regions, time-dependent regional weather and atmospheric effects, rare fixed biospheres, visible biological harvesting, natural landmarks, suit observations and exterior acoustics. These do not claim new runtime functionality or alter the five-second scanner, 1:1 shared clock, landing physics, published geography or unknown Earth route. Surface hydrology requires a separate design.
+
+
 Verification ownership was revised by the owner on 2026-10-23:
 [cloud checks and instructed human evidence](verification-workflow.md) replace
 blanket M1-only issue completion. Feature/science contracts and hardware-specific
 performance targets are unchanged. Keep actual platform results distinct.
 
-Status: **approved design; portable U01–U11 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
+Status: **approved design; portable catalog/trajectory foundations and U17–U19 physics APIs delivered with the limits below; canonical playable-world adoption and remaining expansion are incomplete**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Expansion follows the completed earlier gameplay implementation queue; remaining issues retain their explicit functional blockers. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
 
@@ -147,3 +150,44 @@ U12 packaging, U14 evolving states and U23/U24 playable terrain/arrival/mining
 remain downstream. Current runtime startup, discovery/chart and save semantics
 are unchanged; cloud #436–#439 retain separate integration acceptance, with human
 presentation/platform/budget criteria routed to #561/#557/#563.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.
+
+
+## Real-scale atmospheric drag (#419)
+
+See the [atmosphere contract](universe-atmosphere.md) for planet-specific density,
+co-rotating gas/wind, atomic online/offline drag integration and physically paid
+assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+Implementation status (#421): bounded coasting-gravity forecasts and a current-controller cockpit preview are delivered through separate explicit model boundaries; see [navigation prediction](universe-navigation.md). Neither provides autopilot, guaranteed arrival, new discoveries or complete runtime ephemeris adoption (#427/#432).
+
+
+U27 #428 implements the portable contact/history authority; see [scanner contract](universe-scanner.md). Pulses, saves and cockpit/chart consumers remain their separate downstream issues.
+
+The scanner contact/pulse/checkpoint/projector and player-known chart boundaries
+(#428/#429/#431/#430/#469) are implemented in the [scanner contract](universe-scanner.md).
+Canonical surface observations retain their explicit body frame; no missing
+orbital phase or source motion is invented. Full global-frame playable adoption
+and closed-game trajectory/event production remain #427/#432/#433. Transmission
+production is #470. Chart knowledge survives contact expiry without revealing
+unknown catalog objects or granting autopilot/jump authority.
+
+
+## Hybrid astronomical sky (#423)
+
+The [implemented sky contract](universe-sky.md) maps the universe source/streaming,
+runtime projection and renderer pass/test owners. Full ephemeris-frame adoption,
+full source coverage and human/hardware release qualification remain separate.

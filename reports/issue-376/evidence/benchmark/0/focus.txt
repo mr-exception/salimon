@@ -1,2 +1,0 @@
-frontmost=74484 target=74484
-posted PID=74484 operation=focus

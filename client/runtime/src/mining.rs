@@ -31,6 +31,8 @@ pub(crate) struct MiningTool {
 
 #[derive(Default)]
 pub(crate) struct ResourceGameplay {
+    pub(crate) biological_obstacles: std::sync::Arc<salimon_physics::static_boxes::StaticField>,
+    pub(crate) modular_interior: salimon_character::modular::ModularInterior,
     pub(crate) carry_blocked: bool,
     pub(crate) interior_solids: Vec<[f64; 6]>,
     pub(crate) mount_geometry: salimon_ship::attachments::Attachments,
@@ -63,6 +65,16 @@ pub(crate) struct ResourceGameplay {
 }
 
 impl ResourceGameplay {
+    pub(crate) fn contains_ship(&self, p: [f64; 3]) -> bool {
+        salimon_character::ship_contains_object(p) || self.modular_interior.contains(p)
+    }
+    pub(crate) fn cargo_allowed(&self, p: [f64; 3], radius: f64) -> bool {
+        salimon_character::cargo::cargo_position_allowed(
+            p,
+            radius,
+            if self.cargo_door_blocking { 0. } else { 1. },
+        ) || self.modular_interior.allows_sphere(p, radius)
+    }
     /// Latch the initial F edge; a carrying action consumes this entire press.
     pub(crate) fn press_f(&mut self) -> bool {
         if self.input.f_down {
@@ -263,12 +275,13 @@ impl ResourceGameplay {
         (player.location == CharacterLocation::Surface && equipment.mining_equipped()).then_some(
             HeldItemInstance {
                 active: self.input.held && valid_target,
+                surface_age: 0.,
             },
         )
     }
 }
 
-fn attachment_pose(
+pub(crate) fn attachment_pose(
     player: CharacterSnapshot,
 ) -> Option<salimon_world::resources::ResourceTransform> {
     preview_pose(player)
@@ -321,6 +334,7 @@ impl ResourceGameplay {
         config: salimon_world::spherical_mining::MiningConfig,
     ) -> Self {
         Self {
+            modular_interior: Default::default(),
             session,
             ship_fragments: anchors,
             fragment_motion: motion,
@@ -379,16 +393,25 @@ mod tests {
         equipment.select(crate::equipment::ToolbarSlot::One, false);
         assert_eq!(
             tool.held_item(&equipment, player, true),
-            Some(HeldItemInstance { active: false })
+            Some(HeldItemInstance {
+                active: false,
+                surface_age: 0.
+            })
         );
         tool.input.held = true;
         assert_eq!(
             tool.held_item(&equipment, player, false),
-            Some(HeldItemInstance { active: false })
+            Some(HeldItemInstance {
+                active: false,
+                surface_age: 0.
+            })
         );
         assert_eq!(
             tool.held_item(&equipment, player, true),
-            Some(HeldItemInstance { active: true })
+            Some(HeldItemInstance {
+                active: true,
+                surface_age: 0.
+            })
         );
         player.location = CharacterLocation::InsideShip;
         assert!(tool.held_item(&equipment, player, true).is_none());

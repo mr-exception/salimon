@@ -1,4 +1,5 @@
 //! Compose snapshot-derived permissions at the shared native/automation boundary.
+pub(super) mod save;
 use super::{GameplaySession, ShipControlInput, interaction::InteractionTarget};
 use salimon_survival::restrictions::{Action, Restrictions};
 use std::time::Duration;
@@ -23,7 +24,7 @@ impl GameplaySession {
         });
         if !rules.permits(Action::Pilot) {
             self.ship.revoke_pilot_control();
-            self.ship_control_input = ShipControlInput::default();
+            self.input.steering = ShipControlInput::default();
         }
         if !rules.permits(Action::Mine) {
             self.mining.stop_mining();

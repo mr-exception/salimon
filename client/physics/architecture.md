@@ -419,3 +419,29 @@ correction-created contact, retained projection and sleep regressions remain.
 Small shared arithmetic primitives are inlinable across the crate boundary;
 their expressions and IEEE ordering are unchanged. See the #592 report for
 archived mass/radius-bit pools, partial/timeouts, profiles and exact comparisons.
+
+
+## Contact response owner (#644)
+
+`response.rs` owns sampled terrain/ground contact, warm accumulated impulses,
+normal/friction/rolling response, bit-identical fixed-point detection and response
+save validation. `lib.rs` retains object/surface contracts, substep scheduling,
+gravity/damping/integration and broad-phase contact traversal. The existing
+`ContactResponse` root-private alias preserves sibling sleep/convex consumers;
+there is no public API or serialized-shape change. Fields/helpers are visible
+only to crate-root descendants that already consumed them.
+
+Arithmetic, sixteen-iteration policy, thresholds, scratch allocations and
+contact traversal order are unchanged. `iteration_oracle.rs` remains a frozen
+pre-#592 reference; its ground/pair warm-continuation tests exercise production
+response through the same root seam. `convex.rs` remains cohesive immutable hull,
+SAT and supporting-feature geometry, with related tests; it is deliberately not
+split solely for length. See the [review evidence](../../reports/issue-644/README.md).
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

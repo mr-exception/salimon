@@ -172,6 +172,15 @@ impl ShipController {
         }
     }
 
+    /// Capacity-only transaction: no charge, reservation or input mutation.
+    pub fn increase_core_capacity(
+        &mut self,
+        expected: u64,
+        capacity: u64,
+    ) -> Result<(), crate::InvalidEnergy> {
+        self.energy_core.increase_capacity(expected, capacity)
+    }
+
     pub fn configure_energy_core(
         &mut self,
         config: crate::EnergyConfig,
@@ -231,7 +240,7 @@ impl ShipController {
         }
         let available = (self.energy_core.stored_joules() - reserve).max(0.0);
         let funded = self.exchange_core_energy_joules(0.0, requested.min(available))?;
-        self.auxiliary_watts = funded / elapsed.as_secs_f64();
+        self.auxiliary_watts += funded / elapsed.as_secs_f64();
         Ok(funded)
     }
 
@@ -247,7 +256,11 @@ impl ShipController {
         self.terrain
             .nearest_body(
                 self.pose.position_meters,
-                NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
+                if self.terrain == salimon_world::terrain::TerrainMode::Canonical {
+                    f64::MAX
+                } else {
+                    NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS
+                },
                 false,
             )
             .map(|(body, surface_distance_meters)| NearbyBodyTelemetry {
@@ -518,5 +531,22 @@ mod auxiliary_tests {
                 .unwrap(),
             0.0
         );
+    }
+}
+
+#[cfg(test)]
+mod canonical_range_tests {
+    #[test]
+    fn canonical_telemetry_has_no_compressed_neighborhood_cutoff() {
+        let mut ship = super::ShipController {
+            terrain: salimon_world::terrain::TerrainMode::Canonical,
+            ..Default::default()
+        };
+        let radius = salimon_world::canonical::BODIES[0].radius_meters;
+        ship.pose.position_meters = [0., radius + 40_000_000., 0.];
+        ship.flight_state = crate::FlightState::Flying;
+        let body = ship.snapshot().nearby_body.unwrap();
+        assert_eq!(body.name, "Vesper");
+        assert!(body.surface_distance_meters > 3_000_000.);
     }
 }

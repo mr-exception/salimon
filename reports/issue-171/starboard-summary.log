@@ -1,2 +1,0 @@
-1920 1080
-{"status": "passed", "results": [{"scenario": "scenarios/cockpit-nose-starboard.json", "status": "passed", "steps_completed": 30, "duration_ms": 854, "artifact_directory": "/workspace/scratch/18abc520166f/salimon/artifacts/issue-171-final/run-u7718c57", "result_file": "/workspace/scratch/18abc520166f/salimon/artifacts/issue-171-final/run-u7718c57/result.json"}]}

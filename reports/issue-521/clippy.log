@@ -1,7 +1,0 @@
-    Checking simd-adler32 v0.3.10
-    Checking serde v1.0.229
-    Checking serde_json v1.0.151
-    Checking miniz_oxide v0.9.1
-    Checking flate2 v1.1.10
-    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.92s

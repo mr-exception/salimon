@@ -1,9 +1,9 @@
-# Canonical whole-game save contract (schema 10)
+# Canonical whole-game save contract (schema 29)
 
-> This is the **current compressed-world runtime save schema 10**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+> Current runtime captures use **schema 29**; schema 23 was the historical compressed-world baseline, and schema 24+ additionally binds canonical Vesper definitions. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
-version 10. Decode accepts versions 1–9 for explicit runtime migration; the
+version 29. Decode accepts versions 1–28 for explicit runtime migration; the
 following v1–v3 paragraphs record that historical migration:
 retain the complete physical/Fabricator/equipment payload, initialize newly
 introduced survival meters at 100 with no effects or retrospective active time,
@@ -20,7 +20,7 @@ versions reject before publication. Migration is checkpointed before exposure.
 | Owner | Required logical state | Regenerated/excluded state |
 | --- | --- | --- |
 | Survival/run | Meters/config, fractional drain/starvation/regeneration, full captured effect rules/stacks/partial ticks/lifetimes, wounds/death source/terminal flag, active survival duration, offline UTC watermark, consumable catalog, movement/interaction tuning, run serial, cumulative journey distance and last valid framed physical samples | Launch receipt, held inputs/UI/capture, movement scale and presentation history; derived permissions are repaired |
-| Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; offline world advancement is zero |
+| Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; closed-game timed power/work uses the schema-22 contract below |
 | Character | Location/frame including doorway blend, local/world position, yaw/pitch, vertical/interior/EVA velocities, nearby surface, EVA basis, gravity/ramp state | Jump key edge reset; camera matrices regenerated |
 | Ship | Pose/quaternion, linear velocity, steering ramp, propulsion/configuration, flight/landed state, full assist/bounce progress, selected signed throttle, door state/fraction, cockpit authority, terrain/footprint, Core config/charge/fraction/reservation/consumption, conversion source and progress, Fabricator demand | Held throttle/steering intent reset, transient message and last-funded interval reset; instruments regenerated |
 | World/mining | Seed in runtime, terrain definition mode/version, sparse deposit depletion journal and extracted total, all fragment stable IDs/source/material/mass/pose, allocator high-water mark, sealed growth state, carry identity, attached mining sphere | Fragment index and physical change journal rebuilt. Active attached sphere detaches on restore because no mining key is restored. Generated deposits/terrain patches recreated from seed and immutable versioned definitions; there are no editable terrain deltas in this revision |
@@ -115,7 +115,7 @@ reach storage is not claimed durable, and visible save warnings/retry remain.
 Normal-play launch first restores into a temporary candidate. Only fatigue is
 credited from the checkpoint UTC to launch UTC, with the survival domain's six-hour
 configured cap and rollback/high-watermark protection. Hunger, health, effects,
-world and active duration never advance offline. The worker's SaveManager verifies
+physical world and survival active duration remain frozen; schema-22 timed power/work follows [offline construction](construction-offline.md). The worker's SaveManager verifies
 and publishes credited state/watermark before the candidate is exposed. Failed
 credit publication leaves the caller's live session unchanged and fails startup.
 The receipt is launch-only: focus, minimize/resume, save and renderer changes do
@@ -368,7 +368,7 @@ checkpoint scheduling. See [source and input](../client/runtime/architecture.md#
 
 `salimon-persistence::universe::UniverseSave` is a **separate**
 `salimon.universe.save` version-1 wire envelope, not a migration of current
-`salimon.save` (now schema 10). It is delivered for future world integration; normal
+`salimon.save` (now schema 29). It is delivered for future world integration; normal
 startup still uses the compressed-world session source. Existing saves are never
 implicitly interpreted, discarded or rewritten by this API.
 
@@ -409,7 +409,7 @@ A missing current source or duplicate installation fails transactionally.
 Old v1–v6 saves explicitly initialize empty hardware/progress and add the blueprint
 without granting inputs or replaying work. Current schema-6 Archive identities
 and all prior physical/consumable state survive. Transient R/menu/native input
-and last-tick auxiliary power are never restored; no offline progress is credited.
+and last-tick auxiliary power are never restored; schema-22 closed-game progress follows [offline construction](construction-offline.md).
 See [canonical Recovery contract](data-recovery-module.md#persistence-and-verification).
 
 ## Independent structural domain schema (#541)
@@ -487,3 +487,135 @@ The optional schema-12 cabin source, manual reversible fixtures, supported postu
 ## Persistent cosmetic groups (#579)
 
 Five room groups and exact furniture overrides now use the [bounded finish contract](room-finishes.md). Schema 13 preserves histories independently of divider topology; physical material replacement, future constructed room geometry (#545) and actual damage (#549) retain their owners. Shared instance tint factors are now bounded to [0,4] and cosmetic RGB is clamped before lighting; warning/functional surfaces retain authored values.
+
+
+## Instant direct-material Core upgrades (#548)
+
+The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.
+
+
+## Construction material ownership (#543)
+
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Timed work and completed geometry remain #544/#545.
+
+
+## Room and fixture lighting (#580)
+
+The [maintained lighting contract](room-lighting.md) describes implemented presets, independent overrides, effective bus/condition gates, shutter/Sun contribution and schema 16. Actual future damage/room creation remain #549/#545; human approval #561 and hardware budgets #563.
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+## Construction flight readiness (#546)
+
+See [construction flight safety](construction-flight-safety.md) for schema-19 Stop/Resume, actual hull and attachment admission, cockpit warnings and airborne stop latches. Source: runtime `session/construction/flight.rs`, ship `structure/construction.rs`; regressions: runtime `session/construction/flight/tests.rs`. Run workspace and construction checks plus the production `construction-interlocks.json` evidence scenario.
+
+
+## Optional module schema 20 (#547)
+
+See the [canonical module source/migration contract](non-core-modules.md#ownership-save-and-verification). Saved construction now includes a module map keyed by the original placeholder ID, commissioned tier, persistent unavailability/fault, installed maintenance receipts and optional upgrade/restoration Funding/Work. Old envelopes reject nonempty module maps; current tier/phase, paid time, allocator and cross-owner uniqueness validate before atomic publication. Continuous maintenance time does not turn every simulation tick into a discrete checkpoint.
+
+
+## Construction damage and salvage (#549)
+
+See the [canonical damage and schema-21 contract](construction-damage.md) for runtime `session/construction/damage.rs`, ship lost-cell geometry, world sealed salvage allocation, controls, exact source/mass/identity boundaries and focused tests/evidence routes. Run workspace tests/build/Clippy/fmt plus documentation validation.
+
+
+## Offline construction schema 22 (#550)
+
+[Canonical source, migration, high-water clock, remainder, saved safety reasons and atomic launch behavior](construction-offline.md). Versions 1–21 migrate without retroactive work; ordinary restore never credits time. Closed power and eligible timed systems settle before verified launch publication; saved scene and active survival remain frozen. The independent universe envelope is unchanged.
+
+
+## Cosmetic surface age schema 23 (#581)
+
+The current envelope requires validated runtime surface exposure keyed by exact installed physical IDs, with explicit pristine migration from versions 1–22. Ordinary restore grants no time; passive age and funded Fabricator usage follow the existing verified offline transaction. Recolor/clean repairs preserve exposure; replacements start fresh. See [source, limits and tests](surface-age.md).
+
+
+## Runtime domain mapping ownership (#641)
+
+Schema 23 and its serialized section/field order are unchanged by the ownership
+extraction. `client/runtime/src/session/persistence.rs` is the explicit top-level
+layout and transaction. Runtime domain `save.rs` adapters own version admission
+and reconstruction, while `session/persistence/physical.rs` owns physical source
+validation/reconstruction and `legacy.rs` owns old propulsion conversion.
+Feature-specific rules belong to their owner; adding an actual new saved section
+still requires deliberate typed composition and the documented schema migration.
+Do not flatten unknown fields or introduce a generic registry to avoid review.
+
+`client/runtime/fixtures/save-schema23-new-run.json` was captured from parent
+`bd9a8c2` before extraction. The regression compares exact new-run bytes and
+restore/recapture bytes against it, alongside unknown-field and failed-publication
+contracts. Update a golden only with a deliberate, reviewed source/format change.
+Save-file generations, atomic storage, fallback, rollback and launch/offline
+behavior retain their existing contracts and fault-injection tests.
+
+
+## Canonical surface integration (#425)
+
+The [canonical gameplay contract](universe-gameplay.md) maps current body/frame,
+resource/physics/Fabricator integration and schema-24 definition binding to owners
+and tests. It preserves the frozen terrain and explicit historical fixtures.
+
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit; normal launch rejects prototype saves under #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+
+## Scanner source — schema 25 (#431)
+
+Canonical sessions require the validated versioned scanner checkpoint, parameters,
+logical UTC clock and sub-millisecond remainder. History retains exact identity,
+frame, sampled position/velocity, first/last-seen and refresh counts. Current missing
+or corrupt state rejects atomically; catalog mismatch is incompatible, not silently
+reseeded. Canonical schemas 1–24 migrate empty at checkpoint UTC; compressed test
+fixtures omit scanner source. Startup/restart binds new clocks and launch advances
+freshness exactly once without free detections. See the
+[scanner checkpoint contract](universe-scanner.md#checkpoints-and-launch-431).
+
+## Player-known chart — schema 26 (#469)
+
+Canonical saves require versioned player chart source: observed encounters,
+inferred/transmitted coordinate leads with provenance and explicit unknown/radius
+uncertainty, and voluntary immutable route snapshots. The scanner/chart pair must
+agree exactly on every verified discovery. Catalog truth alone is never a source
+of player navigation knowledge. Missing/malformed/current incompatible records,
+duplicate IDs, future timestamps and forged observed entries reject atomically.
+Versions 1–25 initialize from actual migrated scanner history only; no default
+Earth route or catalog reveal. View/selection are transient. See the
+[player chart contract](universe-scanner.md#player-known-chart-469).
+
+
+## Physical organisms and clearance (#620)
+
+[Physical organism placement](physical-organisms.md) owns stable source/part
+bindings, root/exclusion rules, common physics sweeps and live character/ship
+clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+
+Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](universe-gameplay.md#ordinary-canonical-play-427).
+
+
+## Suit observations (#625)
+
+See [suit measurements and field marks](suit-observations.md) for source/validation
+ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundaries.
+
+
+## Personal planetary chart (#626)
+
+[Planetary chart](planetary-chart.md) maps personal history, physical inspection,
+native text/keys, uncertainty presentation and schema-28 validation to owners/tests.
+
+## Biological source journal — schema 29 (#621)
+
+[Exact source/shape/depletion/restore contract](biological-harvesting.md). Captures
+include the catalog-bound biological journal and explicit fixture context; pending
+grips/audio/caches are excluded. Versions 1–28 migrate empty; new biological data
+cannot be backdated. Natural fragment anatomy is optional on older objects.
+Publication, geometry, mass, allocator, carry and source-debit cross-checks precede
+atomic publication. Missing and partial anatomy never regrows on stream/reload.

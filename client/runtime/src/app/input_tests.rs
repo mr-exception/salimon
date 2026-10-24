@@ -52,8 +52,8 @@ fn cursor_release_then_w_e_l_and_throttle_do_not_mutate_gameplay_until_recapture
     }
     assert_eq!(app.session.ship.snapshot(), before);
     assert_eq!(app.session.character.location(), CharacterLocation::Cockpit);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
-    assert!(!app.session.movement_input.forward);
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
+    assert!(!app.session.input.movement().forward);
     app.cursor_captured = true;
     native(&mut app, KeyCode::ArrowUp, true);
     assert_eq!(
@@ -70,19 +70,19 @@ fn view_switch_clears_walking_steering_mining_and_throttle_without_replay() {
         ..ClientApplication::default()
     };
     native(&mut walker, KeyCode::KeyW, true);
-    assert!(walker.session.movement_input.forward);
+    assert!(walker.session.input.movement().forward);
     native(&mut walker, KeyCode::Digit1, true);
     walker.session.mining_mouse_input(true);
     assert!(walker.session.mining.input.held);
     assert!(walker.session.mining.press_f());
     native(&mut walker, KeyCode::F2, true);
-    assert!(!walker.session.movement_input.forward);
+    assert!(!walker.session.input.movement().forward);
     assert!(!walker.session.mining.input.held);
     assert!(walker.session.mining.press_f(), "view reset clears F latch");
     native(&mut walker, KeyCode::KeyF, false);
     native(&mut walker, KeyCode::KeyW, false);
     native(&mut walker, KeyCode::F2, true);
-    assert!(!walker.session.movement_input.forward);
+    assert!(!walker.session.input.movement().forward);
 
     let mut app = pilot();
     native(&mut app, KeyCode::KeyW, true);
@@ -100,7 +100,7 @@ fn view_switch_clears_walking_steering_mining_and_throttle_without_replay() {
         step: Duration::from_millis(16),
         fragment_load: None,
     });
-    app.session.automation_step = app.e2e_step();
+    app.session.policy.set_automation_step(app.e2e_step());
     // Tour actions and protocol action aliases cannot activate gameplay.
     let before = app.session.ship.snapshot();
     for value in [
@@ -121,7 +121,7 @@ fn view_switch_clears_walking_steering_mining_and_throttle_without_replay() {
         pose.orientation
     );
     assert_eq!(app.session.ship.snapshot().thruster_percentage, selected);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
 }
 
 #[test]
@@ -180,7 +180,7 @@ fn lifecycle_resets_and_focus_replay_cannot_reinstall_held_controls() {
         );
         assert_eq!(app.session.ship.snapshot().thruster_percentage, selected);
         assert_eq!(app.session.view_mode, ViewMode::Gameplay);
-        assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+        assert_eq!(app.session.input.steering(), ShipControlInput::default());
     }
 }
 
@@ -195,7 +195,7 @@ fn automation_bypasses_desktop_capture_but_preserves_power_and_assist_authority(
     app.automation_key(PhysicalKey::Code(KeyCode::ArrowUp), true);
     app.automation_key(PhysicalKey::Code(KeyCode::KeyW), true);
     assert_eq!(app.session.ship.snapshot().thruster_percentage, 1);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
     app.session.ship = ShipController::default();
     app.session.ship.set_cockpit_control(true);
     app.automation_key(PhysicalKey::Code(KeyCode::KeyL), true);
@@ -206,7 +206,7 @@ fn automation_bypasses_desktop_capture_but_preserves_power_and_assist_authority(
     app.automation_key(PhysicalKey::Code(KeyCode::KeyW), true);
     app.automation_key(PhysicalKey::Code(KeyCode::ArrowUp), true);
     assert_eq!(app.session.ship.snapshot().thruster_percentage, 0);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
 }
 
 #[test]
@@ -263,7 +263,7 @@ fn wheel_released_pointer_still_admits_q_release_and_focus_loss_cancels_without_
     native(&mut app, KeyCode::KeyW, true);
     native(&mut app, KeyCode::KeyQ, true);
     assert!(app.session.wheel.open);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
     // The native pointer is released while the wheel has keyboard focus.
     app.cursor_captured = false;
     native(&mut app, KeyCode::KeyQ, false);
@@ -441,7 +441,7 @@ fn pause_native_background_focus_and_protocol_share_freeze() {
     native(&mut app, KeyCode::Enter, true);
     assert!(!app.session.is_paused());
     assert_eq!(app.session.ship.snapshot().thruster_percentage, throttle);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
 }
 
 #[test]
@@ -449,26 +449,26 @@ fn isolated_e2e_ignores_desktop_keys_and_preserves_protocol_holds_on_lifecycle_r
     let mut app = pilot();
     app.e2e_input_isolated = true;
     native(&mut app, KeyCode::KeyW, true);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
     app.automation_key(PhysicalKey::Code(KeyCode::KeyW), true);
-    let scripted = app.session.ship_control_input;
+    let scripted = app.session.input.steering();
     app.session
         .update_clock
         .accumulate(Duration::from_millis(5));
     assert_ne!(scripted, ShipControlInput::default());
     app.set_input_focus(false);
     app.reset_update_clock();
-    assert_eq!(app.session.ship_control_input, scripted);
+    assert_eq!(app.session.input.steering(), scripted);
     assert_eq!(app.session.update_clock.backlog(), Duration::from_millis(5));
     app.automation_key(PhysicalKey::Code(KeyCode::KeyW), false);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
     app.e2e_input_isolated = false;
     app.native_focused = true;
     app.cursor_captured = true;
     native(&mut app, KeyCode::KeyW, true);
-    assert_ne!(app.session.ship_control_input, ShipControlInput::default());
+    assert_ne!(app.session.input.steering(), ShipControlInput::default());
     app.set_input_focus(false);
-    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    assert_eq!(app.session.input.steering(), ShipControlInput::default());
 }
 
 #[test]
@@ -481,7 +481,7 @@ fn pause_save_menu_requires_initial_focus_and_preserves_paused_state() {
     let dir = std::env::temp_dir().join(format!("salimon-382-menu-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     app.checkpoints =
-        Some(crate::checkpoints::Checkpoints::open(dir.clone(), &mut app.session).unwrap());
+        Some(crate::checkpoints::Checkpoints::open_at(dir.clone(), &mut app.session, 100).unwrap());
     native(&mut app, KeyCode::Escape, true);
     let before = app.session.save_bytes(123).unwrap();
     let key = PhysicalKey::Code(KeyCode::KeyX);
@@ -582,4 +582,40 @@ fn blueprint_keys_share_native_admission_stow_tools_and_close_without_pausing() 
     native(&mut app, KeyCode::Escape, true);
     assert!(!app.session.building.active);
     assert!(!app.session.is_paused());
+}
+
+#[test]
+fn surface_chart_native_escape_discards_draft_before_pause_and_respects_focus() {
+    let mut app = ClientApplication {
+        native_focused: true,
+        cursor_captured: true,
+        ..Default::default()
+    };
+    crate::e2e::initialize(
+        &mut app.session,
+        crate::e2e::Config {
+            scenario: crate::e2e::Scenario::PlanetaryChart,
+            seed: 0,
+            step: std::time::Duration::from_millis(16),
+            fragment_load: None,
+        },
+    )
+    .unwrap();
+    native(&mut app, KeyCode::Backslash, true);
+    native(&mut app, KeyCode::KeyR, true);
+    app.session.surface_text("discard this draft").unwrap();
+    app.native_focused = false;
+    native(&mut app, KeyCode::Escape, true);
+    assert!(app.session.surface_chart.open);
+    app.native_focused = true;
+    native(&mut app, KeyCode::Escape, true);
+    assert!(
+        !app.session.surface_chart.open
+            && !app.session.surface_chart.editing
+            && !app.session.is_paused()
+    );
+    assert_eq!(
+        app.session.surface_capture().unwrap().unwrap().entries[&1].note(),
+        ""
+    );
 }

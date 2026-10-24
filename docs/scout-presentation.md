@@ -76,17 +76,19 @@ join the same output rather than a second OS player.
 
 `native_audio.rs` uses maintained [CPAL 0.18.2](https://docs.rs/cpal/0.18.2/cpal/)
 (CoreAudio, WASAPI, ALSA defaults) for one continuous default-device stream.
-`native_audio/mix.rs` owns deterministic original sample synthesis. Six loop
-slots, four ship transient slots and three survival slots bound the mix to 13
-voices, with no pending audio queue. Repeated event counters coalesce to the
-latest event; alerts and footsteps retain the existing four-event input bound.
+`native_audio/mix.rs` owns deterministic original sample synthesis. Thirteen loop
+slots, eleven ship transient slots and three survival slots bound the callback
+to 32 voices, including five [environmental channels](planetary-audio.md). Runtime admits at most 24 Scout scene voices and 12 pending events,
+plus the five environment channels;
+repeated callback event counters coalesce to the latest event. Physical partitions
+and tactile mechanism channels follow [the acoustics contract](scout-acoustics.md).
 Gain/pan converge over 10 ms without chunk-boundary fades. Low-pass procedural
 noise and smooth saturation preserve headroom; no downloaded media is used.
 Original survival timbre/envelope/relative level remain observational.
 
-The producer publishes a fixed 240-byte atomic mailbox; the callback attempts at
+The producer publishes a fixed 672-byte atomic mailbox; the callback attempts at
 most three coherent reads and retains its previous observation on contention.
-Callback state is 1,080 bytes and neither allocates, locks, writes files, logs nor
+Callback state is 3,240 bytes and neither allocates, locks, writes files, logs nor
 calls back into CPAL. Sample phase persists across arbitrary buffer sizes. A
 250 ms producer watchdog fades stalled input to silence and consumes stale event
 counters. Pause/focus/occlusion/terminal/menu/reset/master mute retire events and
@@ -165,7 +167,8 @@ initial fixture placement is distinct from physical mining/travel. Human motion/
 readability review remains #561, physical input/platform checks #557 and hardware
 budgets #563. Fabricator orientation retains its three-screen geometry regression;
 cloud images do not approve readability.
-The absent scanner hologram will integrate through #430/#466 when available.
+The physical scanner projector follows the Scout face and functional palette (#503),
+using the existing contextual action bar and scanner-owned observations.
 No native appearance, mask/tolerance or baseline approval is granted here.
 
 ## Scout UI readability contract (#466)
@@ -191,7 +194,7 @@ physical review. No per-pixel/native accessibility certification is implied.
 | Fabricator recipe panel | Existing modal; readable status words, exact ingredients, queue selection `>` and no-refund controls | Existing atomic enqueue/cancel, focus/range revalidation and exclusive input remain authoritative |
 | Toolbar, Q and H | Shared face/ivory/cyan accents; original food/medical artwork, category colors, layout and modal rules retained | Equipment/inventory/survival selection and consumption stay with existing owners |
 | Reticle | Existing outlined white dot / equipped cross at the exact camera center; fixed physical size retained | Equipment decides the shape; no aim/ray/interaction rule changes |
-| Future scanner | Apply this language after the hologram exists | Blocked by #430; remaining integration is [#503](https://github.com/mr-exception/salimon/issues/503) |
+| Physical scanner | Three bounded rows: explicit FRESH / NO FRESH CONTACTS / OFFLINE, center distance in km, sampled age in s, bracketed M/P controls and logarithmic range notice; shared face and palette | Runtime maps authoritative same-frame contacts and power to renderer `ScannerReadout`; no detection, expiry, clock, save or input rule changes |
 
 Physical screens remain self-lit opaque geometry behind their existing housings;
 no glass opacity, material, draw, shader or pipeline change is introduced. The
@@ -244,3 +247,26 @@ default M1 profile remains strict. Frozen fixture intervals are not normal-play
 FPS. Actual hardware GPU counters/budgets remain #563, physical platform checks
 #557 and original-image/mood/projection/baseline approval #561. Existing1920/M1
 and Blender mood originals remain separate dated corpora.
+
+
+## Tactile audio and physical partitions (#583)
+
+The [maintained acoustics contract](scout-acoustics.md) describes actual mechanism/attachment events, finite cargo/privacy separation, differentiated floor contact and bounded continuous CPAL filtering. E2E mapping stays silent; actual output captures and human listening remain separately identified.
+
+## Scanner readability (#503)
+
+`scanner_readout.rs` formats observed values into at most 39 cells per row.
+Invalid readings show `--`; large finite values use scientific notation without
+losing km/s unit case. Labels are bounded to twelve visible ASCII cells. Existing
+`action_bar.rs` provides the shared opaque contrast-tested background, face and
+integer DPI scaling, without a second overlay. The 3D projector converts the
+shared sRGB palette to linear instance colors: cyan fresh/control, amber selected,
+muted history and ivory leads/origin. Selection also enlarges the marker; text
+names current freshness and power independently of color. Chart mode retains its
+separate explicit historical/lead provenance. No blink, new draw or detection is
+added. #438 owns the integration matrix; #502's historical review now follows
+#561 presentation, #557 physical devices and #563 hardware qualification.
+See [#466 foundation report](../reports/issue-466/README.md) and
+[PR #504](https://github.com/mr-exception/salimon/pull/504).
+
+The [#438 cloud matrix](universe-scanner.md#cloud-scanner-acceptance-438) adds a top-right placement for fresh scanner status at 1280+ physical pixels. It keeps the enlarged 2x toolbar/status stack from covering the selected 3D contact; compact and chart-mode placement remains bottom-aligned. See the report for original failed and corrected captures.

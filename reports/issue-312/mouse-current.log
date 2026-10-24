@@ -1,5 +1,0 @@
-initial {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-relative-mouse-positive {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-relative-mouse-return {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-final {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
-ARTIFACTS /Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261020/312/mouse-current/run-swpqtf5l

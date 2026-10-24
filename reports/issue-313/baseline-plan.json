@@ -1,1 +1,0 @@
-{"candidate_base":"ddffe171de2929f805150043fdcc480860973901","baseline_kind":"controlled damping ablation","baseline_change":"replace only elapsed-time linear/angular retention factors with pre-304 constants 0.995/0.98","production_branch_modified":false,"native_budget_approval":false}

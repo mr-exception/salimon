@@ -25,7 +25,9 @@ fn select(slot: ConsumableSlot, job: u64) -> Selection {
 }
 fn session() -> GameplaySession {
     GameplaySession {
-        automation_step: Some(Duration::from_millis(16)),
+        policy: crate::session::policy::Policy::with_automation_step(Some(Duration::from_millis(
+            16,
+        ))),
         ..Default::default()
     }
 }

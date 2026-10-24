@@ -26,7 +26,8 @@ Update order remains door animation, clamped steering, then flight or full-delta
 assist dispatch. Module methods use only parent-visible access where needed;
 external consumers still observe `ShipSnapshot`. `clear_steering_input` discards
 both target and ramp on runtime lifecycle/view discontinuities without changing
-pose, momentum or selected throttle. Dependencies are unchanged.
+pose, momentum or selected throttle. The shared static-sweep kernel is now a
+typed `salimon-physics` dependency for physical organism clearance.
 
 `ShipController` is authoritative portable state. It owns a double-precision
 world pose, landed/flying/assisted state, door state, cockpit authority, persistent
@@ -470,9 +471,9 @@ rendered previews are never authority. One multi-cell/multi-deck volume is one
 project. Unbuilt neighbors cannot supply structural support. Interior versus
 hull-affecting consequences determine airborne permissions.
 
-Projects expose requirements/duration for inspection but contain no material,
-progress or installed mass. There is no separate worksite or Start action.
-Cancellation removes the unfunded reservation; #543 owns physical intake/refunds,
+Projects capture requirements/duration and exact #543 material receipts/progress.
+There is no separate worksite or Start action.
+Cancellation atomically returns physical unconsumed material; #543 owns intake/refunds,
 #544 progress, #545 geometry and #546 flight interlocks. Domain schema-1 validation
 and the whole-session boundary are documented in the
 [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
@@ -487,3 +488,110 @@ Scout cabin #577: follow [the canonical source, collision, posture and presentat
 
 
 Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
+
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Construction flight readiness (#546)
+
+Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 contract](../../docs/construction-flight-safety.md). The durable stop latch never clears on landing; actual hull/attachment state governs readiness. Preserve Core/engine/cockpit/ramp authority and inertial momentum.
+
+
+## Construction damage (#549)
+
+Follow the [canonical damage, physical salvage and schema-21 contract](../../docs/construction-damage.md). Surviving work preserves paid time and receipts; lost cells and destroyed projects cannot respawn or duplicate salvage. Core identity is protected. Fresh debris IDs, exact material shares, collision/containment and installed mass publish together; restore reconstructs source without reallocating debris.
+
+
+## Offline construction (#550)
+
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.
+
+
+## Cosmetic surface age (#581)
+
+Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+## Assist cohesion review (#644)
+
+Retain `controller/assist.rs`: its production section defines one captured
+landing/takeoff/recovery transition, admission, analytic eased path, energy
+reservation and save validation. Shared transition state/order is the relevant
+boundary; most remaining length is its related regression/safety tests. Splitting
+for line count would scatter the captured path/energy invariants without
+isolating an independent policy. No flight code or numeric behavior changed in
+this review. Revisit only with function-level co-change/test-isolation evidence;
+see [review evidence](../../reports/issue-644/README.md).
+
+
+## Real-scale trajectory foundation (#417)
+
+`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. The compressed playable controller and saves remain unchanged; real-scale support, drag and contact compose through the #418–#420 companion APIs below. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](../../docs/universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.
+
+
+## Real-scale atmospheric drag (#419)
+
+See the [atmosphere contract](../../docs/universe-atmosphere.md) for planet-specific density,
+co-rotating gas/wind, atomic online/offline drag integration and physically paid
+assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](../../docs/universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.
+
+
+## Bounded navigation prediction (#421)
+
+Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+
+## Ordinary canonical play (#427)
+
+Follow the [canonical play isolation contract](../../docs/universe-gameplay.md#ordinary-canonical-play-427).
+Normal launch rejects prototype checkpoints without overwrite. Canonical scenes
+exclude engineering markers/bodies, and ship telemetry/preview selection does
+not apply the compressed 3 Mm cutoff. Explicit fixtures retain their contracts.

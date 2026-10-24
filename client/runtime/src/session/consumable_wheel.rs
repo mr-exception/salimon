@@ -244,7 +244,7 @@ mod tests {
         s.command(Command::Control(ControlKey::Forward, true));
         s.command(Command::Mining(true));
         action(&mut s, WheelAction::Hold(true));
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement.forward);
         let before = s.snapshot();
         let selected = s.equipment.selected();
         let elapsed = s.elapsed;
@@ -259,7 +259,7 @@ mod tests {
         ] {
             s.command(command);
         }
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement.forward);
         assert_eq!(s.equipment.selected(), selected);
         assert_eq!(s.snapshot().character, before.character);
         s.advance_automation(std::time::Duration::from_millis(100));

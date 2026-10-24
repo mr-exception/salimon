@@ -28,6 +28,11 @@ impl Validate for MiningSaveState {
             if f.id().0 == 0 || f.id().0 > self.next_id || !ids.insert(f.id()) {
                 return Err(invalid("fragment IDs/allocator"));
             }
+            if let Some(shape) = f.natural_shape() {
+                shape
+                    .validate()
+                    .map_err(|_| invalid("natural biological shape"))?;
+            }
             let material = RawMaterial::new(f.material().resource(), f.material().mass_kg())
                 .map_err(|_| invalid("fragment material"))?;
             if material.volume_m3() != f.material().volume_m3() {

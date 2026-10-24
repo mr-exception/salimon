@@ -1,5 +1,8 @@
 # Scout Archive, data recovery and discovered navigation
 
+> **Future planetary field observations (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) adds proposed lightweight suit location/bearing marks with assisted, uncertain positioning, and review/editing through a physical Scout planetary chart. These extend **player-known observation** rather than canonical catalog, star-chart discovery or the existing automatic five-second scanner. No perfect planet GPS, automatic landmark POI reveal, new scan mode or autopilot is approved.
+
+
 Status: **Archive reader #467 and local Recovery Module #468 implemented; destination leads/charting remain future #469–470**. Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
 
 ## Physical Ship Archive
@@ -53,3 +56,15 @@ energy defaults, one-component installation into the Archive, emergency reserve,
 low-priority funded work, R controls and schema-7 migration. Recovered local
 fragments stay unverified; full location-bearing story payloads remain #470.
 Native physical/visual/budget and provisional tuning review remains #515.
+
+## Implemented chart boundary (#469)
+
+The [player-known chart](universe-scanner.md#player-known-chart-469) now owns
+observed history, explicit inferred/transmitted provenance and uncertainty, and
+voluntary same-frame route annotations. P/M/Enter operate the cockpit projector;
+normal checkpoints persist the chart. The canonical catalog does not seed it,
+and Earth stays hidden until actual observation. `record_lead` is the admission
+boundary for real recovered/inferred coordinates, not a source of invented hints.
+Transmission production/recovery remains #470; it must supply actual source data
+through that boundary. Jump Drive operation and unresolved wormhole use are not
+implied by chart routing.

@@ -1,4 +1,0 @@
-    Blocking waiting for file lock on build directory
-    Checking salimon-renderer v0.1.0 (/workspace/scratch/18abc520166f/salimon/client/renderer)
-    Checking salimon-client v0.1.0 (/workspace/scratch/18abc520166f/salimon/client/runtime)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.91s

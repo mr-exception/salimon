@@ -1,4 +1,5 @@
 //! Physical placement/explicit mechanical restraints over existing resource identities.
+pub(super) mod save;
 use super::{GameplaySession, frames::character_ship_frame};
 use salimon_character::CharacterLocation;
 use salimon_math::{dot, length, sub};
@@ -41,6 +42,37 @@ impl GameplaySession {
             .map(|v| v.0)
     }
     pub(crate) fn mount_action(&mut self, action: MountAction) {
+        let before = self.mounts.clone();
+        let target = self
+            .aimed_mount()
+            .or_else(|| self.mounts.carried.as_ref().map(|c| c.id));
+        self.execute_mount_action(action);
+        if self.mounts != before {
+            if let Some(id) = target {
+                self.surface_age
+                    .contact(id, std::time::Duration::from_secs(1));
+                if let Some(m) = before.mounts.iter().find(|m| m.id == id) {
+                    self.surface_age
+                        .contact(m.rail, std::time::Duration::from_secs(1));
+                }
+            }
+            let position = target
+                .and_then(|id| {
+                    self.mounts
+                        .mounts
+                        .iter()
+                        .find(|m| m.id == id)
+                        .or_else(|| before.mounts.iter().find(|m| m.id == id))
+                })
+                .map(|m| m.position())
+                .unwrap_or_else(|| {
+                    character_ship_frame(self.ship.snapshot().pose)
+                        .world_to_local(self.snapshot().character.eye_position_meters)
+                });
+            self.mount_audio = (self.mount_audio.0.wrapping_add(1), position);
+        }
+    }
+    fn execute_mount_action(&mut self, action: MountAction) {
         if !self.admit_survival_action(salimon_survival::restrictions::Action::Carry) {
             return;
         }
@@ -418,7 +450,7 @@ impl GameplaySession {
                 eye[i] + direction[i] * 0.8 - f64::from(s.character.up[i]) * 0.35
             });
             let local = frame.world_to_local(c.world_position);
-            let absent = !salimon_character::ship_contains_object(local);
+            let absent = !self.mining.contains_ship(local);
             self.mining
                 .ship_mass
                 .set_dry_equipment_absent(
@@ -471,12 +503,24 @@ impl GameplaySession {
                 bounds.push([p[0] - r, p[0] + r, p[1] - r, p[1] + r, p[2] - r, p[2] + r]);
             }
         }
-        let cabin = self.cabin_solids();
+        let mut cabin = self.cabin_solids();
+        cabin.extend(self.construction_solids());
         bounds.extend_from_slice(&cabin);
         if !self.mining.interior_solids.is_empty() && self.mining.interior_solids != cabin {
             self.mining.fragment_sleep = Default::default();
         }
         self.mining.interior_solids = cabin;
+        let modular = salimon_character::modular::ModularInterior {
+            volumes: self.structural_volumes(),
+            solids: self.structural_solids(),
+            aft_port: self.modular_port(),
+            exit: super::construction::boarding_exit(&self.building.structure),
+        };
+        if self.mining.modular_interior.volumes != modular.volumes {
+            self.mining.mass_frame = None;
+        }
+        self.mining.modular_interior = modular.clone();
+        self.character.set_modular_interior(modular);
         self.character.set_interior_obstacles(bounds);
     }
 }
@@ -574,6 +618,8 @@ mod tests {
         let mut s = GameplaySession::new_run();
         aim(&mut s, [-1.6, 1.9973, 1.8], [-1.6, 1.15, 2.7]);
         assert_eq!(s.aimed_mount(), Some(2001));
+        s.command(Command::Mount(MountAction::ToggleLock));
+        assert_eq!(s.mount_audio.0, 0, "empty clamp rejection emits no sound");
         let id = piece(&mut s, [-1.6, 1.5, 2.0]);
         assert!(s.mining.session.pick_up(id));
         s.equipment.sync_carrying(true);
@@ -582,6 +628,7 @@ mod tests {
         assert_eq!(s.mining.session.carried_id(), None, "{:?}", s.feedback);
         s.command(Command::Mount(MountAction::ToggleLock));
         assert!(s.mounts.is_secured(id), "{:?}", s.feedback);
+        assert_eq!(s.mount_audio.0, 1, "only actual fastening emits a cue");
         let local = s.mining.ship_fragments[&id];
         let mass = s.ship.snapshot().total_mass_kg;
         s.ship.set_stored_core_energy_joules(0);
@@ -596,6 +643,7 @@ mod tests {
         let mut restored = GameplaySession::default();
         restored.restore_bytes(&bytes).unwrap();
         assert_eq!(restored.mounts, s.mounts);
+        assert_eq!(restored.mount_audio.0, 0, "load never replays a fastening");
         assert_eq!(restored.mining.secured, s.mining.secured);
         restored.command(Command::Mount(MountAction::ToggleLock));
         assert!(!restored.mounts.is_secured(id));

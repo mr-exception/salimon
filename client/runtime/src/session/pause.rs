@@ -50,14 +50,14 @@ mod tests {
         s.advance_automation(Duration::from_secs(86400));
         assert_eq!(s.save_bytes(123).unwrap(), before);
         assert_eq!(s.update_clock.backlog(), Duration::ZERO);
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement.forward);
         let mut restored = GameplaySession::default();
         restored.restore_bytes(&before).unwrap();
         assert!(!restored.is_paused());
         s.command(Command::TogglePause);
         s.advance_automation(Duration::from_millis(16));
         assert_eq!(s.elapsed, Duration::from_millis(16));
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement.forward);
     }
     #[test]
     fn tour_pause_is_independent() {

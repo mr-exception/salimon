@@ -490,3 +490,285 @@ cannot replace the required 100 completed moving intervals. Historical failed
 ## Physical mounts (#576)
 
 Run `cargo test -p salimon-client --locked session::mounts`, ship/world/character tests and workspace gates. The physical-mount evidence route retains original production-wgpu images. See [the canonical contract](physical-mounts.md).
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+## Construction flight readiness (#546)
+
+See [construction flight safety](construction-flight-safety.md) for schema-19 Stop/Resume, actual hull and attachment admission, cockpit warnings and airborne stop latches. Source: runtime `session/construction/flight.rs`, ship `structure/construction.rs`; regressions: runtime `session/construction/flight/tests.rs`. Run workspace and construction checks plus the production `construction-interlocks.json` evidence scenario.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.
+
+
+## Construction damage and salvage (#549)
+
+See the [canonical damage and schema-21 contract](construction-damage.md) for runtime `session/construction/damage.rs`, ship lost-cell geometry, world sealed salvage allocation, controls, exact source/mass/identity boundaries and focused tests/evidence routes. Run workspace tests/build/Clippy/fmt plus documentation validation.
+
+
+## Offline construction (#550)
+
+See [the maintained chronology and schema-22 contract](construction-offline.md): runtime `session/offline.rs`, ship `controller/offline.rs`, launch/checkpoint staging and existing work owners. Run offline/checkpoint/Recovery and ship tests, workspace build/tests/Clippy/fmt, the two documented wgpu routes and docs/base-impact validation. Future #433 supplies verified universe events; no scanner or orbit implementation is duplicated here.
+
+
+Cosmetic aging #581: [source/identity, successful use, schema 23, rendering budgets and exact verification](surface-age.md). Damage remains condition-driven; clean repairs restore normal geometry and preserve age.
+
+
+## Architecture review (#645)
+
+Run `python3 -m unittest discover -s scripts -p 'test_architecture_*.py' -v` and
+`python3 scripts/architecture_review.py --base origin/main --output artifacts/architecture/review.json`.
+Use the actual parent SHA for stacked PRs. See the [policy and limitations](architecture-baseline.md#warning-only-boundary-and-active-pr-review-645).
+CI retains candidates and active-PR inventories without failing valid builds on warnings.
+
+## Integrated Scout and construction acceptance (#551)
+
+The [maintained suite](../scripts/README.md#integrated-scout-and-construction-acceptance-551)
+combines production native routes for completed #538–#550 implementations and
+exact 0/50/99% cancellation/refund boundaries. Run runtime construction/offline,
+ship, persistence and workspace checks plus the suite and supplemental machinery
+and Archive drivers. Validate the Scout export with
+`python3 models/assets/ships/salimon-scout/validate.py`; retain current measured
+asset metrics without claiming pending hardware ceilings are approved. Coverage,
+original production images, state and platform limitations belong in the
+[completion report](../reports/issue-551/README.md). Human visual/audio review
+remains #561, physical devices/sleep/wake #557 and hardware budgets #563.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Bounded read-only pack queries (#414)
+
+See the [implemented contract](universe-reader.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Time-addressable ephemeris models (#415)
+
+See the [implemented contract](universe-ephemerides.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Dominant-source celestial gravity (#416)
+
+See the [implemented contract](universe-gravity.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Gravity-aware ship trajectory (#417)
+
+See the [implemented contract](universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.
+
+
+## Real-scale atmospheric drag (#419)
+
+See the [atmosphere contract](universe-atmosphere.md) for planet-specific density,
+co-rotating gas/wind, atomic online/offline drag integration and physically paid
+assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+
+## Navigation forecasts (#421)
+
+See the [bounded prediction contract](universe-navigation.md): `ship/src/prediction.rs` (split-coordinate coasting gravity) and `ship/src/preview.rs` (actual playable power/contact model), `runtime/src/session/navigation.rs` disposable cache, `app/scene.rs` / `automation/inspection.rs` observation mapping, and renderer `cockpit_instruments.rs`. Run ship/runtime navigation and renderer tests, all-target Clippy/fmt/docs, runner tests and `scenarios/evidence/universe-navigation.json` in production software-Vulkan. No autopilot, source-energy mutation, chart reveal or certified arrival/error bound is introduced.
+
+
+## Scanner contacts (#428)
+
+`client/universe/src/scanner.rs` owns bounded player discovery, exact sampled
+celestial states, three-hour freshness and durable encounter history. Unknown
+catalog entries are never revealed implicitly; batches validate before mutation.
+See the [scanner contract](universe-scanner.md) for ownership, clock semantics, tests and downstream integration.
+
+
+## Scanner delivery (#429)
+
+Universe `scanner/pulses.rs` owns fixed five-second cadence and analytical funded linear-path detection. Runtime `session/scanner.rs` composes ordinary Core funding after construction, samples current body-local state and exposes read-only automation. Unknown orbital phase/velocity is never invented; body-local and galactic observations cannot be mixed.
+See the [scanner contract](universe-scanner.md).
+
+
+## Scanner delivery (#431)
+
+Scanner contact checkpoints validate catalog revision, exact IDs/frames, timestamp ordering and bounds before atomic reconstruction. Runtime schema 25 saves canonical scanner parameters, clock/remainder and encounter history; legacy canonical saves migrate empty, current missing/malformed sources reject. Closed-app launch advances freshness once without inventing offline detections.
+See the [scanner contract](universe-scanner.md).
+
+
+## Scanner delivery (#430)
+
+Renderer `scanner_hologram.rs` owns bounded depth-tested ship-local 3D projection geometry; runtime `session/scanner/presentation.rs` maps only fresh same-frame discoveries to ship pose. The physical console projector shows logarithmic distance, true 3D direction/elevation and selected contacts. M cycles contacts only in an admitted canonical cockpit; power loss suppresses projection, not history.
+See the [scanner contract](universe-scanner.md).
+
+
+## Scanner delivery (#469)
+
+Universe `scanner/chart.rs` owns player-known observations, inferred/transmitted leads with explicit uncertainty, and immutable voluntary route annotations. Runtime `session/chart.rs` owns cockpit P/M/Enter controls and schema-26 pair validation with scanner history. Catalog truth never seeds the chart; observed knowledge outlives contact TTL and source frames are preserved without guessed transforms.
+See the [scanner contract](universe-scanner.md).
+
+
+## Geological surface materials (#613)
+
+Follow the [geological material contract](geological-materials.md) for terrain-bound
+profile mapping, immutable material cache keys, the 52-byte vertex layout,
+filtered stratification and original software-Vulkan evidence. Runtime owns
+geology-to-DTO mapping; renderer owns shading only. Vesper and resource palettes,
+physical queries, geometry and save identities are preserved.
+
+
+## Regional climate and weather (#615)
+
+Follow the [climate contract](planetary-climate.md) for immutable geology-bound climate inputs,
+strict versioned publication and stateless TT epoch queries. World owns pressure,
+temperature, coherent storm/cloud/precipitation metadata and body-fixed tangent wind;
+presentation cannot rewrite them. Vacuum has no airborne effects. Existing terrain,
+resource identities, saves and drag physics remain unchanged. Weather visuals are #616.
+
+
+## Active geological sources (#617)
+
+The [active geology contract](active-geology.md) owns explicit heat/mechanism inputs,
+stable terrain-bound sites, strict publication restore and shared-TT source levels.
+Spatial queries cannot create/rekey sources. Vacuum permits ballistic plumes and
+contact coupling, never atmospheric wind/sound. Source radii do not add colliders.
+
+
+## Rare biospheres and ecological regions (#618)
+
+Follow the [ecology contract](planetary-ecology.md) for independent fixed life decisions,
+geology/climate-bound potential, continuous realms and stable patch/grammar IDs.
+Suitability never grants life; observed bodies retain no procedural life claim
+and Vesper stays sterile. Strict catalog/save bindings reject incompatible
+publications. Organism meshes, physical instances and harvesting remain #619–#621.
+
+
+## Hybrid astronomical sky (#423)
+
+The [implemented sky contract](universe-sky.md) maps the universe source/streaming,
+runtime projection and renderer pass/test owners. Full ephemeris-frame adoption,
+full source coverage and human/hardware release qualification remain separate.
+
+
+## Optical atmosphere implementation (#614)
+
+See [planetary optical atmosphere](planetary-atmosphere.md) for source/test ownership,
+physical inputs, bounded depth-aware scattering and exact fixture/native limits.
+Clouds/weather presentation remains #616; human/hardware qualification is separate.
+
+
+## Coherent weather presentation (#616)
+
+[Implemented weather visuals](planetary-weather-visuals.md) route authoritative
+shared-time samples through runtime lighting and fixed production renderer
+fields. Acoustic integration remains #627 and hardware/human qualification separate.
+
+
+## Organism family presentation (#619)
+
+[Procedural organism families](planetary-organisms.md) map the world grammar,
+stable cosmetic surface tiles, runtime adapter and bounded renderer/test owners.
+Physical colliders/landing safety are #620; biological material response is #622.
+
+
+## Physical organisms and clearance (#620)
+
+[Physical organism placement](physical-organisms.md) owns stable source/part
+bindings, root/exclusion rules, common physics sweeps and live character/ship
+clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+## Scanner cloud integration (#438)
+
+Follow the [scanner acceptance contract](universe-scanner.md#cloud-scanner-acceptance-438)
+for the `scanner` evidence suite, exact charge/cadence/modal/persistence tests,
+viewport and simulated-DPI matrix, frozen GPU repeat/pixel review and retained
+qualification boundaries. Use production `--screenshot-command '["native"]'`;
+OS desktop images do not satisfy this GPU evidence check.
+
+## Biological material response (#622)
+
+Follow [organism materials](planetary-organisms.md#biological-materials-and-weather-response-622)
+for runtime source/weather mapping, renderer instance/shader layout, root/bounds
+regressions and opt-in production Vulkan reference captures. Verify workspace
+build/tests/Clippy/fmt, script and documentation checks. Human art review #561,
+physical platform #557 and hardware #563 remain separately unverified.
+
+## Geological landmarks (#623)
+
+[Landmark contract](planetary-landmarks.md) maps world publication/relief tests,
+actual runtime mesh/LOD export and production renderer reference checks. Run
+landmark/terrain tests, workspace gates and `universe-terrain.json` captures;
+source/site identity never comes from render LOD or player chart state.
+
+## Natural signature sites (#624)
+
+[Biological signatures](biological-signature-sites.md) maps world publication,
+rarity/mixed-source tests, runtime physical/render endpoint equality and opt-in
+source export to actual production Vulkan reference captures. Preserve source
+IDs, root/exclusion rules, true physical scale and explicit player discovery.
+
+
+## Suit observations (#625)
+
+See [suit measurements and field marks](suit-observations.md) for source/validation
+ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundaries.
+
+
+## Personal planetary chart (#626)
+
+[Planetary chart](planetary-chart.md) maps personal history, physical inspection,
+native text/keys, uncertainty presentation and schema-28 validation to owners/tests.
+
+
+## Planetary audio (#627)
+
+[Source and verification contract](planetary-audio.md): runtime `environment_audio.rs`
+feeds the existing native continuous mixer from local world definitions. Run its
+portable regressions, production callback export and native environment-audio scenario.
+
+
+## Biological harvesting (#621)
+
+[Source, frame, shape, transaction and schema contract](biological-harvesting.md).
+World `environment/harvest.rs` and `biological_session.rs` own source/mass rules;
+runtime `session/biology.rs` composes input, current anatomy and checkpoint restore.
+Run world/runtime harvest tests, full gates and both native biological scenarios.
+
+
+## Canonical render acceptance (#436)
+
+See the [cloud render acceptance contract](universe-terrain.md#cloud-integration-acceptance-436) for the required
+`universe-render` suite, native frozen/revisit pixel checks, canonical stitched
+seam tests and bounded raw frame/draw observations. Measurements remain
+observational; missing GPU counters stay null and software timings do not
+establish hardware FPS.
+
+## Combined planetary environment (#628)
+
+Use the [maintained environment matrix](../scripts/README.md#planetary-environment-matrix-628)
+for canonical day/night, orbit-to-ground/revisit, positive biological save/harvest,
+personal chart and sound verification plus repeated source exports and production
+GPU/PCM component captures. `planetary-environment` always selects evidence routes.
+Preserve its exact commands, original media and state/context/metric report;
+software timings and fictional positive fixtures have the limits stated there.

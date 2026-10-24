@@ -1,7 +1,8 @@
 //! Native physical-key translation and held control state.
 
+#[cfg(test)]
 use salimon_ship::ThrottleDirection;
-use salimon_world::{CameraCommand, CelestialBodyId};
+use salimon_world::CameraCommand;
 use winit::event::ElementState;
 use winit::keyboard::{KeyCode, PhysicalKey};
 
@@ -24,18 +25,6 @@ pub(super) fn terminal_restart_pressed(
             key,
             PhysicalKey::Code(KeyCode::KeyR | KeyCode::Enter | KeyCode::NumpadEnter)
         )
-}
-
-pub(super) fn toolbar_slot(key: PhysicalKey) -> Option<crate::equipment::ToolbarSlot> {
-    use crate::equipment::ToolbarSlot;
-    match key {
-        PhysicalKey::Code(KeyCode::Digit1) => Some(ToolbarSlot::One),
-        PhysicalKey::Code(KeyCode::Digit2) => Some(ToolbarSlot::Two),
-        PhysicalKey::Code(KeyCode::Digit3) => Some(ToolbarSlot::Three),
-        PhysicalKey::Code(KeyCode::Digit4) => Some(ToolbarSlot::Four),
-        PhysicalKey::Code(KeyCode::Digit5) => Some(ToolbarSlot::Five),
-        _ => None,
-    }
 }
 
 /// Automation deliberately bypasses desktop capture/focus, never gameplay/view
@@ -82,12 +71,9 @@ impl InputPolicy {
     }
 }
 
-pub(super) fn throttle_direction(key: PhysicalKey) -> Option<ThrottleDirection> {
-    match key {
-        PhysicalKey::Code(KeyCode::ArrowUp) => Some(ThrottleDirection::Up),
-        PhysicalKey::Code(KeyCode::ArrowDown) => Some(ThrottleDirection::Down),
-        _ => None,
-    }
+#[cfg(test)]
+fn throttle_direction(key: PhysicalKey) -> Option<ThrottleDirection> {
+    session_key(key).and_then(crate::session::input::keys::throttle_direction)
 }
 
 pub(super) fn camera_command(
@@ -99,244 +85,92 @@ pub(super) fn camera_command(
     if state != ElementState::Pressed || repeat {
         return None;
     }
-
-    if !precision_tour {
-        return None;
-    }
-
-    match key {
-        PhysicalKey::Code(KeyCode::KeyP) => Some(CameraCommand::TogglePause),
-        PhysicalKey::Code(KeyCode::KeyR) => Some(CameraCommand::Restart),
-        PhysicalKey::Code(KeyCode::KeyN) if precision_tour => Some(CameraCommand::JumpToNear),
-        PhysicalKey::Code(KeyCode::Digit1) => {
-            Some(CameraCommand::InspectBody(CelestialBodyId::Sun))
-        }
-        PhysicalKey::Code(KeyCode::Digit2) => {
-            Some(CameraCommand::InspectBody(CelestialBodyId::Mercury))
-        }
-        PhysicalKey::Code(KeyCode::Digit3) => {
-            Some(CameraCommand::InspectBody(CelestialBodyId::Venus))
-        }
-        PhysicalKey::Code(KeyCode::Digit4) => {
-            Some(CameraCommand::InspectBody(CelestialBodyId::Earth))
-        }
-        PhysicalKey::Code(KeyCode::Digit5) => {
-            Some(CameraCommand::InspectBody(CelestialBodyId::Moon))
-        }
-        PhysicalKey::Code(KeyCode::Digit6) => {
-            Some(CameraCommand::InspectBody(CelestialBodyId::Mars))
-        }
-        _ => None,
-    }
+    session_key(key)
+        .and_then(|key| crate::session::input::keys::camera_command(key, precision_tour))
 }
 
 /// Native key translation only; portable session owns command semantics.
-pub(super) fn control_key(key: PhysicalKey) -> Option<crate::session::ControlKey> {
-    use crate::session::ControlKey::*;
-    Some(match key {
-        PhysicalKey::Code(KeyCode::KeyW) => Forward,
-        PhysicalKey::Code(KeyCode::KeyS) => Backward,
-        PhysicalKey::Code(KeyCode::KeyA) => Left,
-        PhysicalKey::Code(KeyCode::KeyD) => Right,
-        PhysicalKey::Code(KeyCode::Space) => Jump,
-        PhysicalKey::Code(KeyCode::ShiftLeft) => Descend,
-        PhysicalKey::Code(KeyCode::ArrowLeft) => RollLeft,
-        PhysicalKey::Code(KeyCode::ArrowRight) => RollRight,
-        _ => return None,
-    })
-}
-
 pub(crate) fn dispatch_session_key(
     session: &mut crate::session::GameplaySession,
     key: PhysicalKey,
     pressed: bool,
 ) {
-    use crate::session::Command;
-    if pressed
-        && session.view_mode == crate::session::ViewMode::Gameplay
-        && !session.is_paused()
-        && !session.archive_reader.open
-        && !session.crafting_ui.open
-        && !session.wheel.open
-    {
-        use crate::session::construction::BuildAction as B;
-        let action = match key {
-            PhysicalKey::Code(KeyCode::KeyC) => Some(B::Toggle),
-            PhysicalKey::Code(KeyCode::Escape) if session.building.active => Some(B::Toggle),
-            PhysicalKey::Code(KeyCode::KeyR) if session.building.active => Some(B::Rotate),
-            PhysicalKey::Code(code) if session.building.active => match code {
-                KeyCode::Digit1 => Some(B::Select(0)),
-                KeyCode::Digit2 => Some(B::Select(1)),
-                KeyCode::Digit3 => Some(B::Select(2)),
-                KeyCode::Digit4 => Some(B::Select(3)),
-                KeyCode::Digit5 => Some(B::Select(4)),
-                KeyCode::Digit6 => Some(B::Select(5)),
-                KeyCode::Digit7 => Some(B::Select(6)),
-                _ => None,
-            },
-            _ => None,
-        };
-        if let Some(action) = action {
-            session.command(Command::Build(action));
-            return;
-        }
+    if let Some(key) = session_key(key) {
+        crate::session::input::dispatch(session, key, pressed);
     }
-    if pressed
-        && key == PhysicalKey::Code(KeyCode::Escape)
-        && session.view_mode == crate::session::ViewMode::Gameplay
-    {
-        session.command(Command::TogglePause);
-        return;
-    }
-    if session.is_paused() {
-        if pressed
-            && matches!(
-                key,
-                PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
-            )
-        {
-            session.command(Command::TogglePause);
-        }
-        return;
-    }
-    if session.archive_reader.open {
-        if pressed {
-            use crate::session::archive::ReaderAction as A;
-            let action = match key {
-                PhysicalKey::Code(KeyCode::KeyE) => Some(A::Close),
-                PhysicalKey::Code(KeyCode::KeyR) => Some(A::ToggleRecovery),
-                PhysicalKey::Code(KeyCode::ArrowUp | KeyCode::ArrowLeft) => Some(A::Previous),
-                PhysicalKey::Code(KeyCode::ArrowDown | KeyCode::ArrowRight | KeyCode::Tab) => {
-                    Some(A::Next)
-                }
-                _ => None,
-            };
-            if let Some(action) = action {
-                session.archive_action(action);
-            }
-        }
-        return;
-    }
-    if key == PhysicalKey::Code(KeyCode::KeyQ) {
-        session.command(Command::Wheel(
-            crate::session::consumable_wheel::WheelAction::Hold(pressed),
-        ));
-        return;
-    }
-    if pressed && key == PhysicalKey::Code(KeyCode::KeyT) {
-        session.command(Command::SkipTutorial);
-        return;
-    }
-    if session.wheel.open {
-        use crate::session::consumable_wheel::WheelAction as W;
-        let action = match (key, pressed) {
-            (PhysicalKey::Code(KeyCode::Tab | KeyCode::ArrowRight | KeyCode::ArrowDown), true) => {
-                Some(W::Next)
-            }
-            (PhysicalKey::Code(KeyCode::ArrowLeft | KeyCode::ArrowUp), true) => Some(W::Previous),
-            (PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter), true) => Some(W::Confirm),
-            (PhysicalKey::Code(KeyCode::Escape), true) => Some(W::Cancel),
-            (PhysicalKey::Code(KeyCode::F2), true) => {
-                session.command(Command::ToggleView);
-                return;
-            }
-            _ => None,
-        };
-        if let Some(action) = action {
-            session.command(Command::Wheel(action));
-        }
-        return;
-    }
-    if session.crafting_ui.open {
-        if pressed {
-            use crate::session::crafting_ui::CraftingAction as A;
-            let action = match key {
-                PhysicalKey::Code(KeyCode::Escape | KeyCode::KeyE) => Some(A::Close),
-                PhysicalKey::Code(KeyCode::ArrowUp) => Some(A::PreviousRecipe),
-                PhysicalKey::Code(KeyCode::ArrowDown) => Some(A::NextRecipe),
-                PhysicalKey::Code(KeyCode::ArrowLeft) => Some(A::Less),
-                PhysicalKey::Code(KeyCode::ArrowRight) => Some(A::More),
-                PhysicalKey::Code(KeyCode::Tab) => Some(A::NextJob),
-                PhysicalKey::Code(KeyCode::Delete) => Some(A::Cancel),
-                PhysicalKey::Code(KeyCode::Enter) => Some(A::Add),
-                _ => None,
-            };
-            if let Some(action) = action {
-                session.crafting_action(action);
-            }
-        }
-        return;
-    }
-    let command = if !pressed {
-        if let Some(control) = control_key(key) {
-            Some(Command::Control(control, false))
-        } else if let Some(direction) = throttle_direction(key) {
-            Some(Command::Throttle(direction, false))
-        } else if key == PhysicalKey::Code(KeyCode::KeyF) {
-            Some(Command::GrabDrop(false))
-        } else {
-            None
-        }
-    } else if key == PhysicalKey::Code(KeyCode::F2) {
-        Some(Command::ToggleView)
-    } else if session.view_mode != crate::session::ViewMode::Gameplay {
-        camera_command(ElementState::Pressed, false, key, true).map(Command::Camera)
-    } else if key == PhysicalKey::Code(KeyCode::KeyH) {
-        Some(Command::InspectVitals)
-    } else if key == PhysicalKey::Code(KeyCode::KeyE) {
-        Some(Command::Interact)
-    } else if key == PhysicalKey::Code(KeyCode::KeyB) {
-        Some(Command::ToggleEngines)
-    } else if key == PhysicalKey::Code(KeyCode::KeyL) {
-        Some(Command::Landing)
-    } else if let Some(camera) = camera_command(ElementState::Pressed, false, key, false) {
-        Some(Command::Camera(camera))
-    } else if let Some(direction) = throttle_direction(key) {
-        Some(Command::Throttle(direction, true))
-    } else if let Some(slot) = toolbar_slot(key) {
-        Some(Command::Select(slot))
-    } else if key == PhysicalKey::Code(KeyCode::KeyV) {
-        Some(Command::Finish(
-            crate::session::finishes::FinishAction::SelectGroup,
-        ))
-    } else if key == PhysicalKey::Code(KeyCode::KeyO) {
-        Some(Command::Finish(
-            crate::session::finishes::FinishAction::Next,
-        ))
-    } else if key == PhysicalKey::Code(KeyCode::KeyZ) {
-        Some(Command::Finish(
-            crate::session::finishes::FinishAction::Reset,
-        ))
-    } else if key == PhysicalKey::Code(KeyCode::KeyG) {
-        Some(Command::Mount(crate::session::mounts::MountAction::Place))
-    } else if key == PhysicalKey::Code(KeyCode::KeyX) {
-        Some(Command::Cabin(crate::session::cabin::CabinAction::Rest))
-    } else if key == PhysicalKey::Code(KeyCode::KeyU) {
-        Some(Command::Cabin(
-            crate::session::cabin::CabinAction::Restraint,
-        ))
-    } else if key == PhysicalKey::Code(KeyCode::KeyJ) {
-        Some(Command::Mount(
-            crate::session::mounts::MountAction::MoveAccessory,
-        ))
-    } else if key == PhysicalKey::Code(KeyCode::KeyK) {
-        Some(Command::Mount(
-            crate::session::mounts::MountAction::ToggleLock,
-        ))
-    } else if key == PhysicalKey::Code(KeyCode::KeyF) {
-        Some(Command::GrabDrop(true))
-    } else {
-        control_key(key).map(|key| Command::Control(key, true))
-    };
-    if let Some(command) = command {
-        session.command(command);
-    }
+}
+
+fn session_key(key: PhysicalKey) -> Option<crate::session::input::Key> {
+    use crate::session::input::Key;
+    Some(match key {
+        PhysicalKey::Code(KeyCode::KeyW) => Key::Forward,
+        PhysicalKey::Code(KeyCode::KeyS) => Key::Backward,
+        PhysicalKey::Code(KeyCode::KeyA) => Key::Left,
+        PhysicalKey::Code(KeyCode::KeyD) => Key::Right,
+        PhysicalKey::Code(KeyCode::Space) => Key::Jump,
+        PhysicalKey::Code(KeyCode::ShiftLeft) => Key::Descend,
+        PhysicalKey::Code(KeyCode::ArrowUp) => Key::Up,
+        PhysicalKey::Code(KeyCode::ArrowDown) => Key::Down,
+        PhysicalKey::Code(KeyCode::ArrowLeft) => Key::Previous,
+        PhysicalKey::Code(KeyCode::ArrowRight) => Key::Next,
+        PhysicalKey::Code(KeyCode::KeyC) => Key::Build,
+        PhysicalKey::Code(KeyCode::Escape) => Key::Cancel,
+        PhysicalKey::Code(KeyCode::KeyR) => Key::Recovery,
+        PhysicalKey::Code(KeyCode::KeyH) => Key::Status,
+        PhysicalKey::Code(KeyCode::KeyX) => Key::Rest,
+        PhysicalKey::Code(KeyCode::KeyG) => Key::Place,
+        PhysicalKey::Code(KeyCode::KeyT) => Key::Tutorial,
+        PhysicalKey::Code(KeyCode::Delete) => Key::Delete,
+        PhysicalKey::Code(KeyCode::Enter) => Key::Confirm,
+        PhysicalKey::Code(KeyCode::NumpadEnter) => Key::ConfirmAlternate,
+        PhysicalKey::Code(KeyCode::KeyE) => Key::Interact,
+        PhysicalKey::Code(KeyCode::Tab) => Key::Tab,
+        PhysicalKey::Code(KeyCode::KeyQ) => Key::Wheel,
+        PhysicalKey::Code(KeyCode::Backslash) => Key::SurfaceChart,
+        PhysicalKey::Code(KeyCode::Comma) => Key::SurfaceInspect,
+        PhysicalKey::Code(KeyCode::Backspace) => Key::NoteBackspace,
+        PhysicalKey::Code(KeyCode::F10) => Key::FieldSpot,
+        PhysicalKey::Code(KeyCode::F11) => Key::FieldBearing,
+        PhysicalKey::Code(KeyCode::F12) => Key::FieldPower,
+        PhysicalKey::Code(KeyCode::F2) => Key::View,
+        PhysicalKey::Code(KeyCode::F3) => Key::Diagnostics,
+        PhysicalKey::Code(KeyCode::F4) => Key::LightPreset,
+        PhysicalKey::Code(KeyCode::F5) => Key::LightMaster,
+        PhysicalKey::Code(KeyCode::F6) => Key::LightFixture,
+        PhysicalKey::Code(KeyCode::F7) => Key::LightBrightness,
+        PhysicalKey::Code(KeyCode::F8) => Key::LightWarmth,
+        PhysicalKey::Code(KeyCode::F9) => Key::LightGeneral,
+        PhysicalKey::Code(KeyCode::KeyB) => Key::Engines,
+        PhysicalKey::Code(KeyCode::KeyL) => Key::Landing,
+        PhysicalKey::Code(KeyCode::KeyI) => Key::CoreInput,
+        PhysicalKey::Code(KeyCode::KeyY) => Key::CoreApply,
+        PhysicalKey::Code(KeyCode::KeyN) => Key::CoreRecover,
+        PhysicalKey::Code(KeyCode::KeyV) => Key::FinishGroup,
+        PhysicalKey::Code(KeyCode::KeyO) => Key::FinishNext,
+        PhysicalKey::Code(KeyCode::KeyZ) => Key::FinishReset,
+        PhysicalKey::Code(KeyCode::KeyU) => Key::Restraint,
+        PhysicalKey::Code(KeyCode::KeyJ) => Key::MoveAccessory,
+        PhysicalKey::Code(KeyCode::KeyK) => Key::Secure,
+        PhysicalKey::Code(KeyCode::KeyF) => Key::GrabDrop,
+        PhysicalKey::Code(KeyCode::KeyP) => Key::TourPause,
+        PhysicalKey::Code(KeyCode::KeyM) => Key::ScannerNext,
+        PhysicalKey::Code(KeyCode::Digit1) => Key::Slot1,
+        PhysicalKey::Code(KeyCode::Digit2) => Key::Slot2,
+        PhysicalKey::Code(KeyCode::Digit3) => Key::Slot3,
+        PhysicalKey::Code(KeyCode::Digit4) => Key::Slot4,
+        PhysicalKey::Code(KeyCode::Digit5) => Key::Slot5,
+        PhysicalKey::Code(KeyCode::Digit6) => Key::Slot6,
+        PhysicalKey::Code(KeyCode::Digit7) => Key::Slot7,
+        _ => return None,
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use salimon_world::CameraCommand;
+    #[cfg(test)]
+    use salimon_world::CelestialBodyId;
     #[test]
     fn native_press_policy_rejects_capture_focus_tour_repeats_and_synthetic_replay() {
         let ready = InputPolicy {
@@ -528,7 +362,7 @@ mod crafting_tests {
         }
         assert!(s.crafting_text().unwrap().contains("QUEUE: 1 /"));
         dispatch_session_key(&mut s, PhysicalKey::Code(KeyCode::KeyW), true);
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement().forward);
         s.clear_held_controls();
         assert!(!s.crafting_ui.open);
     }
@@ -571,7 +405,7 @@ mod wheel_input_tests {
         for key in [KeyCode::KeyW, KeyCode::KeyE, KeyCode::KeyF, KeyCode::Digit1] {
             dispatch_session_key(&mut s, PhysicalKey::Code(key), true);
         }
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement().forward);
         assert!(s.equipment.selected().is_none());
         assert!(!s.crafting_ui.open);
         dispatch_session_key(&mut s, q, false);

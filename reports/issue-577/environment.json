@@ -1,7 +1,0 @@
-{
-  "rustc": "rustc 1.89.0 (29483883e 2025-08-04)",
-  "macos": "26.2",
-  "cpu": "Apple M1",
-  "base": "6782f78ddcfaa5f528c923576e19628d344aee5a",
-  "native": "production wgpu direct capture, 1280x800; explicit seeded 32 g sample; fixed-step protocol, not physical-key/headphone or FPS approval"
-}

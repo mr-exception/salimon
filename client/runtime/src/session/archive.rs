@@ -1,4 +1,5 @@
 //! Local Archive source and modal reader. Recovery and charting are separate owners.
+pub(super) mod save;
 use super::{GameplaySession, ViewMode};
 use salimon_persistence::{SaveError, Validate, invalid};
 
@@ -210,7 +211,8 @@ impl GameplaySession {
             record,
             self.recovery.panel(
                 self.recovery_reserve(),
-                self.ship.snapshot().energy_core.stored_joules
+                self.ship.snapshot().energy_core.stored_joules,
+                self.utility_recovery_multiplier()
             ),
             self.archive.read.len(),
             RECORDS.len()

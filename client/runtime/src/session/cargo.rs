@@ -1,4 +1,5 @@
 //! Internal cargo door composition; resource identity and motion remain world/physics owned.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_character::cargo::{cargo_door_bounds, sphere_overlaps_box};
 use salimon_persistence::{SaveError, Validate, invalid};
@@ -49,7 +50,7 @@ impl GameplaySession {
         !self.mining.session.fragments().iter().any(|p| {
             sphere_overlaps_box(
                 frame.world_to_local(p.transform().position().meters()),
-                salimon_world::resource_size::fragment_contact_radius_meters(p.material()),
+                p.contact_radius_meters(),
                 bounds,
             )
         })
@@ -78,6 +79,8 @@ impl GameplaySession {
         };
         if old != next && self.cargo_sweep_clear(old, next) {
             self.cargo_door.open_fraction = next;
+            self.surface_age
+                .travel(salimon_ship::surface_age::CARGO_FLOOR, old, next);
         } else if old != next {
             self.feedback = Some("Cargo door obstructed; reverse or clear belongings");
         }

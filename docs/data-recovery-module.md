@@ -14,7 +14,7 @@ batch requests reject before reserving ingredients; cancellation never refunds.
 [Recipe data](../client/fabrication/config/recovery-module.json) is validated through
 `RecipeBook`: 1 kg iron ore + 0.5 kg silicate rock, 60 seconds at 1 MW, output
 0.75 kg. These are explicit provisional implementation defaults, subject to owner
-balance review in [#537](https://github.com/mr-exception/salimon/issues/537).
+balance review in [#660](https://github.com/mr-exception/salimon/issues/660).
 They are not an approved progression balance. Existing 20 kg bins, physical raw
 mining/carry/intake, FIFO head, one tray, Core funding and no-refund rules apply.
 
@@ -51,8 +51,7 @@ Open Archive with normal aimed/inside/powered E interaction. Select a damaged
 record and press R to start/stop its job. One record runs at a time; switching
 retains both records' paid work. Stop/abort retains work and never refunds Core
 energy. Reading/closing the terminal does not stop a machine already running.
-Pause freezes simulation; closed-app recovery is zero. No retrospective work is
-credited at load. Future universe offline machinery remains #433.
+Pause freezes simulation. Verified schema-22 launch settles actual closed-game work and joules through [the common offline schedule](construction-offline.md). Future universe event production remains #433.
 
 The accessible text shows installation, working/stopped/reserve-limited status,
 requested MW, protected GJ, per-record percentage and remaining nominal work.
@@ -86,8 +85,11 @@ adds production native-window intake/craft/collect/walk/R captures and exact
 concurrent-funding, migration and Save Now/relaunch/restart regressions. Its
 declared initial materials do not measure acquisition or approve recipe/energy
 balance. Human presentation is #561, physical OS/input/DPI is #557, hardware
-budgets are #563, and route/balance decisions are #537 under the
+budgets are #563, and route/balance decisions are #660 under the
 [verification workflow](verification-workflow.md).
 See [runtime ownership](../client/runtime/architecture.md#data-recovery-module-468),
 [Fabricator ownership](../client/fabrication/architecture.md#recovery-controller-component-468)
 and [ship energy boundary](../client/ship/architecture.md#low-priority-data-recovery-energy-468).
+
+
+Closed-game power and eligible construction/maintenance now follow [the schema-22 offline contract](construction-offline.md). Native launch advances service/conversion, Fabricator/Recovery and eligible work while preserving the saved scene and active survival clock. Future universe/scanner/trajectory events remain #433.

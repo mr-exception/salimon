@@ -459,3 +459,10 @@ Modular interior presentation (#575): [contract](modular-interior-fixtures.md),
 [template source](../models/assets/fixtures/scout-interior-kit/README.md).
 Physical attachment/construction/damage/aging authority remains with their
 existing domain owners; this renderer layer consumes observations only.
+
+
+Exact contact stress (#592): physics `iteration_oracle.rs`, fixed-point response
+loops and shared `salimon-math` arithmetic inlining; runtime `sphere_workloads.rs`
+provides diagnostic terminal prefixes. Reproduce with the isolated historical
+fixture/report, never by reverting gameplay geometry or weakening sleep/contact
+rules. Hardware cadence/frame budgets remain #563 and physical checks #557.

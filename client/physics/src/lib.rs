@@ -983,6 +983,29 @@ impl ContactResponse {
     }
 }
 
+// A deterministic impulse iteration is redundant only after ALL its mutable
+// inputs are bit-identical. No tolerance, iteration-budget or contact change.
+#[derive(PartialEq, Eq)]
+struct ImpulseIterationState<const N: usize> {
+    motion: [[u64; 3]; N],
+    normal: u64,
+    friction: [u64; 3],
+    rolling: [u64; 3],
+}
+fn iteration_state<const N: usize>(
+    motion: [[f64; 3]; N],
+    impulses: &[f64],
+    friction: &[[f64; 3]],
+    rolling: [f64; 3],
+) -> Option<ImpulseIterationState<N>> {
+    (impulses.len() == 1).then(|| ImpulseIterationState {
+        motion: motion.map(|v| v.map(f64::to_bits)),
+        normal: impulses[0].to_bits(),
+        friction: friction[0].map(f64::to_bits),
+        rolling: rolling.map(f64::to_bits),
+    })
+}
+
 // A bounded contact torque models energy lost to rough-contact rolling/spin.
 // Its limit is 10% of normal impulse times bounding radius; no load means no drag.
 fn rolling_delta(
@@ -1133,6 +1156,12 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
         // Positive-only corner impulses otherwise eject and rock resting faces.
         let friction_impulses = &mut response.friction;
         for _ in 0..16 {
+            let before = iteration_state(
+                [piece.velocity, piece.angular_velocity],
+                normal_impulses,
+                friction_impulses,
+                response.rolling,
+            );
             for (index, &arm) in arms.iter().enumerate() {
                 let approach = dot(add(piece.velocity, cross(piece.angular_velocity, arm)), up);
                 let denominator = 1.0 / piece.mass_kg
@@ -1166,6 +1195,17 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
                 piece.angular_velocity,
                 scale(torque, inverse_inertia(piece)),
             );
+            if before.is_some()
+                && before
+                    == iteration_state(
+                        [piece.velocity, piece.angular_velocity],
+                        normal_impulses,
+                        friction_impulses,
+                        response.rolling,
+                    )
+            {
+                break;
+            }
         }
     }
 }
@@ -1275,6 +1315,17 @@ fn pair_impulse_cached(
             let impulses = &mut response.impulses;
             let friction_impulses = &mut response.friction;
             for _ in 0..16 {
+                let before = iteration_state(
+                    [
+                        a.velocity,
+                        a.angular_velocity,
+                        b.velocity,
+                        b.angular_velocity,
+                    ],
+                    impulses,
+                    friction_impulses,
+                    response.rolling,
+                );
                 for (i, &(aa, ba)) in arms.iter().enumerate() {
                     let denominator = inverse_mass_a
                         + inverse_mass_b
@@ -1314,6 +1365,22 @@ fn pair_impulse_cached(
                 );
                 a.angular_velocity = sub(a.angular_velocity, scale(torque, inertia_a));
                 b.angular_velocity = add(b.angular_velocity, scale(torque, inertia_b));
+                if before.is_some()
+                    && before
+                        == iteration_state(
+                            [
+                                a.velocity,
+                                a.angular_velocity,
+                                b.velocity,
+                                b.angular_velocity,
+                            ],
+                            impulses,
+                            friction_impulses,
+                            response.rolling,
+                        )
+                {
+                    break;
+                }
             }
             return;
         }
@@ -1788,3 +1855,7 @@ mod terrain_tests {
         assert!(sampled_contact(&p).unwrap().penetration.abs() < 0.001);
     }
 }
+
+#[cfg(test)]
+#[path = "iteration_oracle.rs"]
+mod iteration_oracle;

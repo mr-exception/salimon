@@ -45,6 +45,8 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) audio_epoch: u64,
+    pub(crate) mount_audio: (u64, [f64; 3]),
     pub(crate) lighting: salimon_ship::lighting::Lighting,
     pub(crate) core_upgrades: salimon_ship::core_upgrades::CoreUpgrades,
     pub(crate) finishes: salimon_ship::finishes::Finishes,
@@ -109,6 +111,8 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            audio_epoch: 0,
+            mount_audio: (0, [0.; 3]),
             lighting: Default::default(),
             core_upgrades: Default::default(),
             finishes: Default::default(),

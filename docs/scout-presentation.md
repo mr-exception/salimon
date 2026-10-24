@@ -76,10 +76,11 @@ join the same output rather than a second OS player.
 
 `native_audio.rs` uses maintained [CPAL 0.18.2](https://docs.rs/cpal/0.18.2/cpal/)
 (CoreAudio, WASAPI, ALSA defaults) for one continuous default-device stream.
-`native_audio/mix.rs` owns deterministic original sample synthesis. Six loop
-slots, four ship transient slots and three survival slots bound the mix to 13
-voices, with no pending audio queue. Repeated event counters coalesce to the
-latest event; alerts and footsteps retain the existing four-event input bound.
+`native_audio/mix.rs` owns deterministic original sample synthesis. Thirteen loop
+slots, eleven ship transient slots and three survival slots bound the callback
+to 27 voices. Runtime admits at most 24 scene voices and 12 pending events;
+repeated callback event counters coalesce to the latest event. Physical partitions
+and tactile mechanism channels follow [the acoustics contract](scout-acoustics.md).
 Gain/pan converge over 10 ms without chunk-boundary fades. Low-pass procedural
 noise and smooth saturation preserve headroom; no downloaded media is used.
 Original survival timbre/envelope/relative level remain observational.
@@ -244,3 +245,8 @@ default M1 profile remains strict. Frozen fixture intervals are not normal-play
 FPS. Actual hardware GPU counters/budgets remain #563, physical platform checks
 #557 and original-image/mood/projection/baseline approval #561. Existing1920/M1
 and Blender mood originals remain separate dated corpora.
+
+
+## Tactile audio and physical partitions (#583)
+
+The [maintained acoustics contract](scout-acoustics.md) describes actual mechanism/attachment events, finite cargo/privacy separation, differentiated floor contact and bounded continuous CPAL filtering. E2E mapping stays silent; actual output captures and human listening remain separately identified.

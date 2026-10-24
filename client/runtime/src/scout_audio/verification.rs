@@ -261,6 +261,7 @@ fn cloud_audio_evidence_485() {
             root.join(format!("{name}.wav")),
             synth::wav(
                 &[Voice {
+                    filter: 1.,
                     cue: Cue::Core,
                     gain: 0.2,
                     pan,

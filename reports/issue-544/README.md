@@ -70,3 +70,14 @@ The final source replaces issue numbers in the unavailable-installation UI messa
 with plain product text; final focused tests/Clippy include that wording change.
 The retained graphical binary and context predate only that wording/test change,
 which does not affect the captured stool route.
+
+## PR CI correction
+
+The initial Source build run failed its documentation impact gate because
+`client/persistence/src/lib.rs` bumped the envelope schema without updating that
+crate's owning guide. The earlier impact check ran before commit; its three-dot
+Git comparison therefore omitted the uncommitted changes and was insufficient.
+Added the persistence schema-17 maintenance/migration guidance. Reproduced the
+failure against base `36d269a85495337c2b5ed731dfcf37d5112482e9`, then reran the
+same base comparison after committing the correction. This correction changes
+only documentation; the prior code/build/graphical results retain their scope.

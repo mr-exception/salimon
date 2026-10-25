@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 9).
+`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 18).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -102,7 +102,7 @@ Room and fixture lights #580: [canonical controls, source, effective output and 
 
 ## Automatic construction schema 17 (#544)
 
-`SCHEMA_VERSION` is 17 for whole-session captures. Runtime owns the construction
+Schema 17 introduced paid construction; current captures use schema 18 for completed structure and partition edits. Runtime owns the construction
 payload and explicit migration: legacy schema-15/16 material progress retains its
 ppm precision; schema 17 also validates paid elapsed nanoseconds, project damage
 and one-time completion. Historical envelopes must reject these new work fields.
@@ -110,3 +110,8 @@ Restore never credits elapsed work or spends Core energy. The independent univer
 envelope remains version 1 and durable two-slot publication is unchanged. See the
 [construction save and verification contract](../../docs/construction-progress.md#save-and-verification)
 and runtime construction tests for atomic rejection and exact continuation.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.

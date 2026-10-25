@@ -228,10 +228,9 @@ pub(crate) fn release_pose(
         .find(|piece| piece.id() == id)
         .filter(|piece| {
             player.location != CharacterLocation::InsideShip
-                || salimon_character::cargo::cargo_position_allowed(
+                || tool.cargo_allowed(
                     frame.world_to_local(piece.transform().position().meters()),
                     salimon_world::resource_size::fragment_contact_radius_meters(piece.material()),
-                    if tool.cargo_door_blocking { 0.0 } else { 1.0 },
                 )
         })
         .map(|piece| piece.transform())
@@ -282,9 +281,9 @@ pub(crate) fn sync_ship_mass(
         events += 1;
         let mass = fragment
             .filter(|p| {
-                salimon_character::ship_contains_object(
-                    frame.world_to_local(p.transform().position().meters()),
-                )
+                let local = frame.world_to_local(p.transform().position().meters());
+                salimon_character::ship_contains_object(local)
+                    || tool.modular_interior.contains(local)
             })
             .map(|p| p.material().mass_kg());
         tool.ship_mass
@@ -294,9 +293,8 @@ pub(crate) fn sync_ship_mass(
     if frame_changed {
         for piece in tool.session.fragments() {
             events += 1;
-            let onboard = salimon_character::ship_contains_object(
-                frame.world_to_local(piece.transform().position().meters()),
-            );
+            let onboard =
+                tool.contains_ship(frame.world_to_local(piece.transform().position().meters()));
             tool.ship_mass
                 .update(
                     salimon_ship::MassObjectId::Fragment(piece.id().0),

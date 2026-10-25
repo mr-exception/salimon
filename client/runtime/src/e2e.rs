@@ -13,6 +13,7 @@ pub(crate) enum Scenario {
     LandedEarth,
     ConstructionMaterials,
     ConstructionBuild,
+    ConstructionRoom,
     ScoutLighting,
     ScoutLightingShutter,
     ScoutLightingBlackout,
@@ -67,6 +68,7 @@ impl Scenario {
             "scout-lighting-dark" => Ok(Self::ScoutLightingDark),
             "construction-materials" => Ok(Self::ConstructionMaterials),
             "construction-build" => Ok(Self::ConstructionBuild),
+            "construction-room" => Ok(Self::ConstructionRoom),
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
             "scout-cabin-table" => Ok(Self::ScoutCabinTable),
@@ -120,6 +122,7 @@ impl Scenario {
             Self::ScoutLightingDark => "scout-lighting-dark",
             Self::ConstructionMaterials => "construction-materials",
             Self::ConstructionBuild => "construction-build",
+            Self::ConstructionRoom => "construction-room",
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
             Self::ScoutCabinTable => "scout-cabin-table",
@@ -312,6 +315,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
             }
         }
 
+        Scenario::ConstructionRoom => crate::session::construction::evidence_room(app)?,
         Scenario::ConstructionMaterials | Scenario::ConstructionBuild => {
             crate::session::construction::evidence_initial_conditions(
                 app,

@@ -1,4 +1,8 @@
 //! Compose blueprint authority with current ship, player and physical cargo.
+mod boarding;
+mod doors;
+mod evidence;
+mod installed;
 mod work;
 use super::{GameplaySession, frames::character_ship_frame};
 use salimon_character::{CharacterLocation, SHIP_FLOOR_HEIGHT_METERS};
@@ -30,28 +34,51 @@ pub(crate) enum BuildAction {
     Rotate,
     Place,
     Cancel,
+    RemovePartition,
 }
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ConstructionSave {
     pub(crate) projects: Placements,
+    #[serde(default)]
+    pub(crate) removed_partitions: Vec<salimon_ship::structure::shell::PartitionEdit>,
+    #[serde(default)]
+    pub(crate) open_doors: Vec<PlaceholderId>,
 }
 impl salimon_persistence::Validate for ConstructionSave {
     fn validate(&self) -> Result<(), salimon_persistence::SaveError> {
         self.projects
             .validate_save()
             .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
-        let structure = starter_structure();
-        for job in self.projects.jobs() {
-            if job.owner != OWNER
-                || job.origin_meters != ORIGIN
-                || registered_catalog().find(&job.blueprint.id).ok() != Some(&job.blueprint)
+        let structure = self
+            .structure(None)
+            .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+        let mut door_ids = std::collections::BTreeSet::new();
+        for id in &self.open_doors {
+            if !door_ids.insert(*id)
+                || self
+                    .projects
+                    .inspect(*id)
+                    .is_none_or(|p| !p.work.completed || p.blueprint.id != "internal-door")
             {
+                return Err(salimon_persistence::invalid("invalid completed door state"));
+            }
+        }
+        for job in self.projects.jobs() {
+            if job.owner != OWNER || job.origin_meters != ORIGIN || !matches_catalog(job) {
                 return Err(salimon_persistence::invalid(
                     "construction project catalog/owner/origin mismatch",
                 ));
             }
-            let obstacles = static_obstacles(job.blueprint.footprint);
+            let mut obstacles = static_obstacles(job.blueprint.footprint);
+            if job.blueprint.footprint == Footprint::Interior {
+                obstacles.extend(structure.parts().filter(|p| p.id.0 >= 1024).flat_map(|p| {
+                    p.collision.iter().map(|b| Obstacle {
+                        kind: ObstacleKind::Installed,
+                        space: *b,
+                    })
+                }));
+            }
             let context = PlacementContext {
                 actor: OWNER,
                 owner: OWNER,
@@ -59,12 +86,26 @@ impl salimon_persistence::Validate for ConstructionSave {
                 eye_meters: job.anchor_meters,
                 reach_meters: REACH_METERS,
                 reachable: true,
-                physical_support: has_physical_support(job.blueprint.footprint, job.space),
+                physical_support: has_physical_support(job.blueprint.footprint, job.space)
+                    || (job.blueprint.footprint == Footprint::Interior
+                        && installed::supported_by(&structure, job.space)),
                 obstacles: &obstacles,
             };
-            self.projects
-                .validate_completion(job.id, &structure, &context)
-                .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+            if job.work.completed && installed::structural(job) {
+                if obstacles.iter().any(|o| {
+                    (0..3).all(|i| {
+                        job.space.min[i] < o.space.max[i] && job.space.max[i] > o.space.min[i]
+                    })
+                }) {
+                    return Err(salimon_persistence::invalid(
+                        "completed structure overlaps authored geometry",
+                    ));
+                }
+            } else {
+                self.projects
+                    .validate_completion(job.id, &structure, &context)
+                    .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+            }
         }
         Ok(())
     }
@@ -75,7 +116,7 @@ pub(crate) struct Building {
     rotation: Rotation,
     pub(crate) source: ConstructionSave,
     catalog: Catalog,
-    structure: ShipStructure,
+    pub(super) structure: ShipStructure,
     pub(crate) running: Option<[f64; 3]>,
 }
 fn starter_structure() -> ShipStructure {
@@ -132,8 +173,12 @@ impl Building {
         source: ConstructionSave,
     ) -> Result<Self, salimon_persistence::SaveError> {
         salimon_persistence::Validate::validate(&source)?;
+        let structure = source
+            .structure(None)
+            .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
         Ok(Self {
             source,
+            structure,
             ..Default::default()
         })
     }
@@ -250,6 +295,16 @@ impl GameplaySession {
             self.feedback = Some("Aim at a reachable placeholder");
             return;
         };
+        if self
+            .building
+            .source
+            .projects
+            .inspect(id)
+            .is_some_and(|p| p.work.completed && p.blueprint.id == "internal-door")
+        {
+            self.toggle_completed_door(id);
+            return;
+        }
         let approved = self.building.catalog.approved_economy;
         let Ok(p) = self.building.source.projects.funding_mut(id, OWNER) else {
             return;
@@ -420,7 +475,15 @@ impl GameplaySession {
         // Interior ground-mounted prototypes target the real deck, not eye height.
         let blueprint = &self.building.catalog.blueprints[self.building.selected];
         if blueprint.footprint == Footprint::Interior {
-            target[1] = SHIP_FLOOR_HEIGHT_METERS;
+            target[1] = self
+                .mining
+                .modular_interior
+                .support(
+                    target,
+                    0.01,
+                    eye[1] - salimon_character::PLAYER_EYE_HEIGHT_METERS + 0.21,
+                )
+                .unwrap_or(SHIP_FLOOR_HEIGHT_METERS);
         }
         let obstacles = self.construction_obstacles(blueprint.footprint);
         let flight = if matches!(
@@ -471,15 +534,24 @@ impl GameplaySession {
                 },
             )
             .ok();
-        let physical_support = preliminary
-            .as_ref()
-            .is_some_and(|p| has_physical_support(b.footprint, p.space));
+        let physical_support = preliminary.as_ref().is_some_and(|p| {
+            if b.footprint == Footprint::Structural {
+                self.structural_support(p.space)
+            } else {
+                has_physical_support(b.footprint, p.space)
+            }
+        });
         let reachable = salimon_character::ship_sight_obstruction(
             eye,
             target,
             super::door_passable(self.ship.snapshot()),
         )
-        .is_none_or(|hit| hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye)));
+        .is_none_or(|hit| hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye)))
+            && self.construction_solids().iter().all(|b| {
+                salimon_character::cargo::box_sight_obstruction(eye, target, *b).is_none_or(|hit| {
+                    hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye))
+                })
+            });
         PlacementContext {
             actor: if authorized { OWNER } else { 0 },
             owner: OWNER,
@@ -503,6 +575,7 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
+            .filter(|p| !(p.work.completed && installed::structural(p)))
             .filter_map(|p| ray_distance(eye, direction, p.space).map(|distance| (p.id, distance)))
             .filter(|(_, distance)| {
                 let target = salimon_math::add(
@@ -515,6 +588,10 @@ impl GameplaySession {
                     super::door_passable(snapshot.ship),
                 )
                 .is_none_or(|hit| hit + 0.02 >= *distance)
+                    && self.construction_solids().iter().all(|b| {
+                        ray_distance(eye, direction, envelope(*b))
+                            .is_none_or(|hit| hit + 0.02 >= *distance)
+                    })
             })
             .min_by(|a, b| a.1.total_cmp(&b.1))
             .map(|p| p.0)
@@ -548,7 +625,7 @@ impl GameplaySession {
             self.feedback = Some("Get up before placing construction projects");
             return;
         }
-        if matches!(action, BuildAction::Place)
+        if matches!(action, BuildAction::Place | BuildAction::RemovePartition)
             && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
         {
             return;
@@ -591,6 +668,10 @@ impl GameplaySession {
         let (eye, target, obstacles, flight, authorized) = self.construction_inputs();
         if !authorized {
             self.feedback = Some("Leave cockpit control to place or cancel a blueprint");
+            return;
+        }
+        if matches!(action, BuildAction::RemovePartition) {
+            self.remove_partition();
             return;
         }
         if matches!(action, BuildAction::Cancel) {
@@ -642,7 +723,11 @@ impl GameplaySession {
             .join(" / ");
         let status = if let Some(job) = hovered {
             if job.work.completed {
-                "COMPLETED".to_string()
+                if job.blueprint.id == "internal-door" {
+                    "COMPLETED | E open/close".to_string()
+                } else {
+                    "COMPLETED".to_string()
+                }
             } else if job.funding.funded(&job.blueprint.requirements) {
                 format!(
                     "{} | {:.1}%",
@@ -657,7 +742,7 @@ impl GameplaySession {
                 .map_or_else(|| "CLEAR".to_string(), |e| format!("{e:?}"))
         };
         Some(format!(
-            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | C close",
+            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | Delete partition | C close",
             hovered.map_or_else(
                 || blueprint.name.clone(),
                 |job| format!("Project #{} {}", job.id.0, blueprint.name)
@@ -670,7 +755,7 @@ impl GameplaySession {
 
     pub(crate) fn construction_inspect(&self) -> serde_json::Value {
         let preview = self.construction_preview();
-        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
+        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"structure":self.building.structure.save_state(),"volumes":self.structural_volumes(),"solids":self.structural_solids(),"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
     }
     pub(crate) fn construction_boxes(&self) -> Vec<(Envelope, [f32; 4])> {
         let mut boxes: Vec<_> = self
@@ -712,6 +797,8 @@ impl GameplaySession {
     }
 }
 
+#[cfg(test)]
+mod room_tests;
 #[cfg(test)]
 mod tests;
 
@@ -772,3 +859,29 @@ pub(crate) fn evidence_initial_conditions(
     s.sync_carried();
     Ok(())
 }
+
+pub(super) fn is_structural(p: &Placeholder) -> bool {
+    installed::structural(p)
+}
+
+fn matches_catalog(job: &Placeholder) -> bool {
+    let Ok(current) = registered_catalog().find(&job.blueprint.id) else {
+        return false;
+    };
+    if current == &job.blueprint {
+        return true;
+    }
+    // Preserve pre-18 two-cell reservations and receipts verbatim. Their unsafe
+    // narrow staircase footprint cannot complete; cancel/replan rather than
+    // silently enlarging an already reserved volume or changing its price.
+    if job.blueprint.id == "two-deck-room" && !job.work.completed {
+        let mut legacy = current.clone();
+        legacy.cells = vec![Cell::new(0, 0, 0), Cell::new(0, 1, 0)];
+        legacy.space.max[0] = 3.;
+        return legacy == job.blueprint;
+    }
+    false
+}
+
+pub(in crate::session) use boarding::boarding_exit;
+pub(crate) use evidence::evidence_room;

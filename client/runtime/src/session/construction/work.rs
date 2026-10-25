@@ -1,10 +1,16 @@
-//! Active-clock construction adapter and simple interior completion. Complex
-//! structural/module installation remains with #545/#547, never a solid box room.
+//! Active-clock paid work and atomic structural/interior completion.
+//! Module commissioning remains with #547.
 use super::*;
 use std::time::Duration;
 
 pub(super) fn supports_completion(p: &Placeholder) -> bool {
-    matches!(p.blueprint.id.as_str(), "stool" | "partition")
+    if p.blueprint.id == "two-deck-room" && p.cells.len() < 4 {
+        return false;
+    }
+    matches!(
+        p.blueprint.id.as_str(),
+        "stool" | "partition" | "internal-door" | "hull-cell" | "deck-cell" | "two-deck-room"
+    )
 }
 fn watts(p: &Placeholder) -> f64 {
     static POWER: std::sync::OnceLock<std::collections::BTreeMap<String, f64>> =
@@ -44,7 +50,12 @@ impl GameplaySession {
                 eye_meters: p.anchor_meters,
                 reach_meters: REACH_METERS,
                 reachable: true,
-                physical_support: has_physical_support(p.blueprint.footprint, p.space),
+                physical_support: if installed::structural(p) {
+                    self.structural_support(p.space)
+                } else {
+                    has_physical_support(p.blueprint.footprint, p.space)
+                        || installed::supported_by(&self.building.structure, p.space)
+                },
                 obstacles: &obstacles,
             },
         )
@@ -65,6 +76,17 @@ impl GameplaySession {
         if !supports_completion(p) && p.work.remaining(&p.funding, &p.blueprint).as_nanos() <= 1_000
         {
             return "PAUSED - installation unavailable".into();
+        }
+        if installed::structural(p)
+            && supports_completion(p)
+            && p.work.remaining(&p.funding, &p.blueprint) <= Duration::from_secs(1)
+            && self
+                .building
+                .source
+                .structure(Some(p.id))
+                .is_ok_and(|next| !self.installation_clear(&next))
+        {
+            return "PAUSED - final doorway or boarding clearance".into();
         }
         if self.ship.snapshot().energy_core.stored_joules as f64 <= self.recovery_reserve() {
             return "PAUSED - Core reserve".into();
@@ -107,6 +129,16 @@ impl GameplaySession {
             if nanos == 0 {
                 continue;
             }
+            // Stage the entire physical installation before the final joule.
+            let installation = if installed::structural(p) && nanos == remaining {
+                match self.building.source.structure(Some(id)) {
+                    Ok(next) if self.installation_clear(&next) => Some(next),
+                    Ok(_) => continue,
+                    Err(_) => continue,
+                }
+            } else {
+                None
+            };
             let power = watts(p);
             let center = std::array::from_fn(|i| (p.space.min[i] + p.space.max[i]) / 2.);
             let requested = nanos as f64 / 1e9 * power;
@@ -131,14 +163,20 @@ impl GameplaySession {
             p.work
                 .advance(&mut p.funding, &p.blueprint, Duration::from_nanos(paid))
                 .expect("validated paid progress");
+            if p.work.completed
+                && let Some(next) = installation
+            {
+                self.building.structure = next;
+            }
             self.building.running = Some(center);
         }
+        self.sync_fabricator_mass();
         self.sync_mount_collision();
     }
     /// One physical geometry definition feeds both rendering and collision. No
     /// preview, partial build, or complex unimplemented room becomes solid.
     pub(crate) fn construction_solids(&self) -> Vec<[f64; 6]> {
-        let mut out = Vec::new();
+        let mut out = self.structural_solids();
         for p in self
             .building
             .source
@@ -168,6 +206,11 @@ impl GameplaySession {
                         ]);
                     }
                 }
+            } else if p.blueprint.id == "internal-door" {
+                out.extend(doors::door_solids(
+                    p,
+                    self.building.source.open_doors.contains(&p.id),
+                ));
             } else if p.blueprint.id == "partition" {
                 out.push([s.min[0], s.max[0], s.min[1], s.max[1], s.min[2], s.max[2]]);
             }
@@ -176,10 +219,19 @@ impl GameplaySession {
     }
     pub(super) fn construction_obstacles(&self, footprint: Footprint) -> Vec<Obstacle> {
         let mut out = static_obstacles(footprint);
-        let bounds = self
-            .cabin_solids()
-            .into_iter()
-            .chain(self.construction_solids());
+        let movable = if footprint == Footprint::Structural {
+            boarding::boarding_solids(
+                &self.building.structure,
+                crate::session::door_passable(self.ship.snapshot()),
+            )
+        } else {
+            Vec::new()
+        };
+        let bounds = self.cabin_solids().into_iter().chain(
+            self.construction_solids()
+                .into_iter()
+                .filter(|b| !movable.contains(b)),
+        );
         out.extend(bounds.map(|b| Obstacle {
             kind: ObstacleKind::Installed,
             space: envelope(b),

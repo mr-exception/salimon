@@ -628,7 +628,7 @@ The owner-authorized capacity tiers, exact receipt accounting, separate fuel/mat
 
 ## Construction material ownership (#543)
 
-See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Timed work and completed geometry remain #544/#545.
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Paid work and completed geometry follow [construction progress](construction-progress.md) and [modular structure](modular-construction.md).
 
 
 ## Room and fixture lighting (#580)
@@ -644,3 +644,8 @@ The [maintained acoustics contract](scout-acoustics.md) describes actual mechani
 ## Automatic construction (#544)
 
 See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.

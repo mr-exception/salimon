@@ -164,6 +164,9 @@ pub(crate) fn dispatch_session_key(
             PhysicalKey::Code(KeyCode::KeyC) => Some(B::Toggle),
             PhysicalKey::Code(KeyCode::Escape) if session.building.active => Some(B::Toggle),
             PhysicalKey::Code(KeyCode::KeyR) if session.building.active => Some(B::Rotate),
+            PhysicalKey::Code(KeyCode::Delete) if session.building.active => {
+                Some(B::RemovePartition)
+            }
             PhysicalKey::Code(code) if session.building.active => match code {
                 KeyCode::Digit1 => Some(B::Select(0)),
                 KeyCode::Digit2 => Some(B::Select(1)),

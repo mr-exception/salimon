@@ -118,6 +118,17 @@ impl CharacterController {
         if local[0] != before_appendages[0] || local[2] != before_appendages[2] {
             world = surface_eye_at_ship_planar_position(local, ship, surface);
         }
+        let modular = self.sweep_modular_exterior(previous, local);
+        if modular != local {
+            if modular[1] != local[1] {
+                self.vertical_speed = 0.;
+            }
+            local = modular;
+            world = ship.local_to_world(local);
+        }
+        if self.enter_modular_stairs(previous, local) {
+            return;
+        }
         let tip = crate::ramp::tip_x();
         let moving_into_ship = dot(tangent, ship.axes[0]) > 1.0e-6;
         let approaching_tip = previous[0] <= tip + world_round_trip_tolerance(world)
@@ -125,7 +136,7 @@ impl CharacterController {
             && previous[2].abs() <= crate::ramp::side_limit()
             && local[2].abs() <= crate::ramp::side_limit()
             && (local[1] - PLAYER_EYE_HEIGHT_METERS - crate::ramp::floor_at(tip)).abs() < 0.3;
-        if doorway_passable && approaching_tip && moving_into_ship {
+        if !self.modular.aft_port && doorway_passable && approaching_tip && moving_into_ship {
             local[1] = crate::ramp::floor_at(local[0]) + PLAYER_EYE_HEIGHT_METERS;
             self.position = PositionState::Doorway {
                 world: ship.local_to_world(local),

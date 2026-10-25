@@ -42,14 +42,13 @@ collision, placement and cabin-motion clearance. Unfinished work has no collider
 Completed source survives save/load; it cannot be cancelled as unfinished work.
 Safe dismantling/damage is separate #549 work, not a refund shortcut.
 
-Complex doors, structural hull/deck/multi-deck rooms and utility modules retain
-#545/#547 physical installation/commissioning ownership. Their paid timer stops
-one microsecond before completion, remains cancellable with the existing refund
-rule, spends no more energy at that boundary and explicitly reports installation
-pending. No room becomes a solid box, no fake module becomes operational and no
-unsupported project is marked complete. #545/#547 must replace this boundary with
-their preflight/commit adapter before those types can complete. This transfer is
-part of #544 delivery, not a claim those downstream tickets are finished.
+Structural hull/deck cells and four-cell/two-deck rooms now complete through the
+[modular structure adapter](modular-construction.md). Its final graph/connector
+clearance preflight precedes the last paid interval. Internal doors also complete into manual, saved pocket doorways with
+occupancy-gated closure. Utility modules retain the unavailable-installation
+boundary under #547. Legacy two-cell room reservations remain cancellable but cannot
+complete into an unsafe stair footprint. These unsupported types stop one
+microsecond before completion, spend no more energy there and never become solid.
 
 Hollow amber edges reveal upward from paid progress; completed simple geometry
 replaces them atomically. The builder shows percent and explicit pause reason.

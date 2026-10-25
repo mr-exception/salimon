@@ -127,7 +127,7 @@ pub(super) fn map_world_to_renderer(
     (camera, instances, spheres, light)
 }
 
-/// Map paid-progress edges and completed simple furnishings into the ordinary
+/// Map paid-progress edges and completed shared structural/furnishing solids into the ordinary
 /// oriented instance pass. Session-owned solids also feed physical collision.
 pub(super) fn construction_wireframes(
     session: &crate::session::GameplaySession,
@@ -136,6 +136,24 @@ pub(super) fn construction_wireframes(
 ) -> Vec<SceneInstance> {
     let mut result = Vec::new();
     for b in session.construction_solids() {
+        // Material bands reveal shared physical deck/panel/tread geometry even
+        // inside an unlit prototype room. Color does not grant collision.
+        let height = b[3] - b[2];
+        let color = if b[0] >= -7.04 {
+            [0.32, 0.36, 0.39, 1.]
+        } else if height > 0.12 && height < 0.22 && b[1] - b[0] < 0.16 && b[5] - b[4] < 0.16 {
+            [0.75, 0.48, 0.18, 1.]
+        } else if height <= 0.111 {
+            if (b[3] - salimon_character::SHIP_FLOOR_HEIGHT_METERS).rem_euclid(3.) < 0.01 {
+                [0.10, 0.14, 0.18, 1.]
+            } else {
+                [0.30, 0.36, 0.39, 1.]
+            }
+        } else if b[1] - b[0] < 0.32 && b[5] - b[4] > 0.9 && height < 3.01 {
+            [0.38, 0.30, 0.20, 1.]
+        } else {
+            [0.15, 0.20, 0.24, 1.]
+        };
         result.push(SceneInstance {
             center_meters: frame.local_to_world([
                 (b[0] + b[1]) / 2.,
@@ -147,7 +165,7 @@ pub(super) fn construction_wireframes(
                 ((b[3] - b[2]) / 2.) as f32,
                 ((b[5] - b[4]) / 2.) as f32,
             ],
-            color: [0.32, 0.36, 0.39, 1.],
+            color,
             orientation,
         });
     }

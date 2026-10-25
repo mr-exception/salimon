@@ -160,7 +160,11 @@ fn saved_projects_cannot_bypass_the_registered_catalog_or_protected_routes() {
     assert_eq!(s.save_bytes(100).unwrap(), good);
 }
 
-fn piece(s: &mut GameplaySession, resource: salimon_world::resources::ResourceId, mass: f64) {
+pub(super) fn piece(
+    s: &mut GameplaySession,
+    resource: salimon_world::resources::ResourceId,
+    mass: f64,
+) {
     use salimon_world::{resources::*, spherical_mining::*};
     let frame = character_ship_frame(s.ship.snapshot().pose);
     let w = frame.local_to_world([-1., 1.3, 2.5]);
@@ -289,7 +293,7 @@ fn funded_stool() -> (GameplaySession, PlaceholderId) {
     let id = p.id;
     (s, id)
 }
-fn move_player(s: &mut GameplaySession, eye: [f64; 3]) {
+pub(super) fn move_player(s: &mut GameplaySession, eye: [f64; 3]) {
     let mut v = serde_json::to_value(s.character.save_state()).unwrap();
     v["position"] = serde_json::json!({"Inside":{"local":eye}});
     s.character =

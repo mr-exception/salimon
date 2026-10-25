@@ -15,7 +15,7 @@ iterating and the [applicable validation gates](validation.md) before completion
 | Coordinates, catalog, landing geometry | world `src/lib.rs` facade; `coordinates.rs`, `catalog.rs`, `geometry.rs`, `proximity.rs` | world invariants, `solar-system-layout.md`, `coordinate-strategy.md`, inline catalog/coordinate/geometry/proximity tests | `orbit-earth.json`; F2/N/1–6 precision tour |
 | Precision fixtures and engineering camera | world `src/precision.rs`, `camera.rs`; root public reexports in `lib.rs` | world coordinate strategy/invariants; inline precision and deterministic camera-tour tests | F2/N/1–6 precision tour |
 | Flight, assists, cockpit authority, airlock | ship `src/lib.rs` facade, `state.rs`, `orientation.rs`, `controller/{mod,flight,steering,assist,door,cockpit,telemetry}.rs`; runtime `session.rs`, `session/interaction.rs`, `app/input.rs`, `app/interaction.rs`, `app/scene.rs`, `action_bar.rs` compose | ship architecture/invariants, inline motion/assist/door tests | `orbit-earth.json`, `space-airlock.json`, `lower-cockpit-windows.json` |
-| Modular structural foundation | ship `src/structure/{mod,grid,persistence,tests}.rs`; `src/mass.rs` namespace | [Structure architecture](../client/ship/architecture.md#portable-structural-foundation-541), ship invariants; headless six-face, multi-deck, removal, damage, identity, mass and save tests | No live runtime composition in #541; placement/construction integration remains #542–#550 |
+| Modular structural foundation | ship `src/structure/{mod,grid,persistence,assembly,tests}.rs`; `src/mass.rs` namespace | [Structure architecture](../client/ship/architecture.md#portable-structural-foundation-541), ship invariants; headless six-face, multi-deck, removal, damage, identity, mass and save tests | No live runtime composition in #541; placement/construction integration remains #542–#550 |
 | Walking, gravity, hull collision, EVA | character `src/controller/{mod,interior,doorway,surface,eva,camera}.rs`, `collision.rs`, `layout.rs`, `queries.rs`; runtime `session.rs`, `session/frames.rs` compose ship snapshots | character architecture/invariants; mode-local collision/gravity/EVA tests and `controller/collision_tests.rs`; generated `spatial_contracts.rs` | `cockpit-nose.json`, `space-airlock.json`, `moving-eva.json`, `nearby-eva.json` |
 | Fabricator recipes, storage, queue, tray and consumables | fabrication `src/{mass,recipes,machine,inventory}.rs`; runtime `session/{fabrication,crafting_ui,consumable_wheel}.rs`, `app/input.rs` | fabrication architecture/invariants; `tests/fabricator.rs`; integer/atomic/FIFO/power/mass regressions | Runtime scenarios are #347; native signoff #348 |
 | Resource identities/generation/streaming | world `src/resources.rs`, `resource_distribution.rs`, `resource_generation.rs`, `mining.rs` | `resource-contracts.md`, world invariants; inline generation/session tests | `resource-deposits.json`, `resource-streaming.json` |
@@ -489,7 +489,7 @@ The owner-authorized capacity tiers, exact receipt accounting, separate fuel/mat
 
 ## Construction material ownership (#543)
 
-See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Timed work and completed geometry remain #544/#545.
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Paid work and completed geometry follow [construction progress](construction-progress.md) and [modular structure](modular-construction.md).
 
 
 ## Room and fixture lighting (#580)
@@ -505,3 +505,8 @@ The [maintained acoustics contract](scout-acoustics.md) describes actual mechani
 ## Automatic construction (#544)
 
 See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.

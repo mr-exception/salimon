@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 9).
+`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 18).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -103,3 +103,8 @@ Schema 15 adds exact construction funding receipts/progress; legacy unfunded pla
 
 
 Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.

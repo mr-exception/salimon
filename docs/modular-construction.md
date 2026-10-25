@@ -51,7 +51,8 @@ Power/pressure network hookups and decompression simulation remain future work.
 
 Ship `structure/{assembly,shell}.rs` owns validated atomic assembly and deterministic
 cell/face geometry. Runtime `session/construction/{installed,boarding,doors,work}.rs` composes
-catalog/source, physical safety and paid publication. Character
+catalog/source, physical safety and paid publication. `evidence.rs` owns only
+explicit native fixture setup. Character
 `modular.rs` and `controller/modular.rs` consume only host-supplied completed
 volumes/solids; they grant no construction authority. Renderer consumes ordinary
 oriented box instances without owning topology or work.

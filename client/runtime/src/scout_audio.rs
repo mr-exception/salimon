@@ -61,6 +61,7 @@ pub(crate) struct Observation {
     powered: bool,
     conversion: bool,
     fabrication: bool,
+    construction: Option<[f64; 3]>,
     thrust: f64,
     door: f64,
     low_power: bool,
@@ -131,6 +132,7 @@ impl Observation {
             powered: state.ship.power_available,
             conversion: state.ship.core_status.conversion_watts > 0.0,
             fabrication: state.ship.core_status.fabricator_watts > 0.0,
+            construction: s.building.running,
             thrust: if state.ship.power_available
                 && state.ship.engines_enabled
                 && state.ship.flight_state == salimon_ship::FlightState::Flying
@@ -328,6 +330,8 @@ impl Mixer {
             }
             if o.fabrication {
                 add(Cue::Fabricator, FABRICATOR, 0.25);
+            } else if let Some(position) = o.construction {
+                add(Cue::Fabricator, position, 0.12);
             }
             if o.thrust > 0.0 {
                 add(Cue::Thrust, [-6.4, 1.1, 0.0], 0.3 * o.thrust);

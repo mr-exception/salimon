@@ -99,3 +99,14 @@ Schema 15 adds exact construction funding receipts/progress; legacy unfunded pla
 
 
 Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+## Automatic construction schema 17 (#544)
+
+`SCHEMA_VERSION` is 17 for whole-session captures. Runtime owns the construction
+payload and explicit migration: legacy schema-15/16 material progress retains its
+ppm precision; schema 17 also validates paid elapsed nanoseconds, project damage
+and one-time completion. Historical envelopes must reject these new work fields.
+Restore never credits elapsed work or spends Core energy. The independent universe
+envelope remains version 1 and durable two-slot publication is unchanged. See the
+[construction save and verification contract](../../docs/construction-progress.md#save-and-verification)
+and runtime construction tests for atomic rejection and exact continuation.

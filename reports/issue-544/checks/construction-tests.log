@@ -1,0 +1,23 @@
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.95s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 15 tests
+test scout_audio::tests::construction_machine_audio_is_spatial_bounded_and_lifecycle_gated ... ok
+test session::construction::tests::complex_installation_stops_cancellable_before_completion_without_fake_solids ... ok
+test session::construction::tests::cargo_obstruction_prevents_final_install_and_spends_nothing_until_clear ... ok
+test session::construction::tests::construction_safety_damage_pause_and_exact_partial_energy_admission ... ok
+test session::construction::tests::fully_funded_partial_cancel_and_corrupt_cross_owner_receipts ... ok
+test session::construction::tests::intake_rejection_receipts_save_refund_and_mass_are_atomic ... ok
+test session::construction::tests::paid_construction_automatically_completes_once_without_tool_or_nearby_player ... ok
+test session::construction::tests::paid_partial_cancel_returns_proportional_real_mass_and_never_replays ... ok
+test session::construction::tests::placeholder_restore_is_exact_and_ui_is_transient_without_advancing_progress ... ok
+test session::construction::tests::production_preview_place_inspect_cancel_preserves_physical_mass_and_materials ... ok
+test session::construction::tests::normal_ship_and_placeholders_do_not_install_structure_or_consume_resources ... ok
+test session::construction::tests::saved_projects_cannot_bypass_the_registered_catalog_or_protected_routes ... ok
+test session::construction::tests::schema_eight_requires_source_and_legacy_seven_migrates_empty_atomically ... ok
+test session::construction::tests::wrong_owner_catalog_or_cells_never_replace_a_live_session ... ok
+test session::construction::tests::timer_partitioning_save_validation_and_full_scheduler_pause_are_exact ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 410 filtered out; finished in 0.11s
+

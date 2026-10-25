@@ -240,7 +240,7 @@ impl ShipController {
         }
         let available = (self.energy_core.stored_joules() - reserve).max(0.0);
         let funded = self.exchange_core_energy_joules(0.0, requested.min(available))?;
-        self.auxiliary_watts = funded / elapsed.as_secs_f64();
+        self.auxiliary_watts += funded / elapsed.as_secs_f64();
         Ok(funded)
     }
 

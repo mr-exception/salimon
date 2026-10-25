@@ -1,4 +1,5 @@
 //! Compose blueprint authority with current ship, player and physical cargo.
+mod work;
 use super::{GameplaySession, frames::character_ship_frame};
 use salimon_character::{CharacterLocation, SHIP_FLOOR_HEIGHT_METERS};
 use salimon_ship::structure::placement::*;
@@ -6,6 +7,7 @@ use salimon_ship::structure::{
     Cell, Envelope, MemberShape, ShipStructure, StructuralMass, StructuralPart, StructureId,
 };
 use serde::{Deserialize, Serialize};
+use work::supports_completion;
 
 const OWNER: u64 = 1; // The existing client-only run has one local ship owner.
 const REACH_METERS: f64 = 5.;
@@ -74,6 +76,7 @@ pub(crate) struct Building {
     pub(crate) source: ConstructionSave,
     catalog: Catalog,
     structure: ShipStructure,
+    pub(crate) running: Option<[f64; 3]>,
 }
 fn starter_structure() -> ShipStructure {
     let origin = ORIGIN;
@@ -115,6 +118,7 @@ impl Default for Building {
         let structure = starter_structure();
         Self {
             active: false,
+            running: None,
             selected: 0,
             rotation: Rotation::Forward,
             source: Default::default(),
@@ -259,7 +263,7 @@ impl GameplaySession {
             ) {
                 Ok(()) => {
                     if p.funding.funded(&p.blueprint.requirements) {
-                        "Materials funded - automatic construction awaits its implementation"
+                        "Materials funded - construction starts automatically when safe"
                     } else {
                         "Material delivered to placeholder"
                     }
@@ -381,6 +385,9 @@ impl GameplaySession {
             .collect();
         let mut ids = std::collections::HashSet::new();
         for p in self.building.source.projects.jobs() {
+            if p.work.completed && !supports_completion(p) {
+                return Err(invalid("unsupported completed construction"));
+            }
             for f in &p.funding.receipts {
                 if !ids.insert(f.id())
                     || core_ids.contains(&f.id())
@@ -415,34 +422,7 @@ impl GameplaySession {
         if blueprint.footprint == Footprint::Interior {
             target[1] = SHIP_FLOOR_HEIGHT_METERS;
         }
-        let mut obstacles = static_obstacles(blueprint.footprint);
-        let player_bottom = eye[1] - salimon_character::PLAYER_EYE_HEIGHT_METERS;
-        obstacles.push(Obstacle {
-            kind: ObstacleKind::Player,
-            space: Envelope {
-                min: [
-                    eye[0] - salimon_character::PLAYER_RADIUS_METERS,
-                    player_bottom,
-                    eye[2] - salimon_character::PLAYER_RADIUS_METERS,
-                ],
-                max: [
-                    eye[0] + salimon_character::PLAYER_RADIUS_METERS,
-                    player_bottom + salimon_character::PLAYER_BODY_HEIGHT_METERS,
-                    eye[2] + salimon_character::PLAYER_RADIUS_METERS,
-                ],
-            },
-        });
-        for piece in self.mining.session.fragments() {
-            let local = frame.world_to_local(piece.transform().position().meters());
-            let radius = crate::fragment_physics::sphere_radius(*piece);
-            obstacles.push(Obstacle {
-                kind: ObstacleKind::Cargo,
-                space: Envelope {
-                    min: local.map(|p| p - radius),
-                    max: local.map(|p| p + radius),
-                },
-            });
-        }
+        let obstacles = self.construction_obstacles(blueprint.footprint);
         let flight = if matches!(
             snapshot.ship.flight_state,
             salimon_ship::FlightState::Landed { .. }
@@ -661,8 +641,14 @@ impl GameplaySession {
             .collect::<Vec<_>>()
             .join(" / ");
         let status = if let Some(job) = hovered {
-            if job.funding.funded(&job.blueprint.requirements) {
-                "FUNDED - awaiting construction".to_string()
+            if job.work.completed {
+                "COMPLETED".to_string()
+            } else if job.funding.funded(&job.blueprint.requirements) {
+                format!(
+                    "{} | {:.1}%",
+                    self.construction_status(job),
+                    f64::from(job.funding.progress_ppm) / 10_000.
+                )
             } else {
                 format!("WAITING | supplied {:.3}kg", job.funding.mass_kg())
             }
@@ -684,7 +670,7 @@ impl GameplaySession {
 
     pub(crate) fn construction_inspect(&self) -> serde_json::Value {
         let preview = self.construction_preview();
-        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
+        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
     }
     pub(crate) fn construction_boxes(&self) -> Vec<(Envelope, [f32; 4])> {
         let mut boxes: Vec<_> = self
@@ -692,7 +678,23 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
-            .map(|p| (p.space, [0.1, 0.7, 0.8, 1.]))
+            .filter(|p| !p.work.completed)
+            .map(|p| {
+                let mut space = p.space;
+                if p.funding.progress_ppm > 0 {
+                    space.max[1] = space.min[1]
+                        + (space.max[1] - space.min[1])
+                            * (0.08 + 0.92 * f64::from(p.funding.progress_ppm) / 1_000_000.);
+                }
+                (
+                    space,
+                    if p.funding.progress_ppm > 0 {
+                        [0.85, 0.65, 0.25, 1.]
+                    } else {
+                        [0.1, 0.7, 0.8, 1.]
+                    },
+                )
+            })
             .collect();
         if self.aimed_construction().is_none()
             && let Some(preview) = self.construction_preview()
@@ -713,9 +715,12 @@ impl GameplaySession {
 #[cfg(test)]
 mod tests;
 
-/// Explicit evidence setup: trusted test catalog, placed stool, half-kg carried
-/// sphere. This does not enable the unapproved catalog in ordinary gameplay.
-pub(crate) fn evidence_initial_conditions(s: &mut GameplaySession) -> Result<(), String> {
+/// Explicit evidence setup: placed stool and one seeded carried iron sphere.
+/// Full funding uses 1 kg; the earlier material-only route uses 0.5 kg.
+pub(crate) fn evidence_initial_conditions(
+    s: &mut GameplaySession,
+    full: bool,
+) -> Result<(), String> {
     use super::{Command, ControlKey};
     s.command(Command::Control(ControlKey::Right, true));
     s.advance_automation(std::time::Duration::from_millis(72 * 16));
@@ -743,9 +748,10 @@ pub(crate) fn evidence_initial_conditions(s: &mut GameplaySession) -> Result<(),
             body: salimon_world::CelestialBodyId::Earth,
             local: 543,
         },
-        RawMaterial::new(ResourceId::IronOre, 0.5).map_err(|e| e.to_string())?,
+        RawMaterial::new(ResourceId::IronOre, if full { 1. } else { 0.5 })
+            .map_err(|e| e.to_string())?,
         pose.position(),
-        0.5,
+        if full { 1. } else { 0.5 },
     )
     .map_err(|e| e.to_string())?;
     let id = (0..400)

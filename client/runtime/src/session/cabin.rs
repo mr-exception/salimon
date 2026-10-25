@@ -293,6 +293,13 @@ impl GameplaySession {
                 return false;
             }
         }
+        if self
+            .construction_solids()
+            .iter()
+            .any(|solid| boxes_overlap(*solid, b, 0.0))
+        {
+            return false;
+        }
         !self.mining.session.fragments().iter().any(|f| {
             salimon_character::cargo::sphere_overlaps_box(
                 frame.world_to_local(f.transform().position().meters()),

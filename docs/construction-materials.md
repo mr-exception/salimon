@@ -12,9 +12,9 @@ explicitly approved the proposed costs/durations in this chat on 2026-10-24;
 `client/runtime/catalogs/blueprints.json` now enables that approved catalog.
 The exact values and decision are recorded in [Project Q&A](project-qa.md).
 A fully supplied project is ready for automatic Building, without another action.
-Timed Core-funded work remains #544; final structural geometry remains #545.
-This change adds their authoritative monotone `set_progress` transaction seam,
-not an unfunded timer or usable object.
+Core-funded active work and simple interior completion now follow the
+[automatic construction contract](construction-progress.md); complex structural
+geometry remains #545. The monotone `set_progress` seam retains exact refunds.
 
 RMB cancels a reachable unfinished project. At progress p, return
 `floor(delivered_milligrams * (1-p))` once per resource, distributing in original

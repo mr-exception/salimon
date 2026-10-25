@@ -496,3 +496,8 @@ Construction receipts/refunds #543: [canonical transaction, mass, controls and s
 
 
 Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and one-time simple interior installation. No unfinished collider, free progress, duplicate mass or unsupported complex completion. Schema 17 restores exact work without elapsed-time credit.

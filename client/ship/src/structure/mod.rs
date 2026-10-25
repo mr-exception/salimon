@@ -1,4 +1,5 @@
 //! Portable structural authority for #541. No placement UI, mesh, traversal or power graph.
+pub mod construction;
 pub mod funding;
 mod grid;
 mod persistence;

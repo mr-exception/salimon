@@ -100,6 +100,8 @@ impl Rotation {
 #[serde(deny_unknown_fields)]
 pub struct Placeholder {
     #[serde(default)]
+    pub work: super::construction::Work,
+    #[serde(default)]
     pub funding: super::funding::Funding,
     pub id: PlaceholderId,
     pub owner: u64,
@@ -508,6 +510,7 @@ impl Placements {
         self.jobs.insert(
             id,
             Placeholder {
+                work: Default::default(),
                 funding: Default::default(),
                 id,
                 owner: c.owner,
@@ -588,6 +591,9 @@ impl Placements {
             p.blueprint.validate()?;
             p.funding
                 .validate(&p.blueprint.requirements)
+                .map_err(|_| PlacementError::InvalidIdentity)?;
+            p.work
+                .validate(&p.funding, &p.blueprint)
                 .map_err(|_| PlacementError::InvalidIdentity)?;
             if *id != p.id || id.0 == 0 || id.0 >= self.next_id || p.owner == 0 {
                 return Err(PlacementError::InvalidIdentity);

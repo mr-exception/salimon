@@ -490,3 +490,8 @@ cannot replace the required 100 completed moving intervals. Historical failed
 ## Physical mounts (#576)
 
 Run `cargo test -p salimon-client --locked session::mounts`, ship/world/character tests and workspace gates. The physical-mount evidence route retains original production-wgpu images. See [the canonical contract](physical-mounts.md).
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.

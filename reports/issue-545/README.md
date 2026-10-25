@@ -54,6 +54,9 @@ revision, binary/input hashes and render environment are in
 | `git diff --check` | Passed |
 
 Workspace ignored tests remain opt-in, as listed in the log; they are not passes.
+After the broad run and captures, the existing expansion regression gained an
+explicit occupied-old-boarding-route assertion. All 26 construction tests and
+workspace Clippy passed again. This test-only addition changes no captured code.
 The earlier draft-phase ALSA discovery failure is preserved in
 [its original log](workspace-initial-alsa-failure.log); extracting libasound2-dev
 and libasound2t64 into the task sysroot resolved it before successful reruns.

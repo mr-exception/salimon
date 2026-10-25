@@ -1,5 +1,5 @@
    Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.56s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.93s
      Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
 
 running 26 tests
@@ -30,4 +30,4 @@ test session::construction::tests::timer_partitioning_save_validation_and_full_s
 test session::construction::tests::wrong_owner_catalog_or_cells_never_replace_a_live_session ... ok
 test session::construction::room_tests::room_evidence_uses_one_real_intake_and_preserves_powered_and_unpowered_movement ... ok
 
-test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 410 filtered out; finished in 3.69s
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 410 filtered out; finished in 3.58s

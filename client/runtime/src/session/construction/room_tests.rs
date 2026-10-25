@@ -217,7 +217,26 @@ fn expansion_opens_one_accessible_door_and_partition_edit_survives_save() {
             .unwrap();
     }
     s.sync_carried();
-    s.advance_construction(Duration::from_secs(120));
+    s.advance_construction(Duration::from_secs(119));
+    let [tip, _, _, top] = boarding_exit(&s.building.structure).unwrap();
+    let floor = s
+        .mining
+        .modular_interior
+        .support([tip + 0.3, top + 1., 0.], 0.24, top)
+        .unwrap();
+    move_player(&mut s, [tip + 0.3, floor + 1.75, 0.]);
+    s.sync_mount_collision();
+    let pending = s.building.source.clone();
+    let energy = s.ship.snapshot().energy_core;
+    s.advance_construction(Duration::from_secs(1));
+    assert_eq!(
+        s.building.source, pending,
+        "occupied old boarding route cannot be rerouted"
+    );
+    assert_eq!(s.ship.snapshot().energy_core, energy);
+    move_player(&mut s, [0.5, SHIP_FLOOR_HEIGHT_METERS + 1.75, -2.2]);
+    s.sync_mount_collision();
+    s.advance_construction(Duration::from_secs(1));
     assert!(
         s.building
             .source

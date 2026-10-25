@@ -1,0 +1,25 @@
+    Checking typenum v1.20.1
+    Checking cfg-if v1.0.4
+    Checking serde_core v1.0.229
+    Checking simd-adler32 v0.3.10
+    Checking adler2 v2.0.1
+    Checking crc32fast v1.5.2
+    Checking miniz_oxide v0.9.1
+    Checking zmij v1.0.23
+    Checking memchr v2.8.3
+    Checking cpufeatures v0.2.17
+    Checking itoa v1.0.18
+    Checking flate2 v1.1.10
+    Checking salimon-math v0.1.0 (/workspace/salimon/client/math)
+    Checking generic-array v0.14.7
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking serde_json v1.0.151
+    Checking serde v1.0.229
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+    Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.37s

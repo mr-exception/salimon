@@ -1,0 +1,122 @@
+    Blocking waiting for file lock on build directory
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 30s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-09805614dde0575c)
+
+running 107 tests
+test attachments::tests::exact_identity_compatibility_uniqueness_and_parent_removal ... ok
+test controller::assist::safety_tests::full_speed_including_tangential_motion_range_and_authority_gate_landing ... ok
+test controller::assist::safety_tests::powered_flight_after_takeoff_obeys_dry_and_realistic_cargo_force_and_power_budgets ... ok
+test controller::assist::safety_tests::local_takeoff_bounds_speed_acceleration_mass_and_reserved_energy_on_all_bodies ... ok
+test controller::assist::safety_tests::takeoff_hands_velocity_to_inertial_flight_and_consumes_leftover_time ... ok
+test controller::assist::safety_tests::takeoff_trace ... ignored, opt-in deterministic takeoff trace; no native hardware claim
+test controller::assist::safety_tests::recovery_is_powered_reserved_uncancellable_and_safe_on_all_solids ... ok
+test controller::assist::tests::assisted_velocity_matches_path_derivative_and_settles_at_phase_boundaries ... ok
+test controller::assist::tests::assist_timing_and_pose_are_independent_of_frame_partition_and_large_deltas ... ok
+test controller::assist::tests::every_solid_body_supports_uncancellable_arbitrary_point_landing ... ok
+test controller::assist::tests::landing_requires_cockpit_authority_and_exact_range ... ok
+test controller::assist::tests::repeated_actions_and_manual_input_cannot_restart_or_override_assists ... ok
+test controller::assist::tests::reservation_rejection_and_bus_blackout_do_not_restart_or_cancel_assist ... ok
+test controller::assist::tests::takeoff_is_door_interlocked_and_completes_without_cockpit_authority ... ok
+test controller::cockpit::blackout_tests::blackout_preserves_signed_selection_heading_and_coasting_then_restores_thrust ... ok
+test controller::cockpit::blackout_tests::steering_stops_at_power_boundary_and_exit_clears_ramp_residue ... ok
+test controller::cockpit::survival_revocation_tests::revocation_stops_manual_thrust_even_during_blackout_and_never_erases_velocity ... ok
+test controller::collision::tests::captured_bounce_partitions_match_and_rebound_count_is_bounded ... ok
+test controller::collision::tests::clear_pass_and_visual_sun_do_not_collide ... ok
+test controller::collision::tests::high_speed_sweeps_every_solid_even_when_endpoint_is_outside_far_side ... ok
+test controller::collision::tests::low_speed_contact_decays_and_powerless_crash_stays_grounded ... ok
+test controller::collision::tests::representative_terrain_contact_preserves_local_normal_clearance ... ok
+test controller::collision::tests::tangent_hill_sweep_does_not_depend_on_endpoint_penetration ... ok
+test controller::door::tests::bottom_hinged_ramp_advances_reverses_and_blocks_takeoff_until_closed ... ok
+test controller::door::tests::landed_and_open_space_doors_toggle_but_nearby_flight_is_locked ... ok
+test controller::door::tests::occupied_ramp_cannot_toggle_or_reverse_its_motion ... ok
+test controller::door::tests::space_airlock_uses_inclusive_nearby_threshold_and_assist_lock ... ok
+test controller::flight::energy_flight_tests::converted_charge_and_consumers_share_one_step_without_capacity_clipping ... ok
+test controller::flight::energy_flight_tests::exhaustion_coasts_without_losing_selection_or_velocity_then_charge_resumes ... ok
+test controller::flight::inertial_tests::arbitrary_partitions_and_high_speed_keep_all_travel ... ok
+test controller::flight::inertial_tests::forward_reverse_and_mass_obey_force_over_mass ... ok
+test controller::flight::inertial_tests::turning_while_coasting_preserves_world_momentum_and_true_speed ... ok
+test controller::flight::tests::leaving_cockpit_does_not_change_flying_motion_or_thruster ... ok
+test controller::flight::tests::long_direct_updates_do_not_discard_travel ... ok
+test controller::flight::tests::solid_body_penetration_is_corrected_to_nearest_valid_position ... ok
+test controller::flight::tests::thruster_changes_by_exact_points_only_with_cockpit_authority ... ok
+test controller::impulse_tests::engine_switch_is_distinct_durable_and_not_reenabled_by_power_restore ... ok
+test controller::impulse_tests::exact_examples_independent_of_starting_velocity_with_mass_and_axis_changes ... ok
+test controller::impulse_tests::held_throttle_bills_each_repeat_at_its_actual_boundary ... ok
+test controller::impulse_tests::partial_shared_funding_and_conversion_do_not_mint_service_or_assist_impulse ... ok
+test controller::steering::tests::steering_ramps_then_holds_the_fixed_five_degree_rate ... ok
+test controller::steering::tests::steering_target_clears_when_cockpit_is_left_without_changing_heading ... ok
+test controller::telemetry::auxiliary_tests::auxiliary_draw_protects_reserve_is_reported_and_invalid_requests_are_atomic ... ok
+test controller::telemetry::core_status_tests::core_status_uses_fractional_authority_and_idle_demand ... ok
+test controller::telemetry::navigation_tests::tangential_and_backward_motion_never_claim_a_reverse_stop ... ok
+test controller::telemetry::navigation_tests::vector_angle_and_reverse_budget_use_full_velocity_and_mass ... ok
+test controller::telemetry::navigation_tests::zero_unsupported_and_overflow_are_explicit ... ok
+test controller::telemetry::tests::core_energy_is_bounded_and_updates_live_snapshots ... ok
+test controller::telemetry::tests::nearby_body_telemetry_crosses_range_and_reports_radial_direction ... ok
+test controller::telemetry::tiny_velocity_test::subnormal_velocity_has_a_finite_direction ... ok
+test controller::tests::default_ship_is_landed_on_earth_with_closed_door ... ok
+test controller::throttle::tests::authority_power_and_opposing_keys_clear_repeat_without_resetting_selection ... ok
+test controller::throttle::tests::contact_resets_selection_and_clears_held_repeat ... ok
+test controller::throttle::tests::held_keys_use_real_edges_and_partition_independent_cadence ... ok
+test controller::throttle::tests::landing_locks_input_and_finishes_with_zero_selection ... ok
+test controller::throttle::tests::power_loss_clears_hold_even_if_restored_before_next_tick ... ok
+test controller::throttle::tests::signed_selection_clamps_and_reverse_thrust_moves_backward ... ok
+test conversion::tests::dead_core_bootstraps_and_full_core_keeps_processing_with_discharge ... ok
+test conversion::tests::depletion_estimate_accounts_for_finite_conversion_and_capacity_waste ... ok
+test conversion::tests::intake_consumes_once_and_rejects_second_until_completion ... ok
+test conversion::tests::zero_yield_is_consumed_and_invalid_config_preserves_state ... ok
+test energy::machine_load_tests::shared_load_is_atomic_and_cannot_spend_reserved_assist_energy ... ok
+test energy::reservation_tests::reservation_is_atomic_isolated_and_refunds_only_unused_energy ... ok
+test energy::tests::exchange_precedence_capacity_bootstrap_and_extreme_numbers ... ok
+test energy::tests::fractional_joules_and_partitions_are_preserved ... ok
+test energy::tests::signed_throttle_idle_and_zero_crossing ... ok
+test finishes::tests::corrupt_and_unbounded_palettes_rejected ... ok
+test finishes::tests::independent_groups_rooms_item_identity_and_roundtrip ... ok
+test lighting::tests::independent_room_histories_and_malformed_settings ... ok
+test lighting::tests::outage_and_damage_preserve_preferences_and_master_supersedes_override ... ok
+test mass::tests::exact_reported_removal_sequence_returns_to_dry_mass ... ok
+test mass::tests::five_hundred_objects_transfers_consumption_equipment_and_validation ... ok
+test mass::tests::overflow_and_invalid_updates_leave_ledger_unchanged ... ok
+test mass::tests::shuffled_replacements_and_transfers_preserve_tiny_residuals ... ok
+test mechanism::tests::reversed_motion_and_saved_intermediate_state_retain_endpoints ... ok
+test orientation::tests::axes_rotate_local_forward_with_pose ... ok
+test orientation::tests::local_quaternion_composition_preserves_right_handed_axes ... ok
+test orientation::tests::quaternion_alignment_follows_the_short_arc_without_endpoint_snaps ... ok
+test propulsion::tests::funded_impulse_and_cached_mass_are_the_only_velocity_inputs ... ok
+test structure::assembly::tests::detached_and_corner_only_rooms_are_rejected_atomically ... ok
+test structure::assembly::tests::late_invalid_geometry_and_duplicate_ids_publish_nothing ... ok
+test structure::assembly::tests::occupied_cells_and_retired_id_cannot_be_reused_by_an_assembly ... ok
+test structure::assembly::tests::one_transaction_retains_four_cell_ids_mass_geometry_and_roundtrip ... ok
+test structure::funding::tests::resource_total_rounding_and_nonreused_original_receipts_at_all_boundaries ... ok
+test structure::funding::tests::underfunded_refunds_all_and_invalid_or_backward_progress_is_atomic ... ok
+test structure::placement::tests::completion_revalidates_new_cargo_support_and_flight_without_a_player_reach_requirement ... ok
+test structure::placement::tests::consequences_restrict_airborne_modules_even_if_the_category_is_interior ... ok
+test structure::placement::tests::duplicate_saved_project_id_is_rejected_before_publication ... ok
+test structure::placement::tests::malformed_catalog_geometry_and_tampered_saved_cells_are_rejected ... ok
+test structure::placement::tests::one_multideck_room_reserves_many_cells_and_never_uses_an_unbuilt_neighbor_as_support ... ok
+test structure::placement::tests::permission_reach_and_unsupported_geometry_fail_without_publishing_projects ... ok
+test structure::placement::tests::player_cargo_installed_geometry_and_escape_routes_block_preview_and_final_placement ... ok
+test structure::placement::tests::quarter_turns_transform_half_open_cells_without_drift_or_wrapping ... ok
+test structure::placement::tests::reservations_overlap_atomically_and_cancellation_does_not_reuse_identity ... ok
+test structure::tests::all_connected_two_by_two_by_two_layouts_obey_cut_and_damage_contracts ... ok
+test structure::tests::all_six_faces_attach_but_edges_and_corners_do_not ... ok
+test structure::tests::authored_baseline_structure_never_counts_dry_hull_mass_again ... ok
+test structure::tests::damage_transfers_multiple_components_ids_equipment_and_room_metadata_once ... ok
+test structure::tests::face_changes_do_not_disconnect_frames_and_shared_faces_have_one_owner ... ok
+test structure::tests::grid_queries_preserve_precision_and_handle_negative_and_extreme_coordinates ... ok
+test structure::tests::invalid_inputs_and_duplicate_identity_reject_atomically ... ok
+test structure::tests::multi_deck_large_footprints_rooms_and_equipment_have_distinct_ownership ... ok
+test structure::tests::opening_a_shared_divider_preserves_independent_room_finishes ... ok
+test structure::tests::safe_remove_rejects_bridge_cut_but_accepts_a_redundant_path ... ok
+test structure::tests::save_round_trip_rebuilds_topology_instead_of_requiring_id_order ... ok
+test structure::tests::structural_mass_namespace_coexists_with_cargo_and_legacy_equipment ... ok
+test controller::assist::tests::assists_have_readable_phases_and_exact_endpoints_on_every_solid_body ... ok
+
+test result: ok. 106 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+   Doc-tests salimon_ship
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

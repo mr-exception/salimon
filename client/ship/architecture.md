@@ -501,3 +501,19 @@ Room and fixture lights #580: [canonical controls, source, effective output and 
 ## Automatic construction (#544)
 
 Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and one-time simple interior installation. No unfinished collider, free progress, duplicate mass or unsupported complex completion. Schema 17 restores exact work without elapsed-time credit.
+
+## Atomic room assemblies (#545 groundwork)
+
+`structure/assembly.rs` stages `RoomAssembly` into a cloned structural graph and
+publishes only after all parts and room membership validate. Each cell must have
+its own caller-allocated part ID; the room ID is distinct and contributes no mass.
+Parts may arrive in arbitrary order; installation repeatedly admits a supported
+part, rejecting no-progress topology. Duplicate/retired IDs, overlapping cells,
+invalid geometry/mass/faces, and membership mismatches leave authority unchanged.
+Faces and collision are explicit inputs: this transaction does not infer walls,
+seal openings, or turn the room's bounding volume into collision.
+
+This is a portable installation primitive, not the live #545 completion adapter.
+The runtime still stops structural projects at the #544 boundary. Room shell and
+connector geometry, usable multi-deck traversal, runtime completion/persistence,
+editing controls and production renderer evidence remain outstanding in #545.

@@ -1,5 +1,7 @@
 //! Portable structural authority for #541. No placement UI, mesh, traversal or power graph.
+mod assembly;
 pub mod construction;
+pub use assembly::RoomAssembly;
 pub mod funding;
 mod grid;
 mod persistence;

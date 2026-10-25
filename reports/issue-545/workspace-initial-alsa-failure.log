@@ -1,0 +1,55 @@
+ Downloading crates ...
+  Downloaded alsa-sys v0.4.0
+  Downloaded cpal v0.18.2
+  Downloaded dasp_sample v0.11.0
+  Downloaded alsa v0.11.0
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+   Compiling wgpu-hal v30.0.1 (/workspace/salimon/vendor/wgpu-hal)
+   Compiling alsa-sys v0.4.0
+   Compiling cpal v0.18.2
+   Compiling salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+error: failed to run custom build command for `alsa-sys v0.4.0`
+
+Caused by:
+  process didn't exit successfully: `/workspace/salimon/target/debug/build/alsa-sys-e951b642298f8bef/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-env-changed=ALSA_NO_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_SYSROOT_DIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR
+
+  --- stderr
+
+  thread 'main' (2239) panicked at /workspace/.salimon-tools/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs:13:19:
+
+  pkg-config exited with status code 1
+  > PKG_CONFIG_PATH=/workspace/.salimon-tools/sysroot/usr/lib/x86_64-linux-gnu/pkgconfig PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config --libs --cflags alsa
+
+  pkg-config output:
+    Package alsa was not found in the pkg-config search path.
+    Perhaps you should add the directory containing `alsa.pc'
+    to the PKG_CONFIG_PATH environment variable
+    Package 'alsa', required by 'virtual:world', not found
+
+  The system library `alsa` required by crate `alsa-sys` was not found.
+  The file `alsa.pc` needs to be installed and the PKG_CONFIG_PATH environment variable must contain its parent directory.
+  PKG_CONFIG_PATH contains the following:
+      - /workspace/.salimon-tools/sysroot/usr/lib/x86_64-linux-gnu/pkgconfig
+
+  HINT: you may need to install a package such as alsa, alsa-dev or alsa-devel.
+
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

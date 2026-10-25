@@ -66,6 +66,7 @@ impl CharacterController {
             local = crate::ramp::resolve_moving_sweep(previous, local);
         }
         local = slide_around_appendages(previous, local, world_round_trip_tolerance(world));
+        local = self.sweep_modular_exterior(previous, local);
         let through_gate = previous[0] < DOORWAY_FORWARD
             && local[0] >= DOORWAY_FORWARD - COLLISION_EPSILON
             && previous[2].abs() <= DOORWAY_SIDE_LIMIT + COLLISION_EPSILON

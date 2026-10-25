@@ -16,6 +16,9 @@ impl CharacterController {
         } = *step;
 
         let previous = local;
+        if self.advance_modular(previous, step) {
+            return;
+        }
         if !self.ship_gravity_enabled {
             self.advance_weightless_interior(local, step);
             return;
@@ -66,7 +69,9 @@ impl CharacterController {
             (local[2] - previous[2]) / seconds,
         ];
         let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
-        if local[0] < DOORWAY_FORWARD && within_doorway && door_open && !ship_landed {
+        if self.modular.aft_port && within_doorway && door_open && local[0] < DOORWAY_FORWARD {
+            self.position = PositionState::Inside { local };
+        } else if local[0] < DOORWAY_FORWARD && within_doorway && door_open && !ship_landed {
             self.vertical_speed = 0.0;
             self.eva_inherited_velocity = ship_velocity;
             self.eva_control_velocity = [0.0; 3];

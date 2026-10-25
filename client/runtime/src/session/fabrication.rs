@@ -78,6 +78,7 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
+            .filter(|p| !(p.work.completed && super::construction::is_structural(p)))
             .map(|p| p.funding.mass_kg())
             .sum();
         changed |= self
@@ -88,6 +89,13 @@ impl GameplaySession {
                 (construction_mass > 0.).then_some(construction_mass),
             )
             .expect("bounded project receipts");
+        for (id, mass) in self.building.structure.mass_entries() {
+            changed |= self
+                .mining
+                .ship_mass
+                .update(id, Some(mass))
+                .expect("validated installed structure mass");
+        }
         let core_mass = self.core_upgrades.mass_kg();
         changed |= self
             .mining

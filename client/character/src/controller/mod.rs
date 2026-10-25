@@ -18,6 +18,7 @@ mod collision_tests;
 mod doorway;
 mod eva;
 mod interior;
+mod modular;
 pub mod persistence;
 mod surface;
 #[cfg(test)]
@@ -60,6 +61,8 @@ pub struct CharacterController {
     cargo_door_blocking: bool,
     #[serde(skip)]
     interior_obstacles: Vec<[f64; 6]>,
+    #[serde(skip)]
+    modular: crate::modular::ModularInterior,
 }
 
 impl Default for CharacterController {
@@ -82,6 +85,7 @@ impl Default for CharacterController {
             ship_gravity_enabled: true,
             cargo_door_blocking: false,
             interior_obstacles: Vec::new(),
+            modular: Default::default(),
         }
     }
 }
@@ -111,6 +115,9 @@ impl CharacterController {
     /// Installed physical fixtures are supplied by composition, never derived from GPU meshes.
     pub fn set_interior_obstacles(&mut self, bounds: Vec<[f64; 6]>) {
         self.interior_obstacles = bounds;
+    }
+    pub fn set_modular_interior(&mut self, interior: crate::modular::ModularInterior) {
+        self.modular = interior;
     }
     fn slide_installed(&self, previous: [f64; 3], mut local: [f64; 3]) -> [f64; 3] {
         let bottom = local[1] - PLAYER_EYE_HEIGHT_METERS;

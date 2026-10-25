@@ -1,10 +1,16 @@
-//! Active-clock construction adapter and simple interior completion. Complex
-//! structural/module installation remains with #545/#547, never a solid box room.
+//! Active-clock paid work and atomic structural/interior completion.
+//! Module commissioning remains with #547.
 use super::*;
 use std::time::Duration;
 
 pub(super) fn supports_completion(p: &Placeholder) -> bool {
-    matches!(p.blueprint.id.as_str(), "stool" | "partition")
+    if p.blueprint.id == "two-deck-room" && p.cells.len() < 4 {
+        return false;
+    }
+    matches!(
+        p.blueprint.id.as_str(),
+        "stool" | "partition" | "hull-cell" | "deck-cell" | "two-deck-room"
+    )
 }
 fn watts(p: &Placeholder) -> f64 {
     static POWER: std::sync::OnceLock<std::collections::BTreeMap<String, f64>> =
@@ -44,7 +50,11 @@ impl GameplaySession {
                 eye_meters: p.anchor_meters,
                 reach_meters: REACH_METERS,
                 reachable: true,
-                physical_support: has_physical_support(p.blueprint.footprint, p.space),
+                physical_support: if installed::structural(p) {
+                    self.structural_support(p.space)
+                } else {
+                    has_physical_support(p.blueprint.footprint, p.space)
+                },
                 obstacles: &obstacles,
             },
         )
@@ -107,6 +117,16 @@ impl GameplaySession {
             if nanos == 0 {
                 continue;
             }
+            // Stage the entire physical installation before the final joule.
+            let installation = if installed::structural(p) && nanos == remaining {
+                match self.building.source.structure(Some(id)) {
+                    Ok(next) if self.installation_clear(&next) => Some(next),
+                    Ok(_) => continue,
+                    Err(_) => continue,
+                }
+            } else {
+                None
+            };
             let power = watts(p);
             let center = std::array::from_fn(|i| (p.space.min[i] + p.space.max[i]) / 2.);
             let requested = nanos as f64 / 1e9 * power;
@@ -131,14 +151,20 @@ impl GameplaySession {
             p.work
                 .advance(&mut p.funding, &p.blueprint, Duration::from_nanos(paid))
                 .expect("validated paid progress");
+            if p.work.completed
+                && let Some(next) = installation
+            {
+                self.building.structure = next;
+            }
             self.building.running = Some(center);
         }
+        self.sync_fabricator_mass();
         self.sync_mount_collision();
     }
     /// One physical geometry definition feeds both rendering and collision. No
     /// preview, partial build, or complex unimplemented room becomes solid.
     pub(crate) fn construction_solids(&self) -> Vec<[f64; 6]> {
-        let mut out = Vec::new();
+        let mut out = self.structural_solids();
         for p in self
             .building
             .source

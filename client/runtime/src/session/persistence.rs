@@ -303,7 +303,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=17, Some(state)) => state,
+            (2..=18, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -315,22 +315,22 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=17, Some(tutorial)) => tutorial,
+            (4..=18, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let archive = match (save.schema_version, save.state.archive) {
-            (6..=17, Some(archive)) => archive,
+            (6..=18, Some(archive)) => archive,
             (1..=5, _) => Default::default(),
             _ => return Err(invalid("archive source missing for save schema")),
         };
         let recovery = match (save.schema_version, save.state.recovery) {
-            (7..=17, Some(recovery)) => recovery,
+            (7..=18, Some(recovery)) => recovery,
             (1..=6, _) => Default::default(),
             _ => return Err(invalid("recovery source missing for schema 7")),
         };
         let construction = match (save.schema_version, save.state.construction) {
-            (8..=17, Some(source)) => source,
+            (8..=18, Some(source)) => source,
             (1..=7, None) => Default::default(),
             (1..=7, Some(source)) if source.projects.jobs().next().is_none() => Default::default(),
             _ => {
@@ -339,6 +339,15 @@ impl GameplaySession {
                 ));
             }
         };
+        if save.schema_version < 18
+            && (!construction.removed_partitions.is_empty()
+                || construction
+                    .projects
+                    .jobs()
+                    .any(|p| p.work.completed && super::construction::is_structural(p)))
+        {
+            return Err(invalid("installed structure requires schema 18"));
+        }
         if save.schema_version < 15
             && construction
                 .projects
@@ -356,7 +365,7 @@ impl GameplaySession {
             return Err(invalid("construction work requires schema 17"));
         }
         let cargo_door = match (save.schema_version, save.state.cargo_door) {
-            (9..=17, Some(door)) => door,
+            (9..=18, Some(door)) => door,
             (1..=8, None) => Default::default(),
             (1..=8, Some(door)) if door.open_fraction == 1.0 && door.opening => Default::default(),
             _ => {
@@ -366,7 +375,7 @@ impl GameplaySession {
             }
         };
         let habitation = match (save.schema_version, save.state.habitation) {
-            (10..=17, Some(h)) => h,
+            (10..=18, Some(h)) => h,
             (1..=9, None) => Default::default(),
             (1..=9, Some(h)) if h.bunk_open_fraction == 0.0 && !h.bunk_deploying => {
                 Default::default()
@@ -393,7 +402,7 @@ impl GameplaySession {
         }
         let physical = save.state.physical.restore()?;
         let mounts = match (save.schema_version, save.state.mounts) {
-            (11..=17, Some(m)) => m,
+            (11..=18, Some(m)) => m,
             (1..=10, None) => Default::default(),
             (1..=10, Some(m)) if m == Default::default() => Default::default(),
             _ => return Err(invalid("mount source missing/incompatible with schema")),
@@ -464,7 +473,11 @@ impl GameplaySession {
         if let Some(c) = &restored.mounts.carried {
             let frame = super::frames::character_ship_frame(restored.ship.snapshot().pose);
             let absent =
-                !salimon_character::ship_contains_object(frame.world_to_local(c.world_position));
+                !(salimon_character::ship_contains_object(frame.world_to_local(c.world_position))
+                    || restored.structural_volumes().iter().any(|b| {
+                        let p = frame.world_to_local(c.world_position);
+                        (0..3).all(|i| p[i] >= b[2 * i] && p[i] <= b[2 * i + 1])
+                    }));
             restored
                 .mining
                 .ship_mass
@@ -476,6 +489,8 @@ impl GameplaySession {
         }
         restored.sync_mount_collision();
         restored.sync_cargo_geometry();
+        let frame = super::frames::character_ship_frame(restored.ship.snapshot().pose);
+        crate::carrying::sync_ship_mass(&mut restored.mining, frame, &mut restored.ship);
         restored.sync_fabricator_mass();
         restored
             .ship
@@ -754,7 +769,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            (self.survival.snapshot().terminal, self.building.source.projects.jobs().map(|p|(p.id,p.work.completed,p.work.damaged)).collect::<Vec<_>>()), self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, (&self.archive, (&self.finishes, (&self.lighting,&self.core_upgrades))), ((self.mounts.carried.as_ref().map(|c|c.id), self.mounts.mounts.iter().map(|m|(m.id,m.rail,m.secured)).collect::<Vec<_>>()), self.recovery.checkpoint_events()), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0,self.cabin_checkpoint()))))
+            (self.survival.snapshot().terminal, (self.building.source.projects.jobs().map(|p|(p.id,p.work.completed,p.work.damaged)).collect::<Vec<_>>(), &self.building.source.removed_partitions)), self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, (&self.archive, (&self.finishes, (&self.lighting,&self.core_upgrades))), ((self.mounts.carried.as_ref().map(|c|c.id), self.mounts.mounts.iter().map(|m|(m.id,m.rail,m.secured)).collect::<Vec<_>>()), self.recovery.checkpoint_events()), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0,self.cabin_checkpoint()))))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

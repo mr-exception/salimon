@@ -1,4 +1,5 @@
 //! Compose blueprint authority with current ship, player and physical cargo.
+mod installed;
 mod work;
 use super::{GameplaySession, frames::character_ship_frame};
 use salimon_character::{CharacterLocation, SHIP_FLOOR_HEIGHT_METERS};
@@ -30,23 +31,25 @@ pub(crate) enum BuildAction {
     Rotate,
     Place,
     Cancel,
+    RemovePartition,
 }
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ConstructionSave {
     pub(crate) projects: Placements,
+    #[serde(default)]
+    pub(crate) removed_partitions: Vec<salimon_ship::structure::shell::PartitionEdit>,
 }
 impl salimon_persistence::Validate for ConstructionSave {
     fn validate(&self) -> Result<(), salimon_persistence::SaveError> {
         self.projects
             .validate_save()
             .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
-        let structure = starter_structure();
+        let structure = self
+            .structure(None)
+            .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
         for job in self.projects.jobs() {
-            if job.owner != OWNER
-                || job.origin_meters != ORIGIN
-                || registered_catalog().find(&job.blueprint.id).ok() != Some(&job.blueprint)
-            {
+            if job.owner != OWNER || job.origin_meters != ORIGIN || !matches_catalog(job) {
                 return Err(salimon_persistence::invalid(
                     "construction project catalog/owner/origin mismatch",
                 ));
@@ -62,9 +65,21 @@ impl salimon_persistence::Validate for ConstructionSave {
                 physical_support: has_physical_support(job.blueprint.footprint, job.space),
                 obstacles: &obstacles,
             };
-            self.projects
-                .validate_completion(job.id, &structure, &context)
-                .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+            if job.work.completed && installed::structural(job) {
+                if obstacles.iter().any(|o| {
+                    (0..3).all(|i| {
+                        job.space.min[i] < o.space.max[i] && job.space.max[i] > o.space.min[i]
+                    })
+                }) {
+                    return Err(salimon_persistence::invalid(
+                        "completed structure overlaps authored geometry",
+                    ));
+                }
+            } else {
+                self.projects
+                    .validate_completion(job.id, &structure, &context)
+                    .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+            }
         }
         Ok(())
     }
@@ -75,7 +90,7 @@ pub(crate) struct Building {
     rotation: Rotation,
     pub(crate) source: ConstructionSave,
     catalog: Catalog,
-    structure: ShipStructure,
+    pub(super) structure: ShipStructure,
     pub(crate) running: Option<[f64; 3]>,
 }
 fn starter_structure() -> ShipStructure {
@@ -132,8 +147,12 @@ impl Building {
         source: ConstructionSave,
     ) -> Result<Self, salimon_persistence::SaveError> {
         salimon_persistence::Validate::validate(&source)?;
+        let structure = source
+            .structure(None)
+            .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
         Ok(Self {
             source,
+            structure,
             ..Default::default()
         })
     }
@@ -471,9 +490,13 @@ impl GameplaySession {
                 },
             )
             .ok();
-        let physical_support = preliminary
-            .as_ref()
-            .is_some_and(|p| has_physical_support(b.footprint, p.space));
+        let physical_support = preliminary.as_ref().is_some_and(|p| {
+            if b.footprint == Footprint::Structural {
+                self.structural_support(p.space)
+            } else {
+                has_physical_support(b.footprint, p.space)
+            }
+        });
         let reachable = salimon_character::ship_sight_obstruction(
             eye,
             target,
@@ -548,7 +571,7 @@ impl GameplaySession {
             self.feedback = Some("Get up before placing construction projects");
             return;
         }
-        if matches!(action, BuildAction::Place)
+        if matches!(action, BuildAction::Place | BuildAction::RemovePartition)
             && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
         {
             return;
@@ -591,6 +614,10 @@ impl GameplaySession {
         let (eye, target, obstacles, flight, authorized) = self.construction_inputs();
         if !authorized {
             self.feedback = Some("Leave cockpit control to place or cancel a blueprint");
+            return;
+        }
+        if matches!(action, BuildAction::RemovePartition) {
+            self.remove_partition();
             return;
         }
         if matches!(action, BuildAction::Cancel) {
@@ -657,7 +684,7 @@ impl GameplaySession {
                 .map_or_else(|| "CLEAR".to_string(), |e| format!("{e:?}"))
         };
         Some(format!(
-            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | C close",
+            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | Delete partition | C close",
             hovered.map_or_else(
                 || blueprint.name.clone(),
                 |job| format!("Project #{} {}", job.id.0, blueprint.name)
@@ -670,7 +697,7 @@ impl GameplaySession {
 
     pub(crate) fn construction_inspect(&self) -> serde_json::Value {
         let preview = self.construction_preview();
-        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
+        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"structure":self.building.structure.save_state(),"volumes":self.structural_volumes(),"solids":self.structural_solids(),"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
     }
     pub(crate) fn construction_boxes(&self) -> Vec<(Envelope, [f32; 4])> {
         let mut boxes: Vec<_> = self
@@ -712,6 +739,8 @@ impl GameplaySession {
     }
 }
 
+#[cfg(test)]
+mod room_tests;
 #[cfg(test)]
 mod tests;
 
@@ -772,3 +801,28 @@ pub(crate) fn evidence_initial_conditions(
     s.sync_carried();
     Ok(())
 }
+
+pub(super) fn is_structural(p: &Placeholder) -> bool {
+    installed::structural(p)
+}
+
+fn matches_catalog(job: &Placeholder) -> bool {
+    let Ok(current) = registered_catalog().find(&job.blueprint.id) else {
+        return false;
+    };
+    if current == &job.blueprint {
+        return true;
+    }
+    // Preserve pre-18 two-cell reservations and receipts verbatim. Their unsafe
+    // narrow staircase footprint cannot complete; cancel/replan rather than
+    // silently enlarging an already reserved volume or changing its price.
+    if job.blueprint.id == "two-deck-room" && !job.work.completed {
+        let mut legacy = current.clone();
+        legacy.cells = vec![Cell::new(0, 0, 0), Cell::new(0, 1, 0)];
+        legacy.space.max[0] = 3.;
+        return legacy == job.blueprint;
+    }
+    false
+}
+
+pub(crate) use installed::evidence_room;

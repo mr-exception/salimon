@@ -441,7 +441,7 @@ impl GameplaySession {
                 eye[i] + direction[i] * 0.8 - f64::from(s.character.up[i]) * 0.35
             });
             let local = frame.world_to_local(c.world_position);
-            let absent = !salimon_character::ship_contains_object(local);
+            let absent = !self.mining.contains_ship(local);
             self.mining
                 .ship_mass
                 .set_dry_equipment_absent(
@@ -501,6 +501,16 @@ impl GameplaySession {
             self.mining.fragment_sleep = Default::default();
         }
         self.mining.interior_solids = cabin;
+        let modular = salimon_character::modular::ModularInterior {
+            volumes: self.structural_volumes(),
+            solids: self.structural_solids(),
+            aft_port: self.modular_port(),
+        };
+        if self.mining.modular_interior.volumes != modular.volumes {
+            self.mining.mass_frame = None;
+        }
+        self.mining.modular_interior = modular.clone();
+        self.character.set_modular_interior(modular);
         self.character.set_interior_obstacles(bounds);
     }
 }

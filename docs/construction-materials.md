@@ -13,8 +13,7 @@ explicitly approved the proposed costs/durations in this chat on 2026-10-24;
 The exact values and decision are recorded in [Project Q&A](project-qa.md).
 A fully supplied project is ready for automatic Building, without another action.
 Core-funded active work and simple interior completion now follow the
-[automatic construction contract](construction-progress.md); complex structural
-geometry remains #545. The monotone `set_progress` seam retains exact refunds.
+[automatic construction contract](construction-progress.md); completed structural geometry follows [modular structure](modular-construction.md). The monotone `set_progress` seam retains exact refunds.
 
 RMB cancels a reachable unfinished project. At progress p, return
 `floor(delivered_milligrams * (1-p))` once per resource, distributing in original

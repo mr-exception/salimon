@@ -325,10 +325,15 @@ Room and fixture lights #580: [canonical controls, source, effective output and 
 
 ## Automatic construction (#544)
 
-Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and one-time simple interior installation. No unfinished collider, free progress, duplicate mass or unsupported complex completion. Schema 17 restores exact work without elapsed-time credit.
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
 
 Atomic room installation: a `RoomAssembly` has exactly one new structural part per
 room cell and a separate room identity. All parts plus membership publish together,
 including their existing face/collision/mass source. Rejected installation neither
 consumes identities nor mutates the graph. Existing dry hull remains untouched.
 The primitive grants no work completion, material receipt or flight authority.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.

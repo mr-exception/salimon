@@ -557,6 +557,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "light_general" => Some(KeyCode::F9),
         "light_warmth" => Some(KeyCode::F8),
         "rotate_blueprint" => Some(KeyCode::KeyR),
+        "remove_partition" => Some(KeyCode::Delete),
         "blueprint_6" => Some(KeyCode::Digit6),
         "blueprint_7" => Some(KeyCode::Digit7),
         "interact" => Some(KeyCode::KeyE),

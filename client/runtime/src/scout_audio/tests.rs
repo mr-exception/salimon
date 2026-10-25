@@ -14,6 +14,7 @@ pub(super) fn observation() -> Observation {
         powered: true,
         conversion: false,
         fabrication: false,
+        construction: None,
         thrust: 0.,
         door: 0.,
         low_power: false,
@@ -376,4 +377,32 @@ fn all_mechanisms_and_manual_latches_survive_blackout_but_machinery_does_not() {
     o.active = false;
     m.observe(o, settings);
     assert!(m.voices(settings).is_empty());
+}
+
+#[test]
+fn construction_machine_audio_is_spatial_bounded_and_lifecycle_gated() {
+    let mut o = observation();
+    o.walking = false;
+    o.construction = Some([0., 1., 3.]);
+    let mut m = Mixer::default();
+    let settings = Settings::default();
+    m.observe(o, settings);
+    let v = m.voices(settings);
+    let machine = v.iter().find(|v| v.cue == Cue::Fabricator).unwrap();
+    assert!(machine.pan.abs() > 0.1);
+    assert!(machine.gain < 0.25);
+    o.fabrication = true;
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert_eq!(
+        m.voices(settings)
+            .iter()
+            .filter(|v| v.cue == Cue::Fabricator)
+            .count(),
+        1
+    );
+    o.active = false;
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert!(!cues(&m.voices(settings)).contains(&Cue::Fabricator));
 }

@@ -127,14 +127,30 @@ pub(super) fn map_world_to_renderer(
     (camera, instances, spheres, light)
 }
 
-/// Hollow blueprint edges use the ordinary oriented instance pass. No domain state
-/// is owned here, and these visual markers never become collision geometry.
+/// Map paid-progress edges and completed simple furnishings into the ordinary
+/// oriented instance pass. Session-owned solids also feed physical collision.
 pub(super) fn construction_wireframes(
     session: &crate::session::GameplaySession,
     frame: salimon_character::ShipFrame,
     orientation: [f32; 4],
 ) -> Vec<SceneInstance> {
     let mut result = Vec::new();
+    for b in session.construction_solids() {
+        result.push(SceneInstance {
+            center_meters: frame.local_to_world([
+                (b[0] + b[1]) / 2.,
+                (b[2] + b[3]) / 2.,
+                (b[4] + b[5]) / 2.,
+            ]),
+            half_extents_meters: [
+                ((b[1] - b[0]) / 2.) as f32,
+                ((b[3] - b[2]) / 2.) as f32,
+                ((b[5] - b[4]) / 2.) as f32,
+            ],
+            color: [0.32, 0.36, 0.39, 1.],
+            orientation,
+        });
+    }
     for (space, color) in session.construction_boxes() {
         for axis in 0..3 {
             let other: Vec<_> = (0..3).filter(|i| *i != axis).collect();

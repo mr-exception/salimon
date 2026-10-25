@@ -619,3 +619,8 @@ Room and fixture lights #580: [canonical controls, source, effective output and 
 
 
 Tactile sound/acoustics #583: [canonical source-event, partition, callback-budget and evidence contract](../../docs/scout-acoustics.md). Actual travel/attachments trigger cues; restore audio epochs are transient. E2E exposes silent preview mapping and keeps device playback suppressed.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and one-time simple interior installation. No unfinished collider, free progress, duplicate mass or unsupported complex completion. Schema 17 restores exact work without elapsed-time credit.

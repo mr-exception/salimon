@@ -12,6 +12,7 @@ use crate::session::GameplaySession;
 pub(crate) enum Scenario {
     LandedEarth,
     ConstructionMaterials,
+    ConstructionBuild,
     ScoutLighting,
     ScoutLightingShutter,
     ScoutLightingBlackout,
@@ -65,6 +66,7 @@ impl Scenario {
             "scout-lighting-broken" => Ok(Self::ScoutLightingBroken),
             "scout-lighting-dark" => Ok(Self::ScoutLightingDark),
             "construction-materials" => Ok(Self::ConstructionMaterials),
+            "construction-build" => Ok(Self::ConstructionBuild),
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
             "scout-cabin-table" => Ok(Self::ScoutCabinTable),
@@ -117,6 +119,7 @@ impl Scenario {
             Self::ScoutLightingBroken => "scout-lighting-broken",
             Self::ScoutLightingDark => "scout-lighting-dark",
             Self::ConstructionMaterials => "construction-materials",
+            Self::ConstructionBuild => "construction-build",
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
             Self::ScoutCabinTable => "scout-cabin-table",
@@ -309,8 +312,11 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
             }
         }
 
-        Scenario::ConstructionMaterials => {
-            crate::session::construction::evidence_initial_conditions(app)?
+        Scenario::ConstructionMaterials | Scenario::ConstructionBuild => {
+            crate::session::construction::evidence_initial_conditions(
+                app,
+                config.scenario == Scenario::ConstructionBuild,
+            )?
         }
         Scenario::ScoutCoreUpgrade | Scenario::ScoutCoreUpgradePowered => {
             crate::session::core_upgrades::evidence_initial_conditions(

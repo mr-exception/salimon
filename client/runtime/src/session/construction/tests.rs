@@ -278,3 +278,334 @@ fn fully_funded_partial_cancel_and_corrupt_cross_owner_receipts() {
     assert_eq!(s.ship.snapshot().total_mass_kg, mass - 0.5);
     assert_eq!(s.mining.session.fragments()[0].material().mass_kg(), 0.5);
 }
+
+fn funded_stool() -> (GameplaySession, PlaceholderId) {
+    let mut s = prepare();
+    s.command(Command::Build(BuildAction::Place));
+    piece(&mut s, salimon_world::resources::ResourceId::IronOre, 1.);
+    s.command(Command::Interact);
+    let p = s.building.source.projects.jobs().next().unwrap();
+    assert!(p.funding.funded(&p.blueprint.requirements));
+    let id = p.id;
+    (s, id)
+}
+fn move_player(s: &mut GameplaySession, eye: [f64; 3]) {
+    let mut v = serde_json::to_value(s.character.save_state()).unwrap();
+    v["position"] = serde_json::json!({"Inside":{"local":eye}});
+    s.character =
+        salimon_character::CharacterController::from_save(serde_json::from_value(v).unwrap(), None)
+            .unwrap();
+}
+#[test]
+fn paid_construction_automatically_completes_once_without_tool_or_nearby_player() {
+    let (mut s, id) = funded_stool();
+    let mass = s.ship.snapshot().total_mass_kg;
+    let energy = s.ship.snapshot().energy_core.stored_joules;
+    s.command(Command::Build(BuildAction::Toggle));
+    move_player(
+        &mut s,
+        [
+            4.,
+            SHIP_FLOOR_HEIGHT_METERS + salimon_character::PLAYER_EYE_HEIGHT_METERS,
+            0.,
+        ],
+    );
+    assert!(s.construction_solids().is_empty());
+    s.advance_construction(Duration::from_secs(5));
+    assert_eq!(
+        s.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .funding
+            .progress_ppm,
+        500_000
+    );
+    assert!(
+        s.construction_solids().is_empty(),
+        "partial build never solid"
+    );
+    assert_eq!(energy - s.ship.snapshot().energy_core.stored_joules, 5_000);
+    let saved = s.save_bytes(100).unwrap();
+    let mut restored = GameplaySession::default();
+    restored.restore_bytes(&saved).unwrap();
+    assert_eq!(restored.building.source, s.building.source);
+    restored.advance_construction(Duration::from_secs(500));
+    assert!(
+        restored
+            .building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .work
+            .completed
+    );
+    assert_eq!(restored.construction_solids().len(), 5);
+    assert_eq!(restored.ship.snapshot().total_mass_kg, mass);
+    assert_eq!(
+        energy - restored.ship.snapshot().energy_core.stored_joules,
+        10_000
+    );
+    assert!(restored.cancel_construction(id).is_err());
+    let after = restored.save_bytes(100).unwrap();
+    restored.advance_construction(Duration::from_secs(500));
+    assert_eq!(restored.save_bytes(100).unwrap(), after);
+    let mut again = GameplaySession::default();
+    again.restore_bytes(&after).unwrap();
+    assert_eq!(again.construction_solids(), restored.construction_solids());
+    assert!(
+        again
+            .mining
+            .interior_solids
+            .iter()
+            .any(|b| again.construction_solids().contains(b))
+    );
+}
+#[test]
+fn construction_safety_damage_pause_and_exact_partial_energy_admission() {
+    let (mut s, id) = funded_stool();
+    let source = s.building.source.clone();
+    let energy = s.ship.snapshot().energy_core.stored_joules;
+    let space = s.building.source.projects.inspect(id).unwrap().space;
+    let original = s.snapshot().character;
+    let frame = character_ship_frame(s.ship.snapshot().pose);
+    let old_eye = frame.world_to_local(original.eye_position_meters);
+    move_player(
+        &mut s,
+        [
+            (space.min[0] + space.max[0]) / 2.,
+            SHIP_FLOOR_HEIGHT_METERS + salimon_character::PLAYER_EYE_HEIGHT_METERS,
+            (space.min[2] + space.max[2]) / 2.,
+        ],
+    );
+    s.advance_construction(Duration::from_secs(10));
+    assert_eq!(s.building.source, source);
+    assert_eq!(s.ship.snapshot().energy_core.stored_joules, energy);
+    assert!(
+        s.construction_inspect()["status"][id.0.to_string()]
+            .as_str()
+            .unwrap()
+            .contains("Player")
+    );
+    move_player(&mut s, old_eye);
+    s.building
+        .source
+        .projects
+        .funding_mut(id, OWNER)
+        .unwrap()
+        .work
+        .damaged = true;
+    s.advance_construction(Duration::from_secs(10));
+    assert_eq!(s.ship.snapshot().energy_core.stored_joules, energy);
+    s.building
+        .source
+        .projects
+        .funding_mut(id, OWNER)
+        .unwrap()
+        .work
+        .damaged = false;
+    s.paused = true;
+    s.advance_construction(Duration::from_secs(10));
+    assert_eq!(s.building.source, source);
+    s.paused = false;
+    let reserve = s.recovery_reserve();
+    s.ship.exchange_core_energy_joules(0., f64::MAX).unwrap();
+    s.advance_construction(Duration::from_secs(5));
+    assert_eq!(s.building.source, source);
+    s.ship
+        .exchange_core_energy_joules(reserve + 2_500., 0.)
+        .unwrap();
+    s.advance_construction(Duration::from_secs(5));
+    assert_eq!(s.ship.snapshot().energy_core.stored_joules, reserve as u64);
+    assert_eq!(
+        s.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .funding
+            .progress_ppm,
+        250_000
+    );
+    let progress = s.building.source.clone();
+    s.advance_construction(Duration::from_secs(5));
+    assert_eq!(s.building.source, progress);
+    s.ship.exchange_core_energy_joules(7_500., 0.).unwrap();
+    s.advance_construction(Duration::from_secs(30));
+    assert!(
+        s.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .work
+            .completed
+    );
+}
+#[test]
+fn paid_partial_cancel_returns_proportional_real_mass_and_never_replays() {
+    let (mut s, id) = funded_stool();
+    s.advance_construction(Duration::from_millis(2_500));
+    let mass = s.ship.snapshot().total_mass_kg;
+    s.cancel_construction(id).unwrap();
+    assert_eq!(s.mining.session.fragments().len(), 1);
+    assert_eq!(s.mining.session.fragments()[0].material().mass_kg(), 0.75);
+    assert_eq!(s.ship.snapshot().total_mass_kg, mass - 0.25);
+    let saved = s.save_bytes(100).unwrap();
+    assert!(s.cancel_construction(id).is_err());
+    assert_eq!(s.save_bytes(100).unwrap(), saved);
+}
+#[test]
+fn timer_partitioning_save_validation_and_full_scheduler_pause_are_exact() {
+    let (mut a, id) = funded_stool();
+    let bytes = a.save_bytes(100).unwrap();
+    let mut b = GameplaySession::default();
+    b.restore_bytes(&bytes).unwrap();
+    a.advance_construction(Duration::from_millis(1_234));
+    for _ in 0..1_234 {
+        b.advance_construction(Duration::from_millis(1));
+    }
+    assert_eq!(a.building.source, b.building.source);
+    assert_eq!(a.ship.snapshot().energy_core, b.ship.snapshot().energy_core);
+    let good = a.save_bytes(100).unwrap();
+    for (key, value) in [
+        ("elapsed_nanos", serde_json::json!(300_000_000_001_u64)),
+        ("completed", serde_json::json!(true)),
+    ] {
+        let mut bad: serde_json::Value = serde_json::from_slice(&good).unwrap();
+        bad["state"]["construction"]["projects"]["jobs"][0]["work"][key] = value;
+        assert!(a.restore_bytes(&serde_json::to_vec(&bad).unwrap()).is_err());
+        assert_eq!(a.save_bytes(100).unwrap(), good);
+    }
+    let mut bad: serde_json::Value = serde_json::from_slice(&good).unwrap();
+    bad["schema_version"] = 16.into();
+    assert!(a.restore_bytes(&serde_json::to_vec(&bad).unwrap()).is_err());
+    a.paused = true;
+    let before = a.building.source.clone();
+    a.advance_automation(Duration::from_secs(5));
+    assert_eq!(a.building.source, before);
+    a.paused = false;
+    a.advance_automation(Duration::from_millis(16));
+    assert!(
+        a.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .funding
+            .progress_ppm
+            > 123_400
+    );
+}
+
+#[test]
+fn cargo_obstruction_prevents_final_install_and_spends_nothing_until_clear() {
+    let (mut s, id) = funded_stool();
+    s.advance_construction(Duration::from_millis(9_984));
+    piece(&mut s, salimon_world::resources::ResourceId::IronOre, 0.1);
+    let f = s.mining.session.carried_id().unwrap();
+    let p = s.building.source.projects.inspect(id).unwrap();
+    let local = std::array::from_fn(|i| (p.space.min[i] + p.space.max[i]) / 2.);
+    let w = character_ship_frame(s.ship.snapshot().pose).local_to_world(local);
+    let pose = salimon_world::resources::ResourceTransform::new(
+        salimon_world::WorldPosition::new(w[0], w[1], w[2]),
+        [0., 0., 0., 1.],
+    )
+    .unwrap();
+    s.mining.session.move_carried(pose);
+    let before = s.building.source.clone();
+    let energy = s.ship.snapshot().energy_core;
+    s.advance_construction(Duration::from_secs(20));
+    assert_eq!(s.building.source, before);
+    assert_eq!(s.ship.snapshot().energy_core, energy);
+    assert!(s.construction_solids().is_empty());
+    s.mining.session.remove_fragment(f);
+    s.sync_carried();
+    let checkpoint = s.checkpoint_events();
+    s.advance_construction(Duration::from_millis(16));
+    assert!(
+        s.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .work
+            .completed
+    );
+    assert_ne!(
+        s.checkpoint_events(),
+        checkpoint,
+        "completion triggers durable checkpoint"
+    );
+}
+
+#[test]
+fn complex_installation_stops_cancellable_before_completion_without_fake_solids() {
+    let mut s = prepare();
+    let mut placed = None;
+    'search: for x in -14..=12 {
+        for z in -8..=8 {
+            let target = [
+                f64::from(x) * 0.5,
+                SHIP_FLOOR_HEIGHT_METERS,
+                f64::from(z) * 0.5,
+            ];
+            let obstacles = s.construction_obstacles(Footprint::Interior);
+            let c = PlacementContext {
+                actor: OWNER,
+                owner: OWNER,
+                flight: FlightPermission::Landed,
+                eye_meters: target,
+                reach_meters: REACH_METERS,
+                reachable: true,
+                physical_support: true,
+                obstacles: &obstacles,
+            };
+            if let Ok(id) = s.building.source.projects.place(
+                &s.building.catalog,
+                "utility-module",
+                target,
+                Rotation::Forward,
+                &s.building.structure,
+                &c,
+            ) {
+                let p = s.building.source.projects.inspect(id).unwrap();
+                if has_physical_support(Footprint::Interior, p.space) {
+                    placed = Some(id);
+                    break 'search;
+                }
+                s.building.source.projects.cancel(id, OWNER).unwrap();
+            }
+        }
+    }
+    let id = placed.expect("a clear supported module location exists in the starter");
+    piece(&mut s, salimon_world::resources::ResourceId::IronOre, 3.);
+    let p = s.building.source.projects.funding_mut(id, OWNER).unwrap();
+    p.funding
+        .contribute(&mut s.mining.session, &p.blueprint.requirements, true)
+        .unwrap();
+    s.sync_carried();
+    let before = s.ship.snapshot().energy_core.stored_joules;
+    s.advance_construction(Duration::from_secs(100));
+    let p = s.building.source.projects.inspect(id).unwrap();
+    assert_eq!(p.funding.progress_ppm, 999_999);
+    assert!(!p.work.completed);
+    assert!(s.construction_solids().is_empty());
+    assert!(
+        s.construction_status(p)
+            .contains("installation unavailable")
+    );
+    assert!(before - s.ship.snapshot().energy_core.stored_joules <= 180_000);
+    let after = s.ship.snapshot().energy_core;
+    let source = s.building.source.clone();
+    s.advance_construction(Duration::from_secs(100));
+    assert_eq!(s.building.source, source);
+    assert_eq!(s.ship.snapshot().energy_core, after);
+    s.cancel_construction(id).unwrap();
+    assert_eq!(
+        s.mining.session.fragments()[0].material().mass_kg(),
+        0.000003
+    );
+}

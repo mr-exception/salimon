@@ -494,7 +494,8 @@ impl GameplaySession {
                 bounds.push([p[0] - r, p[0] + r, p[1] - r, p[1] + r, p[2] - r, p[2] + r]);
             }
         }
-        let cabin = self.cabin_solids();
+        let mut cabin = self.cabin_solids();
+        cabin.extend(self.construction_solids());
         bounds.extend_from_slice(&cabin);
         if !self.mining.interior_solids.is_empty() && self.mining.interior_solids != cabin {
             self.mining.fragment_sleep = Default::default();

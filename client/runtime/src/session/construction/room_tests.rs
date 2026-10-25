@@ -557,3 +557,32 @@ fn aim_at(s: &mut GameplaySession, target: [f64; 3]) {
         (old[1].atan2(old[0].hypot(old[2])) - d[1].atan2(d[0].hypot(d[2]))) / 0.0022,
     ));
 }
+
+#[test]
+fn cargo_on_boarding_stairs_uses_actual_support_below_the_original_deck() {
+    let (mut s, _) = room();
+    s.advance_construction(Duration::from_secs(300));
+    piece(&mut s, salimon_world::resources::ResourceId::IronOre, 1.);
+    let floor = s
+        .mining
+        .modular_interior
+        .support([-16., 2., 0.], 0.24, SHIP_FLOOR_HEIGHT_METERS)
+        .unwrap();
+    move_player(&mut s, [-16., floor + 1.75, 0.]);
+    s.sync_mount_collision();
+    s.sync_carried();
+    let id = s.mining.session.carried_id().unwrap();
+    s.command(Command::GrabDrop(true));
+    s.command(Command::GrabDrop(false));
+    assert!(s.mining.session.carried_id().is_none(), "{:?}", s.feedback);
+    s.advance_automation(Duration::from_secs(3));
+    let p = s.mining.ship_fragments[&id].meters();
+    let radius = crate::fragment_physics::sphere_radius(*s.mining.session.fragment(id).unwrap());
+    let h = s
+        .mining
+        .modular_interior
+        .support(p, radius, p[1] - radius + 0.001)
+        .unwrap();
+    assert!(h < SHIP_FLOOR_HEIGHT_METERS);
+    assert!((p[1] - radius - h).abs() < 0.003, "{p:?}, {h}");
+}

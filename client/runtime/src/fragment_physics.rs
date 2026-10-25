@@ -522,7 +522,22 @@ fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
 }
 
 fn fixture_support_height(tool: &ResourceGameplay, position: [f64; 3], radius: f64) -> f64 {
-    let mut height = salimon_character::cargo::cargo_support_height(position, radius);
+    let mut height = if tool.modular_interior.contains(position)
+        && !salimon_character::ship_contains_object(position)
+    {
+        tool.modular_interior
+            .support(position, radius, position[1] - radius + 0.001)
+            .unwrap_or_else(|| {
+                tool.modular_interior
+                    .volumes
+                    .iter()
+                    .map(|b| b[2])
+                    .min_by(f64::total_cmp)
+                    .unwrap_or(salimon_character::SHIP_FLOOR_HEIGHT_METERS)
+            })
+    } else {
+        salimon_character::cargo::cargo_support_height(position, radius)
+    };
     for m in &tool.mount_geometry.mounts {
         let p = m.position();
         if (position[0] - p[0]).abs() + radius <= 0.5

@@ -255,6 +255,14 @@
     {
       "action": {
         "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
         "key": "right",
         "pressed": true
       },
@@ -271,6 +279,14 @@
       "action": {
         "op": "key",
         "key": "right",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
         "pressed": false
       },
       "timeout_ms": 120000

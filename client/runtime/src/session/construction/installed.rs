@@ -1,4 +1,5 @@
 //! Completed structural source, stable cell/face identities and shared geometry.
+use super::boarding::{boarding_exit, boarding_solids};
 use super::*;
 use salimon_ship::structure::{Direction, FaceKind, shell::*};
 
@@ -33,6 +34,40 @@ impl GameplaySession {
         let eye = frame.world_to_local(snap.character.eye_position_meters);
         let r = salimon_character::PLAYER_RADIUS_METERS;
         let foot = eye[1] - salimon_character::PLAYER_EYE_HEIGHT_METERS;
+        if let Some([tip, _, bottom, _]) = boarding_exit(next) {
+            let local = frame.world_to_local(self.terrain_frame(snap.ship).eye_on_ground(
+                frame.local_to_world([
+                    tip,
+                    bottom + salimon_character::PLAYER_EYE_HEIGHT_METERS,
+                    0.,
+                ]),
+            ));
+            if (local[1] - salimon_character::PLAYER_EYE_HEIGHT_METERS - bottom).abs() > 0.3 {
+                return false;
+            }
+        }
+        if boarding_exit(next) != boarding_exit(&self.building.structure)
+            && let Some([tip, start, bottom, top]) = boarding_exit(&self.building.structure)
+        {
+            if eye[0] >= tip - 0.3
+                && eye[0] <= start + 0.3
+                && eye[2].abs() < 1.
+                && eye[1] >= bottom
+                && foot <= top + 2.
+            {
+                return false;
+            }
+            if self.mining.session.fragments().iter().any(|f| {
+                let p = frame.world_to_local(f.transform().position().meters());
+                p[0] >= tip - 0.3
+                    && p[0] <= start + 0.3
+                    && p[2].abs() < 1.
+                    && p[1] >= bottom
+                    && p[1] <= top + 2.
+            }) {
+                return false;
+            }
+        }
         let old = self.structural_solids();
         let boxes = next.parts().filter(|p| p.id.0 >= 1024).flat_map(|p| {
             p.collision
@@ -50,6 +85,10 @@ impl GameplaySession {
         ];
         boxes
             .chain(connector)
+            .chain(boarding_solids(
+                next,
+                crate::session::door_passable(snap.ship),
+            ))
             .filter(|b| !old.contains(b))
             .all(|b| {
                 let player = eye[0] + r > b[0]
@@ -113,6 +152,10 @@ impl GameplaySession {
                 [-8.5, -7.04, y, y + 2.4, 1.3, 1.4],
             ]);
         }
+        out.extend(boarding_solids(
+            &self.building.structure,
+            crate::session::door_passable(self.ship.snapshot()),
+        ));
         out
     }
     pub(in crate::session) fn modular_port(&self) -> bool {
@@ -135,6 +178,9 @@ impl GameplaySession {
         if self.modular_port() {
             let y = SHIP_FLOOR_HEIGHT_METERS;
             volumes.push([-8.5, -6.8, y, y + 2.4, -1.4, 1.4]);
+        }
+        if let Some([tip, start, bottom, top]) = boarding_exit(&self.building.structure) {
+            volumes.push([tip - 0.5, start + 0.1, bottom, top + 2.4, -0.7, 0.7]);
         }
         volumes
     }
@@ -220,79 +266,17 @@ impl GameplaySession {
     }
 }
 
-/// Evidence-only initial source: one reserved four-cell room and one carried
-/// 40 kg iron sphere. All later intake, paid work and movement use normal commands.
-pub(crate) fn evidence_room(s: &mut GameplaySession) -> Result<(), String> {
-    use salimon_world::{resources::*, spherical_mining::*};
-    let y = SHIP_FLOOR_HEIGHT_METERS;
-    s.character.set_supported_pose([-6.6, y + 1.75, 0.]);
-    s.ship.toggle_door();
-    s.advance_automation(std::time::Duration::from_secs(3));
-    let target = [-14.5, y, -1.5];
-    s.building
-        .source
-        .projects
-        .place(
-            registered_catalog(),
-            "two-deck-room",
-            target,
-            Rotation::Forward,
-            &s.building.structure,
-            &PlacementContext {
-                actor: OWNER,
-                owner: OWNER,
-                flight: FlightPermission::Landed,
-                eye_meters: [-6.6, y + 1.75, 0.],
-                reach_meters: 5.,
-                reachable: true,
-                physical_support: true,
-                obstacles: &static_obstacles(Footprint::Structural),
-            },
-        )
-        .map_err(|e| e.to_string())?;
-    let frame = character_ship_frame(s.ship.snapshot().pose);
-    let w = frame.local_to_world([-6.6, y + 1., 0.]);
-    let pose = ResourceTransform::new(
-        salimon_world::WorldPosition::new(w[0], w[1], w[2]),
-        [0., 0., 0., 1.],
-    )
-    .map_err(|e| e.to_string())?;
-    let mut deposit = ResourceDeposit::new(
-        DepositId {
-            body: salimon_world::CelestialBodyId::Earth,
-            local: 545,
-        },
-        RawMaterial::new(ResourceId::IronOre, 40.).map_err(|e| e.to_string())?,
-        pose.position(),
-        40.,
-    )
-    .map_err(|e| e.to_string())?;
-    let config = MiningConfig::new(40., 100.).map_err(|e| e.to_string())?;
-    let mut id = None;
-    for _ in 0..100 {
-        id = s
-            .mining
-            .session
-            .tick_spherical(true, Some(&mut deposit), SPHERE_TICK, config, pose)
-            .or(id);
-        if id.is_some() {
-            break;
-        }
-    }
-    if !s
-        .mining
-        .session
-        .pick_up(id.ok_or("room evidence sphere absent")?)
-    {
-        return Err("room evidence carry rejected".into());
-    }
-    s.command(crate::session::Command::Look(
-        std::f64::consts::PI / 0.0022,
-        0.,
-    ));
-    s.building.active = true;
-    s.building.selected = 5;
-    s.equipment.stow();
-    s.sync_carried();
-    Ok(())
+pub(super) fn supported_by(structure: &ShipStructure, s: Envelope) -> bool {
+    let parts: Vec<_> = structure.parts().filter(|p| p.id.0 >= 1024).collect();
+    [s.min[0] + 0.001, s.max[0] - 0.001].into_iter().all(|x| {
+        [s.min[2] + 0.001, s.max[2] - 0.001].into_iter().all(|z| {
+            parts.iter().flat_map(|p| &p.collision).any(|b| {
+                x >= b.min[0]
+                    && x <= b.max[0]
+                    && z >= b.min[2]
+                    && z <= b.max[2]
+                    && (b.max[1] - s.min[1]).abs() < 1e-6
+            })
+        })
+    })
 }

@@ -51,6 +51,11 @@ pub fn build_shells(
             return Err(StructureError::Disconnected);
         }
     }
+    let exit_cell = owners
+        .keys()
+        .filter(|c| c.y == 0 && c.z == 1)
+        .min_by_key(|c| c.x)
+        .copied();
     let mut applied = BTreeSet::new();
     let mut assemblies = Vec::new();
     for room in rooms {
@@ -81,7 +86,9 @@ pub fn build_shells(
                 let mut kind = match direction {
                     Direction::Down => FaceKind::Floor,
                     Direction::Up => FaceKind::Ceiling,
-                    _ if port => FaceKind::Doorway,
+                    _ if port || (Some(*cell) == exit_cell && direction == Direction::Aft) => {
+                        FaceKind::Doorway
+                    }
                     _ if other.is_some_and(|(project, _)| *project == room.project) => {
                         FaceKind::Opening
                     }

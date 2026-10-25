@@ -52,6 +52,27 @@ impl CharacterController {
                     local = next;
                     continue;
                 }
+                if let Some([tip, _, _, _]) = self.modular.exit
+                    && next[0] < tip - PLAYER_RADIUS_METERS
+                    && local[0] >= tip - PLAYER_RADIUS_METERS
+                    && next[2].abs() < 0.46
+                {
+                    self.vertical_speed = 0.;
+                    self.interior_velocity = [0.; 3];
+                    let world = step.ship.local_to_world(next);
+                    if step.ship_landed {
+                        self.position = PositionState::Surface {
+                            world: step.surface.eye_on_ground(world),
+                        };
+                    } else {
+                        self.eva_inherited_velocity = step.ship_velocity;
+                        self.eva_control_velocity = [0.; 3];
+                        self.eva_axes = step.ship.axes;
+                        self.nearby_surface = None;
+                        self.position = PositionState::Space { world };
+                    }
+                    return true;
+                }
                 if !self.modular.contains(next) {
                     continue;
                 }
@@ -165,8 +186,8 @@ impl CharacterController {
                     self.modular.contains([eye[0] + x, y, eye[2] + z])
                         || (eye[0] + x >= -7.24
                             && (eye[2] + z).abs() < 1.2
-                            && y >= crate::SHIP_FLOOR_HEIGHT_METERS
-                            && y <= DOORWAY_CEILING_HEIGHT)
+                            && (crate::SHIP_FLOOR_HEIGHT_METERS..=DOORWAY_CEILING_HEIGHT)
+                                .contains(&y))
                 })
             })
         }) {
@@ -221,6 +242,38 @@ impl CharacterController {
     }
 }
 
+impl CharacterController {
+    pub(super) fn enter_modular_stairs(&mut self, previous: [f64; 3], local: [f64; 3]) -> bool {
+        let Some([tip, _, bottom, _]) = self.modular.exit else {
+            return false;
+        };
+        let plane = tip - PLAYER_RADIUS_METERS;
+        if previous[0] <= plane + 0.001
+            && local[0] >= plane - 1e-7
+            && local[0] > previous[0] + 1e-7
+            && local[2].abs() <= 0.46
+            && (local[1] - PLAYER_EYE_HEIGHT_METERS - bottom).abs() < 0.3
+        {
+            let mut next = local;
+            next[0] = next[0].max(plane + 0.002);
+            let Some(floor) = self
+                .modular
+                .support(next, PLAYER_RADIUS_METERS, bottom + 0.3)
+            else {
+                return false;
+            };
+            next[1] = floor + PLAYER_EYE_HEIGHT_METERS;
+            if self.modular_body_clear(next) {
+                self.vertical_speed = 0.;
+                self.interior_velocity = [0.; 3];
+                self.position = PositionState::Inside { local: next };
+                return true;
+            }
+        }
+        false
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -231,6 +284,7 @@ mod tests {
             volumes: vec![],
             solids: vec![[-12., -9., 3., 3.1, -1.5, 1.5]],
             aft_port: false,
+            exit: None,
         });
         let above = c.sweep_modular_exterior([-10., 7., 0.], [-10., 0., 0.]);
         assert!((above[1] - 3.1 - PLAYER_EYE_HEIGHT_METERS).abs() < 1e-12);

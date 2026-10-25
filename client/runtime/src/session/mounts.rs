@@ -505,6 +505,7 @@ impl GameplaySession {
             volumes: self.structural_volumes(),
             solids: self.structural_solids(),
             aft_port: self.modular_port(),
+            exit: super::construction::boarding_exit(&self.building.structure),
         };
         if self.mining.modular_interior.volumes != modular.volumes {
             self.mining.mass_frame = None;

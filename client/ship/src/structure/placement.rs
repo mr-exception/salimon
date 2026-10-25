@@ -384,8 +384,13 @@ impl Placements {
         } else {
             blueprint.fine_pitch_meters
         };
-        let anchor =
+        let mut anchor =
             std::array::from_fn(|i| origin[i] + ((target[i] - origin[i]) / pitch).floor() * pitch);
+        // The trusted host supplies an actual completed support elevation;
+        // horizontal fine snapping must not bury furniture in a new deck.
+        if blueprint.footprint == Footprint::Interior {
+            anchor[1] = target[1];
+        }
         let space = rotated_space(blueprint.space, rotation, anchor)?;
         let cells = covered_cells(space, origin, supplied_limit(blueprint.cells.len()))?;
         let mut preview = Preview {
@@ -478,6 +483,9 @@ impl Placements {
         }
         for job in self.jobs.values() {
             if Some(job.id) != ignore
+                && !(preview.blueprint.footprint == Footprint::Interior
+                    && job.work.completed
+                    && job.blueprint.footprint == Footprint::Structural)
                 && (intersects(preview.space, job.space)
                     || (preview.blueprint.footprint == Footprint::Structural
                         && job.blueprint.footprint == Footprint::Structural
@@ -615,7 +623,13 @@ impl Placements {
         let jobs: Vec<_> = self.jobs.values().collect();
         for (i, a) in jobs.iter().enumerate() {
             for b in &jobs[i + 1..] {
-                if intersects(a.space, b.space) {
+                let furnishing_in_room = (a.work.completed
+                    && a.blueprint.footprint == Footprint::Structural
+                    && b.blueprint.footprint == Footprint::Interior)
+                    || (b.work.completed
+                        && b.blueprint.footprint == Footprint::Structural
+                        && a.blueprint.footprint == Footprint::Interior);
+                if intersects(a.space, b.space) && !furnishing_in_room {
                     return Err(PlacementError::Overlapping(b.id));
                 }
             }

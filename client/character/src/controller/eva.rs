@@ -67,6 +67,13 @@ impl CharacterController {
         }
         local = slide_around_appendages(previous, local, world_round_trip_tolerance(world));
         local = self.sweep_modular_exterior(previous, local);
+        let modular_gate = self.modular.exit.is_some_and(|[_, x, _, top]| {
+            previous[0] < x
+                && local[0] >= x
+                && local[2].abs() <= 0.46
+                && local[1] >= top + PLAYER_EYE_HEIGHT_METERS - 0.01
+                && local[1] <= top + 2.3 - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS)
+        });
         let through_gate = previous[0] < DOORWAY_FORWARD
             && local[0] >= DOORWAY_FORWARD - COLLISION_EPSILON
             && previous[2].abs() <= DOORWAY_SIDE_LIMIT + COLLISION_EPSILON
@@ -74,8 +81,12 @@ impl CharacterController {
             && local[1] >= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT - COLLISION_EPSILON
             && local[1]
                 <= DOORWAY_CEILING_HEIGHT - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
-        if door_open && through_gate && local[0] > previous[0] {
-            local[0] = local[0].max(DOORWAY_FORWARD);
+        if door_open && (through_gate || modular_gate) && local[0] > previous[0] {
+            local[0] = local[0].max(if modular_gate {
+                self.modular.exit.expect("matched modular entry")[1]
+            } else {
+                DOORWAY_FORWARD
+            });
             self.vertical_speed = 0.0;
             self.nearby_surface = None;
             let relative = sub(

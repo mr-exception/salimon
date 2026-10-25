@@ -636,6 +636,14 @@ impl GameplaySession {
     ) -> Option<super::interaction::InteractionTarget> {
         use super::interaction::InteractionTarget::*;
         let base = super::interaction::available_interaction_target(location, eye, look);
+        if matches!(
+            location,
+            salimon_character::CharacterLocation::InsideShip
+                | salimon_character::CharacterLocation::Surface
+        ) && self.modular_gate_target(eye, look)
+        {
+            return Some(ExitDoor);
+        }
         if location != salimon_character::CharacterLocation::InsideShip {
             return base;
         }

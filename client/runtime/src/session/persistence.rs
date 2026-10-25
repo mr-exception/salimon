@@ -341,10 +341,12 @@ impl GameplaySession {
         };
         if save.schema_version < 18
             && (!construction.removed_partitions.is_empty()
-                || construction
-                    .projects
-                    .jobs()
-                    .any(|p| p.work.completed && super::construction::is_structural(p)))
+                || !construction.open_doors.is_empty()
+                || construction.projects.jobs().any(|p| {
+                    p.work.completed
+                        && (super::construction::is_structural(p)
+                            || p.blueprint.id == "internal-door")
+                }))
         {
             return Err(invalid("installed structure requires schema 18"));
         }
@@ -769,7 +771,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            (self.survival.snapshot().terminal, (self.building.source.projects.jobs().map(|p|(p.id,p.work.completed,p.work.damaged)).collect::<Vec<_>>(), &self.building.source.removed_partitions)), self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, (&self.archive, (&self.finishes, (&self.lighting,&self.core_upgrades))), ((self.mounts.carried.as_ref().map(|c|c.id), self.mounts.mounts.iter().map(|m|(m.id,m.rail,m.secured)).collect::<Vec<_>>()), self.recovery.checkpoint_events()), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0,self.cabin_checkpoint()))))
+            (self.survival.snapshot().terminal, (self.building.source.projects.jobs().map(|p|(p.id,p.work.completed,p.work.damaged)).collect::<Vec<_>>(), (&self.building.source.removed_partitions,&self.building.source.open_doors))), self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, (&self.archive, (&self.finishes, (&self.lighting,&self.core_upgrades))), ((self.mounts.carried.as_ref().map(|c|c.id), self.mounts.mounts.iter().map(|m|(m.id,m.rail,m.secured)).collect::<Vec<_>>()), self.recovery.checkpoint_events()), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0,self.cabin_checkpoint()))))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

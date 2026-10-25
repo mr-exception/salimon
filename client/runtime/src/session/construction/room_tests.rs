@@ -364,3 +364,196 @@ fn legacy_two_cell_reservation_retains_original_footprint_and_cancellable_receip
     s.cancel_construction(id).unwrap();
     assert_eq!(s.building.source.projects.jobs().count(), 0);
 }
+
+#[test]
+fn completed_room_accepts_supported_furniture_without_its_old_reservation_occluding_intake() {
+    let (mut s, _) = room();
+    s.advance_construction(Duration::from_secs(300));
+    let y = SHIP_FLOOR_HEIGHT_METERS + 0.1;
+    let target = [-12., y, 0.5];
+    let obstacles = s.construction_obstacles(Footprint::Interior);
+    let id = s
+        .building
+        .source
+        .projects
+        .place(
+            registered_catalog(),
+            "stool",
+            target,
+            Rotation::Forward,
+            &s.building.structure,
+            &PlacementContext {
+                actor: OWNER,
+                owner: OWNER,
+                flight: FlightPermission::Landed,
+                eye_meters: [-10.5, y + 1.75, 0.75],
+                reach_meters: 5.,
+                reachable: true,
+                physical_support: true,
+                obstacles: &obstacles,
+            },
+        )
+        .unwrap();
+    move_player(&mut s, [-10.5, y + 1.75, 0.75]);
+    s.sync_mount_collision();
+    let d = [-1.25_f64, -1.25, 0.];
+    s.command(Command::Look(
+        std::f64::consts::PI / 0.0022,
+        -d[1].atan2(d[0].abs()) / 0.0022,
+    ));
+    s.building.active = true;
+    piece(&mut s, salimon_world::resources::ResourceId::IronOre, 1.);
+    assert_eq!(s.aimed_construction(), Some(id));
+    s.command(Command::Interact);
+    assert!(
+        s.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .funding
+            .funded(&registered_catalog().find("stool").unwrap().requirements)
+    );
+    s.advance_construction(Duration::from_secs(10));
+    assert!(
+        s.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .work
+            .completed
+    );
+    let mut r = GameplaySession::default();
+    r.restore_bytes(&s.save_bytes(100).unwrap()).unwrap();
+    assert_eq!(r.construction_solids(), s.construction_solids());
+}
+
+#[test]
+fn rotated_internal_door_completes_and_manual_closure_respects_occupancy_and_save() {
+    let mut s = GameplaySession::default();
+    let mut result = None;
+    'search: for x in -14..=12 {
+        for z in -7..=7 {
+            let target = [
+                f64::from(x) * 0.5,
+                SHIP_FLOOR_HEIGHT_METERS,
+                f64::from(z) * 0.5,
+            ];
+            let obstacles = s.construction_obstacles(Footprint::Interior);
+            if let Ok(id) = s.building.source.projects.place(
+                registered_catalog(),
+                "internal-door",
+                target,
+                Rotation::Port,
+                &s.building.structure,
+                &PlacementContext {
+                    actor: OWNER,
+                    owner: OWNER,
+                    flight: FlightPermission::Landed,
+                    eye_meters: target,
+                    reach_meters: 5.,
+                    reachable: true,
+                    physical_support: true,
+                    obstacles: &obstacles,
+                },
+            ) {
+                let p = s.building.source.projects.inspect(id).unwrap();
+                if has_physical_support(Footprint::Interior, p.space) {
+                    result = Some(id);
+                    break 'search;
+                }
+                s.building.source.projects.cancel(id, OWNER).unwrap();
+            }
+        }
+    }
+    let id = result.expect("safe rotated interior doorway location");
+    piece(&mut s, salimon_world::resources::ResourceId::IronOre, 5.);
+    let p = s.building.source.projects.funding_mut(id, OWNER).unwrap();
+    p.funding
+        .contribute(&mut s.mining.session, &p.blueprint.requirements, true)
+        .unwrap();
+    s.sync_carried();
+    s.advance_construction(Duration::from_secs(30));
+    assert!(
+        s.building
+            .source
+            .projects
+            .inspect(id)
+            .unwrap()
+            .work
+            .completed
+    );
+    let closed = s.construction_solids();
+    let checkpoint = s.checkpoint_events();
+    s.toggle_completed_door(id);
+    assert!(s.building.source.open_doors.contains(&id));
+    assert_ne!(s.checkpoint_events(), checkpoint);
+    let b = s.building.source.projects.inspect(id).unwrap().space;
+    let eye = [
+        (b.min[0] + b.max[0]) / 2.,
+        b.min[1] + 1.75,
+        (b.min[2] + b.max[2]) / 2.,
+    ];
+    move_player(&mut s, eye);
+    s.toggle_completed_door(id);
+    assert!(s.building.source.open_doors.contains(&id));
+    move_player(&mut s, [0.5, SHIP_FLOOR_HEIGHT_METERS + 1.75, -2.2]);
+    s.toggle_completed_door(id);
+    assert!(!s.building.source.open_doors.contains(&id));
+    assert_eq!(s.construction_solids(), closed);
+    let mut r = GameplaySession::default();
+    r.restore_bytes(&s.save_bytes(100).unwrap()).unwrap();
+    assert_eq!(r.construction_solids(), closed);
+}
+
+#[test]
+fn completed_room_preserves_a_surface_exit_and_body_clear_boarding_return() {
+    let (mut s, _) = room();
+    s.advance_construction(Duration::from_secs(300));
+    move_player(&mut s, [-13., SHIP_FLOOR_HEIGHT_METERS + 1.85, 0.4]);
+    s.sync_mount_collision();
+    aim_at(&mut s, [-14.39, SHIP_FLOOR_HEIGHT_METERS + 1.2, 0.95]);
+    s.command(Command::Interact);
+    s.advance_automation(Duration::from_secs(3));
+    assert!(
+        crate::session::door_passable(s.ship.snapshot()),
+        "{:?}",
+        s.feedback
+    );
+    aim_at(&mut s, [-12., SHIP_FLOOR_HEIGHT_METERS + 1.85, 0.4]);
+    s.command(Command::Control(ControlKey::Backward, true));
+    s.advance_automation(Duration::from_secs(3));
+    s.command(Command::Control(ControlKey::Backward, false));
+    assert_eq!(
+        s.character.location(),
+        salimon_character::CharacterLocation::Surface,
+        "{:?}",
+        s.snapshot().character
+    );
+    s.command(Command::Control(ControlKey::Forward, true));
+    s.advance_automation(Duration::from_secs(3));
+    s.command(Command::Control(ControlKey::Forward, false));
+    assert_eq!(
+        s.character.location(),
+        salimon_character::CharacterLocation::InsideShip,
+        "{:?}",
+        s.snapshot().character
+    );
+    assert!(s.character.local_ship_position().unwrap()[0] > -14.5);
+}
+
+fn aim_at(s: &mut GameplaySession, target: [f64; 3]) {
+    let snap = s.snapshot();
+    let f = character_ship_frame(snap.ship.pose);
+    let eye = f.world_to_local(snap.character.eye_position_meters);
+    let old = salimon_math::sub(f.world_to_local(snap.character.look_target_meters), eye);
+    let d = salimon_math::sub(target, eye);
+    let yaw = (d[2].atan2(d[0]) - old[2].atan2(old[0]) + std::f64::consts::PI)
+        .rem_euclid(std::f64::consts::TAU)
+        - std::f64::consts::PI;
+    s.command(Command::Look(
+        yaw / 0.0022,
+        (old[1].atan2(old[0].hypot(old[2])) - d[1].atan2(d[0].hypot(d[2]))) / 0.0022,
+    ));
+}

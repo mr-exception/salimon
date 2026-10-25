@@ -4,6 +4,8 @@ pub struct ModularInterior {
     pub volumes: Vec<[f64; 6]>,
     pub solids: Vec<[f64; 6]>,
     pub aft_port: bool,
+    /// [boarding tip X, outer doorway X, bottom floor Y, top floor Y].
+    pub exit: Option<[f64; 4]>,
 }
 impl ModularInterior {
     pub fn contains(&self, p: [f64; 3]) -> bool {

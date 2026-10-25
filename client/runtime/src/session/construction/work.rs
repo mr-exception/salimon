@@ -9,7 +9,7 @@ pub(super) fn supports_completion(p: &Placeholder) -> bool {
     }
     matches!(
         p.blueprint.id.as_str(),
-        "stool" | "partition" | "hull-cell" | "deck-cell" | "two-deck-room"
+        "stool" | "partition" | "internal-door" | "hull-cell" | "deck-cell" | "two-deck-room"
     )
 }
 fn watts(p: &Placeholder) -> f64 {
@@ -54,6 +54,7 @@ impl GameplaySession {
                     self.structural_support(p.space)
                 } else {
                     has_physical_support(p.blueprint.footprint, p.space)
+                        || installed::supported_by(&self.building.structure, p.space)
                 },
                 obstacles: &obstacles,
             },
@@ -75,6 +76,17 @@ impl GameplaySession {
         if !supports_completion(p) && p.work.remaining(&p.funding, &p.blueprint).as_nanos() <= 1_000
         {
             return "PAUSED - installation unavailable".into();
+        }
+        if installed::structural(p)
+            && supports_completion(p)
+            && p.work.remaining(&p.funding, &p.blueprint) <= Duration::from_secs(1)
+            && self
+                .building
+                .source
+                .structure(Some(p.id))
+                .is_ok_and(|next| !self.installation_clear(&next))
+        {
+            return "PAUSED - final doorway or boarding clearance".into();
         }
         if self.ship.snapshot().energy_core.stored_joules as f64 <= self.recovery_reserve() {
             return "PAUSED - Core reserve".into();
@@ -194,6 +206,11 @@ impl GameplaySession {
                         ]);
                     }
                 }
+            } else if p.blueprint.id == "internal-door" {
+                out.extend(doors::door_solids(
+                    p,
+                    self.building.source.open_doors.contains(&p.id),
+                ));
             } else if p.blueprint.id == "partition" {
                 out.push([s.min[0], s.max[0], s.min[1], s.max[1], s.min[2], s.max[2]]);
             }
@@ -202,10 +219,19 @@ impl GameplaySession {
     }
     pub(super) fn construction_obstacles(&self, footprint: Footprint) -> Vec<Obstacle> {
         let mut out = static_obstacles(footprint);
-        let bounds = self
-            .cabin_solids()
-            .into_iter()
-            .chain(self.construction_solids());
+        let movable = if footprint == Footprint::Structural {
+            boarding::boarding_solids(
+                &self.building.structure,
+                crate::session::door_passable(self.ship.snapshot()),
+            )
+        } else {
+            Vec::new()
+        };
+        let bounds = self.cabin_solids().into_iter().chain(
+            self.construction_solids()
+                .into_iter()
+                .filter(|b| !movable.contains(b)),
+        );
         out.extend(bounds.map(|b| Obstacle {
             kind: ObstacleKind::Installed,
             space: envelope(b),

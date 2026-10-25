@@ -44,9 +44,9 @@ Safe dismantling/damage is separate #549 work, not a refund shortcut.
 
 Structural hull/deck cells and four-cell/two-deck rooms now complete through the
 [modular structure adapter](modular-construction.md). Its final graph/connector
-clearance preflight precedes the last paid interval. Utility modules and the
-separate internal-door prototype retain the unavailable-installation boundary
-under #547. Legacy two-cell room reservations remain cancellable but cannot
+clearance preflight precedes the last paid interval. Internal doors also complete into manual, saved pocket doorways with
+occupancy-gated closure. Utility modules retain the unavailable-installation
+boundary under #547. Legacy two-cell room reservations remain cancellable but cannot
 complete into an unsafe stair footprint. These unsupported types stop one
 microsecond before completion, spend no more energy there and never become solid.
 

@@ -1,4 +1,7 @@
 //! Compose blueprint authority with current ship, player and physical cargo.
+mod boarding;
+mod doors;
+mod evidence;
 mod installed;
 mod work;
 use super::{GameplaySession, frames::character_ship_frame};
@@ -39,6 +42,8 @@ pub(crate) struct ConstructionSave {
     pub(crate) projects: Placements,
     #[serde(default)]
     pub(crate) removed_partitions: Vec<salimon_ship::structure::shell::PartitionEdit>,
+    #[serde(default)]
+    pub(crate) open_doors: Vec<PlaceholderId>,
 }
 impl salimon_persistence::Validate for ConstructionSave {
     fn validate(&self) -> Result<(), salimon_persistence::SaveError> {
@@ -48,13 +53,32 @@ impl salimon_persistence::Validate for ConstructionSave {
         let structure = self
             .structure(None)
             .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+        let mut door_ids = std::collections::BTreeSet::new();
+        for id in &self.open_doors {
+            if !door_ids.insert(*id)
+                || self
+                    .projects
+                    .inspect(*id)
+                    .is_none_or(|p| !p.work.completed || p.blueprint.id != "internal-door")
+            {
+                return Err(salimon_persistence::invalid("invalid completed door state"));
+            }
+        }
         for job in self.projects.jobs() {
             if job.owner != OWNER || job.origin_meters != ORIGIN || !matches_catalog(job) {
                 return Err(salimon_persistence::invalid(
                     "construction project catalog/owner/origin mismatch",
                 ));
             }
-            let obstacles = static_obstacles(job.blueprint.footprint);
+            let mut obstacles = static_obstacles(job.blueprint.footprint);
+            if job.blueprint.footprint == Footprint::Interior {
+                obstacles.extend(structure.parts().filter(|p| p.id.0 >= 1024).flat_map(|p| {
+                    p.collision.iter().map(|b| Obstacle {
+                        kind: ObstacleKind::Installed,
+                        space: *b,
+                    })
+                }));
+            }
             let context = PlacementContext {
                 actor: OWNER,
                 owner: OWNER,
@@ -62,7 +86,9 @@ impl salimon_persistence::Validate for ConstructionSave {
                 eye_meters: job.anchor_meters,
                 reach_meters: REACH_METERS,
                 reachable: true,
-                physical_support: has_physical_support(job.blueprint.footprint, job.space),
+                physical_support: has_physical_support(job.blueprint.footprint, job.space)
+                    || (job.blueprint.footprint == Footprint::Interior
+                        && installed::supported_by(&structure, job.space)),
                 obstacles: &obstacles,
             };
             if job.work.completed && installed::structural(job) {
@@ -269,6 +295,16 @@ impl GameplaySession {
             self.feedback = Some("Aim at a reachable placeholder");
             return;
         };
+        if self
+            .building
+            .source
+            .projects
+            .inspect(id)
+            .is_some_and(|p| p.work.completed && p.blueprint.id == "internal-door")
+        {
+            self.toggle_completed_door(id);
+            return;
+        }
         let approved = self.building.catalog.approved_economy;
         let Ok(p) = self.building.source.projects.funding_mut(id, OWNER) else {
             return;
@@ -439,7 +475,15 @@ impl GameplaySession {
         // Interior ground-mounted prototypes target the real deck, not eye height.
         let blueprint = &self.building.catalog.blueprints[self.building.selected];
         if blueprint.footprint == Footprint::Interior {
-            target[1] = SHIP_FLOOR_HEIGHT_METERS;
+            target[1] = self
+                .mining
+                .modular_interior
+                .support(
+                    target,
+                    0.01,
+                    eye[1] - salimon_character::PLAYER_EYE_HEIGHT_METERS + 0.21,
+                )
+                .unwrap_or(SHIP_FLOOR_HEIGHT_METERS);
         }
         let obstacles = self.construction_obstacles(blueprint.footprint);
         let flight = if matches!(
@@ -502,7 +546,12 @@ impl GameplaySession {
             target,
             super::door_passable(self.ship.snapshot()),
         )
-        .is_none_or(|hit| hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye)));
+        .is_none_or(|hit| hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye)))
+            && self.construction_solids().iter().all(|b| {
+                salimon_character::cargo::box_sight_obstruction(eye, target, *b).is_none_or(|hit| {
+                    hit + 0.02 >= salimon_math::length(salimon_math::sub(target, eye))
+                })
+            });
         PlacementContext {
             actor: if authorized { OWNER } else { 0 },
             owner: OWNER,
@@ -526,6 +575,7 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
+            .filter(|p| !(p.work.completed && installed::structural(p)))
             .filter_map(|p| ray_distance(eye, direction, p.space).map(|distance| (p.id, distance)))
             .filter(|(_, distance)| {
                 let target = salimon_math::add(
@@ -538,6 +588,10 @@ impl GameplaySession {
                     super::door_passable(snapshot.ship),
                 )
                 .is_none_or(|hit| hit + 0.02 >= *distance)
+                    && self.construction_solids().iter().all(|b| {
+                        ray_distance(eye, direction, envelope(*b))
+                            .is_none_or(|hit| hit + 0.02 >= *distance)
+                    })
             })
             .min_by(|a, b| a.1.total_cmp(&b.1))
             .map(|p| p.0)
@@ -669,7 +723,11 @@ impl GameplaySession {
             .join(" / ");
         let status = if let Some(job) = hovered {
             if job.work.completed {
-                "COMPLETED".to_string()
+                if job.blueprint.id == "internal-door" {
+                    "COMPLETED | E open/close".to_string()
+                } else {
+                    "COMPLETED".to_string()
+                }
             } else if job.funding.funded(&job.blueprint.requirements) {
                 format!(
                     "{} | {:.1}%",
@@ -825,4 +883,5 @@ fn matches_catalog(job: &Placeholder) -> bool {
     false
 }
 
-pub(crate) use installed::evidence_room;
+pub(in crate::session) use boarding::boarding_exit;
+pub(crate) use evidence::evidence_room;

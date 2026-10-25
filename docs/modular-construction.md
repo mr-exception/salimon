@@ -6,8 +6,10 @@ project, one material supply and one automatic build, with no Start action.
 The two-deck room reserves four 3 m cells (6 × 6 × 3 m), retains the approved
 40 kg iron cost and 300-second duration, and includes a 20-tread staircase,
 upper-deck hatch and landing. Hull/deck cells retain their existing cost/time.
-Utility modules and the separate internal-door blueprint still await their
-commissioning adapters under #547. No operational module is fabricated here.
+Utility-module commissioning remains #547. Internal doors complete into
+manual pocket doors: with C open, aim and press E to open/close. Closing checks
+the player and physical cargo before changing the saved state; the leaves
+retract into their frame pockets. No powered module is fabricated here.
 
 ## Placement and access
 
@@ -24,8 +26,14 @@ the same base deck height. Reservations alone provide no support. Existing
 fixtures, cargo, player occupancy and protected routes still reject placement.
 Adjacent completed rooms acquire a shared 1.4 m wide, 2.2 m clear doorway;
 internal cells of one room share an open volume. The original gate still controls
-passage to the Scout. An attached aft room replaces travel down the old ramp at
-that connection; the ramp mechanism itself retains its existing owner.
+passage to the Scout. The outermost lower cell also supplies an exterior doorway and 20-step boarding
+stair. Orange handles use the existing E gate control; its saved open/closed
+state drives both the original and outer gate proxies. Closing checks both
+passages. Surface walking can leave and board again at the stair foot without
+being captured from below the hull. Surface/EVA bodies also sweep against the
+new exterior panels. The original ramp mechanism retains its existing owner.
+Further aft expansion reroutes the outer boarding stair only when its old route
+is unoccupied; the new stair foot must match terrain within 0.3 m.
 
 Before the last paid interval, runtime stages the whole resulting graph and
 checks new solid geometry, including the connector, against the player and all
@@ -42,7 +50,7 @@ Power/pressure network hookups and decompression simulation remain future work.
 ## Source, identity and editing
 
 Ship `structure/{assembly,shell}.rs` owns validated atomic assembly and deterministic
-cell/face geometry. Runtime `session/construction/{installed,work}.rs` composes
+cell/face geometry. Runtime `session/construction/{installed,boarding,doors,work}.rs` composes
 catalog/source, physical safety and paid publication. Character
 `modular.rs` and `controller/modular.rs` consume only host-supplied completed
 volumes/solids; they grant no construction authority. Renderer consumes ordinary
@@ -67,12 +75,15 @@ cell IDs and updates shared boundaries atomically.
 
 ## Save and mass
 
-Whole-session schema 18 retains original completed project sources and validated
-partition edits. Restore rebuilds the deterministic per-cell graph, room
+Whole-session schema 18 retains original completed project sources, manual door
+states and validated partition edits. Restore rebuilds the deterministic per-cell graph, room
 membership, geometry and collision without time credit, new IDs or energy spend.
 Structural material receipts transfer out of `ConstructionMaterials` at completion
 into disjoint `Structure(part_id)` ledger entries; no room or face adds duplicate
-mass. Original receipt identities remain reserved. Loose cargo in completed rooms
+mass. Original receipt identities remain reserved. Completed room reservations allow supported interior furnishings to be placed
+inside them. Fine horizontal snapping preserves the actual completed deck
+elevation; equipment still needs real support and clear final geometry.
+Loose cargo in completed rooms
 retains ship-local identity, support, mass and motion across reload/ship movement.
 
 Historical schema-17 two-cell room reservations are recognized verbatim and are
@@ -94,7 +105,7 @@ Ship/character and workspace tests/build/Clippy remain required.
 `scenarios/evidence/construction-room.json` seeds only a reservation, one carried
 40 kg sphere, open gate and review camera. E supplies that sphere through actual
 intake; protocol steps pay the full 300 seconds. Retain real wgpu screenshots of
-reservation/progress/completion and both decks. The fixture is explicit setup,
+reservation/progress/completion both decks, the clipped exterior shell, and surface exit/reboarding. The fixture is explicit setup,
 not evidence of mining a 40 kg piece or physical OS input. See the
 [issue report](../reports/issue-545/README.md) for actual results and limitations.
 Human presentation review remains #561; physical devices #557 and hardware/Metal

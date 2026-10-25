@@ -141,6 +141,8 @@ pub(super) fn construction_wireframes(
         let height = b[3] - b[2];
         let color = if b[0] >= -7.04 {
             [0.32, 0.36, 0.39, 1.]
+        } else if height > 0.12 && height < 0.22 && b[1] - b[0] < 0.16 && b[5] - b[4] < 0.16 {
+            [0.75, 0.48, 0.18, 1.]
         } else if height <= 0.111 {
             if (b[3] - salimon_character::SHIP_FLOOR_HEIGHT_METERS).rem_euclid(3.) < 0.01 {
                 [0.10, 0.14, 0.18, 1.]

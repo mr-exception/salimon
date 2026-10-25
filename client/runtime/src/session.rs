@@ -356,7 +356,8 @@ impl GameplaySession {
                     }
                     Some(InteractionTarget::ExitDoor) => {
                         let clear = self.character.location() != CharacterLocation::DoorwayBlend
-                            && !salimon_character::boarding_ramp_occupied(local_eye);
+                            && !salimon_character::boarding_ramp_occupied(local_eye)
+                            && self.modular_gate_clear();
                         self.ship.toggle_door_with_clearance(clear);
                         if let Some(message) = self.ship.snapshot().cockpit_message {
                             if matches!(

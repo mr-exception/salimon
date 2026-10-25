@@ -1,0 +1,147 @@
+[
+  {
+    "path": "protocol.jsonl",
+    "bytes": 2945156,
+    "sha256": "452e0dbd1fb8ed3bbe76898bfe7762b540f06b59ad7e906d632fb24e5401a82d"
+  },
+  {
+    "path": "result.json",
+    "bytes": 5255656,
+    "sha256": "4abc817edd80c45fb2ad74d9cfb347ac0806ceef115d750600b781cfa938ddea"
+  },
+  {
+    "path": "scenario.json",
+    "bytes": 2824,
+    "sha256": "59d0c18a598e611799f988073b68a9efebe21f3d4ef5161cb36884aecac13218"
+  },
+  {
+    "path": "stderr.log",
+    "bytes": 220,
+    "sha256": "2d67efcadcb71bc0e0457808a449c3240110fa116fa435d7a63f989aa24adf21"
+  },
+  {
+    "path": "stdout.log",
+    "bytes": 2773513,
+    "sha256": "61e728a3f2a4e3d681c5438564f27f3bc2aacc3aad296c6557db7ecc9984ea36"
+  },
+  {
+    "path": "step-001.json",
+    "bytes": 221049,
+    "sha256": "28ff04a5753a5c84dc3ecf6543e1e8c947c2dd8116da94010c220ce9af224e61"
+  },
+  {
+    "path": "step-002.json",
+    "bytes": 221078,
+    "sha256": "6de4d97f6487047ec6a832a64453e9f7aec5f0c5e84024df0ce8f74a8e7f2c81"
+  },
+  {
+    "path": "step-003.json",
+    "bytes": 221067,
+    "sha256": "a56b8842142c95cbf739829e819d4b12e8b56f251915e9d2ff32ef34001425a4"
+  },
+  {
+    "path": "step-004.json",
+    "bytes": 221234,
+    "sha256": "4c92c7da68009c75a33ec19d45fc431b8b5f569f156f4e6ae76d49ce1292e324"
+  },
+  {
+    "path": "step-005.json",
+    "bytes": 221112,
+    "sha256": "0740580f81ab7528a456def09d0da4f9583140f4e513d53da5c2304328c38510"
+  },
+  {
+    "path": "step-006.json",
+    "bytes": 221117,
+    "sha256": "876f9656e1a8a31b88496fc46f5209dbde423115a07fb9c659a8fa8cd41cb302"
+  },
+  {
+    "path": "step-007.json",
+    "bytes": 221211,
+    "sha256": "4c0c014f670431ee7cce418795389becc09b2e6aff5f08005b4c2d47c5484301"
+  },
+  {
+    "path": "step-008-stopped-secured.png",
+    "bytes": 89047,
+    "sha256": "35ade5081468548d702c7136e21af039bb03cddbc5e99afad36c1e5a7e4a972c"
+  },
+  {
+    "path": "step-008.json",
+    "bytes": 221150,
+    "sha256": "5417fd573a36b6e70a3cbcce05bf4c66e895b8ef04a8373bc8f8370536c4d57e"
+  },
+  {
+    "path": "step-009.json",
+    "bytes": 221060,
+    "sha256": "7a28ef9659fc32810b7150cbcd5aef0ccfd41b8e45a9a6667cbd18b6780bd397"
+  },
+  {
+    "path": "step-010.json",
+    "bytes": 221246,
+    "sha256": "b846e1e592c4cd59d9bb18a87ff85621860c870f7648e724beffed1cf4594175"
+  },
+  {
+    "path": "step-011.json",
+    "bytes": 221112,
+    "sha256": "b280033cc8fabc729f7e1403e5b304bd174e912dc1e97ca9ab31e7f5da5569de"
+  },
+  {
+    "path": "step-012.json",
+    "bytes": 221120,
+    "sha256": "604b10efb338013ab761872729c522525ef23c3efd78dac6befeafe2470479ba"
+  },
+  {
+    "path": "step-013.json",
+    "bytes": 221066,
+    "sha256": "8b33bb2065dcbfa330c9e4277d9ef1d994a7b3e607664b8af0364ab5b715ac31"
+  },
+  {
+    "path": "step-014.json",
+    "bytes": 221241,
+    "sha256": "2bfabb1357858e99908ac781dc1663deff2821df9b046f1509f7abd99d44406b"
+  },
+  {
+    "path": "step-015.json",
+    "bytes": 221127,
+    "sha256": "9dc039f0d1740aa0f16fe5f60cbd4ef9acf96bf2b3e37ac4280312d121877411"
+  },
+  {
+    "path": "step-016.json",
+    "bytes": 221128,
+    "sha256": "b605587c1c04f19928a7eea23995c4cb20dbd796c17f860a331b7a22f7ebc13f"
+  },
+  {
+    "path": "step-017-stopped-after-explicit-resume.png",
+    "bytes": 87997,
+    "sha256": "27d201beb35dbbc97dfc09bc3d603d3ed23da1c0da8cba4c4ee2d457c2c38cfe"
+  },
+  {
+    "path": "step-017.json",
+    "bytes": 221196,
+    "sha256": "1093e80057da0794c81b31275b14eb1a195612a965cada509fcaa1d7fbbc46e7"
+  },
+  {
+    "path": "step-018.json",
+    "bytes": 220810,
+    "sha256": "ed5a0febcceb845b515bc4b2b945d39860b34cf6ee3324dc86ef6662190ea967"
+  },
+  {
+    "path": "step-019.json",
+    "bytes": 220811,
+    "sha256": "016fc682ce58bd392a3b7173b27be43b14dd8c54284feada1d4b8cca65e3c0de"
+  },
+  {
+    "path": "step-020.json",
+    "bytes": 220899,
+    "sha256": "6d800dfa23103a79d4cbd81b659393fc10f204538cf41e9cbc5f55fb2a922797"
+  },
+  {
+    "path": "step-021-cancelled-physical-refund.png",
+    "bytes": 87023,
+    "sha256": "b2216ce5f7e67564a72e553f5a7f5bf16c1821e8d45b05d289f0e94ea6540cf8"
+  },
+  {
+    "path": "step-021.json",
+    "bytes": 220871,
+    "sha256": "420b8459b0f1ba1449b74c1afaefccad32ffb1a5a7d0385bbc194ee29de72dec"
+  }
+]

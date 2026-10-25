@@ -26,7 +26,7 @@ checks. Player distance/aim is deliberately irrelevant to automatic work.
 Insufficient energy, invalid safety or a damaged project pauses without spending
 or resetting progress. Clearing the condition resumes automatically. Project
 condition is a saved seam for #549; this change invents no damage source. Exterior
-stop/takeoff latches remain #546. Normal pause and terminal state freeze work;
+stop/takeoff latches follow [construction flight safety](construction-flight-safety.md). Normal pause and terminal state freeze work;
 restart clears the old run's construction. No closed-game elapsed time is credited
 here: chronological construction/offline reconciliation remains #550/#433.
 

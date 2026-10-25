@@ -1,0 +1,43 @@
+    Blocking waiting for file lock on build directory
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 29s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 34 tests
+test scout_audio::tests::construction_machine_audio_is_spatial_bounded_and_lifecycle_gated ... ok
+test session::construction::flight::tests::construction_active_stop_resume_takeoff_and_exact_save ... ok
+test session::construction::flight::tests::construction_cancel_half_work_refunds_once_and_preserves_structure ... ok
+test session::construction::flight::tests::construction_cancel_preserves_completed_room_identity_faces_and_mass ... ok
+test session::construction::flight::tests::construction_forced_flight_latches_without_momentum_loss_or_landing_restart ... ok
+test session::construction::flight::tests::construction_interior_coasting_and_explicit_resume_are_funded ... ok
+test session::construction::flight::tests::construction_secured_stop_still_obeys_actual_ramp_core_and_engine_gates ... ok
+test session::construction::flight::tests::construction_stopped_unsecured_and_broken_completed_hull_block ... ok
+test session::construction::room_tests::cargo_on_boarding_stairs_uses_actual_support_below_the_original_deck ... ok
+test session::construction::room_tests::closed_gate_and_stairs_keep_full_body_clear_and_reach_upper_deck ... ok
+test session::construction::room_tests::completed_room_accepts_supported_furniture_without_its_old_reservation_occluding_intake ... ok
+test automation::tests::construction_interlock_scenarios_share_native_command_admission ... ok
+test session::construction::room_tests::expansion_opens_one_accessible_door_and_partition_edit_survives_save ... ok
+test session::construction::room_tests::legacy_two_cell_reservation_retains_original_footprint_and_cancellable_receipts ... ok
+test session::construction::room_tests::occupied_connector_cannot_publish_the_last_joule_or_new_colliders ... ok
+test session::construction::room_tests::one_funded_room_commits_four_cells_after_last_tick_and_roundtrips ... ok
+test session::construction::room_tests::completed_room_preserves_a_surface_exit_and_body_clear_boarding_return ... ok
+test session::construction::room_tests::rotated_internal_door_completes_and_manual_closure_respects_occupancy_and_save ... ok
+test session::construction::room_tests::upper_deck_cargo_keeps_identity_collision_support_and_mass_across_reload ... ok
+test session::construction::tests::cargo_obstruction_prevents_final_install_and_spends_nothing_until_clear ... ok
+test session::construction::tests::complex_installation_stops_cancellable_before_completion_without_fake_solids ... ok
+test session::construction::tests::construction_safety_damage_pause_and_exact_partial_energy_admission ... ok
+test session::construction::tests::fully_funded_partial_cancel_and_corrupt_cross_owner_receipts ... ok
+test session::construction::tests::intake_rejection_receipts_save_refund_and_mass_are_atomic ... ok
+test session::construction::tests::normal_ship_and_placeholders_do_not_install_structure_or_consume_resources ... ok
+test session::construction::tests::paid_construction_automatically_completes_once_without_tool_or_nearby_player ... ok
+test session::construction::tests::paid_partial_cancel_returns_proportional_real_mass_and_never_replays ... ok
+test session::construction::tests::placeholder_restore_is_exact_and_ui_is_transient_without_advancing_progress ... ok
+test session::construction::tests::production_preview_place_inspect_cancel_preserves_physical_mass_and_materials ... ok
+test session::construction::tests::saved_projects_cannot_bypass_the_registered_catalog_or_protected_routes ... ok
+test session::construction::tests::schema_eight_requires_source_and_legacy_seven_migrates_empty_atomically ... ok
+test session::construction::tests::timer_partitioning_save_validation_and_full_scheduler_pause_are_exact ... ok
+test session::construction::tests::wrong_owner_catalog_or_cells_never_replace_a_live_session ... ok
+test session::construction::room_tests::room_evidence_uses_one_real_intake_and_preserves_powered_and_unpowered_movement ... ok
+
+test result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 410 filtered out; finished in 4.35s
+

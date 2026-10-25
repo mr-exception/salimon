@@ -29,7 +29,7 @@ fn watts(p: &Placeholder) -> f64 {
     power[&p.blueprint.id]
 }
 impl GameplaySession {
-    fn construction_safety(&self, p: &Placeholder) -> Result<(), PlacementError> {
+    pub(super) fn construction_safety(&self, p: &Placeholder) -> Result<(), PlacementError> {
         let obstacles = self.construction_obstacles(p.blueprint.footprint);
         let flight = if matches!(
             self.ship.snapshot().flight_state,
@@ -63,6 +63,14 @@ impl GameplaySession {
     pub(super) fn construction_status(&self, p: &Placeholder) -> String {
         if p.work.completed {
             return "COMPLETED".into();
+        }
+        if p.work.stopped {
+            return if self.construction_can_secure(p) {
+                "STOPPED-SECURED | T resume"
+            } else {
+                "STOPPED-UNSECURED | repair support or cancel"
+            }
+            .into();
         }
         if !p.funding.funded(&p.blueprint.requirements) {
             return "WAITING FOR MATERIALS".into();
@@ -102,6 +110,7 @@ impl GameplaySession {
         {
             return;
         }
+        self.stop_airborne_construction();
         let ids: Vec<_> = self.building.source.projects.jobs().map(|p| p.id).collect();
         for id in ids {
             let p = self
@@ -111,6 +120,7 @@ impl GameplaySession {
                 .inspect(id)
                 .expect("collected project identity");
             if p.work.completed
+                || p.work.stopped
                 || p.work.damaged
                 || !p.funding.funded(&p.blueprint.requirements)
                 || self.construction_safety(p).is_err()

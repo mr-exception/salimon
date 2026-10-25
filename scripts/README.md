@@ -733,3 +733,6 @@ Cabin evidence: `python3 scripts/salimon-test run scenarios/evidence/habitation-
 Finish evidence: `room-finishes.json`, `room-finishes-blackout.json`, and `furniture-finish.json` under `scenarios/evidence/` use production V/O/Z input after explicit camera setups. Named diagnostic views in `scenarios/visual/scout-finish-cameras.json` change presentation only. Native inspection reports actual ship resident vertex/uniform bytes and draw/triangle counts.
 
 Core upgrade evidence: `core-upgrade-blackout.json` and `core-upgrade-powered.json` under `scenarios/evidence/` use explicit two-receipt/one-carried-fragment seeds, then production I/E/Y inputs. They prove transaction/presentation behavior, not a mining or walked acquisition route.
+
+
+Construction flight readiness (#546): protocol key `construction_stop_resume` maps to native T while the C builder is active, using the same reachable project admission. Run `scenarios/evidence/construction-interlocks.json` for paid Stop/Resume/refund and `scenarios/evidence/construction-interlocks-cockpit.json` for cockpit takeoff refusal. See [the canonical contract](../docs/construction-flight-safety.md).

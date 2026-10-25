@@ -2,6 +2,7 @@
 mod boarding;
 mod doors;
 mod evidence;
+mod flight;
 mod installed;
 mod work;
 use super::{GameplaySession, frames::character_ship_frame};
@@ -35,6 +36,7 @@ pub(crate) enum BuildAction {
     Place,
     Cancel,
     RemovePartition,
+    StopResume,
 }
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -670,6 +672,10 @@ impl GameplaySession {
             self.feedback = Some("Leave cockpit control to place or cancel a blueprint");
             return;
         }
+        if matches!(action, BuildAction::StopResume) {
+            self.stop_resume_construction();
+            return;
+        }
         if matches!(action, BuildAction::RemovePartition) {
             self.remove_partition();
             return;
@@ -728,7 +734,7 @@ impl GameplaySession {
                 } else {
                     "COMPLETED".to_string()
                 }
-            } else if job.funding.funded(&job.blueprint.requirements) {
+            } else if job.work.stopped || job.funding.funded(&job.blueprint.requirements) {
                 format!(
                     "{} | {:.1}%",
                     self.construction_status(job),
@@ -742,7 +748,7 @@ impl GameplaySession {
                 .map_or_else(|| "CLEAR".to_string(), |e| format!("{e:?}"))
         };
         Some(format!(
-            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | Delete partition | C close",
+            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | T stop/resume | Delete partition | C close",
             hovered.map_or_else(
                 || blueprint.name.clone(),
                 |job| format!("Project #{} {}", job.id.0, blueprint.name)

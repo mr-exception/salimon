@@ -11,6 +11,9 @@ use std::time::Duration;
 pub struct Work {
     /// None is the legacy #543 quantized progress seam, upgraded on first paid tick.
     pub elapsed_nanos: Option<u64>,
+    /// Explicit stop latch. Landing/power restoration never clears it.
+    #[serde(default)]
+    pub stopped: bool,
     pub damaged: bool,
     pub completed: bool,
 }
@@ -31,6 +34,7 @@ impl Work {
                 n > duration
                     || n * u64::from(COMPLETE) / duration != u64::from(funding.progress_ppm)
             })
+            || (self.completed && self.stopped)
             || self.completed != (funding.progress_ppm == COMPLETE)
             || (self.elapsed_nanos.is_some_and(|n| n > 0)
                 && !funding.funded(&blueprint.requirements))
@@ -54,7 +58,11 @@ impl Work {
         paid: Duration,
     ) -> Result<(), FundingError> {
         self.validate(funding, blueprint)?;
-        if self.damaged || self.completed || !funding.funded(&blueprint.requirements) {
+        if self.stopped
+            || self.damaged
+            || self.completed
+            || !funding.funded(&blueprint.requirements)
+        {
             return Err(FundingError::Invalid);
         }
         let n = self.elapsed(funding, blueprint)

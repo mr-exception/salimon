@@ -14,6 +14,7 @@ pub(crate) enum Scenario {
     ConstructionMaterials,
     ConstructionBuild,
     ConstructionRoom,
+    ConstructionInterlocks,
     ScoutLighting,
     ScoutLightingShutter,
     ScoutLightingBlackout,
@@ -69,6 +70,7 @@ impl Scenario {
             "construction-materials" => Ok(Self::ConstructionMaterials),
             "construction-build" => Ok(Self::ConstructionBuild),
             "construction-room" => Ok(Self::ConstructionRoom),
+            "construction-interlocks" => Ok(Self::ConstructionInterlocks),
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
             "scout-cabin-table" => Ok(Self::ScoutCabinTable),
@@ -123,6 +125,7 @@ impl Scenario {
             Self::ConstructionMaterials => "construction-materials",
             Self::ConstructionBuild => "construction-build",
             Self::ConstructionRoom => "construction-room",
+            Self::ConstructionInterlocks => "construction-interlocks",
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
             Self::ScoutCabinTable => "scout-cabin-table",
@@ -316,6 +319,20 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         }
 
         Scenario::ConstructionRoom => crate::session::construction::evidence_room(app)?,
+        Scenario::ConstructionInterlocks => {
+            crate::session::construction::evidence_room(app)?;
+            app.command(crate::session::Command::Interact);
+            app.building.active = false;
+            app.ship.toggle_door();
+            app.advance_automation(Duration::from_secs(3));
+            app.character.enter_cockpit();
+            // Explicit fixture view; subsequent takeoff uses production admission.
+            app.command(crate::session::Command::Look(
+                -std::f64::consts::PI / 0.0022,
+                0.,
+            ));
+            app.feedback = None;
+        }
         Scenario::ConstructionMaterials | Scenario::ConstructionBuild => {
             crate::session::construction::evidence_initial_conditions(
                 app,

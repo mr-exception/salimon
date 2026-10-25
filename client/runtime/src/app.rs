@@ -874,7 +874,7 @@ impl ClientApplication {
                 presentation.ship.pose.orientation.map(|v| v as f32),
             ));
         }
-        let monitor_message = self.session.ship.contextual_cockpit_message();
+        let monitor_message = self.session.contextual_cockpit_message();
         let interaction = if self.session.view_mode == ViewMode::Gameplay
             && character_snapshot.location != CharacterLocation::Cockpit
         {

@@ -1,0 +1,62 @@
+[
+  {
+    "path": "protocol.jsonl",
+    "bytes": 651443,
+    "sha256": "d8db5013ecb1b703157b56ad6ec726030d7cfe1cf5f30b303ee086230c0225cc"
+  },
+  {
+    "path": "result.json",
+    "bytes": 1163298,
+    "sha256": "c1ccabd95c0da5001358531572f33af0289b3f07845f136077da2a4b0398471c"
+  },
+  {
+    "path": "scenario.json",
+    "bytes": 653,
+    "sha256": "911a11143237bc74587c54cfc06166c3de65b13c427e91c3c1fbb15f96f975e9"
+  },
+  {
+    "path": "stderr.log",
+    "bytes": 220,
+    "sha256": "f8f046c001617ada471913a1b13cbf32461f3be462631003d9f1ba103057ce4c"
+  },
+  {
+    "path": "stdout.log",
+    "bytes": 613143,
+    "sha256": "c0cef4c35d9e585c6001145171c8744f70635b14a53c3936fedc3822eaa9c5f4"
+  },
+  {
+    "path": "step-001.json",
+    "bytes": 205341,
+    "sha256": "b3a345246ee32e18871709420b3acb4573fcba8e920f0156c06ec0f0e534617d"
+  },
+  {
+    "path": "step-002-cockpit-exterior-takeoff-blocker.png",
+    "bytes": 55583,
+    "sha256": "7f66b78c3e18b5b5c0581d7b6a343246a0e9bcba73f01741e75fe4451426e509"
+  },
+  {
+    "path": "step-002.json",
+    "bytes": 205475,
+    "sha256": "3e689a703f14ae68966097a5be9f95eed3009fffd64d7603c0c7512586d78be1"
+  },
+  {
+    "path": "step-003.json",
+    "bytes": 205309,
+    "sha256": "002cd12fed276f8f9d8c8832df059804720a26b06f4534acb544a8910ac4d352"
+  },
+  {
+    "path": "step-004.json",
+    "bytes": 205511,
+    "sha256": "08b6b4bc6989d3f06599de69566c6f5e3d0115a7b3a6a126e22c2f8584f396d4"
+  },
+  {
+    "path": "step-005-cockpit-refused-takeoff.png",
+    "bytes": 55583,
+    "sha256": "7f66b78c3e18b5b5c0581d7b6a343246a0e9bcba73f01741e75fe4451426e509"
+  },
+  {
+    "path": "step-005.json",
+    "bytes": 205462,
+    "sha256": "ec87dc058a8dbb30e6e292d8fbe8f673bee5ead9338ccc2ecaf4b80bfb26e31b"
+  }
+]

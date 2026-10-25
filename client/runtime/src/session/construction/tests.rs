@@ -283,7 +283,7 @@ fn fully_funded_partial_cancel_and_corrupt_cross_owner_receipts() {
     assert_eq!(s.mining.session.fragments()[0].material().mass_kg(), 0.5);
 }
 
-fn funded_stool() -> (GameplaySession, PlaceholderId) {
+pub(super) fn funded_stool() -> (GameplaySession, PlaceholderId) {
     let mut s = prepare();
     s.command(Command::Build(BuildAction::Place));
     piece(&mut s, salimon_world::resources::ResourceId::IronOre, 1.);

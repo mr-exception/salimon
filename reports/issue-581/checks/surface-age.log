@@ -1,0 +1,12 @@
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.75s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 5 tests
+test session::surface_age::tests::surface_age_current_omission_unknown_identity_and_legacy_smuggling_are_atomic ... ok
+test session::surface_age::tests::surface_age_actual_latch_travel_recolor_blackout_pause_and_restore ... ok
+test session::surface_age::tests::surface_age_physical_replacement_uses_reclaimed_material_with_fresh_identity ... ok
+test session::surface_age::tests::surface_age_real_damage_clean_repair_retains_age_and_lost_cell_identity ... ok
+test session::surface_age::tests::surface_age_offline_partition_and_no_restore_credit_or_occupant_use ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 472 filtered out; finished in 0.23s

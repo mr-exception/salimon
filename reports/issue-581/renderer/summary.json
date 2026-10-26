@@ -1,0 +1,24 @@
+{
+  "expanded-500": {
+    "cpu_prepare_us": 1430.193,
+    "gpu_ms": 1.5235855,
+    "draws": 5,
+    "visible_instances": 500,
+    "triangles": 8400,
+    "resident_geometry_bytes": 18128,
+    "instance_capacity_bytes": 41760,
+    "upload_bytes": 64,
+    "staging_bytes": 80960
+  },
+  "expanded-aged-500": {
+    "cpu_prepare_us": 1443.1475,
+    "gpu_ms": 1.545774,
+    "draws": 5,
+    "visible_instances": 500,
+    "triangles": 8400,
+    "resident_geometry_bytes": 18128,
+    "instance_capacity_bytes": 41760,
+    "upload_bytes": 64,
+    "staging_bytes": 80960
+  }
+}

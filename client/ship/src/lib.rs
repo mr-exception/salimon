@@ -64,6 +64,7 @@ pub const DOOR_HINGE_ANIMATION_DURATION: Duration = Duration::from_millis(700);
 pub use controller::persistence::ShipSaveState;
 
 pub mod finishes;
+pub mod surface_age;
 
 pub mod core_upgrades;
 

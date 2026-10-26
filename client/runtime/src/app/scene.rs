@@ -10,6 +10,7 @@ use salimon_world::{CelestialBodyId, WorldSnapshot};
 pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
     ShipMeshInstance {
         lighting: Default::default(),
+        surface_ages: [0.; 8],
         finish_tints: [[[1.; 3]; 5]; 2],
         machinery: Default::default(),
         fabricator_output_present: false,

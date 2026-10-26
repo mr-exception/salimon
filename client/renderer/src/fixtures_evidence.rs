@@ -72,9 +72,14 @@ fn modular_fixture_gpu_evidence() {
         "independent-move",
         "damaged",
         "blackout",
+        "aged",
+        "aged-repaired",
+        "aged-damaged",
+        "aged-blackout",
         "expanded-500",
+        "expanded-aged-500",
     ] {
-        let expanded = case == "expanded-500";
+        let expanded = case.ends_with("500");
         let camera = CameraFrame {
             position_meters: if expanded {
                 [35., 30., 45.]
@@ -103,6 +108,7 @@ fn modular_fixture_gpu_evidence() {
             (0..500)
                 .map(|i| FixtureInstance {
                     illumination: None,
+                    surface_age: [0.; 4],
                     id: i as u64,
                     mesh: mesh(i % 5),
                     pose: FixturePose {
@@ -121,7 +127,7 @@ fn modular_fixture_gpu_evidence() {
             [
                 FixtureMesh::Shelf,
                 FixtureMesh::Seat,
-                if case == "damaged" {
+                if case == "damaged" || case == "aged-damaged" {
                     FixtureMesh::PanelDamaged
                 } else {
                     FixtureMesh::Panel
@@ -131,6 +137,7 @@ fn modular_fixture_gpu_evidence() {
             .enumerate()
             .map(|(i, mesh)| FixtureInstance {
                 illumination: None,
+                surface_age: [0.; 4],
                 id: i as u64,
                 mesh,
                 pose: FixturePose {
@@ -138,10 +145,24 @@ fn modular_fixture_gpu_evidence() {
                     ..Default::default()
                 },
                 tint: [1.; 3],
-                powered: case != "blackout",
+                powered: !case.ends_with("blackout"),
             })
             .collect()
         };
+        if case.starts_with("aged") || case == "expanded-aged-500" {
+            for (i, n) in instances.iter_mut().enumerate() {
+                n.surface_age = [
+                    if expanded {
+                        0.44 * (i % 101) as f32 / 100.
+                    } else {
+                        0.32
+                    },
+                    (i % 3) as f32,
+                    (i % 17) as f32,
+                    0.,
+                ];
+            }
+        }
         if case == "independent-move" {
             instances[0].pose.position_meters[1] += 0.35;
             let a: f64 = 0.6;
@@ -228,5 +249,8 @@ fn modular_fixture_gpu_evidence() {
     for changed in ["independent-move", "damaged", "blackout"] {
         assert_ne!(images["intact"], images[changed]);
     }
+    assert_ne!(images["intact"], images["aged"]);
+    assert_eq!(images["aged"], images["aged-repaired"]);
+    assert_ne!(images["aged"], images["aged-damaged"]);
     std::fs::write(directory.join("timings.csv"), csv).unwrap();
 }

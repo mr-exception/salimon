@@ -12,6 +12,7 @@ struct ShipUniform {
     ambient: array<vec4<f32>, 2>,
     lamp_positions: array<vec4<f32>, 6>,
     lamp_colors: array<vec4<f32>, 6>,
+    ages: array<vec4<f32>, 2>,
 };
 
 @group(0) @binding(0)
@@ -31,6 +32,7 @@ struct VertexOutput {
     @location(5) local: vec3<f32>,
     @location(6) @interpolate(flat) machinery_role: u32,
     @location(7) @interpolate(flat) finish_group: u32,
+    @location(8) @interpolate(flat) wear_slot: u32,
 };
 
 @vertex
@@ -89,7 +91,8 @@ fn vs_main(
     output.clip_position = ship.view_projection * vec4<f32>(relative, 1.0);
     if door_flag == 3.0 && ship.port.w > 0.5 {output.clip_position=vec4<f32>(2.0,2.0,0.0,1.0);}
     output.color = color;
-    output.finish_group = u32(finish_group);
+    output.finish_group = u32(finish_group) % 16u;
+    output.wear_slot = u32(finish_group) / 16u;
     let key = normalize(vec3<f32>(0.35, 0.82, 0.44));
     let exterior_light = vec3<f32>(0.82, 0.90, 1.0)
         * (0.28 + 0.62 * abs(dot(normal, key)));
@@ -195,6 +198,15 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     if input.finish_group > 0u {
         let room = select(0u, 1u, input.local.x < -4.65);
         base = min(base * ship.finishes[room * 5u + input.finish_group - 1u].rgb, vec3<f32>(1.0));
+    }
+    if input.wear_slot > 0u {
+        var slot=input.wear_slot-1u;
+        if slot==0u && input.local.x < -4.65 {slot=1u;}
+        let strength=ship.ages[slot/4u][slot%4u];
+        var material=0.0;
+        if slot==2u { material=3.0; }
+        if slot==4u { material=2.0; }
+        base=surface_wear(base,input.local,vec4<f32>(strength,material,0.0,0.0));
     }
     return vec4<f32>(base * input.light + input.emissive, input.color.a);
 }

@@ -74,6 +74,7 @@ fn schema_one_migrates_only_missing_survival_and_schema_two_requires_complete_st
     let expected = s.snapshot().ship;
     let mut v: serde_json::Value = serde_json::from_slice(&s.save_bytes(10).unwrap()).unwrap();
     v["schema_version"] = json!(1);
+    v["state"].as_object_mut().unwrap().remove("surface_age");
     v["state"].as_object_mut().unwrap().remove("survival");
     let mut restored = GameplaySession::default();
     restored

@@ -1,6 +1,6 @@
 # Canonical whole-game save contract (schema 20)
 
-> This is the **current compressed-world runtime save schema 22**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+> This is the **current compressed-world runtime save schema 23**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
 version 20. Decode accepts versions 1–19 for explicit runtime migration; the
@@ -532,3 +532,8 @@ See the [canonical damage and schema-21 contract](construction-damage.md) for ru
 ## Offline construction schema 22 (#550)
 
 [Canonical source, migration, high-water clock, remainder, saved safety reasons and atomic launch behavior](construction-offline.md). Versions 1–21 migrate without retroactive work; ordinary restore never credits time. Closed power and eligible timed systems settle before verified launch publication; saved scene and active survival remain frozen. The independent universe envelope is unchanged.
+
+
+## Cosmetic surface age schema 23 (#581)
+
+The current envelope requires validated runtime surface exposure keyed by exact installed physical IDs, with explicit pristine migration from versions 1–22. Ordinary restore grants no time; passive age and funded Fabricator usage follow the existing verified offline transaction. Recolor/clean repairs preserve exposure; replacements start fresh. See [source, limits and tests](surface-age.md).

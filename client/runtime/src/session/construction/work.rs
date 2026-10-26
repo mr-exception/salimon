@@ -231,6 +231,7 @@ impl GameplaySession {
             }
             self.building.running = Some(center);
         }
+        self.sync_surface_age();
         self.advance_modules(delta);
         self.sync_fabricator_mass();
         self.sync_mount_collision();

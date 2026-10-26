@@ -239,6 +239,7 @@ fn clock_migration_malformed_clock_and_rollback_cannot_grant_time_twice() {
     assert_eq!(source(&loaded), work);
     let mut old: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
     old["schema_version"] = 21.into();
+    old["state"].as_object_mut().unwrap().remove("surface_age");
     old["state"].as_object_mut().unwrap().remove("offline");
     loaded
         .restore_for_launch(&serde_json::to_vec(&old).unwrap(), 1000)

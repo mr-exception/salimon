@@ -1,0 +1,83 @@
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Checking salimon-math v0.1.0 (/workspace/salimon/client/math)
+    Checking wgpu-naga-bridge v30.0.1
+    Checking gltf-json v1.4.1
+    Checking wgpu-hal v30.0.1 (/workspace/salimon/vendor/wgpu-hal)
+    Checking calloop-wayland-source v0.3.0
+    Checking wayland-protocols-wlr v0.3.12
+    Checking memmap2 v0.9.11
+    Checking miniz_oxide v0.8.9
+    Checking fdeflate v0.3.7
+    Checking byteorder v1.5.0
+    Checking utf8parse v0.2.2
+    Checking lazy_static v1.5.0
+    Checking ab_glyph_rasterizer v0.1.10
+    Checking gltf v1.4.1
+    Checking ab_glyph v0.2.32
+    Checking anstyle-parse v0.2.7
+    Checking png v0.18.0
+    Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+    Checking smithay-client-toolkit v0.19.2
+    Checking alsa-sys v0.4.0
+    Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Checking salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+    Checking salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+    Checking salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+    Checking regex v1.13.1
+    Checking getrandom v0.3.4
+    Checking tiny-skia v0.11.4
+    Checking gethostname v1.1.0
+    Checking x11rb-protocol v0.13.2
+    Checking pin-project-lite v0.2.17
+    Checking as-raw-xcb-connection v1.0.1
+    Checking is_terminal_polyfill v1.70.2
+    Checking colorchoice v1.0.5
+    Checking tracing-core v0.1.36
+    Checking anstyle v1.0.14
+    Checking wgpu-core-deps-windows-linux-android v30.0.1
+    Checking wgpu-core v30.0.1
+    Checking jiff-core v0.1.0
+    Checking anstyle-query v1.1.5
+    Checking anstream v0.6.21
+    Checking tracing v0.1.44
+    Checking sctk-adwaita v0.10.1
+    Checking jiff v0.2.35
+    Checking ahash v0.8.12
+    Checking env_filter v0.1.4
+    Checking alsa v0.11.0
+    Checking x11-dl v2.21.0
+    Checking xkbcommon-dl v0.4.2
+    Checking wayland-protocols-plasma v0.3.12
+    Checking dasp_sample v0.11.0
+    Checking percent-encoding v2.3.2
+    Checking dpi v0.1.2
+    Checking smol_str v0.2.2
+    Checking cpal v0.18.2
+    Checking env_logger v0.11.8
+    Checking wgpu v30.0.1
+    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Checking salimon-character v0.1.0 (/workspace/salimon/client/character)
+    Checking pollster v0.4.0
+    Checking salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+    Checking salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Checking x11rb v0.13.2
+    Checking winit v0.30.13
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+error: items after a test module
+   --> client/runtime/src/session/surface_age.rs:195:1
+    |
+195 |   mod tests {
+    |   ^^^^^^^^^
+...
+344 | / pub(crate) fn evidence_initial_conditions(
+345 | |     s: &mut GameplaySession,
+346 | |     scenario: &str,
+347 | | ) -> Result<(), String> {
+    | |_______________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+    = help: move the items to before the test module was defined
+
+error: could not compile `salimon-client` (bin "salimon-client" test) due to 1 previous error

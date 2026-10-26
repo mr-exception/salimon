@@ -1054,6 +1054,7 @@ impl ClientApplication {
             mesh.independent_interior = true;
             mesh.lighting = self.session.lighting_dto();
             mesh.finish_tints = self.session.finish_palette();
+            mesh.surface_ages = self.session.ship_surface_ages();
             mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();

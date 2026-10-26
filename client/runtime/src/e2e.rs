@@ -18,6 +18,16 @@ pub(crate) enum Scenario {
     ConstructionBuild,
     ConstructionRoom,
     ConstructionInterlocks,
+    SurfaceAgeOffline,
+    SurfaceAgeReplacement,
+    SurfaceAgeNew,
+    SurfaceAgeUsed,
+    SurfaceAgeIdle,
+    SurfaceAgeRecolor,
+    SurfaceAgeBlackout,
+    SurfaceAgeReload,
+    SurfaceAgeDamage,
+    SurfaceAgeRepair,
     ScoutLighting,
     ScoutLightingShutter,
     ScoutLightingBlackout,
@@ -65,6 +75,16 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "surface-age-offline" => Ok(Self::SurfaceAgeOffline),
+            "surface-age-replacement" => Ok(Self::SurfaceAgeReplacement),
+            "surface-age-new" => Ok(Self::SurfaceAgeNew),
+            "surface-age-used" => Ok(Self::SurfaceAgeUsed),
+            "surface-age-idle" => Ok(Self::SurfaceAgeIdle),
+            "surface-age-recolor" => Ok(Self::SurfaceAgeRecolor),
+            "surface-age-blackout" => Ok(Self::SurfaceAgeBlackout),
+            "surface-age-reload" => Ok(Self::SurfaceAgeReload),
+            "surface-age-damage" => Ok(Self::SurfaceAgeDamage),
+            "surface-age-repair" => Ok(Self::SurfaceAgeRepair),
             "scout-lighting" => Ok(Self::ScoutLighting),
             "scout-lighting-shutter" => Ok(Self::ScoutLightingShutter),
             "scout-lighting-blackout" => Ok(Self::ScoutLightingBlackout),
@@ -123,6 +143,16 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::SurfaceAgeOffline => "surface-age-offline",
+            Self::SurfaceAgeReplacement => "surface-age-replacement",
+            Self::SurfaceAgeNew => "surface-age-new",
+            Self::SurfaceAgeUsed => "surface-age-used",
+            Self::SurfaceAgeIdle => "surface-age-idle",
+            Self::SurfaceAgeRecolor => "surface-age-recolor",
+            Self::SurfaceAgeBlackout => "surface-age-blackout",
+            Self::SurfaceAgeReload => "surface-age-reload",
+            Self::SurfaceAgeDamage => "surface-age-damage",
+            Self::SurfaceAgeRepair => "surface-age-repair",
             Self::ScoutLighting => "scout-lighting",
             Self::ScoutLightingShutter => "scout-lighting-shutter",
             Self::ScoutLightingBlackout => "scout-lighting-blackout",
@@ -291,6 +321,18 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::SurfaceAgeOffline
+        | Scenario::SurfaceAgeReplacement
+        | Scenario::SurfaceAgeNew
+        | Scenario::SurfaceAgeUsed
+        | Scenario::SurfaceAgeIdle
+        | Scenario::SurfaceAgeRecolor
+        | Scenario::SurfaceAgeBlackout
+        | Scenario::SurfaceAgeReload
+        | Scenario::SurfaceAgeDamage
+        | Scenario::SurfaceAgeRepair => {
+            crate::session::surface_age::evidence_initial_conditions(app, config.scenario.name())?;
+        }
         Scenario::ScoutLighting
         | Scenario::ScoutLightingShutter
         | Scenario::ScoutLightingBlackout

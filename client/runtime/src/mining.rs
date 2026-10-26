@@ -274,6 +274,7 @@ impl ResourceGameplay {
         (player.location == CharacterLocation::Surface && equipment.mining_equipped()).then_some(
             HeldItemInstance {
                 active: self.input.held && valid_target,
+                surface_age: 0.,
             },
         )
     }
@@ -391,16 +392,25 @@ mod tests {
         equipment.select(crate::equipment::ToolbarSlot::One, false);
         assert_eq!(
             tool.held_item(&equipment, player, true),
-            Some(HeldItemInstance { active: false })
+            Some(HeldItemInstance {
+                active: false,
+                surface_age: 0.
+            })
         );
         tool.input.held = true;
         assert_eq!(
             tool.held_item(&equipment, player, false),
-            Some(HeldItemInstance { active: false })
+            Some(HeldItemInstance {
+                active: false,
+                surface_age: 0.
+            })
         );
         assert_eq!(
             tool.held_item(&equipment, player, true),
-            Some(HeldItemInstance { active: true })
+            Some(HeldItemInstance {
+                active: true,
+                surface_age: 0.
+            })
         );
         player.location = CharacterLocation::InsideShip;
         assert!(tool.held_item(&equipment, player, true).is_none());

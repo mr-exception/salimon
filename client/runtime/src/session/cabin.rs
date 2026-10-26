@@ -350,6 +350,14 @@ impl GameplaySession {
                         .all(|other| !boxes_overlap(sweep, *other, 0.001))
             });
             if clear {
+                let id = match k {
+                    Furniture::Table => 3001,
+                    Furniture::Seat => 3002,
+                    Furniture::Screen => 3010,
+                    Furniture::Shutter => 3050,
+                    Furniture::Locker => 3020,
+                };
+                self.surface_age.travel(id, old.fraction, next.fraction);
                 self.habitation.cabin.as_mut().unwrap().motions[k as usize] = next;
             } else {
                 self.feedback = Some("Fixture obstructed; reverse or clear player and belongings");

@@ -28,7 +28,8 @@ fn vs_main(@location(0) point: vec3<f32>, @location(1) normal: vec3<f32>,
     return out;
 }
 @fragment fn fs_main(input: Output) -> @location(0) vec4<f32> {
-    let albedo = textureSample(surface, surface_sampler, input.uv).rgb * input.color.rgb;
+    let original = textureSample(surface, surface_sampler, input.uv).rgb * input.color.rgb;
+    let albedo=surface_wear(original,input.view_point,vec4<f32>(placement.status.y,select(0.0,1.0,input.material.y>0.5),0.0,0.0));
     let normal = normalize(input.normal);
     let light = normalize(vec3<f32>(-0.4, 0.8, 0.5));
     let view = normalize(-input.view_point);

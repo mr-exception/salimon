@@ -299,6 +299,7 @@ fn scout_feedback_gpu_evidence() {
             held_item: None,
             ship: Some(ShipMeshInstance {
                 lighting: Default::default(),
+                surface_ages: [0.; 8],
                 finish_tints: [[[1.; 3]; 5]; 2],
                 position_meters: [0.; 3],
                 orientation: [0., 0., 0., 1.],

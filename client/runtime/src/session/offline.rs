@@ -177,6 +177,7 @@ impl GameplaySession {
     }
     fn closed_work_tick(&mut self, delta: Duration) {
         self.offline_power = true;
+        self.advance_surface_age(delta);
         self.advance_fabrication(delta);
         self.advance_recovery(delta);
         self.advance_construction(delta);

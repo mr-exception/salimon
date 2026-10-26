@@ -1,0 +1,147 @@
+{
+  "binaries": {
+    "parent": {
+      "path": "/tmp/salimon-644-parent-tick-cost",
+      "sha256": "e4f2364ad9e2ab91935f6e9faa8b54f5a1bc6fa1fcc696c6f7398b60fc4f0785"
+    },
+    "current": {
+      "path": "/tmp/salimon-644-current-tick-cost",
+      "sha256": "f21768f73a50a9862d5a8644a6343bad2e5ba90f88be181970c9e1f4cd5f17e0"
+    }
+  },
+  "comparisons": [
+    {
+      "count": "500",
+      "state": "settled",
+      "delta_ms": "16",
+      "samples": "100",
+      "substeps": "0",
+      "integrated": "0",
+      "sleeping": "500",
+      "parent_median_ms": 0.082992,
+      "current_median_ms": 0.082771,
+      "median_ratio": 0.9973370927318296,
+      "parent_p95_ms": [
+        0.112244,
+        0.120819,
+        0.125615
+      ],
+      "current_p95_ms": [
+        0.121573,
+        0.125058,
+        0.117565
+      ]
+    },
+    {
+      "count": "500",
+      "state": "fast_drop",
+      "delta_ms": "16",
+      "samples": "100",
+      "substeps": "3",
+      "integrated": "3",
+      "sleeping": "499",
+      "parent_median_ms": 6.616715,
+      "current_median_ms": 6.668076,
+      "median_ratio": 1.007762311056166,
+      "parent_p95_ms": [
+        7.44125,
+        7.331699,
+        7.426171
+      ],
+      "current_p95_ms": [
+        7.753894,
+        7.656945,
+        7.107694
+      ]
+    },
+    {
+      "count": "500",
+      "state": "active",
+      "delta_ms": "16",
+      "samples": "100",
+      "substeps": "22",
+      "integrated": "11000",
+      "sleeping": "0",
+      "parent_median_ms": 12.254814,
+      "current_median_ms": 12.315879,
+      "median_ratio": 1.0049829397655485,
+      "parent_p95_ms": [
+        13.792843,
+        13.159119,
+        13.045101
+      ],
+      "current_p95_ms": [
+        13.187371,
+        13.337724,
+        13.224942
+      ]
+    },
+    {
+      "count": "1000",
+      "state": "settled",
+      "delta_ms": "16",
+      "samples": "100",
+      "substeps": "0",
+      "integrated": "0",
+      "sleeping": "1000",
+      "parent_median_ms": 0.181522,
+      "current_median_ms": 0.180276,
+      "median_ratio": 0.9931358182479259,
+      "parent_p95_ms": [
+        0.325683,
+        0.227548,
+        0.233049
+      ],
+      "current_p95_ms": [
+        0.259167,
+        0.217293,
+        0.221757
+      ]
+    },
+    {
+      "count": "1000",
+      "state": "fast_drop",
+      "delta_ms": "16",
+      "samples": "100",
+      "substeps": "3",
+      "integrated": "3",
+      "sleeping": "999",
+      "parent_median_ms": 13.698208,
+      "current_median_ms": 13.772548,
+      "median_ratio": 1.0054269872380388,
+      "parent_p95_ms": [
+        14.801781,
+        14.647309,
+        14.778781
+      ],
+      "current_p95_ms": [
+        15.553728,
+        14.669121,
+        14.771055
+      ]
+    },
+    {
+      "count": "1000",
+      "state": "active",
+      "delta_ms": "16",
+      "samples": "100",
+      "substeps": "22",
+      "integrated": "22000",
+      "sleeping": "0",
+      "parent_median_ms": 25.882981,
+      "current_median_ms": 26.061299,
+      "median_ratio": 1.0068893919135513,
+      "parent_p95_ms": [
+        27.957191,
+        27.521386,
+        29.852097
+      ],
+      "current_p95_ms": [
+        26.970713,
+        27.705625,
+        27.57518
+      ]
+    }
+  ],
+  "note": "CPU diagnostics only; no new threshold or hardware FPS approval"
+}

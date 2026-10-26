@@ -527,3 +527,15 @@ Follow the [canonical schema-22 clock, energy, safety and atomic launch contract
 ## Cosmetic surface age (#581)
 
 Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+## Assist cohesion review (#644)
+
+Retain `controller/assist.rs`: its production section defines one captured
+landing/takeoff/recovery transition, admission, analytic eased path, energy
+reservation and save validation. Shared transition state/order is the relevant
+boundary; most remaining length is its related regression/safety tests. Splitting
+for line count would scatter the captured path/energy invariants without
+isolating an independent policy. No flight code or numeric behavior changed in
+this review. Revisit only with function-level co-change/test-isolation evidence;
+see [review evidence](../../reports/issue-644/README.md).

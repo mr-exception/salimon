@@ -551,3 +551,14 @@ Preserve preparation order, reverse-Z, draw order (cuboids, spheres, terrain,
 opaque ship, fixtures, resources, glass, held item; then condition, global HUD,
 toolbar, action, reticle), asynchronous timer polling and capture/present order.
 Shader layouts and the public API are unchanged. See [invariants](invariants.md).
+
+
+## Resource geometry owner (#644)
+
+`resource_mesh/geometry.rs` owns pure GLB triangle validation and stable indexed
+vertex packing. `resource_mesh.rs` retains mesh/instance DTOs, the asset table,
+CPU support facade, culling/staging, upload caches and GPU batches. Geometry
+helpers retain the same facet arithmetic, triangle iteration/deduplication order,
+7-float vertex records and errors. Existing geometry, precision, batching and
+GPU equivalence tests consume this same private seam. No shaders, assets,
+layouts, public APIs or per-frame allocation policies change.

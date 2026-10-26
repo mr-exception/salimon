@@ -690,3 +690,13 @@ prompts have focused app owners, while Scout visuals map through the scene
 adapter. See [renderer ownership](../client/renderer/architecture.md#pipeline-and-frame-owners-643)
 and [runtime composition](../client/runtime/architecture.md#native-presentation-composition-643).
 No domain dependency, API, shader layout, draw order or simulation authority changes.
+
+
+## Contact and resource geometry owners (#644)
+
+Physics separates substep/broad-phase scheduling from exact sampled contact and
+impulse response in its private `response.rs`. Renderer separates pure resource
+GLB validation/index packing from GPU batch state. This is source organization
+within the existing domains: numerical behavior, public contracts, serialized
+state, assets/shaders and allocation policy are preserved. Convex/SAT and
+ship-assist owners remain cohesive; see the [maintenance map](maintenance-map.md#contact-and-resource-geometry-review-644).

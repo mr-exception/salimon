@@ -281,3 +281,8 @@ Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs
 Pipeline extraction (#643) retains one Renderer resource owner and the existing
 scene/overlay draw, asynchronous timing, capture/submission/present order; see
 [owners](architecture.md#pipeline-and-frame-owners-643).
+
+
+Resource geometry extraction (#644) preserves authored triangle/facet order,
+index packing, CPU support values and 7-float vertex layout; source ownership
+is documented [here](architecture.md#resource-geometry-owner-644).

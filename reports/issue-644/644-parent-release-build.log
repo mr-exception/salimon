@@ -1,0 +1,30 @@
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling generic-array v0.14.7
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling crc32fast v1.5.2
+   Compiling cfg-if v1.0.4
+   Compiling zmij v1.0.23
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling syn v3.0.5
+   Compiling simd-adler32 v0.3.10
+   Compiling adler2 v2.0.1
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling miniz_oxide v0.9.1
+   Compiling serde_derive v1.0.229
+   Compiling digest v0.10.7
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling flate2 v1.1.10
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+   Compiling salimon-math v0.1.0 (/workspace/salimon/client/math)
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+    Finished `release` profile [optimized] target(s) in 27.48s

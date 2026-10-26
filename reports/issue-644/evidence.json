@@ -1,0 +1,13 @@
+{
+  "source_parent": "25ae080d7181c7641e7434a275b8964fcd06ba77",
+  "binary_sha256": "2f5b0ecc80b029166b9729f3908ba6a8d2bc02cfa4e51a52a259dc4711d028a4",
+  "environment": "Linux x86_64, Rust 1.99.1, Xvfb 1280x800 scale 1, Mesa llvmpipe Vulkan, LP_NUM_THREADS=2; native GPU surface readback; fixed-step protocol input",
+  "status": "passed",
+  "steps": 68,
+  "images": [
+    {
+      "file": "step-062-generated-silicate-deposit.png",
+      "sha256": "2d5f8e22946e6df79d4a5695458f92fc19a20807bd81616fa49a3add58bef582"
+    }
+  ]
+}

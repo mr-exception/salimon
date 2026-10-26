@@ -652,3 +652,8 @@ See the [canonical completed construction contract](modular-construction.md) for
 
 
 Optional module composition (#547): runtime construction owns tier/maintenance/commissioning source, existing ship Funding/Work retain material/time arithmetic, Recovery requests actual Core-funded throughput and renderer consumes physical case geometry. See [the canonical owner and save/test mapping](non-core-modules.md).
+
+
+## Construction damage and salvage (#549)
+
+See the [canonical damage and schema-21 contract](construction-damage.md) for runtime `session/construction/damage.rs`, ship lost-cell geometry, world sealed salvage allocation, controls, exact source/mass/identity boundaries and focused tests/evidence routes. Run workspace tests/build/Clippy/fmt plus documentation validation.

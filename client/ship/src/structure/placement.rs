@@ -482,7 +482,8 @@ impl Placements {
             }
         }
         for job in self.jobs.values() {
-            if Some(job.id) != ignore
+            if !job.work.destroyed
+                && Some(job.id) != ignore
                 && !(preview.blueprint.footprint == Footprint::Interior
                     && job.work.completed
                     && job.blueprint.footprint == Footprint::Structural)
@@ -629,7 +630,11 @@ impl Placements {
                     || (b.work.completed
                         && b.blueprint.footprint == Footprint::Structural
                         && a.blueprint.footprint == Footprint::Interior);
-                if intersects(a.space, b.space) && !furnishing_in_room {
+                if !a.work.destroyed
+                    && !b.work.destroyed
+                    && intersects(a.space, b.space)
+                    && !furnishing_in_room
+                {
                     return Err(PlacementError::Overlapping(b.id));
                 }
             }

@@ -17,14 +17,33 @@ impl ConstructionSave {
         let rooms: Vec<_> = self
             .projects
             .jobs()
-            .filter(|p| structural(p) && (p.work.completed || Some(p.id) == completing))
+            .filter(|p| {
+                !p.work.destroyed && structural(p) && (p.work.completed || Some(p.id) == completing)
+            })
             .map(|p| ShellRoom {
                 project: p.id.0,
                 cells: p.cells.clone(),
-                mass_kg: p.funding.mass_kg(),
+                cell_milligrams: (0..p.cells.len())
+                    .map(|i| {
+                        p.blueprint
+                            .requirements
+                            .iter()
+                            .map(|r| {
+                                let total = p.funding.delivered(r.resource);
+                                let n = p.cells.len() as u64;
+                                total / n + u64::from((i as u64) < total % n)
+                            })
+                            .sum()
+                    })
+                    .collect(),
             })
             .collect();
-        build_shells(&starter_structure(), &rooms, &self.removed_partitions)
+        build_shells_with_losses(
+            &starter_structure(),
+            &rooms,
+            &self.removed_partitions,
+            &self.damage.lost,
+        )
     }
 }
 impl GameplaySession {
@@ -120,6 +139,7 @@ impl GameplaySession {
             && space.max[2] >= 1.5)
             || self.building.source.projects.jobs().any(|p| {
                 p.work.completed
+                    && !p.work.destroyed
                     && structural(p)
                     && (0..3).filter(|axis| *axis != 1).any(|axis| {
                         let other = if axis == 0 { 2 } else { 0 };

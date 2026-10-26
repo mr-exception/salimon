@@ -77,8 +77,15 @@ impl GameplaySession {
             .building
             .source
             .modules
-            .values()
-            .flat_map(|m| m.receipts())
+            .iter()
+            .filter(|(id, _)| {
+                self.building
+                    .source
+                    .projects
+                    .inspect(**id)
+                    .is_some_and(|p| !p.work.destroyed)
+            })
+            .flat_map(|(_, m)| m.receipts())
             .map(|f| f.material().mass_kg())
             .sum();
         let construction_mass: f64 = self
@@ -86,7 +93,9 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
-            .filter(|p| !(p.work.completed && super::construction::is_structural(p)))
+            .filter(|p| {
+                !p.work.destroyed && !(p.work.completed && super::construction::is_structural(p))
+            })
             .map(|p| p.funding.mass_kg())
             .sum();
         changed |= self
@@ -98,6 +107,14 @@ impl GameplaySession {
                     .then_some(construction_mass + maintenance_mass),
             )
             .expect("bounded project receipts");
+        // Destruction must clear old installed entries, including detached cells.
+        for id in &self.building.source.damage.lost {
+            changed |= self
+                .mining
+                .ship_mass
+                .update(salimon_ship::MassObjectId::Structure(id.0), None)
+                .expect("removing installed mass");
+        }
         for (id, mass) in self.building.structure.mass_entries() {
             changed |= self
                 .mining

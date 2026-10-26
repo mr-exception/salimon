@@ -334,6 +334,19 @@ impl MiningSession {
         true
     }
 
+    /// Transfer externally owned salvage into sealed physical objects. The caller
+    /// must remove the source mass atomically; extraction totals do not increase.
+    pub fn import_salvage(
+        &mut self,
+        pieces: &[(
+            crate::resources::DepositId,
+            crate::resources::RawMaterial,
+            crate::resources::ResourceTransform,
+        )],
+    ) -> Option<Vec<crate::resources::FragmentId>> {
+        self.fragments.import_salvage(pieces)
+    }
+
     /// Physical despawn/Core consumption; never reuse an entity identity.
     pub fn remove_fragment(&mut self, id: crate::resources::FragmentId) -> bool {
         if self.carried_id() == Some(id) {

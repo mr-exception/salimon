@@ -137,7 +137,7 @@ fn tutorial_never_pauses_or_blocks_world_and_modal_overlays_hide_it() {
     assert_eq!(s.save_bytes(100).unwrap(), frozen);
     s.command(Command::TogglePause);
     s.command(Command::Control(crate::session::ControlKey::Forward, true));
-    assert!(s.movement_input.forward);
+    assert!(s.input.movement.forward);
 }
 #[test]
 fn all_prompts_fit_small_drawables_above_the_toolbar() {

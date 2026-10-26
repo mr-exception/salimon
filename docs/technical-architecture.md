@@ -667,3 +667,15 @@ See [the maintained chronology and schema-22 contract](construction-offline.md):
 
 Runtime domain save adapters preserve the explicit transactional layout; see
 [ownership and byte compatibility](save-contract.md#runtime-domain-mapping-ownership-641) (#641).
+
+
+## Session domain composition (#642)
+
+Runtime retains explicit typed domain fields; input owns mutable held state and
+host execution policy is a separate nonserialized value. Initialization, command
+admission, interactions and ordered tick stages have focused owners. The
+[runtime ownership table](../client/runtime/architecture.md#internal-composition-modules)
+and [stage contract](../client/runtime/invariants.md#session-composition-owners-642)
+identify the update order and source files. Save/restart/offline publication copies
+host policy and resets held input; schema 23 remains unchanged. No new dynamic
+registry, event bus, dependency cycle or hidden scheduler is introduced.

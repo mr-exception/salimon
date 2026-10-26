@@ -693,3 +693,25 @@ clock). `session/persistence/physical.rs` owns the physical composition adapter;
 layout changed. Keep unknown-field rejection and publish only after all owners
 and cross-domain invariants pass. Generic persistence codec/storage remain
 independent of gameplay domains; there is no dynamic save registry.
+
+
+## Session composition owners (#642)
+
+Held input lives in `session/input/state.rs`; external observers receive Copy
+snapshots through `movement()`/`steering()`, while mutation stays within session
+composition. `session/policy.rs` groups host automation step, interpolation and
+physics measurement flags; copy this single nonserialized value through restore,
+offline reconciliation and restart. `session/init.rs` distinguishes empty
+reconstruction defaults from supply-granting new runs. Command admission and
+interaction details live in `session/commands.rs` and `interaction/actions.rs`.
+
+`session/tick.rs` is the explicit scheduler: admit pause/terminal/offline and
+survival time; begin render history; advance age/camera, steering/Fabricator/ship,
+crash interruption, Recovery then construction; use the completed ship frame for
+character/cargo/habitation; advance mining then loose physics; record journey,
+synchronize carrying/mass, validate UI focus, freeze terminal state and complete
+render history. Stage bodies live in `tick/power.rs`, `character.rs`, `resources.rs`
+and `presentation.rs`. Do not register unordered callbacks or move power consumers
+across these boundaries. Domain-specific behavior normally changes its stage or
+owner, without editing the central session file. New domains/shared contracts
+still require explicit composition review; this is not a generic plugin system.

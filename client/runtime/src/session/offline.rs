@@ -147,9 +147,7 @@ impl GameplaySession {
         next.offline.safety_reasons = next.construction_safety_record();
         let mut verified = GameplaySession::default();
         verified.restore_bytes(&next.save_bytes(0)?)?;
-        next.automation_step = self.automation_step;
-        next.interpolate_presentation = self.interpolate_presentation;
-        next.measure_physics = self.measure_physics;
+        next.policy = self.policy;
         *self = next;
         Ok(())
     }

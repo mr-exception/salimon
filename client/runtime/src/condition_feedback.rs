@@ -33,10 +33,10 @@ impl Observation {
                 && !v.terminal
                 && s.view_mode == ViewMode::Gameplay,
             walking: s.character.location() != salimon_character::CharacterLocation::Cockpit
-                && (s.movement_input.forward
-                    || s.movement_input.backward
-                    || s.movement_input.left
-                    || s.movement_input.right),
+                && (s.input.movement().forward
+                    || s.input.movement().backward
+                    || s.input.movement().left
+                    || s.input.movement().right),
             now: v.active_time,
             serial: s.run.serial,
         }

@@ -106,7 +106,7 @@ fn reader_blocks_world_inputs_and_closes_on_pause_focus_power_loss_and_range_los
     s.open_archive();
     s.command(Command::Control(ControlKey::Forward, true));
     s.command(Command::Mining(true));
-    assert!(!s.movement_input.forward);
+    assert!(!s.input.movement.forward);
     s.command(Command::Wheel(
         super::super::consumable_wheel::WheelAction::Hold(true),
     ));

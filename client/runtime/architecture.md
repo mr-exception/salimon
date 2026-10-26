@@ -32,9 +32,14 @@ renderer, automation reader or benchmark recorder.
 
 | Module | Responsibility |
 | --- | --- |
-| `session.rs` | Typed `Command`/`Snapshot`, gameplay state, held controls, interactions and portable tick order |
+| `session.rs` | Typed `Command`/`Snapshot`, explicit domain fields, view/carry adapters and public composition boundary |
+| `session/init.rs` | Empty reconstruction defaults and explicit starter-supply new-run construction |
+| `session/input.rs`, `input/state.rs` | Domain bindings, private held movement/steering state and centralized reset |
+| `session/policy.rs` | Nonserialized host stepping/interpolation/measurement policy; copied as one value across restore/restart |
+| `session/commands.rs` | Common command admission and delegation to typed domain actions |
+| `session/tick.rs`, `tick/` | Explicit ordered scheduler and focused power, character and resource stage adapters |
 | `session/frames.rs` | Ship/surface frame adapters and nearby solid-body selection |
-| `session/interaction.rs` | Ship-local target/range/aim and interior authority gates |
+| `session/interaction.rs`, `interaction/actions.rs` | Ship-local target/range/aim, interior authority gates and admitted interactions |
 | `app/input.rs` | Physical-key translation and native focus/capture/repeat/synthetic admission |
 | `app/interaction.rs` | Contextual text and prompt-placement mapping |
 | `app/scene.rs` | World/ship renderer DTO mapping at absolute `f64` positions |
@@ -1014,7 +1019,7 @@ recovery and inventory continue exactly and remain frozen offline.
 ## Active survival, terminal state and restart (#371)
 
 `session/lifecycle.rs` owns typed run/journey source and deterministic fresh-run
-preparation. `session.rs` advances survival first to determine the admitted portion
+preparation. `session/tick.rs` advances survival first to determine the admitted portion
 before death, then composes physical work for that duration. Terminal state clears
 held controls/mining, pilot authority and backlog, and rejects subsequent world
 commands. Ordinary menus continue active time; true pause remains #381.
@@ -1038,7 +1043,7 @@ for failure/crash guarantees and remaining #373/#377/#379 scope.
 ## Journey accounting (#372)
 
 `session/journey.rs` owns framed last valid physical samples, combined travel and
-named location DTOs. `session.rs` measures ship travel around its update, then
+named location DTOs. `session/tick.rs` measures ship travel around its update, then
 character travel around its controller using the same completed ship frame.
 Cabin-local samples exclude inherited ship translation/rotation; outside/EVA
 samples remain absolute f64. Neither camera/render origins nor out-of-tick changes
@@ -1611,3 +1616,25 @@ clock). `session/persistence/physical.rs` owns the physical composition adapter;
 layout changed. Keep unknown-field rejection and publish only after all owners
 and cross-domain invariants pass. Generic persistence codec/storage remain
 independent of gameplay domains; there is no dynamic save registry.
+
+
+## Session composition owners (#642)
+
+Held input lives in `session/input/state.rs`; external observers receive Copy
+snapshots through `movement()`/`steering()`, while mutation stays within session
+composition. `session/policy.rs` groups host automation step, interpolation and
+physics measurement flags; copy this single nonserialized value through restore,
+offline reconciliation and restart. `session/init.rs` distinguishes empty
+reconstruction defaults from supply-granting new runs. Command admission and
+interaction details live in `session/commands.rs` and `interaction/actions.rs`.
+
+`session/tick.rs` is the explicit scheduler: admit pause/terminal/offline and
+survival time; begin render history; advance age/camera, steering/Fabricator/ship,
+crash interruption, Recovery then construction; use the completed ship frame for
+character/cargo/habitation; advance mining then loose physics; record journey,
+synchronize carrying/mass, validate UI focus, freeze terminal state and complete
+render history. Stage bodies live in `tick/power.rs`, `character.rs`, `resources.rs`
+and `presentation.rs`. Do not register unordered callbacks or move power consumers
+across these boundaries. Domain-specific behavior normally changes its stage or
+owner, without editing the central session file. New domains/shared contracts
+still require explicit composition review; this is not a generic plugin system.

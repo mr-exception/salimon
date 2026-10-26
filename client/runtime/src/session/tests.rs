@@ -70,20 +70,20 @@ fn typed_controls_clear_on_view_reset_and_never_replay_denied_steering() {
     session.command(Command::Control(ControlKey::Forward, true));
     session.command(Command::Control(ControlKey::Left, true));
     session.command(Command::Control(ControlKey::RollRight, true));
-    let steering = session.ship_control_input.steering();
+    let steering = session.input.steering.steering();
     assert_eq!(
         (steering.pitch, steering.yaw, steering.roll),
         (1.0, 1.0, 1.0)
     );
     session.command(Command::Control(ControlKey::Left, false));
     session.command(Command::Control(ControlKey::Right, true));
-    assert_eq!(session.ship_control_input.steering().yaw, -1.0);
+    assert_eq!(session.input.steering.steering().yaw, -1.0);
     session.ship.set_stored_core_energy_joules(0);
     session.command(Command::Control(ControlKey::Forward, true));
-    assert_eq!(session.ship_control_input, ShipControlInput::default());
+    assert_eq!(session.input.steering, ShipControlInput::default());
     session.ship.exchange_core_energy_joules(1e9, 0.0).unwrap();
     session.advance_automation(Duration::from_millis(16));
-    assert_eq!(session.ship_control_input, ShipControlInput::default());
+    assert_eq!(session.input.steering, ShipControlInput::default());
     session.command(Command::Throttle(salimon_ship::ThrottleDirection::Up, true));
     let throttle = session.ship.snapshot().thruster_percentage;
     session.command(Command::ToggleView);
@@ -93,7 +93,7 @@ fn typed_controls_clear_on_view_reset_and_never_replay_denied_steering() {
     session.command(Command::Control(ControlKey::Forward, false));
     session.command(Command::ToggleView);
     session.advance_automation(Duration::from_millis(160));
-    assert_eq!(session.ship_control_input, ShipControlInput::default());
+    assert_eq!(session.input.steering, ShipControlInput::default());
     assert_eq!(session.ship.snapshot().thruster_percentage, throttle);
 }
 

@@ -1,8 +1,13 @@
 //! Portable domain binding/admission composition; native events end in app/input.rs.
-use super::{Command, GameplaySession, ViewMode};
+use super::{Command, ControlKey, GameplaySession, ViewMode};
+use salimon_character::CharacterLocation;
+use salimon_ship::FlightState;
+use salimon_survival::restrictions::Action;
+mod state;
 use keys::{camera_command, control_key, throttle_direction, toolbar_slot};
 use salimon_ship::ThrottleDirection;
 use salimon_world::{CameraCommand, CelestialBodyId};
+pub(crate) use state::{ShipControlInput, State};
 mod construction;
 mod equipment;
 mod interior;
@@ -100,5 +105,56 @@ pub(crate) fn dispatch(session: &mut GameplaySession, key: Key, pressed: bool) {
     };
     if let Some(command) = command {
         session.command(command);
+    }
+}
+
+impl GameplaySession {
+    pub(crate) fn clear_held_controls(&mut self) {
+        self.crafting_ui.open = false;
+        self.archive_reader.open = false;
+        self.wheel = Default::default();
+        self.input.clear();
+        self.ship.clear_steering_input();
+        self.mining.clear_input();
+        self.ship.clear_throttle_input();
+    }
+    pub(super) fn control(&mut self, key: ControlKey, pressed: bool) {
+        use ControlKey::*;
+        // Releases clear both meanings even across location/view changes.
+        let cockpit = self.character.location() == CharacterLocation::Cockpit;
+        if !pressed || !cockpit || matches!(key, Jump | Descend) {
+            match key {
+                Forward => self.input.movement.forward = pressed,
+                Backward => self.input.movement.backward = pressed,
+                Left => self.input.movement.left = pressed,
+                Right => self.input.movement.right = pressed,
+                Jump => self.input.movement.jump = pressed,
+                Descend => self.input.movement.descend = pressed,
+                _ => {}
+            }
+        }
+        if !pressed || cockpit {
+            let ship = self.ship.snapshot();
+            if pressed
+                && !(self.restrictions().permits(Action::Pilot)
+                    && ship.power_available
+                    && ship.cockpit_control_active
+                    && ship.flight_state == FlightState::Flying)
+            {
+                if !matches!(key, Jump | Descend) {
+                    self.input.steering = ShipControlInput::default();
+                }
+                return;
+            }
+            match key {
+                Forward => self.input.steering.pitch_up = pressed,
+                Backward => self.input.steering.pitch_down = pressed,
+                Left => self.input.steering.yaw_left = pressed,
+                Right => self.input.steering.yaw_right = pressed,
+                RollLeft => self.input.steering.roll_left = pressed,
+                RollRight => self.input.steering.roll_right = pressed,
+                _ => {}
+            }
+        }
     }
 }

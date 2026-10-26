@@ -497,7 +497,7 @@ impl ClientApplication {
     ) {
         log::trace!(
             "input key={key:?} pressed={pressed} source={source:?} ship_controls={:?} orientation={:?}",
-            self.session.ship_control_input,
+            self.session.input.steering(),
             self.session.ship.snapshot().pose.orientation,
         );
         if self.e2e_input_isolated && matches!(source, InputSource::Native) {
@@ -681,7 +681,7 @@ impl ClientApplication {
     fn set_input_focus(&mut self, focused: bool) {
         log::debug!(
             "native input focus={focused} ship_controls={:?} orientation={:?}",
-            self.session.ship_control_input,
+            self.session.input.steering(),
             self.session.ship.snapshot().pose.orientation,
         );
         self.native_focused = focused;
@@ -693,7 +693,7 @@ impl ClientApplication {
     fn release_input_capture(&mut self) {
         log::trace!(
             "releasing native input: ship_controls={:?}",
-            self.session.ship_control_input
+            self.session.input.steering()
         );
         self.scout_audio.stop();
         self.cursor_captured = false;

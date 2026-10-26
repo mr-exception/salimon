@@ -186,9 +186,7 @@ impl GameplaySession {
             elapsed: save.simulated_time,
             update_clock: crate::update_clock::UpdateClock::from_saved_backlog(save.pending_time),
             // Automation policy belongs to the current host, never the save file.
-            automation_step: self.automation_step,
-            interpolate_presentation: self.interpolate_presentation,
-            measure_physics: self.measure_physics,
+            policy: self.policy,
             ..Default::default()
         };
         if restored.cargo_door.open_fraction < 1.0

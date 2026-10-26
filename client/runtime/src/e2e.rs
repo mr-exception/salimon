@@ -618,8 +618,8 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     }
     app.update_clock.set_fixed_step(config.step);
     app.seed = config.seed;
-    app.automation_step = Some(config.step);
-    app.interpolate_presentation = false;
+    app.policy.set_automation_step(Some(config.step));
+    app.policy.set_interpolation(false);
     Ok(())
 }
 

@@ -111,11 +111,11 @@ fn exhaustion_revokes_held_thrust_steering_and_mining_without_replaying_after_re
     assert_eq!(after.thruster_percentage, 0);
     assert!(!after.cockpit_control_active);
     assert!(!s.mining.input.held);
-    assert_eq!(s.ship_control_input, ShipControlInput::default());
+    assert_eq!(s.input.steering, ShipControlInput::default());
     vitals(&mut s, 100, 100);
     s.advance_automation(Duration::from_millis(160));
     assert_eq!(s.snapshot().ship.thruster_percentage, 0);
-    assert_eq!(s.ship_control_input, ShipControlInput::default());
+    assert_eq!(s.input.steering, ShipControlInput::default());
 }
 
 #[test]

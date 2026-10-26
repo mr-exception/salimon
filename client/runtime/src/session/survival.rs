@@ -24,7 +24,7 @@ impl GameplaySession {
         });
         if !rules.permits(Action::Pilot) {
             self.ship.revoke_pilot_control();
-            self.ship_control_input = ShipControlInput::default();
+            self.input.steering = ShipControlInput::default();
         }
         if !rules.permits(Action::Mine) {
             self.mining.stop_mining();

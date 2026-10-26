@@ -118,10 +118,10 @@ impl Observation {
             ),
             walking: state.character.location == CharacterLocation::InsideShip
                 && state.ship.power_available
-                && (s.movement_input.forward
-                    || s.movement_input.backward
-                    || s.movement_input.left
-                    || s.movement_input.right)
+                && (s.input.movement().forward
+                    || s.input.movement().backward
+                    || s.input.movement().left
+                    || s.input.movement().right)
                 && (eye[1]
                     - salimon_character::SHIP_FLOOR_HEIGHT_METERS
                     - salimon_character::PLAYER_EYE_HEIGHT_METERS)

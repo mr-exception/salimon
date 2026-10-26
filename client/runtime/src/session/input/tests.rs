@@ -4,10 +4,10 @@ use super::*;
 fn modal_priority_clears_movement_and_construction_cancel_does_not_pause() {
     let mut session = GameplaySession::new_run();
     dispatch(&mut session, Key::Forward, true);
-    assert!(session.movement_input.forward);
+    assert!(session.input.movement.forward);
     dispatch(&mut session, Key::Wheel, true);
     assert!(session.wheel.open);
-    assert!(!session.movement_input.forward);
+    assert!(!session.input.movement.forward);
     dispatch(&mut session, Key::Build, true);
     assert!(!session.building.active);
     dispatch(&mut session, Key::Wheel, false);
@@ -23,5 +23,5 @@ fn modal_priority_clears_movement_and_construction_cancel_does_not_pause() {
     assert!(!session.building.active);
     dispatch(&mut session, Key::Confirm, true);
     assert!(!session.is_paused());
-    assert!(!session.movement_input.forward);
+    assert!(!session.input.movement.forward);
 }

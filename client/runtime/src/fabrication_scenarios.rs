@@ -328,12 +328,12 @@ fn save_restore_blackout_is_atomic_and_never_restores_held_input_or_modal() {
     s.advance_automation(Duration::from_millis(1008));
     s.ship.set_stored_core_energy_joules(0);
     s.advance_automation(Duration::from_millis(16));
-    s.movement_input.forward = true;
+    s.input.movement().forward = true;
     s.crafting_ui.open = true;
     let bytes = s.save_bytes(10).unwrap();
     let before = s.fabrication_snapshot();
     s.restore_bytes(&bytes).unwrap();
-    assert!(!s.movement_input.forward);
+    assert!(!s.input.movement().forward);
     assert!(!s.crafting_ui.open);
     assert_eq!(before, s.fabrication_snapshot());
     s.advance_automation(Duration::from_millis(1008));

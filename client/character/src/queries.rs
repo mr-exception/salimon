@@ -18,6 +18,15 @@ pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
     if !(cabin || nose) || SHIP_FLOOR_HEIGHT + half * 2.0 >= SHIP_CEILING_HEIGHT {
         return None;
     }
+    let header = crate::spatial_contracts::CARGO_HEADER_BOUNDS;
+    if local[0] + half > header[0]
+        && local[0] - half < header[1]
+        && local[2] + half > header[4]
+        && local[2] - half < header[5]
+        && SHIP_FLOOR_HEIGHT + half * 2.0 >= header[2]
+    {
+        return None;
+    }
     if INTERIOR_OBSTACLES.iter().any(|b| {
         local[0] + half > b[0]
             && local[0] - half < b[1]
@@ -33,7 +42,17 @@ pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
 /// Inputs are ship-local; the returned distance is in meters along a unit ray.
 #[must_use]
 pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) -> Option<f64> {
-    sight_obstruction(eye, target, door_open, false)
+    sight_obstruction(eye, target, door_open, false, false)
+}
+
+/// Runtime supplies the independently moving bunk's exact bounds separately.
+#[must_use]
+pub fn habitation_sight_obstruction(
+    eye: [f64; 3],
+    target: [f64; 3],
+    door_open: bool,
+) -> Option<f64> {
+    sight_obstruction(eye, target, door_open, false, true)
 }
 
 /// The input port is recessed behind its own conservative tray/fixture envelope.
@@ -46,7 +65,7 @@ pub fn fabricator_input_sight_obstruction(eye: [f64; 3]) -> Option<f64> {
 /// Authored machine surfaces omit only their own conservative fixture envelope.
 #[must_use]
 pub fn fabricator_sight_obstruction(eye: [f64; 3], target: [f64; 3]) -> Option<f64> {
-    sight_obstruction(eye, target, true, true)
+    sight_obstruction(eye, target, true, true, false)
 }
 
 fn sight_obstruction(
@@ -54,6 +73,7 @@ fn sight_obstruction(
     target: [f64; 3],
     door_open: bool,
     input_face: bool,
+    independent_bunk: bool,
 ) -> Option<f64> {
     let direction = sub(target, eye);
     let length = dot(direction, direction).sqrt();
@@ -98,6 +118,7 @@ fn sight_obstruction(
             INTERIOR_OBSTACLES
                 .iter()
                 .filter(|b| !input_face || **b != FABRICATOR_OBSTACLE)
+                .filter(|b| !independent_bunk || **b != INTERIOR_OBSTACLES[12])
                 .map(|b| {
                     [
                         b[0],
@@ -109,6 +130,18 @@ fn sight_obstruction(
                     ]
                 }),
         );
+        // Bin envelopes block a walking body, but rays see the real hollow shells.
+        for b in &crate::spatial_contracts::STARTER_COLLIDERS[2..4] {
+            let footprint = [
+                b[0] - PLAYER_RADIUS_METERS,
+                b[1] + PLAYER_RADIUS_METERS,
+                b[4] - PLAYER_RADIUS_METERS,
+                b[5] + PLAYER_RADIUS_METERS,
+            ];
+            boxes.retain(|v| [v[0], v[1], v[4], v[5]] != footprint);
+        }
+        boxes.extend(crate::cargo::cargo_bin_solids());
+        boxes.push(crate::spatial_contracts::CARGO_HEADER_BOUNDS);
         // The shared deck and ceiling occlude objects on the other side.
         for (x0, x1, z0, z1) in [
             (
@@ -263,7 +296,7 @@ mod fabricator_tests {
     fn wall_module_blocks_physical_objects_and_sight_but_not_its_input_or_aisles() {
         assert!(ship_floor_placement([-3.0, 1.0, 3.5], 0.1).is_none());
         assert!(ship_floor_placement([-3.0, 1.0, 2.0], 0.1).is_some());
-        assert!(ship_floor_placement([-5.0, 1.0, 3.4], 0.1).is_some());
+        assert!(ship_floor_placement([-6.0, 1.0, 2.0], 0.1).is_some());
         let eye = [-3.0, 1.65, 2.0];
         let input = crate::FABRICATOR_INPUT_MARKER_METERS;
         assert!(ship_sight_obstruction(eye, input, true).unwrap() < 1.55);

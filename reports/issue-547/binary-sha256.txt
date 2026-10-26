@@ -1,0 +1,1 @@
+41ed5a84683b4a55acfb90cd25cf3c0f47a54409989a7b6119568fa344693d13  target/debug/salimon-client

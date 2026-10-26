@@ -18,6 +18,7 @@ mod collision_tests;
 mod doorway;
 mod eva;
 mod interior;
+mod modular;
 pub mod persistence;
 mod surface;
 #[cfg(test)]
@@ -56,6 +57,12 @@ pub struct CharacterController {
     nearby_surface: Option<SurfaceFrame>,
     ramp_moving: bool,
     ship_gravity_enabled: bool,
+    #[serde(skip)]
+    cargo_door_blocking: bool,
+    #[serde(skip)]
+    interior_obstacles: Vec<[f64; 6]>,
+    #[serde(skip)]
+    modular: crate::modular::ModularInterior,
 }
 
 impl Default for CharacterController {
@@ -76,6 +83,9 @@ impl Default for CharacterController {
             nearby_surface: None,
             ramp_moving: false,
             ship_gravity_enabled: true,
+            cargo_door_blocking: false,
+            interior_obstacles: Vec::new(),
+            modular: Default::default(),
         }
     }
 }
@@ -85,6 +95,11 @@ fn normal_movement_scale() -> f64 {
 }
 
 impl CharacterController {
+    /// Host supplies the independently saved internal door state before stepping.
+    pub fn set_cargo_door_blocking(&mut self, blocking: bool) {
+        self.cargo_door_blocking = blocking;
+    }
+
     /// Scales voluntary locomotion only, never gravity, elapsed time or inherited drift.
     pub fn set_movement_scale(&mut self, scale: f64) {
         self.movement_scale = if scale.is_finite() {
@@ -95,6 +110,45 @@ impl CharacterController {
     }
     fn walk_speed(&self) -> f64 {
         WALK_SPEED_METERS_PER_SECOND * self.movement_scale
+    }
+
+    /// Installed physical fixtures are supplied by composition, never derived from GPU meshes.
+    pub fn set_interior_obstacles(&mut self, bounds: Vec<[f64; 6]>) {
+        self.interior_obstacles = bounds;
+    }
+    pub fn set_modular_interior(&mut self, interior: crate::modular::ModularInterior) {
+        self.modular = interior;
+    }
+    fn slide_installed(&self, previous: [f64; 3], mut local: [f64; 3]) -> [f64; 3] {
+        let bottom = local[1] - PLAYER_EYE_HEIGHT_METERS;
+        for b in &self.interior_obstacles {
+            if bottom < b[3] && bottom + PLAYER_BODY_HEIGHT_METERS > b[2] {
+                local = crate::collision::slide_around_obstacles(
+                    previous,
+                    local,
+                    &[[
+                        b[0] - PLAYER_RADIUS_METERS,
+                        b[1] + PLAYER_RADIUS_METERS,
+                        b[4] - PLAYER_RADIUS_METERS,
+                        b[5] + PLAYER_RADIUS_METERS,
+                    ]],
+                );
+            }
+        }
+        local
+    }
+
+    /// Caller admits the furniture support/clearance; no clock, benefit or look change.
+    pub fn set_supported_pose(&mut self, local: [f64; 3]) -> bool {
+        if !matches!(self.position, PositionState::Inside { .. })
+            || local.iter().any(|v| !v.is_finite())
+        {
+            return false;
+        }
+        self.position = PositionState::Inside { local };
+        self.interior_velocity = [0.; 3];
+        self.vertical_speed = 0.;
+        true
     }
 
     pub fn set_ship_gravity_enabled(&mut self, enabled: bool) {

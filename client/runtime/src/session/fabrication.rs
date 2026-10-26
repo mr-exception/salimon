@@ -73,6 +73,47 @@ impl GameplaySession {
                 .update(id, (mg > 0).then_some(mg as f64 / 1_000_000.0))
                 .expect("bounded stored quantities and validated output mass");
         }
+        let maintenance_mass: f64 = self
+            .building
+            .source
+            .modules
+            .values()
+            .flat_map(|m| m.receipts())
+            .map(|f| f.material().mass_kg())
+            .sum();
+        let construction_mass: f64 = self
+            .building
+            .source
+            .projects
+            .jobs()
+            .filter(|p| !(p.work.completed && super::construction::is_structural(p)))
+            .map(|p| p.funding.mass_kg())
+            .sum();
+        changed |= self
+            .mining
+            .ship_mass
+            .update(
+                salimon_ship::MassObjectId::ConstructionMaterials,
+                (construction_mass + maintenance_mass > 0.)
+                    .then_some(construction_mass + maintenance_mass),
+            )
+            .expect("bounded project receipts");
+        for (id, mass) in self.building.structure.mass_entries() {
+            changed |= self
+                .mining
+                .ship_mass
+                .update(id, Some(mass))
+                .expect("validated installed structure mass");
+        }
+        let core_mass = self.core_upgrades.mass_kg();
+        changed |= self
+            .mining
+            .ship_mass
+            .update(
+                salimon_ship::MassObjectId::CoreUpgradeMaterials,
+                (core_mass > 0.).then_some(core_mass),
+            )
+            .expect("bounded Core receipt mass");
         if changed || self.ship.snapshot().total_mass_kg != self.mining.ship_mass.total_kg() {
             self.ship
                 .set_total_mass_kg(self.mining.ship_mass.total_kg())
@@ -125,6 +166,10 @@ impl GameplaySession {
     }
 
     pub(super) fn insert_fabricator_fragment(&mut self) {
+        if self.mining.carry_blocked {
+            self.feedback = Some("Carried object obstructed - back up or drop before intake");
+            return;
+        }
         if !self
             .restrictions()
             .permits(salimon_survival::restrictions::Action::Fabricate)

@@ -1,5 +1,8 @@
 # World & Realism
 
+> **Environmental scope refinement (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) defines future coherent geological provinces, atmosphere/weather, rare generated biospheres, harvesting, natural landmarks and physical exploration; it does **not** approve oceans/river mechanics, habitat simulations, planetary player bases or unrestricted terrain deformation. Existing canonical physical surface and the one-object carrying rules remain authoritative.
+
+
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 ## Direction

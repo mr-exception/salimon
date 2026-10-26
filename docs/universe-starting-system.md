@@ -1,5 +1,8 @@
 # Permanent awakening system — U11 (#412)
 
+> **Environmental preservation clarification (2026-10-24):** The approved [planetary environmental art direction](planetary-environment-art-direction.md) must preserve Vesper as the established **airless frozen mineral starting world**, not populate it with living vegetation, atmospheric wind/clouds or inferred organisms merely because provisional organic/medicinal resource keys exist. Fixed landing area, terrain, physical anchors and canonical palette remain authoritative until an explicitly approved compatible migration.
+
+
 The portable offline publication freezes **Nacre Reach**, its star **Nacre** and
 starting planet **Vesper**. Scientific-style IDs remain separate from names:
 
@@ -156,7 +159,9 @@ all-target Clippy/fmt and documentation gates. See [measured report](../reports/
 
 U12 #413 owns production merging/packaging; U14 #415 evolving states; U23 #424
 real-scale terrain LOD; U24 #425 playable arrival/resources integration.
-Reference hardware/native gates #436–#439 remain separate. There is no runtime
+Cloud integration gates #436–#439 remain separate; human review/platform/budget
+criteria are #561/#557/#563 under the [verification workflow](verification-workflow.md).
+There is no runtime
 startup, save, scanner/chart, Earth-route, backend or asset change. Renderer/native
 appearance, environmental survival and real hull contact are not validated by
 this portable definition. Explicit all-player-consistent fictional revision

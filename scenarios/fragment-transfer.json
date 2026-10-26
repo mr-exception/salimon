@@ -162,7 +162,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 110
+        "frames": 70
       }
     },
     {
@@ -189,6 +189,26 @@
       "action": {
         "op": "key",
         "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
         "pressed": false
       }
     },
@@ -1555,8 +1575,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 1325.8564409856433,
-        "dy": 0.0
+        "dx": -1160.8170932006003,
+        "dy": 0
       }
     },
     {
@@ -1569,7 +1589,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 37
+        "frames": 45
       }
     },
     {
@@ -1581,9 +1601,22 @@
     },
     {
       "action": {
-        "op": "look",
-        "dx": 443.7564950155775,
-        "dy": 0.0
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 10
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
       }
     },
     {
@@ -1596,7 +1629,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 104
+        "frames": 83
       }
     },
     {
@@ -1609,8 +1642,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 349.3757772034925,
-        "dy": 0.0
+        "dx": 350,
+        "dy": 0
       }
     },
     {
@@ -1715,41 +1748,34 @@
     {
       "action": {
         "op": "look",
-        "dx": 1077.9905790291953,
-        "dy": 0.0
+        "dx": -350,
+        "dy": 0
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "forward",
+        "key": "backward",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "step",
-        "frames": 104
+        "frames": 70
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "forward",
+        "key": "backward",
         "pressed": false
       }
     },
     {
       "action": {
-        "op": "look",
-        "dx": -718.7866247376803,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
         "op": "key",
-        "key": "forward",
+        "key": "right",
         "pressed": true
       }
     },
@@ -1762,22 +1788,48 @@
     {
       "action": {
         "op": "key",
-        "key": "forward",
+        "key": "right",
         "pressed": false
       }
     },
     {
       "action": {
-        "op": "look",
-        "dx": -1631.3862386681203,
-        "dy": 473.4213375785643
+        "op": "key",
+        "key": "backward",
+        "pressed": true
       }
     },
     {
       "action": {
-        "op": "look",
-        "dx": 359.70181997549565,
-        "dy": -212.56153311170507
+        "op": "step",
+        "frames": 32
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 20
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
       }
     },
     {

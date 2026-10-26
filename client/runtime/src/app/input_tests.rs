@@ -542,3 +542,44 @@ fn wheel_pause_and_death_clear_pending_input_without_recapture() {
     app.advance_native(Duration::ZERO);
     assert!(!app.session.wheel.open && !app.cursor_captured);
 }
+
+#[test]
+fn blueprint_keys_share_native_admission_stow_tools_and_close_without_pausing() {
+    let mut app = ClientApplication {
+        native_focused: true,
+        cursor_captured: true,
+        ..Default::default()
+    };
+    native(&mut app, KeyCode::Digit1, true);
+    assert!(app.session.equipment.mining_equipped());
+    native(&mut app, KeyCode::KeyC, true);
+    assert!(app.session.building.active);
+    assert!(!app.session.equipment.mining_equipped());
+    native(&mut app, KeyCode::Digit7, true);
+    assert_eq!(
+        app.session.construction_inspect()["selected"],
+        "utility-module"
+    );
+    let before = app.session.construction_inspect()["preview"]["space"].clone();
+    for (repeat, synthetic) in [(true, false), (false, true)] {
+        app.dispatch_key(
+            PhysicalKey::Code(KeyCode::KeyR),
+            true,
+            repeat,
+            synthetic,
+            InputSource::Native,
+        );
+        assert_eq!(
+            app.session.construction_inspect()["preview"]["space"],
+            before
+        );
+    }
+    native(&mut app, KeyCode::KeyR, true);
+    assert_ne!(
+        app.session.construction_inspect()["preview"]["space"],
+        before
+    );
+    native(&mut app, KeyCode::Escape, true);
+    assert!(!app.session.building.active);
+    assert!(!app.session.is_paused());
+}

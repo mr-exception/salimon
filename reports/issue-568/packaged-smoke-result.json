@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "binary": "/source/artifacts/build/release/salimon-client",
+  "platform": "linux",
+  "artifacts": "/source/artifacts/packaged-smoke/run-jdmxh86n",
+  "checks": [
+    "native window created:",
+    "renderer ready:",
+    "render attempt 1 completed with Presented",
+    "OS F2 switched to PrecisionTour",
+    "OS F2 switched to Gameplay",
+    "game remains playable after OS input"
+  ],
+  "success": true,
+  "pid": 19488,
+  "startup_screenshot": {
+    "status": "captured",
+    "path": "/source/artifacts/packaged-smoke/run-jdmxh86n/startup.png"
+  },
+  "gameplay_screenshot": {
+    "status": "captured",
+    "path": "/source/artifacts/packaged-smoke/run-jdmxh86n/gameplay.png"
+  },
+  "process_exit_code": -15,
+  "duration_ms": 1406
+}

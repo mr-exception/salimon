@@ -49,8 +49,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 For approved flight/Core choices and historical supersession, follow the
 [owned review](../../docs/spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
-Future upgrade/module-load/inertial-cabin/orbit/manual-power features remain out
-of scope; do not interpret tuning setters as progression mechanics.
+Thruster/landing upgrades, future module-load/inertial-cabin/orbit/manual-power features remain deferred. The explicit instant Core capacity progression is implemented by #548; tuning setters alone do not grant a paid upgrade.
 
 #493 replaces independent force capacities with funded Core impulse. Read the
 [math/safety/switch contract](architecture.md#funded-core-impulse-and-engine-switch-493).
@@ -65,3 +64,64 @@ Last-tick auxiliary watts are transient observation, included in total draw
 without another debit and cleared on subsequent advance/restore. Runtime owns
 record progress/config and the `RecoveryModule` physical mass ledger entry. See
 [canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).
+
+## Structural foundation (#541)
+
+`src/structure/` owns portable topology, structural metadata and a separate
+versioned save boundary. Read [structure architecture](architecture.md#portable-structural-foundation-541)
+and its invariants before changing admission/removal/damage or mass mapping.
+It is not yet composed into gameplay. Preserve authored coordinates; placement,
+physical construction, flight readiness and full-save integration retain their
+later issue owners. Run `cargo test -p salimon-ship --locked` and workspace gates
+for mass/persistence boundary changes.
+
+## Blueprint placement authority (#542)
+
+`structure/placement.rs` owns catalog validation, exact 3 m/fine-pitch snapping,
+quarter-turn transforms, stable non-reused placeholder IDs and geometry
+reservations. Runtime supplies trusted owner, flight, physical support,
+reachability and current player/cargo/installed/protected-route envelopes.
+Admission is repeated at placement and immediately before physical completion;
+rendered previews are never authority. One multi-cell/multi-deck volume is one
+project. Unbuilt neighbors cannot supply structural support. Interior versus
+hull-affecting consequences determine airborne permissions.
+
+Projects capture requirements/duration and exact #543 material receipts/progress.
+There is no separate worksite or Start action.
+Cancellation atomically returns physical unconsumed material; #543 owns intake/refunds,
+#544 progress, #545 geometry and #546 flight interlocks. Domain schema-1 validation
+and the whole-session boundary are documented in the
+[save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
+Tests live in `structure/placement/tests.rs`.
+
+## Physical mounts (#576)
+
+Read the physical mount contract before changing rail identity/compatibility or existing-equipment dry-mass transfers. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
+
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Construction flight readiness (#546)
+
+Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 contract](../../docs/construction-flight-safety.md). The durable stop latch never clears on landing; actual hull/attachment state governs readiness. Preserve Core/engine/cockpit/ramp authority and inertial momentum.

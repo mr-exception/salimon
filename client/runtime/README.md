@@ -353,3 +353,16 @@ Survival onboarding: new runs show contextual objective guidance when the action
 band is free. H inspects survival details; hold Q and click a ration to consume;
 E at the Fabricator opens recipes/collects its tray; Escape shows checkpoint
 status. T skips the tutorial for this run. Progress and skip survive save/reload.
+
+Archive verification adds opt-in `scout-archive` initial placement at the physical
+terminal with ordinary unread new-run source. Use the existing key channel
+(`interact` = E, arrows and Tab) and immutable `inspect.archive` source/open/text;
+no command sets record progress. See the [runner](../../scripts/README.md#archive-cloud-verification-505)
+and [cloud report](../../reports/issue-505/README.md). Normal launches are unchanged.
+
+`scout-recovery` is an opt-in E2E fixture near Fabricator, with one held 2 kg iron
+fragment and 0.5 kg raw silicate in the bin. It starts without a module/job/work.
+The `recovery` key alias maps to R; `inspect.recovery` observes captured config,
+identity, active record and paid joules without modifying them. See the
+[Recovery report](../../reports/issue-515/README.md) for the production craft,
+collection, cabin walk and funded reconstruction route.

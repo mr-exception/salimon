@@ -1,5 +1,11 @@
 # Experience validation — E06 (#476)
 
+Verification ownership follows the [cloud/human policy](verification-workflow.md):
+#568 executes automated matrix rows once their implementation dependencies ship;
+#537/#561 own instructed human decisions/reviews. Physical platform tests are
+#557, hardware budgets #563. Retain all blocked/unrun rows and real backend
+requirements; cloud passes do not invent hardware or human approval.
+
 The version-1 [scenario matrix](../scenarios/portable/experience-v1.json) maps
 26 accepted invariants to current portable tests and human native protocols.
 It traces [experience](experience-direction.md), [lost journey](narrative-and-lost-journey.md),
@@ -76,3 +82,16 @@ Human native comparisons and reference performance remain required separately.
 blocked and unrun outcomes. [Follow-up #537](https://github.com/mr-exception/salimon/issues/537)
 owns full native/backend experience acceptance after #476 matrix/runner delivery.
 Closing #476 does not resolve the feature dependencies or grant native signoff.
+
+
+## Automated reproduction (#568)
+
+The current matrix is audited against live implementation dependencies without
+inventing new test mappings: twelve Scout portable rows execute and fourteen
+future protocols retain exact `blocked_by` issue IDs. A runner exit of 3 is
+pending coverage, not a whole-matrix pass. Open #469–#475 still own their real
+navigation, alien opening, location, completion/account/backend and revisit
+features. Source rights and physical-route/balance decisions remain #537;
+appearance/audio/baseline review remains #561. See the [current report](../reports/issue-568/README.md)
+for fresh results, dependency snapshots, raw balance/availability and blank
+physical-trial worksheets. Do not count those unfilled worksheets as evidence.

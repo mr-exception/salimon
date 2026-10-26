@@ -1,5 +1,18 @@
 # Validation matrix
 
+## Verification ownership
+
+Follow [cloud and human verification](verification-workflow.md): reproducible
+Linux cloud checks are the default completion path (`auto-verification`).
+Subjective reviews, physical OS/device experiments and explicit owner decisions
+belong to instructed `human-verification` issues; return evidence to Codex.
+References below to older native/M1 issue gates follow the current issue labels
+and transferred ownership, not a blanket desktop prerequisite. Preserve actual
+failures and context: software Vulkan cannot certify Metal or hardware FPS.
+The existing native graphical commands below run the actual application on Linux;
+no game-engine or browser migration is implied. Existing numerical budgets remain
+in force for their stated workload/hardware.
+
 Run commands from the repository root. Use `python3` on macOS/Linux where
 `python` is not available, and `python` on Windows. Native builds require Python
 3.10+, stable Rust 1.89+ with rustfmt/Clippy, locked Cargo dependencies, and the
@@ -171,6 +184,11 @@ Engine #493: `cargo test -p salimon-ship --locked` plus workspace tests/build/
 Clippy/fmt. `inertial-flight.json` and `landing-speed-cutoff.json` now exercise
 1000/500 m/s² dry thrust, coast/braking and the unchanged 20m/s landing limit.
 Physical B input, handling and instrument appearance need #498 reference evidence.
+Cloud production-protocol engine captures, the seven realistic-flight routes and
+engine-off disk relaunch regression are recorded in
+[the #498 report](../reports/issue-498/README.md). Run its `verify.py` against a
+built native executable on Xvfb/software Vulkan; fresh output paths are required.
+Human handling/physical input and hardware qualification remain #561/#557/#563.
 The same runtime flight regression module replays the landing-cutoff and cockpit
 monitor evidence routes without GPU capture. Run `cargo test -p salimon-client
 --locked flight_regression` for both baseline and screenshot-route gameplay;
@@ -286,7 +304,7 @@ analytic production-U02 frames/motion/GPU narrowing, injected unit/axis/epoch/sc
 faults, missing/extra/duplicate coverage, malformed wire, finite budgets and norm
 boundaries. Release comparator and repeated CPU workloads are documented in the
 [reference guide](universe-reference-fixtures.md); retain raw JSON/context/hashes.
-Linux results do not approve M1 performance (#521), future ephemeris/integrator
+Cloud #521 measurements do not approve M1 performance (hardware decisions #563), future ephemeris/integrator
 model drift or whole-game frame rates. Reference data is not production reuse.
 
 U07: universe/workspace tests run Gaia/CSV goldens, quality/missing-data counts,
@@ -335,7 +353,8 @@ the manifest. Tests cover independent >=30 ly proof, physical screens, immutable
 IDs/digests, altered/unknown/oversized data, single-surface queries, all five
 resources, ship-clearing walk paths and visual independence. See
 [contract](universe-starting-system.md) and [evidence](../reports/issue-412/README.md).
-These CPU checks do not replace U24 integration or native #436–#439 acceptance.
+These CPU checks do not replace U24 integration or cloud #436–#439 rendered and
+session acceptance. Human presentation/platform/budget criteria are #561/#557/#563.
 
 ## Reference save/HUD fixtures (#376)
 
@@ -366,3 +385,128 @@ copy in a fresh isolated save directory. Normal launch uses the real wall clock
 and native OS events; no stdin stepping or rendering override is active.
 Fixture placement/aiming is not physical mining/travel, visual approval or FPS
 evidence. Keep blocked placement failures and human temporal review separate.
+
+## Structural foundation (#541)
+
+`cargo test -p salimon-ship --locked structure::tests` verifies six-face support,
+edge/corner rejection, precise origin/coordinate bounds, multi-deck/multi-cell
+membership, safe removal, damage transfers, stable IDs, atomic invalid-input
+rejection, disjoint mass contributions and versioned save reconstruction.
+Run workspace tests/build/Clippy/fmt for its public mass/save boundaries. The
+foundation is not composed into native gameplay; no visual, Metal/M1 or
+construction-interaction acceptance is claimed by these headless tests.
+
+## Scout continuous audio verification (#582)
+
+`cargo test -p salimon-client --locked scout_audio` covers production ship cues,
+EVA/surface silence, save/focus/terminal admission and spatial mapping.
+`cargo test -p salimon-client --locked native_audio` covers continuous callback
+chunk invariance, mute/reset/watchdog event retirement and finite headroom.
+`condition_feedback` tests retain the survival threshold/settings owner.
+
+Run `SALIMON_AUDIO_EVIDENCE=/absolute/output cargo test --release -p salimon-client
+--locked continuous_audio_evidence_582 -- --ignored --nocapture` for original
+10-second stereo PCM and 60 Hz synthesis timings. Run the separate
+`native_continuous_output_582` opt-in test with the same variable only when an
+actual default output device is available; it retains callback telemetry and
+fails explicitly if unavailable. Offline exports are not speaker recordings.
+Human listening #561, physical backend/device switching #557 and hardware
+budgets #563 require their separate evidence. Historical #485 reports remain
+valid for their archived subprocess revision. See the maintained
+[soundscape contract](scout-presentation.md#soundscape-boundary-465).
+
+## Scout machinery cloud walkthrough (#489)
+
+`cargo test -p salimon-client --locked scout_walkthrough` verifies physical
+Fabricator intake/menu/work/blocked/exact collection, unfunded-job Core recovery
+and byte-identical pause/save/restore feedback. Existing `scout_feedback`, flight,
+cargo, ramp/collision and renderer screen-orientation contracts remain required.
+With Xvfb and lavapipe active, run `python reports/issue-489/walkthrough.py
+--binary target/debug/salimon-client --output artifacts/new-489-walkthrough`.
+It uses production protocol/window adapters and direct GPU capture, isolated
+native input, explicit seeded initial states and fixed simulation steps.
+Its motion frames/encoded clips are not wall-clock/display-FPS evidence.
+See the [report](../reports/issue-489/README.md) for native routes, source/context
+hashes, exact results and remaining #561/#557/#563 criteria.
+
+Scout UI cloud matrix #502: the [report and driver](../reports/issue-502/README.md)
+record actual wgpu screens at 1280x800/1920x1080 and simulated X11 scales 1/1.5/2,
+power restoration through Core intake, physical Fabricator prompts/modal exclusion
+and the existing anchored-world-prompt route. Device DPI remains #557 and human
+readability/appearance remains #561.
+
+Archive #505: `cargo test -p salimon-client --locked archive` includes the real
+Save Now worker, normal relaunch and verified restart reset. The
+[cloud report/driver](../reports/issue-505/README.md) captures all seven intact and
+damaged records via physical E/arrow/Tab dispatch at both supported resolutions.
+
+Recovery #515: `cargo test -p salimon-client --locked session::recovery` covers
+concurrent craft/thrust/recovery funding, old-schema resource/job retention and
+real Save Now/normal-launch/restart with zero offline work. The
+[cloud report/driver](../reports/issue-515/README.md) exercises production
+intake/Fabricator/tray/installation/Archive controls and GPU captures.
+
+Scientific CPU cloud evidence #521: build the three documented release examples,
+then use the [report-local measurement driver](../reports/issue-521/README.md)
+for seven serial processes each of `reference_bench` and `partition_bench`.
+The C supervisor records Linux `wait4` peak RSS without Python's inherited memory
+floor. Raw inner JSON, process time/memory, fixture/binary/compiler/CPU context,
+control failures and comparisons are retained; no FPS/model-error budget follows.
+
+Blueprints #542: `cargo test -p salimon-ship --locked structure::placement` and
+`cargo test -p salimon-client --locked construction` check reservations, safety and
+schema-8 atomic restore. Run the production native
+`scenarios/evidence/blueprint-placement.json` route for visible previews/projects,
+rotation, inspect/cancel and one module spanning four cells. These placeholders
+have no intake/progress/completed geometry; those later gates remain #543–#551.
+
+### Exact historical current-sphere stress (#559)
+
+`reports/issue-559/collect.py --binary /absolute/release-test-binary --output
+artifacts/559/lane` runs the ignored `current_sphere_stress_cpu` test serially.
+It retains every flushed sample and 120s moving / 45s natural-preparation
+subprocess timeout. The fixture uses production extraction/adapter snapshots, archived mass/radius
+bits and the stateful solver at 16 ms; natural preparation is at most 300 steps, without installed sleep flags.
+For the historical #455 comparison use its unchanged pre-starter-layout geometry
+and the identical test harness/instrumentation on both builds. See the report
+for exact checkout/build commands. Current layout results are separate controls,
+not silently the historical v1 population. Query/contact/activation timings
+include instrumentation; software/CPU results do not establish hardware FPS.
+
+
+## Exact contact stress (#592)
+
+Run physics and math tests, workspace tests/build, Clippy and documentation gates
+for changes to the shared arithmetic/contact boundary. The retained
+`iteration_oracle` compares exact old ground/pair response and warm continuation;
+spatial all-pairs, correction-created contact and sleep/retained-projection tests
+remain required. The [serial reproducer](../reports/issue-592/reproduce.sh) builds
+an isolated archived-layout fixture and records every sample with immutable
+binary/source inventories. Never run builds, render workloads or other timing
+lanes concurrently with its release measurements. Diagnostic prefix snapshots
+cannot replace the required 100 completed moving intervals. Historical failed
+300-step preparations and native/frame-budget failures remain failures.
+
+## Physical mounts (#576)
+
+Run `cargo test -p salimon-client --locked session::mounts`, ship/world/character tests and workspace gates. The physical-mount evidence route retains original production-wgpu images. See [the canonical contract](physical-mounts.md).
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+## Construction flight readiness (#546)
+
+See [construction flight safety](construction-flight-safety.md) for schema-19 Stop/Resume, actual hull and attachment admission, cockpit warnings and airborne stop latches. Source: runtime `session/construction/flight.rs`, ship `structure/construction.rs`; regressions: runtime `session/construction/flight/tests.rs`. Run workspace and construction checks plus the production `construction-interlocks.json` evidence scenario.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.

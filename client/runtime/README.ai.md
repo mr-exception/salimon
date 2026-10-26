@@ -30,6 +30,16 @@ real second implementation requires it.
 
 ## Source routing
 
+Starter Scout movement/carrying scenarios cross the authored cargo bulkhead
+through its central opening. `flight_regression.rs` replays the production
+command paths; [starter-layout](../../scenarios/evidence/starter-layout.json),
+[cockpit-nose](../../scenarios/evidence/cockpit-nose.json) and
+[fragment-transfer](../../scenarios/fragment-transfer.json) retain the actual
+walking, Archive-targeting and post-flight retrieval routes. Runtime consumes
+character-owned generated fixture bounds; it does not derive collision geometry
+from rendered meshes. Cargo-door/bin mechanics are implemented by #539;
+habitation interactions remain #540.
+
 Start in `app.rs` for native lifecycle, recovery, scheduling and evidence IO.
 Use `session.rs` for typed commands/snapshots, gameplay state and exact cross-domain
 update order; `session/frames.rs` and `session/interaction.rs` own portable adapters.
@@ -210,6 +220,14 @@ screenshot flight timings aligned with the current engine and assert assist
 admission before advancing toward landing; native periodic runs verify capture
 and pixels. Software-Vulkan corpus renewal is tracked in #518.
 
+Engine cloud verification #498 adds a clear-space disk regression in
+`session/propulsion_tests.rs`: the real two-generation store and normal
+`Checkpoints::open_at` launch preserve engine-off, selected throttle and momentum.
+Refueling cannot enable the switch; a fresh command is required. This tests the
+existing save/engine contract without changing source ownership or gameplay.
+The [report and native driver](../../reports/issue-498/README.md) retain exact
+commands, GPU instruments, realistic-flight routes and human/hardware limits.
+
 
 Scout UI #466: prompt and crafting/status glyphs reuse renderer `ui_style`.
 See the [canonical surface matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466);
@@ -240,3 +258,126 @@ Native cargo review #477 uses an opt-in test-only checkpoint exporter. The
 [validation guide](../../docs/validation.md#normal-clock-cargo-review-fixture-477)
 records its explicit fixture/normal-launch boundary. It changes no production
 input, save schema, physics or interpolation policy.
+
+## Blueprint tool and placeholders (#542)
+
+`session/construction.rs` composes ship-owned placement with actual authored
+character geometry, individual physical cargo and protected starter escape/service
+lanes. `catalogs/blueprints.json` declares seven furniture/wall/door/hull/deck/room/
+module entries. Its costs/durations are **proposed estimates**, with
+`approved_economy=true` following the explicit owner decision on 2026-10-24.
+#543 accepts physical materials; timed progress still belongs to #544.
+#537 owns economy approval before #543/#544 integration. Fine pitch is per-entry
+data (currently 0.5 m), not a mandatory global furnishing rule.
+
+C opens/closes the tool, 1–7 select, R rotates, left click places, E inspects the
+aimed project, right click cancels the aimed reachable reservation. Escape closes
+before pausing. Native and protocol inputs use the same session commands and
+native focus/repeat/synthetic admission remains in the shell. Opening stows the
+mining tool; closing never re-equips it. Existing essential carrying/escape paths
+are protected. The initial coarse structural graph is an explicit support model;
+it does not move authored anchors or generate physical hull. Exterior reservations
+also reject the conservative existing hull, wings and engine volumes. Actual hull
+modification/solid generation remain #545.
+
+`app/scene.rs` maps hollow colored edges into ordinary oriented cuboid instances:
+green clear preview, red declined preview, cyan placed project. These render-only
+edges never become solid colliders or installed mass. Requirements/status stay
+visible together with transient feedback in the action bar. Whole-session schema 8
+preserves project source and rejects malformed restore atomically, while tool UI
+resets. See the canonical [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
+Portable and native routes use `scenarios/evidence/blueprint-placement.json`.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).
+
+
+## Base habitation (#540)
+
+The bunk's two authored panels use the generated
+`habitation_geometry.rs` hinge/swept bounds, sourced from
+[the category definition](../../models/assets/ships/salimon-scout/habitation-geometry.json).
+The renderer maps a finite stowed/deployed fraction to rigid rotation and normals;
+runtime admits manual motion only after full player/belonging clearance. Static
+poses cost no repeated clearance scan. Reserved walking clearance is unchanged.
+Galley E opens the existing exact-identity consumable wheel, with no generated
+food or additional inventory; hygiene remains an inspectable base fixture.
+No water/hygiene meter, sleep-time advancement or additional survival benefit is
+introduced. Expanded sitting/lying, restraints and privacy mechanisms are implemented by #577; see [cabin mechanisms](../../docs/cabin-mechanisms.md). Schema 10 saves source motion; see
+[the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+
+## Interior fixture composition (#575)
+
+`session/fixtures.rs` maps existing saved habitation state to the versioned
+[interior layout](../assets/ship/interior-layout-v1.json), preserving the stable
+berth ID and ship-rooted f64 transform. `app.rs` supplies borrowed fixture DTOs;
+renderer resolves/batches presentation and never owns collision, installed mass,
+construction, cosmetic age or damage authority. Native debug inspect includes
+actual fixture draw/memory/upload counters; `window_state` reports true focused/
+occluded flags. Schema 10 is unchanged. Future room/module owners supply their
+real parent IDs and local poses through this boundary. See
+[architecture and budgets](../../docs/modular-interior-fixtures.md).
+
+
+Continuous audio verification: `native_audio/mix/tests.rs` covers callback-size
+invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
+device telemetry are opt-in. Linux builds require ALSA development headers.
+
+
+Capture verification (#568): native `inspect` with `scope: capture` returns only
+readback status after the usual E2E envelope/admission checks. It is observational
+and never builds the world snapshot. Ordinary inspection is unchanged; old
+executables may ignore the optional scope and return the full snapshot. The
+runner restores the real window before GPU capture and logs that OS request;
+it does not fake focus, disable occlusion or grant physical input qualification.
+See [runner protocol](../../scripts/README.md#bounded-native-capture-polling-568).
+
+## Physical mounts (#576)
+
+Use `session/mounts.rs` for G/K/J, save source and collider synchronization; ship owns attachment rules and world owns the one-object slot. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+Tactile sound/acoustics #583: [canonical source-event, partition, callback-budget and evidence contract](../../docs/scout-acoustics.md). Actual travel/attachments trigger cues; restore audio epochs are transient. E2E exposes silent preview mapping and keeps device playback suppressed.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Construction flight readiness (#546)
+
+Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 contract](../../docs/construction-flight-safety.md). The durable stop latch never clears on landing; actual hull/attachment state governs readiness. Preserve Core/engine/cockpit/ramp authority and inertial momentum.
+
+
+## Optional module commissioning (#547)
+
+`session/construction/modules.rs` owns physical processor tiers, activated downtime, maintenance funding/work and actual commissioning faults. `session/recovery.rs` requests real tier-dependent Core watts. Schema 20 validates module/receipt ownership atomically; cancellation never restores activated equipment without paid restoration. Follow the [canonical controls, tuning, source/test and deferred Jump Drive contract](../../docs/non-core-modules.md).

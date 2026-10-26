@@ -42,7 +42,7 @@ use crate::action_bar::ActionBar;
 use crate::automation::{self, Request};
 use crate::e2e;
 use crate::frame_clock::FrameClock;
-use crate::session::interaction::{InteractionTarget, available_interaction_target};
+use crate::session::interaction::InteractionTarget;
 use crate::session::{ViewMode, door_passable};
 
 const TIMING_LOG_INTERVAL: u64 = 300;
@@ -213,6 +213,16 @@ impl Default for ClientApplication {
 }
 
 impl ClientApplication {
+    pub(crate) fn audio_telemetry(&self) -> serde_json::Value {
+        self.scout_audio.telemetry()
+    }
+    pub(crate) fn ship_resource_stats(&self) -> Option<[u64; 4]> {
+        self.renderer.as_ref().map(Renderer::ship_resource_stats)
+    }
+    pub(crate) fn fixture_batch_stats(&self) -> Option<salimon_renderer::FixtureBatchStats> {
+        self.renderer.as_ref().map(Renderer::fixture_batch_stats)
+    }
+
     pub(crate) fn show_session_feedback(&mut self) {
         if let Some(message) = self.session.feedback.take() {
             self.action_bar.show_transient(message);
@@ -427,7 +437,7 @@ impl ClientApplication {
     }
     pub(crate) fn window_state(&self) -> serde_json::Value {
         self.window.as_ref().map_or(serde_json::Value::Null,|w|serde_json::json!({
-            "minimized":w.is_minimized(), "inner_size":[w.inner_size().width,w.inner_size().height]
+            "minimized":w.is_minimized(), "focused":self.native_focused,"occluded":self.occluded, "inner_size":[w.inner_size().width,w.inner_size().height]
         }))
     }
     /// The only host restart path: publish archive and both fresh generations
@@ -570,6 +580,14 @@ impl ClientApplication {
                 }
                 _ => {}
             }
+        }
+        if pause_key && self.session.building.active && !self.session.is_paused() {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                self.session.command(crate::session::Command::Build(
+                    crate::session::construction::BuildAction::Toggle,
+                ));
+            }
+            return;
         }
         if pause_key {
             if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
@@ -748,14 +766,19 @@ impl ClientApplication {
                 && self.e2e_config.is_none()
                 && self.benchmark.is_none(),
         );
-        self.scout_audio.update(
-            audio,
-            self.condition_feedback.settings,
-            self.condition_feedback.settings_path(),
-        );
+        let condition_cue = self.condition_feedback.take_audio_cue();
+        if self.e2e_config.is_some() {
+            self.scout_audio.preview(
+                crate::scout_audio::Observation::capture(&self.session, true),
+                self.condition_feedback.settings,
+            );
+        } else {
+            self.scout_audio
+                .update(audio, self.condition_feedback.settings, condition_cue);
+        }
         if self.scout_audio.unavailable() {
             self.condition_feedback.message =
-                "Ship audio unavailable - check OS player/output".into();
+                "Ship audio unavailable - check audio device/output".into();
         }
         if let Some(checkpoints) = &mut self.checkpoints {
             checkpoints.poll(&self.session);
@@ -838,22 +861,30 @@ impl ClientApplication {
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface_frame = self.session.terrain_frame(ship_snapshot);
         let world_snapshot = self.session.camera_prototype.snapshot();
-        let (mut camera, scene_instances, mut spheres, light) =
+        let (mut camera, mut scene_instances, mut spheres, light) =
             map_world_to_renderer(world_snapshot);
         let mut resource_meshes = Vec::new();
         let character_snapshot = self.session.character.snapshot(ship_frame, surface_frame);
         let presentation = self.session.presentation();
         let render_ship_frame = character_ship_frame(presentation.ship.pose);
-        let monitor_message = self.session.ship.contextual_cockpit_message();
+        if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(scene::construction_wireframes(
+                &self.session,
+                render_ship_frame,
+                presentation.ship.pose.orientation.map(|v| v as f32),
+            ));
+        }
+        let monitor_message = self.session.contextual_cockpit_message();
         let interaction = if self.session.view_mode == ViewMode::Gameplay
             && character_snapshot.location != CharacterLocation::Cockpit
         {
-            available_interaction_target(
-                character_snapshot.location,
-                ship_frame.world_to_local(character_snapshot.eye_position_meters),
-                ship_frame.world_to_local(character_snapshot.look_target_meters),
-            )
-            .filter(|target| self.session.permitted_interaction(*target))
+            self.session
+                .available_target(
+                    character_snapshot.location,
+                    ship_frame.world_to_local(character_snapshot.eye_position_meters),
+                    ship_frame.world_to_local(character_snapshot.look_target_meters),
+                )
+                .filter(|target| self.session.permitted_interaction(*target))
         } else {
             None
         };
@@ -871,7 +902,7 @@ impl ClientApplication {
                     | InteractionTarget::Core
                     | InteractionTarget::Fabricator
             )
-        ) && (self.session.mining.session.carried_id().is_some()
+        ) && (self.session.mining.session.carried_object().is_some()
             || crate::carrying::target(
                 &self.session.mining,
                 character_snapshot,
@@ -900,12 +931,59 @@ impl ClientApplication {
                     OverlayPlacement::BottomCenter
                 } else {
                     interaction.map_or(OverlayPlacement::BottomCenter, |target| {
-                        interaction::prompt_placement(target, render_ship_frame)
+                        self.session.cabin_interaction_anchor(target).map_or_else(
+                            || interaction::prompt_placement(target, render_ship_frame),
+                            |p| OverlayPlacement::World {
+                                anchor_meters: render_ship_frame.local_to_world(p),
+                                radius_meters: 0.15,
+                            },
+                        )
                     })
                 },
             }
         });
-        let contextual_action = if fragment_interaction {
+        let contextual_action = if let Some(text) = self.session.construction_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if let Some(text) = self.session.cabin_hint() {
+            if matches!(
+                interaction,
+                Some(InteractionTarget::PrivacyScreen | InteractionTarget::ObservationShutter)
+            ) {
+                ship_context.or(resource_context)
+            } else {
+                Some(crate::resource_context::Prompt {
+                    fragment: None,
+                    text: text.to_owned(),
+                    placement: OverlayPlacement::BottomCenter,
+                })
+            }
+        } else if let Some(text) = self.session.core_upgrade_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if let Some(text) = self.session.mount_prompt() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text: text.to_owned(),
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if let Some(text) = self
+            .session
+            .light_hint()
+            .or_else(|| self.session.finish_hint())
+        {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if fragment_interaction {
             resource_context.or(ship_context)
         } else {
             ship_context.or(resource_context)
@@ -929,6 +1007,9 @@ impl ClientApplication {
         if self.session.survival.snapshot().terminal {
             contextual_placement = OverlayPlacement::BottomCenter;
         }
+        self.action_bar.set_combined_contextual(
+            self.session.building.active || interaction == Some(InteractionTarget::Core),
+        );
         self.action_bar
             .set_contextual(if self.session.survival.snapshot().terminal {
                 None
@@ -953,6 +1034,10 @@ impl ClientApplication {
             },
             crate::benchmark::Recorder::window_title,
         ));
+        if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(scene::room_lamps(&self.session, presentation.ship));
+            scene_instances.extend(scene::cargo_door(&self.session, presentation.ship));
+        }
         let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
                 position_meters: presentation.character.eye_position_meters,
@@ -966,6 +1051,10 @@ impl ClientApplication {
                 camera = view.camera(presentation.ship.pose);
             }
             let mut mesh = map_ship_to_renderer(presentation.ship);
+            mesh.independent_interior = true;
+            mesh.lighting = self.session.lighting_dto();
+            mesh.finish_tints = self.session.finish_palette();
+            mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
             mesh.fabricator_output_component = self.session.fabricator_output_component();
@@ -1134,6 +1223,11 @@ impl ClientApplication {
                     .held_item(presentation.character, mining_target.is_some())
             })
             .flatten();
+        let fixture_instances = if self.session.view_mode == ViewMode::Gameplay {
+            self.session.fixture_instances(presentation.ship)
+        } else {
+            Vec::new()
+        };
         let outcome = match self
             .renderer
             .as_mut()
@@ -1143,6 +1237,7 @@ impl ClientApplication {
                     camera,
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,
+                    fixtures: &fixture_instances,
                     spheres: &spheres,
                     terrain: &self.terrain_stream.active,
                     terrain_mask: self.terrain_stream.mask,
@@ -1595,6 +1690,17 @@ impl ApplicationHandler for ClientApplication {
             {
                 release_cursor(&window);
                 self.release_input_capture();
+            }
+            WindowEvent::MouseInput {
+                state: ElementState::Pressed,
+                button: MouseButton::Right,
+                ..
+            } if self.session.building.active => {
+                if self.input_policy().admits_press(InputSource::Native, false) {
+                    self.session.command(crate::session::Command::Build(
+                        crate::session::construction::BuildAction::Cancel,
+                    ));
+                }
             }
             WindowEvent::MouseInput {
                 state,

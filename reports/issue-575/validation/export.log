@@ -1,0 +1,18 @@
+Blender 4.5.3 LTS (hash 67807e1800cc built 2025-09-09 01:33:39)
+Read blend: "/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/models/assets/fixtures/scout-interior-kit/source.blend"
+Info: Read library: '/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/models/assets/ships/salimon-scout/assembly/shared.blend', '//../../ships/salimon-scout/assembly/shared.blend', parent '<direct>'
+INFO Draco mesh compression is available, use library at /Volumes/Blender/Blender.app/Contents/Resources/4.5/scripts/addons_core/io_scene_gltf2/libextern_draco.dylib
+02:15:08 | INFO: Starting glTF 2.0 export
+02:15:08 | INFO: Extracting primitive: Panel
+02:15:08 | INFO: Primitives created: 1
+02:15:08 | INFO: Extracting primitive: PanelDamaged
+02:15:08 | INFO: Primitives created: 1
+02:15:08 | INFO: Extracting primitive: Seat
+02:15:08 | INFO: Primitives created: 1
+02:15:08 | INFO: Extracting primitive: Shelf
+02:15:08 | INFO: Primitives created: 1
+02:15:08 | INFO: Finished glTF 2.0 export in 0.012201070785522461 s
+
+
+Blender quit
+Exported client/assets/fixtures/scout-interior-kit/model.glb

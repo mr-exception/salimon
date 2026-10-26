@@ -214,3 +214,56 @@ Existing faster zero-G momentum is preserved. The field is excluded from saved
 source state and resets to one on restoration; the host reapplies current derived
 survival restrictions before stepping. Character has no survival dependency;
 thresholds/permissions remain in the survival domain and runtime composition.
+
+## Starter envelope (#538)
+
+The exporter owns seven new starter fixture bounds and a separate cargo header.
+`layout.rs` expands the fixtures by the existing body radius. The central doorway
+remains traversable; bulkhead sides and habitation/storage envelopes block walking
+and cargo placement. `interior_ceiling` applies the header to powered jumping and
+zero-G movement, while sight uses its actual 3D bounds. The independent cargo door now uses the #539 obstruction and save contract below.
+
+Blueprint admission reads `ship_installation_obstacles` and the conservative
+hull envelope from the same authored layout used by movement. These read-only
+bounds do not install construction colliders or change character dimensions.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).
+
+
+## Base habitation (#540)
+
+The bunk's two authored panels use the generated
+`habitation_geometry.rs` hinge/swept bounds, sourced from
+[the category definition](../../models/assets/ships/salimon-scout/habitation-geometry.json).
+The renderer maps a finite stowed/deployed fraction to rigid rotation and normals;
+runtime admits manual motion only after full player/belonging clearance. Static
+poses cost no repeated clearance scan. Reserved walking clearance is unchanged.
+Galley E opens the existing exact-identity consumable wheel, with no generated
+food or additional inventory; hygiene remains an inspectable base fixture.
+No water/hygiene meter, sleep-time advancement or additional survival benefit is
+introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
+remain #577. Schema 10 saves source motion; see
+[the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+## Physical mounts (#576)
+
+Runtime supplies installed fixture boxes to `set_interior_obstacles`; walking and zero-G use the same conservative body-expanded sliding query. Obstacles are derived and never saved as character authority. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.

@@ -1,6 +1,11 @@
 # Game experience direction: grounded cinematic Salimon
 
+> **Planetary environment future design (approved 2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) defines scientifically grounded geological provinces, climate/weather, rare coherent biospheres, physical harvesting, rare natural landmarks, suit observations, spatial sound and acceptance scenes. These are **future targets**, not a claim of native implementation or changed Scout interior requirements. Surface-liquid hydrology remains unapproved.
+
+
 Status: **approved experience direction; design guidance and planned work, not shipped native art signoff**. Documentation issue #458. Complements the authoritative [low-poly asset bible](visual-style.md), does not replace its geometry, palette, Blender, physical interfaces or validation rules. The detailed **approved future starter Scout**, separate aft cargo bay, compact habitation and simplified modular-building experience are specified in [Scout art direction and modular construction](scout-and-modular-construction.md); they are not yet claimed as implemented.
+
+The future Scout's detailed owner-approved **habitation, personalization, materials, window, animation, wear, clean repair, lighting and acoustics** are captured in [Scout interior art direction](scout-interior-art-direction.md). This is planned art/experience scope, not a current playable-feature claim; preserve existing authoritative physics, construction, gameplay and presentation acceptance boundaries.
 
 ## Player feeling and artistic identity
 

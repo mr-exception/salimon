@@ -5,10 +5,11 @@ use wgpu::util::DeviceExt;
 use crate::cockpit_instruments::{ATLAS_HEIGHT, ATLAS_WIDTH, InstrumentAtlas};
 use crate::{CockpitInstruments, DEPTH_FORMAT, RendererError, SceneFrame, encode_f32s};
 
-const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
-const VERTEX_FLOATS: usize = 19;
+pub(crate) const SHIP_GLB: &[u8] =
+    include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
+const VERTEX_FLOATS: usize = 20;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
-const UNIFORM_SIZE: u64 = 192;
+const UNIFORM_SIZE: u64 = 576;
 use crate::ramp_geometry::{
     RAMP_ANGLE_RADIANS, RAMP_EXTENSION_METERS, RAMP_FACE_OFFSET_METERS, RAMP_HINGE,
 };
@@ -18,11 +19,18 @@ const DOOR_HINGE_Y_METERS: f32 = RAMP_HINGE[1] as f32;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
+    pub lighting: crate::CabinLighting,
+    /// Bounded linear cosmetic factors: cabin/cargo × five finish groups.
+    pub finish_tints: [[[f32; 3]; 5]; 2],
     pub machinery: crate::MachineryFeedback,
     pub position_meters: [f64; 3],
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.
     pub orientation: [f32; 4],
     pub door_open_fraction: f32,
+    /// Base habitation wall-hinged berth, stowed=0/deployed=1.
+    pub bunk_open_fraction: f32,
+    /// v1 fixture renderer owns the separately instanced berth.
+    pub independent_interior: bool,
     /// Show the authored stationary package only while the Fabricator tray is occupied.
     pub fabricator_output_present: bool,
     pub fabricator_output_medical: bool,
@@ -37,6 +45,38 @@ struct ShipGeometry {
     glass_vertices: Vec<f32>,
     opaque_vertex_count: u32,
     glass_vertex_count: u32,
+}
+
+/// Explicit authored cosmetic allowlist: functional and safety surfaces are excluded.
+fn finish_group(name: Option<&str>) -> f32 {
+    match name {
+        Some(
+            "Wall_Port_Inner"
+            | "Wall_Starboard_Inner"
+            | "Aft_Bulkhead_Port"
+            | "Aft_Bulkhead_Starboard"
+            | "Ceiling_Inner"
+            | "Starter_CargoBulkhead",
+        ) => 1.,
+        Some("Deck_Walkable") => 2.,
+        Some(
+            "Ceiling_Copper_Ribs"
+            | "Deck_Copper_Inlay"
+            | "Window_Port_Sill"
+            | "Window_Starboard_Sill",
+        ) => 3.,
+        Some(
+            "Starter_Galley" | "Starter_GalleyWorktop" | "Starter_Hygiene" | "Starter_CargoBins",
+        ) => 4.,
+        Some(
+            "Starter_BunkCushion"
+            | "Cabin_Woven_Runners"
+            | "Pilot_Seat_Bolsters"
+            | "Pilot_Seat_Cushions"
+            | "Pilot_Seat_Headrest",
+        ) => 5.,
+        _ => 0.,
+    }
 }
 
 fn load_geometry() -> Result<ShipGeometry, RendererError> {
@@ -63,6 +103,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
         let door_flag = match node.name() {
             Some("Exit_Door") => 1.0,
             Some("Exit_Ramp_Tip") => 2.0,
+            Some("Starter_BunkFrame" | "Starter_BunkCushion") => 3.0,
             _ => 0.0,
         };
         let interior_flag = f32::from(interior_nodes[node.index()]);
@@ -117,6 +158,30 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                 || (0..positions.len() as u32).collect(),
                 |values| values.into_u32().collect(),
             );
+            // The authored package uses world-X/Z UVs. Category artwork needs
+            // a full [0,1] face, including vertical faces whose X/Z map collapses.
+            let package_bounds = if display_flag == 3.0 {
+                let mut min = [f32::INFINITY; 3];
+                let mut max = [f32::NEG_INFINITY; 3];
+                for position in &positions {
+                    let point = transform_position(matrix, *position);
+                    for axis in 0..3 {
+                        min[axis] = min[axis].min(point[axis]);
+                        max[axis] = max[axis].max(point[axis]);
+                    }
+                }
+                if (0..3).any(|axis| {
+                    !min[axis].is_finite() || !max[axis].is_finite() || max[axis] <= min[axis]
+                }) {
+                    return Err(RendererError::new(
+                        "failed to load Fabricator package",
+                        "package bounds must be finite and nondegenerate",
+                    ));
+                }
+                Some((min, max))
+            } else {
+                None
+            };
             let material = primitive.material();
             let color = material.pbr_metallic_roughness().base_color_factor();
             let is_glass = material.name() == Some("Cockpit Glass");
@@ -155,6 +220,19 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                 if node.name() == Some("Fabricator_Monitor") {
                     uv[0] = 1.0 - uv[0];
                 }
+                if let Some((min, max)) = package_bounds {
+                    let axes = if transformed_normal[1].abs() > 0.5 {
+                        [0, 2]
+                    } else if transformed_normal[0].abs() > 0.5 {
+                        [2, 1]
+                    } else {
+                        [0, 1]
+                    };
+                    uv = axes.map(|axis| {
+                        ((transformed_position[axis] - min[axis]) / (max[axis] - min[axis]))
+                            .clamp(0.0, 1.0)
+                    });
+                }
                 vertices.extend_from_slice(&[
                     transformed_position[0],
                     transformed_position[1],
@@ -175,6 +253,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                     uv[1],
                     display_flag,
                     crate::machinery::surface_role(node.name()),
+                    finish_group(node.name()),
                 ]);
             }
         }
@@ -316,6 +395,11 @@ fn create_pipeline(
                         offset: 72,
                         shader_location: 7,
                     },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32,
+                        offset: 76,
+                        shader_location: 8,
+                    },
                 ],
             })],
             compilation_options: wgpu::PipelineCompilationOptions::default(),
@@ -349,6 +433,15 @@ fn create_pipeline(
 }
 
 impl ShipMeshRenderer {
+    pub(crate) fn resource_stats(&self) -> [u64; 4] {
+        [
+            self.opaque_vertices.size() + self.glass_vertices.size(),
+            self.uniform.size(),
+            u64::from(self.opaque_vertex_count + self.glass_vertex_count) / 3,
+            if self.visible { 2 } else { 0 },
+        ]
+    }
+
     pub(crate) fn new(
         device: &wgpu::Device,
         format: wgpu::TextureFormat,
@@ -480,6 +573,8 @@ impl ShipMeshRenderer {
         };
         if !ship.position_meters.iter().all(|value| value.is_finite())
             || !ship.orientation.iter().all(|value| value.is_finite())
+            || !ship.bunk_open_fraction.is_finite()
+            || !(0.0..=1.0).contains(&ship.bunk_open_fraction)
             || !ship.door_open_fraction.is_finite()
             || !(0.0..=1.0).contains(&ship.door_open_fraction)
         {
@@ -519,7 +614,7 @@ impl ShipMeshRenderer {
                 },
             );
         }
-        let mut values = Vec::with_capacity(48);
+        let mut values = Vec::with_capacity(88);
         values.extend_from_slice(&view_projection);
         let fraction = ship.door_open_fraction;
         let hinge_fraction = (fraction / 0.6).clamp(0.0, 1.0);
@@ -535,19 +630,19 @@ impl ShipMeshRenderer {
             axes[0][0],
             axes[0][1],
             axes[0][2],
-            0.0,
+            crate::habitation_geometry::BUNK_HINGE_METERS[1] as f32,
             axes[1][0],
             axes[1][1],
             axes[1][2],
-            0.0,
+            crate::habitation_geometry::BUNK_HINGE_METERS[2] as f32,
             axes[2][0],
             axes[2][1],
             axes[2][2],
-            0.0,
+            f32::from(ship.independent_interior),
             OPEN_DOOR_ANGLE_RADIANS * eased_fraction,
             DOOR_HINGE_X_METERS,
             DOOR_HINGE_Y_METERS,
-            0.0,
+            ship.bunk_open_fraction * std::f32::consts::FRAC_PI_2,
             RAMP_EXTENSION_METERS as f32 * extension_fraction,
             RAMP_FACE_OFFSET_METERS as f32 * extension_fraction,
             f32::from(ship.fabricator_output_present),
@@ -558,12 +653,32 @@ impl ShipMeshRenderer {
             },
         ]);
         values.extend_from_slice(&ship.machinery.uniforms()?);
+        for room in ship.finish_tints {
+            for tint in room {
+                if tint
+                    .iter()
+                    .any(|v| !v.is_finite() || !(0.0..=4.).contains(v))
+                {
+                    return Err(RendererError::new(
+                        "ship finish",
+                        "unbounded cosmetic factor",
+                    ));
+                }
+                values.extend_from_slice(&[tint[0], tint[1], tint[2], 0.]);
+            }
+        }
+        values.extend(ship.lighting.values()?);
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         self.visible = true;
         Ok(())
     }
 
+    #[cfg(test)]
     pub(crate) fn draw<'pass>(&'pass self, pass: &mut wgpu::RenderPass<'pass>) {
+        self.draw_opaque(pass);
+        self.draw_glass(pass);
+    }
+    pub(crate) fn draw_opaque<'pass>(&'pass self, pass: &mut wgpu::RenderPass<'pass>) {
         if !self.visible {
             return;
         }
@@ -571,7 +686,13 @@ impl ShipMeshRenderer {
         pass.set_bind_group(0, &self.bind_group, &[]);
         pass.set_vertex_buffer(0, self.opaque_vertices.slice(..));
         pass.draw(0..self.opaque_vertex_count, 0..1);
+    }
+    pub(crate) fn draw_glass<'pass>(&'pass self, pass: &mut wgpu::RenderPass<'pass>) {
+        if !self.visible {
+            return;
+        }
         pass.set_pipeline(&self.glass_pipeline);
+        pass.set_bind_group(0, &self.bind_group, &[]);
         pass.set_vertex_buffer(0, self.glass_vertices.slice(..));
         pass.draw(0..self.glass_vertex_count, 0..1);
     }
@@ -706,15 +827,26 @@ mod tests {
     fn checked_in_ship_stays_within_the_lightweight_asset_budget() {
         let geometry = load_geometry().expect("checked-in ship must load");
         let gltf = gltf::Gltf::from_slice(SHIP_GLB).expect("checked-in GLB must parse");
-        assert!(SHIP_GLB.len() <= 544 * 1024);
-        assert!((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3 <= 6_500);
+        let manifest: serde_json::Value =
+            serde_json::from_str(include_str!("../../assets/ship/asset-manifest.json"))
+                .expect("checked-in asset manifest must parse");
+        let limit = |name: &str| {
+            manifest["budgets"][name]
+                .as_u64()
+                .expect("asset budget must be an integer") as usize
+        };
+        assert!(SHIP_GLB.len() <= limit("maximumGlbBytes"));
+        assert!(
+            ((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3) as usize
+                <= limit("maximumTriangles")
+        );
         assert!(
             gltf.meshes()
                 .map(|mesh| mesh.primitives().len())
                 .sum::<usize>()
-                <= 124
+                <= limit("maximumPrimitives")
         );
-        assert!(gltf.materials().len() <= 13);
+        assert!(gltf.materials().len() <= limit("maximumMaterials"));
     }
 
     #[test]
@@ -833,6 +965,18 @@ mod fabricator_tests {
             .collect();
         assert_eq!(vertices.len(), 36);
         assert!(vertices.iter().all(|v| v[10] == 0.0 && v[14] == 1.0)); // Stationary interior geometry.
+        for face in vertices.as_chunks::<3>().0 {
+            assert!(
+                face.iter()
+                    .all(|v| (0.0..=1.0).contains(&v[15]) && (0.0..=1.0).contains(&v[16]))
+            );
+            let [a, b, c] = [face[0], face[1], face[2]];
+            let area = (b[15] - a[15]) * (c[16] - a[16]) - (b[16] - a[16]) * (c[15] - a[15]);
+            assert!(
+                area.abs() > 0.9,
+                "category artwork needs a noncollapsed full face"
+            );
+        }
         let module = wgpu::naga::front::wgsl::parse_str(include_str!("ship_mesh.wgsl")).unwrap();
         wgpu::naga::valid::Validator::new(
             wgpu::naga::valid::ValidationFlags::all(),

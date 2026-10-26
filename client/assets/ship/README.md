@@ -46,13 +46,16 @@ The aft engines have hollow flared nozzles, recessed emitters, stepped liners,
 armor rings, cooling fins and running lights. Their forms use 8–12 sided
 cross-sections instead of dense smoothing or displacement.
 
-## Cargo module removal
+## Starter cargo and habitation envelope (#538)
 
-The dedicated port cargo room and its protruding hull have been removed from the
-current scout. Loose fragments may still rest on clear main-cabin deck space and
-move with the ship. The ship does not define a dedicated cargo storage volume or
-cargo-room membership count. The historical [cargo-room issue #34](https://github.com/mr-exception/salimon/issues/34)
-describes the earlier layout, not the current asset.
+The aft cargo compartment is separated at X=-4.65 m by a full-height bulkhead
+and 3 m internal opening. Two open storage shells leave a clear center route
+to the unchanged 2.8 m boarding ramp. The cabin has a stowed bunk, compact galley
+and hygiene fixture. Generated proxies align movement, sight and cargo placement.
+Internal door/bin mechanics remain #539 and fixture interactions remain #540;
+this envelope does not claim those features are functional. The old protruding
+port cargo module remains retired. See the owning
+[source guide](../../../models/assets/ships/salimon-scout/README.md#starter-envelope-538).
 
 ## Cockpit glazing and nose
 
@@ -264,3 +267,17 @@ standing eyes on both sides, plus existing lower-window/monitor visibility.
 A deliberately extended shoulder fails those rays. `repair_cockpit_shoulders.py`
 records the one-time source migration; `preview_seams.py -- corners <output>`
 uses the actual seated eye and creates read-only interior/exterior references.
+
+
+The #540 berth preserves named `Starter_BunkFrame`/`Starter_BunkCushion` source
+identity and the existing walking reserve. `habitation-geometry.json` in the
+[Scout source](../../../models/assets/ships/salimon-scout/README.md#base-fold-away-berth-540)
+owns the hinge and generates consumer bounds; the renderer applies rigid motion.
+
+
+The [version-1 interior map](interior-layout-v1.json) migrates the paired berth
+nodes into a stable independently transformed fixture while preserving saved
+habitation, named source meshes and current collision. Other authored ship
+geometry stays in the validated combined export. New reusable templates are
+[separate assets](../../../models/assets/fixtures/scout-interior-kit/README.md);
+room instances reuse them without re-exporting the hull.

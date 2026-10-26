@@ -22,6 +22,8 @@ fn hull_obstruction(
     player: CharacterSnapshot,
     frame: ShipFrame,
     door_open: bool,
+    cargo_blocking: bool,
+    solids: &[[f64; 6]],
     target: [f64; 3],
 ) -> Option<f64> {
     salimon_character::ship_sight_obstruction(
@@ -29,6 +31,23 @@ fn hull_obstruction(
         frame.world_to_local(target),
         door_open,
     )
+    .into_iter()
+    .chain(if cargo_blocking {
+        salimon_character::cargo::cargo_sight_obstruction(
+            frame.world_to_local(player.eye_position_meters),
+            frame.world_to_local(target),
+        )
+    } else {
+        None
+    })
+    .chain(solids.iter().filter_map(|b| {
+        salimon_character::cargo::box_sight_obstruction(
+            frame.world_to_local(player.eye_position_meters),
+            frame.world_to_local(target),
+            *b,
+        )
+    }))
+    .min_by(f64::total_cmp)
 }
 
 pub(crate) fn target(
@@ -50,6 +69,8 @@ pub(crate) fn target(
             player,
             frame,
             door_open,
+            tool.cargo_door_blocking,
+            &tool.interior_solids,
             player.look_target_meters,
         ))
         .min_by(f64::total_cmp)
@@ -76,8 +97,10 @@ pub(crate) fn context(
     ) {
         return None;
     }
-    if tool.session.carried_id().is_some() {
-        Some(if target.is_some() {
+    if tool.session.carried_object().is_some() {
+        Some(if tool.carry_blocked {
+            "Carried object obstructed - back up or F to drop"
+        } else if target.is_some() {
             "Only one world object - F to drop first"
         } else {
             "Carrying fragment - F to drop"
@@ -87,7 +110,8 @@ pub(crate) fn context(
     }
 }
 
-pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot) {
+pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot, frame: ShipFrame) {
+    tool.carry_blocked = false;
     let Some(id) = tool.session.carried_id() else {
         return;
     };
@@ -152,6 +176,34 @@ pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot) {
         }
     }
 
+    if player.location == CharacterLocation::InsideShip && tool.cargo_door_blocking {
+        let local = frame.world_to_local(p);
+        if salimon_character::cargo::sphere_overlaps_box(
+            local,
+            clearance,
+            salimon_character::cargo::cargo_door_bounds(0.0),
+        ) || salimon_character::cargo::cargo_sight_obstruction(
+            frame.world_to_local(player.eye_position_meters),
+            local,
+        )
+        .is_some_and(|hit| hit < length(salimon_math::sub(p, player.eye_position_meters)))
+        {
+            blocked_in_frame(tool, id, frame);
+            return;
+        }
+    }
+    if player.location == CharacterLocation::InsideShip {
+        let local = frame.world_to_local(p);
+        let eye = frame.world_to_local(player.eye_position_meters);
+        if tool.interior_solids.iter().any(|b| {
+            salimon_character::cargo::sphere_overlaps_box(local, clearance, *b)
+                || salimon_character::cargo::box_sight_obstruction(eye, local, *b)
+                    .is_some_and(|d| d < length(salimon_math::sub(local, eye)))
+        }) {
+            blocked_in_frame(tool, id, frame);
+            return;
+        }
+    }
     if let Ok(pose) = ResourceTransform::new(position(p), orientation) {
         tool.session.move_carried(pose);
     }
@@ -176,11 +228,10 @@ pub(crate) fn release_pose(
         .find(|piece| piece.id() == id)
         .filter(|piece| {
             player.location != CharacterLocation::InsideShip
-                || salimon_character::ship_floor_placement(
+                || tool.cargo_allowed(
                     frame.world_to_local(piece.transform().position().meters()),
                     salimon_world::resource_size::fragment_contact_radius_meters(piece.material()),
                 )
-                .is_some()
         })
         .map(|piece| piece.transform())
 }
@@ -230,9 +281,9 @@ pub(crate) fn sync_ship_mass(
         events += 1;
         let mass = fragment
             .filter(|p| {
-                salimon_character::ship_contains_object(
-                    frame.world_to_local(p.transform().position().meters()),
-                )
+                let local = frame.world_to_local(p.transform().position().meters());
+                salimon_character::ship_contains_object(local)
+                    || tool.modular_interior.contains(local)
             })
             .map(|p| p.material().mass_kg());
         tool.ship_mass
@@ -242,9 +293,8 @@ pub(crate) fn sync_ship_mass(
     if frame_changed {
         for piece in tool.session.fragments() {
             events += 1;
-            let onboard = salimon_character::ship_contains_object(
-                frame.world_to_local(piece.transform().position().meters()),
-            );
+            let onboard =
+                tool.contains_ship(frame.world_to_local(piece.transform().position().meters()));
             tool.ship_mass
                 .update(
                     salimon_ship::MassObjectId::Fragment(piece.id().0),
@@ -261,12 +311,39 @@ pub(crate) fn sync_ship_mass(
     events
 }
 
+fn blocked_in_frame(tool: &mut ResourceGameplay, id: FragmentId, frame: ShipFrame) {
+    tool.carry_blocked = true;
+    if let Some(previous) = tool.mass_frame
+        && previous != frame
+        && let Some(piece) = tool.session.fragment(id).copied()
+    {
+        let local = previous.world_to_local(piece.transform().position().meters());
+        let orientation = crate::fragment_physics::to_world_orientation(
+            frame,
+            crate::fragment_physics::to_local_orientation(
+                previous,
+                piece.transform().orientation_xyzw(),
+            ),
+        );
+        if let Ok(pose) = ResourceTransform::new(position(frame.local_to_world(local)), orientation)
+        {
+            tool.session.move_carried(pose);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use salimon_world::resources::ResourceId;
     use std::time::Duration;
 
+    fn test_frame() -> ShipFrame {
+        ShipFrame {
+            origin_meters: [0.; 3],
+            axes: [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]],
+        }
+    }
     fn mined() -> ResourceGameplay {
         let mut tool = ResourceGameplay::default();
         crate::sphere_fixtures::sphere(
@@ -289,7 +366,7 @@ mod tests {
         let surface = crate::session::frames::surface_frame_for_ship(ship.snapshot());
         let mut player = salimon_character::CharacterController::default();
         player.set_ship_gravity_enabled(false);
-        follow(&mut tool, player.snapshot(frame, surface));
+        follow(&mut tool, player.snapshot(frame, surface), frame);
         let before = tool.session.fragments()[0].transform();
         player.advance(
             Duration::from_millis(100),
@@ -302,7 +379,7 @@ mod tests {
             false,
             true,
         );
-        follow(&mut tool, player.snapshot(frame, surface));
+        follow(&mut tool, player.snapshot(frame, surface), frame);
         assert_ne!(tool.session.fragments()[0].transform(), before);
         assert_eq!(tool.session.carried_id(), Some(id));
         assert_eq!(
@@ -342,7 +419,7 @@ mod tests {
                         local_ship_position_meters: None,
                         doorway_blend_fraction: None,
                     };
-                    follow(&mut tool, player);
+                    follow(&mut tool, player, test_frame());
                     let carried = tool.session.fragments()[0];
                     let p = carried.transform().position().meters();
                     assert!(
@@ -371,11 +448,11 @@ mod tests {
                     local_ship_position_meters: Some(eye),
                     doorway_blend_fraction: None,
                 };
-                follow(&mut tool, player);
+                follow(&mut tool, player, test_frame());
                 assert!(release_pose(&tool, player, frame).is_some());
                 player.eye_position_meters[0] = -7.5;
                 player.look_target_meters = [-8.5, eye[1], 0.0];
-                follow(&mut tool, player);
+                follow(&mut tool, player, test_frame());
                 assert!(release_pose(&tool, player, frame).is_none());
                 assert_eq!(tool.session.carried_id(), Some(piece.id()));
             }
@@ -446,7 +523,7 @@ mod tests {
     fn cabin_placement_rejects_walls_core_edges_and_oversized_objects() {
         use salimon_character::ship_floor_placement;
         assert!(ship_floor_placement([-5.8, 2.0, 0.0], 0.1).is_some());
-        assert!(ship_floor_placement([1.0, 2.0, 3.0], 0.1).is_some());
+        assert!(ship_floor_placement([-1.0, 2.0, 2.4], 0.1).is_some());
         for point in [
             [-1.0, 2.0, 0.0],
             [5.0, 2.0, -1.0],

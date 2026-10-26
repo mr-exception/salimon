@@ -31,7 +31,13 @@ pub(crate) struct MiningTool {
 
 #[derive(Default)]
 pub(crate) struct ResourceGameplay {
+    pub(crate) modular_interior: salimon_character::modular::ModularInterior,
+    pub(crate) carry_blocked: bool,
+    pub(crate) interior_solids: Vec<[f64; 6]>,
+    pub(crate) mount_geometry: salimon_ship::attachments::Attachments,
+    pub(crate) secured: std::collections::HashSet<salimon_world::resources::FragmentId>,
     pub(crate) ship_gravity_disabled: bool,
+    pub(crate) cargo_door_blocking: bool,
     pub(crate) ship_mass: salimon_ship::ShipMass,
     pub(crate) mass_frame: Option<ShipFrame>,
     pub(crate) terrain: salimon_world::terrain::TerrainMode,
@@ -58,6 +64,16 @@ pub(crate) struct ResourceGameplay {
 }
 
 impl ResourceGameplay {
+    pub(crate) fn contains_ship(&self, p: [f64; 3]) -> bool {
+        salimon_character::ship_contains_object(p) || self.modular_interior.contains(p)
+    }
+    pub(crate) fn cargo_allowed(&self, p: [f64; 3], radius: f64) -> bool {
+        salimon_character::cargo::cargo_position_allowed(
+            p,
+            radius,
+            if self.cargo_door_blocking { 0. } else { 1. },
+        ) || self.modular_interior.allows_sphere(p, radius)
+    }
     /// Latch the initial F edge; a carrying action consumes this entire press.
     pub(crate) fn press_f(&mut self) -> bool {
         if self.input.f_down {
@@ -316,6 +332,7 @@ impl ResourceGameplay {
         config: salimon_world::spherical_mining::MiningConfig,
     ) -> Self {
         Self {
+            modular_interior: Default::default(),
             session,
             ship_fragments: anchors,
             fragment_motion: motion,

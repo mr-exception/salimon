@@ -73,6 +73,19 @@ impl FragmentOutput {
             .map(|(id, p)| (FragmentId(id), p))
     }
 
+    /// Return a caller-owned reservation, retaining its previously allocated identity.
+    pub(crate) fn return_reserved(&mut self, piece: ResourceFragment) -> bool {
+        if piece.id().0 == 0 || piece.id().0 > self.next_id || self.slots.contains_key(&piece.id())
+        {
+            return false;
+        }
+        self.slots.insert(piece.id(), self.fragments.len());
+        self.fragments.push(piece);
+        self.sealed.insert(piece.id());
+        self.record(piece);
+        true
+    }
+
     pub(crate) fn remove(&mut self, id: FragmentId) -> bool {
         let Some(index) = self.slots.remove(&id) else {
             return false;

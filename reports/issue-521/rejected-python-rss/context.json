@@ -1,0 +1,28 @@
+{
+  "revision": "d8ce33ae544a9e13aeb55210f041a4033c126998",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "python": "3.12.14",
+  "profile": "release; locked Cargo build; default checked-in profile",
+  "fixtures_sha256": {
+    "client/universe/fixtures/references-v1.json": "1bf1f7b34379f7be7e947ffc13ae41350ccd57df188cf86c033b2b52cfc18cda",
+    "client/universe/fixtures/storage-observed-v1.json": "ecd183f9b4b065163ace0044862ef767d8ec91beba926ad12745b409c6830500",
+    "client/universe/fixtures/partition-v1.bin": "53b7a632af67399d13a5f013f60b97b5c24f0c116b2b869926ecd5b8d4234b35",
+    "catalogs/sources/fixtures/jpl-earth-j2000.json": "cb4301b038c85e5c1cdc296b16564bfbd38e4fef42938fa07656d490323f31bb",
+    "client/universe/examples/support/reference_inputs.rs": "66f0dc1a63b014bd7fdf5178269ee67c17388cd51c67b8716c370f767fc14815",
+    "Cargo.lock": "b9776e222272fcf1a4c6b033ec9ff5dda1965e417313608ebacee2e8da8ea98c"
+  },
+  "binaries_sha256": {
+    "reference_bench": "e9d3ba50921a5931d94d2724a9237d56ec047818bcb9394d369a411c3b075765",
+    "partition_bench": "b3660f8d268cccfa1079b7b84ed2b05f9059097a817db1994927e0bcae307442",
+    "reference_compare": "3476d0cae58415acda3cf7a75028d0fa019aba212da3a08a3bb6583eb57f9f4e"
+  },
+  "cgroup": {
+    "cpu.max": "200000 100000",
+    "memory.max": "8589934592",
+    "cpuset.cpus.effective": "0-2"
+  },
+  "input": "frozen local fixtures; no graphics, live sources, wall-clock model or backend",
+  "measurement": "serial fresh child processes; Linux wait4 ru_maxrss in KiB; executable wall time includes launch; inner raw JSON retains workload timings"
+}

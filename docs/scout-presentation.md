@@ -1,5 +1,13 @@
 # Scout presentation foundation
 
+Verification ownership follows the [cloud/human policy](verification-workflow.md).
+#483/#485/#489/#498/#502/#505/#515/#566 own cloud-renderer/interaction/audio
+checks; #561 human presentation/listening, #557 physical platform checks and
+#563 hardware budgets. Retain dated native evidence/failures; desktop availability
+is not a prerequisite for independent cloud integration work.
+
+The owner-approved *future* habitation/art requirements (2026-10-23) are maintained in [Scout interior art direction](scout-interior-art-direction.md). They add modular room/fixture lighting preferences, real observation-window shutters and selective glazing, independently animated furnishings, physical rail mounts, material-aware aging, clean repair appearance, continuous restrained ambience and simple doorway/screen sound attenuation. None is established as implemented merely by this note; continue to distinguish delivered #463/#465/#464 foundations from the new development issues explicitly linked in the interior contract.
+
 ## Lighting and material boundary (#463)
 
 Warm cockpit/workshop fill at ship-local X=4/-3 metres contrasts with a cooler
@@ -17,9 +25,10 @@ The machinery extension below enlarges that uniform to 192 bytes.
 Historical Linux costs belong in the [delivery report](../reports/issue-463/README.md).
 The [native lighting review](../reports/issue-483/README.md) retains actual M1/Metal
 1280/1920 power pairs, repeat checks and separate Blender 4.5 LTS mood references.
-Foreground matched timing and owner appearance decisions remain
-[#566](https://github.com/mr-exception/salimon/issues/566); no measured frame-budget
-acceptance is granted.
+Cloud power transitions and repeatability are reproduced in that report.
+[Matched cloud timings](../reports/issue-566/README.md) are also delivered;
+subjective appearance belongs to #561 and
+hardware timing/budget acceptance to #563. No measured hardware budget is approved.
 
 ## Comparable native and offline reference cameras
 
@@ -44,56 +53,69 @@ Repeated frames must stay identical within the declared tolerance. Keep native
 captures separate from Blender mood references and from approved image corpora.
 Inspect screens, glass, walking-lane edges and dark housings; never promote a
 candidate without human image/mask/tolerance review. The [#451 native report](../reports/issue-451/README.md) verifies the current Core
-blackout condition. Broader lighting/art/baseline approval remains #566/#561;
+blackout condition. Broader lighting/art/baseline approval remains #561;
 cloud/reference fixture passes do not grant that acceptance.
 
 ## Soundscape boundary (#465)
 
-Runtime `scout_audio.rs` observes immutable session/ship/character snapshots. Its
-private typed cues cover Core hum/conversion, funded Fabricator work, selected
-powered thrust, moving ramp, grounded interior footsteps, bus loss/restoration
-and low-power crossing. E02 may consume the same authoritative observations;
-there is no second machinery controller, timer or gameplay event bus. Existing
-#383 heart/hunger/breath cues keep their content and threshold owner, sharing
-only `native_audio.rs` OS playback and the master mute preference.
+`scout_audio.rs` observes immutable session/ship/character snapshots. Core,
+conversion, funded Fabricator work, selected powered thrust, moving ramp,
+grounded interior footsteps, power transitions and low-energy crossing retain
+existing owners. Quiet ventilation is present only in a powered cabin. Idle
+Core gain is restrained; proximity/thrust change actual operating sources.
+Surface/Space/NearbyBody have no invented transmitted machinery, wind, music or
+chatter. DoorwayBlend retains cabin admission. A blackout retires loops and
+leaves only its finite transition. No audio state enters gameplay or run saves.
 
-The listener and machinery anchors are ship-local metres; left/right pan follows
-look direction. A softened inverse-square curve `1/(1+d*d/9)` and 20-metre cutoff
-bound sources, with equal-power stereo panning. There is no HRTF or obstruction
-solver. Interior footfalls require actual horizontal distance, walking input,
-power/artificial gravity and floor-level eye height. Ship translation, airborne
-drift and teleport/reset do not imply footsteps. No exterior wind/atmosphere,
-transmitted machinery in Surface/Space/NearbyBody, music, voices or chatter is
-invented. DoorwayBlend retains cabin sound until the location leaves the ship.
-A powerless cabin becomes quiet after its finite blackout cue; idle power retains
-only restrained Core hum. Existing prompts/screens remain visual alternatives.
+Listener/source positions remain ship-local metres, with look-relative panning,
+`1/(1+d*d/9)` attenuation, 20 m cutoff and equal-power stereo. No HRTF, room
+occlusion or atmosphere solver is implied. Footsteps still require real local
+travel, walking input, artificial gravity and floor-level eye height. Survival
+threshold/hysteresis/content remain `condition_feedback.rs`; its one-shot cues
+join the same output rather than a second OS player.
 
-Pause -> S settings adds M master mute, B ship audio and G ship volume, cycling
-0/20/40/60/80/100 percent. A still controls only survival condition cues. Version-1
-settings gain defaulted fields (master mute false, ship audio true, volume 60),
-preserving older preferences; invalid volume and unknown versions fail. These
-preferences live outside run saves and survive new runs/restarts. Pause, focus,
-occlusion, suspend, terminal, tour and run/time reset discard pending scene cues;
-E2E and benchmarks never start scene playback. Missing or failed playback is
-explicitly reported and stops retrying until a lifecycle/settings suppression.
+`native_audio.rs` uses maintained [CPAL 0.18.2](https://docs.rs/cpal/0.18.2/cpal/)
+(CoreAudio, WASAPI, ALSA defaults) for one continuous default-device stream.
+`native_audio/mix.rs` owns deterministic original sample synthesis. Thirteen loop
+slots, eleven ship transient slots and three survival slots bound the callback
+to 27 voices. Runtime admits at most 24 scene voices and 12 pending events;
+repeated callback event counters coalesce to the latest event. Physical partitions
+and tactile mechanism channels follow [the acoustics contract](scout-acoustics.md).
+Gain/pan converge over 10 ms without chunk-boundary fades. Low-pass procedural
+noise and smooth saturation preserve headroom; no downloaded media is used.
+Original survival timbre/envelope/relative level remain observational.
 
-Original deterministic 22050-Hz stereo 16-bit synthesis uses 0.5-second chunks,
-short edge fades and <=8 simultaneous voices. Four queued transients are bounded;
-power alerts take priority over footsteps. One 44,144-byte WAV is rewritten only
-after its single playback child exits, uses a PID-specific filename beside the
-settings file, and is removed on normal presenter drop. One scene child plus the
-existing one condition child are the maximum; no sample library or Cargo
-link/dependency is introduced. Absolute sample peak is bounded to 30,000.
-The scene's scratch PCM is ~43 KiB; event/mix storage is bounded independently
-of elapsed play time. There is no persistent gameplay audio history.
+The producer publishes a fixed 240-byte atomic mailbox; the callback attempts at
+most three coherent reads and retains its previous observation on contention.
+Callback state is 1,080 bytes and neither allocates, locks, writes files, logs nor
+calls back into CPAL. Sample phase persists across arbitrary buffer sizes. A
+250 ms producer watchdog fades stalled input to silence and consumes stale event
+counters. Pause/focus/occlusion/terminal/menu/reset/master mute retire events and
+fade to silence; unmuting never replays discarded cues. Cabin and survival gates
+remain independent. The silent stream stays resident until device replacement
+or application drop, avoiding repeated startup and delayed queued audio.
 
-This minimal OS boundary reuses afplay, Windows SoundPlayer or optional Linux
-paplay/aplay. It can have audible chunk gaps and up to a chunk of response latency;
-OS process startup/file IO are not realtime streaming. Native listening and
-matched whole-frame costs remain [#485](https://github.com/mr-exception/salimon/issues/485),
-which must decide whether a continuous backend is needed. Synthesis measurements
-are not audio-device or M1 budget approval. See the
-[audio report](../reports/issue-465/README.md) for actual tests and limits.
+A default-device ID poll runs on the main thread at most once per second. A
+changed/failed/missing device drops the old stream, clears its mailbox and
+reopens from current source observations. Errors are explicit and retry no more
+than once per second; the callback only sets an atomic error flag. There is no
+subprocess, WAV rewrite, persistent PCM history or settings-path dependency.
+Supported default PCM formats convert at the boundary; mono downmixes, additional
+channels are silent. Linux build environments need `libasound2-dev`; CI recipes
+install it. Actual backend/frames/buffer/CPU-overrun telemetry is exposed by
+native inspection. Default hardware buffering is observed, not an invented
+universal latency guarantee.
+
+Existing master mute, ship-audio toggle, ship volume and survival-audio toggle
+retain the same separately persisted settings schema and visual alternatives.
+E2E/benchmarks suppress device playback. Pure tests verify chunk invariance,
+bounded onset, headroom, stale/reset/mute admission, exterior silence, real
+production mappings and unchanged saved authority. Opt-in original stereo WAVs
+and callback telemetry are retained in the [#582 report](../reports/issue-582/README.md).
+Historical #465/#485 chunk/process evidence remains historical; those subprocess
+lifecycle tests are replaced by callback lifecycle tests. Human listening #561,
+physical output/device switching #557 and whole-frame hardware budgets #563
+remain distinct from deterministic mixer evidence.
 
 ## Machinery feedback boundary (#464)
 
@@ -137,8 +159,13 @@ Run with an absolute output directory:
 SALIMON_SCOUT_FEEDBACK_DIR="$PWD/artifacts/scout-feedback" VK_DRIVER_FILES=/usr/share/vulkan/icd.d/lvp_icd.json cargo test -p salimon-renderer --locked scout_feedback_gpu_evidence -- --ignored --nocapture
 ```
 
-The normal-play interaction walkthrough, reference hardware budgets and observed
-Fabricator reference-text orientation remain [#489](https://github.com/mr-exception/salimon/issues/489).
+The [#489 cloud walkthrough](../reports/issue-489/README.md) retains production
+window/session state, actual GPU close views and stepped motion sequences for
+pedals, work sweep, blocked output, Core recovery and ramp reversal. Explicit
+initial fixture placement is distinct from physical mining/travel. Human motion/
+readability review remains #561, physical input/platform checks #557 and hardware
+budgets #563. Fabricator orientation retains its three-screen geometry regression;
+cloud images do not approve readability.
 The absent scanner hologram will integrate through #430/#466 when available.
 No native appearance, mask/tolerance or baseline approval is granted here.
 
@@ -206,3 +233,20 @@ promoting any baseline or weakening an authored contract.
 See [#451 native evidence](../reports/issue-451/README.md) for the exact binary,
 shader digest, Metal/drawable context, images, pass results and remaining wider
 appearance/performance limits. The dated #299 report is retained unchanged.
+
+## Matched cloud lighting timings (#566)
+
+The [#566 report](../reports/issue-566/README.md) owns serial current/control
+software-Vulkan measurements and original repeated1280×800 captures. The control
+changes only the retained pre-#463 lighting expressions within current interfaces;
+it is not a historical whole-game build. The named cloud admission profile keeps
+PID/focus/visibility, viewport, frozen source and consecutive-frame checks; the
+default M1 profile remains strict. Frozen fixture intervals are not normal-play
+FPS. Actual hardware GPU counters/budgets remain #563, physical platform checks
+#557 and original-image/mood/projection/baseline approval #561. Existing1920/M1
+and Blender mood originals remain separate dated corpora.
+
+
+## Tactile audio and physical partitions (#583)
+
+The [maintained acoustics contract](scout-acoustics.md) describes actual mechanism/attachment events, finite cargo/privacy separation, differentiated floor contact and bounded continuous CPAL filtering. E2E mapping stays silent; actual output captures and human listening remain separately identified.

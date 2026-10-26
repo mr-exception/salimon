@@ -172,6 +172,15 @@ impl ShipController {
         }
     }
 
+    /// Capacity-only transaction: no charge, reservation or input mutation.
+    pub fn increase_core_capacity(
+        &mut self,
+        expected: u64,
+        capacity: u64,
+    ) -> Result<(), crate::InvalidEnergy> {
+        self.energy_core.increase_capacity(expected, capacity)
+    }
+
     pub fn configure_energy_core(
         &mut self,
         config: crate::EnergyConfig,
@@ -231,7 +240,7 @@ impl ShipController {
         }
         let available = (self.energy_core.stored_joules() - reserve).max(0.0);
         let funded = self.exchange_core_energy_joules(0.0, requested.min(available))?;
-        self.auxiliary_watts = funded / elapsed.as_secs_f64();
+        self.auxiliary_watts += funded / elapsed.as_secs_f64();
         Ok(funded)
     }
 

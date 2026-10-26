@@ -323,8 +323,8 @@ Future thruster upgrades may change force/efficiency; landing upgrades may raise
 safe speed/range or reduce reserved cost. Future physical modules may add energy
 loads. Full cabin acceleration/inertial forces, gravity/orbits, manual per-system
 power management, damage, fuel reaction mass and survival consequences are not
-implemented by this wave. Existing configuration seams do not constitute an
-upgrade/progression system. Owner-only multiplayer navigation is a future rule;
+implemented by this wave. Existing configuration seams alone do not constitute progression. The later
+instant Core capacity system is implemented by #548 under its [separate paid-material contract](core-upgrades.md). Owner-only multiplayer navigation is a future rule;
 current client-only authority means the powered occupied cockpit.
 
 ## Accepted spherical mining (2026-10-15)
@@ -531,3 +531,8 @@ New runs guide survival details, Q consumption, Fabricator inspection/crafting/
 collection and pause-menu checkpoint status. T explicitly skips. Completed
 actions count out of order and progress/skip persist per run; no free supplies,
 auto-pause or timer immunity. See the [runtime contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).
+
+
+## Instant direct-material Core upgrades (#548)
+
+The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.

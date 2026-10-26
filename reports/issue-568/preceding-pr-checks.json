@@ -1,0 +1,58 @@
+{
+  "597": {
+    "workflow_runs": [
+      {
+        "id": 40037292644,
+        "name": "Source build",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 584,
+        "jobs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40037292644/jobs",
+        "logs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40037292644/logs",
+        "workflow_id": 370926087
+      }
+    ]
+  },
+  "598": {
+    "workflow_runs": [
+      {
+        "id": 40039980001,
+        "name": "Source build",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 585,
+        "jobs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40039980001/jobs",
+        "logs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40039980001/logs",
+        "workflow_id": 370926087
+      }
+    ]
+  },
+  "599": {
+    "workflow_runs": [
+      {
+        "id": 40040873722,
+        "name": "Source build",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 586,
+        "jobs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40040873722/jobs",
+        "logs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40040873722/logs",
+        "workflow_id": 370926087
+      }
+    ]
+  },
+  "600": {
+    "workflow_runs": [
+      {
+        "id": 40042599452,
+        "name": "Source build",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 587,
+        "jobs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40042599452/jobs",
+        "logs_url": "https://api.github.com/repos/mr-exception/salimon/actions/runs/40042599452/logs",
+        "workflow_id": 370926087
+      }
+    ]
+  }
+}

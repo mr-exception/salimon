@@ -83,8 +83,14 @@ before interpreting a change. No timing thresholds, invented FPS or extrapolated
 native speed are installed by these CPU harnesses.
 
 [Portable report](../reports/issue-404/README.md) preserves Linux output and injected
-failure evidence. [Native follow-up #521](https://github.com/mr-exception/salimon/issues/521)
-owns the **unrun reference Apple M1** measurements; closure of #404 records portable
-delivery and explicit scope transfer, not native approval. Whole-game frame tails,
-rendering, physical orbital flight and 60 FPS remain #435–#439. These workloads do
+failure evidence. [Cloud measurements #521](../reports/issue-521/README.md)
+retain seven serial release processes per workload, raw timings, peak RSS,
+fixture/binary hashes and matched-size historical Linux comparisons. The report's
+`measure.py` uses its small C `measure_rss.c` supervisor to avoid inheriting the
+Python parent's peak-RSS floor; reproduction and observer controls are included.
+Actual M1 measurements remain unrun
+unless separately collected. Hardware budget decisions belong to #563 under the
+[verification workflow](verification-workflow.md). Whole-game cloud rendering and
+flight/restore integration remain #435–#439; human presentation, physical platform
+and hardware FPS qualification remain #561/#557/#563. These workloads do
 not depend on graphics, host wall clocks, production data downloads or a backend.

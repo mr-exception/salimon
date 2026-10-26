@@ -1,0 +1,35 @@
+{
+  "active": {
+    "available": true,
+    "backend": "cpal-0.18.2",
+    "callback_cpu_overruns": 1043,
+    "callbacks": 206232,
+    "channels": 2,
+    "device_id": "Ok(DeviceId(Alsa, \"default\"))",
+    "frames": 206232,
+    "mailbox_bytes": 568,
+    "max_callback_frames": 1,
+    "max_callback_ns": 332894,
+    "mixer_bytes": 2736,
+    "sample_format": "F32",
+    "sample_rate": 48000,
+    "voices": 27
+  },
+  "scope": "actual configured CPAL output sink; virtual ALSA file sink is not physical speaker or microphone evidence",
+  "stopped": {
+    "available": true,
+    "backend": "cpal-0.18.2",
+    "callback_cpu_overruns": 1066,
+    "callbacks": 212067,
+    "channels": 2,
+    "device_id": "Ok(DeviceId(Alsa, \"default\"))",
+    "frames": 212067,
+    "mailbox_bytes": 568,
+    "max_callback_frames": 1,
+    "max_callback_ns": 332894,
+    "mixer_bytes": 2736,
+    "sample_format": "F32",
+    "sample_rate": 48000,
+    "voices": 27
+  }
+}

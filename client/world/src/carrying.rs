@@ -9,6 +9,7 @@ pub const PICKUP_RANGE_METERS: f64 = 3.0;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WorldObjectId {
     ResourceFragment(FragmentId),
+    Fixture(u64),
 }
 
 #[derive(Default)]

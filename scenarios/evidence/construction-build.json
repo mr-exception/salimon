@@ -1,0 +1,103 @@
+{
+  "setup": {
+    "scenario": "construction-build",
+    "seed": 544,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "assert": {
+        "path": "construction.projects.0.work.completed",
+        "equals": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "ready-for-intake",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 312
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 499200
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "half-built",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 313
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.work.completed",
+        "equals": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 1000000
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "completed-stool",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.work.completed",
+        "equals": true
+      },
+      "timeout_ms": 60000
+    }
+  ]
+}

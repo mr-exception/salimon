@@ -13,7 +13,7 @@ from e2e_artifacts import Artifacts
 
 
 PROTOCOL = 1
-SETUPS = {"cargo-blackout", "flight-regression", "core-restart", "crash-recovery", "cargo-flight", "fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "coasting-space", "coasting-orbit", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
+SETUPS = {"construction-module", "construction-module-upgrade", "construction-module-restore", "construction-interlocks", "construction-room","scout-lighting", "scout-lighting-shutter", "scout-lighting-blackout", "scout-lighting-broken", "scout-lighting-dark", "construction-materials", "construction-build", "scout-core-upgrade", "scout-core-upgrade-powered", "scout-finishes", "scout-finishes-blackout", "scout-cabin-bunk", "scout-cabin-locker", "scout-cabin-table", "scout-cabin", "scout-mounts", "scout-recovery", "scout-archive", "scout-fabricator", "scout-work-blackout", "cargo-blackout", "flight-regression", "core-restart", "crash-recovery", "cargo-flight", "fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "coasting-space", "coasting-orbit", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
 OPS = {"wheel_hover", "scout_reference", "crafting", "window", "performance_reset", "inspect", "step", "look", "aim_fragment", "restore_look", "key", "mouse", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 
@@ -276,9 +276,11 @@ class Game:
 def native_capture(game, artifacts, name, deadline):
     """Capture the actual completed GPU color surface, without unrelated desktop pixels."""
     path = artifacts.directory / f"{name}.png"
+    # Restore the real window so occlusion is resolved by the OS, not bypassed.
+    game.request({"op": "window", "action": "restore"}, deadline)
     game.request({"op": "capture", "path": str(path)}, deadline)
     while time.monotonic() < deadline:
-        status = game.request({"op": "inspect"}, deadline).get("capture_status", "idle")
+        status = game.request({"op": "inspect", "scope": "capture"}, deadline).get("capture_status", "idle")
         if status == "captured":
             if not path.is_file() or path.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
                 return {"status": "failed", "reason": "native capture did not produce a PNG"}

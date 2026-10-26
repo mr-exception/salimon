@@ -166,8 +166,8 @@ cool visibility floor without adding power/gameplay authority. Glass blending,
 depth, immutable geometry and the 160-byte uniform size remain unchanged.
 
 Scout machinery (#464) consumes finite normalized immutable feedback only; no
-simulation/clock/save authority. The current ship uniform is 192 bytes and vertex
-stride 76 bytes. Named role tags cannot animate structural supports, hull, ramp
+simulation/clock/save authority. The current ship uniform is 352 bytes and vertex
+stride 80 bytes. Named role tags cannot animate structural supports, hull, ramp
 or colliders. Electrical cues obey explicit bus state; tray output remains
 independent of power. The original #463 layout statement above describes its
 foundation; #464 extends that layout.
@@ -201,5 +201,73 @@ See [runtime contract](../runtime/architecture.md#scout-archive-467).
 existing anchored tray package. Its existing uniform lane encodes component=2,
 medical=1 or food=0; `ship_mesh.wgsl` draws grey/cyan circuit traces for components.
 No buffers/draws/colliders, installation authority or resource state are added.
-Archive work/progress text remains runtime-owned. Native appearance/input/budget
-acceptance is #515; CPU shader/layout contracts cannot establish it.
+Archive work/progress text remains runtime-owned. Cloud route #515 includes
+original GPU frames and an import-only package UV correction: `Fabricator_Output`
+uses normalized per-face coordinates selected by its flat normal and transformed
+bounds. Authored geometry/exports stay unchanged. World-X/Z UVs previously missed
+all normalized circuit/food/medical artwork and collapsed vertical faces. The
+loaded-geometry regression requires [0,1] coordinates and noncollapsed full-face
+triangles. Human appearance is #561, physical input/DPI #557 and budgets #563.
+
+## Oriented marker instances (#542)
+
+Generic `SceneInstance` cuboids now carry an explicitly validated finite unit
+quaternion. CPU rebasing still subtracts absolute positions in f64 first; the
+64-byte instance stream adds orientation after center/half-extents/color. The
+bootstrap shader rotates local scaled vertices before camera-relative projection.
+Frustum bounding spheres remain conservative at every rotation. Existing world
+markers use identity rotation. Runtime supplies twelve thin cuboids per blueprint
+volume, leaving its interior transparent; renderer owns neither reservation nor
+completion. No new pipeline or game-engine dependency is introduced.
+
+
+## Base habitation (#540)
+
+The bunk's two authored panels use the generated
+`habitation_geometry.rs` hinge/swept bounds, sourced from
+[the category definition](../../models/assets/ships/salimon-scout/habitation-geometry.json).
+The renderer maps a finite stowed/deployed fraction to rigid rotation and normals;
+runtime admits manual motion only after full player/belonging clearance. Static
+poses cost no repeated clearance scan. Reserved walking clearance is unchanged.
+Galley E opens the existing exact-identity consumable wheel, with no generated
+food or additional inventory; hygiene remains an inspectable base fixture.
+No water/hygiene meter, sleep-time advancement or additional survival benefit is
+introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
+remain #577. Schema 10 saves source motion; see
+[the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+
+## Modular interior fixture library (#575)
+
+Renderer `fixtures.rs` loads immutable named templates once, batches by mesh,
+rebases world positions in f64 before narrowing and validates identities, finite
+unit poses and bounded tint. `FixtureNode` resolves root/room/furnishing/attachment
+parents in deterministic input order using a linear queue; missing parents,
+cycles and duplicates fail. Physics/collision and persistent condition remain
+caller-owned. The 16,384-record renderer staging guard fails explicitly; it
+neither limits physical populations nor silently drops submitted instances.
+
+The existing berth migrates through
+[interior layout v1](../assets/ship/interior-layout-v1.json) without changing
+schema-10 gameplay source, identities, anchors, materials, mass or animation state.
+The original whole-ship path remains available for legacy/reference DTOs. Native
+composition selects independent presentation and hides only the old paired berth
+surfaces; opaque fixture batches draw before cockpit glass. Template instances
+share vertex/index buffers and compact 48-byte pose/tint/power records. Per-batch
+counts, allocation capacities and CPU preparation are read-only observations.
+The prototype Shelf/Seat/Panel/PanelDamaged templates demonstrate architecture;
+they do not install furniture or invent physical damage, construction or aging.
+See [fixture ownership/budgets](../../docs/modular-interior-fixtures.md).
+
+## Physical mounts (#576)
+
+Physical rail, clamp and shelf instances retain stable caller IDs. Secured state is supplied by runtime; the renderer cannot create inventory or locks. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.

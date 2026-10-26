@@ -1,0 +1,199 @@
+{
+  "scenario": "scenarios/evidence/physical-mounts.json",
+  "setup": {
+    "scenario": "scout-mounts",
+    "seed": 576,
+    "step_ms": 16
+  },
+  "status": "passed",
+  "duration_ms": 57727,
+  "steps_completed": 17,
+  "steps": [
+    {
+      "index": 1,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "window",
+          "action": "restore"
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 2,
+      "status": "passed",
+      "step": {
+        "screenshot": "sample-carried",
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 3,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "place_object",
+          "pressed": true
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 4,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "place_object",
+          "pressed": false
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 5,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "window",
+          "action": "restore"
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 6,
+      "status": "passed",
+      "step": {
+        "screenshot": "sample-placed-loose",
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 7,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "secure_object",
+          "pressed": true
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 8,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "secure_object",
+          "pressed": false
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 9,
+      "status": "passed",
+      "step": {
+        "assert": {
+          "path": "mounts.mounts.0.secured",
+          "equals": 1
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 10,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "window",
+          "action": "restore"
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 11,
+      "status": "passed",
+      "step": {
+        "screenshot": "sample-secured",
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 12,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "step",
+          "frames": 60
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 13,
+      "status": "passed",
+      "step": {
+        "assert": {
+          "path": "mounts.mounts.0.secured",
+          "equals": 1
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 14,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "secure_object",
+          "pressed": true
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 15,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "secure_object",
+          "pressed": false
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 16,
+      "status": "passed",
+      "step": {
+        "action": {
+          "op": "window",
+          "action": "restore"
+        },
+        "timeout_ms": 30000
+      }
+    },
+    {
+      "index": 17,
+      "status": "passed",
+      "step": {
+        "assert": {
+          "path": "mounts.mounts.0.secured",
+          "equals": null
+        },
+        "timeout_ms": 30000
+      }
+    }
+  ],
+  "original_result_sha256": "e48b5c319f11ecc04447cbcb62b61d590c604ef9ae1f1f2fa0fee0842b2d5ceb",
+  "original_result": "protocol.zip/result.json"
+}

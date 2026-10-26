@@ -1188,14 +1188,11 @@ S returns and Enter/Escape resumes. Version-1 preferences live in
 survive restart/new runs. Save errors stay visible; corrupt/unknown settings use
 defaults with a warning. Settings do not enter run checkpoints.
 
-`condition_feedback/audio.rs` synthesizes original quiet one-second PCM WAV cues
-(22050 Hz mono, 16-bit, peak <=1500) beside the settings file. No third-party
-samples/licenses or Cargo/native audio link dependency. The shared `native_audio.rs` playback seam uses macOS
-`afplay`, Windows PowerShell SoundPlayer, or optional Linux `paplay`/`aplay`. A
-bounded queue and one child process are polled without blocking the frame; menu
-suppression kills/reaps playback. Missing/failed players log an explicit warning;
-missing players also show an accessibility warning. Actual OS playback and sensory
-quality/performance require reference-device verification (#376).
+Continuous audio (#582) is composed by `scout_audio.rs` and the shared
+`native_audio.rs` CPAL output with fixed-memory `native_audio/mix.rs`.
+Survival thresholds remain in `condition_feedback.rs`; settings keep their owner.
+See the [canonical soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for voice limits, lifecycle, device recovery, telemetry and validation.
 
 ## Advanced food composition (#378)
 
@@ -1229,14 +1226,11 @@ feeding/restoration to compare blackout/powered views. See
 
 ## Scout audio composition (#465)
 
-`scout_audio.rs` owns snapshot-to-cue mapping, local listener/attenuation, bounded
-transients and native scene playback; `scout_audio/synth.rs` owns original stereo
-PCM. `native_audio.rs` is the existing survival/scene shared OS process seam.
-`condition_feedback/settings.rs` remains the sole preference store. Audio does
-not enter session commands, domain progression or run checkpoints. See the
-[canonical mix/budgets/validation contract](../../docs/scout-presentation.md#soundscape-boundary-465).
-Native loop/listening and OS/device costs remain #485, distinct from portable
-mapping/settings/synthesis checks.
+Continuous audio (#582) is composed by `scout_audio.rs` and the shared
+`native_audio.rs` CPAL output with fixed-memory `native_audio/mix.rs`.
+Survival thresholds remain in `condition_feedback.rs`; settings keep their owner.
+See the [canonical soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for voice limits, lifecycle, device recovery, telemetry and validation.
 
 ## Scout machinery composition (#464)
 
@@ -1245,6 +1239,18 @@ Core, Fabricator and active elapsed snapshots. `app.rs` attaches it to the same
 presented ship pose; `automation.rs` exposes read-only inspection. No event queue,
 animation controller, save state or additional elapsed admission is introduced.
 See the [canonical feedback contract](../../docs/scout-presentation.md#machinery-feedback-boundary-464).
+
+`scout_walkthrough.rs` supplies opt-in `scout-fabricator` and
+`scout-work-blackout` E2E initial conditions for #489: ordinary starter supplies
+plus the existing exact 2 kg Core-restart fragment. The first starts landed by
+the machine; the second starts with an unfunded job and Core aimed at the held
+fragment. Initial placement/energy are explicit fixtures, not normal-play mining
+or travel. There are no new mutation protocol operations: physical E intake,
+menu commands, production ticks and exact tray collection retain their gates.
+Portable regressions preserve save/restore/pause feedback and identity/mass;
+`reports/issue-489/walkthrough.py` drives the real window adapter and GPU captures.
+Two extra presentation-only close cameras live in `scout-machinery-cameras.json`;
+the four shared lighting/Blender poses remain in their original file.
 
 ## Pause checkpoint controls (#382)
 
@@ -1376,3 +1382,178 @@ consumable/damage/crafting transactions and `SaveManager<NativeStore>`. It write
 only to a new explicitly supplied directory and verifies exact save roundtrips.
 It adds no production launch flag, save format, simulation clock or authority.
 See [validation](../../docs/validation.md#reference-savehud-fixtures-376).
+
+## Archive cloud verification (#505)
+
+`scout_walkthrough::archive_initial_conditions` adds an opt-in `scout-archive`
+E2E fixture at the physical terminal, with ordinary new-run source and no records
+read or reader opened. Subsequent E/arrow/Tab commands use production input and
+range/aim/power/modal gates. `automation::inspect_session` exposes immutable
+Archive source/open/text; inspection does not mutate knowledge or simulation.
+The `interact` key alias maps to physical E, including reader close, unlike a
+synthetic reader action. `session/archive/tests.rs` covers real Save Now worker
+completion, normal relaunch and verified death/restart reset. No save/schema,
+record content, renderer DTO, discovery or navigation authority changes.
+
+## Recovery cloud verification (#515)
+
+The opt-in `scout-recovery` fixture reuses the Fabricator-side held 2 kg iron
+identity and declares 0.5 kg raw silicate initially in the bin. It creates no job,
+tray output, installed module or paid progress. Subsequent production intake,
+menu enqueue, funded ticks, E tray collection, walking and Archive R actions
+retain their existing gates. `inspect.recovery` is an immutable serialized source
+snapshot supplied by `GameplaySession::recovery_observation`; `key: recovery`
+maps to physical R. No protocol command sets recovery state. Session regressions
+verify concurrent craft/thrust/recovery joule separation, schema-6 resources/jobs
+and actual Save Now/relaunch/restart with seven days of zero offline work.
+
+## Blueprint tool and placeholders (#542)
+
+`session/construction.rs` composes ship-owned placement with actual authored
+character geometry, individual physical cargo and protected starter escape/service
+lanes. `catalogs/blueprints.json` declares seven furniture/wall/door/hull/deck/room/
+module entries. Its costs/durations are **proposed estimates**, with
+`approved_economy=true` following the explicit owner decision on 2026-10-24.
+#543 accepts physical materials; timed progress still belongs to #544.
+#537 owns economy approval before #543/#544 integration. Fine pitch is per-entry
+data (currently 0.5 m), not a mandatory global furnishing rule.
+
+C opens/closes the tool, 1–7 select, R rotates, left click places, E inspects the
+aimed project, right click cancels the aimed reachable reservation. Escape closes
+before pausing. Native and protocol inputs use the same session commands and
+native focus/repeat/synthetic admission remains in the shell. Opening stows the
+mining tool; closing never re-equips it. Existing essential carrying/escape paths
+are protected. The initial coarse structural graph is an explicit support model;
+it does not move authored anchors or generate physical hull. Exterior reservations
+also reject the conservative existing hull, wings and engine volumes. Actual hull
+modification/solid generation remain #545.
+
+`app/scene.rs` maps hollow colored edges into ordinary oriented cuboid instances:
+green clear preview, red declined preview, cyan placed project. These render-only
+edges never become solid colliders or installed mass. Requirements/status stay
+visible together with transient feedback in the action bar. Whole-session schema 8
+preserves project source and rejects malformed restore atomically, while tool UI
+resets. See the canonical [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
+Portable and native routes use `scenarios/evidence/blueprint-placement.json`.
+
+The opt-in `sphere_workloads::current_sphere_stress_cpu` records flushed JSONL
+inventories, exact-snapshot solver/contact/query/activation timings and all natural
+sleep preparation steps. Moving pools collect 100 actual moving samples across
+fresh launches; quiet intervals remain raw. It is CPU evidence, not native FPS.
+Historical comparisons must retain the original character/layout revision;
+current Scout geometry can change supported columns without changing physics.
+
+#566 extends only the report-side frozen-frame collector: a named cloud
+llvmpipe profile complements the strict default M1 profile. Both retain actual
+focus/visibility/source-state admission. No runtime scheduling, shader or frame
+logging rule is changed by that tooling extension. Software device timestamps
+cannot be interpreted as hardware GPU budget evidence.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).
+
+
+## Base habitation (#540)
+
+The bunk's two authored panels use the generated
+`habitation_geometry.rs` hinge/swept bounds, sourced from
+[the category definition](../../models/assets/ships/salimon-scout/habitation-geometry.json).
+The renderer maps a finite stowed/deployed fraction to rigid rotation and normals;
+runtime admits manual motion only after full player/belonging clearance. Static
+poses cost no repeated clearance scan. Reserved walking clearance is unchanged.
+Galley E opens the existing exact-identity consumable wheel, with no generated
+food or additional inventory; hygiene remains an inspectable base fixture.
+No water/hygiene meter, sleep-time advancement or additional survival benefit is
+introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
+remain #577. Schema 10 saves source motion; see
+[the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+
+## Interior fixture composition (#575)
+
+`session/fixtures.rs` maps existing saved habitation state to the versioned
+[interior layout](../assets/ship/interior-layout-v1.json), preserving the stable
+berth ID and ship-rooted f64 transform. `app.rs` supplies borrowed fixture DTOs;
+renderer resolves/batches presentation and never owns collision, installed mass,
+construction, cosmetic age or damage authority. Native debug inspect includes
+actual fixture draw/memory/upload counters; `window_state` reports true focused/
+occluded flags. Schema 10 is unchanged. Future room/module owners supply their
+real parent IDs and local poses through this boundary. See
+[architecture and budgets](../../docs/modular-interior-fixtures.md).
+
+
+Continuous audio verification: `native_audio/mix/tests.rs` covers callback-size
+invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
+device telemetry are opt-in. Linux builds require ALSA development headers.
+
+
+Archived solver stress (#592) remains separate from current Scout gameplay.
+`sphere_workloads.rs` accepts `SALIMON_STRESS_PREFIX_SAMPLES=1..100` only for
+explicit diagnostic terminal snapshots. Values below 100 emit
+`diagnostic-prefix`, never a completed 100-sample pool. Ordinary workloads retain
+100 moving samples, exact archived radius/mass bits and natural 300-step
+preparation; no sleep flags are installed. Reproduction uses a disposable
+historical-layout checkout and current production physics, preserving the actual
+current cabin/physical geometry in gameplay. Query clocks remain a subset of
+contact clocks; retain every timeout, partial sample and failed preparation.
+
+
+Capture verification (#568): native `inspect` with `scope: capture` returns only
+readback status after the usual E2E envelope/admission checks. It is observational
+and never builds the world snapshot. Ordinary inspection is unchanged; old
+executables may ignore the optional scope and return the full snapshot. The
+runner restores the real window before GPU capture and logs that OS request;
+it does not fake focus, disable occlusion or grant physical input qualification.
+See [runner protocol](../../scripts/README.md#bounded-native-capture-polling-568).
+
+## Physical mounts (#576)
+
+`session/mounts.rs` composes G placement, K explicit restraint, J empty accessory movement, shared physical carry identity, frame transport and schema-11 save validation. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+Tactile sound/acoustics #583: [canonical source-event, partition, callback-budget and evidence contract](../../docs/scout-acoustics.md). Actual travel/attachments trigger cues; restore audio epochs are transient. E2E exposes silent preview mapping and keeps device playback suppressed.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Construction flight readiness (#546)
+
+Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 contract](../../docs/construction-flight-safety.md). The durable stop latch never clears on landing; actual hull/attachment state governs readiness. Preserve Core/engine/cockpit/ramp authority and inertial momentum.
+
+
+## Optional module commissioning (#547)
+
+`session/construction/modules.rs` owns physical processor tiers, activated downtime, maintenance funding/work and actual commissioning faults. `session/recovery.rs` requests real tier-dependent Core watts. Schema 20 validates module/receipt ownership atomically; cancellation never restores activated equipment without paid restoration. Follow the [canonical controls, tuning, source/test and deferred Jump Drive contract](../../docs/non-core-modules.md).

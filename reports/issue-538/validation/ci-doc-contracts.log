@@ -1,0 +1,10 @@
+test_broken_path_anchor_and_escape_report_lines (test_check_docs.DocumentationChecks.test_broken_path_anchor_and_escape_report_lines) ... ok
+test_exact_baseline_does_not_hide_new_failure (test_check_docs.DocumentationChecks.test_exact_baseline_does_not_hide_new_failure) ... ok
+test_required_guides_json_example_and_changed_owner_gate (test_check_docs.DocumentationChecks.test_required_guides_json_example_and_changed_owner_gate) ... ok
+test_stale_rule_is_scoped_and_historical_exclusion_is_explicit (test_check_docs.DocumentationChecks.test_stale_rule_is_scoped_and_historical_exclusion_is_explicit) ... ok
+test_valid_links_reference_definition_unicode_duplicate_anchors_and_fences (test_check_docs.DocumentationChecks.test_valid_links_reference_definition_unicode_duplicate_anchors_and_fences) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.006s
+
+OK

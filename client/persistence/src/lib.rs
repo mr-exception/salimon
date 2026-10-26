@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::{fmt, time::Duration};
 
-pub const SCHEMA_VERSION: u32 = 7;
+pub const SCHEMA_VERSION: u32 = 20;
 pub const FORMAT: &str = "salimon.save";
 pub const MAX_SAVE_BYTES: usize = 64 * 1024 * 1024;
 
@@ -179,12 +179,13 @@ mod tests {
         assert_eq!(restored.state, save.state);
         assert_eq!(restored.simulated_time, save.simulated_time);
         assert_eq!(restored.pending_time, save.pending_time);
-        let future = String::from_utf8(bytes)
-            .unwrap()
-            .replace("\"schema_version\":7", "\"schema_version\":8");
+        let future = String::from_utf8(bytes).unwrap().replace(
+            &format!("\"schema_version\":{SCHEMA_VERSION}"),
+            &format!("\"schema_version\":{}", SCHEMA_VERSION + 1),
+        );
         assert_eq!(
             SaveGame::<Fixture>::decode(future.as_bytes()).unwrap_err(),
-            SaveError::UnsupportedVersion(8)
+            SaveError::UnsupportedVersion(SCHEMA_VERSION + 1)
         );
         assert!(SaveGame::<Fixture>::decode(b"{}").is_err());
         assert!(

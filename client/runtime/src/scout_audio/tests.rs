@@ -1,6 +1,11 @@
 use super::*;
-fn observation() -> Observation {
+pub(super) fn observation() -> Observation {
     Observation {
+        epoch: 0,
+        motions: [0., 0., 0., 1., 1., 0., 1.],
+        restraints: 0,
+        mounts: 0,
+        mount_position: [0.; 3],
         active: true,
         interior: true,
         walking: true,
@@ -9,6 +14,7 @@ fn observation() -> Observation {
         powered: true,
         conversion: false,
         fabrication: false,
+        construction: None,
         thrust: 0.,
         door: 0.,
         low_power: false,
@@ -25,7 +31,7 @@ fn maps_machinery_transitions_without_repeating_alerts() {
     let mut m = Mixer::default();
     let mut o = observation();
     assert!(m.observe(o, settings));
-    assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+    assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
     o.now += Duration::from_millis(16);
     o.conversion = true;
     o.fabrication = true;
@@ -75,19 +81,19 @@ fn silence_and_resume_clear_queued_events_and_run_changes_do_not_replay() {
         assert!(!m.observe(suppressed, s));
         assert!(m.voices(s).is_empty());
         m.observe(o, settings);
-        assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+        assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
     }
     m.queue(Cue::Blackout);
     let mut fresh = o;
     fresh.serial = 2;
     m.observe(fresh, settings);
-    assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+    assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
     fresh.now = Duration::from_secs(2);
     m.observe(fresh, settings);
     m.queue(Cue::Blackout);
     fresh.now = Duration::ZERO;
     m.observe(fresh, settings);
-    assert_eq!(cues(&m.voices(settings)), [Cue::Core]);
+    assert_eq!(cues(&m.voices(settings)), [Cue::Core, Cue::Ventilation]);
 }
 #[test]
 fn footsteps_follow_local_distance_and_reject_drift_and_teleports() {
@@ -131,6 +137,7 @@ fn spatial_channels_rotate_with_listener_and_attenuate_with_distance() {
 #[test]
 fn pcm_is_bounded_stereo_and_mute_has_no_samples() {
     let v = Voice {
+        filter: 1.,
         cue: Cue::Core,
         gain: 0.8,
         pan: 1.,
@@ -155,6 +162,7 @@ fn pcm_is_bounded_stereo_and_mute_has_no_samples() {
     assert!(samples.iter().any(|p| p[1] != 0));
     let loud = synth::wav(
         &[Voice {
+            filter: 1.,
             cue: Cue::Thrust,
             gain: 10.,
             pan: 0.,
@@ -181,7 +189,7 @@ fn event_queue_and_mix_are_bounded_with_alert_priority() {
     }
     m.queue(Cue::Blackout);
     assert_eq!(m.pending.len(), MAX_EVENTS);
-    assert_eq!(m.pending.front(), Some(&Cue::Blackout));
+    assert_eq!(m.pending.front().map(|e| e.cue), Some(Cue::Blackout));
     let v = m.voices(s);
     assert!(v.len() <= MAX_VOICES);
     assert_eq!(v[0].cue, Cue::Blackout);
@@ -226,6 +234,7 @@ fn production_core_recovery_and_pause_map_without_authority_changes() {
 #[test]
 fn narration_free_pcm_synthesis_has_fixed_memory_and_measured_cost() {
     let voice = Voice {
+        filter: 1.,
         cue: Cue::Thrust,
         gain: 0.1,
         pan: 0.0,
@@ -240,4 +249,160 @@ fn narration_free_pcm_synthesis_has_fixed_memory_and_measured_cost() {
         start.elapsed().as_micros(),
         synth::WAV_BYTES
     );
+}
+
+#[test]
+fn tactile_events_require_actual_travel_endpoints_and_retire_on_obstruction_reversal_and_load() {
+    let settings = Settings::default();
+    let mut m = Mixer::default();
+    let mut o = observation();
+    m.observe(o, settings);
+    m.voices(settings);
+    // Unchanged source (e.g. a blocked input) never triggers a speculative cue.
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert!(
+        !cues(&m.voices(settings))
+            .iter()
+            .any(|c| matches!(c, Cue::Travel(_) | Cue::Release | Cue::Latch))
+    );
+    o.now += Duration::from_millis(16);
+    o.motions[1] = 0.2;
+    m.observe(o, settings);
+    let v = cues(&m.voices(settings));
+    assert!(v.contains(&Cue::Travel(1)));
+    assert!(v.contains(&Cue::Release));
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert!(
+        !cues(&m.voices(settings)).contains(&Cue::Travel(1)),
+        "blocked at the same fraction"
+    );
+    o.now += Duration::from_millis(16);
+    o.motions[1] = 0.1;
+    m.observe(o, settings);
+    assert!(cues(&m.voices(settings)).contains(&Cue::Release));
+    o.now += Duration::from_millis(16);
+    o.motions[1] = 0.;
+    m.observe(o, settings);
+    assert!(cues(&m.voices(settings)).contains(&Cue::Latch));
+    assert!(!cues(&m.voices(settings)).contains(&Cue::Latch));
+    o.epoch += 1;
+    o.motions[1] = 0.9;
+    m.observe(o, settings);
+    assert!(
+        !cues(&m.voices(settings))
+            .iter()
+            .any(|c| matches!(c, Cue::Travel(_) | Cue::Release | Cue::Latch))
+    );
+}
+#[test]
+fn cargo_door_and_privacy_partitions_filter_actual_spatial_sources() {
+    let settings = Settings::default();
+    let mut o = observation();
+    o.eye = [-6., 1.8, 0.];
+    o.motions[6] = 1.;
+    let mut m = Mixer::default();
+    m.observe(o, settings);
+    let open = m
+        .voices(settings)
+        .into_iter()
+        .find(|v| v.cue == Cue::Core)
+        .unwrap();
+    o.now += Duration::from_millis(16);
+    o.motions[6] = 0.;
+    m.observe(o, settings);
+    let closed = m
+        .voices(settings)
+        .into_iter()
+        .find(|v| v.cue == Cue::Core)
+        .unwrap();
+    assert!((closed.gain / open.gain - 0.22).abs() < 1e-12);
+    assert_eq!(closed.filter, 0.08);
+    assert_eq!(closed.pan, open.pan);
+    o.eye = [-0.8, 1.8, -3.5];
+    o.motions[3] = 0.;
+    m.observe(o, settings);
+    let privacy = m
+        .voices(settings)
+        .into_iter()
+        .find(|v| v.cue == Cue::Core)
+        .unwrap();
+    assert_eq!(privacy.filter, 0.4);
+}
+#[test]
+fn restore_same_simulation_time_resets_epoch_without_replaying_changes() {
+    let mut s = GameplaySession::new_run();
+    crate::session::cabin::evidence_initial_conditions(&mut s, "scout-cabin-table").unwrap();
+    let settings = Settings::default();
+    let mut m = Mixer::default();
+    m.observe(Observation::capture(&s, true), settings);
+    m.voices(settings);
+    let bytes = s.save_bytes(100).unwrap();
+    let old = s.audio_epoch;
+    s.restore_bytes(&bytes).unwrap();
+    assert_ne!(s.audio_epoch, old);
+    assert_eq!(s.save_bytes(100).unwrap(), bytes);
+    m.observe(Observation::capture(&s, true), settings);
+    assert!(
+        !cues(&m.voices(settings))
+            .iter()
+            .any(|c| matches!(c, Cue::Latch | Cue::Mount | Cue::Restraint))
+    );
+}
+#[test]
+fn all_mechanisms_and_manual_latches_survive_blackout_but_machinery_does_not() {
+    let settings = Settings::default();
+    let mut o = observation();
+    let mut m = Mixer::default();
+    m.observe(o, settings);
+    m.voices(settings);
+    o.now += Duration::from_millis(16);
+    o.powered = false;
+    o.motions = [0.5; 7];
+    o.restraints = 1;
+    o.mounts = 31;
+    m.observe(o, settings);
+    let v = m.voices(settings);
+    let c = cues(&v);
+    for i in 0..7 {
+        assert!(c.contains(&Cue::Travel(i)));
+    }
+    assert!(c.contains(&Cue::Mount));
+    assert!(c.contains(&Cue::Restraint));
+    assert!(!c.contains(&Cue::Core));
+    assert!(v.len() <= MAX_VOICES);
+    let controls = controls(v, 0, true, None, settings);
+    assert!(controls.gains[13..20].iter().any(|v| *v > 0.));
+    o.active = false;
+    m.observe(o, settings);
+    assert!(m.voices(settings).is_empty());
+}
+
+#[test]
+fn construction_machine_audio_is_spatial_bounded_and_lifecycle_gated() {
+    let mut o = observation();
+    o.walking = false;
+    o.construction = Some([0., 1., 3.]);
+    let mut m = Mixer::default();
+    let settings = Settings::default();
+    m.observe(o, settings);
+    let v = m.voices(settings);
+    let machine = v.iter().find(|v| v.cue == Cue::Fabricator).unwrap();
+    assert!(machine.pan.abs() > 0.1);
+    assert!(machine.gain < 0.25);
+    o.fabrication = true;
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert_eq!(
+        m.voices(settings)
+            .iter()
+            .filter(|v| v.cue == Cue::Fabricator)
+            .count(),
+        1
+    );
+    o.active = false;
+    o.now += Duration::from_millis(16);
+    m.observe(o, settings);
+    assert!(!cues(&m.voices(settings)).contains(&Cue::Fabricator));
 }

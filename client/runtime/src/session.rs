@@ -1,13 +1,22 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
 pub(crate) mod archive;
+pub(crate) mod cabin;
+mod cargo;
+pub(crate) mod construction;
 pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
+pub(crate) mod core_upgrades;
 pub(crate) mod crafting_ui;
 mod fabrication;
+pub(crate) mod finishes;
+mod fixtures;
 pub(crate) mod frames;
+mod habitation;
 pub(crate) mod interaction;
 pub(crate) mod journey;
 pub(crate) mod lifecycle;
+pub(crate) mod lighting;
+pub(crate) mod mounts;
 mod presentation;
 mod recovery;
 mod survival;
@@ -25,7 +34,7 @@ mod starting_supplies_tests;
 #[cfg(test)]
 mod tests;
 use self::frames::character_ship_frame;
-use self::interaction::{InteractionTarget, available_interaction_target};
+use self::interaction::InteractionTarget;
 use crate::update_clock::UpdateClock;
 use salimon_character::{CharacterController, CharacterLocation, MovementInput};
 use salimon_ship::SteeringInput;
@@ -36,7 +45,17 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) audio_epoch: u64,
+    pub(crate) mount_audio: (u64, [f64; 3]),
+    pub(crate) lighting: salimon_ship::lighting::Lighting,
+    pub(crate) core_upgrades: salimon_ship::core_upgrades::CoreUpgrades,
+    pub(crate) finishes: salimon_ship::finishes::Finishes,
+    pub(crate) finish_group: usize,
+    pub(crate) mounts: salimon_ship::attachments::Attachments,
+    pub(crate) cargo_door: cargo::CargoDoor,
+    pub(crate) habitation: habitation::Habitation,
     pub(crate) tutorial: tutorial::Tutorial,
+    pub(crate) building: construction::Building,
     pub(crate) archive: archive::Archive,
     recovery: recovery::Recovery,
     pub(crate) archive_reader: archive::Reader,
@@ -92,6 +111,16 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            audio_epoch: 0,
+            mount_audio: (0, [0.; 3]),
+            lighting: Default::default(),
+            core_upgrades: Default::default(),
+            finishes: Default::default(),
+            finish_group: 0,
+            mounts: Default::default(),
+            cargo_door: Default::default(),
+            habitation: Default::default(),
+            building: Default::default(),
             archive: Default::default(),
             recovery: Default::default(),
             archive_reader: Default::default(),
@@ -140,6 +169,12 @@ pub(crate) enum ControlKey {
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Command {
     Wheel(consumable_wheel::WheelAction),
+    Build(construction::BuildAction),
+    Mount(mounts::MountAction),
+    Cabin(cabin::CabinAction),
+    Finish(finishes::FinishAction),
+    CoreUpgrade(core_upgrades::CoreUpgradeAction),
+    Light(lighting::LightAction),
     TogglePause,
     InspectVitals,
     SkipTutorial,
@@ -181,12 +216,15 @@ impl GameplaySession {
     pub(crate) fn new_run() -> Self {
         let (fabricator, consumables) = salimon_fabrication::Fabricator::starter_with_supplies();
         let mut session = Self {
+            mounts: salimon_ship::attachments::Attachments::starter(),
+            habitation: habitation::Habitation::starter(),
             fabricator,
             consumables,
             tutorial: tutorial::Tutorial::default(),
             ..Default::default()
         };
         session.sync_fabricator_mass();
+        session.sync_accessory();
         session
     }
 
@@ -201,6 +239,10 @@ impl GameplaySession {
             return;
         }
         self.enforce_survival_restrictions();
+        if self.building.active {
+            self.contribute_construction();
+            return;
+        }
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface = self.terrain_frame(ship_snapshot);
@@ -221,13 +263,50 @@ impl GameplaySession {
                 let local_eye = ship_frame.world_to_local(character.eye_position_meters);
                 let local_look = ship_frame.world_to_local(character.look_target_meters);
                 let interaction =
-                    available_interaction_target(self.character.location(), local_eye, local_look);
+                    self.available_target(self.character.location(), local_eye, local_look);
                 if let Some(target) = interaction
                     && !self.admit_survival_action(Self::interaction_action(target))
                 {
                     return;
                 }
+                if self
+                    .habitation
+                    .cabin
+                    .as_ref()
+                    .is_some_and(|c| c.rest.is_some())
+                    && !matches!(
+                        interaction,
+                        Some(
+                            InteractionTarget::PrivacyScreen
+                                | InteractionTarget::ObservationShutter
+                        )
+                    )
+                {
+                    self.stand_from_furniture();
+                    return;
+                }
                 match interaction {
+                    Some(InteractionTarget::CabinTable) => {
+                        self.toggle_cabin_fixture(cabin::Furniture::Table)
+                    }
+                    Some(InteractionTarget::CabinSeat) => {
+                        self.toggle_cabin_fixture(cabin::Furniture::Seat)
+                    }
+                    Some(InteractionTarget::PrivacyScreen) => {
+                        self.toggle_cabin_fixture(cabin::Furniture::Screen)
+                    }
+                    Some(InteractionTarget::ObservationShutter) => {
+                        self.toggle_cabin_fixture(cabin::Furniture::Shutter)
+                    }
+                    Some(InteractionTarget::CabinLocker) => {
+                        self.toggle_cabin_fixture(cabin::Furniture::Locker)
+                    }
+                    Some(InteractionTarget::Bunk) => self.toggle_bunk(),
+                    Some(InteractionTarget::Galley) => self.use_galley(),
+                    Some(InteractionTarget::Hygiene) => {
+                        self.feedback = Some("Compact wash station; no water or hygiene needs")
+                    }
+                    Some(InteractionTarget::CargoDoor) => self.toggle_cargo_door(),
                     Some(InteractionTarget::Archive) => self.open_archive(),
                     Some(InteractionTarget::FabricatorTray) => self.collect_fabricator_output(),
                     Some(InteractionTarget::FabricatorScreen) => {
@@ -239,12 +318,23 @@ impl GameplaySession {
                         self.insert_fabricator_fragment();
                     }
                     Some(InteractionTarget::Core) => {
+                        if self.mining.carry_blocked {
+                            self.feedback =
+                                Some("Carried object obstructed - back up or drop before intake");
+                            return;
+                        }
+                        if self.core_upgrades.mode
+                            == salimon_ship::core_upgrades::InputMode::Upgrade
+                        {
+                            self.contribute_core_upgrade();
+                            return;
+                        }
                         let result = self.ship.intake_carried_fragment(&mut self.mining.session);
                         let text = match result {
-                            salimon_ship::IntakeResult::Accepted => "Core accepted fragment",
+                            salimon_ship::IntakeResult::Accepted => "Core FUEL accepted fragment",
                             salimon_ship::IntakeResult::Busy => "Core is processing a fragment",
                             salimon_ship::IntakeResult::NoCarriedFragment => {
-                                "Carry a fragment to feed the Core"
+                                "CORE FUEL - carry fragment to burn; I selects upgrades"
                             }
                             salimon_ship::IntakeResult::InvalidYield => {
                                 "Invalid fragment energy yield"
@@ -266,7 +356,8 @@ impl GameplaySession {
                     }
                     Some(InteractionTarget::ExitDoor) => {
                         let clear = self.character.location() != CharacterLocation::DoorwayBlend
-                            && !salimon_character::boarding_ramp_occupied(local_eye);
+                            && !salimon_character::boarding_ramp_occupied(local_eye)
+                            && self.modular_gate_clear();
                         self.ship.toggle_door_with_clearance(clear);
                         if let Some(message) = self.ship.snapshot().cockpit_message {
                             if matches!(
@@ -306,9 +397,19 @@ impl GameplaySession {
         local_eye: [f64; 3],
         local_look: [f64; 3],
     ) -> Option<&'static str> {
-        match available_interaction_target(self.character.location(), local_eye, local_look)
+        match self
+            .available_target(self.character.location(), local_eye, local_look)
             .filter(|target| self.permitted_interaction(*target))
         {
+            Some(InteractionTarget::CabinTable) => Some("cabin_table"),
+            Some(InteractionTarget::CabinSeat) => Some("cabin_seat"),
+            Some(InteractionTarget::PrivacyScreen) => Some("privacy_screen"),
+            Some(InteractionTarget::ObservationShutter) => Some("observation_shutter"),
+            Some(InteractionTarget::CabinLocker) => Some("cabin_locker"),
+            Some(InteractionTarget::Bunk) => Some("bunk"),
+            Some(InteractionTarget::Galley) => Some("galley"),
+            Some(InteractionTarget::Hygiene) => Some("hygiene"),
+            Some(InteractionTarget::CargoDoor) => Some("cargo_door"),
             Some(InteractionTarget::Archive) => Some("archive"),
             Some(InteractionTarget::FabricatorTray) => Some("fabricator_tray"),
             Some(InteractionTarget::FabricatorScreen) => Some("fabricator_screen"),
@@ -373,6 +474,19 @@ impl GameplaySession {
     }
 
     pub(crate) fn carry_action(&mut self, pickup: bool) {
+        if self
+            .habitation
+            .cabin
+            .as_ref()
+            .is_some_and(|c| c.rest.is_some())
+        {
+            self.feedback = Some("Get up before carrying a physical object");
+            return;
+        }
+        if self.mounts.carried.is_some() {
+            self.feedback = Some("Accessory in hand - G at a compatible rail to attach");
+            return;
+        }
         if !self.admit_survival_action(Action::Carry) {
             return;
         }
@@ -382,6 +496,9 @@ impl GameplaySession {
         let door_open = door_passable(ship);
         let message = if pickup {
             match crate::carrying::target(&self.mining, player, frame, door_open) {
+                Some(id) if self.mining.secured.contains(&id) => {
+                    "Release mechanical clamp with K first"
+                }
                 Some(id) if self.mining.session.pick_up(id) => {
                     self.equipment.sync_carrying(true);
                     self.mining.stop_mining();
@@ -428,7 +545,7 @@ impl GameplaySession {
             "Cannot drop fragment here"
         };
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
-        crate::carrying::follow(&mut self.mining, player);
+        crate::carrying::follow(&mut self.mining, player, frame);
         crate::carrying::sync_ship_mass(&mut self.mining, frame, &mut self.ship);
         self.mining.carry_feedback = Some(message);
         self.feedback = Some(message);
@@ -438,13 +555,15 @@ impl GameplaySession {
         if self.paused {
             return;
         }
+        self.mining.mount_geometry = self.mounts.clone();
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
         let player = self.character.snapshot(frame, self.terrain_frame(ship));
-        crate::carrying::follow(&mut self.mining, player);
+        crate::carrying::follow(&mut self.mining, player, frame);
         crate::carrying::sync_ship_mass(&mut self.mining, frame, &mut self.ship);
         self.sync_fabricator_mass();
+        self.sync_accessory();
     }
 
     pub(crate) fn clear_held_controls(&mut self) {
@@ -501,6 +620,7 @@ impl GameplaySession {
             .set_steering_input(self.ship_control_input.steering());
         self.advance_fabrication(delta);
         self.advance_recovery(delta);
+        self.advance_construction(delta);
         let ship = self.ship.snapshot();
         if !ship.power_available
             || !ship.cockpit_control_active
@@ -520,19 +640,28 @@ impl GameplaySession {
                 .snapshot(character_ship_frame(ship.pose), self.terrain_frame(ship))
                 .eye_position_meters;
             self.character.set_nearby_surface(self.nearby_terrain(eye));
+            self.advance_cargo_door(delta);
+            self.advance_habitation(delta);
             self.character
                 .set_ramp_moving(ship.door_open_fraction > 0.0 && ship.door_open_fraction < 1.0);
-            self.character.advance_with_motion(
-                delta,
-                self.movement_input,
-                (
-                    character_ship_frame(ship.pose),
-                    ship.velocity_meters_per_second,
-                ),
-                self.terrain_frame(ship),
-                door_passable(ship),
-                matches!(ship.flight_state, FlightState::Landed { .. }),
-            );
+            if self
+                .habitation
+                .cabin
+                .as_ref()
+                .is_none_or(|c| c.rest.is_none())
+            {
+                self.character.advance_with_motion(
+                    delta,
+                    self.movement_input,
+                    (
+                        character_ship_frame(ship.pose),
+                        ship.velocity_meters_per_second,
+                    ),
+                    self.terrain_frame(ship),
+                    door_passable(ship),
+                    matches!(ship.flight_state, FlightState::Landed { .. }),
+                );
+            }
             let eye = self
                 .character
                 .snapshot(character_ship_frame(ship.pose), self.terrain_frame(ship))
@@ -660,6 +789,12 @@ impl GameplaySession {
             return;
         }
         match command {
+            Build(action) => self.construction_action(action),
+            Mount(action) => self.mount_action(action),
+            Cabin(action) => self.cabin_action(action),
+            Finish(action) => self.finish_action(action),
+            Light(action) => self.light_action(action),
+            CoreUpgrade(action) => self.core_upgrade_action(action),
             Control(key, pressed) => self.control(key, pressed),
             Throttle(direction, pressed) => {
                 if !pressed
@@ -670,6 +805,9 @@ impl GameplaySession {
                 } else {
                     self.ship.clear_throttle_input();
                 }
+            }
+            Interact if self.building.active => {
+                self.contribute_construction();
             }
             Interact => {
                 let location = self.character.location();
@@ -691,13 +829,22 @@ impl GameplaySession {
                 if !self.admit_survival_action(Action::Pilot) {
                     return;
                 }
+                if matches!(
+                    self.ship.snapshot().flight_state,
+                    salimon_ship::FlightState::Landed { .. }
+                ) && self.ship.snapshot().cockpit_control_active
+                    && let Some(reason) = self.construction_takeoff_blocker()
+                {
+                    self.feedback = Some(reason.text());
+                    return;
+                }
                 self.ship.trigger_landing_action();
                 self.reset_presentation();
             }
             Select(slot) => {
                 let previous = self.equipment.selected();
                 self.equipment
-                    .select(slot, self.mining.session.carried_id().is_some());
+                    .select(slot, self.mining.session.carried_object().is_some());
                 if previous != self.equipment.selected() {
                     self.mining.clear_input();
                 }
@@ -722,6 +869,12 @@ impl GameplaySession {
                 }
             }
             Look(dx, dy) => self.apply_look_delta(dx, dy),
+            Mining(pressed) if self.building.active => {
+                self.mining.clear_input();
+                if pressed {
+                    self.construction_action(construction::BuildAction::Place);
+                }
+            }
             Mining(pressed) => {
                 let was_down = std::mem::replace(&mut self.wheel.primary_down, pressed);
                 if !pressed || !was_down {

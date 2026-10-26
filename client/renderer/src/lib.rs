@@ -4,9 +4,16 @@
 //! has no dependency on world, character, or ship state.
 
 mod capture;
+mod fixtures;
+pub use fixtures::{
+    FIXTURE_LAYOUT_VERSION, FixtureBatchStats, FixtureInstance, FixtureMesh, FixtureNode,
+    FixturePose, fixture_template_bounds, resolve_fixture_hierarchy,
+};
 mod cockpit_instruments;
 mod consumable_wheel;
 mod equipment_toolbar;
+#[allow(dead_code)]
+mod habitation_geometry;
 pub use consumable_wheel::{ConsumableWheel, ConsumableWheelRaster, consumable_wheel_hit_test};
 mod archive_terminal;
 mod gpu_timing;
@@ -54,7 +61,7 @@ const CLEAR_COLOR: wgpu::Color = wgpu::Color {
 };
 const DEPTH_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Depth32Float;
 const CAMERA_UNIFORM_SIZE: u64 = 64;
-const INSTANCE_STRIDE: u64 = 48;
+const INSTANCE_STRIDE: u64 = 64;
 const CUBE_VERTEX_STRIDE: u64 = 12;
 const CUBE_VERTEX_COUNT: u32 = 36;
 const BASIS_EPSILON: f32 = 1.0e-5;
@@ -118,6 +125,8 @@ pub struct CameraFrame {
 /// Renderer-facing cuboid instance expressed in canonical world metres.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SceneInstance {
+    /// Unit local-to-world quaternion [x, y, z, w].
+    pub orientation: [f32; 4],
     pub center_meters: [f64; 3],
     pub half_extents_meters: [f32; 3],
     pub color: [f32; 4],
@@ -129,6 +138,7 @@ pub struct SceneFrame<'a> {
     pub camera: CameraFrame,
     pub instances: &'a [SceneInstance],
     pub resource_meshes: &'a [ResourceMeshInstance],
+    pub fixtures: &'a [FixtureInstance],
     pub spheres: &'a [SphereInstance],
     pub terrain: &'a [std::sync::Arc<TerrainPatch>],
     pub terrain_mask: Option<TerrainMask>,
@@ -243,6 +253,7 @@ struct CameraBasis {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct GpuInstance {
+    orientation: [f32; 4],
     relative_center: [f32; 3],
     half_extents: [f32; 3],
     color: [f32; 4],
@@ -270,6 +281,7 @@ enum SceneInputError {
     InstanceRelativeCenterOutOfRange(usize),
     InstanceHalfExtentsInvalid(usize),
     InstanceColorInvalid(usize),
+    InstanceOrientationInvalid(usize),
 }
 
 impl fmt::Display for SceneInputError {
@@ -311,6 +323,10 @@ impl fmt::Display for SceneInputError {
             Self::InstanceHalfExtentsInvalid(index) => write!(
                 formatter,
                 "scene instance {index} half-extents must be finite and greater than zero"
+            ),
+            Self::InstanceOrientationInvalid(index) => write!(
+                formatter,
+                "scene instance {index} orientation must be a finite unit quaternion"
             ),
             Self::InstanceColorInvalid(index) => {
                 write!(formatter, "scene instance {index} has a non-finite color")
@@ -370,6 +386,10 @@ fn prepare_scene(
         {
             return Err(SceneInputError::InstanceHalfExtentsInvalid(index));
         }
+        let norm: f32 = instance.orientation.iter().map(|v| v * v).sum();
+        if !instance.orientation.iter().all(|v| v.is_finite()) || (norm - 1.).abs() > 1e-5 {
+            return Err(SceneInputError::InstanceOrientationInvalid(index));
+        }
         if !instance.color.iter().all(|value| value.is_finite()) {
             return Err(SceneInputError::InstanceColorInvalid(index));
         }
@@ -385,6 +405,7 @@ fn prepare_scene(
         }
 
         let gpu_instance = GpuInstance {
+            orientation: instance.orientation,
             relative_center,
             half_extents: instance.half_extents_meters,
             color: instance.color,
@@ -409,7 +430,10 @@ fn instance_intersects_frustum(
     camera: CameraFrame,
     aspect_ratio: f32,
 ) -> bool {
-    let radius = scaled_length(instance.half_extents);
+    // For squared quaternion norm n, the shader transform is (1-n)I+nR.
+    // Bound its scale too, including the admitted f32 unit-norm rounding.
+    let norm: f32 = instance.orientation.iter().map(|v| v * v).sum();
+    let radius = scaled_length(instance.half_extents) * (norm + (1.0 - norm).abs());
     if !radius.is_finite() {
         return true;
     }
@@ -599,7 +623,7 @@ fn encode_f32s(values: impl IntoIterator<Item = f32>) -> Vec<u8> {
 }
 
 fn encode_instances(instances: &[GpuInstance]) -> Vec<u8> {
-    let mut values = Vec::with_capacity(instances.len().saturating_mul(12));
+    let mut values = Vec::with_capacity(instances.len().saturating_mul(16));
     for instance in instances {
         values.extend_from_slice(&[
             instance.relative_center[0],
@@ -614,6 +638,10 @@ fn encode_instances(instances: &[GpuInstance]) -> Vec<u8> {
             instance.color[1],
             instance.color[2],
             instance.color[3],
+            instance.orientation[0],
+            instance.orientation[1],
+            instance.orientation[2],
+            instance.orientation[3],
         ]);
     }
     encode_f32s(values)
@@ -645,6 +673,8 @@ pub struct Renderer {
     spheres: spheres::SphereRenderer,
     terrain: terrain::TerrainRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
+    fixtures: fixtures::FixtureMeshRenderer,
+    last_fixture_batch: FixtureBatchStats,
     held_item: held_item::HeldItemRenderer,
     resource_meshes: resource_mesh::ResourceMeshRenderer,
     gpu_timer: Option<GpuTimer>,
@@ -836,6 +866,11 @@ impl Renderer {
                                 offset: 32,
                                 shader_location: 3,
                             },
+                            wgpu::VertexAttribute {
+                                format: wgpu::VertexFormat::Float32x4,
+                                offset: 48,
+                                shader_location: 4,
+                            },
                         ],
                     }),
                 ],
@@ -884,6 +919,7 @@ impl Renderer {
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let terrain = terrain::TerrainRenderer::new(&device, configuration.format, &spheres);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
+        let fixtures = fixtures::FixtureMeshRenderer::new(&device, configuration.format)?;
         let held_item = held_item::HeldItemRenderer::new(&device, &queue, configuration.format)?;
         let resource_meshes =
             resource_mesh::ResourceMeshRenderer::new(&device, configuration.format)?;
@@ -910,6 +946,8 @@ impl Renderer {
             spheres,
             terrain,
             ship_mesh,
+            fixtures,
+            last_fixture_batch: Default::default(),
             held_item,
             resource_meshes,
             gpu_timer,
@@ -925,6 +963,16 @@ impl Renderer {
     }
 
     #[must_use]
+    /// Last prepared fixture workload; independent of hardware budget approval.
+    pub const fn fixture_batch_stats(&self) -> FixtureBatchStats {
+        self.last_fixture_batch
+    }
+
+    /// Actual resident ship buffers, uniform bytes, triangles and current draw count.
+    pub fn ship_resource_stats(&self) -> [u64; 4] {
+        self.ship_mesh.resource_stats()
+    }
+
     pub const fn info(&self) -> &RendererInfo {
         &self.info
     }
@@ -1018,6 +1066,14 @@ impl Renderer {
 
         self.ship_mesh
             .prepare(&self.queue, scene, prepared_scene.view_projection)?;
+        self.last_fixture_batch = self.fixtures.prepare(
+            &self.device,
+            &self.queue,
+            scene.camera,
+            prepared_scene.view_projection,
+            aspect_ratio,
+            scene.fixtures,
+        )?;
         self.held_item
             .prepare(&self.queue, scene.camera, aspect_ratio, scene.held_item)?;
         let resource_batch = self.resource_meshes.prepare(
@@ -1161,8 +1217,10 @@ impl Renderer {
             }
             self.spheres.draw(&mut render_pass);
             self.terrain.draw(&mut render_pass);
-            self.ship_mesh.draw(&mut render_pass);
+            self.ship_mesh.draw_opaque(&mut render_pass);
+            self.fixtures.draw(&mut render_pass);
             self.resource_meshes.draw(&mut render_pass);
+            self.ship_mesh.draw_glass(&mut render_pass);
             self.held_item.draw(&mut render_pass);
         }
         {
@@ -1241,12 +1299,14 @@ impl Renderer {
             + scene_draw_calls(self.spheres.count())
             + self.terrain.count()
             + self.ship_mesh.draw_count()
+            + self.fixtures.draw_count()
             + self.held_item.count()
             + self.resource_meshes.draw_count();
         let object_count = prepared_scene.instance_count
             + self.spheres.count()
             + self.terrain.count()
             + self.ship_mesh.count()
+            + self.fixtures.object_count()
             + self.held_item.count()
             + self.resource_meshes.object_count();
         Ok(RenderOutcome::Presented(RenderStats {
@@ -1357,6 +1417,12 @@ mod tests {
     fn camera_relative_conversion_is_invariant_under_large_translation() {
         let local_camera = camera([0.0, 0.0, 0.0], [0.0, 0.0, -100.0]);
         let local_instances = [SceneInstance {
+            orientation: [
+                0.,
+                std::f32::consts::FRAC_1_SQRT_2,
+                0.,
+                std::f32::consts::FRAC_1_SQRT_2,
+            ],
             center_meters: [10.0, -4.0, -1_000.0],
             half_extents_meters: [1.0, 2.0, 3.0],
             color: [0.2, 0.4, 0.8, 1.0],
@@ -1365,6 +1431,7 @@ mod tests {
             SceneFrame {
                 camera: local_camera,
                 resource_meshes: &[],
+                fixtures: &[],
                 instances: &local_instances,
                 spheres: &[],
                 terrain: &[],
@@ -1380,6 +1447,12 @@ mod tests {
         let origin = [1_000_000_000_000.0, -1_000_000_000_000.0, 500_000_000_000.0];
         let translated_camera = camera(origin, [origin[0], origin[1], origin[2] - 100.0]);
         let translated_instances = [SceneInstance {
+            orientation: [
+                0.,
+                std::f32::consts::FRAC_1_SQRT_2,
+                0.,
+                std::f32::consts::FRAC_1_SQRT_2,
+            ],
             center_meters: [origin[0] + 10.0, origin[1] - 4.0, origin[2] - 1_000.0],
             ..local_instances[0]
         }];
@@ -1387,6 +1460,7 @@ mod tests {
             SceneFrame {
                 camera: translated_camera,
                 resource_meshes: &[],
+                fixtures: &[],
                 instances: &translated_instances,
                 spheres: &[],
                 terrain: &[],
@@ -1434,6 +1508,7 @@ mod tests {
                 SceneFrame {
                     camera: coincident_camera,
                     resource_meshes: &[],
+                    fixtures: &[],
                     instances: &[],
                     spheres: &[],
                     terrain: &[],
@@ -1448,6 +1523,7 @@ mod tests {
         );
 
         let invalid_instances = [SceneInstance {
+            orientation: [0., 0., 0., 1.],
             center_meters: [0.0, 0.0, -10.0],
             half_extents_meters: [1.0, 0.0, 1.0],
             color: [1.0; 4],
@@ -1457,6 +1533,7 @@ mod tests {
                 SceneFrame {
                     camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                     resource_meshes: &[],
+                    fixtures: &[],
                     instances: &invalid_instances,
                     spheres: &[],
                     terrain: &[],
@@ -1475,21 +1552,25 @@ mod tests {
     fn frustum_culling_controls_scene_counts_and_draw_calls() {
         let instances = [
             SceneInstance {
+                orientation: [0., 0., 0., 1.],
                 center_meters: [0.0, 0.0, -10.0],
                 half_extents_meters: [1.0; 3],
                 color: [1.0; 4],
             },
             SceneInstance {
+                orientation: [0., 0., 0., 1.],
                 center_meters: [2.0, 0.0, -20.0],
                 half_extents_meters: [1.0; 3],
                 color: [0.5; 4],
             },
             SceneInstance {
+                orientation: [0., 0., 0., 1.],
                 center_meters: [0.0, 0.0, 10.0],
                 half_extents_meters: [1.0; 3],
                 color: [0.8; 4],
             },
             SceneInstance {
+                orientation: [0., 0., 0., 1.],
                 center_meters: [100.0, 0.0, -10.0],
                 half_extents_meters: [1.0; 3],
                 color: [0.3; 4],
@@ -1499,6 +1580,7 @@ mod tests {
             SceneFrame {
                 camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                 resource_meshes: &[],
+                fixtures: &[],
                 instances: &instances,
                 spheres: &[],
                 terrain: &[],
@@ -1536,3 +1618,6 @@ mod glb_candidate_tests {
             .expect("offline candidate must exist; run process_glb.py all first")
     }
 }
+
+mod cabin_lighting;
+pub use cabin_lighting::CabinLighting;

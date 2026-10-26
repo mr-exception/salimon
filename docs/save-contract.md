@@ -1,9 +1,9 @@
-# Canonical whole-game save contract (schema 7)
+# Canonical whole-game save contract (schema 20)
 
-> This is the **current compressed-world runtime save schema 7**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+> This is the **current compressed-world runtime save schema 20**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
-version 7. Decode accepts versions 1–6 for explicit runtime migration; the
+version 20. Decode accepts versions 1–19 for explicit runtime migration; the
 following v1–v3 paragraphs record that historical migration:
 retain the complete physical/Fabricator/equipment payload, initialize newly
 introduced survival meters at 100 with no effects or retrospective active time,
@@ -368,7 +368,7 @@ checkpoint scheduling. See [source and input](../client/runtime/architecture.md#
 
 `salimon-persistence::universe::UniverseSave` is a **separate**
 `salimon.universe.save` version-1 wire envelope, not a migration of current
-`salimon.save` (now schema 7). It is delivered for future world integration; normal
+`salimon.save` (now schema 10). It is delivered for future world integration; normal
 startup still uses the compressed-world session source. Existing saves are never
 implicitly interpreted, discarded or rewritten by this API.
 
@@ -411,3 +411,114 @@ without granting inputs or replaying work. Current schema-6 Archive identities
 and all prior physical/consumable state survive. Transient R/menu/native input
 and last-tick auxiliary power are never restored; no offline progress is credited.
 See [canonical Recovery contract](data-recovery-module.md#persistence-and-verification).
+
+## Independent structural domain schema (#541)
+
+`salimon_ship::structure::StructureSaveState` owns schema 1 for the independently
+validated 3 m structural graph. It preserves the Core ID, exact grid origin,
+parts/faces/envelopes, rooms, equipment, baseline/additional mass and retired IDs;
+restore rebuilds occupancy and checks support and uniqueness. See
+[owning architecture](../client/ship/architecture.md#portable-structural-foundation-541).
+This payload is not yet part of `GameplaySession` or disk checkpoints and does
+not change whole-game schema 7. Project/physical installation save integration
+remains #550; no player save acquires an invented grid or rounded Scout anchors.
+
+## Blueprint placeholder schema 8 (#542)
+
+Current captures require `state.construction`, an independent schema-1 project
+reservation ledger. It preserves stable project IDs/next-ID, owner, registered
+blueprint source, exact ship-local origin/anchor, quarter-turn orientation, target
+volume and occupied cells. These projects own no materials, installed structural
+mass, progress or power yet. Schema 1–7 migrates to an empty ledger without a
+simulation tick; unexpected nonempty construction source in a legacy envelope
+rejects. Missing schema-8 source, malformed cells/bounds, overlaps, unknown or
+changed catalog entries, wrong owner and inconsistent IDs reject before publishing
+any restored owner. An older application rejects the unknown schema rather than
+overwriting a checkpoint it cannot interpret.
+
+Builder activation, palette selection, preview, hover and visual wireframes are
+transient and rebuilt. Restored projects remain visible but never become solid or
+usable hardware by loading. The current support graph is an explicit coarse
+baseline, independent of authored collision, and is reconstructed; full installed
+structure/resource/progress/offline construction integration remains #543–#550.
+Future catalog economics changes need an explicit compatible source migration;
+this version does not silently retune an existing project's captured requirements.
+
+
+## Cargo door schema 9 (#539)
+
+The session saves a required `cargo_door` with finite `open_fraction` in [0,1]
+and the requested direction `opening`. v1–v8 migrate the historically open
+aperture. Missing current source, invalid fractions and unknown fields reject
+before publication. Restore rebinds character/resource geometry without ticking
+or moving any fragment. Door start/end/reversal participates in automatic
+checkpoint events. Intermediate motion is included in full saves. This mechanical
+door remains independent of the aft ramp and operable in blackout; it creates
+no pressure simulation. Open bins use existing fragment IDs, ship anchors, motion
+and mass sources, with no separate container contents ledger.
+
+
+## Habitation schema 10 (#540)
+
+Current session source requires finite `habitation.bunk_open_fraction` in [0,1]
+and the manual requested direction `bunk_deploying`. v1–v9 migrate to the
+stowed base fixture. Missing current source and malformed/unknown fields reject
+atomically. Restore neither ticks motion nor creates survival effects; pause
+freezes the fraction. Galley wheel/feedback remain transient and use existing
+consumable IDs. Hygiene adds no persistent need, water ledger or health grant.
+Bunk request/end states trigger checkpoints. Full tactile/occupancy transitions
+remain #577, using the same physical clearance and source boundaries.
+
+## Physical mount schema 11 (#576)
+
+Schema 11 persists stable rail/mount/secured-item source and a carried accessory's
+physical position. Restore validates source and exact child IDs, reconstructs the
+shared one-object slot and colliders before publishing, and rejects conflicts
+atomically. Schemas 1–10 migrate without new installed fixtures, preserving old
+player/cargo clearance. Hand motion does not trigger discrete autosaves. See the
+[physical mount contract](physical-mounts.md).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.
+
+
+## Persistent cosmetic groups (#579)
+
+Five room groups and exact furniture overrides now use the [bounded finish contract](room-finishes.md). Schema 13 preserves histories independently of divider topology; physical material replacement, future constructed room geometry (#545) and actual damage (#549) retain their owners. Shared instance tint factors are now bounded to [0,4] and cosmetic RGB is clamped before lighting; warning/functional surfaces retain authored values.
+
+
+## Instant direct-material Core upgrades (#548)
+
+The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.
+
+
+## Construction material ownership (#543)
+
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Timed work and completed geometry remain #544/#545.
+
+
+## Room and fixture lighting (#580)
+
+The [maintained lighting contract](room-lighting.md) describes implemented presets, independent overrides, effective bus/condition gates, shutter/Sun contribution and schema 16. Actual future damage/room creation remain #549/#545; human approval #561 and hardware budgets #563.
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+## Construction flight readiness (#546)
+
+See [construction flight safety](construction-flight-safety.md) for schema-19 Stop/Resume, actual hull and attachment admission, cockpit warnings and airborne stop latches. Source: runtime `session/construction/flight.rs`, ship `structure/construction.rs`; regressions: runtime `session/construction/flight/tests.rs`. Run workspace and construction checks plus the production `construction-interlocks.json` evidence scenario.
+
+
+## Optional module schema 20 (#547)
+
+See the [canonical module source/migration contract](non-core-modules.md#ownership-save-and-verification). Saved construction now includes a module map keyed by the original placeholder ID, commissioned tier, persistent unavailability/fault, installed maintenance receipts and optional upgrade/restoration Funding/Work. Old envelopes reject nonempty module maps; current tier/phase, paid time, allocator and cross-owner uniqueness validate before atomic publication. Continuous maintenance time does not turn every simulation tick into a discrete checkpoint.

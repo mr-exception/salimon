@@ -8,6 +8,10 @@ struct ShipUniform {
     padding: vec4<f32>,
     activity: vec4<f32>, // conversion, signed thrust, Fabricator mode, active phase
     detail: vec4<f32>, // Core charge, recipe progress, cockpit authority, ramped rudder yaw
+    finishes: array<vec4<f32>, 10>,
+    ambient: array<vec4<f32>, 2>,
+    lamp_positions: array<vec4<f32>, 6>,
+    lamp_colors: array<vec4<f32>, 6>,
 };
 
 @group(0) @binding(0)
@@ -26,6 +30,7 @@ struct VertexOutput {
     @location(4) @interpolate(flat) display_flag: u32,
     @location(5) local: vec3<f32>,
     @location(6) @interpolate(flat) machinery_role: u32,
+    @location(7) @interpolate(flat) finish_group: u32,
 };
 
 @vertex
@@ -38,30 +43,43 @@ fn vs_main(
     @location(5) interior_flag: f32,
     @location(6) display: vec3<f32>,
     @location(7) machinery_role: f32,
+    @location(8) finish_group: f32,
 ) -> VertexOutput {
-    let angle = ship.door_pose.x * min(door_flag, 1.0);
+    let ramp_flag = select(0.0, door_flag, door_flag < 2.5);
+    let angle = ship.door_pose.x * min(ramp_flag, 1.0);
     let cosine = cos(angle);
     let sine = sin(angle);
     let hinge = ship.door_pose.yz;
-    let tip = select(0.0, 1.0, door_flag > 1.5);
+    let tip = select(0.0, 1.0, ramp_flag > 1.5);
     // Decorative pedal travel only; authority/colliders and structural supports
     // remain unchanged. Power-gated ramped yaw moves the two pedals in opposition.
     let pedal = select(0.0, -0.015 * ship.detail.w * sign(local_position.z), machinery_role == 5.0);
     let offset = local_position.xy + vec2<f32>(pedal, 0.0) + ship.padding.yx * tip - hinge;
-    let local = vec3<f32>(
+    var local = vec3<f32>(
         hinge.x + cosine * offset.x - sine * offset.y,
         hinge.y + sine * offset.x + cosine * offset.y,
         local_position.z,
     );
+    if door_flag == 3.0 {
+        let c = cos(ship.door_pose.w);
+        let s = sin(ship.door_pose.w);
+        let hinge_yz = vec2<f32>(ship.forward.w,ship.up.w);
+        let p = local.yz - hinge_yz;
+        local = vec3<f32>(local.x, hinge_yz.x+c*p.x-s*p.y, hinge_yz.y+s*p.x+c*p.y);
+    }
     let relative = ship.center.xyz
         + ship.forward.xyz * local.x
         + ship.up.xyz * local.y
         + ship.port.xyz * local.z;
-    let hinged_normal = vec3<f32>(
+    var hinged_normal = vec3<f32>(
         cosine * local_normal.x - sine * local_normal.y,
         sine * local_normal.x + cosine * local_normal.y,
         local_normal.z,
     );
+    if door_flag == 3.0 {
+        let c = cos(ship.door_pose.w); let s = sin(ship.door_pose.w);
+        hinged_normal = vec3<f32>(local_normal.x,c*local_normal.y-s*local_normal.z,s*local_normal.y+c*local_normal.z);
+    }
     let normal = normalize(
         ship.forward.xyz * hinged_normal.x
         + ship.up.xyz * hinged_normal.y
@@ -69,7 +87,9 @@ fn vs_main(
     );
     var output: VertexOutput;
     output.clip_position = ship.view_projection * vec4<f32>(relative, 1.0);
+    if door_flag == 3.0 && ship.port.w > 0.5 {output.clip_position=vec4<f32>(2.0,2.0,0.0,1.0);}
     output.color = color;
+    output.finish_group = u32(finish_group);
     let key = normalize(vec3<f32>(0.35, 0.82, 0.44));
     let exterior_light = vec3<f32>(0.82, 0.90, 1.0)
         * (0.28 + 0.62 * abs(dot(normal, key)));
@@ -85,7 +105,19 @@ fn vs_main(
     let cabin_light = cold_spill + powered
         * (vec3<f32>(0.46, 0.34, 0.22)
         + vec3<f32>(0.18, 0.14, 0.09) * task_fill + vec3<f32>(ceiling));
-    output.light = mix(exterior_light, cabin_light, interior_flag);
+    var effective_cabin = cabin_light;
+    let room = select(0u,1u,local.x < -4.65);
+    if ship.ambient[room].w > 0.5 {
+        effective_cabin = ship.ambient[room].rgb;
+        for (var i=0u;i<6u;i=i+1u) {
+            if u32(ship.lamp_colors[i].w) == room {
+                let delta=local-ship.lamp_positions[i].xyz;
+                effective_cabin += ship.lamp_colors[i].rgb/(1.0+dot(delta,delta)*ship.lamp_positions[i].w);
+            }
+        }
+        effective_cabin=min(effective_cabin,vec3<f32>(2.0));
+    }
+    output.light = mix(exterior_light, effective_cabin, interior_flag);
     // Authored electrical lamps/accents extinguish on bus loss. Unpowered
     // surfaces retain a cool readability floor; this is not emergency power.
     var intensity = 1.0;
@@ -101,6 +133,11 @@ fn vs_main(
         intensity = 0.12 + 0.88 * ship.detail.z;
     }
     output.emissive = emissive * powered * intensity;
+    if ship.ambient[room].w > 0.5 && interior_flag > 0.5 && machinery_role == 0.0 && display.z == 0.0 {
+        var nearest=0u; var distance=1e9;
+        for(var i=0u;i<5u;i=i+1u) {let d=dot(local-ship.lamp_positions[i].xyz,local-ship.lamp_positions[i].xyz);if d<distance {distance=d;nearest=i;}}
+        output.emissive=emissive*ship.lamp_colors[nearest].rgb*2.0;
+    }
     output.screen_uv = display.xy;
     output.display_flag = u32(display.z);
     output.local = local;
@@ -154,5 +191,10 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     }
     // Keep lamps, displays, and engine/core accents self-lit instead of
     // clamping their emission into the base color and then darkening it.
-    return vec4<f32>(input.color.rgb * input.light + input.emissive, input.color.a);
+    var base = input.color.rgb;
+    if input.finish_group > 0u {
+        let room = select(0u, 1u, input.local.x < -4.65);
+        base = min(base * ship.finishes[room * 5u + input.finish_group - 1u].rgb, vec3<f32>(1.0));
+    }
+    return vec4<f32>(base * input.light + input.emissive, input.color.a);
 }

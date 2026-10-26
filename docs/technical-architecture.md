@@ -18,7 +18,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | `client/runtime/` | Native shell/lifecycle/evidence IO plus portable GameplaySession commands, snapshots, stepping, resource/cargo adapters and presentation mapping |
 | `client/fabrication/` | Portable validated recipes, integer raw storage/reservation, FIFO jobs, single tray and typed consumable slots; runtime adapters remain separate |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
-| `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
+| `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks, live telemetry and independent portable structural topology |
 | `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |
 | `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
 | `client/character/` | Portable movement, collision, gravity, cockpit transitions and open-space/nearby-body EVA |
@@ -109,10 +109,13 @@ monitor UVs, door metadata, budgets and licenses. Read the
 [scout regeneration guide](../client/assets/ship/README.md#source-and-regeneration)
 for commands and generated files; normal builds never require Blender.
 
-The current scout removes the dedicated cargo module, shortens the nose/glazing
-and uses one wide multifunction monitor on the center console with walking routes on both sides.
-Loose fragments use the cabin deck. Historical cargo and migration evidence in
-[reports/](../reports/README.md) describes earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
+The current Scout retains its compact outer hull and precise ramp/cockpit/station
+anchors. The #538 cabin envelope adds a separate aft cargo compartment, a
+full-height bulkhead with a 3 m internal opening, open storage shells and
+wall-integrated stowed bunk, galley and hygiene fixtures. Character movement,
+sight and floor placement consume the same generated bounds. Operable internal
+door/bin mechanics remain #539; habitation interactions remain #540. Historical
+cargo-removal reports describe earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
 and status material. Iron, silicate and water-ice fragments each use two Blender-authored variants selected by stable identity. All three deposit materials use four authored variants; see [renderer architecture](../client/renderer/architecture.md) for selection and bounds contracts.
 
 ## Physical-object simulation decision (#114)
@@ -533,7 +536,9 @@ See [reference wire/budget/workload guide](universe-reference-fixtures.md),
 [architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
 and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
 and CPU diagnostics only; no solver/world migration or scientific model approval.
-Native reference measurements remain #521; full-game native gates remain #435–#439.
+Cloud reference measurements remain #521; full-game cloud gates remain #435–#439.
+Human presentation/platform/budget criteria are #561/#557/#563 under the
+[verification workflow](verification-workflow.md); no M1 result is inferred.
 
 ## Universe Gaia ingestion (#408)
 
@@ -590,3 +595,60 @@ routes, independent domain digests and a single surface evaluator. See
 U01 recipe references remain unchanged; U12 packages the expanded U11 sidecar.
 The runtime still starts in the compressed prototype. U14 states, U23 LOD and
 U24 arrival/mining integration retain their scopes, with separate native gates.
+
+## Portable modular structure (#541)
+
+Ship's independent `structure` module owns the 3 m Core-rooted sparse graph,
+structural/room/equipment IDs and envelopes, safe removal, damage component
+handoffs, explicit baseline/additional mass and domain schema 1. See the
+[owned boundary](../client/ship/architecture.md#portable-structural-foundation-541).
+Runtime composition, current authored hull/colliders and whole-game schema are
+unchanged. This foundation does not claim player construction or the redesigned
+Scout is playable; #538–#550 retain their integration scopes.
+
+## Physical mounts (#576)
+
+Physical mounts compose ship-owned attachments, the world-owned one-object slot and runtime physical/presentation adapters. Schema 11 preserves exact source and safe legacy layouts. See [the canonical contract](physical-mounts.md).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.
+
+
+## Persistent cosmetic groups (#579)
+
+Five room groups and exact furniture overrides now use the [bounded finish contract](room-finishes.md). Schema 13 preserves histories independently of divider topology; physical material replacement, future constructed room geometry (#545) and actual damage (#549) retain their owners. Shared instance tint factors are now bounded to [0,4] and cosmetic RGB is clamped before lighting; warning/functional surfaces retain authored values.
+
+
+## Instant direct-material Core upgrades (#548)
+
+The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.
+
+
+## Construction material ownership (#543)
+
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Paid work and completed geometry follow [construction progress](construction-progress.md) and [modular structure](modular-construction.md).
+
+
+## Room and fixture lighting (#580)
+
+The [maintained lighting contract](room-lighting.md) describes implemented presets, independent overrides, effective bus/condition gates, shutter/Sun contribution and schema 16. Actual future damage/room creation remain #549/#545; human approval #561 and hardware budgets #563.
+
+
+## Tactile audio and physical partitions (#583)
+
+The [maintained acoustics contract](scout-acoustics.md) describes actual mechanism/attachment events, finite cargo/privacy separation, differentiated floor contact and bounded continuous CPAL filtering. E2E mapping stays silent; actual output captures and human listening remain separately identified.
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence completed [modular structure](modular-construction.md) and [optional module commissioning](non-core-modules.md).
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+Optional module composition (#547): runtime construction owns tier/maintenance/commissioning source, existing ship Funding/Work retain material/time arithmetic, Recovery requests actual Core-funded throughput and renderer consumes physical case geometry. See [the canonical owner and save/test mapping](non-core-modules.md).

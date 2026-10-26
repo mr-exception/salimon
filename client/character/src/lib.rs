@@ -3,10 +3,14 @@
 //! This crate consumes typed input and reference-frame descriptions. It has no
 //! dependency on native window events, rendering, or ship simulation state.
 
+pub mod cargo;
 mod collision;
 mod controller;
+pub mod habitation_geometry;
 mod input;
 mod layout;
+pub mod modular;
+pub use layout::PLAYER_RADIUS_METERS;
 mod math;
 mod queries;
 mod ramp;
@@ -21,8 +25,8 @@ pub use points::{ShipLocalPoint, WorldPoint};
 pub use controller::CharacterController;
 pub use input::MovementInput;
 pub use queries::{
-    fabricator_input_sight_obstruction, fabricator_sight_obstruction, ship_contains_object,
-    ship_floor_placement, ship_sight_obstruction,
+    fabricator_input_sight_obstruction, fabricator_sight_obstruction, habitation_sight_obstruction,
+    ship_contains_object, ship_floor_placement, ship_sight_obstruction,
 };
 pub use spatial_contracts::{
     COCKPIT_SEAT_MARKER_METERS, ENGINE_PORT_ANCHOR_METERS, ENGINE_STARBOARD_ANCHOR_METERS,
@@ -106,3 +110,29 @@ pub const CORE_INTERACTION_POSITION_METERS: [f64; 3] = [
 ];
 
 pub use controller::persistence::CharacterSaveState;
+
+/// Raw authored installation envelopes for construction clearance. These are
+/// conservative solids, independent of body expansion and the structural grid.
+pub fn ship_installation_obstacles() -> Vec<[f64; 6]> {
+    use spatial_contracts::*;
+    let mut bounds = vec![
+        CORE_BOUNDS,
+        PILOT_CHAIR_BOUNDS,
+        CONSOLE_BOUNDS,
+        FABRICATOR_BOUNDS,
+        COCKPIT_PORT_HULL_BOUNDS,
+        COCKPIT_STARBOARD_HULL_BOUNDS,
+        CARGO_HEADER_BOUNDS,
+    ];
+    bounds.extend(STARTER_COLLIDERS);
+    bounds.extend(THRUSTER_COLLIDERS);
+    bounds.extend(WING_COLLIDERS);
+    bounds.extend(LANDING_COLLIDERS);
+    bounds
+}
+
+/// Conservative existing cabin/nose hull envelope for exterior construction.
+/// Interior placement uses the individual authored fixture/containment queries.
+pub fn ship_conservative_hull_envelope() -> [f64; 6] {
+    spatial_contracts::CABIN_EXTERIOR_BOUNDS
+}

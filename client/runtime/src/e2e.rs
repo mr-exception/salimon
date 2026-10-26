@@ -11,6 +11,31 @@ use crate::session::GameplaySession;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    ConstructionModule,
+    ConstructionModuleUpgrade,
+    ConstructionModuleRestore,
+    ConstructionMaterials,
+    ConstructionBuild,
+    ConstructionRoom,
+    ConstructionInterlocks,
+    ScoutLighting,
+    ScoutLightingShutter,
+    ScoutLightingBlackout,
+    ScoutLightingBroken,
+    ScoutLightingDark,
+    ScoutMounts,
+    ScoutCabin,
+    ScoutFinishes,
+    ScoutCoreUpgrade,
+    ScoutCoreUpgradePowered,
+    ScoutFinishesBlackout,
+    ScoutCabinBunk,
+    ScoutCabinLocker,
+    ScoutCabinTable,
+    ScoutFabricator,
+    ScoutWorkBlackout,
+    ScoutArchive,
+    ScoutRecovery,
     FlightRegression,
     CargoFlight,
     CargoBlackout,
@@ -40,6 +65,31 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "scout-lighting" => Ok(Self::ScoutLighting),
+            "scout-lighting-shutter" => Ok(Self::ScoutLightingShutter),
+            "scout-lighting-blackout" => Ok(Self::ScoutLightingBlackout),
+            "scout-lighting-broken" => Ok(Self::ScoutLightingBroken),
+            "scout-lighting-dark" => Ok(Self::ScoutLightingDark),
+            "construction-module" => Ok(Self::ConstructionModule),
+            "construction-module-upgrade" => Ok(Self::ConstructionModuleUpgrade),
+            "construction-module-restore" => Ok(Self::ConstructionModuleRestore),
+            "construction-materials" => Ok(Self::ConstructionMaterials),
+            "construction-build" => Ok(Self::ConstructionBuild),
+            "construction-room" => Ok(Self::ConstructionRoom),
+            "construction-interlocks" => Ok(Self::ConstructionInterlocks),
+            "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
+            "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
+            "scout-cabin-table" => Ok(Self::ScoutCabinTable),
+            "scout-core-upgrade" => Ok(Self::ScoutCoreUpgrade),
+            "scout-core-upgrade-powered" => Ok(Self::ScoutCoreUpgradePowered),
+            "scout-finishes" => Ok(Self::ScoutFinishes),
+            "scout-finishes-blackout" => Ok(Self::ScoutFinishesBlackout),
+            "scout-cabin" => Ok(Self::ScoutCabin),
+            "scout-mounts" => Ok(Self::ScoutMounts),
+            "scout-fabricator" => Ok(Self::ScoutFabricator),
+            "scout-work-blackout" => Ok(Self::ScoutWorkBlackout),
+            "scout-archive" => Ok(Self::ScoutArchive),
+            "scout-recovery" => Ok(Self::ScoutRecovery),
             "flight-regression" => Ok(Self::FlightRegression),
             "cargo-flight" => Ok(Self::CargoFlight),
             "cargo-blackout" => Ok(Self::CargoBlackout),
@@ -73,6 +123,31 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::ScoutLighting => "scout-lighting",
+            Self::ScoutLightingShutter => "scout-lighting-shutter",
+            Self::ScoutLightingBlackout => "scout-lighting-blackout",
+            Self::ScoutLightingBroken => "scout-lighting-broken",
+            Self::ScoutLightingDark => "scout-lighting-dark",
+            Self::ConstructionModule => "construction-module",
+            Self::ConstructionModuleUpgrade => "construction-module-upgrade",
+            Self::ConstructionModuleRestore => "construction-module-restore",
+            Self::ConstructionMaterials => "construction-materials",
+            Self::ConstructionBuild => "construction-build",
+            Self::ConstructionRoom => "construction-room",
+            Self::ConstructionInterlocks => "construction-interlocks",
+            Self::ScoutCabinBunk => "scout-cabin-bunk",
+            Self::ScoutCabinLocker => "scout-cabin-locker",
+            Self::ScoutCabinTable => "scout-cabin-table",
+            Self::ScoutCoreUpgrade => "scout-core-upgrade",
+            Self::ScoutCoreUpgradePowered => "scout-core-upgrade-powered",
+            Self::ScoutFinishes => "scout-finishes",
+            Self::ScoutFinishesBlackout => "scout-finishes-blackout",
+            Self::ScoutCabin => "scout-cabin",
+            Self::ScoutMounts => "scout-mounts",
+            Self::ScoutFabricator => "scout-fabricator",
+            Self::ScoutWorkBlackout => "scout-work-blackout",
+            Self::ScoutArchive => "scout-archive",
+            Self::ScoutRecovery => "scout-recovery",
             Self::FlightRegression => "flight-regression",
             Self::CargoFlight => "cargo-flight",
             Self::CargoBlackout => "cargo-blackout",
@@ -216,6 +291,105 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ScoutLighting
+        | Scenario::ScoutLightingShutter
+        | Scenario::ScoutLightingBlackout
+        | Scenario::ScoutLightingBroken
+        | Scenario::ScoutLightingDark => {
+            let shutter = matches!(
+                config.scenario,
+                Scenario::ScoutLightingShutter | Scenario::ScoutLightingBlackout
+            );
+            crate::session::cabin::evidence_initial_conditions(
+                app,
+                if shutter {
+                    "scout-lighting-shutter"
+                } else {
+                    "scout-finishes"
+                },
+            )?;
+            if matches!(
+                config.scenario,
+                Scenario::ScoutLightingBlackout | Scenario::ScoutLightingDark
+            ) {
+                app.ship.set_stored_core_energy_joules(0);
+            }
+            if config.scenario == Scenario::ScoutLightingBroken {
+                app.lighting.rooms.get_mut(&1).unwrap().operable[2] = false;
+            }
+            if config.scenario == Scenario::ScoutLightingDark {
+                let mut pose = app.ship.snapshot().pose;
+                pose.position_meters[2] += 100_000_000.;
+                app.ship = ShipController::flying(pose, 0);
+                app.ship.set_stored_core_energy_joules(0);
+                app.habitation.cabin.as_mut().unwrap().motions[3].fraction = 0.;
+                app.habitation.cabin.as_mut().unwrap().motions[3].opening = false;
+            }
+        }
+
+        Scenario::ConstructionModule
+        | Scenario::ConstructionModuleUpgrade
+        | Scenario::ConstructionModuleRestore => {
+            crate::session::construction::evidence_module(
+                app,
+                match config.scenario {
+                    Scenario::ConstructionModuleUpgrade => 1,
+                    Scenario::ConstructionModuleRestore => 2,
+                    _ => 0,
+                },
+            )?;
+        }
+        Scenario::ConstructionRoom => crate::session::construction::evidence_room(app)?,
+        Scenario::ConstructionInterlocks => {
+            crate::session::construction::evidence_room(app)?;
+            app.command(crate::session::Command::Interact);
+            app.building.active = false;
+            app.ship.toggle_door();
+            app.advance_automation(Duration::from_secs(3));
+            app.character.enter_cockpit();
+            // Explicit fixture view; subsequent takeoff uses production admission.
+            app.command(crate::session::Command::Look(
+                -std::f64::consts::PI / 0.0022,
+                0.,
+            ));
+            app.feedback = None;
+        }
+        Scenario::ConstructionMaterials | Scenario::ConstructionBuild => {
+            crate::session::construction::evidence_initial_conditions(
+                app,
+                config.scenario == Scenario::ConstructionBuild,
+            )?
+        }
+        Scenario::ScoutCoreUpgrade | Scenario::ScoutCoreUpgradePowered => {
+            crate::session::core_upgrades::evidence_initial_conditions(
+                app,
+                config.scenario == Scenario::ScoutCoreUpgradePowered,
+            )?;
+        }
+        Scenario::ScoutFinishes | Scenario::ScoutFinishesBlackout => {
+            crate::session::cabin::evidence_initial_conditions(app, "scout-finishes")?;
+            if config.scenario == Scenario::ScoutFinishesBlackout {
+                app.ship.set_stored_core_energy_joules(0);
+            }
+        }
+        Scenario::ScoutCabin
+        | Scenario::ScoutCabinBunk
+        | Scenario::ScoutCabinLocker
+        | Scenario::ScoutCabinTable => {
+            crate::session::cabin::evidence_initial_conditions(app, config.scenario.name())?;
+        }
+        Scenario::ScoutMounts => {
+            crate::session::mounts::evidence_initial_conditions(app)?;
+        }
+        Scenario::ScoutRecovery => {
+            crate::scout_walkthrough::recovery_initial_conditions(app)?;
+        }
+        Scenario::ScoutArchive => {
+            crate::scout_walkthrough::archive_initial_conditions(app)?;
+        }
+        Scenario::ScoutFabricator | Scenario::ScoutWorkBlackout => {
+            crate::scout_walkthrough::initialize(app, config.scenario)?;
+        }
         Scenario::FlightRegression
         | Scenario::CargoFlight
         | Scenario::CargoBlackout
@@ -367,9 +541,11 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     if matches!(
         config.scenario,
         Scenario::FlightRegression
+            | Scenario::ScoutLightingDark
             | Scenario::CargoFlight
             | Scenario::CargoBlackout
             | Scenario::CoreRestart
+            | Scenario::ScoutWorkBlackout
             | Scenario::CrashRecovery
             | Scenario::TerrainEarthApproach
             | Scenario::TerrainMoonApproach

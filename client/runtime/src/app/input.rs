@@ -153,6 +153,40 @@ pub(crate) fn dispatch_session_key(
 ) {
     use crate::session::Command;
     if pressed
+        && session.view_mode == crate::session::ViewMode::Gameplay
+        && !session.is_paused()
+        && !session.archive_reader.open
+        && !session.crafting_ui.open
+        && !session.wheel.open
+    {
+        use crate::session::construction::BuildAction as B;
+        let action = match key {
+            PhysicalKey::Code(KeyCode::KeyC) => Some(B::Toggle),
+            PhysicalKey::Code(KeyCode::Escape) if session.building.active => Some(B::Toggle),
+            PhysicalKey::Code(KeyCode::KeyR) if session.building.active => Some(B::Rotate),
+            PhysicalKey::Code(KeyCode::KeyG) if session.building.active => Some(B::Module),
+            PhysicalKey::Code(KeyCode::KeyT) if session.building.active => Some(B::StopResume),
+            PhysicalKey::Code(KeyCode::Delete) if session.building.active => {
+                Some(B::RemovePartition)
+            }
+            PhysicalKey::Code(code) if session.building.active => match code {
+                KeyCode::Digit1 => Some(B::Select(0)),
+                KeyCode::Digit2 => Some(B::Select(1)),
+                KeyCode::Digit3 => Some(B::Select(2)),
+                KeyCode::Digit4 => Some(B::Select(3)),
+                KeyCode::Digit5 => Some(B::Select(4)),
+                KeyCode::Digit6 => Some(B::Select(5)),
+                KeyCode::Digit7 => Some(B::Select(6)),
+                _ => None,
+            },
+            _ => None,
+        };
+        if let Some(action) = action {
+            session.command(Command::Build(action));
+            return;
+        }
+    }
+    if pressed
         && key == PhysicalKey::Code(KeyCode::Escape)
         && session.view_mode == crate::session::ViewMode::Gameplay
     {
@@ -252,6 +286,19 @@ pub(crate) fn dispatch_session_key(
         Some(Command::ToggleView)
     } else if session.view_mode != crate::session::ViewMode::Gameplay {
         camera_command(ElementState::Pressed, false, key, true).map(Command::Camera)
+    } else if let PhysicalKey::Code(
+        code @ (KeyCode::F4 | KeyCode::F5 | KeyCode::F6 | KeyCode::F7 | KeyCode::F8 | KeyCode::F9),
+    ) = key
+    {
+        use crate::session::lighting::LightAction::*;
+        Some(Command::Light(match code {
+            KeyCode::F4 => Preset,
+            KeyCode::F5 => Master,
+            KeyCode::F6 => Fixture,
+            KeyCode::F7 => Brightness,
+            KeyCode::F9 => General,
+            _ => Warmth,
+        }))
     } else if key == PhysicalKey::Code(KeyCode::KeyH) {
         Some(Command::InspectVitals)
     } else if key == PhysicalKey::Code(KeyCode::KeyE) {
@@ -266,6 +313,46 @@ pub(crate) fn dispatch_session_key(
         Some(Command::Throttle(direction, true))
     } else if let Some(slot) = toolbar_slot(key) {
         Some(Command::Select(slot))
+    } else if key == PhysicalKey::Code(KeyCode::KeyI) {
+        Some(Command::CoreUpgrade(
+            crate::session::core_upgrades::CoreUpgradeAction::ToggleInput,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyY) {
+        Some(Command::CoreUpgrade(
+            crate::session::core_upgrades::CoreUpgradeAction::Apply,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyN) {
+        Some(Command::CoreUpgrade(
+            crate::session::core_upgrades::CoreUpgradeAction::Recover,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyV) {
+        Some(Command::Finish(
+            crate::session::finishes::FinishAction::SelectGroup,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyO) {
+        Some(Command::Finish(
+            crate::session::finishes::FinishAction::Next,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyZ) {
+        Some(Command::Finish(
+            crate::session::finishes::FinishAction::Reset,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyG) {
+        Some(Command::Mount(crate::session::mounts::MountAction::Place))
+    } else if key == PhysicalKey::Code(KeyCode::KeyX) {
+        Some(Command::Cabin(crate::session::cabin::CabinAction::Rest))
+    } else if key == PhysicalKey::Code(KeyCode::KeyU) {
+        Some(Command::Cabin(
+            crate::session::cabin::CabinAction::Restraint,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyJ) {
+        Some(Command::Mount(
+            crate::session::mounts::MountAction::MoveAccessory,
+        ))
+    } else if key == PhysicalKey::Code(KeyCode::KeyK) {
+        Some(Command::Mount(
+            crate::session::mounts::MountAction::ToggleLock,
+        ))
     } else if key == PhysicalKey::Code(KeyCode::KeyF) {
         Some(Command::GrabDrop(true))
     } else {

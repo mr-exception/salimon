@@ -22,13 +22,20 @@ pub(crate) struct Grid {
     origin: [f64; 3],
     radii: Vec<f64>,
     obsolete_cells: bool,
+    seen: Vec<u32>,
+    query_epoch: u32,
 }
 impl Grid {
     pub(crate) fn reset(&mut self, pieces: &[ObjectState], gap: f64) {
+        self.seen.resize(pieces.len(), 0);
         self.radii.clear();
         self.radii.extend(pieces.iter().map(|p| p.radius));
         self.radii.sort_unstable_by(f64::total_cmp);
-        let cell = (2.0 * self.radii.get(pieces.len() / 2).copied().unwrap_or(1.0)).max(1e-6);
+        // The upper quartile keeps ordinary larger members of mixed populations
+        // in a few buckets without letting one extreme outlier set the grid.
+        // Exact radius AABBs/fallback still decide every candidate.
+        let quartile = pieces.len() - pieces.len().div_ceil(4);
+        let cell = (2.0 * self.radii.get(quartile).copied().unwrap_or(1.0)).max(1e-6);
         let reuse = self.cell == cell && self.bounds.len() == pieces.len();
         self.cell = cell;
         self.origin = pieces.first().map_or([0.0; 3], |p| p.position);
@@ -115,7 +122,7 @@ impl Grid {
         self.bounds[i] = next;
         self.insert(i);
     }
-    pub(crate) fn query(&self, i: usize, reach: f64, out: &mut Vec<usize>) {
+    pub(crate) fn query(&mut self, i: usize, reach: f64, out: &mut Vec<usize>) {
         out.clear();
         #[cfg(test)]
         if BRUTE_FORCE.with(|flag| flag.get()) {
@@ -125,19 +132,43 @@ impl Grid {
         let mut b = self.bounds[i];
         b.lo = b.lo.map(|v| v - reach);
         b.hi = b.hi.map(|v| v + reach);
-        if let Some((lo, hi)) = self.keys(b) {
+        self.query_epoch = self.query_epoch.wrapping_add(1);
+        if self.query_epoch == 0 {
+            self.seen.fill(0);
+            self.query_epoch = 1;
+        }
+        let keys = self.keys(b);
+        let epoch = self.query_epoch;
+        let seen = &mut self.seen;
+        let bounds = &self.bounds;
+        let mut visit = |j: usize| {
+            // Radius AABBs occupy multiple buckets. Test each snapshot only once
+            // per query, before overlap filtering and sorting. No pair cache or
+            // absence survives a query, so correction-created contacts stay visible.
+            if seen[j] != epoch {
+                seen[j] = epoch;
+                if j != i && b.overlaps(bounds[j]) {
+                    out.push(j);
+                }
+            }
+        };
+        if let Some((lo, hi)) = keys {
             Self::each_key(lo, hi, |key| {
                 if let Some(bucket) = self.cells.get(&key) {
-                    out.extend(bucket.iter().copied());
+                    for &j in bucket {
+                        visit(j);
+                    }
                 }
             });
-            out.extend(self.large.iter().copied());
+            for &j in &self.large {
+                visit(j);
+            }
         } else {
-            out.extend(0..self.bounds.len());
+            for j in 0..self.bounds.len() {
+                visit(j);
+            }
         }
-        out.retain(|&j| j != i && b.overlaps(self.bounds[j]));
         out.sort_unstable();
-        out.dedup();
     }
     pub(crate) fn overlaps(&self, i: usize, j: usize) -> bool {
         self.bounds[i].overlaps(self.bounds[j])
@@ -167,6 +198,32 @@ mod tests {
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 2.0,
+        }
+    }
+    #[test]
+    fn duplicate_buckets_and_epoch_rollover_match_exact_sorted_bounds() {
+        let pieces: Vec<_> = (0..80)
+            .map(|i| {
+                let mut p = cube([(i % 10) as f64 * 0.03, 1.0, (i / 10) as f64 * 0.03], 0.1);
+                p.radius = if i % 4 == 0 { 0.3 } else { 0.01 };
+                p
+            })
+            .collect();
+        let mut grid = Grid::default();
+        grid.reset(&pieces, 0.0);
+        let mut actual = Vec::new();
+        for reach in [0.0, 0.2, 100.0] {
+            grid.query_epoch = u32::MAX - 1;
+            for i in 0..pieces.len() {
+                let mut bounds = grid.bounds[i];
+                bounds.lo = bounds.lo.map(|v| v - reach);
+                bounds.hi = bounds.hi.map(|v| v + reach);
+                let expected: Vec<_> = (0..pieces.len())
+                    .filter(|&j| j != i && bounds.overlaps(grid.bounds[j]))
+                    .collect();
+                grid.query(i, reach, &mut actual);
+                assert_eq!(actual, expected);
+            }
         }
     }
     fn reference(pieces: &mut [ObjectState], delta: Duration) -> crate::StepStats {

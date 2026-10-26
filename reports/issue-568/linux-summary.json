@@ -1,0 +1,363 @@
+{
+  "source_revision": "e863ded7e6eb60f7da53483d52ac6a73874a09be",
+  "tracked_clean_at_start_and_end": true,
+  "hosted_periodic_dispatch": "denied HTTP 403; not a hosted pass",
+  "steps": [
+    {
+      "step": "rust-components",
+      "exit_code": 0,
+      "command": [
+        "rustup",
+        "component",
+        "add",
+        "rustfmt",
+        "clippy"
+      ],
+      "finished_utc": "2026-10-24T00:04:08.241218+00:00"
+    },
+    {
+      "step": "npm",
+      "exit_code": 0,
+      "command": [
+        "npm",
+        "ci",
+        "--prefix",
+        "models/tools/gltf",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "finished_utc": "2026-10-24T00:04:08.868006+00:00"
+    },
+    {
+      "step": "models",
+      "exit_code": 0,
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "models/tests",
+        "-v"
+      ],
+      "finished_utc": "2026-10-24T00:04:33.191805+00:00"
+    },
+    {
+      "step": "scripts",
+      "exit_code": 0,
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "finished_utc": "2026-10-24T00:04:37.899996+00:00"
+    },
+    {
+      "step": "format",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "finished_utc": "2026-10-24T00:04:39.143763+00:00"
+    },
+    {
+      "step": "clippy",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "finished_utc": "2026-10-24T00:06:27.158717+00:00"
+    },
+    {
+      "step": "workspace",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--locked"
+      ],
+      "finished_utc": "2026-10-24T00:14:43.801175+00:00"
+    },
+    {
+      "step": "persistence",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "persistence_extended",
+        "--",
+        "--ignored"
+      ],
+      "finished_utc": "2026-10-24T00:14:47.520814+00:00"
+    },
+    {
+      "step": "glb",
+      "exit_code": 0,
+      "command": [
+        "python",
+        "models/tools/process_glb.py",
+        "all",
+        "--profile",
+        "exact-v1",
+        "--output",
+        "artifacts/glb"
+      ],
+      "finished_utc": "2026-10-24T00:14:57.542647+00:00"
+    },
+    {
+      "step": "importer",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-renderer",
+        "--locked",
+        "offline_glb_candidate",
+        "--",
+        "--ignored"
+      ],
+      "finished_utc": "2026-10-24T00:16:08.989606+00:00"
+    },
+    {
+      "step": "headless-resource",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-renderer",
+        "--locked",
+        "headless_resource",
+        "--",
+        "--ignored"
+      ],
+      "finished_utc": "2026-10-24T00:16:10.201513+00:00"
+    },
+    {
+      "step": "build",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "--workspace",
+        "--locked"
+      ],
+      "finished_utc": "2026-10-24T00:20:02.378823+00:00"
+    },
+    {
+      "step": "baseline",
+      "exit_code": 0,
+      "command": [
+        "timeout",
+        "600",
+        "xvfb-run",
+        "-a",
+        "-s",
+        "-screen 0 1280x800x24",
+        "python",
+        "scripts/salimon-test",
+        "suite",
+        "--summary",
+        "--binary",
+        "/target/release/salimon-client"
+      ],
+      "finished_utc": "2026-10-24T00:26:33.152774+00:00"
+    },
+    {
+      "step": "evidence",
+      "exit_code": 0,
+      "command": [
+        "timeout",
+        "1200",
+        "xvfb-run",
+        "-a",
+        "-s",
+        "-screen 0 1280x800x24",
+        "python",
+        "scripts/salimon-test",
+        "suite",
+        "--evidence",
+        "--summary",
+        "--binary",
+        "/target/release/salimon-client",
+        "--screenshot-command",
+        "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
+      ],
+      "finished_utc": "2026-10-24T00:36:03.478135+00:00"
+    },
+    {
+      "step": "corpus",
+      "exit_code": 0,
+      "command": [
+        "timeout",
+        "900",
+        "xvfb-run",
+        "-a",
+        "-s",
+        "-screen 0 1280x800x24",
+        "python",
+        "scripts/model_visual_tests.py",
+        "capture",
+        "--binary",
+        "/target/release/salimon-client"
+      ],
+      "finished_utc": "2026-10-24T00:36:50.792653+00:00"
+    },
+    {
+      "step": "temporal",
+      "exit_code": 0,
+      "command": [
+        "python",
+        "scripts/model_visual_tests.py",
+        "compare",
+        "--temporal-only"
+      ],
+      "finished_utc": "2026-10-24T00:36:58.358748+00:00"
+    },
+    {
+      "step": "appearance",
+      "exit_code": 3,
+      "command": [
+        "python",
+        "scripts/model_visual_tests.py",
+        "compare",
+        "--reviewed",
+        "--baselines",
+        "scenarios/visual/baselines/software-vulkan-option-a-v2"
+      ],
+      "finished_utc": "2026-10-24T00:37:05.325241+00:00"
+    },
+    {
+      "step": "package",
+      "exit_code": 0,
+      "command": [
+        "python",
+        "scripts/build_game.py",
+        "--profile",
+        "release",
+        "--output",
+        "artifacts/build/release"
+      ],
+      "finished_utc": "2026-10-24T00:40:17.095782+00:00"
+    },
+    {
+      "step": "packaged-smoke",
+      "exit_code": 0,
+      "command": [
+        "timeout",
+        "300",
+        "xvfb-run",
+        "-a",
+        "-s",
+        "-screen 0 1920x1080x24",
+        "python",
+        "scripts/packaged_smoke.py",
+        "--binary",
+        "artifacts/build/release/salimon-client",
+        "--timeout",
+        "90"
+      ],
+      "finished_utc": "2026-10-24T00:40:18.626294+00:00"
+    },
+    {
+      "step": "experience",
+      "exit_code": 3,
+      "command": [
+        "python",
+        "scripts/experience_suite.py",
+        "--output",
+        "artifacts/experience-568"
+      ],
+      "finished_utc": "2026-10-24T00:40:26.248472+00:00"
+    },
+    {
+      "step": "balance",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "survival_balance",
+        "--locked"
+      ],
+      "finished_utc": "2026-10-24T00:40:27.069258+00:00"
+    },
+    {
+      "step": "tracked-clean",
+      "exit_code": 0,
+      "command": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "finished_utc": "2026-10-24T00:40:27.147674+00:00"
+    }
+  ],
+  "graphical_baseline_cases": 39,
+  "graphical_evidence_cases": 47,
+  "corpus_images": 128,
+  "temporal_fixture_summaries": {
+    "core": {
+      "passed": true,
+      "comparisons": 2
+    },
+    "contacts": {
+      "passed": true,
+      "comparisons": 4
+    },
+    "resources": {
+      "passed": true,
+      "comparisons": 22
+    },
+    "moving": {
+      "passed": true,
+      "comparisons": 16
+    },
+    "cockpit": {
+      "passed": true,
+      "comparisons": 16
+    },
+    "exterior": {
+      "passed": true,
+      "comparisons": 2
+    },
+    "static": {
+      "passed": true,
+      "comparisons": 4
+    },
+    "ramp": {
+      "passed": true,
+      "comparisons": 10
+    },
+    "interior": {
+      "passed": true,
+      "comparisons": 10
+    }
+  }
+}

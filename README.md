@@ -26,6 +26,11 @@ door, and radial surface traversal.
 
 ## Source of requirements
 
+Verification follows the [cloud and human workflow](docs/verification-workflow.md):
+AI runs reproducible cloud checks and delivers a PR; instructed human reviews
+return evidence to Codex. Routine feature delivery does not require M1 access.
+Hardware-specific performance and platform claims retain their actual context.
+
 The [project documents](docs/README.md) and
 [GitHub issues](https://github.com/mr-exception/salimon/issues) are the source of
 truth. Start with the [current scope](docs/project-phases.md),
@@ -340,3 +345,12 @@ The [permanent awakening definition](docs/universe-starting-system.md) freezes
 Nacre Reach / Vesper, its >=30 ly Earth-distance proof and versioned starting
 surface/resources. Reproduce its manifest/audit with the portable `starting_system`
 example; real-scale playable startup and native verification remain downstream.
+
+Cabin controls: aim + E operates furniture; X sits/lies or gets up; U secures/releases the restraint. See [cabin mechanisms](docs/cabin-mechanisms.md).
+
+Room appearance: aim at galley/door controls and use V to select group, O to cycle color, Z to reset. O/Z on bunk, seat, table or locker controls that item. See [room finishes](docs/room-finishes.md).
+
+Core upgrades: aim at Core, I switches Fuel/Upgrade Materials; E contributes, Y applies a complete upgrade instantly, N recovers a pending fragment. See [tiers and material costs](docs/core-upgrades.md).
+
+
+Optional construction: C → 7 places a utility processor; feed 3 kg iron with E and wait 60 active seconds. Aim at its completed case with C open and press G to plan an upgrade or restoration. Fully funded maintenance disables its recovery bonus until commissioning. See [costs, power and saved downtime](docs/non-core-modules.md).

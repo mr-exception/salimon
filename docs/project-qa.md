@@ -82,12 +82,14 @@ owns validation, identity conflicts, exact continuation and offline freeze.
 
 ### When can the native Metal candidates become approved baselines?
 
-The 2026-10-21 [#314 delivery](../reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#477](https://github.com/mr-exception/salimon/issues/477) owns these remaining decisions/checks, coordinating #453. Source issue closure grants no appearance or interpolation acceptance.
+The 2026-10-21 [#314 delivery](../reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#561](https://github.com/mr-exception/salimon/issues/561) owns human corpus decisions/review, with #557 physical platform checks and #568 cloud automation. Earlier #477/#453 findings remain dated evidence. Source issue closure grants no appearance or interpolation acceptance.
 
-Scout #463 lighting is a bounded presentation proposal pending image/readability and matched frame-budget review in [#483](https://github.com/mr-exception/salimon/issues/483). Its cool blackout floor is visibility fill, not emergency electrical energy. Native #451/#477 captures from older shaders do not approve this change.
+Scout #463 lighting is a bounded presentation proposal: #483/#566 own cloud capture/regression/timing evidence, #561 human image/readability review and #563 hardware budget decisions under the [verification workflow](verification-workflow.md). Its cool blackout floor is visibility fill, not emergency electrical energy. Native #451/#477 captures from older shaders do not approve this change.
 
-Scout #465 native timbre/mix, chunk continuity/latency and matched audio-on/off
-frame costs remain [#485](https://github.com/mr-exception/salimon/issues/485).
+Scout #465 cloud synthesis/routing/playback lifecycle and matched audio-on/off
+measurements remain [#485](https://github.com/mr-exception/salimon/issues/485);
+human timbre/mix/listening review is #561, physical OS playback/device checks
+#557 and hardware budget decisions #563.
 Portable synthesis is bounded but cannot grant listening or M1 performance
 acceptance; the minimal shared OS playback seam may need a continuous backend.
 
@@ -117,3 +119,21 @@ production snapshot approval after #513 private-development/evidence-gate delive
 The owner chose private development only; production eligibility remains blocked
 until the source-review checklist is resolved. Closing either source issue grants
 no appearance or production-data approval.
+
+## Approved construction economy (#543, owner decision 2026-10-24)
+
+The owner explicitly answered “Approve the proposed catalog” in this chat on
+2026-10-24. The catalog is now `approved_economy:true`; #543 may accept physical
+materials. Timed construction still belongs to #544.
+The authored `client/runtime/catalogs/blueprints.json` is the single source:
+stool 1 kg Iron / 10 s; partition 5 kg / 20 s; internal door 5 kg / 30 s;
+hull cell 20 kg / 120 s; deck cell 15 kg / 90 s; two-deck room 40 kg / 300 s;
+utility module 3 kg / 60 s. These are approved gameplay parameters, not a measured
+acquisition-route or subjective play-balance result.
+Fine-grid pitch is per blueprint (currently 0.5 m); the structural lattice stays
+3 m. B02 does not authorize occupied-room demolition or structural completion.
+
+
+## Core upgrade balance — owner direction 2026-10-24 (#548)
+
+The owner answered the unresolved-values question with “guess them yourself” and asked for balanced costs so play is neither too grindy nor too easy. This explicitly authorizes the reviewable data catalog: 90/120/180 GJ, incremental iron/silicate costs 20/10, 30/10, 40/20 kg. Rationale, exact source/transaction semantics and limits are in [Core upgrades](core-upgrades.md). These are selected gameplay parameters, not empirical material measurements, a measured playtest, or blanket approval of the unrelated construction economy.

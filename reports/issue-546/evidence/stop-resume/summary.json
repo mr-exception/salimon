@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/construction-interlocks.json",
+  "status": "passed",
+  "steps_completed": 21,
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/workspace/salimon/artifacts/546/final/run-fsuximar",
+  "setup": {
+    "scenario": "construction-room",
+    "seed": 546,
+    "step_ms": 100
+  },
+  "duration_ms": 6508,
+  "game_exit_code": -15,
+  "result_file": "/workspace/salimon/artifacts/546/final/run-fsuximar/result.json",
+  "raw_result": "result.json.gz"
+}

@@ -9,6 +9,8 @@ use salimon_world::{CelestialBodyId, WorldSnapshot};
 
 pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
     ShipMeshInstance {
+        lighting: Default::default(),
+        finish_tints: [[[1.; 3]; 5]; 2],
         machinery: Default::default(),
         fabricator_output_present: false,
         fabricator_output_medical: false,
@@ -16,6 +18,8 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
         position_meters: ship.pose.position_meters,
         orientation: ship.pose.orientation.map(|value| value as f32),
         door_open_fraction: ship.door_open_fraction as f32,
+        bunk_open_fraction: 0.0,
+        independent_interior: false,
         instruments: CockpitInstruments {
             engines_off: !ship.engines_enabled,
             fabricator: Default::default(),
@@ -104,6 +108,7 @@ pub(super) fn map_world_to_renderer(
         .precision_markers
         .iter()
         .map(|marker| SceneInstance {
+            orientation: [0., 0., 0., 1.],
             center_meters: marker.absolute_center.meters(),
             half_extents_meters: marker.half_extents_meters,
             color: marker.color,
@@ -120,6 +125,146 @@ pub(super) fn map_world_to_renderer(
     };
 
     (camera, instances, spheres, light)
+}
+
+/// Map paid-progress edges and completed shared structural/furnishing solids into the ordinary
+/// oriented instance pass. Session-owned solids also feed physical collision.
+pub(super) fn construction_wireframes(
+    session: &crate::session::GameplaySession,
+    frame: salimon_character::ShipFrame,
+    orientation: [f32; 4],
+) -> Vec<SceneInstance> {
+    let mut result = Vec::new();
+    for b in session.construction_solids() {
+        // Material bands reveal shared physical deck/panel/tread geometry even
+        // inside an unlit prototype room. Color does not grant collision.
+        let height = b[3] - b[2];
+        let color = if b[0] >= -7.04 {
+            [0.32, 0.36, 0.39, 1.]
+        } else if height > 0.12 && height < 0.22 && b[1] - b[0] < 0.16 && b[5] - b[4] < 0.16 {
+            [0.75, 0.48, 0.18, 1.]
+        } else if height <= 0.111 {
+            if (b[3] - salimon_character::SHIP_FLOOR_HEIGHT_METERS).rem_euclid(3.) < 0.01 {
+                [0.10, 0.14, 0.18, 1.]
+            } else {
+                [0.30, 0.36, 0.39, 1.]
+            }
+        } else if b[1] - b[0] < 0.32 && b[5] - b[4] > 0.9 && height < 3.01 {
+            [0.38, 0.30, 0.20, 1.]
+        } else {
+            [0.15, 0.20, 0.24, 1.]
+        };
+        result.push(SceneInstance {
+            center_meters: frame.local_to_world([
+                (b[0] + b[1]) / 2.,
+                (b[2] + b[3]) / 2.,
+                (b[4] + b[5]) / 2.,
+            ]),
+            half_extents_meters: [
+                ((b[1] - b[0]) / 2.) as f32,
+                ((b[3] - b[2]) / 2.) as f32,
+                ((b[5] - b[4]) / 2.) as f32,
+            ],
+            color,
+            orientation,
+        });
+    }
+    for (space, color) in session.construction_boxes() {
+        for axis in 0..3 {
+            let other: Vec<_> = (0..3).filter(|i| *i != axis).collect();
+            for a in [space.min[other[0]], space.max[other[0]]] {
+                for b in [space.min[other[1]], space.max[other[1]]] {
+                    let mut center = std::array::from_fn(|i| (space.min[i] + space.max[i]) / 2.);
+                    center[other[0]] = a;
+                    center[other[1]] = b;
+                    let mut half = [0.012; 3];
+                    half[axis] = ((space.max[axis] - space.min[axis]) / 2.) as f32;
+                    result.push(SceneInstance {
+                        center_meters: frame.local_to_world(center),
+                        half_extents_meters: half,
+                        color,
+                        orientation,
+                    });
+                }
+            }
+        }
+    }
+    result
+}
+
+/// Visible housings and diffusers share the effective electrical source state.
+pub(super) fn room_lamps(
+    session: &crate::session::GameplaySession,
+    ship: ShipSnapshot,
+) -> Vec<SceneInstance> {
+    let frame = crate::session::frames::character_ship_frame(ship.pose);
+    let lights = session.lighting_dto();
+    let mut out = Vec::new();
+    for i in 0..5 {
+        let p = crate::session::lighting::POSITIONS[i];
+        for (y, half, color) in [
+            (0., [0.12, 0.025, 0.06], [0.10, 0.11, 0.13, 1.]),
+            (
+                -0.027,
+                [0.09, 0.004, 0.04],
+                [
+                    0.015 + lights.colors[i][0] * 1.7,
+                    0.018 + lights.colors[i][1] * 1.7,
+                    0.02 + lights.colors[i][2] * 1.7,
+                    1.,
+                ],
+            ),
+        ] {
+            out.push(SceneInstance {
+                center_meters: frame.local_to_world([
+                    f64::from(p[0]),
+                    f64::from(p[1] + y),
+                    f64::from(p[2]),
+                ]),
+                half_extents_meters: half,
+                color,
+                orientation: ship.pose.orientation.map(|v| v as f32),
+            });
+        }
+    }
+    out
+}
+
+/// Bounded procedural mechanical leaves and fixed manual release grips. All
+/// geometry follows character-owned bounds; it carries no interaction authority.
+pub(super) fn cargo_door(
+    session: &crate::session::GameplaySession,
+    ship: ShipSnapshot,
+) -> Vec<SceneInstance> {
+    let frame = crate::session::frames::character_ship_frame(ship.pose);
+    let mut instances = Vec::with_capacity(4);
+    for b in salimon_character::cargo::cargo_door_leaves(session.cargo_door.open_fraction) {
+        instances.push(SceneInstance {
+            center_meters: frame.local_to_world([
+                (b[0] + b[1]) * 0.5,
+                (b[2] + b[3]) * 0.5,
+                (b[4] + b[5]) * 0.5,
+            ]),
+            half_extents_meters: [
+                (b[1] - b[0]) as f32 * 0.5,
+                (b[3] - b[2]) as f32 * 0.5,
+                (b[5] - b[4]) as f32 * 0.5,
+            ],
+            orientation: ship.pose.orientation.map(|v| v as f32),
+            color: [0.13, 0.15, 0.17, 1.0],
+        });
+    }
+    for x in [-0.14, 0.14] {
+        let mut p = salimon_character::cargo::CARGO_DOOR_TARGET;
+        p[0] += x;
+        instances.push(SceneInstance {
+            center_meters: frame.local_to_world(p),
+            half_extents_meters: [0.035, 0.14, 0.035],
+            orientation: ship.pose.orientation.map(|v| v as f32),
+            color: [0.45, 0.24, 0.10, 1.0],
+        });
+    }
+    instances
 }
 
 #[cfg(test)]

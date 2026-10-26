@@ -1,0 +1,18 @@
+{
+  "source": "cea243a5fc5b4f5d1b0f1dc0a61cf0ceaf7d439e",
+  "backend": "Vulkan",
+  "adapter": "Mesa llvmpipe 25.0.7 / LLVM 19.1.7",
+  "display": ":101 Xvfb",
+  "viewport": [
+    1280,
+    800
+  ],
+  "scale": 1,
+  "fixed_step_ms": 16,
+  "hashes": {
+    "target/release/salimon-client": "da62c888f12dc5ba1559e29dfa924bcc35acb342a1162a81de720f402367bc24",
+    "client/runtime/catalogs/blueprints.json": "c87be53f71ab58c4e78c481141357bf142cb6892c24ac418776473f0a39c9f8c",
+    "scenarios/evidence/blueprint-placement.json": "7eb70fec85e5b13238d9dd61fbd2ee38f4e173b759ffa4a57528743006867a8d",
+    "client/renderer/src/bootstrap.wgsl": "cf989c2e0ff65b5b0ca6fb8f76241cdd116ad4bbfb5a15fc2be3679bb46ab9f1"
+  }
+}

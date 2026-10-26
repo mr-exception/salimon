@@ -663,3 +663,79 @@ logging IO is measurement overhead, never free production performance. Frozen
 E2E reference scenes measure presentation without normal-play simulation work.
 See the [lighting report](../reports/issue-483/README.md) for exact context and
 limits. The logger never changes scheduling, input or GPU polling.
+
+## Scout machinery fixtures (#489)
+
+The opt-in `scout-fabricator` E2E setup begins landed near the physical machine
+with starter ingredients and the existing exact 2 kg carried fixture fragment.
+`scout-work-blackout` begins with a queued unfunded ration and the Core-restart
+held fragment/aim. Both validate their initial save source. Subsequent production
+intake/menu/step/collection commands have no test bypass. They never alter a
+normal player's save or imply physical mining/travel.
+`reports/issue-489/walkthrough.py` captures real GPU surfaces through the existing
+window adapter. Named `pedals-close` and `fabricator-close` cameras only change
+presentation; the original four Scout lighting/Blender cameras are unchanged.
+See [validation and limits](../reports/issue-489/README.md).
+
+## Archive cloud verification (#505)
+
+`--e2e --scenario scout-archive` starts with normal new-run source placed at the
+physical Archive; it does not open/read records. `inspect.archive` contains
+`source`, `open` and optional rendered `text`. `key: interact` maps to physical E
+for opening/closing through production dispatch. Existing `thruster_up/down`,
+`roll_left/right` and `wheel_next` map to arrows/Tab and navigate the reader.
+Use `reports/issue-505/verify.py --binary target/debug/salimon-client --output
+artifacts/new-505 --scale 1` under Xvfb/Vulkan for all seven records at both
+resolutions. Scales 1/1.5/2 are simulated via X11, not physical DPI evidence.
+
+## Recovery cloud verification (#515)
+
+`scout-recovery` explicitly starts with a held 2 kg iron identity and a 0.5 kg
+silicate bin, no module/job/progress. `key: recovery` maps to physical R through
+normal Archive dispatch; `inspect.recovery` is immutable source evidence. Use
+`reports/issue-515/verify.py --binary target/debug/salimon-client --output
+artifacts/new-515` under Xvfb/Vulkan. It drives intake, menu, funded craft, tray
+collection/installation, real cabin walking, R start/stop and both paid records.
+This fixture does not measure mining/acquisition, balance or physical OS input.
+
+The #566 collector adds the explicit `--profile cloud-llvmpipe-1280` admission
+profile for Xvfb 1280×800, scale1, Vulkan llvmpipe. The default M1/Metal profile
+remains strict. Both require100 consecutive focused, non-occluded, zero-tick
+frames and unchanged source/context. The X11 helper verifies exact target PID,
+focused window, viewable map state and geometry; it does not certify physical
+input or scanout. Every repeated frozen capture must have the same PNG hash.
+See [matched cloud lighting evidence](../reports/issue-566/README.md) for commands,
+all failures, expression-only control lineage and hardware-counter limitations.
+
+
+## Bounded native capture polling (#568)
+
+`--screenshot-command '["native"]'` requests the actual completed GPU color
+surface. The runner first requests real window restoration, then schedules the
+capture and polls `{"op":"inspect","scope":"capture"}`. Current executables
+return only `capture_status`, avoiding repeated large world/fragment snapshots;
+older executables ignore the optional scope and retain compatible full inspection.
+All envelopes, timeout limits, E2E gates and actual display/occlusion admission
+remain in force. Restoration is an actual logged window operation, never a
+synthetic focus flag. GPU images do not certify physical OS-input delivery.
+
+The native marker is never an external executable. After a scenario/protocol
+failure the runner retains checkpoint images, original error and last state;
+it reports a new native failure screenshot unavailable because a timed-out
+response may still be outstanding. It never issues a second request into a
+possibly desynchronized channel or hides the original failure with a PATH error.
+Contract tests cover bounded polling payload, original PNG validation, the native
+marker and failure-state preservation. Actual native corpus captures remain a
+separate required test. See [the #568 report](../reports/issue-568/README.md).
+
+Cabin evidence: `python3 scripts/salimon-test run scenarios/evidence/habitation-use.json --binary target/debug/salimon-client --screenshot-command '["native"]'` uses the explicit `scout-cabin` camera setup and production E/X/U commands.
+
+Finish evidence: `room-finishes.json`, `room-finishes-blackout.json`, and `furniture-finish.json` under `scenarios/evidence/` use production V/O/Z input after explicit camera setups. Named diagnostic views in `scenarios/visual/scout-finish-cameras.json` change presentation only. Native inspection reports actual ship resident vertex/uniform bytes and draw/triangle counts.
+
+Core upgrade evidence: `core-upgrade-blackout.json` and `core-upgrade-powered.json` under `scenarios/evidence/` use explicit two-receipt/one-carried-fragment seeds, then production I/E/Y inputs. They prove transaction/presentation behavior, not a mining or walked acquisition route.
+
+
+Construction flight readiness (#546): protocol key `construction_stop_resume` maps to native T while the C builder is active, using the same reachable project admission. Run `scenarios/evidence/construction-interlocks.json` for paid Stop/Resume/refund and `scenarios/evidence/construction-interlocks-cockpit.json` for cockpit takeoff refusal. See [the canonical contract](../docs/construction-flight-safety.md).
+
+
+Optional modules (#547): protocol `construction_module` maps to native G in the C builder. Run `scenarios/evidence/construction-module.json`, `construction-module-upgrade.json` and `construction-module-restore.json` for seeded installation, upgrade downtime/Stop/Resume and physical restoration. Each uses real E intake, paid work and commissioning. See [controls and setup limits](../docs/non-core-modules.md).

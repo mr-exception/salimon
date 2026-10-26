@@ -1,5 +1,8 @@
 # Scout Archive, data recovery and discovered navigation
 
+> **Future planetary field observations (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) adds proposed lightweight suit location/bearing marks with assisted, uncertain positioning, and review/editing through a physical Scout planetary chart. These extend **player-known observation** rather than canonical catalog, star-chart discovery or the existing automatic five-second scanner. No perfect planet GPS, automatic landmark POI reveal, new scan mode or autopilot is approved.
+
+
 Status: **Archive reader #467 and local Recovery Module #468 implemented; destination leads/charting remain future #469–470**. Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
 
 ## Physical Ship Archive

@@ -1,0 +1,620 @@
+{
+  "blackout-final": [
+    {
+      "screenshot": "fuel-intake",
+      "energy_core": {
+        "capacity_joules": 60000000000,
+        "stored_joules": 0
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Fuel",
+      "pending_ids": [
+        1,
+        2
+      ],
+      "applied": [],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 131,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 116.242,
+          "mean_ms": 18.592228900000002,
+          "min_ms": 5.819125,
+          "p95_ms": 116.242,
+          "samples": 10
+        },
+        "cpu_update": {
+          "max_ms": 38.793708,
+          "mean_ms": 4.535154,
+          "min_ms": 0.59525,
+          "p95_ms": 38.793708,
+          "samples": 10
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 2.173916,
+          "mean_ms": 1.2772128888888892,
+          "min_ms": 0.857125,
+          "p95_ms": 2.173916,
+          "samples": 9
+        },
+        "presented_interval": {
+          "max_ms": 45.06775,
+          "mean_ms": 19.884375,
+          "min_ms": 0.0,
+          "p95_ms": 45.06775,
+          "samples": 10
+        },
+        "samples": 10
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    },
+    {
+      "screenshot": "upgrade-material-intake",
+      "energy_core": {
+        "capacity_joules": 60000000000,
+        "stored_joules": 0
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Upgrade",
+      "pending_ids": [
+        1,
+        2
+      ],
+      "applied": [],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 127,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 2885.950625,
+          "mean_ms": 132.13912133333335,
+          "min_ms": 5.819125,
+          "p95_ms": 116.242,
+          "samples": 24
+        },
+        "cpu_update": {
+          "max_ms": 38.793708,
+          "mean_ms": 2.616203,
+          "min_ms": 0.512375,
+          "p95_ms": 9.228,
+          "samples": 24
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 2.173916,
+          "mean_ms": 1.1288260869565219,
+          "min_ms": 0.703333,
+          "p95_ms": 1.93075,
+          "samples": 23
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 68.40266154166666,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 24
+        },
+        "samples": 24
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    },
+    {
+      "screenshot": "materials-ready",
+      "energy_core": {
+        "capacity_joules": 60000000000,
+        "stored_joules": 0
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Upgrade",
+      "pending_ids": [
+        1,
+        2,
+        3
+      ],
+      "applied": [],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 77,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 2885.950625,
+          "mean_ms": 172.36155225714288,
+          "min_ms": 5.819125,
+          "p95_ms": 2786.1128750000003,
+          "samples": 35
+        },
+        "cpu_update": {
+          "max_ms": 38.793708,
+          "mean_ms": 2.253811771428571,
+          "min_ms": 0.512375,
+          "p95_ms": 9.228,
+          "samples": 35
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 3.567417,
+          "mean_ms": 1.443137235294118,
+          "min_ms": 0.703333,
+          "p95_ms": 3.52,
+          "samples": 34
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 92.63397982857143,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 35
+        },
+        "samples": 35
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    },
+    {
+      "screenshot": "instant-upgrade",
+      "energy_core": {
+        "capacity_joules": 90000000000,
+        "stored_joules": 0
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Upgrade",
+      "pending_ids": [],
+      "applied": [
+        {
+          "level": 1,
+          "ids": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 94,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 2966.057542,
+          "mean_ms": 178.72693458823528,
+          "min_ms": 5.819125,
+          "p95_ms": 2786.1128750000003,
+          "samples": 51
+        },
+        "cpu_update": {
+          "max_ms": 38.793708,
+          "mean_ms": 1.9820767254901965,
+          "min_ms": 0.501084,
+          "p95_ms": 9.228,
+          "samples": 51
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 3.567417,
+          "mean_ms": 1.5661858000000002,
+          "min_ms": 0.703333,
+          "p95_ms": 3.52,
+          "samples": 50
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 110.86629335294117,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 51
+        },
+        "samples": 51
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    }
+  ],
+  "powered-final": [
+    {
+      "screenshot": "fuel-intake",
+      "energy_core": {
+        "capacity_joules": 60000000000,
+        "stored_joules": 12345678
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Fuel",
+      "pending_ids": [
+        1,
+        2
+      ],
+      "applied": [],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 33,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 194.53875000000002,
+          "mean_ms": 25.243132545454547,
+          "min_ms": 5.819208000000001,
+          "p95_ms": 194.53875000000002,
+          "samples": 11
+        },
+        "cpu_update": {
+          "max_ms": 27.901625,
+          "mean_ms": 3.220897818181818,
+          "min_ms": 0.5714579999999999,
+          "p95_ms": 27.901625,
+          "samples": 11
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 2.512291,
+          "mean_ms": 1.0629627,
+          "min_ms": 0.777459,
+          "p95_ms": 2.512291,
+          "samples": 10
+        },
+        "presented_interval": {
+          "max_ms": 40.399959,
+          "mean_ms": 18.457435636363638,
+          "min_ms": 0.0,
+          "p95_ms": 40.399959,
+          "samples": 11
+        },
+        "samples": 11
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    },
+    {
+      "screenshot": "upgrade-material-intake",
+      "energy_core": {
+        "capacity_joules": 60000000000,
+        "stored_joules": 12345678
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Upgrade",
+      "pending_ids": [
+        1,
+        2
+      ],
+      "applied": [],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 72,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 3091.7056669999997,
+          "mean_ms": 133.48226438461538,
+          "min_ms": 5.764041,
+          "p95_ms": 194.53875000000002,
+          "samples": 26
+        },
+        "cpu_update": {
+          "max_ms": 27.901625,
+          "mean_ms": 2.0918285,
+          "min_ms": 0.517,
+          "p95_ms": 9.183584,
+          "samples": 26
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 2.715542,
+          "mean_ms": 1.2744899600000001,
+          "min_ms": 0.6961660000000001,
+          "p95_ms": 2.512291,
+          "samples": 25
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 63.100594538461536,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 26
+        },
+        "samples": 26
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    },
+    {
+      "screenshot": "materials-ready",
+      "energy_core": {
+        "capacity_joules": 60000000000,
+        "stored_joules": 12345678
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Upgrade",
+      "pending_ids": [
+        1,
+        2,
+        3
+      ],
+      "applied": [],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 38,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 3091.7056669999997,
+          "mean_ms": 177.30517448648646,
+          "min_ms": 5.764041,
+          "p95_ms": 3006.9908339999997,
+          "samples": 37
+        },
+        "cpu_update": {
+          "max_ms": 27.901625,
+          "mean_ms": 1.936349054054054,
+          "min_ms": 0.517,
+          "p95_ms": 10.0835,
+          "samples": 37
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 2.715542,
+          "mean_ms": 1.292699,
+          "min_ms": 0.6961660000000001,
+          "p95_ms": 2.512291,
+          "samples": 36
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 81.6544088108108,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 37
+        },
+        "samples": 37
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    },
+    {
+      "screenshot": "instant-upgrade",
+      "energy_core": {
+        "capacity_joules": 90000000000,
+        "stored_joules": 12345678
+      },
+      "total_mass_kg": 100030.0,
+      "mode": "Upgrade",
+      "pending_ids": [],
+      "applied": [
+        {
+          "level": 1,
+          "ids": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "ship_resources": {
+        "draws": 2,
+        "resident_vertex_bytes": 1625040,
+        "triangles": 6771,
+        "uniform_bytes": 352
+      },
+      "fixtures": {
+        "draws": 1,
+        "instance_capacity_bytes": 720,
+        "layout_version": 1,
+        "prepare_micros": 78,
+        "resident_geometry_bytes": 18128,
+        "triangles": 24,
+        "upload_bytes": 64,
+        "visible_instances": 1
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 3112.309208,
+          "mean_ms": 182.43864346296297,
+          "min_ms": 5.764041,
+          "p95_ms": 3006.9908339999997,
+          "samples": 54
+        },
+        "cpu_update": {
+          "max_ms": 27.901625,
+          "mean_ms": 1.7677090925925925,
+          "min_ms": 0.506458,
+          "p95_ms": 10.0835,
+          "samples": 54
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 5.6842500000000005,
+          "mean_ms": 1.3541186603773587,
+          "min_ms": 0.6961660000000001,
+          "p95_ms": 2.512291,
+          "samples": 53
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 98.10692824074074,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 54
+        },
+        "samples": 54
+      },
+      "window": {
+        "focused": false,
+        "inner_size": [
+          1280,
+          800
+        ],
+        "minimized": false,
+        "occluded": false
+      }
+    }
+  ]
+}

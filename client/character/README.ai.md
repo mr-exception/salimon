@@ -49,3 +49,37 @@ normalization/projection policy. Generated `spatial_contracts.rs` remains export
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).
+
+
+## Base habitation (#540)
+
+The bunk's two authored panels use the generated
+`habitation_geometry.rs` hinge/swept bounds, sourced from
+[the category definition](../../models/assets/ships/salimon-scout/habitation-geometry.json).
+The renderer maps a finite stowed/deployed fraction to rigid rotation and normals;
+runtime admits manual motion only after full player/belonging clearance. Static
+poses cost no repeated clearance scan. Reserved walking clearance is unchanged.
+Galley E opens the existing exact-identity consumable wheel, with no generated
+food or additional inventory; hygiene remains an inspectable base fixture.
+No water/hygiene meter, sleep-time advancement or additional survival benefit is
+introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
+remain #577. Schema 10 saves source motion; see
+[the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.

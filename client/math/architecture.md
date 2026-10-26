@@ -12,3 +12,10 @@ and universe-coordinate semantics remain in world. Renderer retains its
 interpolation and axes remain in ship; resource quaternion validation stays in
 world. See the canonical
 [decision and inventory](../../docs/technical-architecture.md#shared-math-decision-115).
+
+
+The six arithmetic primitives carry `#[inline]` so contact loops in dependent
+crates can optimize their existing expressions across the crate boundary (#592).
+Operation order, IEEE behavior, f64 types and APIs are unchanged; no fast-math,
+reassociation, FMA substitution or physics policy is introduced. Matched archived
+solver counters and terminal states accompany workspace checks in the task report.

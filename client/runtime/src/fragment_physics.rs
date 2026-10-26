@@ -5,7 +5,9 @@ use std::time::{Duration, Instant};
 use salimon_math::{dot, length, sub};
 
 use crate::mining::ResourceGameplay;
-use salimon_character::{SHIP_FLOOR_HEIGHT_METERS, ShipFrame, ship_floor_placement};
+#[cfg(test)]
+use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
+use salimon_character::ShipFrame;
 use salimon_world::resources::{FragmentId, ResourceTransform};
 use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
 
@@ -209,7 +211,9 @@ impl Measurements {
             matrix_allocations,
             activation_time,
             integration_time,
-            contact_time
+            contact_time,
+            grid_query_time,
+            grid_queries
         );
         self.adapter_time += next.adapter_time;
         self.total_time += next.total_time;
@@ -250,7 +254,45 @@ pub(crate) fn advance_measured(
     let states = &mut scratch.states;
     let ids = &scratch.ids;
     let solver_start = profile.then(Instant::now);
-    let contains = |position, radius| ship_floor_placement(position, radius).is_some();
+    let contains = |position, radius| {
+        (salimon_character::cargo::cargo_position_allowed(
+            position,
+            radius,
+            if tool.cargo_door_blocking { 0. } else { 1. },
+        ) || tool.modular_interior.allows_sphere(position, radius))
+            && tool.mount_geometry.mounts.iter().all(|m| {
+                let p = m.position();
+                !salimon_character::cargo::sphere_overlaps_box(
+                    position,
+                    (radius - 0.00001).max(0.),
+                    [
+                        p[0] - 0.5,
+                        p[0] + 0.5,
+                        p[1] - 0.03,
+                        p[1] + 0.03,
+                        p[2] - 0.175,
+                        p[2] + 0.175,
+                    ],
+                )
+            })
+            && tool.interior_solids.iter().all(|b| {
+                !salimon_character::cargo::sphere_overlaps_box(
+                    position,
+                    (radius - 0.00001).max(0.),
+                    *b,
+                )
+            })
+            && tool.secured.iter().all(|id| {
+                tool.session.fragment(*id).is_none_or(|f| {
+                    let p = tool
+                        .ship_fragments
+                        .get(id)
+                        .map(|p| p.meters())
+                        .unwrap_or_else(|| frame.world_to_local(f.transform().position().meters()));
+                    length(sub(position, p)) >= radius + sphere_radius(*f)
+                })
+            })
+    };
     measurements.solver = salimon_physics::advance_with_sleep(
         &mut tool.fragment_sleep,
         ids,
@@ -338,7 +380,9 @@ fn snapshots_into(
             .iter()
             .copied()
             .filter(|p| {
-                Some(p.id()) != carried && Some(p.id()) != tool.session.attached_sphere_id()
+                Some(p.id()) != carried
+                    && Some(p.id()) != tool.session.attached_sphere_id()
+                    && !tool.secured.contains(&p.id())
             })
             .filter(|p| {
                 // Ship advancement precedes final session-pose synchronization.
@@ -390,12 +434,34 @@ fn snapshots_into(
                         surface: if ship {
                             if tool.ship_gravity_disabled {
                                 Surface::UnpoweredFloor {
-                                    height_meters: SHIP_FLOOR_HEIGHT_METERS,
-                                    ceiling_meters: salimon_character::SHIP_CEILING_HEIGHT_METERS,
+                                    height_meters: fixture_support_height(
+                                        tool,
+                                        position,
+                                        sphere_radius(p),
+                                    ),
+                                    ceiling_meters: tool
+                                        .modular_interior
+                                        .volumes
+                                        .iter()
+                                        .filter(|b| {
+                                            position[0] >= b[0]
+                                                && position[0] <= b[1]
+                                                && position[2] >= b[4]
+                                                && position[2] <= b[5]
+                                                && position[1] >= b[2]
+                                                && position[1] <= b[3]
+                                        })
+                                        .map(|b| b[3] - 0.1)
+                                        .max_by(f64::total_cmp)
+                                        .unwrap_or(salimon_character::SHIP_CEILING_HEIGHT_METERS),
                                 }
                             } else {
                                 Surface::Floor {
-                                    height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                                    height_meters: fixture_support_height(
+                                        tool,
+                                        position,
+                                        sphere_radius(p),
+                                    ),
                                 }
                             }
                         } else {
@@ -453,6 +519,50 @@ fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
             center: body.center.meters(),
             radius: body.radius_meters,
         })
+}
+
+fn fixture_support_height(tool: &ResourceGameplay, position: [f64; 3], radius: f64) -> f64 {
+    let mut height = if tool.modular_interior.contains(position)
+        && !salimon_character::ship_contains_object(position)
+    {
+        tool.modular_interior
+            .support(position, radius, position[1] - radius + 0.001)
+            .unwrap_or_else(|| {
+                tool.modular_interior
+                    .volumes
+                    .iter()
+                    .map(|b| b[2])
+                    .min_by(f64::total_cmp)
+                    .unwrap_or(salimon_character::SHIP_FLOOR_HEIGHT_METERS)
+            })
+    } else {
+        salimon_character::cargo::cargo_support_height(position, radius)
+    };
+    for m in &tool.mount_geometry.mounts {
+        let p = m.position();
+        if (position[0] - p[0]).abs() + radius <= 0.5
+            && (position[2] - p[2]).abs() + radius <= 0.175
+            && position[1] >= p[1] + 0.03 + radius - 0.001
+        {
+            height = height.max(p[1] + 0.03);
+        }
+    }
+    for b in &tool.interior_solids {
+        if position[0] - radius >= b[0]
+            && position[0] + radius <= b[1]
+            && position[2] - radius >= b[4]
+            && position[2] + radius <= b[5]
+            && position[1] >= b[3] + radius - 0.001
+        {
+            height = height.max(b[3]);
+        }
+    }
+    height = height.max(
+        tool.modular_interior
+            .support(position, radius, position[1] - radius + 0.001)
+            .unwrap_or(height),
+    );
+    height
 }
 
 #[cfg(test)]

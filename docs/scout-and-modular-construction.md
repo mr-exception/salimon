@@ -1,6 +1,14 @@
 # Scout art direction and modular ship construction — approved design (2026-10-22)
 
+Verification uses the [cloud/human workflow](verification-workflow.md)
+(owner decision 2026-10-23). Routine implementation and integration acceptance
+run in cloud; human spatial/art review and actual platform qualification are
+separate. This supersedes blanket M1-only delivery gates without changing the
+approved construction rules or measured asset budgets.
+
 **Status:** owner-approved **future target and implementation contract**, **NOT a statement that these features already exist in the playable client**. This document consolidates the detailed Scout/art-direction and 3D construction design review. Delivery is tracked by [#538–#551](https://github.com/mr-exception/salimon/issues/538) (individual links at the end). The current asset dimensions, anchors, 100-tonne dry-mass baseline and rendering budgets remain authoritative *for currently implemented code* until deliberately changed and reverified.
+
+**Detailed Scout interior target (2026-10-23):** The approved [interior art direction and habitation presentation](scout-interior-art-direction.md) refines the future starter's sleeping nook, selective glazing and primary observation window, fold-away seating/table, physical belongings and recessed/exposed mounting rails, room finishes/lighting, localized aging and clean repair presentation, tactile animations, continuous sound and lightweight acoustic separation. These define the approved target. Physical mounts (#576), expanded manual cabin use (#577), persistent finish groups (#579) and instant Core upgrades (#548) now have linked implementation contracts below; remaining lighting, ageing/damage and audio features retain their separate owners. No implementation claim grants reference-hardware or human appearance approval. Existing structural grid, cargo/mass, physical placeholder construction, Core upgrade, safety and offline rules in this document remain authoritative. Implementation extends existing #538-#551 with explicitly scoped new art tickets listed in the interior contract.
 
 **Priority and supersession:** This contract takes precedence over older future-design claims that the starter Scout should have no dedicated cargo room, that construction uses only Z-axis snapping, that Core upgrades need staged worksite power, or that cancelling a partially built object needs stage-by-stage salvage. Historic implemented-state descriptions must remain explicitly distinguished from this approved future target. Existing canonical propulsion, Core fueling, Fabricator, survival, universe, narrative and Jump Drive contracts are unchanged except where this document expressly says otherwise.
 
@@ -83,7 +91,7 @@ The starting ship comes fully playable with:
 - When all required inputs are provided, the player may apply the upgrade **instantly**; no separate construction placeholder, worksite, build timer, stages, charged portable battery, external construction feed, Core shutdown or upgrade energy cost.
 - Validate required materials and blueprint atomically; successful upgrade consumes exact accepted input material once and updates approved parameters, while failed application changes nothing. Upgrade can work with an empty Core battery. Pending contributed materials must be accounted for and retrievable before application.
 - Preserve existing Core charge and valid reservations; increasing charge capacity **does not fill** the new capacity or grant joules. Keep Core identity and ship mass/power ledgers consistent.
-- Core upgrade tiers, recipe quantities and exact improved effects are **not yet decided**. Don't mistake illustrative resource numbers for approvals.
+- Original decision: Core upgrade tiers, recipe quantities and improved effects were undecided. On 2026-10-24 the owner explicitly authorized balanced choices; implemented data-driven capacity tiers/costs and rationale are in [Core upgrades](core-upgrades.md). This does not approve unrelated construction estimates.
 - Earlier proposals for independently powered multi-stage **Core upgrades**, emergency construction-power reserves and time-consuming Core commissioning are **superseded and not requirements**. Do not change ordinary blackout throttle behavior incidentally.
 
 ## Damage, destruction and recovery
@@ -96,14 +104,75 @@ The starting ship comes fully playable with:
 
 ## Delivery boundaries and existing implementation
 
-This is a design contract for future implementation, **not a claim that current Rust code has construction, habitation, a starter cargo room, advanced hull damage, full offline construction or the Jump Drive**. The existing implemented ship uses authored anchors, cockpit, Core fueling, Fabricator, Archive, ramp, cabin gravity, physical fragments and mass accounting; existing files and native tests continue to describe that implementation until changed.
+This is a design contract for future implementation. The #538 authored starter envelope now includes an aft cargo compartment and habitation fixtures; **habitation interactions (#540), funded construction, advanced hull damage, full offline construction and the Jump Drive are not shipped by that envelope**. The existing implemented ship uses authored anchors, cockpit, Core fueling, Fabricator, Archive, ramp, cabin gravity, physical fragments and mass accounting; existing files and native tests continue to describe that implementation until changed.
 
-The approved first reference slice is **a completely usable starter Scout**, not a beauty-only Blender render: cockpit, working Core/Fabricator/Archive, dedicated physical cargo, interior door/ramp and integrated habitation, with reliable HUD/UI/lighting/sound feedback. Native Metal/M1 checks and GLB budgets remain necessary.
+The approved first reference slice is **a completely usable starter Scout**, not a beauty-only Blender render: cockpit, working Core/Fabricator/Archive, dedicated physical cargo, interior door/ramp and integrated habitation, with reliable HUD/UI/lighting/sound feedback. GLB budgets remain necessary. Cloud wgpu routes establish automated integration; #561 owns human spatial/presentation review, #557 actual platform experiments and #563 hardware budgets. M1 access is not a routine completion prerequisite.
+
+## Structural foundation delivered (#541)
+
+`salimon_ship::structure` now provides the portable 3 m Core-rooted graph,
+room/equipment footprint metadata, safe removal, damage-component handoffs,
+explicit baseline/additional mass and domain schema 1. See the
+[owned architecture](../client/ship/architecture.md#portable-structural-foundation-541).
+This is an independent domain boundary, not playable construction, a redesigned
+starter ship, generated colliders or a whole-game save migration. Later delivery
+boundaries above remain future work.
 
 ## Implementation issues (2026-10-22)
 
 **Starter Scout:** [#538](https://github.com/mr-exception/salimon/issues/538) layout/cargo/habitation envelope → [#539](https://github.com/mr-exception/salimon/issues/539) cargo mechanics and door; [#540](https://github.com/mr-exception/salimon/issues/540) habitation fixtures.
 
-**Modular construction:** [#541](https://github.com/mr-exception/salimon/issues/541) 3D structure → [#542](https://github.com/mr-exception/salimon/issues/542) placeholders → [#543](https://github.com/mr-exception/salimon/issues/543) resource delivery/proportional refunds → [#544](https://github.com/mr-exception/salimon/issues/544) automatic progress → [#545](https://github.com/mr-exception/salimon/issues/545) multi-cell room/deck geometry → [#546](https://github.com/mr-exception/salimon/issues/546) takeoff interlocks; [#547](https://github.com/mr-exception/salimon/issues/547) module installation/upgrades; [#549](https://github.com/mr-exception/salimon/issues/549) damage/salvage; [#550](https://github.com/mr-exception/salimon/issues/550) offline/persistence. Independent exception: [#548](https://github.com/mr-exception/salimon/issues/548) instant Core upgrades. Integration/native gate: [#551](https://github.com/mr-exception/salimon/issues/551).
+**Modular construction:** [#541](https://github.com/mr-exception/salimon/issues/541) 3D structure → [#542](https://github.com/mr-exception/salimon/issues/542) placeholders → [#543](https://github.com/mr-exception/salimon/issues/543) resource delivery/proportional refunds → [#544](https://github.com/mr-exception/salimon/issues/544) automatic progress → [#545](https://github.com/mr-exception/salimon/issues/545) multi-cell room/deck geometry → [#546](https://github.com/mr-exception/salimon/issues/546) takeoff interlocks; [#547](https://github.com/mr-exception/salimon/issues/547) module installation/upgrades; [#549](https://github.com/mr-exception/salimon/issues/549) damage/salvage; [#550](https://github.com/mr-exception/salimon/issues/550) offline/persistence. Independent exception: [#548](https://github.com/mr-exception/salimon/issues/548) instant Core upgrades. Cloud integration gate: [#551](https://github.com/mr-exception/salimon/issues/551).
 
-Related existing work includes asset modularization #95, Scout experiential/native verification #489/#502, and universe offline timed systems #433. Do not create duplicate issues or imply these existing tickets are complete.
+Related existing work includes asset modularization #95, Scout cloud verification #489/#502 and human presentation review #561, and universe offline timed systems #433. Do not create duplicate issues or imply these existing tickets are complete.
+
+## Blueprint reservations delivered (#542)
+
+The native C tool now selects, rotates, previews, places, inspects and cancels
+unfunded placeholders, including multi-cell modules. Ship-owned admission checks
+support, ownership, reach, actual player/cargo/fixture clearance, protected routes,
+job overlaps and consequence-based flight restrictions. Two-deck room groups are
+one reservation in the portable domain. Hollow previews/projects are not solid or
+usable structure. The JSON catalog's economics are proposed estimates, not owner
+approval; no materials, power or build progress are consumed here. #543–#550 retain
+intake/progress/physical completion/flight/offline ownership, and #551 the complete
+integrated construction route. See runtime/ship guides and schema-8 save contract.
+
+
+## Physical cargo delivery (#539)
+
+The internal manual door has independent opposed leaves, safe swept closure and
+saved motion; open bins expose hollow shell contacts/pickup sight rather than
+virtual inventory. The central corridor remains the loading route. See
+[character geometry](../client/character/architecture.md#physical-cargo-door-and-open-bins-539)
+and [schema 9](save-contract.md#cargo-door-schema-9-539).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.
+
+
+## Persistent cosmetic groups (#579)
+
+Five room groups and exact furniture overrides now use the [bounded finish contract](room-finishes.md). Schema 13 preserves histories independently of divider topology; physical material replacement, future constructed room geometry (#545) and actual damage (#549) retain their owners. Shared instance tint factors are now bounded to [0,4] and cosmetic RGB is clamped before lighting; warning/functional surfaces retain authored values.
+
+
+## Construction material ownership (#543)
+
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Timed work and completed geometry remain #544/#545.
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Construction flight readiness (#546)
+
+See [construction flight safety](construction-flight-safety.md) for schema-19 Stop/Resume, actual hull and attachment admission, cockpit warnings and airborne stop latches. Source: runtime `session/construction/flight.rs`, ship `structure/construction.rs`; regressions: runtime `session/construction/flight/tests.rs`. Run workspace and construction checks plus the production `construction-interlocks.json` evidence scenario.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.

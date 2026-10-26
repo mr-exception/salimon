@@ -1,6 +1,7 @@
 name: Universe implementation
 description: Plan a scoped Universe implementation or follow-up with same-PR documentation.
 title: "[Universe] "
+labels: ["auto-verification"]
 body:
   - type: textarea
     id: scope
@@ -20,7 +21,7 @@ body:
     id: acceptance
     attributes:
       label: Acceptance and validation
-      description: Typed ownership, meaningful portable tests, report path and separate native gates.
+      description: Typed ownership, exact AI/cloud tests, report/PR path and separately linked human evidence criteria. See docs/verification-workflow.md.
     validations:
       required: true
   - type: textarea
@@ -37,5 +38,5 @@ body:
       options:
         - label: Implementation will include same-PR documentation changes or a justified precise no-impact statement, owning guide links and link/path checks. Final audit 441 is not a substitute.
           required: true
-        - label: Reports will distinguish portable delivery from unrun or failed native acceptance and link remaining follow-up ownership.
+        - label: Reports will record actual cloud context/results and link exact remaining human criteria, preserving failures and unrun checks.
           required: true

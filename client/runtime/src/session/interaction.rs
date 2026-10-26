@@ -11,6 +11,15 @@ pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "[E] Use cockpit";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum InteractionTarget {
+    CabinTable,
+    CabinSeat,
+    PrivacyScreen,
+    ObservationShutter,
+    CabinLocker,
+    Bunk,
+    Galley,
+    Hygiene,
+    CargoDoor,
     Archive,
     Fabricator,
     FabricatorScreen,
@@ -43,7 +52,11 @@ pub(crate) fn interaction_target(
         && dot(to_core, look_direction)
             / (core_distance * vector_length(look_direction)).max(f64::EPSILON)
             >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT;
-    if super::archive::target(local_eye_position, local_look_target) {
+    if let Some(target) = habitation_target(local_eye_position, local_look_target) {
+        Some(target)
+    } else if cargo_door_target(local_eye_position, local_look_target) {
+        Some(InteractionTarget::CargoDoor)
+    } else if super::archive::target(local_eye_position, local_look_target) {
         Some(InteractionTarget::Archive)
     } else if core_aimed {
         Some(InteractionTarget::Core)
@@ -81,7 +94,11 @@ pub(crate) fn available_interaction_target(
 ) -> Option<InteractionTarget> {
     match interaction_target(local_eye_position, local_look_target) {
         Some(
-            InteractionTarget::Archive
+            InteractionTarget::Bunk
+            | InteractionTarget::Galley
+            | InteractionTarget::Hygiene
+            | InteractionTarget::CargoDoor
+            | InteractionTarget::Archive
             | InteractionTarget::Cockpit
             | InteractionTarget::Core
             | InteractionTarget::Fabricator
@@ -127,6 +144,48 @@ pub(super) fn machine_target(eye: [f64; 3], look: [f64; 3], target: [f64; 3]) ->
         && (hit[1] - target[1]).abs() <= 0.22
         && salimon_character::fabricator_sight_obstruction(eye, target)
             .is_none_or(|obstruction| obstruction >= distance - 0.02)
+}
+
+fn cargo_door_target(eye: [f64; 3], look: [f64; 3]) -> bool {
+    let target = salimon_character::cargo::CARGO_DOOR_TARGET;
+    let direction = subtract(look, eye);
+    let t = (target[0] - eye[0]) / direction[0];
+    let hit_y = eye[1] + t * direction[1];
+    let hit_z = eye[2] + t * direction[2];
+    t > 0.0
+        && vector_length(subtract(target, eye)) <= 2.0
+        && (hit_y - target[1]).abs() <= 0.20
+        && (hit_z - target[2]).abs() <= 0.16
+        && eye[2].abs() <= 1.25
+}
+
+pub(crate) fn habitation_position(target: InteractionTarget) -> [f64; 3] {
+    match target {
+        InteractionTarget::Bunk => [-0.8, 1.05, -2.95],
+        InteractionTarget::Galley => [0.65, 1.30, 3.04],
+        InteractionTarget::Hygiene => [1.50, 1.10, -2.99],
+        _ => unreachable!("not a habitation fixture"),
+    }
+}
+fn habitation_target(eye: [f64; 3], look: [f64; 3]) -> Option<InteractionTarget> {
+    let direction = subtract(look, eye);
+    [
+        InteractionTarget::Bunk,
+        InteractionTarget::Galley,
+        InteractionTarget::Hygiene,
+    ]
+    .into_iter()
+    .find(|t| {
+        let point = habitation_position(*t);
+        let delta = subtract(point, eye);
+        let distance = vector_length(delta);
+        distance > f64::EPSILON
+            && distance <= 1.8
+            && dot(delta, direction) / (distance * vector_length(direction)).max(f64::EPSILON)
+                >= 0.985
+            && salimon_character::ship_sight_obstruction(eye, point, true)
+                .is_none_or(|hit| hit >= distance - 0.02)
+    })
 }
 
 #[cfg(test)]

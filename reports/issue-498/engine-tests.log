@@ -1,0 +1,11 @@
+    Blocking waiting for file lock on build directory
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-225cf3bc83389f81)
+
+running 3 tests
+test app::input::engine_tests::native_press_admission_and_modals_gate_engine_toggles ... ok
+test session::propulsion_tests::engine_switch_survives_whole_save_and_legacy_forces_migrate_without_velocity_or_energy_changes ... ok
+test flight_regression::tests::landing_cutoff_evidence_matches_current_engine ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 348 filtered out; finished in 0.14s
+

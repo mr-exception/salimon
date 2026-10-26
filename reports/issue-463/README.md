@@ -56,3 +56,16 @@ Matched foreground timing and owner appearance approval remain
 [#566](https://github.com/mr-exception/salimon/issues/566), with broader baseline
 and full-rate review in #561. No shader, baseline or frame-budget approval is
 inferred from capture/repeat success.
+
+Current clean Linux cloud reproduction at both resolutions also passes; see the
+[#483 cloud appendix](../issue-483/README.md#cloud-re-verification--2026-10-23).
+Appearance review remains #561; hardware budget acceptance #563; additional
+matched cloud timing #566. Historical failures above remain historical.
+
+## Matched cloud follow-up (#566)
+
+[Matched current/control cloud evidence](../issue-566/README.md) extends the
+#483 corpus with explicit X11 focus/visibility admission, raw repeated frozen
+frame distributions and exact input/binary/image lineage. It grants no hardware
+FPS, normal-play cadence or human appearance/baseline approval. The diagnostic
+expression control remains distinct from a historical whole-game baseline.

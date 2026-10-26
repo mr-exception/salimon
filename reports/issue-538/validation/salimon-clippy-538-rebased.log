@@ -1,0 +1,4 @@
+    Checking salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Checking salimon-character v0.1.0 (/workspace/salimon/client/character)
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.17s

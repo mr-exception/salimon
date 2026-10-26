@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/construction-interlocks-cockpit.json",
+  "status": "passed",
+  "steps_completed": 5,
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/workspace/salimon/artifacts/546/final/run-oxg70c7_",
+  "setup": {
+    "scenario": "construction-interlocks",
+    "seed": 546,
+    "step_ms": 100
+  },
+  "duration_ms": 3835,
+  "game_exit_code": -15,
+  "result_file": "/workspace/salimon/artifacts/546/final/run-oxg70c7_/result.json",
+  "raw_result": "result.json.gz"
+}

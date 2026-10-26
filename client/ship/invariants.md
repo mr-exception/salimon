@@ -76,7 +76,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 25. Physical cargo mass is cached by stable identity exactly once regardless of
     carrying/storage. Invalid/zero masses are rejected transactionally. Mass
     changes preserve velocity and impulse coefficient; empty cargo restores exact dry
-    mass and finite residuals survive replacement/removal. Validation reconciliation
+    mass for the equipment currently aboard and finite residuals survive replacement/removal. Validation reconciliation
     never runs in flight updates.
 
 26. Energy exhaustion stops free-flight force at the exact cutoff and preserves
@@ -261,3 +261,84 @@ Last-tick auxiliary watts are transient observation, included in total draw
 without another debit and cleared on subsequent advance/restore. Runtime owns
 record progress/config and the `RecoveryModule` physical mass ledger entry. See
 [canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).
+
+## Portable structure (#541)
+
+- Structural cells use exactly 3 m on each ship-local axis and six-face support.
+  Edge/corner contact alone never attaches a part. Room, traversal, pressure and
+  power relationships never substitute for structural support.
+- All admitted cells are connected to the one permanent Core-bearing part.
+  New parts and equipment have internally connected, nonempty, duplicate-free
+  footprints. Conservative envelope coordinates and additional masses are finite.
+- IDs are nonzero and unique across parts, rooms, equipment and retired IDs;
+  mutation/restore rejects invalid input without publishing partial state.
+- Ordinary removal cannot disconnect retained structure, remove the Core or
+  orphan existing room/equipment membership. Damage transfers each disconnected
+  component once with original identity; unsupported metadata/equipment is
+  returned explicitly. Destroying the Core is outside this API.
+- Baseline structure marked `IncludedInDryHull` adds no mass. Additional structure
+  and equipment emit one `MassObjectId::Structure` contribution each; rooms,
+  faces and carried input do not create another installed contribution.
+- Domain schema 1 restores source state and retired IDs, rebuilding indexes;
+  it neither mutates the live flight controller nor changes the whole-game save.
+- Current Scout precision anchors/colliders remain authored data. No existing
+  asset position is silently rounded or moved to this grid.
+
+## Blueprint placement authority (#542)
+
+`structure/placement.rs` owns catalog validation, exact 3 m/fine-pitch snapping,
+quarter-turn transforms, stable non-reused placeholder IDs and geometry
+reservations. Runtime supplies trusted owner, flight, physical support,
+reachability and current player/cargo/installed/protected-route envelopes.
+Admission is repeated at placement and immediately before physical completion;
+rendered previews are never authority. One multi-cell/multi-deck volume is one
+project. Unbuilt neighbors cannot supply structural support. Interior versus
+hull-affecting consequences determine airborne permissions.
+
+Projects capture requirements/duration and exact #543 material receipts/progress.
+There is no separate worksite or Start action.
+Cancellation atomically returns physical unconsumed material; #543 owns intake/refunds,
+#544 progress, #545 geometry and #546 flight interlocks. Domain schema-1 validation
+and the whole-session boundary are documented in the
+[save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
+Tests live in `structure/placement/tests.rs`.
+
+## Physical mounts (#576)
+
+One item can belong to at most one mechanical mount. Existing equipment is included in dry mass, never counted again as cargo; boundary removal/return is idempotent. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+Construction receipts/refunds #543: [canonical transaction, mass, controls and schema-15 contract](../../docs/construction-materials.md). Funding respects the explicit economy approval gate; progress/geometry retain #544/#545 owners.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.
+
+
+## Automatic construction (#544)
+
+Follow the [canonical progress/completion contract](../../docs/construction-progress.md). Ship owns validated paid nanoseconds and ppm; runtime owns actual Core funding, current safety and atomic interior/structural installation. No unfinished collider, free progress, duplicate mass or unsupported module completion. Schema 18 restores exact work and validated modular edits without elapsed-time credit; see the completed modular structure contract below.
+
+Atomic room installation: a `RoomAssembly` has exactly one new structural part per
+room cell and a separate room identity. All parts plus membership publish together,
+including their existing face/collision/mass source. Rejected installation neither
+consumes identities nor mutates the graph. Existing dry hull remains untouched.
+The primitive grants no work completion, material receipt or flight authority.
+
+
+## Completed modular structure (#545)
+
+Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Construction flight readiness (#546)
+
+Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 contract](../../docs/construction-flight-safety.md). The durable stop latch never clears on landing; actual hull/attachment state governs readiness. Preserve Core/engine/cockpit/ramp authority and inertial momentum.

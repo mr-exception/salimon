@@ -15,6 +15,16 @@ pub(crate) fn prompt_placement(
     frame: salimon_character::ShipFrame,
 ) -> salimon_renderer::OverlayPlacement {
     let (local, radius_meters) = match target {
+        InteractionTarget::CabinTable
+        | InteractionTarget::CabinSeat
+        | InteractionTarget::PrivacyScreen
+        | InteractionTarget::ObservationShutter
+        | InteractionTarget::CabinLocker => (crate::session::cabin::default_position(target), 0.15),
+        InteractionTarget::Bunk | InteractionTarget::Galley | InteractionTarget::Hygiene => (
+            crate::session::interaction::habitation_position(target),
+            0.25,
+        ),
+        InteractionTarget::CargoDoor => (salimon_character::cargo::CARGO_DOOR_TARGET, 0.22),
         InteractionTarget::Archive => (crate::session::archive::TERMINAL, 0.15),
         InteractionTarget::FabricatorTray => {
             (salimon_character::FABRICATOR_TRAY_MARKER_METERS, 0.15)
@@ -59,6 +69,19 @@ pub(crate) fn action_bar_context(
         .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
         .map(CockpitMessage::text)
         .or(match interaction {
+            Some(InteractionTarget::CabinTable) => Some("[E] Fold/unfold table"),
+            Some(InteractionTarget::CabinSeat) => {
+                Some("[E] Fold/unfold seat [X] Sit [U] Restraint")
+            }
+            Some(InteractionTarget::PrivacyScreen) => Some("[E] Slide privacy screen"),
+            Some(InteractionTarget::ObservationShutter) => {
+                Some("[E] Slide observation shutter (manual)")
+            }
+            Some(InteractionTarget::CabinLocker) => Some("[E] Open/close physical locker"),
+            Some(InteractionTarget::Bunk) => Some("[E] Unfold/stow bunk [X] Lie [U] Restraint"),
+            Some(InteractionTarget::Galley) => Some("[E] Use galley"),
+            Some(InteractionTarget::Hygiene) => Some("[E] Inspect wash station"),
+            Some(InteractionTarget::CargoDoor) => Some("[E] Open/close cargo door (manual)"),
             Some(InteractionTarget::Archive) => Some("[E] Read Scout Archive"),
             Some(InteractionTarget::FabricatorTray) => Some("[E] Collect Fabricator tray item"),
             Some(InteractionTarget::FabricatorScreen) => Some("[E] Open Fabricator crafting"),

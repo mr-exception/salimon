@@ -21,11 +21,11 @@
   },
   "profile": "legacy-scout-v1",
   "budgets": {
-    "maxTriangles": 6500,
-    "maxPrimitives": 124,
+    "maxTriangles": 6900,
+    "maxPrimitives": 140,
     "maxMaterials": 13,
     "maxTextureBytes": 65536,
-    "maxGlbBytes": 557056
+    "maxGlbBytes": 614400
   },
   "collision": {
     "policy": "authored-proxies",
@@ -55,7 +55,18 @@
       "Fabricator_Input",
       "Fabricator_Monitor",
       "Fabricator_Tray",
-      "Fabricator_Output"
+      "Fabricator_Output",
+      "Starter_BunkCushion",
+      "Starter_BunkFrame",
+      "Starter_CargoBins",
+      "Starter_CargoBulkhead",
+      "Starter_DoorFrame",
+      "Starter_Galley",
+      "Starter_GalleyBasin",
+      "Starter_GalleyTap",
+      "Starter_GalleyWorktop",
+      "Starter_Hygiene",
+      "Starter_HygieneSeat"
     ],
     "materials": [
       "Hull Graphite",
@@ -80,7 +91,10 @@
       "MARKER_DoorwayTransition",
       "MARKER_FabricatorInput",
       "MARKER_FabricatorMonitor",
-      "MARKER_FabricatorTray"
+      "MARKER_FabricatorTray",
+      "MARKER_Starter_AftExpansion",
+      "MARKER_Starter_CargoDoor",
+      "MARKER_Starter_UpperExpansion"
     ],
     "colliders": [
       "COLLIDER_InteriorFloor",
@@ -111,7 +125,15 @@
       "COLLIDER_Landing_Forward_Port_Leg",
       "COLLIDER_Landing_Forward_Starboard_Foot",
       "COLLIDER_Landing_Forward_Starboard_Leg",
-      "COLLIDER_Fabricator"
+      "COLLIDER_Fabricator",
+      "COLLIDER_Starter_BinPort",
+      "COLLIDER_Starter_BinStarboard",
+      "COLLIDER_Starter_BulkheadPort",
+      "COLLIDER_Starter_BulkheadStarboard",
+      "COLLIDER_Starter_Bunk",
+      "COLLIDER_Starter_Galley",
+      "COLLIDER_Starter_Hygiene",
+      "COLLIDER_Starter_Header"
     ],
     "requiredExtras": [
       {
@@ -332,6 +354,50 @@
       },
       {
         "node": "MARKER_FabricatorTray",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BinPort",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BinStarboard",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BulkheadPort",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BulkheadStarboard",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Bunk",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Galley",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Header",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Hygiene",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_Starter_AftExpansion",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_Starter_CargoDoor",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_Starter_UpperExpansion",
         "path": "salimon"
       }
     ]

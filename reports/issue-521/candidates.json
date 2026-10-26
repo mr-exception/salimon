@@ -1,0 +1,101 @@
+{
+  "format": "salimon.universe.samples",
+  "samples": [
+    {
+      "epoch": {
+        "day": 10957,
+        "nanos": 0,
+        "scale": "tdb"
+      },
+      "frame": "ICRF-SSB-geometric",
+      "id": "earth-jpl-1",
+      "position_meters": [
+        -26279037510.48988,
+        132573481168.4155,
+        57510611843.1282
+      ],
+      "velocity_mps": [
+        -29830.52803412253,
+        -4789.643244025284,
+        -2076.675100153809
+      ]
+    },
+    {
+      "epoch": {
+        "day": 10958,
+        "nanos": 0,
+        "scale": "tdb"
+      },
+      "frame": "ICRF-SSB-geometric",
+      "id": "earth-jpl-2",
+      "position_meters": [
+        -28852422144.59306,
+        132138914804.9882,
+        57322205957.48592
+      ],
+      "velocity_mps": [
+        -29736.948263807717,
+        -5269.561174592738,
+        -2284.486678493427
+      ]
+    },
+    {
+      "epoch": {
+        "day": 10957,
+        "nanos": 43200000000000,
+        "scale": "tdb"
+      },
+      "frame": "fixture-body",
+      "id": "local-rotating",
+      "position_meters": [
+        10.0,
+        22.0,
+        30.0
+      ],
+      "velocity_mps": [
+        -1.0,
+        5.0,
+        5.0
+      ]
+    },
+    {
+      "epoch": {
+        "day": 10957,
+        "nanos": 43200000000000,
+        "scale": "tdb"
+      },
+      "frame": "galactic-camera-relative",
+      "id": "distant-submillimeter",
+      "position_meters": [
+        0.000244140625,
+        0.0,
+        0.0
+      ],
+      "velocity_mps": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "epoch": {
+        "day": 10959,
+        "nanos": 43200000000000,
+        "scale": "tdb"
+      },
+      "frame": "galactic-initial-relative",
+      "id": "interstellar-proper-motion",
+      "position_meters": [
+        518400.0,
+        -691200.0,
+        2073600.0
+      ],
+      "velocity_mps": [
+        3.0,
+        -4.0,
+        12.0
+      ]
+    }
+  ],
+  "schema_version": 1
+}

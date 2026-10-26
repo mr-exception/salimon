@@ -25,6 +25,11 @@ fn engine_switch_survives_whole_save_and_legacy_forces_migrate_without_velocity_
     assert_eq!(s.save_bytes(100).unwrap(), before);
     let mut old: Value = serde_json::from_slice(&before).unwrap();
     old["schema_version"] = 4.into();
+    old["state"].as_object_mut().unwrap().remove("mounts");
+    old["state"]["habitation"]
+        .as_object_mut()
+        .unwrap()
+        .remove("cabin");
     let ship = old["state"]["physical"]["ship"].as_object_mut().unwrap();
     ship.remove("engines_enabled");
     ship["propulsion"] =
@@ -47,4 +52,60 @@ fn engine_switch_survives_whole_save_and_legacy_forces_migrate_without_velocity_
     let current = s.save_bytes(100).unwrap();
     assert!(s.restore_bytes(&serde_json::to_vec(&old).unwrap()).is_err());
     assert_eq!(s.save_bytes(100).unwrap(), current);
+}
+
+#[test]
+fn engine_off_disk_relaunch_keeps_momentum_selection_and_requires_fresh_enable() {
+    use salimon_persistence::storage::{NativeStore, SaveManager};
+    use std::time::Duration;
+    let mut s = flying();
+    // Clear-space fixture: the new-run default pose is grounded on Earth.
+    s.ship = ShipController::flying_with_velocity(
+        salimon_ship::ShipPose {
+            position_meters: [0.0; 3],
+            orientation: [0.0, 0.0, 0.0, 1.0],
+        },
+        70,
+        [20.0, 0.0, 0.0],
+    )
+    .unwrap();
+    s.command(Command::ToggleEngines);
+    let before = s.ship.snapshot();
+    let path = std::env::temp_dir().join(format!("salimon-498-{}", std::process::id()));
+    if path.exists() {
+        std::fs::remove_dir_all(&path).unwrap();
+    }
+    std::fs::create_dir(&path).unwrap();
+    let validate = |bytes: &[u8]| GameplaySession::default().restore_bytes(bytes);
+    {
+        let mut store = SaveManager::new(NativeStore::open(path.clone()).unwrap());
+        store.recover(validate).unwrap();
+        store
+            .checkpoint(&s.save_bytes(100).unwrap(), validate)
+            .unwrap();
+    }
+    let mut restored = GameplaySession::default();
+    let host = crate::checkpoints::Checkpoints::open_at(path.clone(), &mut restored, 100).unwrap();
+    let after = restored.ship.snapshot();
+    assert!(!after.engines_enabled);
+    assert_eq!(after.thruster_percentage, before.thruster_percentage);
+    assert_eq!(
+        after.velocity_meters_per_second,
+        before.velocity_meters_per_second
+    );
+    assert_eq!(after.energy_core, before.energy_core);
+    restored.ship.set_stored_core_energy_joules(0);
+    restored.ship.set_stored_core_energy_joules(1_000_000_000);
+    restored.advance_game(Duration::from_millis(96));
+    assert!(!restored.ship.snapshot().engines_enabled);
+    assert_eq!(
+        restored.ship.snapshot().velocity_meters_per_second,
+        before.velocity_meters_per_second
+    );
+    restored.command(Command::ToggleEngines);
+    restored.advance_game(Duration::from_millis(96));
+    assert!(restored.ship.snapshot().engines_enabled);
+    assert!(restored.ship.snapshot().speed_meters_per_second > before.speed_meters_per_second);
+    drop(host);
+    std::fs::remove_dir_all(path).unwrap();
 }

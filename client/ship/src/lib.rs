@@ -7,13 +7,16 @@
 use salimon_world::LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 use std::time::Duration;
 
+pub mod attachments;
 mod conversion;
+pub mod mechanism;
 pub use conversion::{ConversionConfig, IntakeResult};
 mod energy;
 pub use energy::{EnergyConfig, EnergyCore, InvalidEnergy};
 mod mass;
 pub use mass::{MassObjectId, ShipMass};
 mod propulsion;
+pub mod structure;
 pub use propulsion::{
     InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_IMPULSE_NS_PER_JOULE,
 };
@@ -59,3 +62,9 @@ pub const DEFAULT_CORE_ENERGY_STORED_JOULES: u64 = 45_000_000_000;
 pub const DOOR_HINGE_ANIMATION_DURATION: Duration = Duration::from_millis(700);
 
 pub use controller::persistence::ShipSaveState;
+
+pub mod finishes;
+
+pub mod core_upgrades;
+
+pub mod lighting;

@@ -27,6 +27,7 @@ pub(crate) fn append(vertices: &mut Vec<f32>) {
                 v,
                 display,
                 0.,
+                0.,
             ]);
         }
     }
@@ -37,9 +38,9 @@ mod tests {
     fn terminal_faces_cabin_and_uvs_are_viewer_right_top_left() {
         let mut v = Vec::new();
         super::append(&mut v);
-        assert_eq!(v.len(), 12 * 19);
+        assert_eq!(v.len(), 12 * 20);
         let screen: Vec<_> = v
-            .as_chunks::<19>()
+            .as_chunks::<20>()
             .0
             .iter()
             .filter(|v| v[17] == 5.0)

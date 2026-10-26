@@ -14,7 +14,19 @@ pub(crate) fn find(name: &str) -> Option<View> {
     let views: Vec<View> =
         serde_json::from_str(include_str!("../../../scenarios/visual/scout-cameras.json"))
             .expect("checked-in reference camera contract");
-    views.into_iter().find(|v| v.name == name)
+    let machinery: Vec<View> = serde_json::from_str(include_str!(
+        "../../../scenarios/visual/scout-machinery-cameras.json"
+    ))
+    .expect("checked-in machinery camera contract");
+    let finishes: Vec<View> = serde_json::from_str(include_str!(
+        "../../../scenarios/visual/scout-finish-cameras.json"
+    ))
+    .expect("finish cameras");
+    views
+        .into_iter()
+        .chain(machinery)
+        .chain(finishes)
+        .find(|v| v.name == name)
 }
 
 impl View {
@@ -36,7 +48,16 @@ mod tests {
     #[test]
     fn shared_cameras_are_finite_and_follow_ship_pose_without_changing_it() {
         let pose = salimon_ship::ShipController::default().snapshot().pose;
-        for name in ["cockpit", "core", "fabricator", "aft-door"] {
+        for name in [
+            "finishes",
+            "seat-finish",
+            "cockpit",
+            "core",
+            "fabricator",
+            "aft-door",
+            "pedals-close",
+            "fabricator-close",
+        ] {
             let v = find(name).unwrap();
             let c = v.camera(pose);
             assert_ne!(c.position_meters, c.target_meters);

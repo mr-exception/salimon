@@ -1,0 +1,246 @@
+{
+  "setup": {
+    "scenario": "cargo-blackout",
+    "seed": 199,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.total_mass_kg",
+        "approx": 100017.968,
+        "tolerance": 1e-06
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "not_equals": null
+      }
+    },
+    {
+      "screenshot": "blackout-500-core-off"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "ascend",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 4
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "ascend",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.local_ship_position_meters.1",
+        "gt": 2.005
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 4
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "player.local_ship_position_meters.1",
+        "gt": 2.012
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 499
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.total_mass_kg",
+        "approx": 100015.968,
+        "tolerance": 1e-06
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.conversion_remaining_joules",
+        "equals": 2000000000
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.thruster_percentage",
+        "equals": 50
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.conversion_remaining_joules",
+        "gt": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.conversion_remaining_joules",
+        "lt": 2000000000
+      }
+    },
+    {
+      "screenshot": "blackout-500-converting"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 24
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "ship.conversion_remaining_joules",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.energy_core.stored_joules",
+        "gt": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 499
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.total_mass_kg",
+        "approx": 100015.968,
+        "tolerance": 1e-06
+      }
+    },
+    {
+      "screenshot": "blackout-500-recharged"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.energy_core.stored_joules",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.thruster_percentage",
+        "equals": 50
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 499
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.total_mass_kg",
+        "approx": 100015.968,
+        "tolerance": 1e-06
+      }
+    },
+    {
+      "screenshot": "blackout-500-depleted-again"
+    }
+  ]
+}

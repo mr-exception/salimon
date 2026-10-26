@@ -64,9 +64,17 @@ impl GameplaySession {
 
     pub(super) fn interaction_action(target: InteractionTarget) -> Action {
         match target {
-            InteractionTarget::Archive => Action::Menu,
+            InteractionTarget::CabinTable
+            | InteractionTarget::CabinSeat
+            | InteractionTarget::PrivacyScreen
+            | InteractionTarget::ObservationShutter
+            | InteractionTarget::CabinLocker
+            | InteractionTarget::Archive
+            | InteractionTarget::Bunk
+            | InteractionTarget::Galley
+            | InteractionTarget::Hygiene => Action::Menu,
             InteractionTarget::Cockpit => Action::Pilot,
-            InteractionTarget::ExitDoor => Action::Door,
+            InteractionTarget::ExitDoor | InteractionTarget::CargoDoor => Action::Door,
             InteractionTarget::Core => Action::FeedCore,
             InteractionTarget::Fabricator
             | InteractionTarget::FabricatorScreen

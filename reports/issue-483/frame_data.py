@@ -1,5 +1,5 @@
 """Parsing and fail-closed admission for frozen reference frames, never FPS approval."""
-import re,math
+import re,math,statistics
 pattern=re.compile(r'frame=(\d+) interval_ms=([\d.]+) present_wall_ms=([\d.]+) cpu_update_ms=([\d.]+) cpu_render_ms=([\d.]+) gpu_time=(.*?) ticks=(\d+) backlog_ms=([\d.]+) focused=(true|false) occluded=(true|false)')
 def frames(lines):
  out=[]
@@ -15,17 +15,25 @@ def frames(lines):
 
 def distribution(samples,key):
  v=sorted(s[key] for s in samples if s[key] is not None)
- return None if not v else {'samples':len(v),'p95':v[math.ceil(.95*len(v))-1],'max':v[-1]}
+ return None if not v else {'samples':len(v),'median':statistics.median(v),'p95':v[math.ceil(.95*len(v))-1],'p99':v[math.ceil(.99*len(v))-1],'max':v[-1]}
 
 def source_state(s):return {k:s[k] for k in ['ship','player','survival','fabricator','world','journey','machinery','consumables','carrying']}
 
-def validate_window(row):
+def validate_window(row, profile="apple-m1-metal"):
+ assert profile in ["apple-m1-metal", "cloud-llvmpipe-1280"]
  samples=row['samples'];assert len(samples)>=100
  assert [s['frame'] for s in samples]==list(range(samples[0]['frame'],samples[-1]['frame']+1))
  assert all(s['focused'] and not s['occluded'] and s['interval_ms']>0 and s['ticks']==0 for s in samples)
  assert source_state(row['before'])==source_state(row['after'])
  for state in [row['before'],row['after']]:
-  c=state['visual_context'];assert c['backend']=='Metal' and c['adapter']=='Apple M1'
-  assert c['viewport_pixels']==[1920,1080] and c['scale_factor']==2
+  c=state['visual_context']
+  if profile=='apple-m1-metal':
+   assert c['backend']=='Metal' and c['adapter']=='Apple M1'
+   assert c['viewport_pixels']==[1920,1080] and c['scale_factor']==2
+  else:
+   assert c['backend']=='Vulkan' and c['adapter'].startswith('llvmpipe (')
+   assert c['viewport_pixels']==[1280,800] and c['scale_factor']==1
   assert state['window']['minimized'] is False and state['native_input_isolated'] is True
   assert state['ship']['power_available']==row['powered']
+
+ assert row['before']['visual_context']==row['after']['visual_context']

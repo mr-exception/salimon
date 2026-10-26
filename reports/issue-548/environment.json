@@ -1,0 +1,7 @@
+{
+  "rustc": "rustc 1.89.0 (29483883e 2025-08-04)",
+  "macos": "26.2",
+  "cpu": "Apple M1",
+  "base": "15232abbab57d8f1a28c9e094591ddf1bfb914e8",
+  "native": "production wgpu direct readback; explicit physical sphere/receipt seed; no acquisition/FPS/device qualification"
+}

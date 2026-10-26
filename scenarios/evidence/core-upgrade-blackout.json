@@ -1,0 +1,174 @@
+{
+  "setup": {
+    "scenario": "scout-core-upgrade",
+    "seed": 548,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "core"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "core_upgrades.mode",
+        "equals": "Fuel"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "fuel-intake",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "core_input_mode",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "core_input_mode",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "core_upgrades.mode",
+        "equals": "Upgrade"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "upgrade-material-intake",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "materials-ready",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "core_upgrade_apply",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "core_upgrade_apply",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "ship.energy_core.capacity_joules",
+        "equals": 90000000000
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "ship.energy_core.stored_joules",
+        "equals": 0
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "core_upgrades.applied.0.tier.level",
+        "equals": 1
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "instant-upgrade",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "core_upgrade_apply",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "core_upgrade_apply",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "ship.energy_core.capacity_joules",
+        "equals": 90000000000
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "ship.energy_core.stored_joules",
+        "equals": 0
+      },
+      "timeout_ms": 30000
+    }
+  ]
+}

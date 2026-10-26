@@ -181,10 +181,27 @@ impl MiningSession {
         removed
     }
 
+    /// Shared one-object slot. External owners persist/validate their own fixture source.
+    pub fn carried_object(&self) -> Option<crate::carrying::WorldObjectId> {
+        self.carry.object()
+    }
+    pub fn carry_fixture(&mut self, id: u64) -> bool {
+        self.carry
+            .pick_up(crate::carrying::WorldObjectId::Fixture(id))
+    }
+    pub fn release_fixture(&mut self, id: u64) -> bool {
+        if self.carry.object() != Some(crate::carrying::WorldObjectId::Fixture(id)) {
+            return false;
+        }
+        self.carry.release();
+        true
+    }
+
     pub fn carried_id(&self) -> Option<crate::resources::FragmentId> {
-        self.carry.object().map(|object| match object {
-            crate::carrying::WorldObjectId::ResourceFragment(id) => id,
-        })
+        match self.carry.object() {
+            Some(crate::carrying::WorldObjectId::ResourceFragment(id)) => Some(id),
+            _ => None,
+        }
     }
 
     pub fn pick_up(&mut self, id: crate::resources::FragmentId) -> bool {
@@ -257,6 +274,64 @@ impl MiningSession {
         &mut self,
     ) -> impl Iterator<Item = (crate::resources::FragmentId, Option<ResourceFragment>)> {
         self.fragments.drain_changes()
+    }
+
+    /// Reclaim one original reserved receipt into the existing single carry slot.
+    /// Reservation owners validate receipts against their source before this boundary.
+    pub fn return_reserved_fragment(&mut self, fragment: ResourceFragment) -> bool {
+        if self.carried_object().is_some()
+            || self.attached_sphere_id.is_some()
+            || !crate::resources::RawMaterial::new(
+                fragment.material().resource(),
+                fragment.material().mass_kg(),
+            )
+            .is_ok_and(|m| m.volume_m3() == fragment.material().volume_m3())
+            || crate::resources::ResourceTransform::new(
+                fragment.transform().position(),
+                fragment.transform().orientation_xyzw(),
+            )
+            .is_err()
+            || !self.fragments.return_reserved(fragment)
+        {
+            return false;
+        }
+        assert!(
+            self.pick_up(fragment.id()),
+            "reserved return passed single-slot admission"
+        );
+        true
+    }
+
+    /// Atomically return a validated reservation batch as loose physical pieces.
+    /// The caller owns receipt provenance and collision-free destination admission.
+    pub fn return_reserved_loose(&mut self, pieces: &[ResourceFragment]) -> bool {
+        let mut ids = std::collections::HashSet::new();
+        let next = self.save_state().next_id;
+        if pieces.iter().any(|f| {
+            f.id().0 == 0
+                || f.id().0 > next
+                || !ids.insert(f.id())
+                || self.fragment(f.id()).is_some()
+                || !crate::resources::RawMaterial::new(
+                    f.material().resource(),
+                    f.material().mass_kg(),
+                )
+                .is_ok_and(|m| m == f.material())
+                || crate::resources::ResourceTransform::new(
+                    f.transform().position(),
+                    f.transform().orientation_xyzw(),
+                )
+                .is_err()
+        }) {
+            return false;
+        }
+        for f in pieces {
+            assert!(
+                self.fragments.return_reserved(*f),
+                "batch preflight admitted receipt"
+            );
+        }
+        true
     }
 
     /// Physical despawn/Core consumption; never reuse an entity identity.

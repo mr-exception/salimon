@@ -6,9 +6,12 @@ from salimon_test import Game,native_capture
 from e2e_artifacts import Artifacts
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--binary',type=Path,required=True);p.add_argument('--helper',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+p.add_argument('--profile',choices=['apple-m1-metal','cloud-llvmpipe-1280'],default='apple-m1-metal')
 p.add_argument('--sample-seconds',type=float,default=3);p.add_argument('--repeats',type=int,default=3)
-a=p.parse_args();a.output.mkdir(parents=True,exist_ok=False)
-os.environ.update(SALIMON_REFERENCE_SIZE='1',RUST_LOG='info,salimon_client::frame=trace,salimon_client::app=debug')
+a=p.parse_args();assert a.sample_seconds>0 and a.repeats>0;a.output.mkdir(parents=True,exist_ok=False)
+os.environ['RUST_LOG']='info,salimon_client::frame=trace,salimon_client::app=debug'
+if a.profile=='apple-m1-metal':os.environ['SALIMON_REFERENCE_SIZE']='1'
+else:os.environ.pop('SALIMON_REFERENCE_SIZE',None)
 art=Artifacts({'workload':'frozen-scout-reference-v1','fixed_step':True,'normal_simulation':False},a.output,['native']);art.open_logs();rows=[];events=[]
 from frame_data import frames,distribution,source_state,validate_window
 try:
@@ -28,11 +31,18 @@ try:
      end=len((art.directory/'stderr.log').read_text().splitlines());after=g.request({'op':'inspect'});raw=(art.directory/'stderr.log').read_text().splitlines()[start:end];samples=frames(raw)
      row={'view':view,'powered':powered,'repeat':trial,'wall_seconds':time.monotonic()-began,'log_lines':[start,end],'before':before,'after':after,'samples':samples};rows.append(row)
      (a.output/'windows.json').write_text(json.dumps(rows,indent=2)+'\n')
-     validate_window(row)
+     validate_window(row,a.profile)
      row['metrics']={k:distribution(samples,k) for k in ['interval_ms','present_wall_ms','cpu_update_ms','cpu_render_ms','gpu_latest_ms','backlog_ms']}
+     capture=native_capture(g,art,f'{view}-{powered}-{trial}',time.monotonic()+10)
+     assert capture['status']=='captured'
+     row['image_sha256']=hashlib.sha256(Path(capture['path']).read_bytes()).hexdigest()
+     assert all(r['image_sha256']==row['image_sha256'] for r in rows if r.get('view')==view and r.get('powered')==powered and 'image_sha256' in r)
      print(view,powered,trial,len(samples),flush=True)
     assert native_capture(g,art,f'{view}-{powered}',time.monotonic()+10)['status']=='captured'
   context=g.request({'op':'inspect'})['visual_context']
+except BaseException as error:
+ (a.output/'failure.json').write_text(json.dumps({'type':type(error).__name__,'message':str(error),'profile':a.profile,'accepted_windows':sum('metrics' in row for row in rows)},indent=2)+'\n')
+ raise
 finally:
  (a.output/'windows.json').write_text(json.dumps(rows,indent=2)+'\n');(a.output/'focus.json').write_text(json.dumps(events,indent=2)+'\n');art.close()
-(a.output/'summary.json').write_text(json.dumps({'schema':1,'workload':'frozen-scout-reference-v1','binary_sha256':hashlib.sha256(a.binary.read_bytes()).hexdigest(),'source':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'context':context,'normal_simulation':False,'cpu_frame_log_rounding_ms':.001,'logging_overhead_included':True,'windows':[{k:v for k,v in row.items() if k not in ['samples','before','after']} for row in rows],'approval_granted':False},indent=2)+'\n')
+(a.output/'summary.json').write_text(json.dumps({'schema':1,'workload':'frozen-scout-reference-v1','binary_sha256':hashlib.sha256(a.binary.read_bytes()).hexdigest(),'source':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'context':context,'normal_simulation':False,'admission_profile':a.profile,'hardware_gpu_metrics':None if a.profile.startswith('cloud-') else 'reported native device counters','gpu_note':'Asynchronous latest device duration may repeat; cloud software timestamps are not hardware GPU counters.','cpu_frame_log_rounding_ms':.001,'logging_overhead_included':True,'windows':[{k:v for k,v in row.items() if k not in ['samples','before','after']} for row in rows],'approval_granted':False},indent=2)+'\n')

@@ -264,6 +264,142 @@ fn native_reader_controls_pause_and_durable_restore_do_not_replay_or_bank_work()
 }
 
 #[test]
+fn concurrent_thrust_crafting_and_recovery_spend_disjoint_exact_joules() {
+    let mut s = install();
+    for (resource, kg) in [
+        (ResourceId::OrganicBiomass, 0.4),
+        (ResourceId::WaterIce, 0.1),
+    ] {
+        s.execute_fabricator(C::Insert(RawMaterial::new(resource, kg).unwrap()))
+            .unwrap();
+    }
+    s.execute_fabricator(C::Enqueue {
+        recipe: RecipeId::new("food-ration").unwrap(),
+        quantity: 1,
+    })
+    .unwrap();
+    s.ship = salimon_ship::ShipController::flying(
+        salimon_ship::ShipPose {
+            position_meters: [0.; 3],
+            orientation: [0., 0., 0., 1.],
+        },
+        100,
+    );
+    s.sync_carried();
+    s.toggle_recovery("received.damaged-01");
+    let before = s.ship.snapshot();
+    let watts = 100_000_000.0 + 110_000.0 + s.fabrication_snapshot().requested_watts;
+    for _ in 0..6 {
+        s.advance_game(Duration::from_millis(16));
+    }
+    let after = s.ship.snapshot();
+    assert_eq!(s.recovery.spent_joules[0], 5_000_000.0 * 0.096);
+    assert_eq!(
+        (before.energy_core.stored_joules - after.energy_core.stored_joules) as f64,
+        (watts + 5_000_000.0) * 0.096
+    );
+    assert!(
+        (after.velocity_meters_per_second[0] - 100_000_000.0 * 0.096 / before.total_mass_kg).abs()
+            < 1e-9
+    );
+    assert_eq!(
+        s.fabrication_snapshot().jobs[0].progress,
+        Duration::from_millis(96)
+    );
+}
+
+#[test]
+fn schema_six_initializes_recovery_without_changing_existing_job_resources_or_core() {
+    let mut s = new_session();
+    for (resource, kg) in [
+        (ResourceId::OrganicBiomass, 0.4),
+        (ResourceId::WaterIce, 0.1),
+        (ResourceId::IronOre, 2.0),
+    ] {
+        s.execute_fabricator(C::Insert(RawMaterial::new(resource, kg).unwrap()))
+            .unwrap();
+    }
+    s.execute_fabricator(C::Enqueue {
+        recipe: RecipeId::new("food-ration").unwrap(),
+        quantity: 1,
+    })
+    .unwrap();
+    s.advance_game(Duration::from_millis(16));
+    let mut legacy: serde_json::Value =
+        serde_json::from_slice(&s.save_bytes(100).unwrap()).unwrap();
+    legacy["schema_version"] = 6.into();
+    legacy["state"].as_object_mut().unwrap().remove("recovery");
+    legacy["state"]["fabrication"]["machine"]["recipes"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|r| r["id"] != "data-recovery-module");
+    let mut expected = legacy["state"]["fabrication"]["machine"].clone();
+    expected.as_object_mut().unwrap().remove("recipes");
+    let core = s.ship.snapshot().energy_core;
+    s.restore_bytes(&serde_json::to_vec(&legacy).unwrap())
+        .unwrap();
+    let migrated: serde_json::Value = serde_json::from_slice(&s.save_bytes(100).unwrap()).unwrap();
+    let mut actual = migrated["state"]["fabrication"]["machine"].clone();
+    actual.as_object_mut().unwrap().remove("recipes");
+    assert_eq!(actual, expected);
+    assert_eq!(s.ship.snapshot().energy_core, core);
+    assert!(s.recovery.module.is_none());
+    assert_eq!(s.recovery.spent_joules, [0.0; 2]);
+    assert_eq!(s.recovery.active, None);
+}
+
+#[test]
+fn save_now_disk_relaunch_and_restart_never_bank_or_duplicate_recovery_work() {
+    use crate::checkpoints::{
+        Checkpoints,
+        control::{Request, Status},
+    };
+    use std::time::Instant;
+    let path = std::env::temp_dir().join(format!("salimon-515-{}", std::process::id()));
+    std::fs::create_dir(&path).unwrap();
+    let mut s = install();
+    let mut host = Checkpoints::open_at(path.clone(), &mut s, 100).unwrap();
+    s.toggle_recovery("received.damaged-01");
+    s.advance_game(Duration::from_millis(16));
+    let source = serde_json::to_value(&s.recovery).unwrap();
+    let mass = s.ship.snapshot().total_mass_kg;
+    let energy = s.ship.snapshot().energy_core;
+    s.toggle_pause();
+    host.request(Request::SaveNow, &s);
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while !matches!(host.status().0, Status::Saved { .. }) {
+        assert!(
+            Instant::now() < deadline,
+            "recovery Save Now timeout: {:?}",
+            host.status()
+        );
+        host.poll(&s);
+        std::thread::yield_now();
+    }
+    let utc = host.status().1.unwrap();
+    drop(host);
+    let mut loaded = GameplaySession::default();
+    // Seven days offline still grants zero recovery work or Core energy.
+    let mut host = Checkpoints::open_at(path.clone(), &mut loaded, utc + 7 * 86400).unwrap();
+    assert_eq!(serde_json::to_value(&loaded.recovery).unwrap(), source);
+    assert_eq!(loaded.ship.snapshot().total_mass_kg, mass);
+    assert_eq!(loaded.ship.snapshot().energy_core, energy);
+    assert!(!loaded.archive_reader.open);
+    loaded
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    host.restart(&mut loaded).unwrap();
+    assert!(loaded.recovery.module.is_none());
+    assert_eq!(loaded.recovery.spent_joules, [0.; 2]);
+    assert_eq!(loaded.recovery.active, None);
+    drop(host);
+    std::fs::remove_dir_all(path).unwrap();
+}
+
+#[test]
 #[ignore = "writes CPU Archive raster evidence; set SALIMON_RECOVERY_EVIDENCE"]
 fn recovery_ui_evidence() {
     let dir = std::path::PathBuf::from(std::env::var("SALIMON_RECOVERY_EVIDENCE").unwrap());

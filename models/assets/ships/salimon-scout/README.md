@@ -1,6 +1,13 @@
 # Salimon scout — Blender visual source
 
-> **Current-asset documentation, not the approved final starter layout.** The GLB/Blender revision documented below **currently has no dedicated cargo room**. On 2026-10-22 the owner approved a **future** redesigned starter Scout with a coherent separate aft cargo bay and wide internal door, real physical bins, fold-away bunk, compact galley/hygiene, and accommodation for later 3D modular expansion. The old cargo-room removal is implementation history, **not the latest design goal**. See [approved design contract](../../../../docs/scout-and-modular-construction.md) and #538–#540. All listed current anchors, ramp measures, collision and budget constraints remain in force until the redesign is implemented and verified.
+> **#538 layout delivery.** The linked cabin library now contains a separate aft
+> cargo compartment, a full-height bulkhead and 3 m internal doorway, two open
+> storage shells, a stowed fold-away bunk, galley and hygiene fixture. The compact
+> outer hull, precision anchors and 2.8 m ramp retain their authored scale. Internal
+> door operation/bin mechanics remain #539 and habitation interactions remain #540.
+> These fixtures do not yet implement those interactions. See the
+> [design contract](../../../../docs/scout-and-modular-construction.md).
+
 
 `assembly/salimon-scout.blend` is the editable Blender source for the current scout. It contains
 the authored visual geometry, metadata-only colliders and interaction empties.
@@ -146,8 +153,8 @@ The adapter generates portable spatial Rust layouts from Blender-authored
 proxy/marker nodes. `client/assets/ship/spatial-contracts.json` is the matching
 runtime sidecar. Seat, exit, spawn and engine anchors are sourced from authored
 spatial transforms while gameplay rules remain in Rust. The legacy manifest
-owns instrument assemblies and sightline samples, with no dedicated cargo-room
-volume. Read [the complete runtime contract](../../../../client/assets/ship/README.md#runtime-contract)
+owns instrument assemblies and sightline samples. The starter cargo/fixture
+bounds are documented below; the retired port cargo-room volume is not restored. Read [the complete runtime contract](../../../../client/assets/ship/README.md#runtime-contract)
 and its validator before altering them.
 
 The `legacy-scout-v1` profile explicitly validates legacy metadata boxes using
@@ -407,3 +414,41 @@ standing eyes on both sides, plus existing lower-window/monitor visibility.
 A deliberately extended shoulder fails those rays. `repair_cockpit_shoulders.py`
 records the one-time source migration; `preview_seams.py -- corners <output>`
 uses the actual seated eye and creates read-only interior/exterior references.
+
+## Starter envelope (#538)
+
+`author_starter_layout.py` deliberately edits only the linked cabin library.
+Reproduce with Blender 4.5.3, then run the normal exporter and source/modular
+validators. All new geometry uses existing materials and the original asset license.
+The continuous bulkhead extrusion and open bin shells avoid coplanar joins;
+no quality exemptions were added. Hull, glazing, landing gear, ramp and existing
+station anchors remain unchanged. Ceiling fixtures are split around the full-height wall; their hidden roof contact caps are omitted.
+
+Cargo occupies the aft compartment behind X=-4.65 m. Two side storage shells
+leave the central route clear. The 3 m doorway meets future structural pitch
+without snapping any existing anchor. `MARKER_Starter_AftExpansion` and
+`MARKER_Starter_UpperExpansion` are authored future interfaces, not installed
+modules or permission to modify the current hull. No Jump Drive is installed.
+Seven generated fixture bounds feed planar character/cargo admission; the
+separate header bound caps standing/jumping/zero-G clearance and sight.
+Bins currently use conservative exterior placement bounds; physical intake and
+internal door collision/state are #539, rather than advertised usable storage.
+
+Measured export: 6,767 triangles, 134 primitives, 13 materials, 581,396 bytes.
+Deliberate limits: 6,900 triangles, 140 primitives, 600 KiB GLB, 180 nodes;
+the ship still uses one opaque and one glass draw. This is an asset budget
+change, not hardware performance approval. Review of the original cloud views
+belongs to #561 and hardware budgets to #563.
+
+
+## Base fold-away berth (#540)
+
+`author_habitation.py` edits only the linked cabin-owned frame/cushion meshes,
+preserving fixture names, parents, materials and all authored collision/anchor
+interfaces. `habitation-geometry.json` is the single hinge/size/clearance source;
+the category exporter generates renderer/character consumers. Use supported
+Blender 4.5.3, then the normal category export/source/asset checks. The frame and
+cushion have a 5 mm source gap; no surface-overlap exemption is added. Runtime
+rigid rotation stays inside the pre-existing berth reserve. Source geometry and
+the actual deployed renderer image must both be reviewed; a stowed source check
+does not prove animated appearance. Expanded fixtures remain #577.

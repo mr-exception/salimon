@@ -12,6 +12,8 @@ COMPONENTS = ('hull', 'cockpit', 'wings', 'engines', 'exit-door', 'pilot-seat',
 
 
 def verify(asset):
+    # macOS temporary directories may enter through /var -> /private/var.
+    asset = asset.resolve()
     assembly = asset / 'assembly/salimon-scout.blend'
     bpy.ops.wm.open_mainfile(filepath=str(assembly))
     assert len(bpy.context.scene.collection.children) == 10

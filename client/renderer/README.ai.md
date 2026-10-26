@@ -72,6 +72,13 @@ nearby-body DTO values into one cached
 is a self-lit surface in the existing opaque draw and stay live when unseated.
 Keep gameplay interaction and ship state out of these modules.
 
+The Scout starter layout retains one opaque plus one glass draw. Its embedded
+asset-budget regression decodes the canonical
+[ship manifest](../../models/assets/ships/salimon-scout/manifest.json), rather
+than duplicating triangle/byte limits in Rust. Starter cargo and habitation
+views belong to the opt-in `scout_feedback_gpu_evidence` capture fixture; keep
+its source/binary provenance and frozen-repeat checks with the originals.
+
 ## Shared maintenance rules
 
 Follow the root [coding conventions](../../docs/coding-conventions.md),
@@ -148,5 +155,55 @@ See [runtime contract](../runtime/architecture.md#scout-archive-467).
 existing anchored tray package. Its existing uniform lane encodes component=2,
 medical=1 or food=0; `ship_mesh.wgsl` draws grey/cyan circuit traces for components.
 No buffers/draws/colliders, installation authority or resource state are added.
-Archive work/progress text remains runtime-owned. Native appearance/input/budget
-acceptance is #515; CPU shader/layout contracts cannot establish it.
+Archive work/progress text remains runtime-owned. Cloud route #515 includes
+original GPU frames and an import-only package UV correction: `Fabricator_Output`
+uses normalized per-face coordinates selected by its flat normal and transformed
+bounds. Authored geometry/exports stay unchanged. World-X/Z UVs previously missed
+all normalized circuit/food/medical artwork and collapsed vertical faces. The
+loaded-geometry regression requires [0,1] coordinates and noncollapsed full-face
+triangles. Human appearance is #561, physical input/DPI #557 and budgets #563.
+
+
+## Base habitation (#540)
+
+The bunk's two authored panels use the generated
+`habitation_geometry.rs` hinge/swept bounds, sourced from
+[the category definition](../../models/assets/ships/salimon-scout/habitation-geometry.json).
+The renderer maps a finite stowed/deployed fraction to rigid rotation and normals;
+runtime admits manual motion only after full player/belonging clearance. Static
+poses cost no repeated clearance scan. Reserved walking clearance is unchanged.
+Galley E opens the existing exact-identity consumable wheel, with no generated
+food or additional inventory; hygiene remains an inspectable base fixture.
+No water/hygiene meter, sleep-time advancement or additional survival benefit is
+introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
+remain #577. Schema 10 saves source motion; see
+[the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+
+## Modular interior fixture library (#575)
+
+Renderer `fixtures.rs` loads immutable named templates once, batches by mesh,
+rebases world positions in f64 before narrowing and validates identities, finite
+unit poses and bounded tint. `FixtureNode` resolves root/room/furnishing/attachment
+parents in deterministic input order using a linear queue; missing parents,
+cycles and duplicates fail. Physics/collision and persistent condition remain
+caller-owned. The 16,384-record renderer staging guard fails explicitly; it
+neither limits physical populations nor silently drops submitted instances.
+
+The existing berth migrates through
+[interior layout v1](../assets/ship/interior-layout-v1.json) without changing
+schema-10 gameplay source, identities, anchors, materials, mass or animation state.
+The original whole-ship path remains available for legacy/reference DTOs. Native
+composition selects independent presentation and hides only the old paired berth
+surfaces; opaque fixture batches draw before cockpit glass. Template instances
+share vertex/index buffers and compact 48-byte pose/tint/power records. Per-batch
+counts, allocation capacities and CPU preparation are read-only observations.
+The prototype Shelf/Seat/Panel/PanelDamaged templates demonstrate architecture;
+they do not install furniture or invent physical damage, construction or aging.
+See [fixture ownership/budgets](../../docs/modular-interior-fixtures.md).
+
+
+Persistent finishes #579: [canonical ownership, schema 13, bounded render factors and controls](../../docs/room-finishes.md). Ship owns room/item cosmetic identity; runtime owns nearby physical control admission; renderer applies the explicit nonfunctional surface allowlist. Cosmetic changes never edit physical material/age/damage.
+
+
+Room and fixture lights #580: [canonical controls, source, effective output and schema-16 contract](../../docs/room-lighting.md). Master/blackout/inoperable lamps suppress output without changing preferences; critical machine displays remain independent.

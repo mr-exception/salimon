@@ -175,30 +175,36 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             app.observations.clear();
             Ok(json!({"reset":true}))
         }
+        Some("inspect") if command.get("scope").and_then(Value::as_str) == Some("capture") => {
+            Ok(json!({"capture_status":app.capture_status}))
+        }
         Some("inspect") => {
             let mut result = inspect_session(&app.session);
             let upload_times = app.terrain_upload_times();
             let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
             let native = json!({ "native_input_isolated":app.e2e_input_isolated, "terrain_upload_preparation_micros": upload_times,
-            "visual_context": app.visual_context(),
-                    "survival_details_open":app.survival_hud.details_open,
-            "window": app.window_state(),
-            "capture_status": app.capture_status,
-            "performance": app.observations.snapshot(),
-            "terrain": { "mode": format!("{:?}", app.session.mining.terrain), "active_patches": app.terrain_stream.active.len(),
-                "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
-                "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
-                "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
-                "selection_last_frame_micros": app.terrain_stream.selection_micros,
-                "preparation_last_frame_micros": app.terrain_stream.preparation_micros,
-                "preparation_peak_micros": app.terrain_stream.preparation_peak_micros,
-                "preparation_overruns": app.terrain_stream.preparation_overruns,
-                "generation_last_frame_micros": app.terrain_stream.generation_micros,
-                "generation_peak_micros":app.terrain_stream.generation_peak_micros,
-                "generation_total_micros":app.terrain_stream.generation_total_micros,
-                "generated_peak":app.terrain_stream.generated_peak, "uploaded_last_frame_bytes":uploaded_bytes, "peak_upload_bytes":peak_upload_bytes, "total_generated": app.terrain_stream.total_generated },
+                "visual_context": app.visual_context(),
+                        "survival_details_open":app.survival_hud.details_open,
+                "window": app.window_state(),
+                "capture_status": app.capture_status,
+                "audio_output":app.audio_telemetry(),
+            "ship_resources":app.ship_resource_stats().map(|s|json!({"resident_vertex_bytes":s[0],"uniform_bytes":s[1],"triangles":s[2],"draws":s[3]})),
+            "fixtures": app.fixture_batch_stats().map(|s| {json!({"layout_version":salimon_renderer::FIXTURE_LAYOUT_VERSION,"draws":s.draw_calls,"visible_instances":s.visible_instances,"triangles":s.triangles,"resident_geometry_bytes":s.resident_geometry_bytes,"instance_capacity_bytes":s.instance_capacity_bytes,"upload_bytes":s.upload_bytes,"prepare_micros":s.prepare_time.as_micros()})}),
+                "performance": app.observations.snapshot(),
+                "terrain": { "mode": format!("{:?}", app.session.mining.terrain), "active_patches": app.terrain_stream.active.len(),
+                    "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
+                    "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
+                    "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
+                    "selection_last_frame_micros": app.terrain_stream.selection_micros,
+                    "preparation_last_frame_micros": app.terrain_stream.preparation_micros,
+                    "preparation_peak_micros": app.terrain_stream.preparation_peak_micros,
+                    "preparation_overruns": app.terrain_stream.preparation_overruns,
+                    "generation_last_frame_micros": app.terrain_stream.generation_micros,
+                    "generation_peak_micros":app.terrain_stream.generation_peak_micros,
+                    "generation_total_micros":app.terrain_stream.generation_total_micros,
+                    "generated_peak":app.terrain_stream.generated_peak, "uploaded_last_frame_bytes":uploaded_bytes, "peak_upload_bytes":peak_upload_bytes, "total_generated": app.terrain_stream.total_generated },
 
-                });
+                    });
             for (key, value) in native.as_object().expect("native observation object") {
                 result[key] = value.clone();
             }
@@ -491,6 +497,15 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
                     }
                     Ok(json!({"button": "left", "pressed": pressed}))
                 }
+                (Some("right"), Some(true)) if app.building.active => {
+                    app.command(crate::session::Command::Build(
+                        crate::session::construction::BuildAction::Cancel,
+                    ));
+                    Ok(json!({"button":"right","pressed":true}))
+                }
+                (Some("right"), Some(false)) if app.building.active => {
+                    Ok(json!({"button":"right","pressed":false}))
+                }
                 _ => Err((
                     "invalid_argument",
                     "left button and boolean pressed required",
@@ -534,9 +549,23 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "wheel_next" => Some(KeyCode::Tab),
         "wheel_confirm" => Some(KeyCode::Enter),
         "engines" => Some(KeyCode::KeyB),
+        "build" => Some(KeyCode::KeyC),
+        "light_preset" => Some(KeyCode::F4),
+        "light_master" => Some(KeyCode::F5),
+        "light_fixture" => Some(KeyCode::F6),
+        "light_brightness" => Some(KeyCode::F7),
+        "light_general" => Some(KeyCode::F9),
+        "light_warmth" => Some(KeyCode::F8),
+        "rotate_blueprint" => Some(KeyCode::KeyR),
+        "remove_partition" => Some(KeyCode::Delete),
+        "blueprint_6" => Some(KeyCode::Digit6),
+        "blueprint_7" => Some(KeyCode::Digit7),
+        "interact" => Some(KeyCode::KeyE),
+        "recovery" => Some(KeyCode::KeyR),
         "pause" => Some(KeyCode::Escape),
         "status" => Some(KeyCode::KeyH),
-        "skip_tutorial" => Some(KeyCode::KeyT),
+        "skip_tutorial" | "construction_stop_resume" => Some(KeyCode::KeyT),
+        "construction_module" => Some(KeyCode::KeyG),
         "resume" => Some(KeyCode::Enter),
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),
@@ -555,6 +584,17 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "4" | "slot_4" => Some(KeyCode::Digit4),
         "5" | "slot_5" => Some(KeyCode::Digit5),
         "6" => Some(KeyCode::Digit6),
+        "rest_furniture" => Some(KeyCode::KeyX),
+        "core_input_mode" => Some(KeyCode::KeyI),
+        "core_upgrade_apply" => Some(KeyCode::KeyY),
+        "core_upgrade_recover" => Some(KeyCode::KeyN),
+        "finish_group" => Some(KeyCode::KeyV),
+        "finish_next" => Some(KeyCode::KeyO),
+        "finish_reset" => Some(KeyCode::KeyZ),
+        "restraint" => Some(KeyCode::KeyU),
+        "move_accessory" => Some(KeyCode::KeyJ),
+        "place_object" => Some(KeyCode::KeyG),
+        "secure_object" => Some(KeyCode::KeyK),
         "grab_drop" | "pickup" | "drop" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
         "roll_right" => Some(KeyCode::ArrowRight),
@@ -779,7 +819,20 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
+    observation["core_upgrades"] =
+        serde_json::to_value(&app.core_upgrades).expect("validated Core upgrades");
+    observation["finishes"] = serde_json::to_value(&app.finishes).expect("validated finishes");
+    observation["cabin"] = serde_json::to_value(&app.habitation.cabin).expect("validated cabin");
+    observation["mounts"] = serde_json::to_value(&app.mounts).expect("validated attachment state");
+    observation["habitation"] = json!({"bunk_open_fraction":app.habitation.bunk_open_fraction,"bunk_deploying":app.habitation.bunk_deploying});
+    observation["cargo_door"] =
+        json!({"open_fraction":app.cargo_door.open_fraction,"opening":app.cargo_door.opening});
+    observation["lighting"] = app.light_inspect();
+    observation["construction"] = app.construction_inspect();
     observation["ship"]["engines_enabled"] = ship.engines_enabled.into();
+    observation["archive"] =
+        json!({"source":app.archive, "open":app.archive_reader.open, "text":app.archive_text()});
+    observation["recovery"] = app.recovery_observation();
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
     observation
 }
@@ -831,6 +884,30 @@ mod tests {
         )
         .unwrap();
         app
+    }
+
+    #[test]
+    fn scout_archive_fixture_and_observation_preserve_unread_source_until_real_e() {
+        let mut s = app(Scenario::ScoutArchive);
+        let before = s.save_bytes(100).unwrap();
+        let initial = inspect(&s);
+        assert_eq!(initial["interaction"], "archive");
+        assert_eq!(initial["archive"]["source"]["read"], json!([]));
+        assert_eq!(initial["archive"]["open"], false);
+        assert_eq!(s.save_bytes(100).unwrap(), before);
+        let result = execute(
+            &mut s,
+            r#"{"protocol":1,"id":1,"op":"key","key":"interact","pressed":true}"#,
+        );
+        assert_eq!(result["ok"], true);
+        assert_eq!(inspect(&s)["archive"]["open"], true);
+        assert_eq!(
+            inspect(&s)["archive"]["source"]["read"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
     }
 
     #[test]
@@ -1343,7 +1420,7 @@ mod tests {
         test.interact();
         assert!(test.mining.session.carried_id().is_none());
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
-        assert!(test.mining.session.carried_id().is_some());
+        assert!(test.mining.session.carried_object().is_some());
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
         assert!(!test.equipment.mining_equipped());
         assert_eq!(inspect(&test)["mining"]["held_item_visible"], false);
@@ -1357,9 +1434,9 @@ mod tests {
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
         test.advance_game(Duration::from_secs(1));
         assert_eq!(test.mining.session.extracted_mass_kg(), mass);
-        assert!(test.mining.session.carried_id().is_some());
+        assert!(test.mining.session.carried_object().is_some());
         test.interact();
-        assert!(test.mining.session.carried_id().is_some());
+        assert!(test.mining.session.carried_object().is_some());
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), false);
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
         assert!(test.mining.session.carried_id().is_none());
@@ -1554,8 +1631,20 @@ mod tests {
         );
     }
 
+    #[test]
+    fn construction_interlock_scenarios_share_native_command_admission() {
+        assert_gameplay_scenario(
+            Scenario::ConstructionRoom,
+            include_str!("../../../scenarios/evidence/construction-interlocks.json"),
+        );
+        assert_gameplay_scenario(
+            Scenario::ConstructionInterlocks,
+            include_str!("../../../scenarios/evidence/construction-interlocks-cockpit.json"),
+        );
+    }
+
     fn assert_gameplay_scenario(initial: Scenario, source: &str) {
-        let mut test = app(initial);
+        let mut test = GameplaySession::default();
         let scenario: Value = serde_json::from_str(source).unwrap();
         e2e::initialize(
             &mut test,
@@ -1720,6 +1809,34 @@ mod tests {
         assert_eq!(
             execute(&mut test, r#"{"protocol":1,"id":3,"op":"warp"}"#)["error"]["code"],
             "unknown_op"
+        );
+    }
+
+    #[test]
+    fn capture_polling_observes_only_status_without_mutating_authority() {
+        let mut test = ClientApplication::default();
+        test.session = app(Scenario::LandedEarth);
+        test.e2e_config = Some(Config {
+            fragment_load: None,
+            scenario: Scenario::LandedEarth,
+            seed: 7,
+            step: Duration::from_millis(20),
+        });
+        test.capture_status = "captured".into();
+        let before = test.session.save_bytes(100).unwrap();
+        let response = super::execute(
+            &mut test,
+            r#"{"protocol":1,"id":1,"op":"inspect","scope":"capture"}"#,
+        );
+        assert_eq!(response["result"], json!({"capture_status":"captured"}));
+        assert_eq!(before, test.session.save_bytes(100).unwrap());
+        let mut normal = ClientApplication::default();
+        assert_eq!(
+            super::execute(
+                &mut normal,
+                r#"{"protocol":1,"id":1,"op":"inspect","scope":"capture"}"#
+            )["error"]["code"],
+            "disabled"
         );
     }
 

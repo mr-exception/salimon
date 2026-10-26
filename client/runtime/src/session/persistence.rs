@@ -156,9 +156,23 @@ impl PhysicalState {
 pub(crate) struct SessionState {
     physical: PhysicalState,
     #[serde(default)]
+    finishes: salimon_ship::finishes::Finishes,
+    #[serde(default)]
+    lighting: salimon_ship::lighting::Lighting,
+    #[serde(default)]
+    core_upgrades: salimon_ship::core_upgrades::CoreUpgrades,
+    #[serde(default)]
+    mounts: Option<salimon_ship::attachments::Attachments>,
+    #[serde(default)]
+    cargo_door: Option<super::cargo::CargoDoor>,
+    #[serde(default)]
+    habitation: Option<super::habitation::Habitation>,
+    #[serde(default)]
     archive: Option<super::archive::Archive>,
     #[serde(default)]
     recovery: Option<super::recovery::Recovery>,
+    #[serde(default)]
+    construction: Option<super::construction::ConstructionSave>,
     fabrication: salimon_fabrication::FabricationSaveState,
     equipment: crate::equipment::EquipmentToolbar,
     #[serde(default)]
@@ -185,6 +199,24 @@ impl Validate for SurvivalState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        self.finishes.validate()?;
+        self.lighting.validate()?;
+        if !self.lighting.rooms.contains_key(&1) || !self.lighting.rooms.contains_key(&2) {
+            return Err(invalid("installed light room missing"));
+        }
+        self.core_upgrades.validate()?;
+        if let Some(m) = &self.mounts {
+            m.validate()?;
+        }
+        if let Some(h) = &self.habitation {
+            h.validate()?;
+        }
+        if let Some(door) = &self.cargo_door {
+            door.validate()?;
+        }
+        if let Some(construction) = &self.construction {
+            construction.validate()?;
+        }
         if let Some(archive) = &self.archive {
             archive.validate()?;
         }
@@ -218,8 +250,10 @@ impl Validate for SessionState {
         if let Some(survival) = &self.survival {
             survival.validate()?;
         }
-        self.equipment
-            .validate_save(self.physical.world.carried.is_some())?;
+        self.equipment.validate_save(
+            self.physical.world.carried.is_some()
+                || self.mounts.as_ref().is_some_and(|m| m.carried.is_some()),
+        )?;
         Ok(())
     }
 }
@@ -227,8 +261,15 @@ impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            finishes: self.finishes.clone(),
+            lighting: self.lighting.clone(),
+            core_upgrades: self.core_upgrades.clone(),
+            mounts: Some(self.mounts.clone()),
+            cargo_door: Some(self.cargo_door.clone()),
+            habitation: Some(self.habitation.clone()),
             archive: Some(self.archive.clone()),
             recovery: Some(self.recovery.clone()),
+            construction: Some(self.building.source.clone()),
             fabrication: salimon_fabrication::FabricationSaveState::capture(
                 &self.fabricator,
                 &self.consumables,
@@ -262,7 +303,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=7, Some(state)) => state,
+            (2..=20, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -274,20 +315,93 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=7, Some(tutorial)) => tutorial,
+            (4..=20, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let archive = match (save.schema_version, save.state.archive) {
-            (6..=7, Some(archive)) => archive,
+            (6..=20, Some(archive)) => archive,
             (1..=5, _) => Default::default(),
             _ => return Err(invalid("archive source missing for save schema")),
         };
         let recovery = match (save.schema_version, save.state.recovery) {
-            (7, Some(recovery)) => recovery,
+            (7..=20, Some(recovery)) => recovery,
             (1..=6, _) => Default::default(),
             _ => return Err(invalid("recovery source missing for schema 7")),
         };
+        let construction = match (save.schema_version, save.state.construction) {
+            (8..=20, Some(source)) => source,
+            (1..=7, None) => Default::default(),
+            (1..=7, Some(source)) if source.projects.jobs().next().is_none() => Default::default(),
+            _ => {
+                return Err(invalid(
+                    "construction source missing or incompatible with save schema",
+                ));
+            }
+        };
+        if save.schema_version < 20 && !construction.modules.is_empty() {
+            return Err(invalid("module commissioning requires schema 20"));
+        }
+        if save.schema_version < 19 && construction.projects.jobs().any(|p| p.work.stopped) {
+            return Err(invalid("construction stop latch requires schema 19"));
+        }
+        if save.schema_version < 18
+            && (!construction.removed_partitions.is_empty()
+                || !construction.open_doors.is_empty()
+                || construction.projects.jobs().any(|p| {
+                    p.work.completed
+                        && (super::construction::is_structural(p)
+                            || p.blueprint.id == "internal-door")
+                }))
+        {
+            return Err(invalid("installed structure requires schema 18"));
+        }
+        if save.schema_version < 15
+            && construction
+                .projects
+                .jobs()
+                .any(|p| !p.funding.receipts.is_empty() || p.funding.progress_ppm != 0)
+        {
+            return Err(invalid("funded construction requires schema 15"));
+        }
+        if save.schema_version < 17
+            && construction
+                .projects
+                .jobs()
+                .any(|p| p.work != Default::default())
+        {
+            return Err(invalid("construction work requires schema 17"));
+        }
+        let cargo_door = match (save.schema_version, save.state.cargo_door) {
+            (9..=20, Some(door)) => door,
+            (1..=8, None) => Default::default(),
+            (1..=8, Some(door)) if door.open_fraction == 1.0 && door.opening => Default::default(),
+            _ => {
+                return Err(invalid(
+                    "cargo door source missing or incompatible with schema",
+                ));
+            }
+        };
+        let habitation = match (save.schema_version, save.state.habitation) {
+            (10..=20, Some(h)) => h,
+            (1..=9, None) => Default::default(),
+            (1..=9, Some(h)) if h.bunk_open_fraction == 0.0 && !h.bunk_deploying => {
+                Default::default()
+            }
+            _ => {
+                return Err(invalid(
+                    "habitation source missing or incompatible with schema",
+                ));
+            }
+        };
+        if save.schema_version < 12 && habitation.cabin.is_some() {
+            return Err(invalid(
+                "expanded cabin source incompatible with historical schema",
+            ));
+        }
+        if save.schema_version < 16 && save.state.lighting != Default::default() {
+            return Err(invalid("lighting requires schema 16"));
+        }
         let (mut fabricator, consumables) = save.state.fabrication.restore()?;
         if save.schema_version <= 6 {
             fabricator
@@ -295,8 +409,36 @@ impl GameplaySession {
                 .map_err(|e| invalid(e.to_string()))?;
         }
         let physical = save.state.physical.restore()?;
+        let mounts = match (save.schema_version, save.state.mounts) {
+            (11..=20, Some(m)) => m,
+            (1..=10, None) => Default::default(),
+            (1..=10, Some(m)) if m == Default::default() => Default::default(),
+            _ => return Err(invalid("mount source missing/incompatible with schema")),
+        };
+        if save.schema_version < 13 && save.state.finishes != Default::default() {
+            return Err(invalid(
+                "custom finishes incompatible with historical schema",
+            ));
+        }
+        if save.schema_version < 14
+            && (save.state.core_upgrades.mode != salimon_ship::core_upgrades::InputMode::Fuel
+                || !save.state.core_upgrades.applied.is_empty()
+                || !save.state.core_upgrades.pending.is_empty())
+        {
+            return Err(invalid(
+                "Core upgrade source incompatible with historical schema",
+            ));
+        }
         let mut restored = Self {
+            lighting: save.state.lighting,
+            core_upgrades: save.state.core_upgrades,
+            finishes: save.state.finishes,
+
+            mounts,
+            building: super::construction::Building::from_source(construction)?,
             seed: physical.seed,
+            cargo_door,
+            habitation,
             archive,
             recovery,
             tutorial,
@@ -320,6 +462,43 @@ impl GameplaySession {
             measure_physics: self.measure_physics,
             ..Default::default()
         };
+        if restored.cargo_door.open_fraction < 1.0
+            && !restored.cargo_sweep_clear(0.0, restored.cargo_door.open_fraction)
+        {
+            return Err(invalid(
+                "restored cargo door overlaps player or physical cargo",
+            ));
+        }
+        restored.core_upgrades.validate_context(
+            super::core_upgrades::catalog(),
+            &restored.mining.session,
+            &restored.ship,
+        )?;
+        restored.validate_construction_receipts()?;
+        restored.validate_finishes()?;
+        restored.validate_cabin_restore()?;
+        restored.validate_mounts()?;
+        if let Some(c) = &restored.mounts.carried {
+            let frame = super::frames::character_ship_frame(restored.ship.snapshot().pose);
+            let absent =
+                !(salimon_character::ship_contains_object(frame.world_to_local(c.world_position))
+                    || restored.structural_volumes().iter().any(|b| {
+                        let p = frame.world_to_local(c.world_position);
+                        (0..3).all(|i| p[i] >= b[2 * i] && p[i] <= b[2 * i + 1])
+                    }));
+            restored
+                .mining
+                .ship_mass
+                .set_dry_equipment_absent(
+                    c.id,
+                    absent.then_some(salimon_ship::attachments::PORTABLE_SHELF_MASS_KG),
+                )
+                .map_err(|_| invalid("accessory mass"))?;
+        }
+        restored.sync_mount_collision();
+        restored.sync_cargo_geometry();
+        let frame = super::frames::character_ship_frame(restored.ship.snapshot().pose);
+        crate::carrying::sync_ship_mass(&mut restored.mining, frame, &mut restored.ship);
         restored.sync_fabricator_mass();
         restored
             .ship
@@ -329,6 +508,7 @@ impl GameplaySession {
         if restored.survival.snapshot().terminal {
             restored.freeze_terminal();
         }
+        restored.audio_epoch = self.audio_epoch.wrapping_add(1);
         *self = restored;
         Ok(())
     }
@@ -597,7 +777,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, &self.archive, self.recovery.checkpoint_events())))
+            (self.survival.snapshot().terminal, (self.building.source.projects.jobs().map(|p|(p.id,p.work.completed,p.work.damaged,p.work.stopped)).collect::<Vec<_>>(), (&self.building.source.removed_partitions,(&self.building.source.open_doors,self.module_checkpoint())))), self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, (&self.archive, (&self.finishes, (&self.lighting,&self.core_upgrades))), ((self.mounts.carried.as_ref().map(|c|c.id), self.mounts.mounts.iter().map(|m|(m.id,m.rail,m.secured)).collect::<Vec<_>>()), self.recovery.checkpoint_events()), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0,self.cabin_checkpoint()))))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

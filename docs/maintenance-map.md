@@ -15,6 +15,7 @@ iterating and the [applicable validation gates](validation.md) before completion
 | Coordinates, catalog, landing geometry | world `src/lib.rs` facade; `coordinates.rs`, `catalog.rs`, `geometry.rs`, `proximity.rs` | world invariants, `solar-system-layout.md`, `coordinate-strategy.md`, inline catalog/coordinate/geometry/proximity tests | `orbit-earth.json`; F2/N/1–6 precision tour |
 | Precision fixtures and engineering camera | world `src/precision.rs`, `camera.rs`; root public reexports in `lib.rs` | world coordinate strategy/invariants; inline precision and deterministic camera-tour tests | F2/N/1–6 precision tour |
 | Flight, assists, cockpit authority, airlock | ship `src/lib.rs` facade, `state.rs`, `orientation.rs`, `controller/{mod,flight,steering,assist,door,cockpit,telemetry}.rs`; runtime `session.rs`, `session/interaction.rs`, `app/input.rs`, `app/interaction.rs`, `app/scene.rs`, `action_bar.rs` compose | ship architecture/invariants, inline motion/assist/door tests | `orbit-earth.json`, `space-airlock.json`, `lower-cockpit-windows.json` |
+| Modular structural foundation | ship `src/structure/{mod,grid,persistence,assembly,tests}.rs`; `src/mass.rs` namespace | [Structure architecture](../client/ship/architecture.md#portable-structural-foundation-541), ship invariants; headless six-face, multi-deck, removal, damage, identity, mass and save tests | No live runtime composition in #541; placement/construction integration remains #542–#550 |
 | Walking, gravity, hull collision, EVA | character `src/controller/{mod,interior,doorway,surface,eva,camera}.rs`, `collision.rs`, `layout.rs`, `queries.rs`; runtime `session.rs`, `session/frames.rs` compose ship snapshots | character architecture/invariants; mode-local collision/gravity/EVA tests and `controller/collision_tests.rs`; generated `spatial_contracts.rs` | `cockpit-nose.json`, `space-airlock.json`, `moving-eva.json`, `nearby-eva.json` |
 | Fabricator recipes, storage, queue, tray and consumables | fabrication `src/{mass,recipes,machine,inventory}.rs`; runtime `session/{fabrication,crafting_ui,consumable_wheel}.rs`, `app/input.rs` | fabrication architecture/invariants; `tests/fabricator.rs`; integer/atomic/FIFO/power/mass regressions | Runtime scenarios are #347; native signoff #348 |
 | Resource identities/generation/streaming | world `src/resources.rs`, `resource_distribution.rs`, `resource_generation.rs`, `mining.rs` | `resource-contracts.md`, world invariants; inline generation/session tests | `resource-deposits.json`, `resource-streaming.json` |
@@ -222,7 +223,7 @@ and eight power/view checkpoints live under `scenarios/visual/scout-*`; offline
 saving source assets. See [capture/limits](scout-presentation.md).
 
 Scout spatial soundscape (#465): runtime `scout_audio.rs`, `scout_audio/synth.rs`
-and `scout_audio/tests.rs`; shared OS playback `native_audio.rs`; persisted mix
+and `scout_audio/tests.rs`; shared continuous CPAL output `native_audio.rs` / `native_audio/mix.rs`; persisted mix
 controls remain in existing `condition_feedback/settings.rs`. See
 [soundscape contract/budgets](scout-presentation.md#soundscape-boundary-465).
 Do not duplicate #383 survival cues or simulate machinery in the audio adapter.
@@ -367,7 +368,8 @@ See [reference wire/budget/workload guide](universe-reference-fixtures.md),
 [architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
 and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
 and CPU diagnostics only; no solver/world migration or scientific model approval.
-Native reference measurements remain #521; full-game native gates remain #435–#439.
+Repeated cloud reference/RSS measurements are recorded in [the #521 report](../reports/issue-521/README.md);
+full-game cloud gates remain #435–#439. Human hardware budgets remain #563.
 
 ## Universe Gaia ingestion (#408)
 
@@ -423,3 +425,98 @@ repeat the manifest example and compare the golden; cross-platform CI also runs
 debug/release tests. Candidate/world hashes must not change silently. U12 merges
 and packages; U14 supplies states; U23/U24 integrate terrain/arrival/resources.
 No runtime, prototype save, player chart or native signoff changes are implied.
+
+Scout machinery verification (#489): runtime `scout_walkthrough.rs` supplies two
+validated E2E initial fixtures; `e2e.rs` and `scripts/salimon_test.py` select them.
+Subsequent intake/menu/power/work/collection uses production session/window routes.
+`reports/issue-489/walkthrough.py` retains GPU motion frames plus authoritative
+state, with two additional close cameras consumed by `scout_reference.rs`.
+See [evidence/limits](../reports/issue-489/README.md); subjective review #561,
+physical platform/input #557, hardware budgets #563, scanner integration #503/#430.
+
+Recovery cloud verification (#515): `scout_walkthrough.rs` owns declared initial
+materials, `automation.rs` exposes read-only recovery source and the R alias,
+`session/recovery/tests.rs` owns exact concurrent funding/migration/disk coverage.
+Renderer `ship_mesh.rs` normalizes the generic tray package's per-face artwork UVs;
+its geometry regression and the matched native before/after images cover the
+correction. See [the report](../reports/issue-515/README.md) and renderer architecture.
+
+## Blueprint placement (#542)
+
+- Authority: `client/ship/src/structure/placement.rs`, with focused regressions in
+  `structure/placement/tests.rs`.
+- Composition/catalog/save/input: runtime `session/construction.rs`,
+  `catalogs/blueprints.json`, `session/persistence.rs`, `app/input.rs` and automation.
+- Rendering: `app/scene.rs` maps hollow oriented cuboids; renderer `lib.rs` and
+  `bootstrap.wgsl` own validated quaternion upload/projection.
+- Integration: `scenarios/evidence/blueprint-placement.json`, portable construction
+  restore/transaction tests, native input admission and actual wgpu captures.
+
+
+Modular interior presentation (#575): [contract](modular-interior-fixtures.md),
+[renderer](../client/renderer/src/fixtures.rs),
+[runtime mapping](../client/runtime/src/session/fixtures.rs),
+[template source](../models/assets/fixtures/scout-interior-kit/README.md).
+Physical attachment/construction/damage/aging authority remains with their
+existing domain owners; this renderer layer consumes observations only.
+
+
+Exact contact stress (#592): physics `iteration_oracle.rs`, fixed-point response
+loops and shared `salimon-math` arithmetic inlining; runtime `sphere_workloads.rs`
+provides diagnostic terminal prefixes. Reproduce with the isolated historical
+fixture/report, never by reverting gameplay geometry or weakening sleep/contact
+rules. Hardware cadence/frame budgets remain #563 and physical checks #557.
+
+## Physical mounts (#576)
+
+Source: `client/ship/src/attachments.rs`, `client/runtime/src/session/mounts.rs`, world carrying and character installed obstacles. Checks: `session::mounts`, ship attachment tests and `scenarios/evidence/physical-mounts.json`. See [the canonical contract](physical-mounts.md).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.
+
+
+## Persistent cosmetic groups (#579)
+
+Five room groups and exact furniture overrides now use the [bounded finish contract](room-finishes.md). Schema 13 preserves histories independently of divider topology; physical material replacement, future constructed room geometry (#545) and actual damage (#549) retain their owners. Shared instance tint factors are now bounded to [0,4] and cosmetic RGB is clamped before lighting; warning/functional surfaces retain authored values.
+
+
+## Instant direct-material Core upgrades (#548)
+
+The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.
+
+
+## Construction material ownership (#543)
+
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Paid work and completed geometry follow [construction progress](construction-progress.md) and [modular structure](modular-construction.md).
+
+
+## Room and fixture lighting (#580)
+
+The [maintained lighting contract](room-lighting.md) describes implemented presets, independent overrides, effective bus/condition gates, shutter/Sun contribution and schema 16. Actual future damage/room creation remain #549/#545; human approval #561 and hardware budgets #563.
+
+
+## Tactile audio and physical partitions (#583)
+
+The [maintained acoustics contract](scout-acoustics.md) describes actual mechanism/attachment events, finite cargo/privacy separation, differentiated floor contact and bounded continuous CPAL filtering. E2E mapping stays silent; actual output captures and human listening remain separately identified.
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence completed [modular structure](modular-construction.md) and [optional module commissioning](non-core-modules.md).
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+## Construction flight readiness (#546)
+
+See [construction flight safety](construction-flight-safety.md) for schema-19 Stop/Resume, actual hull and attachment admission, cockpit warnings and airborne stop latches. Source: runtime `session/construction/flight.rs`, ship `structure/construction.rs`; regressions: runtime `session/construction/flight/tests.rs`. Run workspace and construction checks plus the production `construction-interlocks.json` evidence scenario.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.

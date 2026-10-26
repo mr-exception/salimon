@@ -653,3 +653,17 @@ Follow the [canonical schema-22 clock, energy, safety and atomic launch contract
 ## Cosmetic surface age (#581)
 
 Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+## Domain automation ownership (#639)
+
+`automation.rs` owns the line reader, common validated envelope, deadlines,
+paused/modal admission and protocol responses. `automation/native.rs` owns
+native-window/capture observations and commands; `automation/inspection.rs`
+retains the observational snapshot. Registered handlers in `automation/`
+(`survival`, `crafting`, `construction`, `lifecycle`, `clock`, `movement`, `input`)
+own operation parsing and typed production calls. Add operations with their
+owner; update central registration only for a new owner. An unrecognized handler
+returns `None` without effects; recognized validation failures return the same
+protocol error. The native event thread remains the only executor. Legacy
+aliases live in `automation/keys.rs`; tests retain the original scenario corpus.

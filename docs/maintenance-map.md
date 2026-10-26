@@ -535,3 +535,10 @@ See [the maintained chronology and schema-22 contract](construction-offline.md):
 
 
 Cosmetic aging #581: [source/identity, successful use, schema 23, rendering budgets and exact verification](surface-age.md). Damage remains condition-driven; clean repairs restore normal geometry and preserve age.
+
+
+Automation domain operations now live in `client/runtime/src/automation/` (#639).
+The envelope/reader stays in `automation.rs`; native commands, observations and
+legacy key aliases have separate owners. Domain handlers call the existing
+production session API; protocol compatibility and scenario regressions live in
+`automation/tests.rs`.

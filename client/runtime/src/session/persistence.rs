@@ -156,6 +156,8 @@ impl PhysicalState {
 pub(crate) struct SessionState {
     physical: PhysicalState,
     #[serde(default)]
+    offline: Option<super::offline::OfflineClock>,
+    #[serde(default)]
     finishes: salimon_ship::finishes::Finishes,
     #[serde(default)]
     lighting: salimon_ship::lighting::Lighting,
@@ -199,6 +201,14 @@ impl Validate for SurvivalState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(clock) = &self.offline {
+            clock.validate()?;
+            clock.validate_sites(
+                self.construction
+                    .iter()
+                    .flat_map(|c| c.projects.jobs().map(|p| p.id.0)),
+            )?;
+        }
         self.finishes.validate()?;
         self.lighting.validate()?;
         if !self.lighting.rooms.contains_key(&1) || !self.lighting.rooms.contains_key(&2) {
@@ -261,6 +271,10 @@ impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            offline: Some(
+                self.offline
+                    .captured(now_unix_seconds, self.construction_safety_record()),
+            ),
             finishes: self.finishes.clone(),
             lighting: self.lighting.clone(),
             core_upgrades: self.core_upgrades.clone(),
@@ -296,6 +310,21 @@ impl GameplaySession {
     pub(crate) fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
         let migrated = migrate_propulsion(bytes)?;
         let save = salimon_persistence::SaveGame::<SessionState>::decode(&migrated)?;
+        let offline = match (save.schema_version, save.state.offline) {
+            (22, Some(clock)) => clock,
+            (1..=21, None) => super::offline::OfflineClock::at(save.saved_at_unix_seconds),
+            (1..=21, Some(clock)) if clock.pending_nanos == 0 => {
+                super::offline::OfflineClock::at(save.saved_at_unix_seconds)
+            }
+            _ => {
+                return Err(invalid(
+                    "offline construction clock missing or incompatible with schema",
+                ));
+            }
+        };
+        if offline.watermark < save.saved_at_unix_seconds {
+            return Err(invalid("offline watermark precedes checkpoint"));
+        }
         let mut survival = match (save.schema_version, save.state.survival) {
             (1, None) => SurvivalState {
                 vitals: Default::default(),
@@ -303,7 +332,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=21, Some(state)) => state,
+            (2..=22, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -315,22 +344,22 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=21, Some(tutorial)) => tutorial,
+            (4..=22, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let archive = match (save.schema_version, save.state.archive) {
-            (6..=21, Some(archive)) => archive,
+            (6..=22, Some(archive)) => archive,
             (1..=5, _) => Default::default(),
             _ => return Err(invalid("archive source missing for save schema")),
         };
         let recovery = match (save.schema_version, save.state.recovery) {
-            (7..=21, Some(recovery)) => recovery,
+            (7..=22, Some(recovery)) => recovery,
             (1..=6, _) => Default::default(),
             _ => return Err(invalid("recovery source missing for schema 7")),
         };
         let construction = match (save.schema_version, save.state.construction) {
-            (8..=21, Some(source)) => source,
+            (8..=22, Some(source)) => source,
             (1..=7, None) => Default::default(),
             (1..=7, Some(source)) if source.projects.jobs().next().is_none() => Default::default(),
             _ => {
@@ -379,7 +408,7 @@ impl GameplaySession {
             return Err(invalid("construction work requires schema 17"));
         }
         let cargo_door = match (save.schema_version, save.state.cargo_door) {
-            (9..=21, Some(door)) => door,
+            (9..=22, Some(door)) => door,
             (1..=8, None) => Default::default(),
             (1..=8, Some(door)) if door.open_fraction == 1.0 && door.opening => Default::default(),
             _ => {
@@ -389,7 +418,7 @@ impl GameplaySession {
             }
         };
         let habitation = match (save.schema_version, save.state.habitation) {
-            (10..=21, Some(h)) => h,
+            (10..=22, Some(h)) => h,
             (1..=9, None) => Default::default(),
             (1..=9, Some(h)) if h.bunk_open_fraction == 0.0 && !h.bunk_deploying => {
                 Default::default()
@@ -416,7 +445,7 @@ impl GameplaySession {
         }
         let physical = save.state.physical.restore()?;
         let mounts = match (save.schema_version, save.state.mounts) {
-            (11..=21, Some(m)) => m,
+            (11..=22, Some(m)) => m,
             (1..=10, None) => Default::default(),
             (1..=10, Some(m)) if m == Default::default() => Default::default(),
             _ => return Err(invalid("mount source missing/incompatible with schema")),
@@ -460,6 +489,7 @@ impl GameplaySession {
             fabricator,
             consumables,
             equipment: save.state.equipment,
+            offline,
             elapsed: save.simulated_time,
             update_clock: crate::update_clock::UpdateClock::from_saved_backlog(save.pending_time),
             // Automation policy belongs to the current host, never the save file.

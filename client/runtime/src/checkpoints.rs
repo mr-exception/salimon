@@ -362,6 +362,10 @@ mod tests {
             .as_object_mut()
             .unwrap()
             .remove("offline_watermark");
+        value["state"]["offline"]
+            .as_object_mut()
+            .unwrap()
+            .remove("watermark");
         value
     }
     #[test]
@@ -379,10 +383,11 @@ mod tests {
         assert!(session.wheel.open && session.wheel.primary_down);
         assert_eq!(session.checkpoint_events(), events);
         let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
+        let launch = now().unwrap();
         saves.finish(&session).unwrap();
         drop(saves);
         let mut restored = GameplaySession::default();
-        let saves = Checkpoints::open(dir.clone(), &mut restored).unwrap();
+        let saves = Checkpoints::open_at(dir.clone(), &mut restored, launch).unwrap();
         assert!(!restored.wheel.open && !restored.wheel.held && !restored.wheel.primary_down);
         assert!(restored.wheel.hovered.is_none());
         assert_eq!(
@@ -492,8 +497,7 @@ mod lifecycle_tests {
         s
     }
     #[test]
-    fn launch_commits_only_fatigue_credit_once_and_preserves_world_healing_and_rollback_watermark()
-    {
+    fn launch_commits_fatigue_and_timed_power_once_preserving_healing_and_rollback_watermarks() {
         let directory = dir("offline");
         let _ = std::fs::remove_dir_all(&directory);
         let original = reduced();
@@ -516,7 +520,13 @@ mod lifecycle_tests {
             restored.survival.active_effects().collect::<Vec<_>>(),
             original.survival.active_effects().collect::<Vec<_>>()
         );
-        assert_eq!(restored.snapshot().ship, original.snapshot().ship);
+        assert_eq!(restored.snapshot().ship.pose, original.snapshot().ship.pose);
+        let config = original.ship.energy_config();
+        assert_eq!(
+            restored.snapshot().ship.energy_core.stored_joules,
+            original.snapshot().ship.energy_core.stored_joules
+                - (7200. * (config.gravity_idle_watts + config.cockpit_idle_watts)) as u64
+        );
         assert!(restored.survival.snapshot().fatigue.value() > 53.0);
         let credited = restored.survival.snapshot().fatigue;
         drop(saves);

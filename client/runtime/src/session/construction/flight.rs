@@ -118,7 +118,7 @@ impl GameplaySession {
             "Construction stopped - unsecured; repair support or cancel"
         });
     }
-    pub(super) fn stop_airborne_construction(&mut self) {
+    pub(in crate::session) fn stop_airborne_construction(&mut self) {
         if matches!(
             self.ship.snapshot().flight_state,
             FlightState::Landed { .. }

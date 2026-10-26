@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 9 tests
+test session::recovery::tests::concurrent_thrust_crafting_and_recovery_spend_disjoint_exact_joules ... ok
+test session::recovery::tests::mined_carried_fabricated_installed_and_core_funded_first_record_loop ... ok
+test session::recovery::tests::module_recipe_commit_install_mass_and_duplicate_requests_are_atomic ... ok
+test session::recovery::tests::progress_is_exactly_core_funded_and_stops_at_emergency_floor_without_refund ... ok
+test session::recovery::tests::recovery_ui_evidence ... ignored, writes CPU Archive raster evidence; set SALIMON_RECOVERY_EVIDENCE
+test session::recovery::tests::native_reader_controls_pause_and_durable_restore_do_not_replay_or_bank_work ... ok
+test session::recovery::tests::save_restore_offline_freeze_legacy_and_bad_sources_are_transactional ... ok
+test session::recovery::tests::schema_six_initializes_recovery_without_changing_existing_job_resources_or_core ... ok
+test session::recovery::tests::save_now_disk_relaunch_and_restart_never_bank_or_duplicate_recovery_work ... ok
+
+test result: ok. 8 passed; 0 failed; 1 ignored; 0 measured; 459 filtered out; finished in 0.95s
+

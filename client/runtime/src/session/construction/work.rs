@@ -113,6 +113,44 @@ impl GameplaySession {
         }
         "BUILDING".into()
     }
+    pub(in crate::session) fn construction_offline_pending(&self) -> bool {
+        if !self.building.catalog.approved_economy {
+            return false;
+        }
+        self.building.source.projects.jobs().any(|p| {
+            !p.work.destroyed
+                && !p.work.completed
+                && !p.work.stopped
+                && !p.work.damaged
+                && p.funding.funded(&p.blueprint.requirements)
+                && self.construction_safety(p).is_ok()
+                && (!installed::structural(p)
+                    || p.work.remaining(&p.funding, &p.blueprint)
+                        > Duration::from_nanos(16_000_000)
+                    || self
+                        .building
+                        .source
+                        .structure(Some(p.id))
+                        .is_ok_and(|s| self.installation_clear(&s)))
+        }) || self.building.source.modules.iter().any(|(id, m)| {
+            self.building
+                .source
+                .projects
+                .inspect(*id)
+                .is_some_and(|p| !p.work.destroyed && !p.work.damaged)
+                && self
+                    .module_fault(*id)
+                    .is_none_or(|f| f == modules::Fault::NoPower)
+                && m.maintenance.as_ref().is_some_and(|o| {
+                    !o.work.completed
+                        && !o.work.damaged
+                        && !o.work.stopped
+                        && self
+                            .module_blueprint(*id)
+                            .is_some_and(|b| o.funding.funded(&b.requirements))
+                })
+        })
+    }
     pub(in crate::session) fn advance_construction(&mut self, delta: Duration) {
         self.building.running = None;
         if delta.is_zero()

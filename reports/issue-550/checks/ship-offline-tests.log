@@ -1,0 +1,21 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling serde_json v1.0.151
+   Compiling simd-adler32 v0.3.10
+   Compiling miniz_oxide v0.9.1
+   Compiling flate2 v1.1.10
+   Compiling syn v3.0.5
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.79s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-09805614dde0575c)
+
+running 1 test
+test controller::offline::tests::closed_power_cannot_generate_impulse_or_change_engine_selection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 107 filtered out; finished in 0.00s
+

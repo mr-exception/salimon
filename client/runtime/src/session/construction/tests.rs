@@ -80,6 +80,7 @@ fn schema_eight_requires_source_and_legacy_seven_migrates_empty_atomically() {
     );
     assert_eq!(s.save_bytes(100).unwrap(), good);
     current["schema_version"] = 7.into();
+    current["state"].as_object_mut().unwrap().remove("offline");
     s.restore_bytes(&serde_json::to_vec(&current).unwrap())
         .unwrap();
     assert_eq!(s.building.source.projects.jobs().count(), 0);

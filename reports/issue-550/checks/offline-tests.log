@@ -1,0 +1,21 @@
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.47s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 13 tests
+test session::offline::tests::a_long_blocked_absence_has_no_progress_cap_or_free_work ... ok
+test session::offline::tests::clock_migration_malformed_clock_and_rollback_cannot_grant_time_twice ... ok
+test session::offline::tests::competing_fabricator_and_captured_assist_reserves_never_fund_free_work ... ok
+test session::offline::tests::current_clock_requires_checkpoint_watermark_and_exact_site_records ... ok
+test session::offline::tests::conversion_restarts_starved_work_without_ever_granting_unfunded_progress ... ok
+test session::offline::tests::damage_boundary_precedes_future_work_and_late_invalid_event_is_atomic ... ok
+test session::offline::tests::elapsed_partition_remainders_and_core_depletion_are_exact ... ok
+test session::offline::tests::exterior_departure_latches_even_when_landing_returns_and_interior_runs_in_flight ... ok
+test session::offline::tests::failed_native_publication_exposes_no_completed_project_and_retry_commits_once ... ok
+test session::offline::tests::live_pause_freezes_work_but_closing_from_pause_allows_eligible_work ... ok
+test session::offline::tests::offline_paid_completion_matches_live_schedule_and_restore_never_replays_it ... ok
+test session::offline::tests::full_offline_room_publishes_four_independent_cells_once_with_exact_power_and_mass ... ok
+test session::offline::tests::upgrade_offline_uses_existing_downtime_commissioning_and_exact_joules ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 459 filtered out; finished in 9.51s
+

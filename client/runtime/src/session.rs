@@ -22,6 +22,7 @@ mod recovery;
 mod survival;
 pub(crate) mod tutorial;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
+pub(crate) mod offline;
 mod pause;
 #[allow(dead_code)]
 pub(crate) mod persistence;
@@ -45,6 +46,8 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) offline: offline::OfflineClock,
+    offline_power: bool,
     pub(crate) audio_epoch: u64,
     pub(crate) mount_audio: (u64, [f64; 3]),
     pub(crate) lighting: salimon_ship::lighting::Lighting,
@@ -111,6 +114,8 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            offline: Default::default(),
+            offline_power: false,
             audio_epoch: 0,
             mount_audio: (0, [0.; 3]),
             lighting: Default::default(),
@@ -599,6 +604,7 @@ impl GameplaySession {
             self.freeze_terminal();
             return;
         }
+        self.finish_offline_remainder();
         let before = self.survival.snapshot().active_time;
         self.survival.advance(delta);
         let delta = self.survival.snapshot().active_time - before;
@@ -750,6 +756,7 @@ impl GameplaySession {
         if self.paused {
             return;
         }
+        self.finish_offline_remainder();
         self.enforce_survival_restrictions();
         if self.view_mode == ViewMode::Gameplay {
             match command {

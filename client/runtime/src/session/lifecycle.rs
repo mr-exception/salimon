@@ -116,13 +116,27 @@ impl GameplaySession {
         #[derive(serde::Deserialize)]
         struct Header {
             saved_at_unix_seconds: u64,
+            schema_version: u32,
         }
-        self.restore_bytes(bytes)?;
+        let mut candidate = GameplaySession {
+            automation_step: self.automation_step,
+            interpolate_presentation: self.interpolate_presentation,
+            measure_physics: self.measure_physics,
+            ..Default::default()
+        };
+        candidate.restore_bytes(bytes)?;
         let header: Header =
             serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
-        self.survival
+        if header.schema_version >= 22 {
+            let elapsed = launch_utc.saturating_sub(candidate.offline.watermark);
+            candidate.reconcile_construction_offline(Duration::from_secs(elapsed), &[])?;
+        }
+        candidate.offline.watermark = candidate.offline.watermark.max(launch_utc);
+        candidate
+            .survival
             .recover_offline(header.saved_at_unix_seconds, launch_utc);
-        self.enforce_survival_restrictions();
+        candidate.enforce_survival_restrictions();
+        *self = candidate;
         Ok(())
     }
 }

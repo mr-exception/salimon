@@ -1,0 +1,41 @@
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-character v0.1.0 (/workspace/salimon/client/character)
+   Compiling salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+   Compiling salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 25.74s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 11 tests
+test session::journey::tests::flight_roundtrip_offline_teleport_and_tour_preserve_only_real_travel ... ok
+test checkpoints::publication_failure_tests::failed_offline_credit_publication_does_not_expose_candidate_or_destroy_prior_checkpoint ... ok
+test session::offline::tests::clock_migration_malformed_clock_and_rollback_cannot_grant_time_twice ... ok
+test session::offline::tests::damage_boundary_precedes_future_work_and_late_invalid_event_is_atomic ... FAILED
+test session::offline::tests::elapsed_partition_remainders_and_core_depletion_are_exact ... ok
+test session::offline::tests::live_pause_freezes_work_but_closing_from_pause_allows_eligible_work ... ok
+test session::offline::tests::exterior_departure_latches_even_when_landing_returns_and_interior_runs_in_flight ... ok
+test session::offline::tests::offline_paid_completion_matches_live_schedule_and_restore_never_replays_it ... ok
+test session::persistence_scenarios::rates::persistence_scenario_exact_rates_survive_split_save_and_offline_recovery ... ok
+test session::recovery::tests::save_restore_offline_freeze_legacy_and_bad_sources_are_transactional ... ok
+test session::offline::tests::upgrade_offline_uses_existing_downtime_commissioning_and_exact_joules ... ok
+
+failures:
+
+---- session::offline::tests::damage_boundary_precedes_future_work_and_late_invalid_event_is_atomic stdout ----
+
+thread 'session::offline::tests::damage_boundary_precedes_future_work_and_late_invalid_event_is_atomic' (15284) panicked at client/runtime/src/session/offline/tests.rs:138:5:
+assertion `left == right` failed
+  left: EnergyCoreState { capacity_joules: 60000000000, stored_joules: 44998991160 }
+ right: EnergyCoreState { capacity_joules: 60000000000, stored_joules: 44998990280 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    session::offline::tests::damage_boundary_precedes_future_work_and_late_invalid_event_is_atomic
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 455 filtered out; finished in 4.56s
+
+error: test failed, to rerun pass `-p salimon-client --bin salimon-client`

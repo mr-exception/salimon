@@ -27,8 +27,7 @@ Insufficient energy, invalid safety or a damaged project pauses without spending
 or resetting progress. Clearing the condition resumes automatically. Project
 condition and physical impact producers follow [the damage contract](construction-damage.md). Exterior
 stop/takeoff latches follow [construction flight safety](construction-flight-safety.md). Normal pause and terminal state freeze work;
-restart clears the old run's construction. No closed-game elapsed time is credited
-here: chronological construction/offline reconciliation remains #550/#433.
+restart clears the old run's construction. Closed-game reconciliation now follows [the schema-22 offline contract](construction-offline.md); future universe event production remains #433.
 
 ## Completion and presentation
 
@@ -80,3 +79,6 @@ See [non-Core module contract](non-core-modules.md) for the Archive processor, G
 
 
 Gameplay damage, safe dismantling, surviving-site recovery and physical debris now follow the [damage contract](construction-damage.md). Offline progression remains #550.
+
+
+Closed-game power and eligible construction/maintenance now follow [the schema-22 offline contract](construction-offline.md). Native launch advances service/conversion, Fabricator/Recovery and eligible work while preserving the saved scene and active survival clock. Future universe/scanner/trajectory events remain #433.

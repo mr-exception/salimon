@@ -51,8 +51,7 @@ Open Archive with normal aimed/inside/powered E interaction. Select a damaged
 record and press R to start/stop its job. One record runs at a time; switching
 retains both records' paid work. Stop/abort retains work and never refunds Core
 energy. Reading/closing the terminal does not stop a machine already running.
-Pause freezes simulation; closed-app recovery is zero. No retrospective work is
-credited at load. Future universe offline machinery remains #433.
+Pause freezes simulation. Verified schema-22 launch settles actual closed-game work and joules through [the common offline schedule](construction-offline.md). Future universe event production remains #433.
 
 The accessible text shows installation, working/stopped/reserve-limited status,
 requested MW, protected GJ, per-record percentage and remaining nominal work.
@@ -91,3 +90,6 @@ budgets are #563, and route/balance decisions are #537 under the
 See [runtime ownership](../client/runtime/architecture.md#data-recovery-module-468),
 [Fabricator ownership](../client/fabrication/architecture.md#recovery-controller-component-468)
 and [ship energy boundary](../client/ship/architecture.md#low-priority-data-recovery-energy-468).
+
+
+Closed-game power and eligible construction/maintenance now follow [the schema-22 offline contract](construction-offline.md). Native launch advances service/conversion, Fabricator/Recovery and eligible work while preserving the saved scene and active survival clock. Future universe/scanner/trajectory events remain #433.

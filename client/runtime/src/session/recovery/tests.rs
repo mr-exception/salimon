@@ -379,11 +379,13 @@ fn save_now_disk_relaunch_and_restart_never_bank_or_duplicate_recovery_work() {
     let utc = host.status().1.unwrap();
     drop(host);
     let mut loaded = GameplaySession::default();
-    // Seven days offline still grants zero recovery work or Core energy.
+    // Real closed-game service/Recovery work settles before publication.
     let mut host = Checkpoints::open_at(path.clone(), &mut loaded, utc + 7 * 86400).unwrap();
-    assert_eq!(serde_json::to_value(&loaded.recovery).unwrap(), source);
+    assert!(loaded.recovery.complete(0));
+    assert!(loaded.recovery.spent_joules[0] >= source["spent_joules"][0].as_f64().unwrap());
     assert_eq!(loaded.ship.snapshot().total_mass_kg, mass);
-    assert_eq!(loaded.ship.snapshot().energy_core, energy);
+    assert_eq!(loaded.ship.snapshot().energy_core.stored_joules, 0);
+    assert!(loaded.ship.snapshot().energy_core.stored_joules <= energy.stored_joules);
     assert!(!loaded.archive_reader.open);
     loaded
         .survival

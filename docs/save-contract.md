@@ -1,6 +1,6 @@
 # Canonical whole-game save contract (schema 20)
 
-> This is the **current compressed-world runtime save schema 20**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+> This is the **current compressed-world runtime save schema 22**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
 version 20. Decode accepts versions 1–19 for explicit runtime migration; the
@@ -20,7 +20,7 @@ versions reject before publication. Migration is checkpointed before exposure.
 | Owner | Required logical state | Regenerated/excluded state |
 | --- | --- | --- |
 | Survival/run | Meters/config, fractional drain/starvation/regeneration, full captured effect rules/stacks/partial ticks/lifetimes, wounds/death source/terminal flag, active survival duration, offline UTC watermark, consumable catalog, movement/interaction tuning, run serial, cumulative journey distance and last valid framed physical samples | Launch receipt, held inputs/UI/capture, movement scale and presentation history; derived permissions are repaired |
-| Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; offline world advancement is zero |
+| Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; closed-game timed power/work uses the schema-22 contract below |
 | Character | Location/frame including doorway blend, local/world position, yaw/pitch, vertical/interior/EVA velocities, nearby surface, EVA basis, gravity/ramp state | Jump key edge reset; camera matrices regenerated |
 | Ship | Pose/quaternion, linear velocity, steering ramp, propulsion/configuration, flight/landed state, full assist/bounce progress, selected signed throttle, door state/fraction, cockpit authority, terrain/footprint, Core config/charge/fraction/reservation/consumption, conversion source and progress, Fabricator demand | Held throttle/steering intent reset, transient message and last-funded interval reset; instruments regenerated |
 | World/mining | Seed in runtime, terrain definition mode/version, sparse deposit depletion journal and extracted total, all fragment stable IDs/source/material/mass/pose, allocator high-water mark, sealed growth state, carry identity, attached mining sphere | Fragment index and physical change journal rebuilt. Active attached sphere detaches on restore because no mining key is restored. Generated deposits/terrain patches recreated from seed and immutable versioned definitions; there are no editable terrain deltas in this revision |
@@ -115,7 +115,7 @@ reach storage is not claimed durable, and visible save warnings/retry remain.
 Normal-play launch first restores into a temporary candidate. Only fatigue is
 credited from the checkpoint UTC to launch UTC, with the survival domain's six-hour
 configured cap and rollback/high-watermark protection. Hunger, health, effects,
-world and active duration never advance offline. The worker's SaveManager verifies
+physical world and survival active duration remain frozen; schema-22 timed power/work follows [offline construction](construction-offline.md). The worker's SaveManager verifies
 and publishes credited state/watermark before the candidate is exposed. Failed
 credit publication leaves the caller's live session unchanged and fails startup.
 The receipt is launch-only: focus, minimize/resume, save and renderer changes do
@@ -409,7 +409,7 @@ A missing current source or duplicate installation fails transactionally.
 Old v1–v6 saves explicitly initialize empty hardware/progress and add the blueprint
 without granting inputs or replaying work. Current schema-6 Archive identities
 and all prior physical/consumable state survive. Transient R/menu/native input
-and last-tick auxiliary power are never restored; no offline progress is credited.
+and last-tick auxiliary power are never restored; schema-22 closed-game progress follows [offline construction](construction-offline.md).
 See [canonical Recovery contract](data-recovery-module.md#persistence-and-verification).
 
 ## Independent structural domain schema (#541)
@@ -527,3 +527,8 @@ See the [canonical module source/migration contract](non-core-modules.md#ownersh
 ## Construction damage and salvage (#549)
 
 See the [canonical damage and schema-21 contract](construction-damage.md) for runtime `session/construction/damage.rs`, ship lost-cell geometry, world sealed salvage allocation, controls, exact source/mass/identity boundaries and focused tests/evidence routes. Run workspace tests/build/Clippy/fmt plus documentation validation.
+
+
+## Offline construction schema 22 (#550)
+
+[Canonical source, migration, high-water clock, remainder, saved safety reasons and atomic launch behavior](construction-offline.md). Versions 1–21 migrate without retroactive work; ordinary restore never credits time. Closed power and eligible timed systems settle before verified launch publication; saved scene and active survival remain frozen. The independent universe envelope is unchanged.

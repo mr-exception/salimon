@@ -1363,8 +1363,7 @@ record progress. `archive.rs` composes R start/stop and bounded evidence text;
 ledger. Ordinary ship/Fabricator tick settlement precedes low-priority Core
 funding; recovery only spends surplus above an emergency floor. Schema 7
 validates installed/pending/tray identity and reconstructs mass without charging.
-See [canonical contract](../../docs/data-recovery-module.md). No offline work,
-free coordinates or reconstruction of irrecoverable bytes. Native review #515.
+See [canonical contract](../../docs/data-recovery-module.md). Closed work uses [the schema-22 power schedule](../../docs/construction-offline.md); it grants no free coordinates or reconstruction of irrecoverable bytes. Native review #515.
 
 ### Modal/world overlay composition (#348)
 
@@ -1405,7 +1404,7 @@ retain their existing gates. `inspect.recovery` is an immutable serialized sourc
 snapshot supplied by `GameplaySession::recovery_observation`; `key: recovery`
 maps to physical R. No protocol command sets recovery state. Session regressions
 verify concurrent craft/thrust/recovery joule separation, schema-6 resources/jobs
-and actual Save Now/relaunch/restart with seven days of zero offline work.
+and actual Save Now/relaunch/restart. Closed power/work now follows [the schema-22 schedule](../../docs/construction-offline.md).
 
 ## Blueprint tool and placeholders (#542)
 
@@ -1562,3 +1561,8 @@ Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 cont
 ## Construction damage (#549)
 
 Follow the [canonical damage, physical salvage and schema-21 contract](../../docs/construction-damage.md). Surviving work preserves paid time and receipts; lost cells and destroyed projects cannot respawn or duplicate salvage. Core identity is protected. Fresh debris IDs, exact material shares, collision/containment and installed mass publish together; restore reconstructs source without reallocating debris.
+
+
+## Offline construction (#550)
+
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.

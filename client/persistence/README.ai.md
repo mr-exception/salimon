@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 20).
+`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 22).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -123,3 +123,8 @@ Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 cont
 
 
 #547 advances the envelope to schema 20 for runtime-owned optional module commissioning, maintenance receipts/work and durable downtime. Versions 1–19 migrate without granting modules or time; historical envelopes cannot smuggle module source. See [the module/save contract](../../docs/non-core-modules.md).
+
+
+## Offline construction (#550)
+
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.

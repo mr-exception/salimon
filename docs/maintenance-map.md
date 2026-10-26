@@ -542,3 +542,6 @@ The envelope/reader stays in `automation.rs`; native commands, observations and
 legacy key aliases have separate owners. Domain handlers call the existing
 production session API; protocol compatibility and scenario regressions live in
 `automation/tests.rs`.
+
+Domain input binding owners are in `client/runtime/src/session/input/` (#640);
+`app/input.rs` retains physical translation and native admission only.

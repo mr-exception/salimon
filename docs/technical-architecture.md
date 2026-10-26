@@ -1,5 +1,7 @@
 # Technical architecture and AI maintenance
 
+[Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
+
 ## Implemented architecture
 
 Salimon uses a custom Rust runtime with low-level `winit` and `wgpu`, without a

@@ -1,5 +1,7 @@
 # Feature maintenance map
 
+[Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
+
 Start with the affected row, then read that crate's `README.ai.md`,
 `architecture.md` and `invariants.md`. Paths below are repository-root-relative;
 Rust tests are generally inline `#[cfg(test)]` modules. Run focused checks while

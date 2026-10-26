@@ -30,6 +30,17 @@ jobs:
           python-version: "3.12"
       - name: Documentation validator contracts
         run: python -m unittest discover -s scripts -p test_check_docs.py -v
+      - name: Architecture audit contracts
+        run: python -m unittest discover -s scripts -p test_architecture_audit.py -v
+      - name: Architecture review candidates (non-blocking)
+        continue-on-error: true
+        run: python scripts/architecture_audit.py --output artifacts/architecture/current.json --summary
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: architecture-audit
+          path: artifacts/architecture/current.json
+          if-no-files-found: warn
       - name: Offline documentation validation
         env:
           DOCS_BASE: ${{ github.event.pull_request.base.sha }}

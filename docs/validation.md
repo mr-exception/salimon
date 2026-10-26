@@ -523,3 +523,11 @@ See [the maintained chronology and schema-22 contract](construction-offline.md):
 
 
 Cosmetic aging #581: [source/identity, successful use, schema 23, rendering budgets and exact verification](surface-age.md). Damage remains condition-driven; clean repairs restore normal geometry and preserve age.
+
+
+## Architecture review (#645)
+
+Run `python3 -m unittest discover -s scripts -p 'test_architecture_*.py' -v` and
+`python3 scripts/architecture_review.py --base origin/main --output artifacts/architecture/review.json`.
+Use the actual parent SHA for stacked PRs. See the [policy and limitations](architecture-baseline.md#warning-only-boundary-and-active-pr-review-645).
+CI retains candidates and active-PR inventories without failing valid builds on warnings.

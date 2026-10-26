@@ -268,6 +268,25 @@ pub(super) fn cargo_door(
     instances
 }
 
+/// Compose observational Scout visuals without changing domain state.
+pub(super) fn gameplay_ship(
+    session: &crate::session::GameplaySession,
+    ship: ShipSnapshot,
+) -> ShipMeshInstance {
+    let mut mesh = map_ship_to_renderer(ship);
+    mesh.independent_interior = true;
+    mesh.lighting = session.lighting_dto();
+    mesh.finish_tints = session.finish_palette();
+    mesh.surface_ages = session.ship_surface_ages();
+    mesh.bunk_open_fraction = session.habitation.bunk_open_fraction as f32;
+    mesh.fabricator_output_present = session.fabricator_output_present();
+    mesh.fabricator_output_medical = session.fabricator_output_medical();
+    mesh.fabricator_output_component = session.fabricator_output_component();
+    mesh.instruments.fabricator = session.fabricator_instruments();
+    mesh.machinery = crate::scout_feedback::capture(session, ship);
+    mesh
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::diagnostics::{camera_body_distances, camera_domain_metrics};

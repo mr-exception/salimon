@@ -276,3 +276,8 @@ Room and fixture lights #580: [canonical controls, source, effective output and 
 ## Cosmetic surface age (#581)
 
 Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+Pipeline extraction (#643) retains one Renderer resource owner and the existing
+scene/overlay draw, asynchronous timing, capture/submission/present order; see
+[owners](architecture.md#pipeline-and-frame-owners-643).

@@ -24,6 +24,7 @@ pub(crate) mod lifecycle;
 pub(crate) mod lighting;
 pub(crate) mod mounts;
 mod presentation;
+pub(crate) use presentation::Presentation;
 mod recovery;
 pub(crate) mod surface_age;
 mod survival;

@@ -553,3 +553,15 @@ central persistence retains the explicit layout and atomic publication. See the
 For session composition (#642), use `session/init.rs`, `commands.rs`,
 `interaction/actions.rs`, `input/state.rs`, `policy.rs` and the explicit
 `tick.rs` scheduler with power/character/resource stage owners.
+
+
+## Presentation extraction (#643)
+
+GPU initialization, resize and frame work: renderer `src/initialize.rs`,
+`src/surface.rs`, `src/frame.rs`; DTOs/resources remain in `src/lib.rs`.
+Native redraw/overlays: runtime `src/app/presentation.rs`; prompt priority/anchors:
+`src/app/presentation/prompts.rs`; Scout observation mapping:
+`src/app/scene.rs::gameplay_ship`. Tests remain with renderer camera/layout
+contracts and runtime scene/input/session owners. Production evidence routes:
+`scenarios/evidence/lower-cockpit-windows.json` and
+`scenarios/evidence/construction-interlocks.json`.

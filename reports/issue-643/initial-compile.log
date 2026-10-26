@@ -1,0 +1,147 @@
+    Blocking waiting for file lock on build directory
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Checking salimon-math v0.1.0 (/workspace/salimon/client/math)
+    Checking salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+warning: unused import: `CUBE_VERTEX_COUNT`
+ --> client/renderer/src/initialize.rs:3:26
+  |
+3 |     CAMERA_UNIFORM_SIZE, CUBE_VERTEX_COUNT, CUBE_VERTEX_STRIDE, CUBE_VERTICES, DEPTH_FORMAT,
+  |                          ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `salimon-renderer` (lib) generated 1 warning (run `cargo fix --lib -p salimon-renderer` to apply 1 suggestion)
+    Checking pollster v0.4.0
+    Checking salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+    Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+    Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Checking salimon-character v0.1.0 (/workspace/salimon/client/character)
+    Checking salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+    Checking salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+    Checking salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+error[E0425]: cannot find function `door_passable` in this scope
+  --> client/runtime/src/app/presentation/prompts.rs:40:13
+   |
+40 |             door_passable(ship_snapshot),
+   |             ^^^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this function
+   |
+ 2 + use crate::session::door_passable;
+   |
+
+error[E0425]: cannot find value `ship_snapshot` in this scope
+  --> client/runtime/src/app/presentation/prompts.rs:40:27
+   |
+40 |             door_passable(ship_snapshot),
+   |                           ^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `door_passable` in this scope
+  --> client/runtime/src/app/presentation/prompts.rs:55:17
+   |
+55 |                 door_passable(ship_snapshot),
+   |                 ^^^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this function
+   |
+ 2 + use crate::session::door_passable;
+   |
+
+error[E0425]: cannot find value `ship_snapshot` in this scope
+  --> client/runtime/src/app/presentation/prompts.rs:55:31
+   |
+55 |                 door_passable(ship_snapshot),
+   |                               ^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `door_passable` in this scope
+  --> client/runtime/src/app/presentation/prompts.rs:63:13
+   |
+63 |             door_passable(ship_snapshot),
+   |             ^^^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this function
+   |
+ 2 + use crate::session::door_passable;
+   |
+
+error[E0425]: cannot find value `ship_snapshot` in this scope
+  --> client/runtime/src/app/presentation/prompts.rs:63:27
+   |
+63 |             door_passable(ship_snapshot),
+   |                           ^^^^^^^^^^^^^ not found in this scope
+
+error[E0433]: cannot find module or crate `interaction` in this scope
+  --> client/runtime/src/app/presentation/prompts.rs:80:32
+   |
+80 | ...                   || interaction::prompt_placement(target, render_ship_frame),
+   |                          ^^^^^^^^^^^ use of unresolved module or unlinked crate `interaction`
+   |
+   = help: if you wanted to use a crate named `interaction`, use `cargo add interaction` to add it to your `Cargo.toml`
+help: consider importing this module
+   |
+ 2 + use crate::app::interaction;
+   |
+
+error[E0425]: cannot find function `surface_size` in this scope
+   --> client/runtime/src/app/presentation.rs:415:20
+    |
+415 |                 if surface_size(&window).is_drawable() {
+    |                    ^^^^^^^^^^^^
+    |
+help: a local variable with a similar name exists
+    |
+415 -                 if surface_size(&window).is_drawable() {
+415 +                 if surface_frame(&window).is_drawable() {
+    |
+help: consider importing this function through its public re-export
+    |
+  2 + use crate::app::surface_size;
+    |
+
+error[E0603]: module `presentation` is private
+  --> client/runtime/src/app/presentation/prompts.rs:20:40
+   |
+20 |         presentation: &crate::session::presentation::Presentation,
+   |                                        ^^^^^^^^^^^^  ------------ struct `Presentation` is not publicly re-exported
+   |                                        |
+   |                                        private module
+   |
+note: the module `presentation` is defined here
+  --> client/runtime/src/session.rs:26:1
+   |
+26 | mod presentation;
+   | ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `door_passable`
+  --> client/runtime/src/app.rs:46:32
+   |
+46 | use crate::session::{ViewMode, door_passable};
+   |                                ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0599]: no method named `flush` found for struct `std::io::Stdout` in the current scope
+   --> client/runtime/src/app.rs:343:18
+    |
+342 | /             std::io::stdout()
+343 | |                 .flush()
+    | |                 -^^^^^ method not found in `std::io::Stdout`
+    | |_________________|
+    |
+    |
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/io/write.rs:178:7
+    |
+    = note: the method is available for `std::io::Stdout` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Write` which provides `flush` is implemented but not in scope; perhaps you want to import it
+    |
+  1 + use std::io::Write;
+    |
+
+Some errors have detailed explanations: E0425, E0433, E0599, E0603.
+For more information about an error, try `rustc --explain E0425`.
+warning: `salimon-client` (bin "salimon-client") generated 1 warning
+error: could not compile `salimon-client` (bin "salimon-client") due to 10 previous errors; 1 warning emitted

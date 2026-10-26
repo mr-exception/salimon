@@ -448,3 +448,10 @@ and `presentation.rs`. Do not register unordered callbacks or move power consume
 across these boundaries. Domain-specific behavior normally changes its stage or
 owner, without editing the central session file. New domains/shared contracts
 still require explicit composition review; this is not a generic plugin system.
+
+
+Native presentation (#643): redraw/overlay composition lives in
+`src/app/presentation.rs`, contextual prompt policy in its `prompts.rs` child,
+and Scout visual fields in `src/app/scene.rs::gameplay_ship`. Read the
+[presentation boundary](architecture.md#native-presentation-composition-643)
+before editing lifecycle/input in `app.rs`.

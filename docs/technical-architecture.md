@@ -679,3 +679,14 @@ and [stage contract](../client/runtime/invariants.md#session-composition-owners-
 identify the update order and source files. Save/restart/offline publication copies
 host policy and resets held input; schema 23 remains unchanged. No new dynamic
 registry, event bus, dependency cycle or hidden scheduler is introduced.
+
+
+## Presentation owners (#643)
+
+Renderer resource ownership and public DTOs remain in its facade. Private
+initialization, surface and frame modules isolate GPU construction, drawable
+resize and ordered submission. Runtime native presentation and contextual
+prompts have focused app owners, while Scout visuals map through the scene
+adapter. See [renderer ownership](../client/renderer/architecture.md#pipeline-and-frame-owners-643)
+and [runtime composition](../client/runtime/architecture.md#native-presentation-composition-643).
+No domain dependency, API, shader layout, draw order or simulation authority changes.

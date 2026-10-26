@@ -1,0 +1,92 @@
+{
+  "parent_commit": "28300ede91c69367f73beb2a8f95e27bc0f60c1b",
+  "environment": "Linux x86_64; Xvfb 1280x800 scale 1; Mesa llvmpipe Vulkan; native GPU surface capture; fixed-step protocol input; LP_NUM_THREADS=2",
+  "routes": [
+    {
+      "name": "flight",
+      "parent_status": "passed",
+      "current_status": "passed",
+      "steps": 24,
+      "images": [
+        {
+          "file": "step-003-forward-approach.png",
+          "parent_sha256": "301cbbca5ab75410b58701d989736d426fc23a3c9d55637a6cc839c50be3fe68",
+          "current_sha256": "301cbbca5ab75410b58701d989736d426fc23a3c9d55637a6cc839c50be3fe68",
+          "byte_identical": true
+        },
+        {
+          "file": "step-005-lower-port-approach.png",
+          "parent_sha256": "41e75803b9a5a22e5ce2fedb26c4f66c4eab4ef119277ea42f2a37089958cae6",
+          "current_sha256": "41e75803b9a5a22e5ce2fedb26c4f66c4eab4ef119277ea42f2a37089958cae6",
+          "byte_identical": true
+        },
+        {
+          "file": "step-009-lower-port-low-altitude.png",
+          "parent_sha256": "57b698159b6bc25fcd796f2e4878603934cf9a62e1220e680f3d29cc97001285",
+          "current_sha256": "57b698159b6bc25fcd796f2e4878603934cf9a62e1220e680f3d29cc97001285",
+          "byte_identical": true
+        },
+        {
+          "file": "step-011-lower-port-landed.png",
+          "parent_sha256": "2a6c8ae42269ae2ef800ba22db1b7a9782b246408a124aa98f63f8693f22e578",
+          "current_sha256": "2a6c8ae42269ae2ef800ba22db1b7a9782b246408a124aa98f63f8693f22e578",
+          "byte_identical": true
+        },
+        {
+          "file": "step-013-lower-starboard-landed.png",
+          "parent_sha256": "b5ec0ac93cf7437a634e5eacdac1b18f42dfd955448df0f51ba0e4415b73300f",
+          "current_sha256": "b5ec0ac93cf7437a634e5eacdac1b18f42dfd955448df0f51ba0e4415b73300f",
+          "byte_identical": true
+        },
+        {
+          "file": "step-015-forward-landed.png",
+          "parent_sha256": "5ae4a6706e330c2968e0a3beb346c6156375b4d0c7b2cd00760dd7a66c0aecd7",
+          "current_sha256": "5ae4a6706e330c2968e0a3beb346c6156375b4d0c7b2cd00760dd7a66c0aecd7",
+          "byte_identical": true
+        },
+        {
+          "file": "step-020-lower-starboard-after-takeoff.png",
+          "parent_sha256": "5dd44000471cb0bc41626ef7dbd9f13e8efaa027bc31771975180d0f2ceb8327",
+          "current_sha256": "5dd44000471cb0bc41626ef7dbd9f13e8efaa027bc31771975180d0f2ceb8327",
+          "byte_identical": true
+        },
+        {
+          "file": "step-024-standing-cockpit.png",
+          "parent_sha256": "3c4aaadff20ce5b00a59c7d04c01df3d0decf8ff94562237eabdd1ab332516d8",
+          "current_sha256": "3c4aaadff20ce5b00a59c7d04c01df3d0decf8ff94562237eabdd1ab332516d8",
+          "byte_identical": true
+        }
+      ]
+    },
+    {
+      "name": "construction",
+      "parent_status": "passed",
+      "current_status": "passed",
+      "steps": 21,
+      "images": [
+        {
+          "file": "step-008-stopped-secured.png",
+          "parent_sha256": "703bba8281eae2b3ce070119a4ea26613caefb1c488c18e8256545c64c62019b",
+          "current_sha256": "703bba8281eae2b3ce070119a4ea26613caefb1c488c18e8256545c64c62019b",
+          "byte_identical": true
+        },
+        {
+          "file": "step-017-stopped-after-explicit-resume.png",
+          "parent_sha256": "df15c213450cca988b13ba56bac6e85359bd1da0a35c05f1c0bba8bc26d179a9",
+          "current_sha256": "df15c213450cca988b13ba56bac6e85359bd1da0a35c05f1c0bba8bc26d179a9",
+          "byte_identical": true
+        },
+        {
+          "file": "step-021-cancelled-physical-refund.png",
+          "parent_sha256": "33b38e1e6ee12f187a8a146b2f4b361c8a5061378e8f1243e72f24252963d79f",
+          "current_sha256": "33b38e1e6ee12f187a8a146b2f4b361c8a5061378e8f1243e72f24252963d79f",
+          "byte_identical": true
+        }
+      ]
+    }
+  ],
+  "binaries": {
+    "parent": "7b840ba0c8d61fde3a8ed7d5e4a50c7e6e7b3d3efbfa67397c7185010be93eb1",
+    "current": "ea51860a22833b2e95de1d935966c364a0278e9f39f086144721d64d8b4f7bf8"
+  }
+}

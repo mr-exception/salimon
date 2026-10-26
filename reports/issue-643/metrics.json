@@ -1,0 +1,70 @@
+{
+  "client/renderer/src/lib.rs": {
+    "before": {
+      "lines": 1623,
+      "branch_tokens": 63,
+      "functions": 49
+    },
+    "after": {
+      "lines": 1007,
+      "branch_tokens": 39,
+      "functions": 44
+    }
+  },
+  "client/runtime/src/app.rs": {
+    "before": {
+      "lines": 2046,
+      "branch_tokens": 311,
+      "functions": 53
+    },
+    "after": {
+      "lines": 1476,
+      "branch_tokens": 225,
+      "functions": 52
+    }
+  },
+  "client/runtime/src/app/scene.rs": {
+    "before": {
+      "lines": 480,
+      "branch_tokens": 25,
+      "functions": 9
+    },
+    "after": {
+      "lines": 499,
+      "branch_tokens": 25,
+      "functions": 10
+    }
+  },
+  "new_owners": [
+    {
+      "path": "client/renderer/src/frame.rs",
+      "lines": 372,
+      "branch_tokens": 18,
+      "functions": 2
+    },
+    {
+      "path": "client/renderer/src/initialize.rs",
+      "lines": 243,
+      "branch_tokens": 4,
+      "functions": 1
+    },
+    {
+      "path": "client/renderer/src/surface.rs",
+      "lines": 25,
+      "branch_tokens": 2,
+      "functions": 2
+    },
+    {
+      "path": "client/runtime/src/app/presentation/prompts.rs",
+      "lines": 178,
+      "branch_tokens": 22,
+      "functions": 1
+    },
+    {
+      "path": "client/runtime/src/app/presentation.rs",
+      "lines": 441,
+      "branch_tokens": 64,
+      "functions": 1
+    }
+  ]
+}

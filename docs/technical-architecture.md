@@ -643,9 +643,12 @@ The [maintained acoustics contract](scout-acoustics.md) describes actual mechani
 
 ## Automatic construction (#544)
 
-See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence completed [modular structure](modular-construction.md) and [optional module commissioning](non-core-modules.md).
 
 
 ## Completed modular structure (#545)
 
 See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+Optional module composition (#547): runtime construction owns tier/maintenance/commissioning source, existing ship Funding/Work retain material/time arithmetic, Recovery requests actual Core-funded throughput and renderer consumes physical case geometry. See [the canonical owner and save/test mapping](non-core-modules.md).

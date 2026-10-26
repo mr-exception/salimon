@@ -1,0 +1,115 @@
+{
+  "setup": {
+    "scenario": "construction-module",
+    "seed": 547,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "assert": {
+        "path": "construction.recovery_multiplier",
+        "equals": 1.0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "planned",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 75
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 500000
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "half-built",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 75
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "construction.recovery_multiplier",
+        "equals": 1.25
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "commissioned",
+      "timeout_ms": 60000
+    }
+  ]
+}

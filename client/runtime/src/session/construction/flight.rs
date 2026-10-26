@@ -9,7 +9,7 @@ impl GameplaySession {
     /// Current construction publishes sealed geometry atomically. There are no
     /// half-built hull openings to pretend are sealed. Detect missing/edited
     /// completed faces and attachment loss against their canonical source.
-    fn construction_hull_ready(&self) -> bool {
+    pub(super) fn construction_hull_ready(&self) -> bool {
         self.building
             .source
             .structure(None)
@@ -70,6 +70,9 @@ impl GameplaySession {
             self.feedback = Some("Aim at a reachable unfinished project");
             return;
         };
+        if self.module_stop_resume(id) {
+            return;
+        }
         let p = self
             .building
             .source

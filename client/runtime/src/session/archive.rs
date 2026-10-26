@@ -210,7 +210,8 @@ impl GameplaySession {
             record,
             self.recovery.panel(
                 self.recovery_reserve(),
-                self.ship.snapshot().energy_core.stored_joules
+                self.ship.snapshot().energy_core.stored_joules,
+                self.utility_recovery_multiplier()
             ),
             self.archive.read.len(),
             RECORDS.len()

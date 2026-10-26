@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "results": [
+    {
+      "scenario": "scenarios/evidence/construction-module.json",
+      "status": "passed",
+      "steps_completed": 16,
+      "duration_ms": 27879,
+      "artifact_directory": "/workspace/salimon/artifacts/issue-547/verified/run-6qwdpht4",
+      "result_file": "/workspace/salimon/artifacts/issue-547/verified/run-6qwdpht4/result.json"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "results": [
+    {
+      "scenario": "scenarios/evidence/construction-module-upgrade.json",
+      "status": "passed",
+      "steps_completed": 27,
+      "duration_ms": 37541,
+      "artifact_directory": "/workspace/salimon/artifacts/issue-547/verified/run-o7znutra",
+      "result_file": "/workspace/salimon/artifacts/issue-547/verified/run-o7znutra/result.json"
+    }
+  ]
+}

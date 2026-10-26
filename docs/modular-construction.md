@@ -6,7 +6,7 @@ project, one material supply and one automatic build, with no Start action.
 The two-deck room reserves four 3 m cells (6 × 6 × 3 m), retains the approved
 40 kg iron cost and 300-second duration, and includes a 20-tread staircase,
 upper-deck hatch and landing. Hull/deck cells retain their existing cost/time.
-Utility-module commissioning remains #547. Internal doors complete into
+Utility-module commissioning follows the [non-Core module contract](non-core-modules.md). Internal doors complete into
 manual pocket doors: with C open, aim and press E to open/close. Closing checks
 the player and physical cargo before changing the saved state; the leaves
 retract into their frame pockets. No powered module is fabricated here.
@@ -111,3 +111,8 @@ not evidence of mining a 40 kg piece or physical OS input. See the
 [issue report](../reports/issue-545/README.md) for actual results and limitations.
 Human presentation review remains #561; physical devices #557 and hardware/Metal
 budgets #563. Software Vulkan images do not establish hardware frame rate.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.

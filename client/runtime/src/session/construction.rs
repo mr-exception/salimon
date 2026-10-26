@@ -2,8 +2,10 @@
 mod boarding;
 mod doors;
 mod evidence;
+pub(crate) use evidence::evidence_module;
 mod flight;
 mod installed;
+mod modules;
 mod work;
 use super::{GameplaySession, frames::character_ship_frame};
 use salimon_character::{CharacterLocation, SHIP_FLOOR_HEIGHT_METERS};
@@ -37,10 +39,13 @@ pub(crate) enum BuildAction {
     Cancel,
     RemovePartition,
     StopResume,
+    Module,
 }
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ConstructionSave {
+    #[serde(default)]
+    pub(super) modules: std::collections::BTreeMap<PlaceholderId, modules::Module>,
     pub(crate) projects: Placements,
     #[serde(default)]
     pub(crate) removed_partitions: Vec<salimon_ship::structure::shell::PartitionEdit>,
@@ -109,6 +114,7 @@ impl salimon_persistence::Validate for ConstructionSave {
                     .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
             }
         }
+        self.validate_modules()?;
         Ok(())
     }
 }
@@ -307,6 +313,19 @@ impl GameplaySession {
             self.toggle_completed_door(id);
             return;
         }
+        if self.feed_module(id) {
+            return;
+        }
+        if self
+            .building
+            .source
+            .projects
+            .inspect(id)
+            .is_some_and(|p| p.work.completed)
+        {
+            self.feedback = Some("G: upgrade / restoration / commissioning");
+            return;
+        }
         let approved = self.building.catalog.approved_economy;
         let Ok(p) = self.building.source.projects.funding_mut(id, OWNER) else {
             return;
@@ -336,16 +355,15 @@ impl GameplaySession {
         self.sync_carried();
         self.sync_fabricator_mass();
     }
-    fn cancel_construction(&mut self, id: PlaceholderId) -> Result<(), ()> {
-        let job = self.building.source.projects.inspect(id).ok_or(())?;
-        let mut refunds = job
-            .funding
-            .refunds(&job.blueprint.requirements)
-            .map_err(|_| ())?;
+    fn return_construction_materials(
+        &mut self,
+        mut refunds: Vec<salimon_world::resources::ResourceFragment>,
+    ) -> Result<(), ()> {
         let state = self.snapshot();
         let frame = character_ship_frame(state.ship.pose);
         let eye = frame.world_to_local(state.character.eye_position_meters);
         let mut solids = self.cabin_solids();
+        solids.extend(self.construction_solids());
         if self.cargo_door.open_fraction < 1. {
             solids.push(salimon_character::cargo::cargo_door_bounds(
                 self.cargo_door.open_fraction,
@@ -407,6 +425,24 @@ impl GameplaySession {
         if !self.mining.session.return_reserved_loose(&refunds) {
             return Err(());
         }
+        Ok(())
+    }
+    fn cancel_construction(&mut self, id: PlaceholderId) -> Result<(), ()> {
+        if self
+            .building
+            .source
+            .modules
+            .get(&id)
+            .is_some_and(|m| m.maintenance.is_some())
+        {
+            return self.cancel_module(id);
+        }
+        let job = self.building.source.projects.inspect(id).ok_or(())?;
+        let refunds = job
+            .funding
+            .refunds(&job.blueprint.requirements)
+            .map_err(|_| ())?;
+        self.return_construction_materials(refunds)?;
         let p = self
             .building
             .source
@@ -419,6 +455,7 @@ impl GameplaySession {
             .projects
             .cancel(id, OWNER)
             .map_err(|_| ())?;
+        self.building.source.modules.remove(&id);
         self.sync_carried();
         self.sync_fabricator_mass();
         Ok(())
@@ -445,7 +482,14 @@ impl GameplaySession {
             if p.work.completed && !supports_completion(p) {
                 return Err(invalid("unsupported completed construction"));
             }
-            for f in &p.funding.receipts {
+            for f in p.funding.receipts.iter().chain(
+                self.building
+                    .source
+                    .modules
+                    .get(&p.id)
+                    .into_iter()
+                    .flat_map(|m| m.receipts()),
+            ) {
                 if !ids.insert(f.id())
                     || core_ids.contains(&f.id())
                     || f.id().0 > next
@@ -627,8 +671,10 @@ impl GameplaySession {
             self.feedback = Some("Get up before placing construction projects");
             return;
         }
-        if matches!(action, BuildAction::Place | BuildAction::RemovePartition)
-            && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
+        if matches!(
+            action,
+            BuildAction::Place | BuildAction::RemovePartition | BuildAction::Module
+        ) && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
         {
             return;
         }
@@ -670,6 +716,10 @@ impl GameplaySession {
         let (eye, target, obstacles, flight, authorized) = self.construction_inputs();
         if !authorized {
             self.feedback = Some("Leave cockpit control to place or cancel a blueprint");
+            return;
+        }
+        if matches!(action, BuildAction::Module) {
+            self.module_action();
             return;
         }
         if matches!(action, BuildAction::StopResume) {
@@ -714,7 +764,10 @@ impl GameplaySession {
         let hovered = self
             .aimed_construction()
             .and_then(|id| self.building.source.projects.inspect(id));
-        let blueprint = hovered.map_or(&p.blueprint, |job| &job.blueprint);
+        let maintenance_blueprint = hovered.and_then(|job| self.module_blueprint(job.id));
+        let blueprint = maintenance_blueprint
+            .as_ref()
+            .unwrap_or_else(|| hovered.map_or(&p.blueprint, |job| &job.blueprint));
         let resources = blueprint
             .requirements
             .iter()
@@ -728,7 +781,9 @@ impl GameplaySession {
             .collect::<Vec<_>>()
             .join(" / ");
         let status = if let Some(job) = hovered {
-            if job.work.completed {
+            if let Some(status) = self.module_status(job.id) {
+                status
+            } else if job.work.completed {
                 if job.blueprint.id == "internal-door" {
                     "COMPLETED | E open/close".to_string()
                 } else {
@@ -748,7 +803,7 @@ impl GameplaySession {
                 .map_or_else(|| "CLEAR".to_string(), |e| format!("{e:?}"))
         };
         Some(format!(
-            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | T stop/resume | Delete partition | C close",
+            "{} | {}\n{} | {}s (estimate)\n1-7 choose | R rotate | LMB place | E feed | RMB cancel | T stop/resume | G module | Delete partition | C close",
             hovered.map_or_else(
                 || blueprint.name.clone(),
                 |job| format!("Project #{} {}", job.id.0, blueprint.name)
@@ -761,7 +816,7 @@ impl GameplaySession {
 
     pub(crate) fn construction_inspect(&self) -> serde_json::Value {
         let preview = self.construction_preview();
-        serde_json::json!({"active":self.building.active,"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"structure":self.building.structure.save_state(),"volumes":self.structural_volumes(),"solids":self.structural_solids(),"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
+        serde_json::json!({"active":self.building.active,"modules":self.building.source.modules,"recovery_multiplier":self.utility_recovery_multiplier(),"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"structure":self.building.structure.save_state(),"volumes":self.structural_volumes(),"solids":self.structural_solids(),"installed_solids":self.construction_solids(),"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
     }
     pub(crate) fn construction_boxes(&self) -> Vec<(Envelope, [f32; 4])> {
         let mut boxes: Vec<_> = self

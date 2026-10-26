@@ -76,6 +76,9 @@ malformed saves and exhausted allocator atomicity. Production wgpu routes:
 
 [Completion evidence](../reports/issue-549/README.md) records actual results.
 Human presentation review remains #561, physical platform/input checks #557,
-and hardware/Metal budgets #563. Offline chronology is #550; universe/scanner
+and hardware/Metal budgets #563. Offline chronology follows [the schema-22 contract](construction-offline.md); universe/scanner
 integration remains #433. No new combat system, decompression simulation or
 reference-hardware performance claim follows from the damage boundary.
+
+
+Closed-game power and eligible construction/maintenance now follow [the schema-22 offline contract](construction-offline.md). Native launch advances service/conversion, Fabricator/Recovery and eligible work while preserving the saved scene and active survival clock. Future universe/scanner/trajectory events remain #433.

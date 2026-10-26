@@ -244,20 +244,47 @@ fn complete_disk_roundtrip_matrix_and_deterministic_continuation() {
 }
 
 #[test]
-fn disk_resume_freezes_everything_except_fatigue_and_replay_is_idempotent() {
+fn disk_resume_advances_timed_power_and_fabrication_but_freezes_physical_and_survival_sources() {
     let dir = Directory::new();
     let mut s = initialize(e2e::Scenario::CargoFlight);
     add_effects(&mut s);
     enqueue(&mut s, "food-ration", 1);
     s.advance_automation(Duration::from_millis(1375));
     checkpoint(&dir, &s, 100);
-    let mut expected = value(&s);
-    let mut resumed = reload(&dir, 21700); // Exactly the approved six-hour cap.
+    let before = value(&s);
+    let mut resumed = reload(&dir, 21700);
     assert_eq!(resumed.survival.snapshot().fatigue, Points::FULL);
-    expected["state"]["survival"]["vitals"]["fatigue"] =
-        serde_json::to_value(Points::FULL).unwrap();
-    expected["state"]["survival"]["vitals"]["offline_watermark"] = json!(21700);
-    assert_eq!(value(&resumed), expected);
+    let expected = value(&resumed);
+    assert_eq!(
+        expected["state"]["physical"]["world"],
+        before["state"]["physical"]["world"]
+    );
+    assert_eq!(
+        expected["state"]["physical"]["ship"]["pose"],
+        before["state"]["physical"]["ship"]["pose"]
+    );
+    assert_eq!(
+        expected["state"]["physical"]["motion"],
+        before["state"]["physical"]["motion"]
+    );
+    assert_eq!(
+        resumed.survival.snapshot().health,
+        s.survival.snapshot().health
+    );
+    assert_eq!(
+        resumed.survival.snapshot().hunger,
+        s.survival.snapshot().hunger
+    );
+    assert_eq!(
+        resumed.survival.active_effects().collect::<Vec<_>>(),
+        s.survival.active_effects().collect::<Vec<_>>()
+    );
+    assert!(resumed.fabricator.snapshot(true).tray.is_some());
+    assert!(
+        resumed.ship.snapshot().energy_core.stored_joules
+            < s.ship.snapshot().energy_core.stored_joules
+    );
+    assert_eq!(expected["state"]["offline"]["watermark"], json!(21700));
     for utc in [21700, 99, 100, 21699, 21700] {
         resumed = reload(&dir, utc);
         assert_eq!(value(&resumed), expected, "replay/rollback at {utc}");

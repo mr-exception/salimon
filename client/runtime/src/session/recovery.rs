@@ -159,6 +159,10 @@ impl GameplaySession {
             self.recovery.active = Some(i);
         }
     }
+    pub(super) fn recovery_work_pending(&self) -> bool {
+        self.recovery.active.is_some()
+    }
+
     pub(super) fn advance_recovery(&mut self, delta: Duration) {
         let Some(i) = self.recovery.active else {
             return;

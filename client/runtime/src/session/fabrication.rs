@@ -138,6 +138,14 @@ impl GameplaySession {
         }
     }
 
+    fn advance_ship_power(&mut self, delta: std::time::Duration) {
+        if self.offline_power {
+            self.ship.advance_offline_power(delta);
+        } else {
+            self.ship.advance(delta);
+        }
+    }
+
     /// One shared tick; recipe completion ends its draw before the rest of the tick.
     pub(super) fn advance_fabrication(&mut self, delta: std::time::Duration) {
         let mut remaining = delta;
@@ -146,14 +154,14 @@ impl GameplaySession {
                 self.ship
                     .set_fabricator_watts(0.0)
                     .expect("zero load is valid");
-                self.ship.advance(remaining);
+                self.advance_ship_power(remaining);
                 break;
             };
             let active = demand.until_output.min(remaining);
             self.ship
                 .set_fabricator_watts(demand.watts)
                 .expect("validated recipe watts");
-            self.ship.advance(active);
+            self.advance_ship_power(active);
             let funded = self.ship.fabricator_powered_duration(active);
             self.fabricator.step(funded, true);
             if self
@@ -173,7 +181,7 @@ impl GameplaySession {
                 self.ship
                     .set_fabricator_watts(0.0)
                     .expect("zero load is valid");
-                self.ship.advance(remaining);
+                self.advance_ship_power(remaining);
                 break;
             }
         }

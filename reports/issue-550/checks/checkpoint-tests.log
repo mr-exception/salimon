@@ -1,0 +1,29 @@
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.36s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 21 tests
+test checkpoints::control::tests::failure_waits_for_retry_cancel_or_explicit_risk_choice ... ok
+test checkpoints::control::tests::old_inflight_save_cannot_satisfy_a_new_exit_request ... ok
+test checkpoints::control::tests::cancel_while_busy_never_exits_and_rapid_pending_requests_stay_bounded ... ok
+test checkpoints::control::tests::timestamp_requires_verification_and_failed_writes_never_report_success ... ok
+test checkpoints::lifecycle_tests::archive_is_idempotent_conflicting_report_rejects_and_new_run_serial_avoids_history ... ok
+test checkpoints::lifecycle_tests::death_checkpoint_archives_before_restart_and_launch_repairs_missing_report ... ok
+test checkpoints::lifecycle_tests::report_versions_are_immutable_and_both_namespaces_reserve_run_ids ... ok
+test checkpoints::lifecycle_tests::launch_commits_fatigue_and_timed_power_once_preserving_healing_and_rollback_watermarks ... ok
+test checkpoints::lifecycle_tests::terminal_native_restart_archives_once_and_corrupt_latest_cannot_restore_old_run ... ok
+test checkpoints::manual_tests::corrupt_write_keeps_previous_generation_and_explicit_risk_exit_is_not_saved ... ok
+test checkpoints::manual_tests::disk_full_exit_waits_retry_works_while_game_time_is_frozen ... ok
+test checkpoints::manual_tests::stationary_save_and_exit_coalesces_and_saves_latest_state_without_a_tick ... ok
+test checkpoints::publication_failure_tests::failed_offline_credit_publication_does_not_expose_candidate_or_destroy_prior_checkpoint ... ok
+test checkpoints::publication_failure_tests::terminal_checkpoint_retry_uses_host_time_while_gameplay_clock_is_frozen ... ok
+test checkpoints::scenarios::persistence_scenario_failed_manual_save_never_acknowledges_and_previous_full_session_recovers ... ok
+test checkpoints::tests::durable_restore_closes_q_wheel_and_clears_primary_without_consumption ... ok
+test checkpoints::tests::five_hundred_fragment_native_checkpoint_preserves_ids_mass_and_clocks ... ok
+test checkpoints::tests::periodic_boundary_and_discrete_events_schedule_without_waiting_for_render_time ... ok
+test checkpoints::tests::startup_exit_roundtrip_and_corrupted_latest_fallback ... ok
+test session::persistence_scenarios::native_reference_checkpoints_376 ... ignored, writes opt-in native review fixtures; requires SALIMON_NATIVE_REVIEW_DIR
+test checkpoints::scenarios::persistence_scenario_death_restart_failure_at_every_transaction_boundary ... ok
+
+test result: ok. 20 passed; 0 failed; 1 ignored; 0 measured; 447 filtered out; finished in 1.68s
+

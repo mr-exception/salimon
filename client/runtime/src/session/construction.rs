@@ -840,9 +840,19 @@ impl GameplaySession {
         ))
     }
 
+    pub(in crate::session) fn construction_safety_record(
+        &self,
+    ) -> std::collections::BTreeMap<u64, String> {
+        self.building
+            .source
+            .projects
+            .jobs()
+            .map(|p| (p.id.0, self.construction_status(p)))
+            .collect()
+    }
     pub(crate) fn construction_inspect(&self) -> serde_json::Value {
         let preview = self.construction_preview();
-        serde_json::json!({"active":self.building.active,"modules":self.building.source.modules,"recovery_multiplier":self.utility_recovery_multiplier(),"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"damage":self.building.source.damage,"structure":self.building.structure.save_state(),"volumes":self.structural_volumes(),"solids":self.structural_solids(),"installed_solids":self.construction_solids(),"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
+        serde_json::json!({"offline_clock":self.offline,"active":self.building.active,"modules":self.building.source.modules,"recovery_multiplier":self.utility_recovery_multiplier(),"approved_economy":self.building.catalog.approved_economy,"selected":self.building.catalog.blueprints[self.building.selected].id,"damage":self.building.source.damage,"structure":self.building.structure.save_state(),"volumes":self.structural_volumes(),"solids":self.structural_solids(),"installed_solids":self.construction_solids(),"projects":self.building.source.projects.jobs().collect::<Vec<_>>(),"status":self.building.source.projects.jobs().map(|p|(p.id.0.to_string(),self.construction_status(p))).collect::<std::collections::BTreeMap<_,_>>(),"aimed_project":self.aimed_construction().map(|id|id.0),"preview":preview.map(|p|serde_json::json!({"anchor":p.anchor_meters,"space":p.space,"cells":p.cells,"valid":p.rejection.is_none(),"feedback":p.rejection.map(|e|format!("{e:?}")),"requirements":p.blueprint.requirements,"duration_seconds":p.blueprint.duration_seconds}))})
     }
     pub(crate) fn construction_boxes(&self) -> Vec<(Envelope, [f32; 4])> {
         let mut boxes: Vec<_> = self
@@ -902,7 +912,7 @@ impl GameplaySession {
 }
 
 #[cfg(test)]
-mod room_tests;
+pub(in crate::session) mod room_tests;
 #[cfg(test)]
 mod tests;
 

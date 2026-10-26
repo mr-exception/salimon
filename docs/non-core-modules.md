@@ -56,8 +56,7 @@ Completed work cannot be cancelled as unfinished work.
 Only paid work advances. Pause/terminal state, no surplus power, stopped or damaged
 work and unsafe geometry pause maintenance without changing receipts or elapsed
 nanoseconds. The same actual Core auxiliary funding and mobility/flight reserve
-used by ordinary construction apply. No closed-game construction time is granted;
-chronological offline work remains #550.
+used by ordinary construction apply. Closed-game maintenance follows [the schema-22 offline contract](construction-offline.md).
 
 Commissioning checks current power, original Core-connected hull, actual deck
 support, damage and player/cargo/fixture clearance. The module's own installed
@@ -116,3 +115,6 @@ footprint and safety; the utility processor is the completed example.
 
 
 Gameplay damage, safe dismantling, surviving-site recovery and physical debris now follow the [damage contract](construction-damage.md). Offline progression remains #550.
+
+
+Closed-game power and eligible construction/maintenance now follow [the schema-22 offline contract](construction-offline.md). Native launch advances service/conversion, Fabricator/Recovery and eligible work while preserving the saved scene and active survival clock. Future universe/scanner/trajectory events remain #433.

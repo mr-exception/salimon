@@ -657,3 +657,8 @@ Optional module composition (#547): runtime construction owns tier/maintenance/c
 ## Construction damage and salvage (#549)
 
 See the [canonical damage and schema-21 contract](construction-damage.md) for runtime `session/construction/damage.rs`, ship lost-cell geometry, world sealed salvage allocation, controls, exact source/mass/identity boundaries and focused tests/evidence routes. Run workspace tests/build/Clippy/fmt plus documentation validation.
+
+
+## Offline construction (#550)
+
+See [the maintained chronology and schema-22 contract](construction-offline.md): runtime `session/offline.rs`, ship `controller/offline.rs`, launch/checkpoint staging and existing work owners. Run offline/checkpoint/Recovery and ship tests, workspace build/tests/Clippy/fmt, the two documented wgpu routes and docs/base-impact validation. Future #433 supplies verified universe events; no scanner or orbit implementation is duplicated here.

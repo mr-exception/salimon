@@ -12,6 +12,7 @@ pub(crate) mod cockpit;
 mod collision;
 mod door;
 mod flight;
+mod offline;
 pub mod persistence;
 mod steering;
 pub(crate) mod telemetry;

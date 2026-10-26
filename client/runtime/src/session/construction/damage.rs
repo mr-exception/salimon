@@ -345,7 +345,10 @@ impl GameplaySession {
             });
         }
     }
-    pub(super) fn dismantle_construction(&mut self, target: Target) -> Result<(), &'static str> {
+    pub(in crate::session) fn dismantle_construction(
+        &mut self,
+        target: Target,
+    ) -> Result<(), &'static str> {
         if !matches!(
             self.ship.snapshot().flight_state,
             salimon_ship::FlightState::Landed { .. }

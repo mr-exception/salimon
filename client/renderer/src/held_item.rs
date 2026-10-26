@@ -12,6 +12,7 @@ const FLOATS: usize = 15;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeldItemInstance {
     pub active: bool,
+    pub surface_age: f32,
 }
 
 // Column-major asset-to-view transform: asset +X forward, +Y up, +Z right.
@@ -249,7 +250,17 @@ impl HeldItemRenderer {
                 },
             ],
         });
-        let shader = device.create_shader_module(wgpu::include_wgsl!("held_item.wgsl"));
+        let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("held item"),
+            source: wgpu::ShaderSource::Wgsl(
+                concat!(
+                    include_str!("surface_age.wgsl"),
+                    "\n",
+                    include_str!("held_item.wgsl")
+                )
+                .into(),
+            ),
+        });
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Held item layout"),
             bind_group_layouts: &[Some(&layout)],
@@ -313,7 +324,10 @@ impl HeldItemRenderer {
         self.visible = item.is_some();
         if let Some(item) = item {
             let mut values = model_to_clip(camera, aspect)?.to_vec();
-            values.extend_from_slice(&[f32::from(item.active), 0.0, 0.0, 0.0]);
+            if !item.surface_age.is_finite() || !(0.0..=0.44).contains(&item.surface_age) {
+                return Err(RendererError::new("held item age", "unbounded exposure"));
+            }
+            values.extend_from_slice(&[f32::from(item.active), item.surface_age, 0.0, 0.0]);
             queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         }
         Ok(())

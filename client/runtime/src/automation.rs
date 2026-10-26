@@ -866,6 +866,8 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     });
     observation["core_upgrades"] =
         serde_json::to_value(&app.core_upgrades).expect("validated Core upgrades");
+    observation["surface_age"] =
+        serde_json::to_value(&app.surface_age).expect("validated surface age");
     observation["finishes"] = serde_json::to_value(&app.finishes).expect("validated finishes");
     observation["cabin"] = serde_json::to_value(&app.habitation.cabin).expect("validated cabin");
     observation["mounts"] = serde_json::to_value(&app.mounts).expect("validated attachment state");

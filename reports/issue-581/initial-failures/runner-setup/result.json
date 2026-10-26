@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/surface-age-used.json",
+  "status": "failed",
+  "steps_completed": 0,
+  "steps": [],
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/workspace/salimon/artifacts/issue-581/native/run-t_q0cf6k",
+  "error": "invalid setup scenario, seed, or step_ms",
+  "failure_screenshot": {
+    "status": "unavailable",
+    "reason": "game did not become ready"
+  },
+  "duration_ms": 0,
+  "result_file": "/workspace/salimon/artifacts/issue-581/native/run-t_q0cf6k/result.json"
+}

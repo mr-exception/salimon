@@ -47,6 +47,14 @@ impl GameplaySession {
             .or_else(|| self.mounts.carried.as_ref().map(|c| c.id));
         self.execute_mount_action(action);
         if self.mounts != before {
+            if let Some(id) = target {
+                self.surface_age
+                    .contact(id, std::time::Duration::from_secs(1));
+                if let Some(m) = before.mounts.iter().find(|m| m.id == id) {
+                    self.surface_age
+                        .contact(m.rail, std::time::Duration::from_secs(1));
+                }
+            }
             let position = target
                 .and_then(|id| {
                     self.mounts

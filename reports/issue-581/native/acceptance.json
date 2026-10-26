@@ -1,0 +1,10 @@
+{
+  "used_reload_exposure_exact": true,
+  "damage_repair_exposure_exact": true,
+  "authoritative_damage_cleared": true,
+  "replacement_old_project_destroyed_new_completed_fresh": true,
+  "native_routes": 10,
+  "steps": 20,
+  "used_reload_component_pixels_identical": true,
+  "new_used_component_pixels_differ": true
+}

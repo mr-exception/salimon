@@ -19,6 +19,7 @@ pub(crate) mod lighting;
 pub(crate) mod mounts;
 mod presentation;
 mod recovery;
+pub(crate) mod surface_age;
 mod survival;
 pub(crate) mod tutorial;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
@@ -52,6 +53,7 @@ pub(crate) struct GameplaySession {
     pub(crate) mount_audio: (u64, [f64; 3]),
     pub(crate) lighting: salimon_ship::lighting::Lighting,
     pub(crate) core_upgrades: salimon_ship::core_upgrades::CoreUpgrades,
+    pub(crate) surface_age: salimon_ship::surface_age::SurfaceAge,
     pub(crate) finishes: salimon_ship::finishes::Finishes,
     pub(crate) finish_group: usize,
     pub(crate) mounts: salimon_ship::attachments::Attachments,
@@ -120,6 +122,7 @@ impl Default for GameplaySession {
             mount_audio: (0, [0.; 3]),
             lighting: Default::default(),
             core_upgrades: Default::default(),
+            surface_age: Default::default(),
             finishes: Default::default(),
             finish_group: 0,
             mounts: Default::default(),
@@ -389,7 +392,15 @@ impl GameplaySession {
         valid_target: bool,
     ) -> Option<salimon_renderer::HeldItemInstance> {
         (self.view_mode == ViewMode::Gameplay)
-            .then(|| self.mining.held_item(&self.equipment, player, valid_target))
+            .then(|| {
+                self.mining
+                    .held_item(&self.equipment, player, valid_target)
+                    .map(|mut item| {
+                        item.surface_age =
+                            self.surface_age.intensity(salimon_ship::surface_age::TOOL);
+                        item
+                    })
+            })
             .flatten()
     }
 
@@ -621,6 +632,7 @@ impl GameplaySession {
             crate::fragment_physics::capture_previous(&mut self.mining, frame, player);
         }
         let journey_ship_start = self.ship.snapshot().pose.position_meters;
+        self.advance_surface_age(delta);
         self.camera_prototype.advance(delta);
         self.ship
             .set_steering_input(self.ship_control_input.steering());
@@ -649,6 +661,7 @@ impl GameplaySession {
         // Both character endpoints use the completed ship frame. Transport and
         // rotation of the cabin therefore cannot become extra walking distance.
         let journey_character_start = self.snapshot().character;
+        let wear_walk_start = self.character.local_ship_position();
         if self.view_mode == ViewMode::Gameplay {
             let eye = self
                 .character
@@ -677,6 +690,7 @@ impl GameplaySession {
                     matches!(ship.flight_state, FlightState::Landed { .. }),
                 );
             }
+            self.record_floor_contact(wear_walk_start, delta);
             let eye = self
                 .character
                 .snapshot(character_ship_frame(ship.pose), self.terrain_frame(ship))
@@ -685,6 +699,7 @@ impl GameplaySession {
         }
         if self.view_mode == ViewMode::Gameplay {
             let frame = character_ship_frame(ship.pose);
+            let extracted_before = self.mining.session.extracted_mass_kg();
             self.mining.advance(
                 &self.equipment,
                 self.mining_delta(delta),
@@ -693,6 +708,10 @@ impl GameplaySession {
                 door_passable(ship),
                 self.world_seed(),
             );
+            if self.mining.session.extracted_mass_kg() > extracted_before {
+                self.surface_age
+                    .contact(salimon_ship::surface_age::TOOL, delta);
+            }
             let player = self
                 .character
                 .snapshot(frame, self.terrain_frame(ship))

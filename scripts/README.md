@@ -739,3 +739,9 @@ Construction flight readiness (#546): protocol key `construction_stop_resume` ma
 
 
 Optional modules (#547): protocol `construction_module` maps to native G in the C builder. Run `scenarios/evidence/construction-module.json`, `construction-module-upgrade.json` and `construction-module-restore.json` for seeded installation, upgrade downtime/Stop/Resume and physical restoration. Each uses real E intake, paid work and commissioning. See [controls and setup limits](../docs/non-core-modules.md).
+
+Persistent surface-age evidence #581: run `scenarios/evidence/surface-age-used.json`
+with the normal native capture command (and the matching new/idle/recolor/blackout/
+reload/damage/repair routes). The used setup executes 600 actual locker open/close
+cycles before the first frame; the other declared seeds and independent renderer
+stress workload are documented in [the surface-age contract](../docs/surface-age.md).

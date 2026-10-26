@@ -163,6 +163,8 @@ impl GameplaySession {
                 .expect("validated recipe watts");
             self.advance_ship_power(active);
             let funded = self.ship.fabricator_powered_duration(active);
+            self.surface_age
+                .contact(salimon_ship::surface_age::FABRICATOR, funded);
             self.fabricator.step(funded, true);
             if self
                 .fabrication_snapshot()
@@ -427,10 +429,21 @@ mod power_tests {
         );
         assert!(!s.ship.snapshot().power_available);
         let paused = s.fabricator.clone();
+        assert!(
+            s.surface_age
+                .intensity(salimon_ship::surface_age::FABRICATOR)
+                > 0.
+        );
+        let mut exposure = s.surface_age.clone();
+        exposure.advance(Duration::from_millis(160));
         for _ in 0..10 {
             s.advance_game(Duration::from_millis(16));
         }
         assert_eq!(s.fabricator, paused);
+        assert_eq!(
+            s.surface_age, exposure,
+            "unfunded work adds passive age only"
+        );
         s.ship
             .exchange_core_energy_joules(1_000_000.0, 0.0)
             .unwrap();

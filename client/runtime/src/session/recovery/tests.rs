@@ -123,6 +123,10 @@ fn save_restore_offline_freeze_legacy_and_bad_sources_are_transactional() {
     let mut legacy: serde_json::Value =
         serde_json::from_slice(&new_session().save_bytes(100).unwrap()).unwrap();
     legacy["schema_version"] = 6.into();
+    legacy["state"]
+        .as_object_mut()
+        .unwrap()
+        .remove("surface_age");
     legacy["state"].as_object_mut().unwrap().remove("recovery");
     legacy["state"]["fabrication"]["machine"]["recipes"]
         .as_array_mut()
@@ -328,6 +332,10 @@ fn schema_six_initializes_recovery_without_changing_existing_job_resources_or_co
     let mut legacy: serde_json::Value =
         serde_json::from_slice(&s.save_bytes(100).unwrap()).unwrap();
     legacy["schema_version"] = 6.into();
+    legacy["state"]
+        .as_object_mut()
+        .unwrap()
+        .remove("surface_age");
     legacy["state"].as_object_mut().unwrap().remove("recovery");
     legacy["state"]["fabrication"]["machine"]["recipes"]
         .as_array_mut()

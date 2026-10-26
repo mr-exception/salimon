@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/surface-age-replacement.json",
+  "status": "failed",
+  "steps_completed": 0,
+  "steps": [],
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/workspace/salimon/artifacts/issue-581/review-native/run-utunbvsx",
+  "setup": {
+    "scenario": "surface-age-replacement",
+    "seed": 581,
+    "step_ms": 16
+  },
+  "error": "game exited before ready signal (exit 1): [2026-10-26T11:57:01Z ERROR salimon_client] Salimon client stopped: E2E setup failed: replacement salvage absent: Some(\"Aim at a reachable physical construction object\")",
+  "failure_screenshot": {
+    "status": "unavailable",
+    "reason": "game did not become ready"
+  },
+  "duration_ms": 19,
+  "game_exit_code": 1,
+  "result_file": "/workspace/salimon/artifacts/issue-581/review-native/run-utunbvsx/result.json"
+}

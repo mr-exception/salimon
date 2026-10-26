@@ -1,0 +1,32 @@
+   Compiling bitflags v2.13.1
+   Compiling log v0.4.29
+   Compiling bytemuck v1.25.2
+   Compiling smallvec v1.16.0
+   Compiling gpu-allocator v0.28.0
+   Compiling spirv v0.4.0+sdk-1.4.341.0
+   Compiling parking_lot_core v0.9.12
+   Compiling wgpu-types v30.0.1
+   Compiling parking_lot v0.12.5
+   Compiling wayland-sys v0.31.11
+   Compiling serde v1.0.229
+   Compiling png v0.18.0
+   Compiling gltf-json v1.4.1
+   Compiling naga v30.0.1
+   Compiling gltf v1.4.1
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1 (/workspace/salimon/vendor/wgpu-hal)
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling wgpu v30.0.1
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.72s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-13cca2c4ca3c0afb)
+
+running 1 test
+Failed to create /home/agent/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+Failed to create /home/agent/.cache/mesa_shader_cache_db for shader cache (Read-only file system)---disabling.
+Failed to create /home/agent/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+Failed to create /home/agent/.cache/mesa_shader_cache_db for shader cache (Read-only file system)---disabling.
+test fixtures::evidence::modular_fixture_gpu_evidence ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 95 filtered out; finished in 8.59s

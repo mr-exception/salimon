@@ -20,9 +20,8 @@ Recoloring is immediate/free cosmetic tint only. It never changes physical
 material, roughness, geometry, mass, resource quantities, energy, component age
 or damage. Physical replacements remain resource-fed construction with a new
 part identity. Removing an item removes only that exact override through the
-explicit registry API; no new ID inherits it. The current registry does not
-simulate wear or damage, nor claim that future room construction (#545) or damage
-(#549) has shipped. Portable structural tests create two real room records and
+explicit registry API; no new ID inherits it. The finish registry itself does not simulate wear or damage; the separate
+[surface-age](surface-age.md) and construction damage owners compose them. Portable structural tests create two real room records and
 remove their shared wall while retaining both independent finish records.
 
 ## Rendering and source validation
@@ -50,3 +49,6 @@ and renderer during actual installation/removal; no spatial connected-component
 recoloring is permitted. This boundary does not generate physical geometry.
 See [the report](../reports/issue-579/README.md) for actual native captures/resource
 counters and separate human appearance/hardware limitations.
+
+
+Cosmetic aging #581: [source/identity, successful use, schema 23, rendering budgets and exact verification](surface-age.md). Damage remains condition-driven; clean repairs restore normal geometry and preserve age.

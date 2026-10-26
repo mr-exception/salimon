@@ -78,6 +78,8 @@ impl GameplaySession {
         };
         if old != next && self.cargo_sweep_clear(old, next) {
             self.cargo_door.open_fraction = next;
+            self.surface_age
+                .travel(salimon_ship::surface_age::CARGO_FLOOR, old, next);
         } else if old != next {
             self.feedback = Some("Cargo door obstructed; reverse or clear belongings");
         }

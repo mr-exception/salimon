@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "thresholds": {
+    "lines": 1000,
+    "branch_tokens": 200
+  },
+  "allowed_crate_edges": {
+    "salimon_character": [
+      "salimon_math",
+      "salimon_persistence"
+    ],
+    "salimon_client": [
+      "salimon_character",
+      "salimon_diagnostics",
+      "salimon_fabrication",
+      "salimon_math",
+      "salimon_persistence",
+      "salimon_physics",
+      "salimon_renderer",
+      "salimon_ship",
+      "salimon_survival",
+      "salimon_world"
+    ],
+    "salimon_diagnostics": [],
+    "salimon_fabrication": [
+      "salimon_persistence",
+      "salimon_world"
+    ],
+    "salimon_math": [],
+    "salimon_persistence": [
+      "salimon_universe"
+    ],
+    "salimon_physics": [
+      "salimon_math",
+      "salimon_persistence"
+    ],
+    "salimon_renderer": [],
+    "salimon_ship": [
+      "salimon_math",
+      "salimon_persistence",
+      "salimon_world"
+    ],
+    "salimon_survival": [
+      "salimon_persistence"
+    ],
+    "salimon_universe": [],
+    "salimon_world": [
+      "salimon_persistence"
+    ]
+  },
+  "exceptions": []
+}

@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: source-build-${{ github.event.pull_request.number || github.ref }}
@@ -31,15 +32,55 @@ jobs:
       - name: Documentation validator contracts
         run: python -m unittest discover -s scripts -p test_check_docs.py -v
       - name: Architecture audit contracts
-        run: python -m unittest discover -s scripts -p test_architecture_audit.py -v
+        run: python -m unittest discover -s scripts -p 'test_architecture_*.py' -v
       - name: Architecture review candidates (non-blocking)
         continue-on-error: true
         run: python scripts/architecture_audit.py --output artifacts/architecture/current.json --summary
+      - name: Read active PR file inventories (including drafts)
+        id: active-prs
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              ...context.repo, state: 'open', per_page: 100
+            });
+            const inventories = [];
+            for (const pull of pulls) {
+              if (pull.number === context.issue.number) continue;
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                ...context.repo, pull_number: pull.number, per_page: 100
+              });
+              if (files.length >= 3000) throw new Error(`PR #${pull.number}: file inventory may be truncated`);
+              inventories.push({number: pull.number, head_sha: pull.head.sha,
+                draft: pull.draft, paths: files.map(file => file.filename)});
+            }
+            fs.mkdirSync('artifacts/architecture', {recursive: true});
+            fs.writeFileSync('artifacts/architecture/active-prs.json', JSON.stringify(inventories));
+      - name: Architecture boundaries and PR overlap (warning-only)
+        continue-on-error: true
+        env:
+          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          REVIEW_PR: ${{ github.event.pull_request.number }}
+          INVENTORY_STATUS: ${{ steps.active-prs.outcome }}
+        run: |
+          base="$REVIEW_BASE"
+          if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            base=$(git rev-parse HEAD^)
+          fi
+          args=(--base "$base" --output artifacts/architecture/review.json)
+          if [ "$INVENTORY_STATUS" = success ]; then
+            args+=(--active-prs artifacts/architecture/active-prs.json)
+          fi
+          if [ -n "$REVIEW_PR" ]; then args+=(--current-pr "$REVIEW_PR"); fi
+          python scripts/architecture_review.py "${args[@]}" > artifacts/architecture/review.txt
+          cat artifacts/architecture/review.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: architecture-audit
-          path: artifacts/architecture/current.json
+          path: artifacts/architecture/
           if-no-files-found: warn
       - name: Offline documentation validation
         env:

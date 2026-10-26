@@ -1597,3 +1597,17 @@ Escape/pause, Archive, Q/T, wheel, crafting, then ordinary commands. A domain
 binding change normally edits its owner; a new physical key also needs native
 translation. Native and automation dispatch through the same typed boundary.
 Input reset remains centralized in `GameplaySession::clear_held_controls`.
+
+
+## Domain save adapters (#641)
+
+`session/persistence.rs` retains the explicit serialized section layout and
+ordered decode/validate/reconstruct/publish transaction. Domain `save.rs` modules
+own historical-version admission, source-specific reconstruction and contextual
+rules (survival, construction, cargo/habitation, mounts, fabrication, Archive,
+Recovery, lighting, finishes, Core upgrades, surface age, tutorial and offline
+clock). `session/persistence/physical.rs` owns the physical composition adapter;
+`legacy.rs` isolates historical propulsion compatibility. No schema or field
+layout changed. Keep unknown-field rejection and publish only after all owners
+and cross-domain invariants pass. Generic persistence codec/storage remain
+independent of gameplay domains; there is no dynamic save registry.

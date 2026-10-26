@@ -664,3 +664,6 @@ See the [canonical damage and schema-21 contract](construction-damage.md) for ru
 ## Offline construction (#550)
 
 See [the maintained chronology and schema-22 contract](construction-offline.md): runtime `session/offline.rs`, ship `controller/offline.rs`, launch/checkpoint staging and existing work owners. Run offline/checkpoint/Recovery and ship tests, workspace build/tests/Clippy/fmt, the two documented wgpu routes and docs/base-impact validation. Future #433 supplies verified universe events; no scanner or orbit implementation is duplicated here.
+
+Runtime domain save adapters preserve the explicit transactional layout; see
+[ownership and byte compatibility](save-contract.md#runtime-domain-mapping-ownership-641) (#641).

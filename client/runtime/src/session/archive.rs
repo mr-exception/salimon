@@ -1,4 +1,5 @@
 //! Local Archive source and modal reader. Recovery and charting are separate owners.
+pub(super) mod save;
 use super::{GameplaySession, ViewMode};
 use salimon_persistence::{SaveError, Validate, invalid};
 

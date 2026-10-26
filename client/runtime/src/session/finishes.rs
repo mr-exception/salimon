@@ -1,4 +1,5 @@
 //! Local physical appearance controls; cosmetic source never edits part age/damage.
+pub(super) mod save;
 use super::{GameplaySession, frames::character_ship_frame, interaction::InteractionTarget};
 use salimon_ship::finishes::{CABIN_ROOM, CARGO_ROOM, Group};
 #[derive(Clone, Copy, Debug)]

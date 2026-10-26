@@ -1,4 +1,5 @@
 //! Physical placement/explicit mechanical restraints over existing resource identities.
+pub(super) mod save;
 use super::{GameplaySession, frames::character_ship_frame};
 use salimon_character::CharacterLocation;
 use salimon_math::{dot, length, sub};

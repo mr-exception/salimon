@@ -1,4 +1,5 @@
 //! Physical room switches and presentation mapping. No invented lighting wattage.
+pub(super) mod save;
 use super::{GameplaySession, frames::character_ship_frame, interaction::InteractionTarget};
 use salimon_ship::lighting::{Setting, rgb};
 #[derive(Clone, Copy, Debug)]

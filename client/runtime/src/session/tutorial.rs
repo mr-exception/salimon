@@ -1,4 +1,5 @@
 //! Per-run, event-driven onboarding. No input capture, resources or clock authority.
+pub(super) mod save;
 use super::{GameplaySession, ViewMode};
 use salimon_persistence::{SaveError, Validate};
 

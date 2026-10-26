@@ -545,3 +545,7 @@ production session API; protocol compatibility and scenario regressions live in
 
 Domain input binding owners are in `client/runtime/src/session/input/` (#640);
 `app/input.rs` retains physical translation and native admission only.
+
+Domain save mapping/version rules now live in runtime `session/<domain>/save.rs` (#641);
+central persistence retains the explicit layout and atomic publication. See the
+[save ownership contract](save-contract.md#runtime-domain-mapping-ownership-641).

@@ -1,4 +1,5 @@
 //! Physical Core interface and saved direct-material transaction composition.
+pub(super) mod save;
 use super::{GameplaySession, frames::character_ship_frame, interaction::InteractionTarget};
 use salimon_ship::core_upgrades::{InputMode, Tier, UpgradeResult};
 #[cfg(test)]

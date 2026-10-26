@@ -1,4 +1,5 @@
 //! Maps physical identities and successful use to cosmetic exposure. Never repairs condition.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_ship::surface_age::*;
 use std::{collections::BTreeSet, time::Duration};

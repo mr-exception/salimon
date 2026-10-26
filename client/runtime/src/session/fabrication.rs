@@ -1,4 +1,5 @@
 //! Physical intake adapter. All validation precedes the infallible single-owner commit.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_fabrication::FabricationError;
 

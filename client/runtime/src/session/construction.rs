@@ -3,6 +3,7 @@ mod boarding;
 pub(crate) mod damage;
 mod doors;
 mod evidence;
+pub(super) mod save;
 pub(crate) use evidence::evidence_module;
 mod flight;
 mod installed;

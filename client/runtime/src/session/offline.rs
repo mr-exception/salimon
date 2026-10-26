@@ -1,5 +1,6 @@
 //! Construction's chronological powered-work adapter, shared with future U32.
 //! The current host retains its saved ship/region frame. No scanner/orbit logic.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_persistence::{SaveError, Validate, invalid};
 use serde::{Deserialize, Serialize};

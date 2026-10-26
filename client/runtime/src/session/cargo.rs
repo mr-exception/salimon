@@ -1,4 +1,5 @@
 //! Internal cargo door composition; resource identity and motion remain world/physics owned.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_character::cargo::{cargo_door_bounds, sphere_overlaps_box};
 use salimon_persistence::{SaveError, Validate, invalid};

@@ -1,4 +1,5 @@
 //! Portable Archive machine source. Core and Fabricator retain energy/item authority.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_fabrication::{OutputCategory, OutputItem};
 use salimon_persistence::{SaveError, Validate, invalid};

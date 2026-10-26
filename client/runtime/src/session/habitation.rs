@@ -1,4 +1,5 @@
 //! Base habitation fixtures; no new hygiene, water, sleep or survival authority.
+pub(super) mod save;
 use super::GameplaySession;
 use salimon_persistence::{SaveError, Validate, invalid};
 use std::time::Duration;

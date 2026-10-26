@@ -1,155 +1,15 @@
-//! Typed schema-1 state composition. Restore builds temporary owners, never ticks.
+//! Explicit versioned save composition. Owners validate/reconstruct; publish once.
 use super::{GameplaySession, ViewMode};
-use crate::mining::ResourceGameplay;
+#[cfg(test)]
+mod contracts;
+#[cfg(test)]
+mod journal_tests;
+mod legacy;
+mod physical;
+use super::survival::save::Snapshot as SurvivalState;
+use legacy::migrate_propulsion;
+use physical::PhysicalState;
 use salimon_persistence::{SaveError, Validate, invalid};
-use salimon_world::resources::FragmentId;
-use std::collections::HashMap;
-
-#[derive(serde::Serialize, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(crate) struct PhysicalState {
-    pub(crate) seed: u64,
-    view_mode: ViewMode,
-    camera: salimon_world::CameraPrototype,
-    character: salimon_character::CharacterSaveState,
-    ship: salimon_ship::ShipSaveState,
-    terrain: salimon_world::terrain::TerrainMode,
-    ship_gravity_disabled: bool,
-    mining_config: salimon_world::spherical_mining::MiningConfig,
-    world: salimon_world::mining::MiningSaveState,
-    #[serde(with = "salimon_persistence::pairs")]
-    anchors: HashMap<FragmentId, salimon_character::ShipLocalPoint>,
-    #[serde(with = "salimon_persistence::pairs")]
-    motion: HashMap<FragmentId, crate::fragment_physics::FragmentMotion>,
-    sleep: salimon_physics::SleepSaveState<FragmentId>,
-}
-pub(crate) struct RestoredPhysical {
-    pub(crate) seed: u64,
-    pub(crate) camera: salimon_world::CameraPrototype,
-    pub(crate) character: salimon_character::CharacterController,
-    pub(crate) ship: salimon_ship::ShipController,
-    pub(crate) mining: ResourceGameplay,
-}
-impl Validate for PhysicalState {
-    fn validate(&self) -> Result<(), SaveError> {
-        self.character.validate()?;
-        self.ship.validate()?;
-        if let Some(s) = self.character.nearby_surface()
-            && !salimon_world::CELESTIAL_BODIES.iter().any(|b| {
-                b.center.meters() == s.body_center_meters && b.radius_meters == s.radius_meters
-            })
-        {
-            return Err(invalid("character surface is not in world catalog"));
-        }
-        self.world.validate()?;
-        let mut total = salimon_ship::STARTER_DRY_MASS_KG;
-        for fragment in &self.world.fragments {
-            total += fragment.material().mass_kg();
-            if !total.is_finite() {
-                return Err(invalid("physical mass overflow"));
-            }
-        }
-        salimon_world::spherical_mining::MiningConfig::new(
-            self.mining_config.cap_kg(),
-            self.mining_config.rate_kg_per_second(),
-        )
-        .map_err(|_| invalid("mining config"))?;
-        self.camera.validate_save()?;
-        let ids: std::collections::HashSet<_> =
-            self.world.fragments.iter().map(|f| f.id()).collect();
-        // Validate logical sleep state even when decoding without publishing it.
-        salimon_physics::SleepTracker::from_save(self.sleep.clone(), |id, p| {
-            ids.contains(id).then(|| p.clone())
-        })?;
-        for (id, anchor) in &self.anchors {
-            if !ids.contains(id)
-                || Some(*id) == self.world.carried
-                || anchor.meters().iter().any(|v| !v.is_finite())
-            {
-                return Err(invalid("ship fragment anchor reference"));
-            }
-        }
-        for (id, m) in &self.motion {
-            if !ids.contains(id)
-                || m.velocity
-                    .iter()
-                    .chain(m.angular_velocity.iter())
-                    .any(|v| !v.is_finite())
-            {
-                return Err(invalid("fragment motion reference"));
-            }
-            if let Some(q) = m.ship_orientation {
-                let n: f64 = q.iter().map(|v| v * v).sum();
-                if !n.is_finite() || (n - 1.).abs() > 1e-9 {
-                    return Err(invalid("fragment frame orientation"));
-                }
-            }
-        }
-        Ok(())
-    }
-}
-impl PhysicalState {
-    pub(crate) fn capture(s: &GameplaySession) -> Self {
-        Self {
-            seed: s.seed,
-            view_mode: ViewMode::Gameplay,
-            camera: s.camera_prototype.clone(),
-            character: s.character.save_state(),
-            ship: s.ship.save_state(),
-            terrain: s.mining.terrain,
-            ship_gravity_disabled: s.mining.ship_gravity_disabled,
-            mining_config: s.mining.config,
-            world: s.mining.session.save_state(),
-            anchors: s.mining.ship_fragments.clone(),
-            motion: s.mining.fragment_motion.clone(),
-            sleep: s.mining.fragment_sleep.save_state(),
-        }
-    }
-    pub(crate) fn restore(self) -> Result<RestoredPhysical, SaveError> {
-        self.validate()?;
-        let mut ship = salimon_ship::ShipController::from_save(self.ship)?;
-        let query = (self.terrain == salimon_world::terrain::TerrainMode::Representative)
-            .then_some(crate::terrain::character_ground as salimon_character::GroundQuery);
-        let character = salimon_character::CharacterController::from_save(self.character, query)?;
-        let mut mining = ResourceGameplay::from_saved_world(
-            salimon_world::mining::MiningSession::from_save(self.world)?,
-            self.anchors,
-            self.motion,
-            self.terrain,
-            self.ship_gravity_disabled,
-            self.mining_config,
-        );
-        mining.fragment_sleep = salimon_physics::SleepTracker::from_save(self.sleep, |id, p| {
-            mining.session.fragment(*id)?;
-            let mut p = p.clone();
-            if let salimon_physics::Surface::Sphere(body) = p.surface {
-                if !salimon_world::CELESTIAL_BODIES
-                    .iter()
-                    .any(|b| b.center.meters() == body.center && b.radius_meters == body.radius)
-                {
-                    return None;
-                }
-                if mining.terrain == salimon_world::terrain::TerrainMode::Representative {
-                    p.surface = salimon_physics::Surface::Sampled {
-                        body,
-                        query: crate::terrain::physics_ground,
-                        point_query: crate::terrain::physics_ground_point,
-                    };
-                }
-            }
-            Some(p)
-        })?;
-        let frame = super::frames::character_ship_frame(ship.snapshot().pose);
-        crate::carrying::sync_ship_mass(&mut mining, frame, &mut ship);
-        Ok(RestoredPhysical {
-            seed: self.seed,
-            camera: self.camera,
-            character,
-            ship,
-            mining,
-        })
-    }
-}
 
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -184,22 +44,6 @@ pub(crate) struct SessionState {
     #[serde(default)]
     survival: Option<SurvivalState>,
 }
-#[derive(serde::Serialize, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
-struct SurvivalState {
-    vitals: salimon_survival::Survival,
-    catalog: salimon_survival::consumables::Catalog,
-    restrictions: salimon_survival::restrictions::RestrictionConfig,
-    run: super::lifecycle::RunState,
-}
-impl Validate for SurvivalState {
-    fn validate(&self) -> Result<(), SaveError> {
-        self.vitals.validate()?;
-        self.catalog.validate_registered(&self.vitals)?;
-        self.restrictions.validate()?;
-        self.run.validate()
-    }
-}
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
@@ -215,10 +59,7 @@ impl Validate for SessionState {
             age.validate()?;
         }
         self.finishes.validate()?;
-        self.lighting.validate()?;
-        if !self.lighting.rooms.contains_key(&1) || !self.lighting.rooms.contains_key(&2) {
-            return Err(invalid("installed light room missing"));
-        }
+        super::lighting::save::validate_context(&self.lighting)?;
         self.core_upgrades.validate()?;
         if let Some(m) = &self.mounts {
             m.validate()?;
@@ -239,34 +80,12 @@ impl Validate for SessionState {
             tutorial.validate()?;
         }
         self.fabrication.validate()?;
-        if let Some(recovery) = &self.recovery {
-            recovery.validate()?;
-            let machine = self.fabrication.machine.snapshot(true);
-            let committed = machine
-                .jobs
-                .iter()
-                .filter(|j| j.recipe.key() == "data-recovery-module")
-                .map(|j| u64::from(j.remaining_quantity))
-                .sum::<u64>()
-                + u64::from(
-                    machine
-                        .tray
-                        .as_ref()
-                        .is_some_and(|i| i.recipe.key() == "data-recovery-module"),
-                )
-                + u64::from(recovery.module.is_some());
-            if committed > 1 {
-                return Err(invalid("multiple committed Recovery Modules"));
-            }
-            if let Some(module) = &recovery.module {
-                self.fabrication.validate_installed_component(module)?;
-            }
-        }
+        super::recovery::save::validate_with_fabrication(&self.recovery, &self.fabrication)?;
         if let Some(survival) = &self.survival {
             survival.validate()?;
         }
         self.equipment.validate_save(
-            self.physical.world.carried.is_some()
+            self.physical.has_carried_fragment()
                 || self.mounts.as_ref().is_some_and(|m| m.carried.is_some()),
         )?;
         Ok(())
@@ -296,12 +115,7 @@ impl GameplaySession {
             ),
             equipment: self.equipment.clone(),
             tutorial: Some(self.tutorial.clone()),
-            survival: Some(SurvivalState {
-                vitals: self.survival.clone(),
-                catalog: self.consumable_effects.clone(),
-                restrictions: self.restriction_config,
-                run: self.run.clone(),
-            }),
+            survival: Some(SurvivalState::capture(self)),
         };
         salimon_persistence::SaveGame::new(
             state,
@@ -316,166 +130,32 @@ impl GameplaySession {
     pub(crate) fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
         let migrated = migrate_propulsion(bytes)?;
         let save = salimon_persistence::SaveGame::<SessionState>::decode(&migrated)?;
-        let surface_age = match (save.schema_version, save.state.surface_age) {
-            (23, Some(age)) => age,
-            (1..=22, None) => Default::default(),
-            (1..=22, Some(age)) if age == Default::default() => age,
-            _ => return Err(invalid("surface age missing or incompatible with schema")),
-        };
-        let offline = match (save.schema_version, save.state.offline) {
-            (22..=23, Some(clock)) => clock,
-            (1..=21, None) => super::offline::OfflineClock::at(save.saved_at_unix_seconds),
-            (1..=21, Some(clock)) if clock.pending_nanos == 0 => {
-                super::offline::OfflineClock::at(save.saved_at_unix_seconds)
-            }
-            _ => {
-                return Err(invalid(
-                    "offline construction clock missing or incompatible with schema",
-                ));
-            }
-        };
-        if offline.watermark < save.saved_at_unix_seconds {
-            return Err(invalid("offline watermark precedes checkpoint"));
-        }
-        let mut survival = match (save.schema_version, save.state.survival) {
-            (1, None) => SurvivalState {
-                vitals: Default::default(),
-                catalog: salimon_survival::consumables::Catalog::starter(),
-                restrictions: Default::default(),
-                run: Default::default(),
-            },
-            (2..=23, Some(state)) => state,
-            _ => return Err(invalid("survival payload does not match envelope version")),
-        };
-        if save.schema_version == 2 {
-            // Schema 2 recorded only a cumulative counter. There is no missing
-            // movement to infer, and no restore displacement to charge.
-            survival.run.journey.initialize_tracking();
-        } else if survival.run.journey.tracking.is_none() {
-            return Err(invalid("schema-3 journey sampling source missing"));
-        }
-        survival.validate()?;
-        let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=23, Some(tutorial)) => tutorial,
-            (1..=3, _) => super::tutorial::Tutorial::dismissed(),
-            _ => return Err(invalid("tutorial source missing for save schema")),
-        };
-        let archive = match (save.schema_version, save.state.archive) {
-            (6..=23, Some(archive)) => archive,
-            (1..=5, _) => Default::default(),
-            _ => return Err(invalid("archive source missing for save schema")),
-        };
-        let recovery = match (save.schema_version, save.state.recovery) {
-            (7..=23, Some(recovery)) => recovery,
-            (1..=6, _) => Default::default(),
-            _ => return Err(invalid("recovery source missing for schema 7")),
-        };
-        let construction = match (save.schema_version, save.state.construction) {
-            (8..=23, Some(source)) => source,
-            (1..=7, None) => Default::default(),
-            (1..=7, Some(source)) if source.projects.jobs().next().is_none() => Default::default(),
-            _ => {
-                return Err(invalid(
-                    "construction source missing or incompatible with save schema",
-                ));
-            }
-        };
-        if save.schema_version < 21
-            && (construction.damage != Default::default()
-                || construction.projects.jobs().any(|p| p.work.destroyed))
-        {
-            return Err(invalid("construction destruction requires schema 21"));
-        }
-        if save.schema_version < 20 && !construction.modules.is_empty() {
-            return Err(invalid("module commissioning requires schema 20"));
-        }
-        if save.schema_version < 19 && construction.projects.jobs().any(|p| p.work.stopped) {
-            return Err(invalid("construction stop latch requires schema 19"));
-        }
-        if save.schema_version < 18
-            && (!construction.removed_partitions.is_empty()
-                || !construction.open_doors.is_empty()
-                || construction.projects.jobs().any(|p| {
-                    p.work.completed
-                        && (super::construction::is_structural(p)
-                            || p.blueprint.id == "internal-door")
-                }))
-        {
-            return Err(invalid("installed structure requires schema 18"));
-        }
-        if save.schema_version < 15
-            && construction
-                .projects
-                .jobs()
-                .any(|p| !p.funding.receipts.is_empty() || p.funding.progress_ppm != 0)
-        {
-            return Err(invalid("funded construction requires schema 15"));
-        }
-        if save.schema_version < 17
-            && construction
-                .projects
-                .jobs()
-                .any(|p| p.work != Default::default())
-        {
-            return Err(invalid("construction work requires schema 17"));
-        }
-        let cargo_door = match (save.schema_version, save.state.cargo_door) {
-            (9..=23, Some(door)) => door,
-            (1..=8, None) => Default::default(),
-            (1..=8, Some(door)) if door.open_fraction == 1.0 && door.opening => Default::default(),
-            _ => {
-                return Err(invalid(
-                    "cargo door source missing or incompatible with schema",
-                ));
-            }
-        };
-        let habitation = match (save.schema_version, save.state.habitation) {
-            (10..=23, Some(h)) => h,
-            (1..=9, None) => Default::default(),
-            (1..=9, Some(h)) if h.bunk_open_fraction == 0.0 && !h.bunk_deploying => {
-                Default::default()
-            }
-            _ => {
-                return Err(invalid(
-                    "habitation source missing or incompatible with schema",
-                ));
-            }
-        };
-        if save.schema_version < 12 && habitation.cabin.is_some() {
-            return Err(invalid(
-                "expanded cabin source incompatible with historical schema",
-            ));
-        }
-        if save.schema_version < 16 && save.state.lighting != Default::default() {
-            return Err(invalid("lighting requires schema 16"));
-        }
-        let (mut fabricator, consumables) = save.state.fabrication.restore()?;
-        if save.schema_version <= 6 {
-            fabricator
-                .migrate_recovery_recipe()
-                .map_err(|e| invalid(e.to_string()))?;
-        }
+        let surface_age =
+            super::surface_age::save::restore(save.state.surface_age, save.schema_version)?;
+        let offline = super::offline::save::restore(
+            save.state.offline,
+            save.schema_version,
+            save.saved_at_unix_seconds,
+        )?;
+        let survival = super::survival::save::restore(save.state.survival, save.schema_version)?;
+        let tutorial = super::tutorial::save::restore(save.state.tutorial, save.schema_version)?;
+        let archive = super::archive::save::restore(save.state.archive, save.schema_version)?;
+        let recovery = super::recovery::save::restore(save.state.recovery, save.schema_version)?;
+        let construction =
+            super::construction::save::restore(save.state.construction, save.schema_version)?;
+        let cargo_door = super::cargo::save::restore(save.state.cargo_door, save.schema_version)?;
+        let habitation =
+            super::habitation::save::restore(save.state.habitation, save.schema_version)?;
+        super::lighting::save::validate_schema(&save.state.lighting, save.schema_version)?;
+        let (fabricator, consumables) =
+            super::fabrication::save::restore(save.state.fabrication, save.schema_version)?;
         let physical = save.state.physical.restore()?;
-        let mounts = match (save.schema_version, save.state.mounts) {
-            (11..=23, Some(m)) => m,
-            (1..=10, None) => Default::default(),
-            (1..=10, Some(m)) if m == Default::default() => Default::default(),
-            _ => return Err(invalid("mount source missing/incompatible with schema")),
-        };
-        if save.schema_version < 13 && save.state.finishes != Default::default() {
-            return Err(invalid(
-                "custom finishes incompatible with historical schema",
-            ));
-        }
-        if save.schema_version < 14
-            && (save.state.core_upgrades.mode != salimon_ship::core_upgrades::InputMode::Fuel
-                || !save.state.core_upgrades.applied.is_empty()
-                || !save.state.core_upgrades.pending.is_empty())
-        {
-            return Err(invalid(
-                "Core upgrade source incompatible with historical schema",
-            ));
-        }
+        let mounts = super::mounts::save::restore(save.state.mounts, save.schema_version)?;
+        super::finishes::save::validate_schema(&save.state.finishes, save.schema_version)?;
+        super::core_upgrades::save::validate_schema(
+            &save.state.core_upgrades,
+            save.schema_version,
+        )?;
         let mut restored = Self {
             lighting: save.state.lighting,
             core_upgrades: save.state.core_upgrades,
@@ -528,23 +208,7 @@ impl GameplaySession {
         restored.validate_surface_age()?;
         restored.validate_cabin_restore()?;
         restored.validate_mounts()?;
-        if let Some(c) = &restored.mounts.carried {
-            let frame = super::frames::character_ship_frame(restored.ship.snapshot().pose);
-            let absent =
-                !(salimon_character::ship_contains_object(frame.world_to_local(c.world_position))
-                    || restored.structural_volumes().iter().any(|b| {
-                        let p = frame.world_to_local(c.world_position);
-                        (0..3).all(|i| p[i] >= b[2 * i] && p[i] <= b[2 * i + 1])
-                    }));
-            restored
-                .mining
-                .ship_mass
-                .set_dry_equipment_absent(
-                    c.id,
-                    absent.then_some(salimon_ship::attachments::PORTABLE_SHELF_MASS_KG),
-                )
-                .map_err(|_| invalid("accessory mass"))?;
-        }
+        super::mounts::save::reconcile_carried_mass(&mut restored)?;
         restored.sync_mount_collision();
         restored.sync_cargo_geometry();
         let frame = super::frames::character_ship_frame(restored.ship.snapshot().pose);
@@ -561,253 +225,6 @@ impl GameplaySession {
         restored.audio_epoch = self.audio_epoch.wrapping_add(1);
         *self = restored;
         Ok(())
-    }
-}
-
-/// v1-v4 force capacities are deliberately superseded, not converted into an
-/// arbitrary coefficient. Preserve energy, velocity and all other source state.
-fn migrate_propulsion(bytes: &[u8]) -> Result<Vec<u8>, SaveError> {
-    if bytes.len() > salimon_persistence::MAX_SAVE_BYTES {
-        return Err(invalid("save exceeds size limit"));
-    }
-    #[derive(serde::Deserialize)]
-    struct Header {
-        schema_version: u32,
-    }
-    let version = serde_json::from_slice::<Header>(bytes)
-        .map_err(|e| SaveError::Encoding(e.to_string()))?
-        .schema_version;
-    if !(1..=salimon_persistence::SCHEMA_VERSION).contains(&version) {
-        return Err(SaveError::UnsupportedVersion(version));
-    }
-    if version == salimon_persistence::SCHEMA_VERSION {
-        // Preserve typed decoding's duplicate-field rejection, and avoid a
-        // full DOM/reserialization pass for ordinary current-schema restores.
-        return Ok(bytes.to_vec());
-    }
-    let mut value: serde_json::Value =
-        serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
-    if version <= 4 {
-        let ship = value["state"]["physical"]["ship"]
-            .as_object_mut()
-            .ok_or_else(|| invalid("legacy ship source missing"))?;
-        ship.entry("engines_enabled").or_insert(true.into());
-        let p = ship
-            .get_mut("propulsion")
-            .and_then(serde_json::Value::as_object_mut)
-            .ok_or_else(|| invalid("legacy propulsion missing"))?;
-        if p.contains_key("forward_force_newtons") || p.contains_key("reverse_force_newtons") {
-            for key in ["forward_force_newtons", "reverse_force_newtons"] {
-                if !p
-                    .get(key)
-                    .and_then(serde_json::Value::as_f64)
-                    .is_some_and(|v| v.is_finite() && v >= 0.0)
-                {
-                    return Err(invalid("legacy force configuration"));
-                }
-                p.remove(key);
-            }
-            p.insert("impulse_ns_per_joule".into(), 1.0.into());
-        }
-    }
-    serde_json::to_vec(&value).map_err(|e| SaveError::Encoding(e.to_string()))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::e2e::{self, Config, Scenario};
-    use std::time::Duration;
-    fn initialize(scenario: Scenario) -> GameplaySession {
-        let mut s = GameplaySession::default();
-        e2e::initialize(
-            &mut s,
-            Config {
-                scenario,
-                seed: 363,
-                step: Duration::from_millis(16),
-                fragment_load: None,
-            },
-        )
-        .unwrap();
-        s
-    }
-    fn roundtrip(s: &GameplaySession) -> GameplaySession {
-        let source = PhysicalState::capture(s);
-        source.validate().unwrap();
-        let bytes = serde_json::to_vec(&source).unwrap();
-        let decoded: PhysicalState = serde_json::from_slice(&bytes).unwrap();
-        let r = decoded.restore().unwrap();
-        let mut restored = GameplaySession {
-            seed: r.seed,
-            view_mode: ViewMode::Gameplay,
-            camera_prototype: r.camera,
-            character: r.character,
-            ship: r.ship,
-            mining: r.mining,
-            ..Default::default()
-        };
-        restored.sync_fabricator_mass();
-        assert_eq!(
-            serde_json::to_value(PhysicalState::capture(&restored)).unwrap(),
-            serde_json::from_slice::<serde_json::Value>(&bytes).unwrap()
-        );
-        assert!(restored.mining.fragment_previous.is_empty());
-        assert_eq!(
-            restored.movement_input,
-            salimon_character::MovementInput::default()
-        );
-        restored
-    }
-    #[test]
-    fn physical_roundtrip_landed_moving_eva_carrying_blackout_and_terrain() {
-        for scenario in [
-            Scenario::LandedEarth,
-            Scenario::CoastingSpace,
-            Scenario::EvaApproach,
-            Scenario::CargoFlight,
-            Scenario::CargoBlackout,
-            Scenario::CoreRestart,
-            Scenario::TerrainMoon,
-            Scenario::TerrainMarsApproach,
-        ] {
-            let mut s = initialize(scenario);
-            s.advance_automation(Duration::from_millis(48));
-            let restored = roundtrip(&s);
-            assert_eq!(s.snapshot().ship, restored.snapshot().ship);
-            assert_eq!(s.snapshot().character, restored.snapshot().character);
-            assert_eq!(
-                s.mining.session.fragments(),
-                restored.mining.session.fragments()
-            );
-        }
-    }
-    #[test]
-    fn physical_roundtrip_five_hundred_fragments_and_contact_continuation() {
-        let mut s = initialize(Scenario::LandedEarth);
-        crate::benchmark_fixture::initialize(
-            &mut s,
-            500,
-            crate::benchmark_fixture::Layout::Scattered,
-            363,
-            true,
-        )
-        .unwrap();
-        s.advance_automation(Duration::from_millis(64));
-        let mut restored = roundtrip(&s);
-        for _ in 0..4 {
-            s.advance_automation(Duration::from_millis(16));
-            restored.advance_automation(Duration::from_millis(16));
-        }
-        assert_eq!(
-            s.mining.session.fragments(),
-            restored.mining.session.fragments()
-        );
-        assert_eq!(
-            s.snapshot().ship.total_mass_kg,
-            restored.snapshot().ship.total_mass_kg
-        );
-    }
-    #[test]
-    fn physical_sleep_and_mid_takeoff_continue_without_events() {
-        let mut s = initialize(Scenario::LandedEarth);
-        crate::benchmark_fixture::initialize(
-            &mut s,
-            8,
-            crate::benchmark_fixture::Layout::SphereDeck,
-            363,
-            false,
-        )
-        .unwrap();
-        for _ in 0..100 {
-            s.advance_automation(Duration::from_millis(16));
-        }
-        let sleeping: Vec<_> = s
-            .mining
-            .session
-            .fragments()
-            .iter()
-            .filter(|f| s.mining.fragment_sleep.is_sleeping(f.id()))
-            .map(|f| f.id())
-            .collect();
-        assert!(!sleeping.is_empty());
-        let restored = roundtrip(&s);
-        for id in sleeping {
-            assert!(restored.mining.fragment_sleep.is_sleeping(id));
-        }
-        let mut s = initialize(Scenario::CockpitEarth);
-        s.ship.trigger_landing_action();
-        s.advance_automation(Duration::from_millis(512));
-        assert!(matches!(
-            s.ship.snapshot().flight_state,
-            salimon_ship::FlightState::AssistedTakeoff { .. }
-        ));
-        let mut restored = roundtrip(&s);
-        for _ in 0..10 {
-            s.advance_automation(Duration::from_millis(16));
-            restored.advance_automation(Duration::from_millis(16));
-        }
-        assert_eq!(s.snapshot().ship, restored.snapshot().ship);
-    }
-    #[test]
-    fn physical_rejects_dangling_identity_and_invalid_domain_state() {
-        let s = initialize(Scenario::LandedEarth);
-        let mut state = PhysicalState::capture(&s);
-        state.anchors.insert(
-            FragmentId(999),
-            salimon_character::ShipLocalPoint::new([0.; 3]),
-        );
-        assert!(state.restore().is_err());
-        let mut value = serde_json::to_value(PhysicalState::capture(&s)).unwrap();
-        value["ship"]["door_open_fraction"] = serde_json::json!(2.0);
-        assert!(
-            serde_json::from_value::<PhysicalState>(value)
-                .unwrap()
-                .restore()
-                .is_err()
-        );
-    }
-}
-
-#[cfg(test)]
-mod journal_tests {
-    use salimon_world::{
-        CelestialBodyId, WorldPosition,
-        mining::MiningSession,
-        resources::{DepositId, RawMaterial, ResourceDeposit, ResourceId},
-    };
-    use std::time::Duration;
-    #[test]
-    fn depletion_survives_streaming_and_consumed_ids_never_reallocate() {
-        let make = || {
-            ResourceDeposit::new(
-                DepositId {
-                    body: CelestialBodyId::Earth,
-                    local: 123,
-                },
-                RawMaterial::new(ResourceId::IronOre, 20.).unwrap(),
-                WorldPosition::new(0., 0., 0.),
-                20.,
-            )
-            .unwrap()
-        };
-        let mut world = MiningSession::default();
-        let mut deposit = make();
-        world.extract(&mut deposit, Duration::from_millis(500));
-        let id = world.fragments()[0].id();
-        assert!(world.remove_fragment(id));
-        let saved = world.save_state();
-        let mut restored = MiningSession::from_save(
-            serde_json::from_slice(&serde_json::to_vec(&saved).unwrap()).unwrap(),
-        )
-        .unwrap();
-        let mut streamed = make();
-        // Reconcile through the ordinary extraction path, including a zero tick.
-        restored.extract(&mut streamed, Duration::ZERO);
-        assert_eq!(streamed.remaining_mass_kg(), deposit.remaining_mass_kg());
-        restored.extract(&mut streamed, Duration::from_millis(500));
-        assert!(restored.fragments()[0].id().0 > id.0);
-        assert_eq!(restored.save_state().extracted_mass_kg, 2.);
     }
 }
 

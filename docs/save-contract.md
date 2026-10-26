@@ -537,3 +537,22 @@ See the [canonical damage and schema-21 contract](construction-damage.md) for ru
 ## Cosmetic surface age schema 23 (#581)
 
 The current envelope requires validated runtime surface exposure keyed by exact installed physical IDs, with explicit pristine migration from versions 1–22. Ordinary restore grants no time; passive age and funded Fabricator usage follow the existing verified offline transaction. Recolor/clean repairs preserve exposure; replacements start fresh. See [source, limits and tests](surface-age.md).
+
+
+## Runtime domain mapping ownership (#641)
+
+Schema 23 and its serialized section/field order are unchanged by the ownership
+extraction. `client/runtime/src/session/persistence.rs` is the explicit top-level
+layout and transaction. Runtime domain `save.rs` adapters own version admission
+and reconstruction, while `session/persistence/physical.rs` owns physical source
+validation/reconstruction and `legacy.rs` owns old propulsion conversion.
+Feature-specific rules belong to their owner; adding an actual new saved section
+still requires deliberate typed composition and the documented schema migration.
+Do not flatten unknown fields or introduce a generic registry to avoid review.
+
+`client/runtime/fixtures/save-schema23-new-run.json` was captured from parent
+`bd9a8c2` before extraction. The regression compares exact new-run bytes and
+restore/recapture bytes against it, alongside unknown-field and failed-publication
+contracts. Update a golden only with a deliberate, reviewed source/format change.
+Save-file generations, atomic storage, fallback, rollback and launch/offline
+behavior retain their existing contracts and fault-injection tests.

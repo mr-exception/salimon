@@ -12,6 +12,7 @@ pub(crate) mod finishes;
 mod fixtures;
 pub(crate) mod frames;
 mod habitation;
+pub(crate) mod input;
 pub(crate) mod interaction;
 pub(crate) mod journey;
 pub(crate) mod lifecycle;

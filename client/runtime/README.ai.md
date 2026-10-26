@@ -400,3 +400,15 @@ owner; update central registration only for a new owner. An unrecognized handler
 returns `None` without effects; recognized validation failures return the same
 protocol error. The native event thread remains the only executor. Legacy
 aliases live in `automation/keys.rs`; tests retain the original scenario corpus.
+
+
+## Domain input bindings (#640)
+
+`app/input.rs` translates physical keys into `session/input::Key` and owns native
+focus/capture/repeat/synthetic-event admission. `session/input/` owns portable
+construction, lighting, ship, equipment and interior bindings. Modal owners
+(Archive, wheel, crafting) retain explicit priority: construction admission,
+Escape/pause, Archive, Q/T, wheel, crafting, then ordinary commands. A domain
+binding change normally edits its owner; a new physical key also needs native
+translation. Native and automation dispatch through the same typed boundary.
+Input reset remains centralized in `GameplaySession::clear_held_controls`.

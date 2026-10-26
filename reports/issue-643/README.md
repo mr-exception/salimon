@@ -14,7 +14,7 @@ order, numerical rule or domain dependency changes.
 (311 → 225 branch tokens). New owner sizes/branches are included so moving code
 does not conceal complexity. Counts establish clearer owners, not measured
 future merge-conflict reduction. The three #645 candidates are the two existing
-broad facades and the new scene adapter's existing permitted ship reference;
+broad facades and a syntactically changed existing ViewMode import;
 there are no new crate cycles or forbidden domain directions.
 
 ## Validation

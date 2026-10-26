@@ -70,6 +70,9 @@ impl GameplaySession {
         if let Some(status) = self.module_status(p.id) {
             return status;
         }
+        if p.work.destroyed {
+            return "DESTROYED".into();
+        }
         if p.work.completed {
             return "COMPLETED".into();
         }
@@ -128,7 +131,8 @@ impl GameplaySession {
                 .projects
                 .inspect(id)
                 .expect("collected project identity");
-            if p.work.completed
+            if p.work.destroyed
+                || p.work.completed
                 || p.work.stopped
                 || p.work.damaged
                 || !p.funding.funded(&p.blueprint.requirements)
@@ -202,7 +206,7 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
-            .filter(|p| p.work.completed)
+            .filter(|p| p.work.completed && !p.work.destroyed)
         {
             let s = p.space;
             if p.blueprint.id == "utility-module" {

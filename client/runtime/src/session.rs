@@ -618,7 +618,16 @@ impl GameplaySession {
         self.camera_prototype.advance(delta);
         self.ship
             .set_steering_input(self.ship_control_input.steering());
+        let pre_flight = self.ship.snapshot().flight_state;
         self.advance_fabrication(delta);
+        if !matches!(pre_flight, FlightState::GroundedAfterCrash { .. })
+            && matches!(
+                self.ship.snapshot().flight_state,
+                FlightState::GroundedAfterCrash { .. }
+            )
+        {
+            self.interrupt_construction_after_crash();
+        }
         self.advance_recovery(delta);
         self.advance_construction(delta);
         let ship = self.ship.snapshot();

@@ -25,7 +25,7 @@ installed/cabin/mount/protected-route, player and individual cargo occupancy
 checks. Player distance/aim is deliberately irrelevant to automatic work.
 Insufficient energy, invalid safety or a damaged project pauses without spending
 or resetting progress. Clearing the condition resumes automatically. Project
-condition is a saved seam for #549; this change invents no damage source. Exterior
+condition and physical impact producers follow [the damage contract](construction-damage.md). Exterior
 stop/takeoff latches follow [construction flight safety](construction-flight-safety.md). Normal pause and terminal state freeze work;
 restart clears the old run's construction. No closed-game elapsed time is credited
 here: chronological construction/offline reconciliation remains #550/#433.
@@ -40,7 +40,7 @@ another resource object or adding duplicate mass. Shared ship-local solid boxes
 feed visible stool seat/legs or partition geometry, character and fragment/carry
 collision, placement and cabin-motion clearance. Unfinished work has no collider.
 Completed source survives save/load; it cannot be cancelled as unfinished work.
-Safe dismantling/damage is separate #549 work, not a refund shortcut.
+Safe dismantling/damage follows [the damage contract](construction-damage.md).
 
 Structural hull/deck cells and four-cell/two-deck rooms now complete through the
 [modular structure adapter](modular-construction.md). Its final graph/connector
@@ -77,3 +77,6 @@ not evidence of a mining journey or physical OS input.
 ## Optional module commissioning (#547)
 
 See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.
+
+
+Gameplay damage, safe dismantling, surviving-site recovery and physical debris now follow the [damage contract](construction-damage.md). Offline progression remains #550.

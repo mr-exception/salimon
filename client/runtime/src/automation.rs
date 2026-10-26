@@ -344,6 +344,19 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
                 None => Err(("invalid_argument", "known crafting action required")),
             }
         }
+        Some("construction_impact") => {
+            match command
+                .get("impact")
+                .cloned()
+                .and_then(|v| serde_json::from_value(v).ok())
+            {
+                Some(impact) => app
+                    .construction_impact(impact)
+                    .map(|()| json!({"applied":true}))
+                    .map_err(|e| ("invalid_argument", e)),
+                None => Err(("invalid_argument", "typed impact required")),
+            }
+        }
         Some("step") => match command.get("frames").and_then(Value::as_u64) {
             Some(frames @ 1..=600) => {
                 let step = app.e2e_step().expect("automation only runs in E2E mode");
@@ -565,6 +578,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "pause" => Some(KeyCode::Escape),
         "status" => Some(KeyCode::KeyH),
         "skip_tutorial" | "construction_stop_resume" => Some(KeyCode::KeyT),
+        "construction_repair" => Some(KeyCode::KeyH),
+        "construction_dismantle" => Some(KeyCode::KeyX),
         "construction_module" => Some(KeyCode::KeyG),
         "resume" => Some(KeyCode::Enter),
         "view" => Some(KeyCode::F2),

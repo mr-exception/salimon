@@ -16,6 +16,9 @@ pub struct Work {
     pub stopped: bool,
     pub damaged: bool,
     pub completed: bool,
+    /// All physical contents transferred out; identity remains a durable tombstone.
+    #[serde(default)]
+    pub destroyed: bool,
 }
 impl Work {
     pub fn elapsed(&self, funding: &Funding, blueprint: &Blueprint) -> u64 {

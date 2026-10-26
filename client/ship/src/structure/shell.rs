@@ -5,7 +5,7 @@ use super::*;
 pub struct ShellRoom {
     pub project: u64,
     pub cells: Vec<Cell>,
-    pub mass_kg: f64,
+    pub cell_milligrams: Vec<u64>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PartitionEdit {
@@ -20,12 +20,27 @@ pub fn build_shells(
     rooms: &[ShellRoom],
     edits: &[PartitionEdit],
 ) -> Result<ShipStructure, StructureError> {
+    build_shells_with_losses(starter, rooms, edits, &BTreeSet::new())
+}
+
+/// Losses address original sorted-cell IDs; surviving cells are never renumbered.
+pub fn build_shells_with_losses(
+    starter: &ShipStructure,
+    rooms: &[ShellRoom],
+    edits: &[PartitionEdit],
+    losses: &BTreeSet<StructureId>,
+) -> Result<ShipStructure, StructureError> {
     let mut owners = BTreeMap::new();
+    let mut original_owners = BTreeMap::new();
     for room in rooms {
         if room.project == 0 {
             return Err(StructureError::InvalidIdentity);
         }
-        if room.cells.len() > 128 || room.cells.is_empty() {
+        if room.cells.len() > 128
+            || room.cells.is_empty()
+            || room.cell_milligrams.len() != room.cells.len()
+            || room.cell_milligrams.contains(&0)
+        {
             return Err(StructureError::InvalidGeometry);
         }
         let mut cells = room.cells.clone();
@@ -36,6 +51,10 @@ pub fn build_shells(
                 .checked_mul(1024)
                 .and_then(|n| n.checked_add(1024 + index as u64))
                 .ok_or(StructureError::InvalidIdentity)?;
+            original_owners.insert(*cell, (room.project, StructureId(id)));
+            if losses.contains(&StructureId(id)) {
+                continue;
+            }
             if owners
                 .insert(*cell, (room.project, StructureId(id)))
                 .is_some()
@@ -61,24 +80,33 @@ pub fn build_shells(
     for room in rooms {
         let mut cells = room.cells.clone();
         cells.sort();
+        if cells
+            .iter()
+            .all(|c| !owners.get(c).is_some_and(|(p, _)| *p == room.project))
+        {
+            continue;
+        }
         let low_x = cells.iter().map(|c| c.x).min().unwrap();
         let high_x = cells.iter().map(|c| c.x).max().unwrap();
         let mut parts = Vec::new();
-        for cell in &cells {
-            let id = owners[cell].1;
+        for (cell_index, cell) in cells.iter().enumerate() {
+            let id = original_owners[cell].1;
+            if losses.contains(&id) {
+                continue;
+            }
             let space = cell.bounds(starter.origin_meters())?;
             let mut faces = Vec::new();
             let mut collision = Vec::new();
             for direction in Direction::ALL {
                 let neighbor = cell.neighbor(direction);
-                let other = neighbor.and_then(|c| owners.get(&c));
+                let other = neighbor.and_then(|c| original_owners.get(&c));
                 if direction == Direction::Up && other.is_some() {
                     continue;
                 }
                 // Horizontal shared faces have exactly one owner. The upper cell
                 // owns inter-deck floors; no duplicate lower ceiling is emitted.
                 if !matches!(direction, Direction::Up | Direction::Down)
-                    && neighbor.is_some_and(|n| owners.contains_key(&n) && n < *cell)
+                    && neighbor.is_some_and(|n| original_owners.contains_key(&n) && n < *cell)
                 {
                     continue;
                 }
@@ -127,7 +155,7 @@ pub fn build_shells(
                 .neighbor(Direction::Up)
                 .is_some_and(|n| cells.contains(&n))
             {
-                if high_x - low_x < 1 {
+                if high_x - low_x < 1 && losses.is_empty() {
                     return Err(StructureError::InvalidGeometry);
                 }
                 let x0 = starter.origin_meters()[0] + f64::from(low_x) * 3. + 0.4;
@@ -198,7 +226,7 @@ pub fn build_shells(
                 faces,
                 space,
                 collision,
-                mass: StructuralMass::AddedKilograms(room.mass_kg / cells.len() as f64),
+                mass: StructuralMass::AddedKilograms(room.cell_milligrams[cell_index] as f64 / 1e6),
             });
         }
         let room_id = room
@@ -209,7 +237,7 @@ pub fn build_shells(
         assemblies.push(RoomAssembly {
             room: Room {
                 id: StructureId(room_id),
-                cells,
+                cells: parts.iter().flat_map(|p| p.cells.iter().copied()).collect(),
             },
             parts,
         });
@@ -218,17 +246,27 @@ pub fn build_shells(
         return Err(StructureError::InvalidFace);
     }
     let mut result = starter.clone();
-    while !assemblies.is_empty() {
-        let index = assemblies
+    let mut parts: Vec<_> = assemblies
+        .iter_mut()
+        .flat_map(|a| std::mem::take(&mut a.parts))
+        .collect();
+    while !parts.is_empty() {
+        let index = parts
             .iter()
-            .position(|a| {
-                a.room
-                    .cells
+            .position(|p| {
+                p.cells
                     .iter()
                     .any(|c| neighbors(*c).any(|n| result.cells.contains_key(&n)))
             })
             .ok_or(StructureError::Disconnected)?;
-        result.install_room(assemblies.remove(index))?;
+        result.add_part(parts.remove(index))?;
+    }
+    for a in assemblies {
+        // A fractured aggregate has no room-wide traversal authority. Its cells
+        // remain individually authoritative and Core-connected through the ship.
+        if connected(&a.room.cells.iter().copied().collect()) {
+            result.add_room(a.room)?;
+        }
     }
     Ok(result)
 }

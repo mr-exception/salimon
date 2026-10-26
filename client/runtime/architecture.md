@@ -1557,3 +1557,8 @@ Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 cont
 ## Optional module commissioning (#547)
 
 `session/construction/modules.rs` owns physical processor tiers, activated downtime, maintenance funding/work and actual commissioning faults. `session/recovery.rs` requests real tier-dependent Core watts. Schema 20 validates module/receipt ownership atomically; cancellation never restores activated equipment without paid restoration. Follow the [canonical controls, tuning, source/test and deferred Jump Drive contract](../../docs/non-core-modules.md).
+
+
+## Construction damage (#549)
+
+Follow the [canonical damage, physical salvage and schema-21 contract](../../docs/construction-damage.md). Surviving work preserves paid time and receipts; lost cells and destroyed projects cannot respawn or duplicate salvage. Core identity is protected. Fresh debris IDs, exact material shares, collision/containment and installed mass publish together; restore reconstructs source without reallocating debris.

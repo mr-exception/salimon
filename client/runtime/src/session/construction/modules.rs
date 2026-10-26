@@ -56,7 +56,11 @@ impl Module {
         )
     }
     fn available(&self, p: &Placeholder) -> bool {
-        self.tier > 0 && !self.unavailable && self.fault.is_none() && !p.work.damaged
+        !p.work.destroyed
+            && self.tier > 0
+            && !self.unavailable
+            && self.fault.is_none()
+            && !p.work.damaged
     }
 }
 impl ConstructionSave {
@@ -418,7 +422,7 @@ impl GameplaySession {
         for id in ids {
             let p = self.building.source.projects.inspect(id).unwrap();
             let m = self.building.source.modules.entry(id).or_default();
-            if !p.work.completed {
+            if !p.work.completed || p.work.destroyed {
                 continue;
             }
             if m.tier == 0 && m.fault.is_none() {

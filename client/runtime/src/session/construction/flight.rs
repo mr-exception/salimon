@@ -14,12 +14,25 @@ impl GameplaySession {
             .source
             .structure(None)
             .is_ok_and(|expected| expected == self.building.structure)
-            && !self
-                .building
-                .source
-                .projects
-                .jobs()
-                .any(|p| p.work.completed && p.blueprint.hull_affecting && p.work.damaged)
+            && self.building.source.damage.damaged.is_empty()
+            && !self.building.source.projects.jobs().any(|p| {
+                p.work.completed
+                    && !p.work.destroyed
+                    && is_structural(p)
+                    && (0..p.cells.len()).any(|i| {
+                        self.building
+                            .source
+                            .damage
+                            .lost
+                            .contains(&StructureId(p.id.0 * 1024 + 1024 + i as u64))
+                    })
+            })
+            && !self.building.source.projects.jobs().any(|p| {
+                !p.work.destroyed
+                    && p.work.completed
+                    && p.blueprint.hull_affecting
+                    && p.work.damaged
+            })
     }
     pub(super) fn construction_can_secure(&self, p: &Placeholder) -> bool {
         !p.work.damaged
@@ -35,7 +48,7 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
-            .filter(|p| !p.work.completed && requires_ground(p))
+            .filter(|p| !p.work.completed && !p.work.destroyed && requires_ground(p))
         {
             if !p.work.stopped {
                 return Some(CockpitMessage::StopExteriorConstruction);
@@ -117,7 +130,7 @@ impl GameplaySession {
             .source
             .projects
             .jobs()
-            .filter(|p| !p.work.completed && requires_ground(p))
+            .filter(|p| !p.work.completed && !p.work.destroyed && requires_ground(p))
             .map(|p| p.id)
             .collect();
         for id in ids {

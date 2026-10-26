@@ -21,6 +21,34 @@ pub(crate) struct FragmentOutput {
 }
 
 impl FragmentOutput {
+    pub(crate) fn import_salvage(
+        &mut self,
+        pieces: &[(crate::resources::DepositId, RawMaterial, ResourceTransform)],
+    ) -> Option<Vec<FragmentId>> {
+        let end = self.next_id.checked_add(pieces.len() as u64)?;
+        if pieces.len() > 16384
+            || pieces.iter().any(|(_, m, p)| {
+                RawMaterial::new(m.resource(), m.mass_kg()).is_err()
+                    || ResourceTransform::new(p.position(), p.orientation_xyzw()).is_err()
+            })
+        {
+            return None;
+        }
+        let mut ids = Vec::with_capacity(pieces.len());
+        for (source, material, pose) in pieces {
+            self.next_id += 1;
+            let id = FragmentId(self.next_id);
+            let f = ResourceFragment::new(id, *source, *material, *pose);
+            self.slots.insert(id, self.fragments.len());
+            self.fragments.push(f);
+            self.sealed.insert(id);
+            self.record(f);
+            ids.push(id);
+        }
+        debug_assert_eq!(self.next_id, end);
+        Some(ids)
+    }
+
     /// Attached spherical output uses the same ID/journal storage, but is sealed
     /// against legacy extraction-tail growth immediately.
     pub(crate) fn upsert_sphere(

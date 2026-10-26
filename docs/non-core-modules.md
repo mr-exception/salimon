@@ -65,8 +65,7 @@ case is excluded from that final occupancy test. A failed commissioning retains
 all paid material/work and reports `Damage`, `NoPower`, `Connection` or `Clearance`;
 capability remains unavailable. Resolve the actual condition and press G to retry
 without repaying completed work. Damaged maintenance can also be cancelled and
-replaced by a funded restoration. Authoritative damage producers and structural
-salvage retain #549; this change adds no combat/damage hotkey.
+replaced by a funded restoration. Authoritative damage producers and structural salvage follow [the damage contract](construction-damage.md).
 
 This processor is non-invasive inside work and can run while coasting. Its outage
 does not itself ground the ship. Existing Core, engine, cockpit, ramp and
@@ -114,3 +113,6 @@ retains its physical install/commissioned-N acceptance after owner tuning and
 real-scale flight/navigation prerequisites. It must reuse these downtime,
 physical-material and commissioning contracts with its actual module-specific
 footprint and safety; the utility processor is the completed example.
+
+
+Gameplay damage, safe dismantling, surviving-site recovery and physical debris now follow the [damage contract](construction-damage.md). Offline progression remains #550.

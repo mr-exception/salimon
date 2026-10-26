@@ -522,3 +522,8 @@ See [construction flight safety](construction-flight-safety.md) for schema-19 St
 ## Optional module schema 20 (#547)
 
 See the [canonical module source/migration contract](non-core-modules.md#ownership-save-and-verification). Saved construction now includes a module map keyed by the original placeholder ID, commissioned tier, persistent unavailability/fault, installed maintenance receipts and optional upgrade/restoration Funding/Work. Old envelopes reject nonempty module maps; current tier/phase, paid time, allocator and cross-owner uniqueness validate before atomic publication. Continuous maintenance time does not turn every simulation tick into a discrete checkpoint.
+
+
+## Construction damage and salvage (#549)
+
+See the [canonical damage and schema-21 contract](construction-damage.md) for runtime `session/construction/damage.rs`, ship lost-cell geometry, world sealed salvage allocation, controls, exact source/mass/identity boundaries and focused tests/evidence routes. Run workspace tests/build/Clippy/fmt plus documentation validation.

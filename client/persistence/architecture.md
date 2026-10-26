@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 20).
+`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 21).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -116,3 +116,8 @@ Follow the [canonical Stop/Resume, physical securing, takeoff and schema-19 cont
 
 
 #547 advances the envelope to schema 20 for runtime-owned optional module commissioning, maintenance receipts/work and durable downtime. Versions 1–19 migrate without granting modules or time; historical envelopes cannot smuggle module source. See [the module/save contract](../../docs/non-core-modules.md).
+
+
+## Construction damage (#549)
+
+Follow the [canonical damage, physical salvage and schema-21 contract](../../docs/construction-damage.md). Surviving work preserves paid time and receipts; lost cells and destroyed projects cannot respawn or duplicate salvage. Core identity is protected. Fresh debris IDs, exact material shares, collision/containment and installed mass publish together; restore reconstructs source without reallocating debris.

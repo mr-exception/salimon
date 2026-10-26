@@ -1,0 +1,101 @@
+   Compiling generic-array v0.14.7
+   Compiling alsa-sys v0.4.0
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling salimon-math v0.1.0 (/workspace/salimon/client/math)
+   Compiling wgpu-core v30.0.1
+   Compiling cpal v0.18.2
+   Compiling dasp_sample v0.11.0
+   Compiling alsa v0.11.0
+   Compiling salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+   Compiling wgpu v30.0.1
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+   Compiling salimon-character v0.1.0 (/workspace/salimon/client/character)
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 02s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-7610c1996ebe51e9)
+
+running 47 tests
+test scout_audio::tests::construction_machine_audio_is_spatial_bounded_and_lifecycle_gated ... ok
+test session::construction::damage::tests::cell_destruction_detaches_once_preserves_core_and_exact_mass_and_reload ... FAILED
+test session::construction::damage::tests::destroyed_placeholder_uses_actual_survival_not_cancel_progress_and_can_be_replaced ... ok
+test session::construction::damage::tests::independent_cell_condition_safe_dismantle_and_malformed_save_rejection ... FAILED
+test session::construction::damage::tests::partial_damage_survives_without_consumption_and_cancel_is_still_proportional ... ok
+test session::construction::damage::tests::salvage_allocator_failure_is_atomic ... ok
+test session::construction::flight::tests::construction_active_stop_resume_takeoff_and_exact_save ... ok
+test session::construction::flight::tests::construction_cancel_half_work_refunds_once_and_preserves_structure ... ok
+test session::construction::flight::tests::construction_cancel_preserves_completed_room_identity_faces_and_mass ... ok
+test session::construction::flight::tests::construction_forced_flight_latches_without_momentum_loss_or_landing_restart ... ok
+test session::construction::flight::tests::construction_interior_coasting_and_explicit_resume_are_funded ... ok
+test session::construction::flight::tests::construction_secured_stop_still_obeys_actual_ramp_core_and_engine_gates ... ok
+test session::construction::flight::tests::construction_stopped_unsecured_and_broken_completed_hull_block ... ok
+test session::construction::modules::tests::activated_cancel_refunds_half_without_restoring_old_module_and_restoration_costs_work ... ok
+test session::construction::modules::tests::install_upgrade_downtime_mass_and_verified_reload ... ok
+test session::construction::modules::tests::malformed_source_duplicate_receipts_and_old_schema_reject_atomically ... ok
+test session::construction::modules::tests::native_evidence_setup_uses_reachable_production_feed_and_commissioning ... ok
+test session::construction::modules::tests::optional_module_failure_does_not_ground_ship_but_critical_structural_damage_does ... ok
+test session::construction::modules::tests::pause_power_damage_stop_and_commission_fault_never_advance_or_grant_capability ... ok
+test session::construction::modules::tests::recovery_throughput_uses_real_core_joules_and_downtime_removes_whole_bonus ... ok
+test session::construction::modules::tests::scarce_surplus_credits_only_paid_nanoseconds_and_discrete_events_exclude_continuous_work ... ok
+test session::construction::room_tests::cargo_on_boarding_stairs_uses_actual_support_below_the_original_deck ... ok
+test automation::tests::construction_interlock_scenarios_share_native_command_admission ... ok
+test session::construction::room_tests::completed_room_accepts_supported_furniture_without_its_old_reservation_occluding_intake ... ok
+test session::construction::room_tests::closed_gate_and_stairs_keep_full_body_clear_and_reach_upper_deck ... ok
+test session::construction::room_tests::expansion_opens_one_accessible_door_and_partition_edit_survives_save ... ok
+test session::construction::room_tests::legacy_two_cell_reservation_retains_original_footprint_and_cancellable_receipts ... ok
+test session::construction::room_tests::occupied_connector_cannot_publish_the_last_joule_or_new_colliders ... ok
+test session::construction::room_tests::one_funded_room_commits_four_cells_after_last_tick_and_roundtrips ... ok
+test session::construction::room_tests::completed_room_preserves_a_surface_exit_and_body_clear_boarding_return ... ok
+test session::construction::room_tests::rotated_internal_door_completes_and_manual_closure_respects_occupancy_and_save ... ok
+test session::construction::room_tests::upper_deck_cargo_keeps_identity_collision_support_and_mass_across_reload ... ok
+test session::construction::tests::cargo_obstruction_prevents_final_install_and_spends_nothing_until_clear ... ok
+test session::construction::tests::construction_safety_damage_pause_and_exact_partial_energy_admission ... ok
+test session::construction::tests::fully_funded_partial_cancel_and_corrupt_cross_owner_receipts ... ok
+test session::construction::tests::intake_rejection_receipts_save_refund_and_mass_are_atomic ... ok
+test session::construction::tests::normal_ship_and_placeholders_do_not_install_structure_or_consume_resources ... ok
+test session::construction::tests::paid_construction_automatically_completes_once_without_tool_or_nearby_player ... ok
+test session::construction::tests::paid_partial_cancel_returns_proportional_real_mass_and_never_replays ... ok
+test session::construction::tests::placeholder_restore_is_exact_and_ui_is_transient_without_advancing_progress ... ok
+test session::construction::tests::production_preview_place_inspect_cancel_preserves_physical_mass_and_materials ... ok
+test session::construction::tests::saved_projects_cannot_bypass_the_registered_catalog_or_protected_routes ... ok
+test session::construction::tests::schema_eight_requires_source_and_legacy_seven_migrates_empty_atomically ... ok
+test session::construction::tests::timer_partitioning_save_validation_and_full_scheduler_pause_are_exact ... ok
+test session::construction::tests::utility_module_publishes_physical_installation_only_after_paid_completion ... ok
+test session::construction::tests::wrong_owner_catalog_or_cells_never_replace_a_live_session ... ok
+test session::construction::room_tests::room_evidence_uses_one_real_intake_and_preserves_powered_and_unpowered_movement ... ok
+
+failures:
+
+---- session::construction::damage::tests::cell_destruction_detaches_once_preserves_core_and_exact_mass_and_reload stdout ----
+
+thread 'session::construction::damage::tests::cell_destruction_detaches_once_preserves_core_and_exact_mass_and_reload' (3797) panicked at client/runtime/src/session/construction/damage/tests.rs:29:5:
+assertion `left == right` failed
+  left: 100000.0
+ right: 100035.0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- session::construction::damage::tests::independent_cell_condition_safe_dismantle_and_malformed_save_rejection stdout ----
+
+thread 'session::construction::damage::tests::independent_cell_condition_safe_dismantle_and_malformed_save_rejection' (3799) panicked at client/runtime/src/session/construction/damage/tests.rs:29:5:
+assertion `left == right` failed
+  left: 100030.0
+ right: 100040.0
+
+
+failures:
+    session::construction::damage::tests::cell_destruction_detaches_once_preserves_core_and_exact_mass_and_reload
+    session::construction::damage::tests::independent_cell_condition_safe_dismantle_and_malformed_save_rejection
+
+test result: FAILED. 45 passed; 2 failed; 0 ignored; 0 measured; 410 filtered out; finished in 7.97s
+
+error: test failed, to rerun pass `-p salimon-client --bin salimon-client`

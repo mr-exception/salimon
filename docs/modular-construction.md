@@ -62,8 +62,7 @@ at most 128 cells per project; the separate mass-free room ID uses offset 2047.
 Faces have stable `(part_id, direction)` identities, and each part retains its
 own collision and mass. Completion order does not allocate or renumber these
 identities. Existing structural damage/detachment and domain save APIs can address
-one cell independently; gameplay damage sources, salvage and detachment
-composition remain #549, rather than a new builder combat control.
+one cell independently; gameplay damage, salvage and detachment follow the [damage contract](construction-damage.md).
 
 With C open, aim at an ordinary shared room partition and press **Delete** to
 remove it. Reach, line of sight and owner/survival gates apply. Only a horizontal
@@ -116,3 +115,6 @@ budgets #563. Software Vulkan images do not establish hardware frame rate.
 ## Optional module commissioning (#547)
 
 See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.
+
+
+Gameplay damage, safe dismantling, surviving-site recovery and physical debris now follow the [damage contract](construction-damage.md). Offline progression remains #550.

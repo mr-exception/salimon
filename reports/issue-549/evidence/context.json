@@ -1,0 +1,19 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "backend": "Vulkan",
+  "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+  "scale_factor": 1.0,
+  "viewport_pixels": [
+    1280,
+    800
+  ],
+  "os": "Linux 6.18.55 x86_64",
+  "rust": "1.99.1 (58cf8f9c3 2026-10-13)",
+  "python": "3.12.14",
+  "display": "Xvfb :98",
+  "input": "E2E protocol; native key dispatch; typed declared impact injection",
+  "seed": 549,
+  "damage_step_ms": 16,
+  "detachment_step_ms": 100,
+  "binary_sha256": "ce9eaf3ea55203d69e09f3533f8e6e95424618746632bd341443614844b719c5"
+}

@@ -1,0 +1,165 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded dasp_sample v0.11.0
+  Downloaded cpufeatures v0.2.17
+  Downloaded block-buffer v0.10.4
+  Downloaded alsa v0.11.0
+  Downloaded alsa-sys v0.4.0
+  Downloaded crypto-common v0.1.7
+  Downloaded typenum v1.20.1
+  Downloaded generic-array v0.14.7
+  Downloaded digest v0.10.7
+  Downloaded sha2 v0.10.9
+  Downloaded cpal v0.18.2
+   Compiling unicode-ident v1.0.24
+    Checking cfg-if v1.0.4
+    Checking bitflags v2.13.1
+    Checking log v0.4.29
+    Checking libloading v0.8.9
+   Compiling proc-macro2 v1.0.107
+    Checking once_cell v1.21.4
+    Checking libc v0.2.189
+    Checking dlib v0.5.3
+    Checking smallvec v1.16.0
+    Checking memchr v2.8.3
+    Checking wayland-sys v0.31.11
+    Checking linux-raw-sys v0.12.1
+   Compiling generic-array v0.14.7
+    Checking simd-adler32 v0.3.10
+   Compiling quote v1.0.47
+    Checking serde_core v1.0.229
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+    Checking foldhash v0.2.0
+    Checking typenum v1.20.1
+    Checking rustix v1.1.4
+    Checking adler2 v2.0.1
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck_derive v1.12.0
+    Checking zmij v1.0.23
+    Checking equivalent v1.0.2
+    Checking itoa v1.0.18
+    Checking serde_json v1.0.151
+    Checking crc32fast v1.5.2
+    Checking bytemuck v1.25.2
+   Compiling thiserror-impl v2.0.20
+    Checking miniz_oxide v0.9.1
+   Compiling zerocopy-derive v0.8.56
+    Checking downcast-rs v1.2.1
+    Checking scoped-tls v1.0.1
+    Checking wayland-backend v0.3.17
+    Checking thiserror v2.0.20
+    Checking flate2 v1.1.10
+    Checking serde v1.0.229
+    Checking zerocopy v0.8.56
+    Checking libm v0.2.16
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking hashbrown v0.17.1
+    Checking arrayvec v0.7.8
+    Checking digest v0.10.7
+   Compiling wayland-scanner v0.31.11
+    Checking indexmap v2.14.2
+    Checking num-traits v0.2.19
+    Checking rustc-hash v1.1.0
+    Checking cpufeatures v0.2.17
+    Checking sha2 v0.10.9
+    Checking naga-types v30.0.1
+    Checking raw-window-handle v0.6.2
+    Checking bit-vec v0.9.1
+    Checking unicode-width v0.2.2
+    Checking bit-set v0.10.0
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Checking codespan-reporting v0.13.1
+    Checking wayland-client v0.31.15
+    Checking spirv v0.4.0+sdk-1.4.341.0
+    Checking static_assertions v1.1.0
+    Checking scopeguard v1.2.0
+    Checking allocator-api2 v0.2.21
+    Checking half v2.7.1
+    Checking hashbrown v0.16.1
+    Checking naga v30.0.1
+    Checking lock_api v0.4.14
+    Checking wgpu-types v30.0.1
+    Checking ash v0.38.0+1.3.281
+    Checking parking_lot_core v0.9.12
+   Compiling thiserror-impl v1.0.69
+    Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling wgpu-hal v30.0.1 (/workspace/salimon/vendor/wgpu-hal)
+    Checking linux-raw-sys v0.4.15
+    Checking presser v0.3.1
+    Checking rustix v0.38.44
+    Checking thiserror v1.0.69
+    Checking parking_lot v0.12.5
+    Checking khronos-egl v6.0.0
+    Checking wayland-protocols v0.32.13
+    Checking wgpu-naga-bridge v30.0.1
+    Checking ordered-float v5.4.0
+    Checking polling v3.11.0
+    Checking slab v0.4.12
+    Checking glow v0.17.0
+    Checking profiling v1.0.18
+    Checking renderdoc-sys v1.1.0
+    Checking calloop v0.13.0
+    Checking aho-corasick v1.1.5
+    Checking gpu-allocator v0.28.0
+   Compiling alsa-sys v0.4.0
+    Checking xkeysym v0.2.1
+    Checking ttf-parser v0.25.1
+    Checking arrayref v0.3.9
+    Checking regex-syntax v0.8.11
+    Checking xcursor v0.3.11
+    Checking strict-num v0.1.1
+    Checking cursor-icon v1.2.0
+    Checking wayland-csd-frame v0.3.0
+    Checking regex-automata v0.4.18
+    Checking tiny-skia-path v0.11.4
+    Checking owned_ttf_parser v0.25.1
+    Checking wayland-cursor v0.31.14
+    Checking wayland-protocols-wlr v0.3.12
+   Compiling gltf-derive v1.4.1
+error: failed to run custom build command for `alsa-sys v0.4.0`
+
+Caused by:
+  process didn't exit successfully: `/workspace/salimon/target/debug/build/alsa-sys-e951b642298f8bef/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-env-changed=ALSA_NO_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_SYSROOT_DIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR
+
+  --- stderr
+
+  thread 'main' (1752) panicked at /workspace/.salimon-tools/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs:13:19:
+
+  pkg-config exited with status code 1
+  > PKG_CONFIG_PATH=/workspace/.salimon-tools/sysroot/usr/lib/x86_64-linux-gnu/pkgconfig PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config --libs --cflags alsa
+
+  pkg-config output:
+    Package alsa was not found in the pkg-config search path.
+    Perhaps you should add the directory containing `alsa.pc'
+    to the PKG_CONFIG_PATH environment variable
+    Package 'alsa', required by 'virtual:world', not found
+
+  The system library `alsa` required by crate `alsa-sys` was not found.
+  The file `alsa.pc` needs to be installed and the PKG_CONFIG_PATH environment variable must contain its parent directory.
+  PKG_CONFIG_PATH contains the following:
+      - /workspace/.salimon-tools/sysroot/usr/lib/x86_64-linux-gnu/pkgconfig
+
+  HINT: you may need to install a package such as alsa, alsa-dev or alsa-devel.
+
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

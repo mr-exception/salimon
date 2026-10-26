@@ -107,7 +107,7 @@ impl Recovery {
         };
         Some(format!("{status}\n{content}"))
     }
-    pub(super) fn panel(&self, reserve: f64, stored: u64) -> String {
+    pub(super) fn panel(&self, reserve: f64, stored: u64, multiplier: f64) -> String {
         let hardware = if self.module.is_some() {
             "INSTALLED"
         } else {
@@ -122,12 +122,14 @@ impl Recovery {
         };
         format!(
             "RECOVERY {hardware}\n{active}  {:.1} MW / reserve {:.2} GJ\nRecord progress: {:.1}% / {:.1}%\nWork left at requested power: {:.0}s / {:.0}s\nR: start/stop selected damaged record (no refund)",
-            self.config.watts / 1e6,
+            self.config.watts * multiplier / 1e6,
             reserve / 1e9,
             self.spent_joules[0] / self.config.record_cost_joules[0] * 100.0,
             self.spent_joules[1] / self.config.record_cost_joules[1] * 100.0,
-            (self.config.record_cost_joules[0] - self.spent_joules[0]) / self.config.watts,
-            (self.config.record_cost_joules[1] - self.spent_joules[1]) / self.config.watts
+            (self.config.record_cost_joules[0] - self.spent_joules[0])
+                / (self.config.watts * multiplier),
+            (self.config.record_cost_joules[1] - self.spent_joules[1])
+                / (self.config.watts * multiplier)
         )
     }
 }
@@ -162,7 +164,9 @@ impl GameplaySession {
             return;
         };
         let remaining = self.recovery.config.record_cost_joules[i] - self.recovery.spent_joules[i];
-        let request = (self.recovery.config.watts * delta.as_secs_f64()).min(remaining);
+        let request =
+            (self.recovery.config.watts * self.utility_recovery_multiplier() * delta.as_secs_f64())
+                .min(remaining);
         let funded = self
             .ship
             .fund_auxiliary_work(request, self.recovery_reserve(), delta)

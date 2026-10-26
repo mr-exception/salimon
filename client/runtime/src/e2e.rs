@@ -11,6 +11,9 @@ use crate::session::GameplaySession;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    ConstructionModule,
+    ConstructionModuleUpgrade,
+    ConstructionModuleRestore,
     ConstructionMaterials,
     ConstructionBuild,
     ConstructionRoom,
@@ -67,6 +70,9 @@ impl Scenario {
             "scout-lighting-blackout" => Ok(Self::ScoutLightingBlackout),
             "scout-lighting-broken" => Ok(Self::ScoutLightingBroken),
             "scout-lighting-dark" => Ok(Self::ScoutLightingDark),
+            "construction-module" => Ok(Self::ConstructionModule),
+            "construction-module-upgrade" => Ok(Self::ConstructionModuleUpgrade),
+            "construction-module-restore" => Ok(Self::ConstructionModuleRestore),
             "construction-materials" => Ok(Self::ConstructionMaterials),
             "construction-build" => Ok(Self::ConstructionBuild),
             "construction-room" => Ok(Self::ConstructionRoom),
@@ -122,6 +128,9 @@ impl Scenario {
             Self::ScoutLightingBlackout => "scout-lighting-blackout",
             Self::ScoutLightingBroken => "scout-lighting-broken",
             Self::ScoutLightingDark => "scout-lighting-dark",
+            Self::ConstructionModule => "construction-module",
+            Self::ConstructionModuleUpgrade => "construction-module-upgrade",
+            Self::ConstructionModuleRestore => "construction-module-restore",
             Self::ConstructionMaterials => "construction-materials",
             Self::ConstructionBuild => "construction-build",
             Self::ConstructionRoom => "construction-room",
@@ -318,6 +327,18 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
             }
         }
 
+        Scenario::ConstructionModule
+        | Scenario::ConstructionModuleUpgrade
+        | Scenario::ConstructionModuleRestore => {
+            crate::session::construction::evidence_module(
+                app,
+                match config.scenario {
+                    Scenario::ConstructionModuleUpgrade => 1,
+                    Scenario::ConstructionModuleRestore => 2,
+                    _ => 0,
+                },
+            )?;
+        }
         Scenario::ConstructionRoom => crate::session::construction::evidence_room(app)?,
         Scenario::ConstructionInterlocks => {
             crate::session::construction::evidence_room(app)?;

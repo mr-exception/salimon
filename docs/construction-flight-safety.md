@@ -35,7 +35,7 @@ throttle or controls. Landing does not resume it. Safe interior work remains
 eligible during coasting. The existing actual Core power, engine-switch and
 cockpit-authority gates remain enforced by the ship controller; optional
 Fabricator/Jump Drive availability does not itself ground the ship. General
-module downtime/commissioning is owned by #547 and actual damage/salvage by #549;
+module downtime/commissioning follows the [non-Core module contract](non-core-modules.md) and actual damage/salvage by #549;
 this change adds no pretend damage source or module-state flags.
 
 Whole-session schema **19** adds `Work.stopped`. Versions 1–18 migrate with the
@@ -51,3 +51,8 @@ window title. Instrument telemetry retains its existing owner.
 Run construction tests, workspace gates and the production wgpu evidence scenario
 `scenarios/evidence/construction-interlocks.json`. Human presentation, physical
 device qualification and hardware budgets remain #561, #557 and #563.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.

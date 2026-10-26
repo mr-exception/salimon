@@ -736,3 +736,6 @@ Core upgrade evidence: `core-upgrade-blackout.json` and `core-upgrade-powered.js
 
 
 Construction flight readiness (#546): protocol key `construction_stop_resume` maps to native T while the C builder is active, using the same reachable project admission. Run `scenarios/evidence/construction-interlocks.json` for paid Stop/Resume/refund and `scenarios/evidence/construction-interlocks-cockpit.json` for cockpit takeoff refusal. See [the canonical contract](../docs/construction-flight-safety.md).
+
+
+Optional modules (#547): protocol `construction_module` maps to native G in the C builder. Run `scenarios/evidence/construction-module.json`, `construction-module-upgrade.json` and `construction-module-restore.json` for seeded installation, upgrade downtime/Stop/Resume and physical restoration. Each uses real E intake, paid work and commissioning. See [controls and setup limits](../docs/non-core-modules.md).

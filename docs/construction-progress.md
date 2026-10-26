@@ -45,8 +45,7 @@ Safe dismantling/damage is separate #549 work, not a refund shortcut.
 Structural hull/deck cells and four-cell/two-deck rooms now complete through the
 [modular structure adapter](modular-construction.md). Its final graph/connector
 clearance preflight precedes the last paid interval. Internal doors also complete into manual, saved pocket doorways with
-occupancy-gated closure. Utility modules retain the unavailable-installation
-boundary under #547. Legacy two-cell room reservations remain cancellable but cannot
+occupancy-gated closure. Utility modules complete through the [commissioning contract](non-core-modules.md). Legacy two-cell room reservations remain cancellable but cannot
 complete into an unsafe stair footprint. These unsupported types stop one
 microsecond before completion, spend no more energy there and never become solid.
 
@@ -73,3 +72,8 @@ workspace gates. The production protocol/wgpu route is
 1 kg iron fragment, feeds with E, checks half-progress and completion, and tests
 that unfinished cancellation cannot remove the completed stool. It is a fixture,
 not evidence of a mining journey or physical OS input.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.

@@ -565,6 +565,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "pause" => Some(KeyCode::Escape),
         "status" => Some(KeyCode::KeyH),
         "skip_tutorial" | "construction_stop_resume" => Some(KeyCode::KeyT),
+        "construction_module" => Some(KeyCode::KeyG),
         "resume" => Some(KeyCode::Enter),
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),

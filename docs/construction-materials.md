@@ -35,3 +35,8 @@ unique IDs across projects/Core/world and allocator bounds before publishing.
 The ConstructionMaterials ledger replaces carried-fragment mass at intake,
 and physical returned identities replace it at cancellation. Save/load never
 advances progress or replays an intake.
+
+
+## Optional module commissioning (#547)
+
+See [non-Core module contract](non-core-modules.md) for the Archive processor, G/E/T/RMB maintenance, immediate activation downtime, real commissioning faults, paid restoration, schema 20, source/test mapping and deferred Jump Drive follow-up #633.

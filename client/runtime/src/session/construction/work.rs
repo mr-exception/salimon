@@ -9,7 +9,13 @@ pub(super) fn supports_completion(p: &Placeholder) -> bool {
     }
     matches!(
         p.blueprint.id.as_str(),
-        "stool" | "partition" | "internal-door" | "hull-cell" | "deck-cell" | "two-deck-room"
+        "stool"
+            | "partition"
+            | "internal-door"
+            | "hull-cell"
+            | "deck-cell"
+            | "two-deck-room"
+            | "utility-module"
     )
 }
 fn watts(p: &Placeholder) -> f64 {
@@ -61,6 +67,9 @@ impl GameplaySession {
         )
     }
     pub(super) fn construction_status(&self, p: &Placeholder) -> String {
+        if let Some(status) = self.module_status(p.id) {
+            return status;
+        }
         if p.work.completed {
             return "COMPLETED".into();
         }
@@ -180,6 +189,7 @@ impl GameplaySession {
             }
             self.building.running = Some(center);
         }
+        self.advance_modules(delta);
         self.sync_fabricator_mass();
         self.sync_mount_collision();
     }
@@ -195,7 +205,9 @@ impl GameplaySession {
             .filter(|p| p.work.completed)
         {
             let s = p.space;
-            if p.blueprint.id == "stool" {
+            if p.blueprint.id == "utility-module" {
+                out.push([s.min[0], s.max[0], s.min[1], s.max[1], s.min[2], s.max[2]]);
+            } else if p.blueprint.id == "stool" {
                 out.push([
                     s.min[0],
                     s.max[0],

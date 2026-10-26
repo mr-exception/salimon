@@ -549,3 +549,7 @@ Domain input binding owners are in `client/runtime/src/session/input/` (#640);
 Domain save mapping/version rules now live in runtime `session/<domain>/save.rs` (#641);
 central persistence retains the explicit layout and atomic publication. See the
 [save ownership contract](save-contract.md#runtime-domain-mapping-ownership-641).
+
+For session composition (#642), use `session/init.rs`, `commands.rs`,
+`interaction/actions.rs`, `input/state.rs`, `policy.rs` and the explicit
+`tick.rs` scheduler with power/character/resource stage owners.

@@ -169,7 +169,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     benchmark_fixture::initialize(app, config.count, config.layout, config.seed, config.active)?;
     benchmark_fixture::settle(app, config.count, config.settle_steps)?;
     app.seed = config.seed;
-    app.measure_physics = true;
+    app.policy.set_physics_measurement(true);
     // Camera remains a production character camera, facing the aft population.
     if !config.away {
         app.character

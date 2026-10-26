@@ -355,7 +355,7 @@ mod crafting_tests {
         }
         assert!(s.crafting_text().unwrap().contains("QUEUE: 1 /"));
         dispatch_session_key(&mut s, PhysicalKey::Code(KeyCode::KeyW), true);
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement().forward);
         s.clear_held_controls();
         assert!(!s.crafting_ui.open);
     }
@@ -398,7 +398,7 @@ mod wheel_input_tests {
         for key in [KeyCode::KeyW, KeyCode::KeyE, KeyCode::KeyF, KeyCode::Digit1] {
             dispatch_session_key(&mut s, PhysicalKey::Code(key), true);
         }
-        assert!(!s.movement_input.forward);
+        assert!(!s.input.movement().forward);
         assert!(s.equipment.selected().is_none());
         assert!(!s.crafting_ui.open);
         dispatch_session_key(&mut s, q, false);

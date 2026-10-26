@@ -86,9 +86,7 @@ impl GameplaySession {
             .ok_or_else(|| invalid("run identity exhausted"))?;
         let mut fresh = Self {
             seed: self.seed,
-            automation_step: self.automation_step,
-            interpolate_presentation: self.interpolate_presentation,
-            measure_physics: self.measure_physics,
+            policy: self.policy,
             run: RunState {
                 serial,
                 ..Default::default()
@@ -119,9 +117,7 @@ impl GameplaySession {
             schema_version: u32,
         }
         let mut candidate = GameplaySession {
-            automation_step: self.automation_step,
-            interpolate_presentation: self.interpolate_presentation,
-            measure_physics: self.measure_physics,
+            policy: self.policy,
             ..Default::default()
         };
         candidate.restore_bytes(bytes)?;

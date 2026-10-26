@@ -91,7 +91,7 @@ fn gather(s: &mut GameplaySession, resource: ResourceId, required_kg: f64, seed:
     s.command(Command::Mining(false));
     s.advance_automation(TICK);
     let id = released.expect("production aim and mining reach required ration feedstock");
-    s.automation_step = Some(TICK);
+    s.policy.set_automation_step(Some(TICK));
     let request = json!({"protocol":1,"id":1,"op":"aim_fragment","fragment_id":id.0});
     let response = crate::automation::execute_session(s, &request.to_string());
     assert_eq!(response["ok"], true, "{response}");
@@ -346,7 +346,7 @@ fn zero_fatigue_denies_work_but_emergency_food_and_eva_return_still_use_producti
     .unwrap();
     // Route fixture begins in flight; vitals must be fresh for the pilot commands.
     s.survival = Default::default();
-    s.automation_step = Some(TICK);
+    s.policy.set_automation_step(Some(TICK));
     for step in route["steps"].as_array().unwrap() {
         if let Some(action) = step.get("action") {
             let mut request = action.clone();

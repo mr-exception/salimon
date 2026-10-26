@@ -178,7 +178,7 @@ fn takeoff_assist_counts_its_path_without_passenger_double_counting() {
 fn real_cabin_walking_adds_only_controller_path_and_restored_samples_remain_exact() {
     let mut s = GameplaySession::default();
     let start = s.snapshot().character.local_ship_position_meters.unwrap();
-    s.movement_input.forward = true;
+    s.input.movement.forward = true;
     for _ in 0..5 {
         s.advance_game(Duration::from_millis(16));
     }

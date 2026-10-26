@@ -195,7 +195,7 @@ mod tests {
         );
         assert!(restored.mining.fragment_previous.is_empty());
         assert_eq!(
-            restored.movement_input,
+            restored.input.movement,
             salimon_character::MovementInput::default()
         );
         restored

@@ -82,13 +82,16 @@ fn checkpoint(dir: &Directory, s: &GameplaySession, utc: u64) {
 }
 fn reload(dir: &Directory, utc: u64) -> GameplaySession {
     let mut s = GameplaySession {
-        automation_step: Some(Duration::from_millis(16)),
+        policy: crate::session::policy::Policy::with_automation_step(Some(Duration::from_millis(
+            16,
+        ))),
         ..Default::default()
     };
     let host = Checkpoints::open_at(dir.0.clone(), &mut s, utc).unwrap();
     drop(host); // Release worker and exclusive filesystem lease before reopening.
     // Normal launch deliberately excludes automation host policy from saves.
-    s.automation_step = Some(Duration::from_millis(16));
+    s.policy
+        .set_automation_step(Some(Duration::from_millis(16)));
     s
 }
 fn protocol(s: &mut GameplaySession, mut request: Value) -> Value {
@@ -569,7 +572,9 @@ fn native_cargo_checkpoint_477() {
     probe.restore_bytes(&bytes).unwrap();
     assert!(probe.e2e_step().is_none());
     assert_eq!(probe.save_bytes(utc).unwrap(), bytes);
-    probe.automation_step = Some(Duration::from_millis(16));
+    probe
+        .policy
+        .set_automation_step(Some(Duration::from_millis(16)));
     assert_eq!(
         protocol(
             &mut probe,

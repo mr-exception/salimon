@@ -1,4 +1,5 @@
 //! Portable authored interaction gates shared by commands and presentation.
+mod actions;
 use salimon_character::CharacterLocation;
 pub(crate) const COCKPIT_INTERACTION_POSITION_METERS: [f64; 3] = [
     salimon_character::COCKPIT_SEAT_MARKER_METERS[0],

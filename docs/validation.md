@@ -531,3 +531,16 @@ Run `python3 -m unittest discover -s scripts -p 'test_architecture_*.py' -v` and
 `python3 scripts/architecture_review.py --base origin/main --output artifacts/architecture/review.json`.
 Use the actual parent SHA for stacked PRs. See the [policy and limitations](architecture-baseline.md#warning-only-boundary-and-active-pr-review-645).
 CI retains candidates and active-PR inventories without failing valid builds on warnings.
+
+## Integrated Scout and construction acceptance (#551)
+
+The [maintained suite](../scripts/README.md#integrated-scout-and-construction-acceptance-551)
+combines production native routes for completed #538–#550 implementations and
+exact 0/50/99% cancellation/refund boundaries. Run runtime construction/offline,
+ship, persistence and workspace checks plus the suite and supplemental machinery
+and Archive drivers. Validate the Scout export with
+`python3 models/assets/ships/salimon-scout/validate.py`; retain current measured
+asset metrics without claiming pending hardware ceilings are approved. Coverage,
+original production images, state and platform limitations belong in the
+[completion report](../reports/issue-551/README.md). Human visual/audio review
+remains #561, physical devices/sleep/wake #557 and hardware budgets #563.

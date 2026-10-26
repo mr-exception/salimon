@@ -454,6 +454,45 @@ fn construction_safety_damage_pause_and_exact_partial_energy_admission() {
     );
 }
 #[test]
+fn cancellation_boundaries_survive_reload_without_early_colliders_or_duplicate_refunds() {
+    for elapsed_ms in [0, 5_000, 9_900] {
+        let (mut s, id) = funded_stool();
+        let before_mass = s.ship.snapshot().total_mass_kg;
+        let structure = s.building.structure.save_state();
+        s.advance_construction(Duration::from_millis(elapsed_ms));
+        assert!(s.construction_solids().is_empty());
+        let progress = elapsed_ms as u32 * 100;
+        assert_eq!(
+            s.building
+                .source
+                .projects
+                .inspect(id)
+                .unwrap()
+                .funding
+                .progress_ppm,
+            progress
+        );
+        let saved = s.save_bytes(100).unwrap();
+        let mut restored = GameplaySession::default();
+        restored.restore_bytes(&saved).unwrap();
+        assert!(restored.construction_solids().is_empty());
+        restored.cancel_construction(id).unwrap();
+        let refund = 1. - f64::from(progress) / 1_000_000.;
+        let pieces = restored.mining.session.fragments();
+        assert_eq!(pieces.len(), 1);
+        assert!((pieces[0].material().mass_kg() - refund).abs() < 1e-12);
+        assert_eq!(restored.building.structure.save_state(), structure);
+        assert!(
+            (restored.ship.snapshot().total_mass_kg - (before_mass - 1. + refund)).abs() < 1e-9
+        );
+        assert!(restored.construction_solids().is_empty());
+        let after_cancel = restored.save_bytes(100).unwrap();
+        restored.restore_bytes(&after_cancel).unwrap();
+        assert!(restored.cancel_construction(id).is_err());
+        assert_eq!(restored.save_bytes(100).unwrap(), after_cancel);
+    }
+}
+#[test]
 fn paid_partial_cancel_returns_proportional_real_mass_and_never_replays() {
     let (mut s, id) = funded_stool();
     s.advance_construction(Duration::from_millis(2_500));

@@ -17,6 +17,7 @@ pub(crate) enum Scenario {
     ConstructionMaterials,
     ConstructionBuild,
     ConstructionRoom,
+    ConstructionCancellation,
     ConstructionInterlocks,
     SurfaceAgeOffline,
     SurfaceAgeReplacement,
@@ -96,6 +97,7 @@ impl Scenario {
             "construction-materials" => Ok(Self::ConstructionMaterials),
             "construction-build" => Ok(Self::ConstructionBuild),
             "construction-room" => Ok(Self::ConstructionRoom),
+            "construction-cancellation" => Ok(Self::ConstructionCancellation),
             "construction-interlocks" => Ok(Self::ConstructionInterlocks),
             "scout-cabin-bunk" => Ok(Self::ScoutCabinBunk),
             "scout-cabin-locker" => Ok(Self::ScoutCabinLocker),
@@ -164,6 +166,7 @@ impl Scenario {
             Self::ConstructionMaterials => "construction-materials",
             Self::ConstructionBuild => "construction-build",
             Self::ConstructionRoom => "construction-room",
+            Self::ConstructionCancellation => "construction-cancellation",
             Self::ConstructionInterlocks => "construction-interlocks",
             Self::ScoutCabinBunk => "scout-cabin-bunk",
             Self::ScoutCabinLocker => "scout-cabin-locker",
@@ -380,6 +383,9 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
                     _ => 0,
                 },
             )?;
+        }
+        Scenario::ConstructionCancellation => {
+            crate::session::construction::evidence_cancellation(app)?
         }
         Scenario::ConstructionRoom => crate::session::construction::evidence_room(app)?,
         Scenario::ConstructionInterlocks => {

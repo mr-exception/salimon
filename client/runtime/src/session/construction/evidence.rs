@@ -4,18 +4,34 @@ use super::*;
 /// Evidence-only initial source: one reserved four-cell room and one carried
 /// 40 kg iron sphere. All later intake, paid work and movement use normal commands.
 pub(crate) fn evidence_room(s: &mut GameplaySession) -> Result<(), String> {
+    evidence_structure(s, "two-deck-room", -14.5, 40., 545)
+}
+
+/// The approved 120-second hull blueprint has exact 50/99% boundaries on the
+/// live 16 ms scheduler. This declares a reservation and one physical input only.
+pub(crate) fn evidence_cancellation(s: &mut GameplaySession) -> Result<(), String> {
+    evidence_structure(s, "hull-cell", -11.5, 20., 551)
+}
+
+fn evidence_structure(
+    s: &mut GameplaySession,
+    blueprint: &str,
+    target_x: f64,
+    mass_kg: f64,
+    source_id: u64,
+) -> Result<(), String> {
     use salimon_world::{resources::*, spherical_mining::*};
     let y = SHIP_FLOOR_HEIGHT_METERS;
     s.character.set_supported_pose([-6.6, y + 1.75, 0.]);
     s.ship.toggle_door();
     s.advance_automation(std::time::Duration::from_secs(3));
-    let target = [-14.5, y, -1.5];
+    let target = [target_x, y, -1.5];
     s.building
         .source
         .projects
         .place(
             registered_catalog(),
-            "two-deck-room",
+            blueprint,
             target,
             Rotation::Forward,
             &s.building.structure,
@@ -41,14 +57,14 @@ pub(crate) fn evidence_room(s: &mut GameplaySession) -> Result<(), String> {
     let mut deposit = ResourceDeposit::new(
         DepositId {
             body: salimon_world::CelestialBodyId::Earth,
-            local: 545,
+            local: source_id,
         },
-        RawMaterial::new(ResourceId::IronOre, 40.).map_err(|e| e.to_string())?,
+        RawMaterial::new(ResourceId::IronOre, mass_kg).map_err(|e| e.to_string())?,
         pose.position(),
-        40.,
+        mass_kg,
     )
     .map_err(|e| e.to_string())?;
-    let config = MiningConfig::new(40., 100.).map_err(|e| e.to_string())?;
+    let config = MiningConfig::new(mass_kg, 100.).map_err(|e| e.to_string())?;
     let mut id = None;
     for _ in 0..100 {
         id = s
@@ -72,7 +88,7 @@ pub(crate) fn evidence_room(s: &mut GameplaySession) -> Result<(), String> {
         0.,
     ));
     s.building.active = true;
-    s.building.selected = 5;
+    s.building.selected = if blueprint == "hull-cell" { 3 } else { 5 };
     s.equipment.stow();
     s.sync_carried();
     Ok(())

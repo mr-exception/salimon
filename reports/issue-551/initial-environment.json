@@ -1,0 +1,17 @@
+{
+  "base_revision": "ee37ca4c40ca99fbf3d38f39faed1e3095b9798f",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "cpu": "AMD EPYC 7763 64-Core Processor",
+  "cpu_quota": "200000 100000",
+  "memory_max": "8589934592",
+  "binary_sha256": "f8b9e463bf4311bd8a392aaf59903134cf897b3ffbb8728ec24e035a146d38d0",
+  "viewport": [
+    1280,
+    800
+  ],
+  "display": ":99",
+  "backend": "Vulkan",
+  "driver": "llvmpipe LLVM 19.1.7 CPU; full observed adapter context retained per capture",
+  "input": "isolated E2E protocol; no physical-device qualification"
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/construction-interlocks-cockpit.json",
+  "status": "failed",
+  "steps_completed": 0,
+  "steps": [],
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/workspace/salimon/artifacts/546/native/run-7ci0tcwt",
+  "error": "invalid setup scenario, seed, or step_ms",
+  "failure_screenshot": {
+    "status": "unavailable",
+    "reason": "game did not become ready"
+  },
+  "duration_ms": 1,
+  "result_file": "/workspace/salimon/artifacts/546/native/run-7ci0tcwt/result.json"
+}

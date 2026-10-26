@@ -1,0 +1,70 @@
+   Compiling alsa-sys v0.4.0
+   Compiling wgpu-core v30.0.1
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling calloop-wayland-source v0.3.0
+   Compiling wayland-protocols-wlr v0.3.12
+   Compiling wgpu v30.0.1
+   Compiling memmap2 v0.9.11
+   Compiling ahash v0.8.12
+   Compiling x11-dl v2.21.0
+   Compiling salimon-math v0.1.0 (/workspace/salimon/client/math)
+   Compiling ab_glyph_rasterizer v0.1.10
+   Compiling utf8parse v0.2.2
+   Compiling anstyle-parse v0.2.7
+   Compiling ab_glyph v0.2.32
+   Compiling smithay-client-toolkit v0.19.2
+   Compiling getrandom v0.3.4
+   Compiling regex v1.13.1
+   Compiling gltf-json v1.4.1
+   Compiling tiny-skia v0.11.4
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling gethostname v1.1.0
+   Compiling winit v0.30.13
+   Compiling colorchoice v1.0.5
+   Compiling as-raw-xcb-connection v1.0.1
+   Compiling lazy_static v1.5.0
+   Compiling tracing-core v0.1.36
+   Compiling jiff-core v0.1.0
+   Compiling anstyle v1.0.14
+   Compiling anstyle-query v1.1.5
+   Compiling x11rb-protocol v0.13.2
+   Compiling byteorder v1.5.0
+   Compiling pin-project-lite v0.2.17
+   Compiling cpal v0.18.2
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling anstream v0.6.21
+   Compiling tracing v0.1.44
+   Compiling gltf v1.4.1
+   Compiling jiff v0.2.35
+   Compiling png v0.18.0
+   Compiling sctk-adwaita v0.10.1
+   Compiling x11rb v0.13.2
+   Compiling env_filter v0.1.4
+   Compiling alsa v0.11.0
+   Compiling xkbcommon-dl v0.4.2
+   Compiling wayland-protocols-plasma v0.3.12
+   Compiling percent-encoding v2.3.2
+   Compiling dpi v0.1.2
+   Compiling smol_str v0.2.2
+   Compiling dasp_sample v0.11.0
+   Compiling env_logger v0.11.8
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-character v0.1.0 (/workspace/salimon/client/character)
+   Compiling salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+   Compiling salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+   Compiling pollster v0.4.0
+   Compiling salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+error: linking with `cc` failed: exit status: 1
+  |
+  = note:  "cc" "-m64" "/workspace/salimon/target/debug/deps/rustceXdccr/symbols.o" "<257 object files omitted>" "-Wl,--as-needed" "-Wl,-Bstatic" "/workspace/salimon/target/debug/deps/{libenv_logger-2456513ddbb39db1,libanstream-93e309b2a46fa6d1,libanstyle_query-84d96ec08ba40538,libis_terminal_polyfill-0f0687097ee62b2c,libcolorchoice-e8cb1af8c83a3a0b,libanstyle_parse-4238d7468d317b5b,libutf8parse-1bc830e89181ae12,libjiff-01daddd411436306,libjiff_core-ba04335e2b3a1924,libenv_filter-aeae8af4595aaa2b,libregex-c1175d1b49ebde0c,libregex_automata-de76aeacf39ca0b7,libaho_corasick-39758fe22f33aec7,libregex_syntax-a8b29b0da03930f8,libanstyle-b598f5c74c5312cb,libpollster-e966f13b81ac96c6}.rlib" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib/{libtest-*,libgetopts-*,librustc_std_workspace_std-*}.rlib" "/workspace/salimon/target/debug/deps/{libsalimon_fabrication-636b9a6678861154,libcpal-aeb8f59195ba5005,libdasp_sample-0de6cc4a7be79b2d,libalsa-ee43363e0aa5874e,libalsa_sys-2c55011b58c43bf4,libsalimon_physics-989df9d1422e7055,libsalimon_survival-33bf9d780a943016,libsalimon_character-9637bacb4a01265a,libwinit-849a95b7e90a4216,libsctk_adwaita-5cf05b9a667129df,libab_glyph-9fad5d62a538187b,libowned_ttf_parser-c2b3a43d5c23f601,libttf_parser-e0dc8c0ac6da7174,libab_glyph_rasterizer-f326a76afac8cf2f,libtiny_skia-5d8d714020c81c00,libtiny_skia_path-5fb4365cfa058006,libstrict_num-143c30f4cad8d253,libarrayref-f5453fdcce4bed07,libpercent_encoding-70f9167c8155d3c0,libx11rb-2ca3bdbda4193f07,libgethostname-dad1b86071babbf4,libas_raw_xcb_connection-6568391f4071e95c,libx11rb_protocol-13c866559fd2afac,libwayland_protocols_plasma-bbae892ab19c237a,libahash-16220c6611f89d6a,libgetrandom-c9abf54e528d7f2d,libsmithay_client_toolkit-d6797ac9e5577402,libwayland_cursor-56db545fd145b80b,libxcursor-4fab3259d7afe6f6,libwayland_protocols_wlr-40f91ef3f6b47961,libwayland_protocols-64503b7b75e9ca36,libwayland_csd_frame-dab72a68d4d59a36,libcalloop_wayland_source-0add5daf825d488a,libwayland_client-ce7875f61ec2e382,libwayland_backend-4b2e4e35d976c6d3,libdowncast_rs-67c8da15c0cdb363,libscoped_tls-619aa67ed43e5968,libcalloop-f82f0c36e924b105,libthiserror-eb5b8a427f873e5d,librustix-8dde5fe0c44ee16c,liblinux_raw_sys-ec68d8603d3f51b5,libpolling-54d55994abe24ead,librustix-32a120f697994302,liblinux_raw_sys-3b45f8991b7cc9c8,libmemmap2-318d26e9aae26014,libx11_dl-db76958738b9dcb1,libxkbcommon_dl-157a58a8370c77d0,libxkeysym-5021a2902b14a068,libtracing-7082cb7d499cc510,libpin_project_lite-d48789d525c49729,libtracing_core-653250e00b2064ca,libsmol_str-aff6153b5f3db859,libcursor_icon-37b7a98680e94316,libdpi-3891bb350ad88fd0,libsalimon_ship-7813a7575cbb81d3,libsalimon_math-e8acea91055d5087,libsalimon_world-273d32a5917b0de2,libsalimon_persistence-a3b02da56811a72f,libsalimon_universe-ef43db2c2c362513,libsha2-04d7736cc82c6bb2,libcpufeatures-d03b0f93a485ccc1,libdigest-fcb53e246b1a9b00,libblock_buffer-a5e2f621a3d336b4,libcrypto_common-112972d7064cdf3f,libgeneric_array-f3252ffe899b8ae6,libtypenum-93390c974fd6012d,libsalimon_diagnostics-a23dd19899d21b07,libsalimon_renderer-1487907f3b485232,libgltf-91285ea2fdca686d,libbyteorder-f254cc6540e72165,libgltf_json-a23867b23963090d,libserde_json-905bfedf0aad3430,libmemchr-2974315c36bbf455,libzmij-017fa04e9bfbd0ce,libitoa-b101c554dc96d6c2,libserde-2205ed5a6882f40d,libserde_core-1e9d9efd87f47fd3,liblazy_static-10369834de353d1d,libpng-304c8befba0f83a6,libflate2-20d75dd699f3a9ed,libminiz_oxide-0409ed98228e5da8,libfdeflate-0a26eb33e6c76896,libsimd_adler32-d467d3b3552967f1,libcrc32fast-281ea95cbf040229,libwgpu-77e1b31090abbc31,libwgpu_core-5b36c586b8c1df46,libwgpu_hal-1029f4a394612c8a,librenderdoc_sys-1c698c29ddf8e94c,libkhronos_egl-69170a4604146e10,libwayland_sys-59abff81e049f318,libdlib-a880ea72a6c2dac8,libprofiling-22ca7a8c7d4461eb,libwgpu_naga_bridge-b200b9f827ded885,libordered_float-7631f7a089e2e8d7,libgpu_allocator-dd26969c99111012,libpresser-88e3d67c3e9a3621,libhashbrown-d74daab439db5887,liballocator_api2-c5f47beab62f0ed2,libash-a467647fc5ad2c8b,liblibloading-6d7859e10517791c,libnaga-297a4ca67248f3ab,libunicode_ident-3d289a65cc9a0635,libbit_set-667b44e171883926,libbit_vec-cec2e4408bccb918,libonce_cell-58dd468cb35436f8,libhalf-86df10df1af9bf4d,libzerocopy-67c0ea98ced5b9e8,libcodespan_reporting-d72cf623b396d761,libunicode_width-120549e73566edd1,libnum_traits-9900c776a49e69ea,liblibm-e100722407abb443,libspirv-69b84cf5dc1d26df,libthiserror-76b3a0652c73c430,libarrayvec-b17a75581c4f1e36,libparking_lot-271d32204808d71d,libparking_lot_core-29b83b333e0f44ac,liblibc-9aa02241a4ece1e5,libcfg_if-99e44dc3dd0378a9,libsmallvec-a2e88a99f284f6d1,liblock_api-ea1d97961bc41a55,libscopeguard-72077e85bdc77ec2,libglow-78419c02cf572a8e,libwgpu_types-16b1b58724ec565d,libraw_window_handle-62cf9869fdce7fe8,libstatic_assertions-aaea5c37712e2616,liblog-c2f0d92149d47e77,libbytemuck-d5d197c8f88d3f23,libbitflags-75b96e29171dd02f,libnaga_types-789dc216003f1ac6,libindexmap-c09076ae25993892,libequivalent-56fa6a5a6022575c,librustc_hash-9e452d459747ffed,libhashbrown-aac1633f79502156,libfoldhash-eff0395d86cf3aad}.rlib" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib/{libstd-*,libpanic_unwind-*,libobject-*,libmemchr-*,libaddr2line-*,libgimli-*,libcfg_if-*,librustc_demangle-*,libstd_detect-*,libhashbrown-*,librustc_std_workspace_alloc-*,libminiz_oxide-*,libadler2-*,libunwind-*,liblibc-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libcompiler_builtins-*}.rlib" "-Wl,-Bdynamic" "-lasound" "-ldl" "-ldl" "-lgcc_s" "-lutil" "-lrt" "-lpthread" "-lm" "-ldl" "-lc" "-L" "/workspace/salimon/target/debug/deps/rustceXdccr/raw-dylibs" "-B<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld" "-fuse-ld=lld" "-Wl,--eh-frame-hdr" "-Wl,-z,noexecstack" "-L" "/workspace/tooling546/root/usr/lib/x86_64-linux-gnu" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib" "-o" "/workspace/salimon/target/debug/deps/salimon_client-7610c1996ebe51e9" "-Wl,--gc-sections" "-pie" "-Wl,-z,relro,-z,now" "-nodefaultlibs"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: rust-lld: error: unable to find library -lasound
+          collect2: error: ld returned 1 exit status
+          
+
+error: could not compile `salimon-client` (bin "salimon-client" test) due to 1 previous error

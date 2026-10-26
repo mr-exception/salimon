@@ -3,7 +3,7 @@ use super::*;
 use crate::session::{Command, ControlKey};
 use std::time::Duration;
 
-fn room() -> (GameplaySession, PlaceholderId) {
+pub(super) fn room() -> (GameplaySession, PlaceholderId) {
     let mut s = GameplaySession::default();
     let y = SHIP_FLOOR_HEIGHT_METERS;
     let target = [-14.5, y, -1.5];

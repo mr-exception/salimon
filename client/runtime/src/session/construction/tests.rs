@@ -283,7 +283,7 @@ fn fully_funded_partial_cancel_and_corrupt_cross_owner_receipts() {
     assert_eq!(s.mining.session.fragments()[0].material().mass_kg(), 0.5);
 }
 
-fn funded_stool() -> (GameplaySession, PlaceholderId) {
+pub(super) fn funded_stool() -> (GameplaySession, PlaceholderId) {
     let mut s = prepare();
     s.command(Command::Build(BuildAction::Place));
     piece(&mut s, salimon_world::resources::ResourceId::IronOre, 1.);
@@ -546,7 +546,7 @@ fn cargo_obstruction_prevents_final_install_and_spends_nothing_until_clear() {
 }
 
 #[test]
-fn complex_installation_stops_cancellable_before_completion_without_fake_solids() {
+fn utility_module_publishes_physical_installation_only_after_paid_completion() {
     let mut s = prepare();
     let mut placed = None;
     'search: for x in -14..=12 {
@@ -594,22 +594,18 @@ fn complex_installation_stops_cancellable_before_completion_without_fake_solids(
     let before = s.ship.snapshot().energy_core.stored_joules;
     s.advance_construction(Duration::from_secs(100));
     let p = s.building.source.projects.inspect(id).unwrap();
-    assert_eq!(p.funding.progress_ppm, 999_999);
-    assert!(!p.work.completed);
-    assert!(s.construction_solids().is_empty());
-    assert!(
-        s.construction_status(p)
-            .contains("installation unavailable")
+    assert_eq!(p.funding.progress_ppm, 1_000_000);
+    assert!(p.work.completed);
+    assert!(!s.construction_solids().is_empty());
+    assert_eq!(s.utility_recovery_multiplier(), 1.25);
+    assert_eq!(
+        before - s.ship.snapshot().energy_core.stored_joules,
+        180_000
     );
-    assert!(before - s.ship.snapshot().energy_core.stored_joules <= 180_000);
     let after = s.ship.snapshot().energy_core;
     let source = s.building.source.clone();
     s.advance_construction(Duration::from_secs(100));
     assert_eq!(s.building.source, source);
     assert_eq!(s.ship.snapshot().energy_core, after);
-    s.cancel_construction(id).unwrap();
-    assert_eq!(
-        s.mining.session.fragments()[0].material().mass_kg(),
-        0.000003
-    );
+    assert!(s.cancel_construction(id).is_err());
 }

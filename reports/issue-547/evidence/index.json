@@ -1,0 +1,26 @@
+{
+  "install": {
+    "scenario": "scenarios/evidence/construction-module.json",
+    "status": "passed",
+    "steps_completed": 16,
+    "duration_ms": 27879,
+    "artifact_directory": "/workspace/salimon/artifacts/issue-547/verified/run-6qwdpht4",
+    "result_file": "/workspace/salimon/artifacts/issue-547/verified/run-6qwdpht4/result.json"
+  },
+  "upgrade": {
+    "scenario": "scenarios/evidence/construction-module-upgrade.json",
+    "status": "passed",
+    "steps_completed": 27,
+    "duration_ms": 37541,
+    "artifact_directory": "/workspace/salimon/artifacts/issue-547/verified/run-o7znutra",
+    "result_file": "/workspace/salimon/artifacts/issue-547/verified/run-o7znutra/result.json"
+  },
+  "restore": {
+    "scenario": "scenarios/evidence/construction-module-restore.json",
+    "status": "passed",
+    "steps_completed": 12,
+    "duration_ms": 19088,
+    "artifact_directory": "/workspace/salimon/artifacts/issue-547/final/run-xnscwe_2",
+    "result_file": "/workspace/salimon/artifacts/issue-547/final/run-xnscwe_2/result.json"
+  }
+}

@@ -829,6 +829,15 @@ impl GameplaySession {
                 if !self.admit_survival_action(Action::Pilot) {
                     return;
                 }
+                if matches!(
+                    self.ship.snapshot().flight_state,
+                    salimon_ship::FlightState::Landed { .. }
+                ) && self.ship.snapshot().cockpit_control_active
+                    && let Some(reason) = self.construction_takeoff_blocker()
+                {
+                    self.feedback = Some(reason.text());
+                    return;
+                }
                 self.ship.trigger_landing_action();
                 self.reset_presentation();
             }

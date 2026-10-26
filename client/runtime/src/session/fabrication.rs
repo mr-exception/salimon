@@ -73,6 +73,14 @@ impl GameplaySession {
                 .update(id, (mg > 0).then_some(mg as f64 / 1_000_000.0))
                 .expect("bounded stored quantities and validated output mass");
         }
+        let maintenance_mass: f64 = self
+            .building
+            .source
+            .modules
+            .values()
+            .flat_map(|m| m.receipts())
+            .map(|f| f.material().mass_kg())
+            .sum();
         let construction_mass: f64 = self
             .building
             .source
@@ -86,7 +94,8 @@ impl GameplaySession {
             .ship_mass
             .update(
                 salimon_ship::MassObjectId::ConstructionMaterials,
-                (construction_mass > 0.).then_some(construction_mass),
+                (construction_mass + maintenance_mass > 0.)
+                    .then_some(construction_mass + maintenance_mass),
             )
             .expect("bounded project receipts");
         for (id, mass) in self.building.structure.mass_entries() {

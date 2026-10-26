@@ -564,7 +564,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "recovery" => Some(KeyCode::KeyR),
         "pause" => Some(KeyCode::Escape),
         "status" => Some(KeyCode::KeyH),
-        "skip_tutorial" => Some(KeyCode::KeyT),
+        "skip_tutorial" | "construction_stop_resume" => Some(KeyCode::KeyT),
+        "construction_module" => Some(KeyCode::KeyG),
         "resume" => Some(KeyCode::Enter),
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),
@@ -1630,8 +1631,20 @@ mod tests {
         );
     }
 
+    #[test]
+    fn construction_interlock_scenarios_share_native_command_admission() {
+        assert_gameplay_scenario(
+            Scenario::ConstructionRoom,
+            include_str!("../../../scenarios/evidence/construction-interlocks.json"),
+        );
+        assert_gameplay_scenario(
+            Scenario::ConstructionInterlocks,
+            include_str!("../../../scenarios/evidence/construction-interlocks-cockpit.json"),
+        );
+    }
+
     fn assert_gameplay_scenario(initial: Scenario, source: &str) {
-        let mut test = app(initial);
+        let mut test = GameplaySession::default();
         let scenario: Value = serde_json::from_str(source).unwrap();
         e2e::initialize(
             &mut test,

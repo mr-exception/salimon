@@ -9,7 +9,13 @@ pub(super) fn supports_completion(p: &Placeholder) -> bool {
     }
     matches!(
         p.blueprint.id.as_str(),
-        "stool" | "partition" | "internal-door" | "hull-cell" | "deck-cell" | "two-deck-room"
+        "stool"
+            | "partition"
+            | "internal-door"
+            | "hull-cell"
+            | "deck-cell"
+            | "two-deck-room"
+            | "utility-module"
     )
 }
 fn watts(p: &Placeholder) -> f64 {
@@ -29,7 +35,7 @@ fn watts(p: &Placeholder) -> f64 {
     power[&p.blueprint.id]
 }
 impl GameplaySession {
-    fn construction_safety(&self, p: &Placeholder) -> Result<(), PlacementError> {
+    pub(super) fn construction_safety(&self, p: &Placeholder) -> Result<(), PlacementError> {
         let obstacles = self.construction_obstacles(p.blueprint.footprint);
         let flight = if matches!(
             self.ship.snapshot().flight_state,
@@ -61,8 +67,19 @@ impl GameplaySession {
         )
     }
     pub(super) fn construction_status(&self, p: &Placeholder) -> String {
+        if let Some(status) = self.module_status(p.id) {
+            return status;
+        }
         if p.work.completed {
             return "COMPLETED".into();
+        }
+        if p.work.stopped {
+            return if self.construction_can_secure(p) {
+                "STOPPED-SECURED | T resume"
+            } else {
+                "STOPPED-UNSECURED | repair support or cancel"
+            }
+            .into();
         }
         if !p.funding.funded(&p.blueprint.requirements) {
             return "WAITING FOR MATERIALS".into();
@@ -102,6 +119,7 @@ impl GameplaySession {
         {
             return;
         }
+        self.stop_airborne_construction();
         let ids: Vec<_> = self.building.source.projects.jobs().map(|p| p.id).collect();
         for id in ids {
             let p = self
@@ -111,6 +129,7 @@ impl GameplaySession {
                 .inspect(id)
                 .expect("collected project identity");
             if p.work.completed
+                || p.work.stopped
                 || p.work.damaged
                 || !p.funding.funded(&p.blueprint.requirements)
                 || self.construction_safety(p).is_err()
@@ -170,6 +189,7 @@ impl GameplaySession {
             }
             self.building.running = Some(center);
         }
+        self.advance_modules(delta);
         self.sync_fabricator_mass();
         self.sync_mount_collision();
     }
@@ -185,7 +205,9 @@ impl GameplaySession {
             .filter(|p| p.work.completed)
         {
             let s = p.space;
-            if p.blueprint.id == "stool" {
+            if p.blueprint.id == "utility-module" {
+                out.push([s.min[0], s.max[0], s.min[1], s.max[1], s.min[2], s.max[2]]);
+            } else if p.blueprint.id == "stool" {
                 out.push([
                     s.min[0],
                     s.max[0],

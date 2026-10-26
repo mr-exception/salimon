@@ -1,0 +1,19 @@
+{
+  "iteration_state": true,
+  "rolling_delta": true,
+  "weightless_ceiling_contact": true,
+  "ground_contact": true,
+  "sampled_contact": true,
+  "ground_contact_cached": true,
+  "correction_direction": true,
+  "inverse_inertia": true,
+  "apply_impulse": true,
+  "friction_delta": true,
+  "pair_impulse": true,
+  "pair_impulse_cached": true,
+  "ContactResponse::rearm": true,
+  "ContactResponse::prepare": true,
+  "ContactResponse::validate_save": true,
+  "resource::geometry": true,
+  "resource::indexed_geometry": true
+}

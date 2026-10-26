@@ -565,3 +565,16 @@ Native redraw/overlays: runtime `src/app/presentation.rs`; prompt priority/ancho
 contracts and runtime scene/input/session owners. Production evidence routes:
 `scenarios/evidence/lower-cockpit-windows.json` and
 `scenarios/evidence/construction-interlocks.json`.
+
+
+## Contact and resource geometry review (#644)
+
+Physics scheduling/data: `client/physics/src/lib.rs`; sampled contact, warm
+impulses and normal/friction/rolling response: `client/physics/src/response.rs`.
+Exact response regression: `client/physics/src/iteration_oracle.rs`; broad-phase
+and sleep tests retain their owners. Resource GLB validation/index packing:
+`client/renderer/src/resource_mesh/geometry.rs`; GPU staging/culling/cache remains
+in its parent. Convex/SAT and ship assist owners were reviewed and retained.
+See [physics](../client/physics/architecture.md#contact-response-owner-644),
+[resource](../client/renderer/architecture.md#resource-geometry-owner-644) and
+[assist](../client/ship/architecture.md#assist-cohesion-review-644) ownership.

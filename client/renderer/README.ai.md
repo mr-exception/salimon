@@ -218,3 +218,8 @@ Pipeline ownership (#643): use `src/initialize.rs` for device/pipeline creation,
 `src/surface.rs` for resize/configuration and `src/frame.rs` for ordered draw,
 capture, submission and observations. Keep facade/resource ownership in
 `src/lib.rs`. Follow [pipeline invariants](architecture.md#pipeline-and-frame-owners-643).
+
+
+Resource geometry (#644): pure GLB validation and stable index packing live in
+`src/resource_mesh/geometry.rs`. Keep GPU staging/upload/culling in the parent;
+see [resource ownership](architecture.md#resource-geometry-owner-644).

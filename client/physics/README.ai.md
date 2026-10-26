@@ -72,3 +72,9 @@ correction-created contact, retained projection and sleep regressions remain.
 Small shared arithmetic primitives are inlinable across the crate boundary;
 their expressions and IEEE ordering are unchanged. See the #592 report for
 archived mass/radius-bit pools, partial/timeouts, profiles and exact comparisons.
+
+
+Contact response (#644) lives in `src/response.rs`; root `src/lib.rs` schedules
+substeps and broad-phase traversal. Read the [response owner](architecture.md#contact-response-owner-644)
+and frozen iteration oracle before changing impulse order, tolerances, warm
+state or allocations. `convex.rs` remains the coherent hull/SAT/feature owner.

@@ -1,0 +1,64 @@
+{
+  "client/physics/src/lib.rs": {
+    "before": {
+      "lines": 1861,
+      "branch_tokens": 193,
+      "functions": 49
+    },
+    "after": {
+      "lines": 1335,
+      "branch_tokens": 134,
+      "functions": 34
+    }
+  },
+  "client/physics/src/convex.rs": {
+    "before": {
+      "lines": 1605,
+      "branch_tokens": 146,
+      "functions": 56
+    },
+    "after": {
+      "lines": 1605,
+      "branch_tokens": 146,
+      "functions": 56
+    }
+  },
+  "client/renderer/src/resource_mesh.rs": {
+    "before": {
+      "lines": 1541,
+      "branch_tokens": 93,
+      "functions": 33
+    },
+    "after": {
+      "lines": 1452,
+      "branch_tokens": 75,
+      "functions": 31
+    }
+  },
+  "client/ship/src/controller/assist.rs": {
+    "before": {
+      "lines": 1263,
+      "branch_tokens": 97,
+      "functions": 34
+    },
+    "after": {
+      "lines": 1263,
+      "branch_tokens": 97,
+      "functions": 34
+    }
+  },
+  "new_owners": [
+    {
+      "path": "client/physics/src/response.rs",
+      "lines": 539,
+      "branch_tokens": 59,
+      "functions": 15
+    },
+    {
+      "path": "client/renderer/src/resource_mesh/geometry.rs",
+      "lines": 94,
+      "branch_tokens": 18,
+      "functions": 2
+    }
+  ]
+}

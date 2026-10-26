@@ -38,6 +38,6 @@ render checks exercise actual wgpu rather than claiming physical input coverage.
 
 Fresh production wgpu/Xvfb/llvmpipe Vulkan route: 24/24 steps passed using
 `python3 scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json --binary target/debug/salimon-client --artifacts artifacts/issue-639-fresh --screenshot-command '["native"]' --summary`.
-Original [result](native/result.json), [protocol](native/protocol.jsonl) and captures
+Original [lossless result](native/result.json.gz), [protocol](native/protocol.jsonl) and captures
 are retained beside this report. An earlier run used a pre-existing old binary;
 its pass is excluded from change verification.

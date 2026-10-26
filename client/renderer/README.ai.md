@@ -212,3 +212,9 @@ Room and fixture lights #580: [canonical controls, source, effective output and 
 ## Cosmetic surface age (#581)
 
 Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+Pipeline ownership (#643): use `src/initialize.rs` for device/pipeline creation,
+`src/surface.rs` for resize/configuration and `src/frame.rs` for ordered draw,
+capture, submission and observations. Keep facade/resource ownership in
+`src/lib.rs`. Follow [pipeline invariants](architecture.md#pipeline-and-frame-owners-643).

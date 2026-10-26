@@ -1638,3 +1638,16 @@ and `presentation.rs`. Do not register unordered callbacks or move power consume
 across these boundaries. Domain-specific behavior normally changes its stage or
 owner, without editing the central session file. New domains/shared contracts
 still require explicit composition review; this is not a generic plugin system.
+
+
+## Native presentation composition (#643)
+
+`app.rs` owns lifecycle, input and scheduling. `app/presentation.rs` owns redraw
+composition, overlays/modal priority, production-renderer invocation, capture
+publication and present observations/retry. `app/presentation/prompts.rs` owns
+contextual prompt priority/anchors, keeping actual targeting/admission in session.
+`app/scene.rs::gameplay_ship` maps ship/session observations into Scout material,
+lighting, machinery, fabrication and habitation DTOs. New Scout visual fields
+normally change this adapter, rather than central app lifecycle code. No
+authoritative state, power rule, clock, shader layout or scheduler order changes.
+The runtime still supplies absolute f64 DTO positions; renderer owns rebasing.

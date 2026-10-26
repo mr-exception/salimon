@@ -535,3 +535,19 @@ Room and fixture lights #580: [canonical controls, source, effective output and 
 ## Cosmetic surface age (#581)
 
 Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+## Pipeline and frame owners (#643)
+
+`src/lib.rs` retains the public DTO/error/measurement facade, Renderer resource
+ownership and pure scene/camera preparation. `src/initialize.rs` creates the
+adapter/device, surface format, pipelines and domain renderers. `src/surface.rs`
+handles drawable resize/configuration; `src/frame.rs` owns ordered preparation,
+scene/overlay passes, capture, submission/present and measurement. Private impl
+blocks share the one Renderer resource owner; no resource registry or gameplay
+dependency is introduced. Surface recovery/retry and clocks remain runtime-owned.
+
+Preserve preparation order, reverse-Z, draw order (cuboids, spheres, terrain,
+opaque ship, fixtures, resources, glass, held item; then condition, global HUD,
+toolbar, action, reticle), asynchronous timer polling and capture/present order.
+Shader layouts and the public API are unchanged. See [invariants](invariants.md).

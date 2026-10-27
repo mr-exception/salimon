@@ -1,0 +1,13 @@
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.67s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-e2d72dcedce2c335)
+
+running 5 tests
+test surface::tests::interlocks_insufficient_thrust_energy_bad_ephemerides_and_invalid_inputs_are_atomic ... ok
+test surface::tests::mass_gravity_and_impulse_conversion_determine_cost_without_free_energy ... ok
+test surface::tests::full_takeoff_coast_landing_cycle_has_continuous_inertial_handoffs_and_exact_receipts ... ok
+test surface::tests::rotation_orbit_and_support_force_match_independent_newtonian_result ... ok
+test surface::tests::partitioned_and_whole_advances_match_and_velocity_is_the_path_derivative ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.58s
+

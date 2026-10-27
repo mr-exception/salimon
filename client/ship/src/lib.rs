@@ -17,6 +17,7 @@ mod mass;
 pub use mass::{MassObjectId, ShipMass};
 mod propulsion;
 pub mod structure;
+pub mod surface;
 pub mod trajectory;
 pub use propulsion::{
     InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_IMPULSE_NS_PER_JOULE,

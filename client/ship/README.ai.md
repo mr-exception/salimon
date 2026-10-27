@@ -135,3 +135,10 @@ Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs
 ## Real-scale trajectory foundation (#417)
 
 `trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. Runtime has not adopted it; current controller, saves, assists and contact remain unchanged. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](../../docs/universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.

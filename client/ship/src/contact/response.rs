@@ -73,6 +73,15 @@ impl Hit {
         propulsion: Propulsion,
         policy: ResponsePolicy,
     ) -> Result<Resolution, Error> {
+        finite(self.normal)?;
+        finite(self.surface_velocity_mps)?;
+        if (length(self.normal) - 1.0).abs() > 1e-12
+            || !self.spatial_uncertainty_meters.is_finite()
+            || self.spatial_uncertainty_meters <= 0.0
+            || self.elapsed_nanos < 0
+        {
+            return Err(error("invalid contact witness normal/tolerance/time"));
+        }
         if state.epoch != self.epoch
             || length(state.position.relative_meters(self.position)?)
                 > self.spatial_uncertainty_meters + 0.001

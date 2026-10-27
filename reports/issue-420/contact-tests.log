@@ -1,5 +1,5 @@
    Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.25s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s
      Running unittests src/lib.rs (target/debug/deps/salimon_ship-e2d72dcedce2c335)
 
 running 13 tests
@@ -17,4 +17,4 @@ test contact::tests::streamed_triangle_face_edge_corner_and_moving_surface_veloc
 test contact::tests::triangles_from_production_terrain_queries_contact_with_declared_ephemeris_motion ... ok
 test contact::tests::bounded_work_exhaustion_rejects_without_publishing_a_fake_contact_or_free_movement ... ok
 
-test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 130 filtered out; finished in 0.31s
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 130 filtered out; finished in 0.36s

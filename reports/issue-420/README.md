@@ -18,7 +18,7 @@ gravity, so a proposed endpoint inside a planet still resolves its first contact
 outside the solid. Body-relative grounded/rebound/fatal consequences, shutdown
 observation, remaining time and unused funded-thrust receipts publish atomically.
 Clear space exactly preserves the atmospheric integrator. Provider, geometry,
-numeric, stale-witness and work-limit failures publish nothing.
+numeric, stale/mutated-witness and work-limit failures publish nothing.
 
 ## Cloud verification — 2026-10-27
 
@@ -83,3 +83,7 @@ compressed gameplay and render output are unchanged, so no new graphical
 capture gate applies. Physical/OS #557, human presentation #561 and actual
 M1/Metal/GPU budgets #563 remain separately unverified release qualification;
 no required routine cloud criterion is deferred here.
+
+Final API audit also exercises modified hit records: nonunit normals and invalid
+spatial tolerances reject before response, preventing fabricated rebound energy
+or bypassed witness matching. The affected and complete cloud gates were rerun.

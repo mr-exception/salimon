@@ -86,6 +86,9 @@ restart. The owner dispatches the returned grounded/rebounding/fatal mode instea
 of blindly advancing another airborne tick. Grounded motion thereafter uses
 surface support; a rebound uses subsequent ordinary gravity/contact steps.
 
+Response revalidates unit normals, finite surface velocity and positive finite
+uncertainty on public hit records before using them; modified invalid witnesses
+reject instead of granting rebound energy or bypassing position matching.
 Response uses velocity relative to the moving contact point. Default restitution
 0.35, 8 m/s rebound cap and 0.1 m/s minimum retain established ship contact values;
 other relative motion is dissipated. The result records body-frame dissipated

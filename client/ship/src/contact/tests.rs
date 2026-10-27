@@ -237,6 +237,21 @@ fn moving_frame_response_bounce_grounding_and_fatal_policy_have_correct_energy()
     let ship = linear([-1000.0, 0.0, 0.0], [2000.0, 0.0, 0.0], n);
     let h = scene.sweep(&ship, 16.0).unwrap().0.unwrap();
     let incoming = ship.state_at(h.elapsed_nanos).unwrap();
+    let mut invalid = h.clone();
+    invalid.normal = scale(h.normal, 2.0);
+    assert!(
+        invalid
+            .resolve(incoming, Propulsion::default(), ResponsePolicy::default())
+            .is_err(),
+        "a nonunit normal must not create rebound energy"
+    );
+    let mut invalid = h.clone();
+    invalid.spatial_uncertainty_meters = f64::NAN;
+    assert!(
+        invalid
+            .resolve(incoming, Propulsion::default(), ResponsePolicy::default())
+            .is_err()
+    );
     let bounce = h
         .resolve(incoming, Propulsion::default(), ResponsePolicy::default())
         .unwrap();

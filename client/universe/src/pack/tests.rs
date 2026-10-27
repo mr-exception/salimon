@@ -124,6 +124,34 @@ fn offline_pipeline_accepts_observed_input_and_preserves_old_pack_on_source_fail
     );
     pipeline::build(&request_file, &output).unwrap();
     assert_eq!(before, fs::read(output.join("manifest.json")).unwrap());
+    let raw_catalog = serde_json::to_string(&bundle["catalog"]).unwrap();
+    fs::write(
+        root.join("observed.json"),
+        format!("{{\"catalog\":{raw_catalog},\"catalog\":{raw_catalog}}}"),
+    )
+    .unwrap();
+    assert!(
+        pipeline::build(&request_file, &output)
+            .unwrap_err()
+            .to_string()
+            .contains("duplicate producer field")
+    );
+    let nested = raw_catalog.replacen(
+        "\"schema_version\":1",
+        "\"schema_version\":1,\"schema_version\":1",
+        1,
+    );
+    fs::write(
+        root.join("observed.json"),
+        format!("{{\"catalog\":{nested}}}"),
+    )
+    .unwrap();
+    assert!(pipeline::build(&request_file, &output).is_err());
+    fs::write(
+        root.join("observed.json"),
+        serde_json::to_vec(&bundle).unwrap(),
+    )
+    .unwrap();
     fs::write(
         root.join("sources/fixtures/gaia-synthetic.csv"),
         b"tampered",

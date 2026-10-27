@@ -1,6 +1,24 @@
 use super::*;
 use crate::pack::Builder;
 #[test]
+fn dropping_prefetch_with_foreground_guard_does_not_deadlock() {
+    let (root, key) = setup();
+    let reader = Arc::new(Mutex::new(Reader::open(&root, 16384).unwrap()));
+    let prefetch = Prefetch::start(reader.clone());
+    let guard = reader.lock().unwrap();
+    assert!(prefetch.request(key));
+    let (tx, rx) = std::sync::mpsc::channel();
+    let worker = std::thread::spawn(move || {
+        drop(prefetch);
+        tx.send(()).unwrap();
+    });
+    let result = rx.recv_timeout(std::time::Duration::from_secs(2));
+    drop(guard);
+    worker.join().unwrap();
+    assert!(result.is_ok());
+    fs::remove_dir_all(root).unwrap();
+}
+#[test]
 fn randomized_seek_eviction_stays_bounded() {
     let (root, _) = setup();
     let fixture = std::str::from_utf8(include_bytes!("../../fixtures/schema-v1.json")).unwrap();

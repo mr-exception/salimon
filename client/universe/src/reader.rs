@@ -161,7 +161,8 @@ impl Reader {
     }
 }
 /// Bounded queue; one background read/decode at a time, shared cache under a
-/// mutex. Saturation returns false. Drop drains at most eight queued requests.
+/// mutex. Saturation returns false; contended speculative requests are skipped.
+/// Drop drains at most eight requests without waiting for a foreground guard.
 pub struct Prefetch {
     sender: Option<mpsc::SyncSender<CellKey>>,
     worker: Option<thread::JoinHandle<()>>,
@@ -171,7 +172,11 @@ impl Prefetch {
         let (sender, receiver) = mpsc::sync_channel(8);
         let worker = thread::spawn(move || {
             while let Ok(key) = receiver.recv() {
-                let Ok(mut reader) = reader.lock() else { break };
+                let mut reader = match reader.try_lock() {
+                    Ok(reader) => reader,
+                    Err(std::sync::TryLockError::WouldBlock) => continue,
+                    Err(std::sync::TryLockError::Poisoned(_)) => break,
+                };
                 if let Err(e) = reader.cell(key) {
                     reader.last_prefetch_error = Some(e.to_string());
                 }

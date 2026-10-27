@@ -23,3 +23,8 @@ The recorded cloud workload completes with bounded cache and observed RSS; no
 human verification or native performance claim is required. Hooking this reader
 into playable real-scale streaming is #422 and subsequent integration work,
 rather than a missing acceptance criterion of the read-only U13 service.
+
+Prefetch is speculative: requests contending with a foreground guard are skipped
+rather than waiting for that mutex. Shutdown can therefore join the worker while
+the caller holds a foreground guard, without a lock-order deadlock. A bounded
+shutdown regression and a fresh filesystem workload cover this lifecycle case.

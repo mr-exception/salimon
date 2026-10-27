@@ -39,3 +39,17 @@ migration remain their existing downstream tickets. Those are neither unfinished
 U16 scope nor human-verification gates. Future public release remains #659;
 scientific full-release data coverage remains #524/#526. No human review is
 needed to establish this routine cloud delivery's automated acceptance.
+
+## Final automated stack verification
+
+The complete workspace run at revision `75c5b3ce` passed **1060 tests, zero
+failures, 38 existing opt-in ignored**; workspace build and all-target Clippy
+with warnings denied passed. The subsequent raw-producer JSON and prefetch
+shutdown refinements were validated by the affected final domain suites at
+`100ed644`: **117 ship tests passed (one existing ignored) and 89 universe tests
+passed**, with all-target domain Clippy, formatting and documentation/base-impact
+checks passing. Original complete-workspace and final-domain logs are retained
+compressed under `cloud/`. Published-head CI performs fresh complete-workspace
+verification before the PR is marked ready. Historical draft limitations above
+are superseded by these completed cloud checks and the scoped ownership mapping.
+No human/native qualification or future release approval is a routine gate.

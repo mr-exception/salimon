@@ -123,6 +123,6 @@ These broad heuristic screens are not empirical goodness-of-fit tests.
 See [U10 evidence](../reports/issue-411/README.md). U11 now publishes the [selected-world definition](universe-starting-system.md);
 other worlds' full definitions,
 U12 production batching/packaging, U14 dynamics, source reuse/coverage
-#537/#524/#526, and cloud integration #436–#439 remain their existing
+#659/#524/#526, and cloud integration #436–#439 remain their existing
 scopes. There is no playable migration, scanner revelation, save change, Earth
 route disclosure, surface migration or new native performance claim.

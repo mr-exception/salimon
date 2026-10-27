@@ -2,7 +2,9 @@
 
 This is an unapproved review checklist. Do not enter a reviewer name/date or an
 approval record on someone's behalf. Return actual decisions, original evidence
-and exact source/input hashes through [#537](https://github.com/mr-exception/salimon/issues/537).
+and exact source/input hashes through #659 (sources), #660 (balance/routes) or
+#661 (full experience). The owner authorized delivery of #537 preparation with
+these human checks deferred on 2026-10-27.
 
 ## Already decided — preserve these
 
@@ -39,8 +41,8 @@ and exact source/input hashes through [#537](https://github.com/mr-exception/sal
    manifest, source status/origin and complete human review sidecar before use.
 
 This source decision is independent of the unrelated balance and future-experience
-checklists below. #537 can remain open for those while a genuine scoped source
-review is recorded; issue closure never substitutes for the source evidence.
+checklists below. #659 retains the source gate after #537 preparation closes;
+issue closure never substitutes for the source evidence.
 
 ## Physical routes and balance — unmeasured
 

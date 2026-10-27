@@ -97,7 +97,7 @@ acceptance; the minimal shared OS playback seam may need a continuous backend.
 
 Portable balance evidence is [documented](survival-balance.md). Proposed comfortable
 360-second and break-even 720-second one-ration budgets await explicit owner
-approval in [#537](https://github.com/mr-exception/salimon/issues/537) after #496
+approval in [#660](https://github.com/mr-exception/salimon/issues/660) after #496
 evidence delivery. Physical routes/subjective native timing remain unmeasured;
 current non-Earth profiles have no biomass. Approved meter durations are unchanged.
 
@@ -111,14 +111,16 @@ remains #498. Jump Drive N=20% capacity/progression balance stays future, unchan
 
 ## Replacement corpus and production source decisions (#537)
 
-[Follow-up #537](https://github.com/mr-exception/salimon/issues/537) retains human
-image/mask/tolerance approval and exact hosted software-Vulkan verification after
-#518 candidate delivery. Candidate status and native Metal independence remain.
-It also retains source-specific full terms, exact credits/permissions and full
-production snapshot approval after #513 private-development/evidence-gate delivery.
-The owner chose private development only; production eligibility remains blocked
-until the source-review checklist is resolved. Closing either source issue grants
-no appearance or production-data approval.
+On 2026-10-27 the owner authorized proceeding with the verified #537 preparation
+in PR #658 and verifying personally later. This accepts delivery with deferred
+review, not unrun checks or new source permissions. [#659](https://github.com/mr-exception/salimon/issues/659)
+owns source-specific full terms, exact credits/permissions and full production
+snapshot approval; #660 owns measured survival/recovery routes and balance
+choices; #661 owns future full-experience/backend acceptance. #561 retains human
+image/mask/tolerance approval and independent hosted software-Vulkan corpus
+review, with #557 physical platform experiments and #563 hardware qualification.
+The owner still permits private development only; production eligibility remains
+blocked on #659. Closing #537 grants no appearance or production-data approval.
 
 ## Approved construction economy (#543, owner decision 2026-10-24)
 

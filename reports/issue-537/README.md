@@ -1,11 +1,36 @@
-# #537 — pending source review and decision evidence
+# #537 — source review preparation and deferred acceptance
 
-**Preparation only: #537 remains incomplete and must stay open.** No production
-source permission, full snapshot, balance setting, physical trial or future
-experience approval is granted. Base: `ecbf59e21cd8405b940ff6593061c06978a7bc7d`
+**Delivered preparation; human acceptance explicitly deferred by the owner on
+2026-10-27.** No production source permission, full snapshot, balance setting,
+physical trial or future experience approval is granted. Base: `ecbf59e21cd8405b940ff6593061c06978a7bc7d`
 (main after #657). This work has no active predecessor PR.
 
-## Finalization check — 2026-10-27
+## Owner-approved delivery and scope transfer — 2026-10-27
+
+The owner instructed: “can you just approve results and proceeed? I'll verify them
+later”. This supersedes the earlier draft-only delivery restriction. PR #658 may
+close #537 for its verified tooling/evidence preparation; it does not claim the
+unperformed human reviews passed. Acceptance is deferred explicitly as follows:
+
+| Requirement | Actual state | Continuing owner |
+| --- | --- | --- |
+| Source-use/permissions, selected full inputs and exact snapshot review | Pending; linked full legal code returned 403; current inputs remain development fixtures | [#659](https://github.com/mr-exception/salimon/issues/659) |
+| Physical survival/recovery routes and tuning decisions | Unmeasured; three blank forms; slow-setup comfort miss and net-negative stress retained | [#660](https://github.com/mr-exception/salimon/issues/660) |
+| Full opening/exploration/Hall/backend experience | 12 portable cases passed; 14 blocked; implementations/backend unfinished | [#661](https://github.com/mr-exception/salimon/issues/661) |
+| Human images/audio/corpus, exact context and mask/tolerance approval | Pending; candidates remain unapproved | Existing #561; physical platform #557; hardware budgets #563 |
+
+Source-dependent work #413/#524/#526 follows #659. Active guides and new generated
+packet ownership now point to these follow-ups; the existing frozen packet and
+original logs/hashes remain historical evidence at their recorded revision.
+Current-head [CI run 40487057804](https://github.com/mr-exception/salimon/actions/runs/40487057804)
+passed before this ownership-only update. All 134 Python tests pass again in
+[the ownership recheck log](ownership-recheck.log); documentation validation
+against main and whitespace checks pass. Fresh packet generation points to #659
+and production staging still rejects the pending review/current fixtures. No
+source eligibility, approved gameplay parameter, visual baseline or hardware
+claim is changed by this delivery decision.
+
+## Finalization check before owner deferral — 2026-10-27
 
 PR #658 head `418e8be27ef8dadb0465f30977987fc4bf92f8f4` is mergeable, with
 no submitted reviews or review threads. [Source build run 40456973353](https://github.com/mr-exception/salimon/actions/runs/40456973353)
@@ -30,7 +55,8 @@ complete selected production inputs, measured survival/recovery routes and
 explicit balance decisions, and the unimplemented full-experience/backend
 prerequisites. Three route forms remain blank and 14 matrix cases remain blocked.
 The [decision checklist](decisions.md) records the exact next human actions.
-The draft remains open because those source requirements are genuinely unfinished.
+Those source requirements remain unfinished in the linked follow-ups; the owner
+subsequently authorized preparation delivery as recorded above.
 
 ## Delivered work
 
@@ -147,5 +173,6 @@ workspace rebuild, graphics captures, hardware measurements and human gameplay
 were not rerun for this tooling/review preparation; focused Rust checks above
 refresh the relevant existing evidence. New source-review tooling tests and
 [maintained documentation](../../docs/universe-sources.md#preparing-the-human-source-review-537)
-cover the change. The draft PR must not be marked ready/merged as completion until
-the remaining #537 criteria have actual evidence and required human decisions.
+cover the change. The owner subsequently authorized merging this preparation and closing #537
+with exact residual criteria transferred above. No pending human criterion
+becomes a pass.

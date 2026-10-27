@@ -1,8 +1,8 @@
 # Experience and narrative implementation/ownership map
 
 Current verification routing: [cloud and human workflows](verification-workflow.md).
-#568 owns automatable corpus/matrix/experience checks; #537 owns source rights,
-balance and human experience decisions; #561 presentation/audio, #557 physical
+#568 owns automatable corpus/matrix/experience checks; #659 owns source rights,
+#660 balance and #661 human experience decisions; #561 presentation/audio, #557 physical
 platform checks and #563 hardware budgets. Earlier native wording below is
 context, not a requirement to wait for reference M1 access for cloud delivery.
 
@@ -53,7 +53,7 @@ opening/navigation/story/endgame blockers. Portable passes are not full E06,
 M1/audio/appearance approval or a backend fallback implementation.
 
 
-Human experience/source/balance acceptance from #476 is tracked in
-[follow-up #537](https://github.com/mr-exception/salimon/issues/537) after the
-versioned matrix/runner delivery. Its feature prerequisites and human evidence
-requirements remain active when #476 closes.
+Human experience acceptance from #476 is tracked in
+[follow-up #661](https://github.com/mr-exception/salimon/issues/661), source review
+in #659 and route/balance decisions in #660 after #537 preparation delivery.
+Feature prerequisites and human evidence requirements remain active.

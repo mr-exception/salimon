@@ -9,7 +9,7 @@ import tempfile
 
 from import_universe_sources import ROOT, stage, verify
 
-REVIEW_ISSUE = 'https://github.com/mr-exception/salimon/issues/537'
+REVIEW_ISSUE = 'https://github.com/mr-exception/salimon/issues/659'
 
 
 def write_json(path, value):
@@ -66,7 +66,7 @@ def prepare(manifest, output):
         write_json(temporary / 'production-review.pending.json', pending)
         (temporary / 'README.md').write_text(
             '# Pending source review\n\n'
-            f'Current review owner: [#537]({REVIEW_ISSUE}).\n\n'
+            f'Current review owner: [#659]({REVIEW_ISSUE}).\n\n'
             f'Frozen manifest SHA-256: `{digest}`.\n\n'
             'Inspect `inventory.json` and the exact raw bytes in `inputs/`. '
             'Attribution guidance and the manifest metadata date are historical; '

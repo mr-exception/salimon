@@ -2037,6 +2037,7 @@ version = "0.1.0"
 dependencies = [
  "salimon-math",
  "salimon-persistence",
+ "salimon-universe",
  "salimon-world",
  "serde",
  "serde_json",

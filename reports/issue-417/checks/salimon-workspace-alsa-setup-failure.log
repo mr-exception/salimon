@@ -1,0 +1,309 @@
+ Downloading crates ...
+  Downloaded anstyle-query v1.1.5
+  Downloaded ab_glyph v0.2.32
+  Downloaded anstream v0.6.21
+  Downloaded bit-vec v0.9.1
+  Downloaded autocfg v1.5.1
+  Downloaded anstyle-parse v0.2.7
+  Downloaded ahash v0.8.12
+  Downloaded alsa-sys v0.4.0
+  Downloaded aho-corasick v1.1.5
+  Downloaded allocator-api2 v0.2.21
+  Downloaded as-raw-xcb-connection v1.0.1
+  Downloaded arrayref v0.3.9
+  Downloaded arrayvec v0.7.8
+  Downloaded bitflags v1.3.2
+  Downloaded ab_glyph_rasterizer v0.1.10
+  Downloaded bytemuck v1.25.2
+  Downloaded anstyle v1.0.14
+  Downloaded alsa v0.11.0
+  Downloaded ash v0.38.0+1.3.281
+  Downloaded bit-set v0.10.0
+  Downloaded bitflags v2.13.1
+  Downloaded bytemuck_derive v1.12.0
+  Downloaded cc v1.4.5
+  Downloaded calloop v0.13.0
+  Downloaded calloop-wayland-source v0.3.0
+  Downloaded byteorder v1.5.0
+  Downloaded cfg_aliases v0.2.2
+  Downloaded codespan-reporting v0.13.1
+  Downloaded colorchoice v1.0.5
+  Downloaded cpal v0.18.2
+  Downloaded cursor-icon v1.2.0
+  Downloaded defmt v1.1.1
+  Downloaded dasp_sample v0.11.0
+  Downloaded defmt-macros v1.1.1
+  Downloaded document-features v0.2.12
+  Downloaded defmt-parser v1.0.0
+  Downloaded dlib v0.5.3
+  Downloaded downcast-rs v1.2.1
+  Downloaded dpi v0.1.2
+  Downloaded env_filter v0.1.4
+  Downloaded env_logger v0.11.8
+  Downloaded equivalent v1.0.2
+  Downloaded fdeflate v0.3.7
+  Downloaded errno v0.3.14
+  Downloaded foldhash v0.2.0
+  Downloaded find-msvc-tools v0.1.12
+  Downloaded glow v0.17.0
+  Downloaded gltf v1.4.1
+  Downloaded gltf-derive v1.4.1
+  Downloaded gethostname v1.1.0
+  Downloaded hashbrown v0.16.1
+  Downloaded gpu-allocator v0.28.0
+  Downloaded gltf-json v1.4.1
+  Downloaded half v2.7.1
+  Downloaded indexmap v2.14.2
+  Downloaded is_terminal_polyfill v1.70.2
+  Downloaded getrandom v0.3.4
+  Downloaded jobserver v0.1.35
+  Downloaded khronos-egl v6.0.0
+  Downloaded inflections v1.1.1
+  Downloaded hashbrown v0.17.1
+  Downloaded jiff-core v0.1.0
+  Downloaded jiff v0.2.35
+  Downloaded lazy_static v1.5.0
+  Downloaded libloading v0.8.9
+  Downloaded libm v0.2.16
+  Downloaded litrs v1.0.0
+  Downloaded libc v0.2.189
+  Downloaded miniz_oxide v0.8.9
+  Downloaded lock_api v0.4.14
+  Downloaded naga v30.0.1
+  Downloaded log v0.4.29
+  Downloaded memmap2 v0.9.11
+  Downloaded naga-types v30.0.1
+  Downloaded num-traits v0.2.19
+  Downloaded once_cell v1.21.4
+  Downloaded owned_ttf_parser v0.25.1
+  Downloaded ordered-float v5.4.0
+  Downloaded parking_lot v0.12.5
+  Downloaded parking_lot_core v0.9.12
+  Downloaded percent-encoding v2.3.2
+  Downloaded linux-raw-sys v0.4.15
+  Downloaded pin-project-lite v0.2.17
+  Downloaded pkg-config v0.3.34
+  Downloaded png v0.18.0
+  Downloaded polling v3.11.0
+  Downloaded pollster v0.4.0
+  Downloaded linux-raw-sys v0.12.1
+  Downloaded profiling v1.0.18
+  Downloaded presser v0.3.1
+  Downloaded quick-xml v0.41.0
+  Downloaded raw-window-handle v0.6.2
+  Downloaded regex v1.13.1
+  Downloaded regex-syntax v0.8.11
+  Downloaded rustc-hash v1.1.0
+  Downloaded rustix v0.38.44
+  Downloaded renderdoc-sys v1.1.0
+  Downloaded sctk-adwaita v0.10.1
+  Downloaded smithay-client-toolkit v0.19.2
+  Downloaded regex-automata v0.4.18
+  Downloaded scoped-tls v1.0.1
+  Downloaded rustix v1.1.4
+  Downloaded strict-num v0.1.1
+  Downloaded thiserror v2.0.20
+  Downloaded wayland-protocols-wlr v0.3.12
+  Downloaded tiny-skia-path v0.11.4
+  Downloaded ttf-parser v0.25.1
+  Downloaded wayland-csd-frame v0.3.0
+  Downloaded wgpu-core v30.0.1
+  Downloaded xcursor v0.3.11
+  Downloaded winit v0.30.13
+  Downloaded smol_str v0.2.2
+  Downloaded scopeguard v1.2.0
+  Downloaded static_assertions v1.1.0
+  Downloaded spirv v0.4.0+sdk-1.4.341.0
+  Downloaded shlex v2.0.1
+  Downloaded termcolor v1.4.1
+  Downloaded slab v0.4.12
+  Downloaded smallvec v1.16.0
+  Downloaded syn v2.0.119
+  Downloaded thiserror v1.0.69
+  Downloaded thiserror-impl v1.0.69
+  Downloaded tiny-skia v0.11.4
+  Downloaded thiserror-impl v2.0.20
+  Downloaded tracing-core v0.1.36
+  Downloaded tracing v0.1.44
+  Downloaded unicode-width v0.2.2
+  Downloaded utf8parse v0.2.2
+  Downloaded wayland-backend v0.3.17
+  Downloaded wgpu v30.0.1
+  Downloaded wgpu-core-deps-windows-linux-android v30.0.1
+  Downloaded wayland-client v0.31.15
+  Downloaded wayland-protocols v0.32.13
+  Downloaded wayland-cursor v0.31.14
+  Downloaded wayland-protocols-plasma v0.3.12
+  Downloaded wayland-scanner v0.31.11
+  Downloaded wayland-sys v0.31.11
+  Downloaded wgpu-naga-bridge v30.0.1
+  Downloaded xkbcommon-dl v0.4.2
+  Downloaded x11rb-protocol v0.13.2
+  Downloaded x11-dl v2.21.0
+  Downloaded wgpu-types v30.0.1
+  Downloaded x11rb v0.13.2
+  Downloaded xkeysym v0.2.1
+  Downloaded zerocopy-derive v0.8.56
+  Downloaded zlib-rs v0.6.8
+  Downloaded zerocopy v0.8.56
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling simd-adler32 v0.3.10
+   Compiling serde_json v1.0.151
+   Compiling syn v3.0.5
+   Compiling miniz_oxide v0.9.1
+   Compiling flate2 v1.1.10
+   Compiling bitflags v2.13.1
+   Compiling serde_derive v1.0.229
+   Compiling pkg-config v0.3.34
+   Compiling log v0.4.29
+   Compiling libloading v0.8.9
+   Compiling once_cell v1.21.4
+   Compiling syn v2.0.119
+   Compiling serde v1.0.229
+   Compiling salimon-universe v0.1.0 (/workspace/salimon-universe-stack/client/universe)
+   Compiling libc v0.2.189
+   Compiling dlib v0.5.3
+   Compiling wayland-sys v0.31.11
+   Compiling smallvec v1.16.0
+   Compiling cfg_aliases v0.2.2
+   Compiling rustix v1.1.4
+   Compiling linux-raw-sys v0.12.1
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon-universe-stack/client/persistence)
+   Compiling salimon-world v0.1.0 (/workspace/salimon-universe-stack/client/world)
+   Compiling foldhash v0.2.0
+   Compiling bytemuck_derive v1.12.0
+   Compiling shlex v2.0.1
+   Compiling autocfg v1.5.1
+   Compiling thiserror v2.0.20
+   Compiling equivalent v1.0.2
+   Compiling find-msvc-tools v0.1.12
+   Compiling libm v0.2.16
+   Compiling zerocopy v0.8.56
+   Compiling cc v1.4.5
+   Compiling num-traits v0.2.19
+   Compiling bytemuck v1.25.2
+   Compiling zerocopy-derive v0.8.56
+   Compiling thiserror-impl v2.0.20
+   Compiling wayland-backend v0.3.17
+   Compiling hashbrown v0.17.1
+   Compiling arrayvec v0.7.8
+   Compiling indexmap v2.14.2
+   Compiling scoped-tls v1.0.1
+   Compiling memchr v2.8.3
+   Compiling rustc-hash v1.1.0
+   Compiling downcast-rs v1.2.1
+   Compiling quick-xml v0.41.0
+   Compiling naga-types v30.0.1
+   Compiling naga v30.0.1
+   Compiling wayland-client v0.31.15
+   Compiling parking_lot_core v0.9.12
+   Compiling raw-window-handle v0.6.2
+   Compiling bit-vec v0.9.1
+   Compiling unicode-width v0.2.2
+   Compiling ash v0.38.0+1.3.281
+   Compiling bit-set v0.10.0
+   Compiling codespan-reporting v0.13.1
+   Compiling wayland-scanner v0.31.11
+   Compiling half v2.7.1
+   Compiling spirv v0.4.0+sdk-1.4.341.0
+   Compiling allocator-api2 v0.2.21
+   Compiling scopeguard v1.2.0
+   Compiling khronos-egl v6.0.0
+   Compiling static_assertions v1.1.0
+   Compiling wgpu-types v30.0.1
+   Compiling lock_api v0.4.14
+   Compiling hashbrown v0.16.1
+   Compiling wgpu-hal v30.0.1 (/workspace/salimon-universe-stack/vendor/wgpu-hal)
+   Compiling presser v0.3.1
+   Compiling gpu-allocator v0.28.0
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling parking_lot v0.12.5
+   Compiling ordered-float v5.4.0
+   Compiling profiling v1.0.18
+   Compiling renderdoc-sys v1.1.0
+   Compiling rustix v0.38.44
+   Compiling glow v0.17.0
+   Compiling thiserror v1.0.69
+   Compiling salimon-survival v0.1.0 (/workspace/salimon-universe-stack/client/survival)
+   Compiling wgpu-core v30.0.1
+   Compiling thiserror-impl v1.0.69
+   Compiling linux-raw-sys v0.4.15
+   Compiling litrs v1.0.0
+   Compiling inflections v1.1.1
+   Compiling gltf-derive v1.4.1
+   Compiling document-features v0.2.12
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wayland-protocols v0.32.13
+   Compiling polling v3.11.0
+   Compiling wgpu v30.0.1
+   Compiling slab v0.4.12
+   Compiling calloop v0.13.0
+   Compiling gltf-json v1.4.1
+   Compiling alsa-sys v0.4.0
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling aho-corasick v1.1.5
+   Compiling regex-syntax v0.8.11
+   Compiling strict-num v0.1.1
+   Compiling ttf-parser v0.25.1
+   Compiling xcursor v0.3.11
+   Compiling cursor-icon v1.2.0
+   Compiling lazy_static v1.5.0
+   Compiling getrandom v0.3.4
+   Compiling byteorder v1.5.0
+   Compiling smithay-client-toolkit v0.19.2
+   Compiling arrayref v0.3.9
+   Compiling xkeysym v0.2.1
+   Compiling tiny-skia-path v0.11.4
+   Compiling gltf v1.4.1
+   Compiling owned_ttf_parser v0.25.1
+   Compiling wayland-csd-frame v0.3.0
+   Compiling wayland-cursor v0.31.14
+   Compiling regex-automata v0.4.18
+   Compiling png v0.18.0
+error: failed to run custom build command for `alsa-sys v0.4.0`
+
+Caused by:
+  process didn't exit successfully: `/workspace/salimon-universe-stack/target/debug/build/alsa-sys-e951b642298f8bef/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-env-changed=ALSA_NO_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_SYSROOT_DIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR
+
+  --- stderr
+
+  thread 'main' (16874) panicked at /workspace/.salimon-cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs:13:19:
+
+  pkg-config exited with status code 1
+  > PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config --libs --cflags alsa
+
+  pkg-config output:
+    Package alsa was not found in the pkg-config search path.
+    Perhaps you should add the directory containing `alsa.pc'
+    to the PKG_CONFIG_PATH environment variable
+    Package 'alsa', required by 'virtual:world', not found
+
+  The system library `alsa` required by crate `alsa-sys` was not found.
+  The file `alsa.pc` needs to be installed and the PKG_CONFIG_PATH environment variable must contain its parent directory.
+  The PKG_CONFIG_PATH environment variable is not set.
+
+  HINT: if you have installed the library, try setting PKG_CONFIG_PATH to the directory containing `alsa.pc`.
+
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

@@ -75,3 +75,8 @@ The independent [portable structural foundation](architecture.md#portable-struct
 implements the 3 m Core-rooted grid, room/equipment footprints, safe removal,
 damage partition data and domain save validation (#541). It does not yet enable
 player building or migrate the current authored Scout.
+
+
+## Real-scale trajectory foundation (#417)
+
+`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. Runtime has not adopted it; current controller, saves, assists and contact remain unchanged. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.

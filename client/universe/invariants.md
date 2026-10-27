@@ -120,3 +120,8 @@ See the [implemented contract](../../docs/universe-ephemerides.md) for ownership
 ## Dominant-source celestial gravity (#416)
 
 See the [implemented contract](../../docs/universe-gravity.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Gravity-aware ship trajectory (#417)
+
+See the [implemented contract](../../docs/universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

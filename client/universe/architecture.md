@@ -241,3 +241,8 @@ Tests: `src/starting_system/tests.rs`; independent frozen manifest/request:
 `examples/starting_system.rs`. Run universe/workspace gates and repeated example
 output; macOS/Windows CI runs debug/release U11 goldens. These are portable CPU
 definitions and physical screens, not M1 rendering/contact/survival acceptance.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

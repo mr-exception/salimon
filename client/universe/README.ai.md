@@ -67,3 +67,8 @@ requires a human review sidecar bound to the exact source manifest; see the
 [source-use/evidence contract](../../docs/universe-sources.md#private-development-decision-and-production-evidence-513).
 Rust source metadata/schema is unchanged; never treat metadata acceptance as
 permission, full-snapshot coverage or approval of a production staging operation.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

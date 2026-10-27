@@ -43,3 +43,8 @@ distance/physical screening, full versioned starting-world surface/resource/visu
 inputs and a reproducible manifest. Run `cargo run -p salimon-universe --example
 starting_system --locked -- --audit` for candidate evidence. Portable definition
 publication does not change playable startup; U24 owns that migration.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

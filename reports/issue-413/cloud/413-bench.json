@@ -1,0 +1,31 @@
+{
+  "arch": "x86_64",
+  "full_milky_way_budget": "not extrapolated from replicated fixtures; real full-release resource acceptance remains #524/#526",
+  "os": "linux",
+  "rows": [
+    {
+      "build_seconds": 0.000315305,
+      "cells": 1,
+      "installed_bytes": 7528,
+      "manifest_sha256": "e1fe5fb4a0a8478d987aca627ae6c350f1b9dec3cae43b523310d62299f5bb0e",
+      "records": 4,
+      "source": "frozen Earth/Proxima fields; identities remapped synthetically"
+    },
+    {
+      "build_seconds": 0.02139295,
+      "cells": 128,
+      "installed_bytes": 256797,
+      "manifest_sha256": "49ba6d48f0168bd74af8329dd6507a151a7cb6783ef7cc677159a76b3226c193",
+      "records": 512,
+      "source": "frozen Earth/Proxima fields; identities remapped synthetically"
+    },
+    {
+      "build_seconds": 0.764405134,
+      "cells": 1024,
+      "installed_bytes": 2024099,
+      "manifest_sha256": "24e0bd27e9fc78c1de74e3c2a1025ac981c990bfe82a94c3a2c4b5e356c5fb17",
+      "records": 4096,
+      "source": "frozen Earth/Proxima fields; identities remapped synthetically"
+    }
+  ]
+}

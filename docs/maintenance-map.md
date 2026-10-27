@@ -578,3 +578,8 @@ in its parent. Convex/SAT and ship assist owners were reviewed and retained.
 See [physics](../client/physics/architecture.md#contact-response-owner-644),
 [resource](../client/renderer/architecture.md#resource-geometry-owner-644) and
 [assist](../client/ship/architecture.md#assist-cohesion-review-644) ownership.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

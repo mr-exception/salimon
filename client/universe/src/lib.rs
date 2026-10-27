@@ -3,6 +3,7 @@ pub mod coordinates;
 mod epoch;
 pub mod inference;
 pub mod ingestion;
+pub mod pack;
 pub mod partitions;
 pub mod reference;
 pub mod sources;

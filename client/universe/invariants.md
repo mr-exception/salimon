@@ -98,3 +98,8 @@ surface/resources. Fixed semantic deposit IDs, positive starting quantities and
 ship-clearing <=55 m walk paths are baseline inputs, not mining/persistence deltas.
 Native/playable U24 integration and explicit revision migration remain required.
 See the [starting-system contract](../../docs/universe-starting-system.md).
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

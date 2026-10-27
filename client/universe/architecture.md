@@ -251,3 +251,8 @@ See the [implemented contract](../../docs/universe-pack.md) for ownership, input
 ## Bounded read-only pack queries (#414)
 
 See the [implemented contract](../../docs/universe-reader.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Time-addressable ephemeris models (#415)
+
+See the [implemented contract](../../docs/universe-ephemerides.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

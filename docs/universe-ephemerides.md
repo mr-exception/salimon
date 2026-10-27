@@ -1,0 +1,7 @@
+# Time-addressable ephemeris models (#415)
+
+The `ephemerides` module evaluates typed linear stellar motion, explicit elliptic two-body models and cubic Hermite interpolation of imported Horizons samples. Samples retain TT/TDB epochs; UTC arithmetic and implicit time conversion reject. Extrapolation is off by default and requires a finite explicit linear horizon, with a lower-accuracy label. Generated orbits require explicit phase, epoch and right-handed orientation; absent U10 fields are never invented. Typed models can be loaded from checksum-verified pack sidecars. Body tracks build instantaneous U02 frame trees with declared axial spin and transport velocity; cyclic/disconnected frames reject. Exact Horizons endpoints and analytic orbits are tested. Independent intermediate-date JPL model-error calibration, complete release data and production quality acceptance remain unrun; interpolation is a method, not a claimed high-quality JPL replacement.
+
+This is portable private-development implementation, separate from playable runtime adoption. Production source approval remains #659 and full-data acceptance #524/#526. No hardware, scientific model accuracy or production completeness is inferred from fixture tests.
+
+Run `cargo test -p salimon-universe --locked`, `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`, `cargo fmt --all -- --check` and `python3 scripts/check_docs.py`.

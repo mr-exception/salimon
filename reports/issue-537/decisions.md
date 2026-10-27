@@ -19,10 +19,12 @@ and exact source/input hashes through [#537](https://github.com/mr-exception/sal
    existing private-fixture-only scope. Private development does not itself
    authorize full real-data acquisition, pack publication or commercial reuse.
 2. Obtain full current official Gaia license/credits, JPL source-specific use and
-   citation requirements, and Exoplanet Archive policy/original references. Current
-   environment requests were blocked before provider content; no fresh terms are
-   available in this packet. Archive raw pages, exact URLs, date and hashes, then
+   citation requirements, and Exoplanet Archive policy/original references. The
+   [current evidence](network/current/README.md) archives six fetched official
+   pages; the linked Creative Commons full legal code still returns HTTP 403.
+   Inspect the originals, obtain missing release/reference-specific material and
    record source-specific implications for the chosen use and required permission.
+   Retrieval and AI preparation are not the required human review or approval.
 3. Choose the actual complete production selection: release/query/selection,
    targets/hosts, epochs/time scale/frame, fields/uncertainties/provenance and
    approved data credit/reference text. Gaia scientific selection/resource checks

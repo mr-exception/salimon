@@ -102,7 +102,11 @@ restricted/unreviewed inputs must fail production validation. No source status,
 query, input bytes or approval is changed by preparing a packet.
 
 The [current review packet and decision checklist](../reports/issue-537/README.md)
-record actual network failures and remaining owner actions. Historical manifest
+record historical network failures, newly archived provider evidence and remaining
+owner actions. The finalization retry retrieved the three original provider pages
+and linked ESA credits/terms and JPL image policy; the linked Creative Commons
+legal code still failed. That image policy alone does not approve ephemeris reuse.
+Historical manifest
 metadata is not a refreshed terms review. The current synthetic Gaia/two-epoch
 Earth/single-exoplanet inputs remain development fixtures. Full selected inputs
 require new acquisition decisions and a new manifest, followed by regeneration

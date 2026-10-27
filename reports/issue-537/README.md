@@ -5,6 +5,33 @@ source permission, full snapshot, balance setting, physical trial or future
 experience approval is granted. Base: `ecbf59e21cd8405b940ff6593061c06978a7bc7d`
 (main after #657). This work has no active predecessor PR.
 
+## Finalization check — 2026-10-27
+
+PR #658 head `418e8be27ef8dadb0465f30977987fc4bf92f8f4` is mergeable, with
+no submitted reviews or review threads. [Source build run 40456973353](https://github.com/mr-exception/salimon/actions/runs/40456973353)
+passed Ubuntu workspace compilation/tests and Windows/macOS publication goldens.
+A fresh local run of all 134 Python tests passed; [original log](python-recheck.log).
+Documentation validation against `origin/main` and whitespace checks also pass;
+all six archived response hashes and byte counts were independently verified.
+These checks verify the preparation tooling, not the missing human criteria.
+
+The current environment reports an enforced unrestricted HTTP policy. With
+network enabled for the execution command, all three original provider URLs now
+return HTTP 200. The earlier revision-3 allowlist failures below are historical;
+they are not the current source-access diagnosis. Six official pages are archived
+with URLs, timestamps, response-byte hashes and lossless compressed originals in
+the [current source evidence](network/current/README.md). The linked Creative
+Commons full legal-code request still returns HTTP 403. Successful page retrieval
+does not establish complete source-specific review, production selection or reuse
+approval. No source status, production eligibility or owner decision changed.
+
+The remaining completion blockers are the actual source-use/snapshot decisions,
+complete selected production inputs, measured survival/recovery routes and
+explicit balance decisions, and the unimplemented full-experience/backend
+prerequisites. Three route forms remain blank and 14 matrix cases remain blocked.
+The [decision checklist](decisions.md) records the exact next human actions.
+The draft remains open because those source requirements are genuinely unfinished.
+
 ## Delivered work
 
 The new offline `scripts/prepare_source_review.py` freezes validated manifest and
@@ -26,7 +53,7 @@ meter durations, recipes and prior owner decisions remain unchanged.
 - [Owner decision and physical-trial checklist](decisions.md), with three blank
   normal/impaired/poor-layout forms. Empty values are unrun, never approved.
 
-## Current source evidence
+## Original preparation source evidence (before the finalization check)
 
 The exact input-manifest SHA-256 is
 `eaa6c4ff059ae06464d72744302cc2b7696fed7cc965759ec9f43af09f79ee3d`.

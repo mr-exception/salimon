@@ -1,0 +1,14 @@
+{
+  "url": "https://www.cosmos.esa.int/web/gaia-users/license",
+  "checked_at_utc": "2026-10-27T10:11:30.696039+00:00",
+  "human_reviewed": false,
+  "reuse_approved": false,
+  "status": 200,
+  "final_url": "https://www.cosmos.esa.int/web/gaia-users/license",
+  "content_type": "text/html;charset=UTF-8",
+  "body_sha256": "b40f83f826e419f3af06ea45e1a1d282d520cc3695bb69a9e294463189eb1654",
+  "body_bytes": 72916,
+  "body_file": "gaia-license.html.gz",
+  "storage_encoding": "gzip",
+  "archive_sha256": "3c370b0b218217f353759da375e9c81c6d5f45f15e1127afae593b53b5491651"
+}

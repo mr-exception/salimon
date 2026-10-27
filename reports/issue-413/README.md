@@ -27,3 +27,9 @@ selection/coverage/size is already owned by #524/#526; it is not represented as
 passed or a human gate on this builder PR. No new deferred code scope is created.
 
 Fresh checks and measured storage/throughput are retained under `cloud/`.
+
+Final input-boundary check: producer fields now retain raw JSON bytes; duplicate
+bundle fields and nested duplicate catalog fields reject before publication.
+The same 73 universe tests (including the expanded pipeline regression) and
+all-target Clippy pass, with final logs under `cloud/413-final-*`. This avoids
+normalizing malformed producer JSON into a valid-looking catalog.

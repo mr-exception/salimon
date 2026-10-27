@@ -2,7 +2,31 @@
 //! tooling; every selected byte is frozen before this offline transaction.
 use super::*;
 use serde::Deserialize;
+use serde::de::{MapAccess, Visitor};
+use serde_json::value::RawValue;
 use std::io::Read;
+struct ProducerFields(BTreeMap<String, Box<RawValue>>);
+impl<'de> Deserialize<'de> for ProducerFields {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct FieldsVisitor;
+        impl<'de> Visitor<'de> for FieldsVisitor {
+            type Value = ProducerFields;
+            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str("a unique-key producer object")
+            }
+            fn visit_map<M: MapAccess<'de>>(self, mut map: M) -> Result<Self::Value, M::Error> {
+                let mut fields = BTreeMap::new();
+                while let Some((key, value)) = map.next_entry::<String, Box<RawValue>>()? {
+                    if fields.insert(key, value).is_some() {
+                        return Err(serde::de::Error::custom("duplicate producer field"));
+                    }
+                }
+                Ok(ProducerFields(fields))
+            }
+        }
+        deserializer.deserialize_map(FieldsVisitor)
+    }
+}
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -124,23 +148,13 @@ pub fn build(request_file: &Path, output: &Path) -> Result<Manifest, Error> {
             crate::synthesis::MAX_PUBLICATION_BYTES,
         )?;
         let mut sidecars = BTreeMap::new();
-        let value: serde_json::Value =
+        let mut fields: ProducerFields =
             serde_json::from_slice(&bytes).map_err(|e| Error::Encoding(e.to_string()))?;
-        let catalog = if let Some(catalog) = value.get("catalog") {
-            let fields = value
-                .as_object()
-                .ok_or_else(|| invalid("producer bundle object"))?;
-            for (key, value) in fields {
-                if key != "catalog" {
-                    sidecars.insert(
-                        key.clone(),
-                        serde_json::to_vec(value).map_err(|e| Error::Encoding(e.to_string()))?,
-                    );
-                }
+        let catalog = if let Some(catalog) = fields.0.remove("catalog") {
+            for (key, value) in fields.0 {
+                sidecars.insert(key, value.get().as_bytes().to_vec());
             }
-            Catalog::decode(
-                &serde_json::to_vec(catalog).map_err(|e| Error::Encoding(e.to_string()))?,
-            )?
+            Catalog::decode(catalog.get().as_bytes())?
         } else {
             Catalog::decode(&bytes)?
         };

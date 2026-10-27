@@ -21,3 +21,9 @@ logical IO and quarter-by-quarter Linux RSS in `cloud/414-bench.json`.
 checks complete U13 cloud acceptance with the now-configurable U12 pack pipeline.
 Later playable streaming integration remains #422; it is not a human gate or an
 unfinished U13 API. Full-release input coverage remains separately #524/#526.
+
+Final lifecycle regression: prefetch now skips contended speculative requests
+using try_lock, so shutdown cannot deadlock on a foreground reader guard. The
+bounded regression passes; 79 universe tests and all-target Clippy pass. The
+filesystem/worker workload was rerun on this final implementation, with results
+in `cloud/414-final-bench.json` and final test/lint logs beside it.

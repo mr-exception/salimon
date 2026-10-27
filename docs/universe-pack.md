@@ -43,3 +43,8 @@ Run universe tests, all-target universe Clippy, formatting and docs/base-impact
 checks. Run `pack_bench OUTPUT_DIR` in release mode for repeatable storage and
 throughput evidence. Playable world adoption is owned by later expansion issues;
 no human gameplay or hardware signoff is required for this portable builder.
+
+Producer bundles retain raw JSON field bytes. Duplicate root fields reject, and
+the nested catalog is decoded from its original bytes so duplicate/unknown U01
+fields cannot be hidden by intermediate JSON normalization. Source hashes and
+the previous active manifest remain unchanged on these failures.

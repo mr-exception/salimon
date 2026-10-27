@@ -8,3 +8,16 @@ Validation results are recorded below. Linux x86_64, Rust 1.99.1; private fixtur
 - `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`: passed.
 - `cargo fmt --all`: applied; docs/base-impact check passed with zero failures.
 - Concurrent prefetch, missing/corrupt blob rejection and oversized-cell bypass pass. Full workload RSS/IO latency and runtime adoption are unrun.
+
+## Cloud completion revision
+
+Added observable verified catalog IO/cache-hit counters and an eight-thread
+concurrent navigation regression. The actual filesystem/prefetch workload runs
+20000 randomized seeks across 1024 cells at 16/64/256 KiB cache budgets (60000
+queries total), checks residency at every query, and retains p50/p95/max latency,
+logical IO and quarter-by-quarter Linux RSS in `cloud/414-bench.json`.
+
+78 universe tests pass; all-target universe Clippy passes. These service-level
+checks complete U13 cloud acceptance with the now-configurable U12 pack pipeline.
+Later playable streaming integration remains #422; it is not a human gate or an
+unfinished U13 API. Full-release input coverage remains separately #524/#526.

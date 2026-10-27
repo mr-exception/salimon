@@ -20,8 +20,8 @@ verifies shared-cache reuse without duplicate IO. Missing/corrupt cells and
 prefetch failures retain their existing fail-closed coverage.
 
 The recorded cloud workload completes with bounded cache and observed RSS; no
-human verification or native performance claim is required. Hooking this reader
-into playable real-scale streaming is #422 and subsequent integration work,
+human verification or native performance claim is required. The [predictive streaming service](universe-streaming.md) now polls this reader
+from the native client without frame-thread IO; gameplay adoption is subsequent integration work,
 rather than a missing acceptance criterion of the read-only U13 service.
 
 Prefetch is speculative: requests contending with a foreground guard are skipped

@@ -128,6 +128,23 @@ impl ClientApplication {
         {
             resource_meshes.push(preview);
         }
+        if let Some(stream) = &mut self.universe_stream {
+            let result = salimon_universe::coordinates::GalacticPosition::new(
+                [0; 3],
+                camera.position_meters,
+            )
+            .and_then(|position| {
+                stream.update(position, presentation.ship.velocity_meters_per_second)
+            });
+            let error = result
+                .err()
+                .map(|e| e.to_string())
+                .or_else(|| stream.last_error.clone());
+            if let Some(error) = error {
+                self.fail(event_loop, error);
+                return;
+            }
+        }
         let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
             self.session.mining.terrain
         } else {

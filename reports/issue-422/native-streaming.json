@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "steps_completed": 4,
+  "duration_ms": 4920,
+  "command": [
+    "/repo/target/debug/salimon-client"
+  ],
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "observations": {
+    "active_cells": 1,
+    "error": null,
+    "io": {
+      "cache_hits": 0,
+      "catalog_blob_bytes": 1684,
+      "catalog_blob_reads": 1
+    },
+    "ready": true,
+    "resident_encoded_bytes": 4096,
+    "wanted_cells": 1
+  },
+  "source_artifact": "/repo/artifacts/e2e/run-8yrghjul",
+  "adapter": "llvmpipe LLVM 15 Vulkan CPU"
+}

@@ -1,0 +1,58 @@
+............fatal: ambiguous argument 'missing-ref': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+.........Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+...Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+.Running physics-1-dense-active-facing
+Running physics-1-dense-active-facing
+..Prepared a
+Prepared b
+Measuring a (other fixtures idle)
+Measuring b (other fixtures idle)
+....Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics --release
+.Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+...................Switched to a new branch 'ci-reports'
+...............................................................E...................
+======================================================================
+ERROR: test_success_and_process_cleanup (test_salimon_test.RunnerTests.test_success_and_process_cleanup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/salimon/scripts/salimon_test.py", line 221, in _receive
+    line = self.responses.get(timeout=remaining)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/queue.py", line 179, in get
+    raise Empty
+_queue.Empty
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/salimon/scripts/test_salimon_test.py", line 106, in test_success_and_process_cleanup
+    with Game([sys.executable, str(self.fake)], parse_scenario(self.scenario)["setup"], time.monotonic() + 2) as game:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/salimon/scripts/salimon_test.py", line 185, in __enter__
+    first = self._receive("ready signal")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/salimon/scripts/salimon_test.py", line 223, in _receive
+    raise ScenarioError(f"timeout waiting for {label}") from exc
+salimon_test.ScenarioError: timeout waiting for ready signal
+
+----------------------------------------------------------------------
+Ran 134 tests in 35.479s
+
+FAILED (errors=1)
+No source change since the latest successful suites; skipping
+Run suites
+{"status": "failed", "report": "/tmp/tmpzz7gzbte/failed.json", "error": "Command 'profile' timed out after 300 seconds"}

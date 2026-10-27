@@ -624,3 +624,11 @@ assist compensation. Model validity, tests and playable-adoption limits are expl
 See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
 certified earliest-event queries, atomic gravity/drag interception, body-relative
 consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery or replace gameplay yet.

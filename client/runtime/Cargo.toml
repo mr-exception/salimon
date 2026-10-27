@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+salimon-universe = { path = "../universe" }
 serde.workspace = true
 salimon-survival = { path = "../survival" }
 salimon-persistence = { path = "../persistence" }

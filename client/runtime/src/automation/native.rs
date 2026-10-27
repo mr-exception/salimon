@@ -64,6 +64,11 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
         }
         Some("inspect") => {
             let mut result = inspect_session(&app.session);
+            result["universe_stream"] = app.universe_stream.as_ref().map_or(Value::Null, |stream| json!({
+                "ready": stream.ready(), "active_cells": stream.active().len(),
+                "wanted_cells": stream.wanted().len(), "resident_encoded_bytes": stream.resident_encoded_bytes,
+                "io": stream.stats, "error": stream.last_error,
+            }));
             let upload_times = app.terrain_upload_times();
             let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
             let native = json!({ "native_input_isolated":app.e2e_input_isolated, "terrain_upload_preparation_micros": upload_times,

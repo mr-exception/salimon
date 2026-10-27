@@ -14,8 +14,10 @@
    a seed alone is never a full world definition. No runtime generation choices.
 7. Unknown schemas/fields, duplicate wire fields and malformed/bounded JSON reject;
    schema evolution requires deliberate versioned compatibility tests.
-8. Canonical truth is not player-known navigation. No production catalog, physics,
-   gravity, scanner, save migration or world replacement is implemented here.
+8. Canonical truth is not player-known navigation. Portable ephemeris/gravity
+   services preserve explicit epochs, split positions and reference checks.
+   Scanner knowledge, playable-world migration and release catalog qualification
+   retain their separate owners; no service grants player discovery.
 
 The [architecture](architecture.md) is the canonical API/limit/ownership contract.
 
@@ -113,3 +115,8 @@ See the [implemented contract](../../docs/universe-reader.md) for ownership, inp
 ## Time-addressable ephemeris models (#415)
 
 See the [implemented contract](../../docs/universe-ephemerides.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Dominant-source celestial gravity (#416)
+
+See the [implemented contract](../../docs/universe-gravity.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

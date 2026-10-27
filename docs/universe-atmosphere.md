@@ -74,3 +74,10 @@ already scoped canonical-world adoption (#424–#427). Real-scale contact is #42
 scientific full-pack acceptance is #524/#526. Physical platform, human presentation
 and hardware qualification remain separately unverified under #557/#561/#563;
 no new renderer output requires graphical captures for this domain-only PR.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.

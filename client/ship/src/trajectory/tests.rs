@@ -1,6 +1,157 @@
 use super::*;
 use salimon_universe::{CatalogId, gravity::Config};
 #[test]
+fn indexed_and_complete_source_trajectories_match_exactly() {
+    use salimon_universe::gravity::SourceIndex;
+    let mut sources = vec![earth()];
+    for i in 0..64 {
+        sources.push(Source {
+            id: CatalogId::from_source("fixture", &format!("far-{i}")).unwrap(),
+            position: pos(1.0e12 + i as f64 * 1e8),
+            mu_m3_per_s2: 1e10,
+            radius_meters: 0.0,
+        });
+    }
+    let index = std::sync::Arc::new(SourceIndex::new(sources.clone()).unwrap());
+    let mut direct = trajectory(pos(7_000_000.0), [0.0, 7500.0, 0.0]);
+    let mut indexed = direct.clone();
+    for _ in 0..1000 {
+        direct
+            .step(1_000_000_000, coast(), |_, _| Ok(sources.clone()))
+            .unwrap();
+        indexed
+            .step_indexed(1_000_000_000, coast(), |_, _| Ok(index.clone()))
+            .unwrap();
+    }
+    assert_eq!(direct.state(), indexed.state());
+}
+#[test]
+fn moving_body_gravity_assist_conserves_body_frame_energy_and_changes_inertial_energy() {
+    let origin = pos(0.0);
+    let initial = origin
+        .translated([40_000_000.0, 20_000_000.0, 0.0])
+        .unwrap();
+    let mut t = trajectory(initial, [7000.0, 0.0, 0.0]);
+    let source_at = |at: Epoch| {
+        let seconds = at.seconds_since(epoch()).unwrap();
+        let mut e = earth();
+        e.position = origin.translated([15000.0 * seconds, 0.0, 0.0]).unwrap();
+        e
+    };
+    let energy = |state: State| {
+        let e = source_at(state.epoch);
+        let r = length(state.position.relative_meters(e.position).unwrap());
+        let relative = salimon_math::sub(state.velocity_mps, [15000.0, 0.0, 0.0]);
+        length(relative).powi(2) / 2.0 - e.mu_m3_per_s2 / r
+    };
+    let before = energy(t.state());
+    for _ in 0..10000 {
+        t.step(2_000_000_000, coast(), |at, _| Ok(vec![source_at(at)]))
+            .unwrap();
+    }
+    let after = energy(t.state());
+    let drift = ((after - before) / before).abs();
+    eprintln!(
+        "moving-body flyby relative-energy drift {drift:.12}; initial inertial speed 7000; final {}",
+        length(t.state().velocity_mps)
+    );
+    assert!(drift < 1e-5);
+    assert!(length(t.state().velocity_mps) > 7000.0);
+}
+#[test]
+fn three_body_ephemeris_field_matches_independent_rk4_reference() {
+    // Reference RK4 is independent of the production Verlet/selector kernel.
+    // Both consume the same declared analytic Sun/Earth/Moon field.
+    use salimon_math::{add, scale, sub};
+    let sun_mu = 1.32712440018e20;
+    let earth_mu = 3.986004418e14;
+    let moon_mu = 4.9048695e12;
+    let a = 149_597_870_700.0_f64;
+    let b = 384_400_000.0_f64;
+    let ne = (sun_mu / a.powi(3)).sqrt();
+    let nm = (earth_mu / b.powi(3)).sqrt();
+    let centers = |time: f64| {
+        let earth = [a * (ne * time).cos(), a * (ne * time).sin(), 0.0];
+        vec![
+            ([0.0; 3], sun_mu),
+            (earth, earth_mu),
+            (
+                add(earth, [b * (nm * time).cos(), b * (nm * time).sin(), 0.0]),
+                moon_mu,
+            ),
+        ]
+    };
+    let accel = |position: [f64; 3], time: f64| {
+        let mut out = [0.0; 3];
+        for (center, mu) in centers(time) {
+            let d = sub(center, position);
+            let r = d[0].hypot(d[1]).hypot(d[2]);
+            out = add(out, d.map(|v| mu * (v / r) / r / r));
+        }
+        out
+    };
+    let start = [a + 7_000_000.0, 0.0, 0.0];
+    let velocity = [0.0, a * ne + (earth_mu / 7_000_000.0).sqrt(), 0.0];
+    let mut t = trajectory(pos(0.0).translated(start).unwrap(), velocity);
+    let (mut rp, mut rv) = (start, velocity);
+    for step in 0..6000 {
+        let time = step as f64;
+        t.step(1_000_000_000, coast(), |at, _| {
+            let seconds = at.seconds_since(epoch())?;
+            centers(seconds)
+                .into_iter()
+                .enumerate()
+                .map(|(i, (center, mu))| {
+                    Ok(Source {
+                        id: CatalogId::from_source("fixture", &format!("body-{i}"))?,
+                        position: pos(0.0).translated(center)?,
+                        mu_m3_per_s2: mu,
+                        radius_meters: 0.0,
+                    })
+                })
+                .collect()
+        })
+        .unwrap();
+        for half in 0..2 {
+            let tm = time + half as f64 * 0.5;
+            let h = 0.5;
+            let (kp1, kv1) = (rv, accel(rp, tm));
+            let (kp2, kv2) = (
+                add(rv, scale(kv1, h / 2.0)),
+                accel(add(rp, scale(kp1, h / 2.0)), tm + h / 2.0),
+            );
+            let (kp3, kv3) = (
+                add(rv, scale(kv2, h / 2.0)),
+                accel(add(rp, scale(kp2, h / 2.0)), tm + h / 2.0),
+            );
+            let (kp4, kv4) = (
+                add(rv, scale(kv3, h)),
+                accel(add(rp, scale(kp3, h)), tm + h),
+            );
+            rp = add(
+                rp,
+                scale(
+                    add(add(kp1, scale(kp2, 2.0)), add(scale(kp3, 2.0), kp4)),
+                    h / 6.0,
+                ),
+            );
+            rv = add(
+                rv,
+                scale(
+                    add(add(kv1, scale(kv2, 2.0)), add(scale(kv3, 2.0), kv4)),
+                    h / 6.0,
+                ),
+            );
+        }
+    }
+    let error = length(sub(
+        t.state().position.relative_meters(pos(0.0)).unwrap(),
+        rp,
+    ));
+    eprintln!("Sun/Earth/Moon 6000s Verlet versus RK4 position error {error:.9} m");
+    assert!(error < 25.0);
+}
+#[test]
 fn moving_ephemeris_frame_is_queried_at_both_step_epochs() {
     use salimon_universe::{
         coordinates::{FrameId, Rotation, SystemAnchor},

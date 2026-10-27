@@ -1,5 +1,63 @@
 use super::*;
 #[test]
+fn independent_withheld_jpl_epochs_and_sparse_gap_refusal() {
+    let dataset = crate::Dataset {
+        id: CatalogId::from_source("jpl", "earth-3h-20000101").unwrap(),
+        version: "Horizons API 1.2".into(),
+        reference: "reports/issue-415/cloud/jpl-source.json".into(),
+    };
+    let data = crate::ingestion::horizons::Ephemeris::decode(
+        include_bytes!("../../fixtures/jpl-earth-3h-20000101.json"),
+        &dataset,
+    )
+    .unwrap();
+    let samples = data
+        .samples()
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| i % 2 == 0)
+        .map(|(_, s)| Sample {
+            epoch: s.epoch,
+            position_meters: s.position_meters,
+            velocity_mps: s.velocity_mps,
+        })
+        .collect();
+    let mut model = Model::Sampled {
+        samples,
+        max_extrapolation_seconds: 0.0,
+        max_interpolation_gap_seconds: 21600.0,
+    };
+    for (_, s) in data
+        .samples()
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| i % 2 == 1)
+    {
+        let (state, quality) = model.evaluate(s.epoch).unwrap();
+        assert_eq!(quality, Accuracy::Interpolated);
+        let norm = |v: [f64; 3]| v[0].hypot(v[1]).hypot(v[2]);
+        assert!(
+            norm(std::array::from_fn(
+                |i| state.meters[i] - s.position_meters[i]
+            )) < 1.0
+        );
+        assert!(
+            norm(std::array::from_fn(
+                |i| state.meters_per_second[i] - s.velocity_mps[i]
+            )) < 0.001
+        );
+    }
+    if let Model::Sampled {
+        max_interpolation_gap_seconds,
+        ..
+    } = &mut model
+    {
+        *max_interpolation_gap_seconds = 10000.0;
+    }
+    assert!(model.evaluate(data.samples()[1].epoch).is_err());
+    assert!(model.evaluate(data.samples()[0].epoch).is_ok());
+}
+#[test]
 fn evaluated_rotating_body_preserves_transport_and_rejects_cycles() {
     use crate::coordinates::{GalacticPosition, Rotation};
     let system = CatalogId::from_source("fixture", "system").unwrap();
@@ -67,6 +125,7 @@ fn sample(t: i64) -> Sample {
 #[test]
 fn hermite_exact_motion_validity_fallback_and_scales() {
     let mut m = Model::Sampled {
+        max_interpolation_gap_seconds: 10.0,
         samples: vec![sample(0), sample(10)],
         max_extrapolation_seconds: 0.0,
     };

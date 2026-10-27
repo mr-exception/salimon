@@ -29,6 +29,9 @@ pub enum Model {
     Sampled {
         samples: Vec<Sample>,
         max_extrapolation_seconds: f64,
+        /// Explicit model sampling contract; gaps are not validity guarantees.
+        #[serde(default = "default_sample_gap")]
+        max_interpolation_gap_seconds: f64,
     },
     /// Explicit stellar proper/radial motion, never missing velocity -> zero.
     Linear { sample: Sample, valid_seconds: f64 },
@@ -41,6 +44,9 @@ pub enum Model {
         mean_anomaly_radians: f64,
         axes: [[f64; 3]; 3],
     },
+}
+pub fn default_sample_gap() -> f64 {
+    21600.0
 }
 fn finite(s: Sample) -> Result<(), Error> {
     if s.epoch.scale() == TimeScale::Utc
@@ -72,6 +78,7 @@ impl Model {
     }
     pub fn from_horizons(e: &crate::ingestion::horizons::Ephemeris) -> Self {
         Self::Sampled {
+            max_interpolation_gap_seconds: default_sample_gap(),
             samples: e
                 .samples()
                 .iter()
@@ -109,11 +116,14 @@ impl Model {
             Self::Sampled {
                 samples,
                 max_extrapolation_seconds,
+                max_interpolation_gap_seconds,
             } => {
                 if samples.is_empty()
                     || samples.len() > 65536
                     || !max_extrapolation_seconds.is_finite()
                     || *max_extrapolation_seconds < 0.0
+                    || !max_interpolation_gap_seconds.is_finite()
+                    || *max_interpolation_gap_seconds <= 0.0
                 {
                     return Err(invalid("ephemeris sample/fallback bounds"));
                 }
@@ -152,6 +162,11 @@ impl Model {
                     let a = samples[i - 1];
                     let b = samples[i];
                     let h = b.epoch.seconds_since(a.epoch)?;
+                    if h > *max_interpolation_gap_seconds {
+                        return Err(invalid(
+                            "ephemeris sample gap exceeds model's validated interpolation spacing",
+                        ));
+                    }
                     let u = epoch.seconds_since(a.epoch)? / h;
                     let position_meters = std::array::from_fn(|j| {
                         (2.0 * u * u * u - 3.0 * u * u + 1.0) * a.position_meters[j]

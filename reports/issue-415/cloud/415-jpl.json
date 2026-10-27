@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "id": "earth-withheld-1",
+      "regime": "system_flight",
+      "position_error_meters": 0.2246396609288169,
+      "velocity_error_mps": 3.370189937126993e-8,
+      "budget": {
+        "position_meters": 1.0,
+        "velocity_mps": 0.001
+      },
+      "passed": true
+    },
+    {
+      "id": "earth-withheld-3",
+      "regime": "system_flight",
+      "position_error_meters": 0.22490795648605083,
+      "velocity_error_mps": 3.3340654595415996e-8,
+      "budget": {
+        "position_meters": 1.0,
+        "velocity_mps": 0.001
+      },
+      "passed": true
+    },
+    {
+      "id": "earth-withheld-5",
+      "regime": "system_flight",
+      "position_error_meters": 0.225250948832616,
+      "velocity_error_mps": 3.1919064471914073e-8,
+      "budget": {
+        "position_meters": 1.0,
+        "velocity_mps": 0.001
+      },
+      "passed": true
+    },
+    {
+      "id": "earth-withheld-7",
+      "regime": "system_flight",
+      "position_error_meters": 0.2257371667519621,
+      "velocity_error_mps": 3.313700515599313e-8,
+      "budget": {
+        "position_meters": 1.0,
+        "velocity_mps": 0.001
+      },
+      "passed": true
+    }
+  ]
+}

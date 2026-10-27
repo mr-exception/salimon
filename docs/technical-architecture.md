@@ -700,3 +700,8 @@ GLB validation/index packing from GPU batch state. This is source organization
 within the existing domains: numerical behavior, public contracts, serialized
 state, assets/shaders and allocation policy are preserved. Convex/SAT and
 ship-assist owners remain cohesive; see the [maintenance map](maintenance-map.md#contact-and-resource-geometry-review-644).
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

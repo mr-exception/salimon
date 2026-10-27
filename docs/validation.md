@@ -544,3 +544,8 @@ asset metrics without claiming pending hardware ceilings are approved. Coverage,
 original production images, state and platform limitations belong in the
 [completion report](../reports/issue-551/README.md). Human visual/audio review
 remains #561, physical devices/sleep/wake #557 and hardware budgets #563.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

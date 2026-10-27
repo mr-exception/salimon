@@ -115,6 +115,39 @@ impl Trajectory {
                 .meters_per_second_squared)
         })
     }
+    /// Strang-split quadratic atmospheric drag around the production gravity
+    /// and funded-thrust step. The same operation serves online and closed-game
+    /// callers; closed-game composition supplies coasting thrust. Any provider
+    /// or numerical failure rolls back position, velocity, epoch and selector.
+    pub fn step_with_drag(
+        &mut self,
+        elapsed_nanos: i64,
+        thrust: Thrust,
+        aerodynamics: crate::atmosphere::Aerodynamics,
+        sources: impl FnMut(Epoch, GalacticPosition) -> Result<Vec<Source>, Error>,
+        mut air: impl FnMut(Epoch, GalacticPosition) -> Result<Option<crate::atmosphere::Air>, Error>,
+    ) -> Result<State, Error> {
+        if elapsed_nanos <= 0 || elapsed_nanos > self.max_step_nanos {
+            return Err(error("trajectory step exceeds configured bound"));
+        }
+        let mut staged = self.clone();
+        let half_seconds = elapsed_nanos as f64 * 0.5e-9;
+        staged.state.velocity_mps = aerodynamics.velocity_after(
+            staged.state.velocity_mps,
+            thrust.propulsion,
+            air(staged.state.epoch, staged.state.position)?,
+            half_seconds,
+        )?;
+        staged.step(elapsed_nanos, thrust, sources)?;
+        staged.state.velocity_mps = aerodynamics.velocity_after(
+            staged.state.velocity_mps,
+            thrust.propulsion,
+            air(staged.state.epoch, staged.state.position)?,
+            half_seconds,
+        )?;
+        *self = staged;
+        Ok(self.state)
+    }
     fn advance(
         &mut self,
         elapsed_nanos: i64,

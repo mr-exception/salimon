@@ -199,8 +199,36 @@ impl Maneuver {
         controls: Controls,
         config: ManeuverConfig,
         core: &mut EnergyCore,
+        body_at: impl FnMut(&CatalogId, Epoch) -> Result<BodyMotion, Error>,
+        gravity_at: impl FnMut(Epoch, GalacticPosition) -> Result<[f64; 3], Error>,
+    ) -> Result<Self, Error> {
+        Self::activate_with_drag(
+            kind,
+            start,
+            site,
+            propulsion,
+            controls,
+            config,
+            core,
+            crate::atmosphere::Aerodynamics::new(0.0, 0.0)?,
+            body_at,
+            gravity_at,
+            |_, _| Ok(None),
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn activate_with_drag(
+        kind: ManeuverKind,
+        start: State,
+        site: &Site,
+        propulsion: Propulsion,
+        controls: Controls,
+        config: ManeuverConfig,
+        core: &mut EnergyCore,
+        aerodynamics: crate::atmosphere::Aerodynamics,
         mut body_at: impl FnMut(&CatalogId, Epoch) -> Result<BodyMotion, Error>,
         mut gravity_at: impl FnMut(Epoch, GalacticPosition) -> Result<[f64; 3], Error>,
+        mut air_at: impl FnMut(Epoch, GalacticPosition) -> Result<Option<crate::atmosphere::Air>, Error>,
     ) -> Result<Self, Error> {
         finite(start.velocity_mps)?;
         if !controls.cockpit
@@ -257,17 +285,29 @@ impl Maneuver {
         } else {
             [0.0; 3]
         };
+        let mut passive = |motion: Kinematics| -> Result<[f64; 3], Error> {
+            let gravity = gravity_at(motion.state.epoch, motion.state.position)?;
+            finite(gravity)?;
+            let drag = aerodynamics.acceleration_mps2(
+                motion.state.velocity_mps,
+                propulsion,
+                air_at(motion.state.epoch, motion.state.position)?,
+            )?;
+            let result = add(gravity, drag);
+            finite(result)?;
+            Ok(result)
+        };
         let support_epoch = if kind == ManeuverKind::Takeoff {
             start.epoch
         } else {
             start.epoch.advance_nanos(config.duration_nanos)?
         };
         let support_body = body_at(&site.body, support_epoch)?;
-        let support_position = site.at(support_epoch, support_body)?.state.position;
+        let support_motion = site.at(support_epoch, support_body)?;
         site.support(
             support_epoch,
             support_body,
-            gravity_at(support_epoch, support_position)?,
+            passive(support_motion)?,
             propulsion,
             config.static_friction,
         )?;
@@ -287,8 +327,7 @@ impl Maneuver {
             }
             let epoch = start.epoch.advance_nanos(nanos)?;
             let motion = site.relative_at(epoch, body_at(&site.body, epoch)?, x, v, a)?;
-            let gravity = gravity_at(epoch, motion.state.position)?;
-            finite(gravity)?;
+            let gravity = passive(motion)?;
             let watts = length(sub(motion.acceleration_mps2, gravity)) / dv_per_joule;
             if !watts.is_finite() || watts > max_watts {
                 return Err(error("insufficient maneuver thrust/power"));

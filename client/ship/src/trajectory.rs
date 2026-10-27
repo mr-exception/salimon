@@ -1,0 +1,126 @@
+//! Portable real-scale inertial trajectory. Runtime adoption, contact and assists
+//! remain separate: this never grants engine authority or spends Core energy.
+use crate::Propulsion;
+use salimon_math::{add, length, scale};
+use salimon_universe::{
+    Epoch, Error, TimeScale,
+    coordinates::GalacticPosition,
+    gravity::{Selector, Source},
+};
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct State {
+    pub position: GalacticPosition,
+    pub velocity_mps: [f64; 3],
+    pub epoch: Epoch,
+}
+/// Already-funded directional Core work. Existing ship/runtime allocation owns
+/// debit and ledger-derived mass; the integrator must never spend it again.
+#[derive(Clone, Copy, Debug)]
+pub struct Thrust {
+    pub direction: [f64; 3],
+    pub funded_joules: f64,
+    pub propulsion: Propulsion,
+}
+impl Thrust {
+    pub fn coasting(propulsion: Propulsion) -> Self {
+        Self {
+            direction: [0.0; 3],
+            funded_joules: 0.0,
+            propulsion,
+        }
+    }
+    fn delta_velocity(self) -> Result<[f64; 3], Error> {
+        let norm = length(self.direction);
+        if !self.funded_joules.is_finite()
+            || self.funded_joules < 0.0
+            || !norm.is_finite()
+            || (self.funded_joules > 0.0 && (norm - 1.0).abs() > 1e-12)
+        {
+            return Err(error("trajectory funded thrust/direction"));
+        }
+        let dv = scale(
+            self.direction,
+            self.propulsion
+                .delta_velocity_meters_per_second(self.funded_joules),
+        );
+        finite(dv)?;
+        Ok(dv)
+    }
+}
+fn error(message: &str) -> Error {
+    Error::Invalid(message.into())
+}
+fn finite(v: [f64; 3]) -> Result<(), Error> {
+    if v.into_iter().all(f64::is_finite) {
+        Ok(())
+    } else {
+        Err(error("trajectory nonfinite state"))
+    }
+}
+#[derive(Clone, Debug)]
+pub struct Trajectory {
+    state: State,
+    gravity: Selector,
+    max_step_nanos: i64,
+}
+impl Trajectory {
+    pub fn new(state: State, gravity: Selector, max_step_nanos: i64) -> Result<Self, Error> {
+        finite(state.velocity_mps)?;
+        if state.epoch.scale() == TimeScale::Utc || !(1..=60_000_000_000).contains(&max_step_nanos)
+        {
+            return Err(error("trajectory requires TT/TDB and positive step <=60 s"));
+        }
+        Ok(Self {
+            state,
+            gravity,
+            max_step_nanos,
+        })
+    }
+    pub fn state(&self) -> State {
+        self.state
+    }
+    /// Velocity Verlet in split galactic cells, symmetric funded-impulse kicks.
+    /// Calls the epoch-aware candidate provider at both endpoints. Caller uses a
+    /// fixed step and supplies fresh ledger-derived Propulsion when mass changes.
+    /// All internal state is committed only after both evaluations succeed.
+    pub fn step(
+        &mut self,
+        elapsed_nanos: i64,
+        thrust: Thrust,
+        mut sources: impl FnMut(Epoch, GalacticPosition) -> Result<Vec<Source>, Error>,
+    ) -> Result<State, Error> {
+        if elapsed_nanos <= 0 || elapsed_nanos > self.max_step_nanos {
+            return Err(error("trajectory step exceeds configured bound"));
+        }
+        let dt = elapsed_nanos as f64 * 1e-9;
+        let dv = thrust.delta_velocity()?;
+        let mut gravity = self.gravity.clone();
+        let first = sources(self.state.epoch, self.state.position)?;
+        let a0 = gravity
+            .sample(&first, self.state.position, 0.0)?
+            .meters_per_second_squared;
+        let half = add(
+            add(self.state.velocity_mps, scale(a0, dt / 2.0)),
+            scale(dv, 0.5),
+        );
+        finite(half)?;
+        let position = self.state.position.translated(scale(half, dt))?;
+        let epoch = self.state.epoch.advance_nanos(elapsed_nanos)?;
+        let last = sources(epoch, position)?;
+        let a1 = gravity
+            .sample(&last, position, dt)?
+            .meters_per_second_squared;
+        let velocity_mps = add(add(half, scale(a1, dt / 2.0)), scale(dv, 0.5));
+        finite(velocity_mps)?;
+        let state = State {
+            position,
+            velocity_mps,
+            epoch,
+        };
+        self.state = state;
+        self.gravity = gravity;
+        Ok(state)
+    }
+}
+#[cfg(test)]
+mod tests;

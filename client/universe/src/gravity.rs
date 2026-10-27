@@ -128,8 +128,9 @@ impl Selector {
             transition: None,
         })
     }
-    /// Pure preview when dt=0; callers must supply all retained sources until
-    /// transition completes. Missing active sources fail, never teleport force.
+    /// Zero dt advances no blend time, but may initialize selection or begin a
+    /// handoff. Retain all active sources until the transition completes;
+    /// missing active sources fail rather than abruptly removing their force.
     pub fn sample(
         &mut self,
         sources: &[Source],

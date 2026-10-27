@@ -539,3 +539,8 @@ for line count would scatter the captured path/energy invariants without
 isolating an independent policy. No flight code or numeric behavior changed in
 this review. Revisit only with function-level co-change/test-isolation evidence;
 see [review evidence](../../reports/issue-644/README.md).
+
+
+## Real-scale trajectory foundation (#417)
+
+`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. Runtime has not adopted it; current controller, saves, assists and contact remain unchanged. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.

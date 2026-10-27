@@ -1,0 +1,5 @@
+    Checking salimon-universe v0.1.0 (/workspace/salimon-universe-stack/client/universe)
+    Checking salimon-persistence v0.1.0 (/workspace/salimon-universe-stack/client/persistence)
+    Checking salimon-world v0.1.0 (/workspace/salimon-universe-stack/client/world)
+    Checking salimon-ship v0.1.0 (/workspace/salimon-universe-stack/client/ship)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.17s

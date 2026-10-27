@@ -1,5 +1,6 @@
 //! U01 immutable schema foundation. Not connected to playable world/navigation.
 pub mod coordinates;
+pub mod ephemerides;
 mod epoch;
 pub mod inference;
 pub mod ingestion;

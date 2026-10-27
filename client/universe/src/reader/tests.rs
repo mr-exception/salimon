@@ -1,6 +1,24 @@
 use super::*;
 use crate::pack::Builder;
 #[test]
+fn dropping_prefetch_with_foreground_guard_does_not_deadlock() {
+    let (root, key) = setup();
+    let reader = Arc::new(Mutex::new(Reader::open(&root, 16384).unwrap()));
+    let prefetch = Prefetch::start(reader.clone());
+    let guard = reader.lock().unwrap();
+    assert!(prefetch.request(key));
+    let (tx, rx) = std::sync::mpsc::channel();
+    let worker = std::thread::spawn(move || {
+        drop(prefetch);
+        tx.send(()).unwrap();
+    });
+    let result = rx.recv_timeout(std::time::Duration::from_secs(2));
+    drop(guard);
+    worker.join().unwrap();
+    assert!(result.is_ok());
+    fs::remove_dir_all(root).unwrap();
+}
+#[test]
 fn randomized_seek_eviction_stays_bounded() {
     let (root, _) = setup();
     let fixture = std::str::from_utf8(include_bytes!("../../fixtures/schema-v1.json")).unwrap();
@@ -104,5 +122,29 @@ fn corrupt_or_missing_cells_never_enter_cache() {
     assert_eq!(reader.resident_bytes(), 0);
     fs::remove_file(path).unwrap();
     assert!(reader.cell(key).is_err());
+    fs::remove_dir_all(root).unwrap();
+}
+#[test]
+fn cache_hits_avoid_catalog_io_and_parallel_navigation_is_bounded() {
+    let (root, key) = setup();
+    let reader = Arc::new(Mutex::new(Reader::open(&root, 16384).unwrap()));
+    let threads: Vec<_> = (0..8)
+        .map(|_| {
+            let reader = reader.clone();
+            std::thread::spawn(move || {
+                for _ in 0..100 {
+                    let mut r = reader.lock().unwrap();
+                    assert!(!r.cell(key).unwrap().records().is_empty());
+                    assert!(r.resident_bytes() <= 16384);
+                }
+            })
+        })
+        .collect();
+    for t in threads {
+        t.join().unwrap();
+    }
+    let r = reader.lock().unwrap();
+    assert_eq!(r.stats().catalog_blob_reads, 1);
+    assert_eq!(r.stats().cache_hits, 799);
     fs::remove_dir_all(root).unwrap();
 }

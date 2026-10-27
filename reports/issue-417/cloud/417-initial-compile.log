@@ -1,0 +1,23 @@
+   Compiling salimon-universe v0.1.0 (/workspace/salimon-universe-stack/client/universe)
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon-universe-stack/client/persistence)
+   Compiling salimon-world v0.1.0 (/workspace/salimon-universe-stack/client/world)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon-universe-stack/client/ship)
+error[E0308]: `?` operator has incompatible types
+   --> client/ship/src/trajectory.rs:112:34
+    |
+112 |                 .sample_indexed(&index(epoch, position)?, position, dt)?
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^ expected `SourceIndex`, found `Arc<SourceIndex>`
+    |
+    = note: `?` operator cannot convert from `Arc<SourceIndex>` to `SourceIndex`
+    = note: expected struct `SourceIndex`
+               found struct `Arc<SourceIndex>`
+note: return type inferred to be `SourceIndex` here
+   --> client/ship/src/trajectory.rs:112:34
+    |
+112 |                 .sample_indexed(&index(epoch, position)?, position, dt)?
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `salimon-ship` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `salimon-ship` (lib test) due to 1 previous error

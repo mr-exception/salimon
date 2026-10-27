@@ -8,3 +8,28 @@ Validation results are recorded below. Linux x86_64, Rust 1.99.1; private fixtur
 - `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`: passed.
 - `cargo fmt --all`: applied; `python3 scripts/check_docs.py`: zero failures.
 - Full workspace and production/rendered checks are not run at this stage; this leaf module is not connected to runtime.
+
+## Cloud completion revision
+
+Supersedes the initial fixture-only CLI and draft assessment above. The CLI now
+consumes an explicit build request with arbitrary frozen local catalogs/producer
+bundles and additional full-world sidecars. Original source artifacts are streamed
+through SHA256/size verification, source paths are confined to their root, bundle
+observations/inference/generation are preserved, and combined revision selection
+is explicit. Incremental reuse, identity migration and atomic old-manifest
+preservation are exercised through the actual offline pipeline. Real observed
+input is permitted for private development; #659 is future distribution review.
+
+Cloud implementation acceptance maps to standalone packaging, complete selected
+input/sidecar preservation, deterministic hashes, corruption/path refusal,
+incremental reuse and explicit ID migration. Full-release scientific input
+selection/coverage/size is already owned by #524/#526; it is not represented as
+passed or a human gate on this builder PR. No new deferred code scope is created.
+
+Fresh checks and measured storage/throughput are retained under `cloud/`.
+
+Final input-boundary check: producer fields now retain raw JSON bytes; duplicate
+bundle fields and nested duplicate catalog fields reject before publication.
+The same 73 universe tests (including the expanded pipeline regression) and
+all-target Clippy pass, with final logs under `cloud/413-final-*`. This avoids
+normalizing malformed producer JSON into a valid-looking catalog.

@@ -89,16 +89,50 @@ impl Trajectory {
         thrust: Thrust,
         mut sources: impl FnMut(Epoch, GalacticPosition) -> Result<Vec<Source>, Error>,
     ) -> Result<State, Error> {
+        self.advance(elapsed_nanos, thrust, |gravity, epoch, position, dt| {
+            Ok(gravity
+                .sample(&sources(epoch, position)?, position, dt)?
+                .meters_per_second_squared)
+        })
+    }
+    /// Epoch-aware indexed snapshots. Arc ownership lets callers reuse an
+    /// immutable snapshot without cloning the spatial tree for every ship.
+    pub fn step_indexed(
+        &mut self,
+        elapsed_nanos: i64,
+        thrust: Thrust,
+        mut index: impl FnMut(
+            Epoch,
+            GalacticPosition,
+        )
+            -> Result<std::sync::Arc<salimon_universe::gravity::SourceIndex>, Error>,
+    ) -> Result<State, Error> {
+        self.advance(elapsed_nanos, thrust, |gravity, epoch, position, dt| {
+            let snapshot = index(epoch, position)?;
+            Ok(gravity
+                .sample_indexed(snapshot.as_ref(), position, dt)?
+                .0
+                .meters_per_second_squared)
+        })
+    }
+    fn advance(
+        &mut self,
+        elapsed_nanos: i64,
+        thrust: Thrust,
+        mut acceleration: impl FnMut(
+            &mut Selector,
+            Epoch,
+            GalacticPosition,
+            f64,
+        ) -> Result<[f64; 3], Error>,
+    ) -> Result<State, Error> {
         if elapsed_nanos <= 0 || elapsed_nanos > self.max_step_nanos {
             return Err(error("trajectory step exceeds configured bound"));
         }
         let dt = elapsed_nanos as f64 * 1e-9;
         let dv = thrust.delta_velocity()?;
         let mut gravity = self.gravity.clone();
-        let first = sources(self.state.epoch, self.state.position)?;
-        let a0 = gravity
-            .sample(&first, self.state.position, 0.0)?
-            .meters_per_second_squared;
+        let a0 = acceleration(&mut gravity, self.state.epoch, self.state.position, 0.0)?;
         let half = add(
             add(self.state.velocity_mps, scale(a0, dt / 2.0)),
             scale(dv, 0.5),
@@ -106,10 +140,7 @@ impl Trajectory {
         finite(half)?;
         let position = self.state.position.translated(scale(half, dt))?;
         let epoch = self.state.epoch.advance_nanos(elapsed_nanos)?;
-        let last = sources(epoch, position)?;
-        let a1 = gravity
-            .sample(&last, position, dt)?
-            .meters_per_second_squared;
+        let a1 = acceleration(&mut gravity, epoch, position, dt)?;
         let velocity_mps = add(add(half, scale(a1, dt / 2.0)), scale(dv, 0.5));
         finite(velocity_mps)?;
         let state = State {

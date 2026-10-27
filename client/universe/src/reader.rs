@@ -22,6 +22,13 @@ pub struct Reader {
     budget: usize,
     resident: usize,
     last_prefetch_error: Option<String>,
+    stats: Stats,
+}
+#[derive(Clone, Copy, Debug, Default, serde::Serialize)]
+pub struct Stats {
+    pub catalog_blob_reads: u64,
+    pub catalog_blob_bytes: u64,
+    pub cache_hits: u64,
 }
 impl Reader {
     /// Budget applies to cached encoded catalog bytes (Vec capacities). Returned
@@ -54,6 +61,7 @@ impl Reader {
             budget,
             resident: 0,
             last_prefetch_error: None,
+            stats: Stats::default(),
         })
     }
     pub fn manifest(&self) -> &Manifest {
@@ -61,6 +69,9 @@ impl Reader {
     }
     pub fn resident_bytes(&self) -> usize {
         self.resident
+    }
+    pub fn stats(&self) -> Stats {
+        self.stats
     }
     pub fn last_prefetch_error(&self) -> Option<&str> {
         self.last_prefetch_error.as_deref()
@@ -89,6 +100,7 @@ impl Reader {
     pub fn cell(&mut self, key: CellKey) -> Result<Catalog, Error> {
         if let Some(raw) = self.cache.get(&key) {
             let catalog = Catalog::decode(raw)?;
+            self.stats.cache_hits = self.stats.cache_hits.saturating_add(1);
             self.touch(key);
             return Ok(catalog);
         }
@@ -99,6 +111,11 @@ impl Reader {
             .map_err(|_| invalid("unknown pack cell"))?;
         let entry = &self.manifest.cells[i];
         let bytes = pack::read_blob(&self.root, &entry.catalog)?;
+        self.stats.catalog_blob_reads = self.stats.catalog_blob_reads.saturating_add(1);
+        self.stats.catalog_blob_bytes = self
+            .stats
+            .catalog_blob_bytes
+            .saturating_add(bytes.len() as u64);
         let mut reader = partitions::Reader::open(Cursor::new(bytes))?;
         if reader.cells().len() != 1
             || reader.cells()[0].key != key
@@ -144,7 +161,8 @@ impl Reader {
     }
 }
 /// Bounded queue; one background read/decode at a time, shared cache under a
-/// mutex. Saturation returns false. Drop drains at most eight queued requests.
+/// mutex. Saturation returns false; contended speculative requests are skipped.
+/// Drop drains at most eight requests without waiting for a foreground guard.
 pub struct Prefetch {
     sender: Option<mpsc::SyncSender<CellKey>>,
     worker: Option<thread::JoinHandle<()>>,
@@ -154,7 +172,11 @@ impl Prefetch {
         let (sender, receiver) = mpsc::sync_channel(8);
         let worker = thread::spawn(move || {
             while let Ok(key) = receiver.recv() {
-                let Ok(mut reader) = reader.lock() else { break };
+                let mut reader = match reader.try_lock() {
+                    Ok(reader) => reader,
+                    Err(std::sync::TryLockError::WouldBlock) => continue,
+                    Err(std::sync::TryLockError::Poisoned(_)) => break,
+                };
                 if let Err(e) = reader.cell(key) {
                     reader.last_prefetch_error = Some(e.to_string());
                 }

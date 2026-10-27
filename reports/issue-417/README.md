@@ -19,3 +19,37 @@ Final stack verification:
 - `python3 scripts/check_docs.py --base codex/issue-416-celestial-gravity` and `cargo fmt --all -- --check`: pass.
 - Parent PRs #663–#666 each passed Ubuntu source CI and macOS/Windows fictional-publication goldens at their published heads. Those platform goldens do not establish native device/Metal performance or real-scale gameplay.
 - No graphical/runtime adapter changed, so no new renderer captures are claimed. Source permission, production data completeness, independent ephemeris accuracy calibration, production spatial indexing/performance and downstream playable adoption remain explicitly incomplete as described in the parent PRs and source issues. All five PRs remain draft for those scope/acceptance limits; nothing is merged.
+
+## Cloud completion revision
+
+The portable integration is now tested through U15 indexed snapshots as well as
+the complete-candidate path. Added exact 1000-step indexed/direct parity, an
+independent RK4 Sun/Earth/Moon reference over 6000s (16.804049113 m position error,
+25 m fixture limit), and a moving-body gravity assist (specific-energy relative
+drift 5.659e-9, limit 1e-5; inertial speed 7000 -> 10249.17694 m/s). Existing
+circular-orbit refinement, escape, mass/funded-thrust, replay and failure checks
+remain unchanged. 117 ship tests pass (one existing opt-in ignored), 88 universe
+tests pass, and affected all-target Clippy passes. The initial Arc coercion
+compile error is retained with the corrected results under `cloud/`.
+
+The previous draft assessment overstated runtime adoption as missing U16 work.
+The approved U16 acceptance is the portable integrator/reference suite; actual
+landing/support #418, collision #420, streaming #422 and later playable world
+migration remain their existing downstream tickets. Those are neither unfinished
+U16 scope nor human-verification gates. Future public release remains #659;
+scientific full-release data coverage remains #524/#526. No human review is
+needed to establish this routine cloud delivery's automated acceptance.
+
+## Final automated stack verification
+
+The complete workspace run at revision `75c5b3ce` passed **1060 tests, zero
+failures, 38 existing opt-in ignored**; workspace build and all-target Clippy
+with warnings denied passed. The subsequent raw-producer JSON and prefetch
+shutdown refinements were validated by the affected final domain suites at
+`100ed644`: **117 ship tests passed (one existing ignored) and 89 universe tests
+passed**, with all-target domain Clippy, formatting and documentation/base-impact
+checks passing. Original complete-workspace and final-domain logs are retained
+compressed under `cloud/`. Published-head CI performs fresh complete-workspace
+verification before the PR is marked ready. Historical draft limitations above
+are superseded by these completed cloud checks and the scoped ownership mapping.
+No human/native qualification or future release approval is a routine gate.

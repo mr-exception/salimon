@@ -1,0 +1,31 @@
+{
+  "arch": "x86_64",
+  "os": "linux",
+  "rows": [
+    {
+      "all_queries_exactly_match_complete_source_selection": true,
+      "build_ms": 0.8583770000000001,
+      "evaluated_sources": 132992,
+      "full_scan_p50_us": 213.19199999999998,
+      "indexed_max_us": 476.08,
+      "indexed_p50_us": 38.919,
+      "indexed_p95_us": 76.506,
+      "queries": 512,
+      "sources": 1024,
+      "visited_nodes": 68576
+    },
+    {
+      "all_queries_exactly_match_complete_source_selection": true,
+      "build_ms": 52.943380999999995,
+      "evaluated_sources": 176768,
+      "full_scan_p50_us": 9587.361,
+      "indexed_max_us": 1994.8880000000001,
+      "indexed_p50_us": 155.505,
+      "indexed_p95_us": 631.975,
+      "queries": 512,
+      "sources": 32768,
+      "visited_nodes": 270912
+    }
+  ],
+  "scope": "serial software CPU algorithm workload; no hardware FPS or global scientific accuracy claim"
+}

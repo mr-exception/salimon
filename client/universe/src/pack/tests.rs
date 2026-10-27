@@ -124,6 +124,25 @@ fn offline_pipeline_accepts_observed_input_and_preserves_old_pack_on_source_fail
     );
     pipeline::build(&request_file, &output).unwrap();
     assert_eq!(before, fs::read(output.join("manifest.json")).unwrap());
+    let observed = serde_json::json!({"gaia":{"source":"gaia:dr3","artifact":"fixtures/gaia-synthetic.csv"},"exoplanets":{"source":"nasa:exoplanet-ps","artifact":"fixtures/exoplanet-proxima.csv"},"horizons":[{"source":"jpl:horizons-earth-j2000","artifact":"fixtures/jpl-earth-j2000.json","system":"system:solar","parent":"system:solar","body_kind":"planet"}]});
+    let raw_request = serde_json::json!({"version":1,"revision":"private-raw-v1","source_manifest":"sources/manifest.json","cells":[{"key":key(),"observed":observed}]});
+    let raw_request_file = root.join("raw-build.json");
+    fs::write(&raw_request_file, serde_json::to_vec(&raw_request).unwrap()).unwrap();
+    let raw = pipeline::build(&raw_request_file, &root.join("raw-output")).unwrap();
+    for sidecar in ["gaia_observations", "planet_observations", "ephemerides"] {
+        assert!(raw.cells[0].sidecars.contains_key(sidecar));
+    }
+    let mut reader = partitions::Reader::open(std::io::Cursor::new(
+        read_blob(&root.join("raw-output"), &raw.cells[0].catalog).unwrap(),
+    ))
+    .unwrap();
+    assert!(
+        reader
+            .read_cell(key())
+            .unwrap()
+            .get(&CatalogId::from_source("jpl", "399").unwrap())
+            .is_some()
+    );
     let raw_catalog = serde_json::to_string(&bundle["catalog"]).unwrap();
     fs::write(
         root.join("observed.json"),

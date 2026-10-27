@@ -1,5 +1,29 @@
 # Universe source manifests and offline staging — U06 (#407)
 
+## Current private-development authorization (2026-10-27)
+
+The owner authorizes acquiring and using the public Gaia/ESA, JPL Horizons and
+NASA Exoplanet Archive datasets for private, noncommercial development. This
+includes real-data ingestion, scientific validation and locally used offline
+packs, beyond the existing small fixtures. No additional owner source-use
+approval is required for this development scope. The owner defers legal/ethical
+and redistribution review until a future public or commercial release.
+
+This decision supersedes the older fixture-only acquisition restriction below.
+[#659](https://github.com/mr-exception/salimon/issues/659) now owns that future
+release review; it does not block current private source acquisition, cloud
+verification or routine development PRs. Preserve exact source IDs, queries,
+provenance, credits, raw-byte hashes and existing provider-status metadata.
+Scientific selection, completeness, accuracy and resource measurements remain
+real work under #524/#526 and the implementation tickets.
+
+Use the existing non-production staging path for private data. The
+`--production` flag is the separately reviewed release/distribution path, not
+the way to enable real observed data in development. Current validators already
+allow observed snapshots in non-production mode; no code change, fabricated
+review sidecar or provider-status promotion is needed. The checked-in manifest
+still describes only its existing bytes, not a newly downloaded full catalog.
+
 The frozen [manifest](../catalogs/sources/manifest-v1.json) records official Gaia
 DR3, JPL Horizons and NASA Exoplanet Archive PS sources, exact acquisition queries,
 release/model context, coverage, uncertainty, credits/reuse policy references and
@@ -45,8 +69,9 @@ U08 now implements the [JPL/exoplanet fixture adapters](universe-observed-ingest
 `--production` fails on the checked-in manifest: restricted/unreviewed sources
 and synthetic fixtures cannot be published. There is no opt-in override flag.
 [Follow-up #659](https://github.com/mr-exception/salimon/issues/659) owns source-use
-review/permissions and actual full input snapshot approval before production Gaia
-work or pack distribution. Code licensing does not relicense third-party data.
+review/permissions and exact release snapshot review before public/commercial
+pack distribution. Private real-data work follows the current authorization
+above. Code licensing does not relicense third-party data.
 Fixture source bytes retain their provider's terms and references. U06 closure
 records manifest/tooling delivery, not approval of production use or science.
 
@@ -60,7 +85,9 @@ conversation. [Decision and exact input inventory](../reports/issue-513/private-
 bind that scope to the current manifest. Keep synthetic Gaia and the existing
 small JPL/PS development inputs; no actual Gaia release, commercial distribution,
 production source approval or alternative scientific source is authorized by
-that choice. Source-specific restrictions and unreviewed statuses remain intact.
+that earlier choice. The 2026-10-27 authorization above now permits real public
+data acquisition for private development. Historical source-status evidence
+remains intact; it is not a private-development approval gate.
 
 Production staging now additionally requires `--production-review <file>`.
 A separate schema-1 `salimon.universe.production-review` JSON record must bind
@@ -90,8 +117,9 @@ At #513 delivery no full current terms were fetched. The #537 preparation now
 archives six official pages; the linked full legal code and release/reference
 review remain incomplete. Existing 2026-10-21 references are historical guidance,
 not refreshed legal approval.
-U07 and U12 publication remain gated until that review; private fixture science
-and implementation may continue. See the [report](../reports/issue-513/README.md).
+Public/commercial U07 and U12 distribution remains gated until release review;
+private real-data science, implementation and local packs are authorized above.
+See the historical [report](../reports/issue-513/README.md).
 
 ## Preparing the human source review (#537)
 
@@ -111,13 +139,15 @@ legal code still failed. That image policy alone does not approve ephemeris reus
 Historical manifest
 metadata is not a refreshed terms review. The current synthetic Gaia/two-epoch
 Earth/single-exoplanet inputs remain development fixtures. Full selected inputs
-require new acquisition decisions and a new manifest, followed by regeneration
-and human approval bound to that exact new digest. A blank form cannot promote
+require exact acquisition records and a new manifest. Private acquisition and
+validation are authorized above; public/commercial release additionally needs
+release review bound to the exact new digest. A blank form cannot promote
 these fixtures by changing status/origin flags.
 
 Source-use decisions in #659 can be recorded independently of #660 balance and
 #661 future-experience reviews. The owner authorized merging #537 preparation on
-2026-10-27 with those human checks deferred; source approval is still required. Production consumers follow the actual unresolved source
-permission/snapshot requirement; closure of an umbrella issue alone grants no
-source approval. The existing private-development-only owner decision remains
-in force until explicitly revised with the required evidence.
+2026-10-27 with those human checks deferred. The later explicit authorization
+above permits real public data for private noncommercial development. #659 now
+retains only future public/commercial release review; its open state must not be
+used to block that private work. Exact scientific and implementation checks
+remain required, and an umbrella issue closure does not turn them into passes.

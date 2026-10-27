@@ -119,8 +119,19 @@ snapshot approval; #660 owns measured survival/recovery routes and balance
 choices; #661 owns future full-experience/backend acceptance. #561 retains human
 image/mask/tolerance approval and independent hosted software-Vulkan corpus
 review, with #557 physical platform experiments and #563 hardware qualification.
-The owner still permits private development only; production eligibility remains
-blocked on #659. Closing #537 grants no appearance or production-data approval.
+The owner permits private development; public/commercial release review remains
+#659. Closing #537 grants no appearance or release-data approval.
+
+## Public astronomy data for private development (2026-10-27)
+
+The owner explicitly authorizes acquiring and using public astronomy data in
+this private, noncommercial project, including real-data ingestion, validation
+and locally used offline packs. Legal/ethical and redistribution review is
+deferred to a future public or commercial release under #659. That future gate
+does not require another approval before private development proceeds. This
+supersedes the older fixture-only restriction, while keeping provenance,
+credits, exact input hashes and scientific/implementation checks intact. See the
+[current source policy](universe-sources.md#current-private-development-authorization-2026-10-27).
 
 ## Approved construction economy (#543, owner decision 2026-10-24)
 

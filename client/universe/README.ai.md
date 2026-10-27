@@ -32,7 +32,8 @@ tolerances or claiming solver/native coverage. Preserve failure and source conte
 
 U07 `ingestion/gaia.rs` adds streaming local CSV decoding and bounded canonical
 matching with typed source measurements; see the [Gaia contract](../../docs/universe-gaia-ingestion.md).
-Production reuse/full-data acceptance remain gated on #659 after #513 delivery.
+Private real-data acquisition is authorized by the 2026-10-27 owner decision.
+Scientific full-data acceptance remains #524; future release review is #659.
 
 U08 `ingestion/{horizons,exoplanets}.rs` imports source-labeled Solar System states,
 physical measurements and PS default-row planets; see the [observed ingestion
@@ -62,7 +63,12 @@ digests. Visual overrides cannot change terrain or resources. Resource routes
 must clear the authored ship disk and use the same terrain query. Golden changes
 need explicit publication/migration review; native/playable integration is U24.
 
-#513 owner scope is private development only. Python production staging additionally
+#513 originally limited acquisition to existing fixtures. The owner's later
+2026-10-27 authorization permits public real data for private noncommercial
+development, including ingestion, validation and local packs. #659 is a future
+public/commercial release gate; do not block private development on it. Preserve
+exact source/provenance/hash records and complete actual scientific checks.
+Python release-mode production staging additionally
 requires a human review sidecar bound to the exact source manifest; see the
 [source-use/evidence contract](../../docs/universe-sources.md#private-development-decision-and-production-evidence-513).
 Rust source metadata/schema is unchanged; never treat metadata acceptance as

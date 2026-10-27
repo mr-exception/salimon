@@ -1,0 +1,19 @@
+{
+  "spec_revision": "3",
+  "observed_spec_revision": "3",
+  "observations_current": true,
+  "source_config_id": "97211292-a724-4598-9915-387d1448cc63~cecfg_6ad9af6fdb1c819a8a02f1bd92349278",
+  "source_config_version_id": "97211292-a724-4598-9915-387d1448cc63~cecfgver_6ad9b5f3b02c819a8faab43bf03f9580",
+  "network_mode": "restricted",
+  "policy_state": "enforced",
+  "presets": [
+    "package_managers"
+  ],
+  "custom_hosts": [],
+  "provider_effective_rules": {
+    "www.cosmos.esa.int": [],
+    "ssd.jpl.nasa.gov": [],
+    "ssd-api.jpl.nasa.gov": [],
+    "exoplanetarchive.ipac.caltech.edu": []
+  }
+}

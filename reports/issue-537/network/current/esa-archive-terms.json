@@ -1,0 +1,14 @@
+{
+  "url": "https://www.cosmos.esa.int/web/esdc/terms-and-conditions",
+  "checked_at_utc": "2026-10-27T10:12:06.958870+00:00",
+  "human_reviewed": false,
+  "reuse_approved": false,
+  "status": 200,
+  "final_url": "https://www.cosmos.esa.int/web/esdc/terms-and-conditions",
+  "content_type": "text/html;charset=UTF-8",
+  "body_sha256": "680f2b2d4d5d27d8208013df80c75c2bda770475f6175e537bb0d6d5baf08a51",
+  "body_bytes": 99792,
+  "body_file": "esa-archive-terms.html.gz",
+  "storage_encoding": "gzip",
+  "archive_sha256": "76ce5b1363b4fd1e97a229f5d3d7bc417397555c6dc32fecf055d4a61d643df0"
+}

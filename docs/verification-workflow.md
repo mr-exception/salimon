@@ -107,10 +107,10 @@ than blocking routine cloud PRs on desktop availability.
 | Work | Auto issues | Human evidence/decision owner |
 | --- | --- | --- |
 | Universe render/flight/scanner/restore and scientific workload | #436–#439, #521 and implementation issues | #561 presentation; #557 physical platform checks; #563 hardware budgets |
-| Scout lighting, machinery, engine, UI, Archive, recovery and audio | #483, #485, #489, #498, #502, #505, #515, #566 | #561 visual/audio/handling review; #537 route/balance decisions |
+| Scout lighting, machinery, engine, UI, Archive, recovery and audio | #483, #485, #489, #498, #502, #505, #515, #566 | #561 visual/audio/handling review; #660 route/balance decisions |
 | Construction implementation and integrated routes | #538–#550, #551 | #561 spatial/preview review; #557 physical platform checks; #563 budgets |
 | Physics stress optimization | #559 | #563 stress limits and hardware budget decision |
-| Corpus/experience/balance automation | #568 | #537 source rights/balance/experience decisions; #561 corpus approval |
+| Corpus/experience/balance automation | #568 | #659 source rights; #660 balance; #661 experience decisions; #561 corpus approval |
 | Actual OS suspend/wake and physical display/input | AI prepares harnesses and analyzes evidence | #557 |
 
 This table is routing, not a claim any blocked implementation, human review or

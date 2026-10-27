@@ -1,0 +1,14 @@
+{
+  "url": "https://www.cosmos.esa.int/web/gaia-users/credits",
+  "checked_at_utc": "2026-10-27T10:12:04.912481+00:00",
+  "human_reviewed": false,
+  "reuse_approved": false,
+  "status": 200,
+  "final_url": "https://www.cosmos.esa.int/web/gaia-users/credits",
+  "content_type": "text/html;charset=UTF-8",
+  "body_sha256": "fb653c0efe3804d168f4032db08b3cd2ec6c8a7c98201f27ccdda38e63e664ee",
+  "body_bytes": 81613,
+  "body_file": "gaia-credits.html.gz",
+  "storage_encoding": "gzip",
+  "archive_sha256": "96f528de04a8327ce297f19db24c2073db02c00f75027b07491f66c0239eec62"
+}

@@ -339,7 +339,7 @@ a deterministic bundle. `catalogs/sources/manifest-v1.json` separates synthetic
 Gaia fixtures from actual JPL/exoplanet snapshots. [Source contract](universe-sources.md),
 [architecture](../client/universe/architecture.md#source-manifests--u06-407) and
 [invariants](../client/universe/invariants.md) govern reuse/precision boundaries.
-Production reuse/full snapshots wait for #537; science ingestion remains U07/U08.
+Production reuse/full snapshots wait for #659; science ingestion remains U07/U08.
 
 ## Data Recovery Module (#468)
 
@@ -381,7 +381,7 @@ See the [Gaia selection/units/cross-match contract](universe-gaia-ingestion.md),
 [architecture](../client/universe/architecture.md#gaia-ingestion--u07-408) and
 [invariants](../client/universe/invariants.md). Synthetic local ingestion and
 bounded canonical batches are implemented; production approval/full snapshots
-remain #537, inference U09, astrometry pack integration U12. No playable migration.
+remain #659, inference U09, astrometry pack integration U12. No playable migration.
 
 ## Universe observed ingestion (#409)
 

@@ -1,0 +1,91 @@
+{
+  "format": "salimon.universe.source-review-packet",
+  "schema_version": 1,
+  "review_issue": "https://github.com/mr-exception/salimon/issues/537",
+  "production_eligible": false,
+  "manifest": "inputs/manifest-v1.json",
+  "manifest_sha256": "eaa6c4ff059ae06464d72744302cc2b7696fed7cc965759ec9f43af09f79ee3d",
+  "manifest_metadata_date": "2026-10-21",
+  "sources": [
+    {
+      "id": "gaia:dr3",
+      "release": "Gaia DR3 / gaiadr3.gaia_source / reference epoch J2016.0",
+      "endpoint": "https://gea.esac.esa.int/tap-server/tap/sync",
+      "acquisition": "SELECT source_id,ref_epoch,ra,dec,parallax,parallax_error,pmra,pmdec,radial_velocity FROM gaiadr3.gaia_source; full export is not downloaded by this fixture build",
+      "documentation": [
+        "https://www.cosmos.esa.int/web/gaia-users/archive/extract-data",
+        "https://www.cosmos.esa.int/web/gaia-users/credits",
+        "https://www.cosmos.esa.int/web/gaia-users/license"
+      ],
+      "license_status": "restricted",
+      "terms_url": "https://www.cosmos.esa.int/web/gaia-users/license",
+      "historical_attribution_guidance": "ESA/Gaia/DPAC; use release-specific credits and papers. Official index states CC BY-NC 3.0 IGO; full policy fetch returned 451. Production use not approved.",
+      "coverage": "DR3 observed sources; survey selection, missing astrometry/radial velocities and crowded/faint coverage are not complete galaxy truth. This file is synthetic and represents no real star.",
+      "uncertainty": "Retain parallax errors, negative/missing parallax and missing proper/radial motion; do not invert noisy parallax into certain distance. U07/U09 own selection and inference.",
+      "artifacts": [
+        {
+          "path": "fixtures/gaia-synthetic.csv",
+          "sha256": "7e491c028434af86f534d83e77df37110a4c238023ba0ebe1bcaf64b4fc132ff",
+          "bytes": 185,
+          "origin": "synthetic",
+          "encoding": "csv"
+        }
+      ],
+      "full_current_terms_verified": false,
+      "full_production_selection_verified": false
+    },
+    {
+      "id": "jpl:horizons-earth-j2000",
+      "release": "Frozen Horizons API response; signature and model metadata retained in JSON",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "acquisition": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27399%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%271d%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license_status": "unreviewed",
+      "terms_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+      "historical_attribution_guidance": "Credit NASA/JPL Solar System Dynamics, Horizons, retrieval date and actual model/version. Public query access does not approve all downstream redistribution terms.",
+      "coverage": "Earth center 399, solar-system barycenter 500@0; two vector epochs 2000-01-01 through 2000-01-02; KM-S, ICRF frame plane, TDB. Snapshot is not an ephemeris pack.",
+      "uncertainty": "Preserve service header/model, exact validity and units. Response has no full state covariance; no precision or long-range validity inferred. U08/U14 own conversion/evaluation.",
+      "artifacts": [
+        {
+          "path": "fixtures/jpl-earth-j2000.json",
+          "sha256": "cb4301b038c85e5c1cdc296b16564bfbd38e4fef42938fa07656d490323f31bb",
+          "bytes": 6924,
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ],
+      "full_current_terms_verified": false,
+      "full_production_selection_verified": false
+    },
+    {
+      "id": "nasa:exoplanet-ps",
+      "release": "Frozen PS default-row query snapshot 2026-10-21",
+      "endpoint": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
+      "acquisition": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name%2Chostname%2Cgaia_dr3_id%2Csy_dist%2Csy_disterr1%2Csy_disterr2%2Cpl_orbper%2Cpl_orbpererr1%2Cpl_orbpererr2%2Cpl_refname+from+ps+where+default_flag%3D1+and+pl_name%3D%27Proxima+Cen+b%27&format=csv",
+      "documentation": [
+        "https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html",
+        "https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html",
+        "https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html"
+      ],
+      "license_status": "unreviewed",
+      "terms_url": "https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html",
+      "historical_attribution_guidance": "Credit NASA Exoplanet Archive/Caltech/NASA Exoplanet Exploration Program, Christiansen et al. (2025), and original per-record literature. Retain pl_refname; do not treat contributed data as blanket public-domain approval.",
+      "coverage": "PS default_flag=1 for Proxima Cen b only; one self-consistent literature parameter row, not PSCompPars mixed references or a full observed planet inventory.",
+      "uncertainty": "Preserve asymmetric signed errors, nulls, Gaia identifiers and original references. No zero-fill, host cross-match, unit/frame conversion or inferred orbit in U06.",
+      "artifacts": [
+        {
+          "path": "fixtures/exoplanet-proxima.csv",
+          "sha256": "223a3bf4b728629fff24c7ac557390129e4acd3b61c718044a44e7a59059d714",
+          "bytes": 438,
+          "origin": "observed_snapshot",
+          "encoding": "csv"
+        }
+      ],
+      "full_current_terms_verified": false,
+      "full_production_selection_verified": false
+    }
+  ]
+}

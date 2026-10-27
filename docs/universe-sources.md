@@ -8,7 +8,7 @@ not a complete catalog download or production redistribution approval.
 
 | Source | Pinned fixture | Limits and reuse |
 | --- | --- | --- |
-| Gaia DR3 / `gaiadr3.gaia_source` | Two explicitly synthetic CSV rows, J2016.0; no real Gaia bytes committed | Negative/missing parallax and missing radial motion remain explicit. Official [license](https://www.cosmos.esa.int/web/gaia-users/license) index states CC BY-NC 3.0 IGO. Full Cosmos pages returned 451 here. [Credits](https://www.cosmos.esa.int/web/gaia-users/credits) and release papers must be reviewed; production restricted pending #537. |
+| Gaia DR3 / `gaiadr3.gaia_source` | Two explicitly synthetic CSV rows, J2016.0; no real Gaia bytes committed | Negative/missing parallax and missing radial motion remain explicit. Official [license](https://www.cosmos.esa.int/web/gaia-users/license) index states CC BY-NC 3.0 IGO. Full Cosmos pages returned 451 here. [Credits](https://www.cosmos.esa.int/web/gaia-users/credits) and release papers must be reviewed; production restricted pending #659. |
 | JPL Horizons | Actual frozen Earth-399 barycentric ICRF vector API JSON, two dates, KM-S/TDB; response signature/header retained | [Manual](https://ssd.jpl.nasa.gov/horizons/manual.html) defines frames, epochs, validity and citation. No full covariance, invented certainty, orbit integration or complete SPK pack. Source-specific production reuse review is uncompleted. |
 | NASA Exoplanet Archive PS | Actual frozen default-row Proxima Cen b CSV with Gaia identity, asymmetric errors and original literature reference | [PS columns](https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html) distinguish self-consistent rows from composite data. [Acknowledgment policy](https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html) requests Archive credit, Christiansen et al. (2025) and original references. Public data access does not establish blanket rights to contributed material. |
 
@@ -44,7 +44,7 @@ U08 now implements the [JPL/exoplanet fixture adapters](universe-observed-ingest
 
 `--production` fails on the checked-in manifest: restricted/unreviewed sources
 and synthetic fixtures cannot be published. There is no opt-in override flag.
-[Follow-up #537](https://github.com/mr-exception/salimon/issues/537) owns source-use
+[Follow-up #659](https://github.com/mr-exception/salimon/issues/659) owns source-use
 review/permissions and actual full input snapshot approval before production Gaia
 work or pack distribution. Code licensing does not relicense third-party data.
 Fixture source bytes retain their provider's terms and references. U06 closure
@@ -86,7 +86,38 @@ human review sidecar. No runtime consumer or production packaging is added.
 These checks establish record completeness and binding; they cannot verify the
 truth or legal sufficiency of a human decision. Owner source-use review must
 inspect actual full current terms/permissions and actual complete selected data.
-No full current terms were fetched in this restricted environment. Existing
-2026-10-21 references are historical guidance, not refreshed legal approval.
+At #513 delivery no full current terms were fetched. The #537 preparation now
+archives six official pages; the linked full legal code and release/reference
+review remain incomplete. Existing 2026-10-21 references are historical guidance,
+not refreshed legal approval.
 U07 and U12 publication remain gated until that review; private fixture science
 and implementation may continue. See the [report](../reports/issue-513/README.md).
+
+## Preparing the human source review (#537)
+
+Run `python3 scripts/prepare_source_review.py --output artifacts/source-review`
+with a fresh output directory. The offline tool reuses validated atomic staging,
+freezes exact manifest/input bytes, and writes a deterministic inventory plus
+`production-review.pending.json`. The form intentionally lacks reviewer, date,
+terms/credit/permission evidence and full-selection approval; both the form and
+restricted/unreviewed inputs must fail production validation. No source status,
+query, input bytes or approval is changed by preparing a packet.
+
+The [current review packet and decision checklist](../reports/issue-537/README.md)
+record historical network failures, newly archived provider evidence and remaining
+owner actions. The finalization retry retrieved the three original provider pages
+and linked ESA credits/terms and JPL image policy; the linked Creative Commons
+legal code still failed. That image policy alone does not approve ephemeris reuse.
+Historical manifest
+metadata is not a refreshed terms review. The current synthetic Gaia/two-epoch
+Earth/single-exoplanet inputs remain development fixtures. Full selected inputs
+require new acquisition decisions and a new manifest, followed by regeneration
+and human approval bound to that exact new digest. A blank form cannot promote
+these fixtures by changing status/origin flags.
+
+Source-use decisions in #659 can be recorded independently of #660 balance and
+#661 future-experience reviews. The owner authorized merging #537 preparation on
+2026-10-27 with those human checks deferred; source approval is still required. Production consumers follow the actual unresolved source
+permission/snapshot requirement; closure of an umbrella issue alone grants no
+source approval. The existing private-development-only owner decision remains
+in force until explicitly revised with the required evidence.

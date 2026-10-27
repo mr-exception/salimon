@@ -1,0 +1,528 @@
+{
+  "source_revision": "ecbf59e21cd8405b940ff6593061c06978a7bc7d",
+  "evidence_kind": "portable_fixture_reproduction",
+  "physical_routes_measured": false,
+  "owner_approval": false,
+  "comfortable_seconds_proposed": 360,
+  "break_even_seconds_proposed": 720,
+  "rows": [
+    {
+      "name": "baseline",
+      "first_ration_seconds": 86.304,
+      "single_ration_margin": 35.20533333333333,
+      "net_negative": false,
+      "travel_budget_seconds": 60.0,
+      "setup_budget_seconds": 15.0
+    },
+    {
+      "name": "slow_setup",
+      "first_ration_seconds": 431.304,
+      "single_ration_margin": 16.03866666666667,
+      "net_negative": false,
+      "travel_budget_seconds": 300.0,
+      "setup_budget_seconds": 120.0
+    },
+    {
+      "name": "low_health_fatigue",
+      "first_ration_seconds": 221.384,
+      "single_ration_margin": 27.700888888888883,
+      "net_negative": false,
+      "travel_budget_seconds": 180.0,
+      "setup_budget_seconds": 30.0
+    },
+    {
+      "name": "net_negative_route",
+      "first_ration_seconds": 941.304,
+      "single_ration_margin": -12.294666666666672,
+      "net_negative": true,
+      "travel_budget_seconds": 900.0,
+      "setup_budget_seconds": 30.0
+    }
+  ],
+  "availability": {
+    "query_radius_meters": 200,
+    "rows": [
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 0
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 1
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 2
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 3
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 4
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 5
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 6
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 7
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 8
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 9
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 10
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 11
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 12
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 13
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 14
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mercury",
+        "ice_meters": null,
+        "seed": 15
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 0
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 1
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 2
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 3
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 4
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 5
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 6
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 7
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 8
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 9
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 10
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 11
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 12
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 13
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 14
+      },
+      {
+        "biomass_meters": null,
+        "body": "Venus",
+        "ice_meters": null,
+        "seed": 15
+      },
+      {
+        "biomass_meters": 16.795104021703217,
+        "body": "Earth",
+        "ice_meters": 54.622973153542006,
+        "seed": 0
+      },
+      {
+        "biomass_meters": 19.007164882199127,
+        "body": "Earth",
+        "ice_meters": 11.98795028097903,
+        "seed": 1
+      },
+      {
+        "biomass_meters": 25.785705048549442,
+        "body": "Earth",
+        "ice_meters": 165.65831364364712,
+        "seed": 2
+      },
+      {
+        "biomass_meters": 11.70437146489525,
+        "body": "Earth",
+        "ice_meters": 85.24438163137329,
+        "seed": 3
+      },
+      {
+        "biomass_meters": 29.997638809644513,
+        "body": "Earth",
+        "ice_meters": 89.83422815576658,
+        "seed": 4
+      },
+      {
+        "biomass_meters": 20.407018218419292,
+        "body": "Earth",
+        "ice_meters": 116.16989616336181,
+        "seed": 5
+      },
+      {
+        "biomass_meters": 28.195147939980924,
+        "body": "Earth",
+        "ice_meters": 109.20346431025595,
+        "seed": 6
+      },
+      {
+        "biomass_meters": 13.269020509393771,
+        "body": "Earth",
+        "ice_meters": 75.71534234235891,
+        "seed": 7
+      },
+      {
+        "biomass_meters": 15.558470492194388,
+        "body": "Earth",
+        "ice_meters": 115.20331295310598,
+        "seed": 8
+      },
+      {
+        "biomass_meters": 19.22266486126436,
+        "body": "Earth",
+        "ice_meters": 125.45031410825122,
+        "seed": 9
+      },
+      {
+        "biomass_meters": 13.779067821613046,
+        "body": "Earth",
+        "ice_meters": 157.96023432855858,
+        "seed": 10
+      },
+      {
+        "biomass_meters": 23.159336441530172,
+        "body": "Earth",
+        "ice_meters": 61.99677532403323,
+        "seed": 11
+      },
+      {
+        "biomass_meters": 16.374139391447077,
+        "body": "Earth",
+        "ice_meters": 140.67374727410348,
+        "seed": 12
+      },
+      {
+        "biomass_meters": 20.910002311914532,
+        "body": "Earth",
+        "ice_meters": 85.5407564587289,
+        "seed": 13
+      },
+      {
+        "biomass_meters": 17.213871288753538,
+        "body": "Earth",
+        "ice_meters": 55.25984975989725,
+        "seed": 14
+      },
+      {
+        "biomass_meters": 22.094641434226247,
+        "body": "Earth",
+        "ice_meters": 92.36533614523354,
+        "seed": 15
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 125.31704337946384,
+        "seed": 0
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 58.76788893535872,
+        "seed": 1
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 150.20195558672958,
+        "seed": 2
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 79.60287936086661,
+        "seed": 3
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 39.30063060823431,
+        "seed": 4
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 58.66974542123871,
+        "seed": 5
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 134.71964198272684,
+        "seed": 6
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 192.39987123395875,
+        "seed": 7
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 69.58475326059134,
+        "seed": 8
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 72.63120152885915,
+        "seed": 9
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 102.30261833619434,
+        "seed": 10
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 125.0623630631239,
+        "seed": 11
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 172.4358974658439,
+        "seed": 12
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 99.4974881736022,
+        "seed": 13
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 60.63272554508606,
+        "seed": 14
+      },
+      {
+        "biomass_meters": null,
+        "body": "Moon",
+        "ice_meters": 106.24037987951284,
+        "seed": 15
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 44.882217376762426,
+        "seed": 0
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 20.150824489361504,
+        "seed": 1
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 53.99855041794306,
+        "seed": 2
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 42.0128500943589,
+        "seed": 3
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 69.28490202182807,
+        "seed": 4
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 89.74661871739434,
+        "seed": 5
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 102.2180438149404,
+        "seed": 6
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 56.55351939538376,
+        "seed": 7
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 72.73995707646898,
+        "seed": 8
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 73.82601335246176,
+        "seed": 9
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 42.065393408761345,
+        "seed": 10
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 69.35947371333842,
+        "seed": 11
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 51.17238113942885,
+        "seed": 12
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 25.54140904557054,
+        "seed": 13
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 109.3700909226275,
+        "seed": 14
+      },
+      {
+        "biomass_meters": null,
+        "body": "Mars",
+        "ice_meters": 93.59399777903123,
+        "seed": 15
+      }
+    ],
+    "sample_is_not_global_guarantee": true
+  }
+}

@@ -32,7 +32,7 @@ tolerances or claiming solver/native coverage. Preserve failure and source conte
 
 U07 `ingestion/gaia.rs` adds streaming local CSV decoding and bounded canonical
 matching with typed source measurements; see the [Gaia contract](../../docs/universe-gaia-ingestion.md).
-Production reuse/full-data acceptance remain gated on #537 after #513 delivery.
+Production reuse/full-data acceptance remain gated on #659 after #513 delivery.
 
 U08 `ingestion/{horizons,exoplanets}.rs` imports source-labeled Solar System states,
 physical measurements and PS default-row planets; see the [observed ingestion

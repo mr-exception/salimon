@@ -14,7 +14,7 @@ batch requests reject before reserving ingredients; cancellation never refunds.
 [Recipe data](../client/fabrication/config/recovery-module.json) is validated through
 `RecipeBook`: 1 kg iron ore + 0.5 kg silicate rock, 60 seconds at 1 MW, output
 0.75 kg. These are explicit provisional implementation defaults, subject to owner
-balance review in [#537](https://github.com/mr-exception/salimon/issues/537).
+balance review in [#660](https://github.com/mr-exception/salimon/issues/660).
 They are not an approved progression balance. Existing 20 kg bins, physical raw
 mining/carry/intake, FIFO head, one tray, Core funding and no-refund rules apply.
 
@@ -85,7 +85,7 @@ adds production native-window intake/craft/collect/walk/R captures and exact
 concurrent-funding, migration and Save Now/relaunch/restart regressions. Its
 declared initial materials do not measure acquisition or approve recipe/energy
 balance. Human presentation is #561, physical OS/input/DPI is #557, hardware
-budgets are #563, and route/balance decisions are #537 under the
+budgets are #563, and route/balance decisions are #660 under the
 [verification workflow](verification-workflow.md).
 See [runtime ownership](../client/runtime/architecture.md#data-recovery-module-468),
 [Fabricator ownership](../client/fabrication/architecture.md#recovery-controller-component-468)

@@ -1,0 +1,29 @@
+[
+  {
+    "check": "pending source form",
+    "status": "rejected_as_expected",
+    "reason": "production review requires reviewer"
+  },
+  {
+    "check": "production staging with current fixtures",
+    "status": "rejected_as_expected",
+    "exit_code": 1,
+    "output_published": false,
+    "reason": "source import failed: gaia:dr3: production reuse not approved; see https://github.com/mr-exception/salimon/issues/513"
+  },
+  {
+    "check": "physical-route-normal.pending.json",
+    "status": "rejected_as_expected",
+    "reason": "missing physical-route context: revision"
+  },
+  {
+    "check": "physical-route-obstacles-poor-layout.pending.json",
+    "status": "rejected_as_expected",
+    "reason": "missing physical-route context: revision"
+  },
+  {
+    "check": "physical-route-low-health-fatigue.pending.json",
+    "status": "rejected_as_expected",
+    "reason": "missing physical-route context: revision"
+  }
+]

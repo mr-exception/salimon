@@ -1,0 +1,18 @@
+test_manifest_unknown_schema_and_duplicate_json_fields_reject (test_import_universe_sources.OfflineSourceImport.test_manifest_unknown_schema_and_duplicate_json_fields_reject) ... ok
+test_offline_import_is_byte_reproducible_and_never_overwrites (test_import_universe_sources.OfflineSourceImport.test_offline_import_is_byte_reproducible_and_never_overwrites) ... ok
+test_production_requires_reuse_review_and_actual_source_snapshots (test_import_universe_sources.OfflineSourceImport.test_production_requires_reuse_review_and_actual_source_snapshots) ... ok
+test_tampered_bytes_and_unsafe_paths_fail_before_publication (test_import_universe_sources.OfflineSourceImport.test_tampered_bytes_and_unsafe_paths_fail_before_publication) ... ok
+test_reserved_review_path_cannot_replace_staged_evidence (test_import_universe_sources.ProductionEvidenceGate.test_reserved_review_path_cannot_replace_staged_evidence) ... ok
+test_status_and_origin_edits_alone_cannot_publish_observed_fixtures (test_import_universe_sources.ProductionEvidenceGate.test_status_and_origin_edits_alone_cannot_publish_observed_fixtures) ... ok
+test_corrupt_input_never_publishes_a_partial_packet (test_prepare_source_review.SourceReviewPacketTests.test_corrupt_input_never_publishes_a_partial_packet) ... ok
+test_existing_review_is_preserved_and_generation_is_deterministic (test_prepare_source_review.SourceReviewPacketTests.test_existing_review_is_preserved_and_generation_is_deterministic) ... ok
+test_packet_binds_and_freezes_exact_bytes_without_promoting_sources (test_prepare_source_review.SourceReviewPacketTests.test_packet_binds_and_freezes_exact_bytes_without_promoting_sources) ... ok
+test_exact_manifest_binding_and_complete_review (test_production_source_review.ProductionReview.test_exact_manifest_binding_and_complete_review) ... ok
+test_missing_duplicate_or_wrong_source_reviews_fail (test_production_source_review.ProductionReview.test_missing_duplicate_or_wrong_source_reviews_fail) ... ok
+test_pending_permissions_and_fixture_scope_never_promote (test_production_source_review.ProductionReview.test_pending_permissions_and_fixture_scope_never_promote) ... ok
+test_staging_preserves_review_binding_and_rechecks_before_publish (test_production_source_review.ProductionReview.test_staging_preserves_review_binding_and_rechecks_before_publish) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.025s
+
+OK

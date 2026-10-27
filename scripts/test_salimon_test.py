@@ -257,13 +257,17 @@ pathlib.Path(sys.argv[1]).write_bytes(b"\\x89PNG\\r\\n\\x1a\\n" + b"fake")
         self.assertEqual(result["steps"][0]["screenshot"]["status"], "failed")
         self.assertIn("exited 2", result["steps"][0]["screenshot"]["reason"])
 
-    def test_capture_timeout_and_invalid_png(self):
+    def test_capture_timeout(self):
         self.data["steps"] = [{"screenshot": "view", "timeout_ms": 100}]
         self.save()
         result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts",
                      [sys.executable, "-c", "import time; time.sleep(0.2)", "{path}"])
         self.assertEqual(result["status"], "failed")
         self.assertIn("timed out", result["steps"][0]["screenshot"]["reason"])
+
+    def test_invalid_png_is_rejected(self):
+        self.data["steps"] = [{"screenshot": "view"}]
+        self.save()
         result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts",
                      [sys.executable, "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).write_text('bad')", "{path}"])
         self.assertIn("did not produce a PNG", result["steps"][0]["screenshot"]["reason"])

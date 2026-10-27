@@ -999,4 +999,4 @@ fn matches_catalog(job: &Placeholder) -> bool {
 }
 
 pub(in crate::session) use boarding::boarding_exit;
-pub(crate) use evidence::evidence_room;
+pub(crate) use evidence::{evidence_cancellation, evidence_room};

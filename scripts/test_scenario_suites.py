@@ -7,11 +7,20 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scenario_suites import GROUPS, RESOURCE_COLLECTION, select_scenarios
+from scenario_suites import GROUPS, RESOURCE_COLLECTION, SCOUT_CONSTRUCTION, select_scenarios
 from salimon_test import ScenarioError, parse_scenario
 
 
 class ScenarioSuiteTests(unittest.TestCase):
+    def test_integrated_construction_always_selects_capture_routes(self):
+        root = Path(__file__).resolve().parents[1] / "scenarios"
+        for evidence in (False, True):
+            selected = select_scenarios(root, "scout-construction", evidence)
+            self.assertEqual(len(selected), len(set(SCOUT_CONSTRUCTION)))
+            for path in selected:
+                self.assertEqual(path.parent, root / "evidence")
+                self.assertTrue(any("screenshot" in step for step in parse_scenario(path)["steps"]))
+
     def test_missing_prerequisite_is_selected_and_fails(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -19,7 +28,7 @@ class ScenarioSuiteTests(unittest.TestCase):
                 for evidence in (False, True):
                     paths = select_scenarios(root, group, evidence)
                     self.assertEqual([path.name for path in paths], list(names))
-                    self.assertEqual(paths[0].parent, root / "evidence" if evidence else root)
+                    self.assertEqual(paths[0].parent, root / "evidence" if evidence or group == "scout-construction" else root)
                     with self.assertRaises(ScenarioError):
                         parse_scenario(paths[0])
 

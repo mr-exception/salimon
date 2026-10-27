@@ -788,6 +788,17 @@ fn assisted_baselines_preserve_landing_and_handoff_to_inertial_takeoff() {
 }
 
 #[test]
+fn cancellation_boundary_routes_use_exact_live_ticks_and_physical_refunds() {
+    for source in [
+        include_str!("../../../../scenarios/evidence/construction-cancel-0.json"),
+        include_str!("../../../../scenarios/evidence/construction-cancel-50.json"),
+        include_str!("../../../../scenarios/evidence/construction-cancel-99.json"),
+    ] {
+        assert_gameplay_scenario(Scenario::ConstructionCancellation, source);
+    }
+}
+
+#[test]
 fn construction_interlock_scenarios_share_native_command_admission() {
     assert_gameplay_scenario(
         Scenario::ConstructionRoom,

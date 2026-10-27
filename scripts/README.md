@@ -80,6 +80,45 @@ acceleration. Cockpit-to-nose traversal and airlock collision checks cover the r
 Run this evidence group manually against a locally staged release binary.
 See [historical issue discussion](https://github.com/mr-exception/salimon/issues/39) for results and screenshots.
 
+## Integrated Scout and construction acceptance (#551)
+
+Run the complete maintained capture group against a newly built native binary:
+
+```sh
+python3 scripts/salimon-test suite --group scout-construction --evidence \
+  --binary target/debug/salimon-client --artifacts artifacts/scout-construction \
+  --screenshot-command '["native"]' --summary
+```
+
+This group always selects the evidence routes, including when `--evidence` is
+omitted. Its explicit inventory fails on missing files, launch, action, state or
+capture failures. Keep capture enabled for acceptance. It covers cockpit/flight,
+Core, cargo door/ramp/carrying, habitation, galley inspection and lighting,
+Core upgrades, blueprint placement/intake/completion, two-deck traversal,
+module installation/upgrade/restoration, damage/detachment, stop/takeoff and
+offline resume. The three cancellation routes use a declared 20 kg hull-cell input
+and ordinary work/control commands at exactly 0/50/99%; they assert no early
+installed colliders and one physical iron refund of 20/10/0.2 kg. Fixtures do
+not establish actual mining/acquisition balance or physical device input.
+
+For full machinery/Archive coverage also rerun the retained production drivers:
+
+```sh
+python3 reports/issue-489/walkthrough.py --binary target/debug/salimon-client \
+  --output artifacts/scout-machinery
+python3 reports/issue-505/verify.py --binary target/debug/salimon-client \
+  --output artifacts/scout-archive --scale 1
+python3 reports/issue-505/verify.py --binary target/debug/salimon-client \
+  --output artifacts/scout-archive-power --power
+```
+
+Use fresh output directories and the Linux Xvfb/software-Vulkan setup in
+[validation](../docs/validation.md#native-graphical-gates). Preserve per-step state,
+protocol/process logs, original images and source/binary hashes. The current
+[#551 report](../reports/issue-551/README.md) records coverage, actual failures and
+human/platform/performance handoffs. These fixed-step protocol routes do not
+establish human appearance approval, Metal compatibility or physical 60 FPS.
+
 ## Resource collection suite (#51)
 
 Run the complete resource regression suite, then its synchronized visual routes:

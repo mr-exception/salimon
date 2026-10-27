@@ -87,3 +87,10 @@ player building or migrate the current authored Scout.
 See the [surface-flight contract](../../docs/universe-surface-flight.md) for rotating/orbiting support,
 Core-funded physically bounded landing/takeoff, production source/tests and
 remaining playable-world adoption. Current compressed gameplay is unchanged.
+
+
+## Real-scale atmospheric drag (#419)
+
+See the [atmosphere contract](../../docs/universe-atmosphere.md) for planet-specific density,
+co-rotating gas/wind, atomic online/offline drag integration and physically paid
+assist compensation. Model validity, tests and playable-adoption limits are explicit.

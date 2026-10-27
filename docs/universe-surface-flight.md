@@ -73,3 +73,10 @@ closed-game event orchestration is #432–#434. No renderer output changes here,
 so numerical/domain acceptance does not require graphical captures. Actual
 Metal/physical controls/hardware qualification remains #557/#563 and human
 presentation remains #561, separate from routine cloud delivery.
+
+
+## Real-scale atmospheric drag (#419)
+
+See the [atmosphere contract](universe-atmosphere.md) for planet-specific density,
+co-rotating gas/wind, atomic online/offline drag integration and physically paid
+assist compensation. Model validity, tests and playable-adoption limits are explicit.

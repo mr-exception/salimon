@@ -1,0 +1,14 @@
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.15s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-e2d72dcedce2c335)
+
+running 7 tests
+test atmosphere::tests::atmospheric_assists_fund_drag_and_reject_unaffordable_wind_without_debit ... ok
+test atmosphere::tests::atmospheric_orbit_loses_specific_energy_and_offline_matches_online ... ok
+test atmosphere::tests::planet_specific_density_rotation_wind_and_model_bounds_are_explicit ... ok
+test atmosphere::tests::provider_or_numerical_failure_preserves_trajectory_and_selector ... ok
+test atmosphere::tests::quadratic_operator_matches_closed_form_and_never_reverses_relative_velocity ... ok
+test atmosphere::tests::vacuum_is_exactly_the_existing_gravity_thrust_path ... ok
+test atmosphere::tests::gravity_plus_drag_converges_to_terminal_speed_and_refines_at_second_order ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 123 filtered out; finished in 0.13s

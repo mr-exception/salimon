@@ -1,5 +1,6 @@
 //! Standalone, local-input build orchestration. Downloads remain acquisition
 //! tooling; every selected byte is frozen before this offline transaction.
+pub use super::observed::{ArtifactInput, HorizonsInput, Input as ObservedInput};
 use super::*;
 use serde::Deserialize;
 use serde::de::{MapAccess, Visitor};
@@ -45,11 +46,12 @@ pub struct CellInput {
     /// A U01 catalog, or a producer bundle with a `catalog` field. Every other
     /// bundle field is retained as an exact JSON sidecar (observations, source
     /// metadata, inference evidence, full generation request/definitions).
-    pub input: String,
+    pub input: Option<String>,
+    pub observed: Option<ObservedInput>,
     #[serde(default)]
     pub sidecars: BTreeMap<String, String>,
 }
-fn local(root: &Path, path: &str) -> Result<PathBuf, Error> {
+pub(super) fn local(root: &Path, path: &str) -> Result<PathBuf, Error> {
     let relative = Path::new(path);
     if relative.is_absolute()
         || relative
@@ -64,7 +66,7 @@ fn local(root: &Path, path: &str) -> Result<PathBuf, Error> {
     }
     Ok(path)
 }
-fn bounded(path: &Path, limit: usize) -> Result<Vec<u8>, Error> {
+pub(super) fn bounded(path: &Path, limit: usize) -> Result<Vec<u8>, Error> {
     let mut out = Vec::new();
     fs::File::open(path)
         .map_err(io)?
@@ -143,20 +145,33 @@ pub fn build(request_file: &Path, output: &Path) -> Result<Manifest, Error> {
     };
     let mut builder = Builder::new(output, request.revision.clone(), &source_bytes)?;
     for cell in request.cells {
-        let bytes = bounded(
-            &local(root, &cell.input)?,
-            crate::synthesis::MAX_PUBLICATION_BYTES,
-        )?;
-        let mut sidecars = BTreeMap::new();
-        let mut fields: ProducerFields =
-            serde_json::from_slice(&bytes).map_err(|e| Error::Encoding(e.to_string()))?;
-        let catalog = if let Some(catalog) = fields.0.remove("catalog") {
-            for (key, value) in fields.0 {
-                sidecars.insert(key, value.get().as_bytes().to_vec());
+        let (catalog, mut sidecars) = match (cell.input, cell.observed) {
+            (None, Some(observed)) => {
+                super::observed::import(observed, &source_path, &source_bytes, &request.revision)?
             }
-            Catalog::decode(catalog.get().as_bytes())?
-        } else {
-            Catalog::decode(&bytes)?
+            (Some(input), None) => {
+                let bytes = bounded(
+                    &local(root, &input)?,
+                    crate::synthesis::MAX_PUBLICATION_BYTES,
+                )?;
+                let mut sidecars = BTreeMap::new();
+                let mut fields: ProducerFields =
+                    serde_json::from_slice(&bytes).map_err(|e| Error::Encoding(e.to_string()))?;
+                let catalog = if let Some(catalog) = fields.0.remove("catalog") {
+                    for (key, value) in fields.0 {
+                        sidecars.insert(key, value.get().as_bytes().to_vec());
+                    }
+                    Catalog::decode(catalog.get().as_bytes())?
+                } else {
+                    Catalog::decode(&bytes)?
+                };
+                (catalog, sidecars)
+            }
+            _ => {
+                return Err(invalid(
+                    "cell must select exactly one producer input or raw observed input",
+                ));
+            }
         };
         for (name, path) in cell.sidecars {
             if sidecars

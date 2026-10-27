@@ -22,6 +22,13 @@ pub struct Reader {
     budget: usize,
     resident: usize,
     last_prefetch_error: Option<String>,
+    stats: Stats,
+}
+#[derive(Clone, Copy, Debug, Default, serde::Serialize)]
+pub struct Stats {
+    pub catalog_blob_reads: u64,
+    pub catalog_blob_bytes: u64,
+    pub cache_hits: u64,
 }
 impl Reader {
     /// Budget applies to cached encoded catalog bytes (Vec capacities). Returned
@@ -54,6 +61,7 @@ impl Reader {
             budget,
             resident: 0,
             last_prefetch_error: None,
+            stats: Stats::default(),
         })
     }
     pub fn manifest(&self) -> &Manifest {
@@ -61,6 +69,9 @@ impl Reader {
     }
     pub fn resident_bytes(&self) -> usize {
         self.resident
+    }
+    pub fn stats(&self) -> Stats {
+        self.stats
     }
     pub fn last_prefetch_error(&self) -> Option<&str> {
         self.last_prefetch_error.as_deref()
@@ -89,6 +100,7 @@ impl Reader {
     pub fn cell(&mut self, key: CellKey) -> Result<Catalog, Error> {
         if let Some(raw) = self.cache.get(&key) {
             let catalog = Catalog::decode(raw)?;
+            self.stats.cache_hits = self.stats.cache_hits.saturating_add(1);
             self.touch(key);
             return Ok(catalog);
         }
@@ -99,6 +111,11 @@ impl Reader {
             .map_err(|_| invalid("unknown pack cell"))?;
         let entry = &self.manifest.cells[i];
         let bytes = pack::read_blob(&self.root, &entry.catalog)?;
+        self.stats.catalog_blob_reads = self.stats.catalog_blob_reads.saturating_add(1);
+        self.stats.catalog_blob_bytes = self
+            .stats
+            .catalog_blob_bytes
+            .saturating_add(bytes.len() as u64);
         let mut reader = partitions::Reader::open(Cursor::new(bytes))?;
         if reader.cells().len() != 1
             || reader.cells()[0].key != key

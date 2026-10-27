@@ -5,3 +5,21 @@ The `reader` module owns exact record/system ID and galactic-region queries, SHA
 This is portable private-development implementation, separate from playable runtime adoption. Production source approval remains #659 and full-data acceptance #524/#526. No hardware, scientific model accuracy or production completeness is inferred from fixture tests.
 
 Run `cargo test -p salimon-universe --locked`, `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`, `cargo fmt --all -- --check` and `python3 scripts/check_docs.py`.
+
+## Cloud workload acceptance
+
+`cargo run -p salimon-universe --example reader_bench --release --locked -- PACK_DIR`
+exercises the actual filesystem reader and prefetch worker for 20000 randomized
+seeks over 1024 cells at each of 16/64/256 KiB cache budgets. It checks resident
+encoded capacities on every request and records logical catalog IO, p50/p95/max
+latency and Linux RSS at each quarter. `Reader::stats` exposes actual verified
+catalog blob reads/bytes and cache hits for predictable IO accounting. Manifest
+and index memory, bounded decode scratch and caller-owned returned catalogs are
+explicitly separate from cache capacity. An eight-thread navigation regression
+verifies shared-cache reuse without duplicate IO. Missing/corrupt cells and
+prefetch failures retain their existing fail-closed coverage.
+
+The recorded cloud workload completes with bounded cache and observed RSS; no
+human verification or native performance claim is required. Hooking this reader
+into playable real-scale streaming is #422 and subsequent integration work,
+rather than a missing acceptance criterion of the read-only U13 service.

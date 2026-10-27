@@ -8,3 +8,19 @@ Validation results are recorded below. Linux x86_64, Rust 1.99.1; private fixtur
 - Exact imported Earth states, analytic Kepler endpoints, interpolation/fallback boundaries, scale errors and rotating-frame/cycle checks pass.
 - All-target universe Clippy with warnings denied and docs/base-impact checks pass; formatting applied.
 - No independent intermediate-epoch JPL error budget or live playable integration is claimed.
+
+## Cloud completion revision
+
+The independent intermediate-date comparison is now executed, not deferred.
+Fetched and froze an unmodified official Horizons Earth response at 3h intervals;
+`cloud/jpl-source.json` records URL/size/SHA256. The model fits every second sample
+(6h spacing), comparing all four withheld epochs through the unchanged U03
+reference comparator. Maximum position error is 0.2257371668 m and maximum velocity
+error is 3.37019e-8 m/s, passing the declared 1 m / 0.001 m/s interpolation test
+budget. Exact-decoder rounding budgets and source uncertainties are unchanged.
+
+Added explicit sampling-gap refusal (6h default) and a CI regression for the
+withheld references. 83 universe tests and all-target universe Clippy pass.
+Frame hierarchy, stellar/analytic motion, scale/validity and bounded fallback
+checks remain covered. Complete-release input coverage stays #526; later runtime
+migration is outside this issue. Neither is a human-verification gate on U14.

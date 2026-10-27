@@ -2,6 +2,8 @@
 use crate::{CatalogId, Error, coordinates::GalacticPosition, invalid};
 use salimon_math::{add, length, scale};
 use std::collections::{BTreeMap, BTreeSet};
+mod index;
+pub use index::{QueryWork, SourceIndex};
 #[derive(Clone, Debug)]
 pub struct Source {
     pub id: CatalogId,
@@ -217,10 +219,10 @@ fn rank(
             (
                 id,
                 score
-                    * (if old.contains(id) {
-                        1.0 + hysteresis
-                    } else {
+                    / (if old.contains(id) {
                         1.0
+                    } else {
+                        1.0 + hysteresis
                     }),
             )
         })

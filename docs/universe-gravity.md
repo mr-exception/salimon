@@ -5,3 +5,26 @@ The `gravity` module evaluates known positive gravitational parameters using spl
 This is portable private-development implementation, separate from playable runtime adoption. Production source approval remains #659 and full-data acceptance #524/#526. No hardware, scientific model accuracy or production completeness is inferred from fixture tests.
 
 Run `cargo test -p salimon-universe --locked`, `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`, `cargo fmt --all -- --check` and `python3 scripts/check_docs.py`.
+
+## Indexed selection and cloud acceptance
+
+`SourceIndex` now supplies the production indexed-candidate path. It builds an
+immutable evaluated-source snapshot (at most one million known sources) with
+conservative enclosing-sphere bounds and per-node maximum gravitational parameter.
+Branch-and-bound ranks actual mu/r², not nearest distance; a massive distant body
+cannot be omitted by a nearest-neighbor assumption. Physical radii are included
+in bounds so interior failures cannot be pruned. Split-position subtraction and
+expanded numerical bounds preserve conservative pruning at distant origins.
+`Selector::sample_indexed` pins active old/new handoff sources and uses the same
+hysteresis and acceleration kernel as complete-source selection. Snapshot motion
+updates belong to the epoch-aware caller; U21 owns playable streaming, not this
+portable service. Query work counters expose visited nodes and evaluated sources.
+
+The 32768-source / 512-query serial CPU workload exactly matches complete-source
+selection for every query. It evaluates 176768 sources versus 16777216 complete
+scan candidates (~1.05 percent), with observed median query time 155.505 us versus
+9587.361 us for complete scans. Times are retained observations, not hardware FPS
+budgets. Earth/Moon/Sun handoffs, small-body truncation (<1e-8 relative error for
+the declared fixture), far massive-source admission and conservative interior
+refusal have regression coverage. Existing stable transition/configuration and
+all-source reference APIs remain available. No human signoff is a cloud gate.

@@ -8,3 +8,21 @@ Validation results are recorded below. Linux x86_64, Rust 1.99.1; private fixtur
 - Inverse-square/reference comparisons, stable ties/order, source-selection hysteresis/continuous handoff, singularity/missing/duplicate-source failures pass.
 - `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`, formatting and docs/base-impact checks pass.
 - Added the existing workspace math crate and deliberately updated Cargo.lock. Full-catalog spatial candidate indexing and measured performance budgets remain incomplete; current caller supplies the bounded complete candidate list.
+
+## Cloud completion revision
+
+The missing spatial-candidate index is implemented in `gravity/index.rs` and
+exercised by the production `sample_indexed` path. Conservative bounds include
+physical radii and maximum mu; retained transition sources survive selection.
+Hysteresis ranking avoids overflow by applying an equivalent common scaling.
+
+88 universe tests and all-target universe Clippy pass. Added Earth/Moon/Sun
+handoff/reference, small-body rejection, distant massive-body and interior tests.
+`cloud/416-bench.json` records exact indexed/full-source selection equality across
+512 queries at 1024 and 32768 sources. At 32768, only 176768 of 16777216 candidate
+forces are evaluated (~1.05%); median query latency is 155.505 us versus 9587.361 us
+for full scans, with a separate 52.943381 ms immutable-index build measurement.
+The structural workload regression requires <1/8 complete evaluations for the
+specified sparse handoff fixture. These are CPU algorithm budgets/observations,
+not a reference-M1 FPS claim. Later playable spatial streaming remains #422 and
+human hardware qualification remains #563, neither a gate on this service PR.

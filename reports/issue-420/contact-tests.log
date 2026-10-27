@@ -1,0 +1,20 @@
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-e2d72dcedce2c335)
+
+running 13 tests
+test contact::tests::atmospheric_funded_drift_contact_settles_only_elapsed_work_and_matches_truncated_integrator ... ok
+test contact::tests::broadphase_rejects_far_objects_and_ties_have_canonical_identity_order ... ok
+test contact::tests::clear_space_is_exactly_atmospheric_integrator_and_failures_are_atomic ... ok
+test contact::tests::common_orbital_velocity_and_large_galactic_anchor_preserve_event_and_relative_response ... ok
+test contact::tests::curved_ephemeris_crossing_is_not_reduced_to_endpoint_chords ... ok
+test contact::tests::fused_production_step_intercepts_before_an_endpoint_gravity_query_enters_a_body ... ok
+test contact::tests::high_speed_moving_sphere_crossing_finds_first_time_with_clear_endpoints ... ok
+test contact::tests::malformed_identity_geometry_and_numerics_fail_without_silent_collision_gaps ... ok
+test contact::tests::moving_frame_response_bounce_grounding_and_fatal_policy_have_correct_energy ... ok
+test contact::tests::planet_scale_tangent_and_near_miss_are_bounded_without_tunneling ... ok
+test contact::tests::streamed_triangle_face_edge_corner_and_moving_surface_velocity_are_resolved ... ok
+test contact::tests::triangles_from_production_terrain_queries_contact_with_declared_ephemeris_motion ... ok
+test contact::tests::bounded_work_exhaustion_rejects_without_publishing_a_fake_contact_or_free_movement ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 130 filtered out; finished in 0.36s

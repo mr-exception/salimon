@@ -8,7 +8,7 @@ Verification ownership was revised by the owner on 2026-10-23:
 blanket M1-only issue completion. Feature/science contracts and hardware-specific
 performance targets are unchanged. Keep actual platform results distinct.
 
-Status: **approved design; portable U01–U11 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
+Status: **approved design; portable catalog/trajectory foundations and U17–U19 physics APIs delivered with the limits below; canonical playable-world adoption and remaining expansion are incomplete**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Expansion follows the completed earlier gameplay implementation queue; remaining issues retain their explicit functional blockers. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
 
@@ -164,3 +164,10 @@ remaining playable-world adoption. Current compressed gameplay is unchanged.
 See the [atmosphere contract](universe-atmosphere.md) for planet-specific density,
 co-rotating gas/wind, atomic online/offline drag integration and physically paid
 assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.

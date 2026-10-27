@@ -16,6 +16,7 @@ pub use energy::{EnergyConfig, EnergyCore, InvalidEnergy};
 mod mass;
 pub use mass::{MassObjectId, ShipMass};
 pub mod atmosphere;
+pub mod contact;
 mod propulsion;
 pub mod structure;
 pub mod surface;

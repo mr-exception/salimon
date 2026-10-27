@@ -134,7 +134,7 @@ Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs
 
 ## Real-scale trajectory foundation (#417)
 
-`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. Runtime has not adopted it; current controller, saves, assists and contact remain unchanged. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
+`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. The compressed playable controller and saves remain unchanged; real-scale support, drag and contact compose through the #418–#420 companion APIs below. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
 
 
 ## Real-scale surface flight (#418)
@@ -149,3 +149,10 @@ remaining playable-world adoption. Current compressed gameplay is unchanged.
 See the [atmosphere contract](../../docs/universe-atmosphere.md) for planet-specific density,
 co-rotating gas/wind, atomic online/offline drag integration and physically paid
 assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](../../docs/universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.

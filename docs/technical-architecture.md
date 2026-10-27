@@ -739,3 +739,10 @@ remaining playable-world adoption. Current compressed gameplay is unchanged.
 See the [atmosphere contract](universe-atmosphere.md) for planet-specific density,
 co-rotating gas/wind, atomic online/offline drag integration and physically paid
 assist compensation. Model validity, tests and playable-adoption limits are explicit.
+
+
+## Real-scale moving contact (#420)
+
+See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
+certified earliest-event queries, atomic gravity/drag interception, body-relative
+consequences, funded-work receipts, cloud tests and adoption/precision limits.

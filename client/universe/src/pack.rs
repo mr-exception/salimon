@@ -13,6 +13,7 @@ use std::{
 };
 
 pub const MAX_MANIFEST_BYTES: usize = 16 * 1024 * 1024;
+pub mod pipeline;
 pub const MAX_BLOB_BYTES: usize = partitions::MAX_PACK_BYTES;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

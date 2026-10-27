@@ -86,3 +86,54 @@ fn silent_identity_churn_and_malicious_manifest_reject() {
     assert!(Manifest::decode(&serde_json::to_vec(&value).unwrap()).is_err());
     fs::remove_dir_all(root).unwrap();
 }
+#[test]
+fn offline_pipeline_accepts_observed_input_and_preserves_old_pack_on_source_failure() {
+    let root = root();
+    fs::create_dir_all(root.join("sources")).unwrap();
+    let source_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../catalogs/sources");
+    let bytes = fs::read(source_root.join("manifest-v1.json")).unwrap();
+    let manifest = crate::sources::SourceManifest::decode(&bytes, false).unwrap();
+    fs::write(root.join("sources/manifest.json"), &bytes).unwrap();
+    for source in manifest.sources {
+        for artifact in source.artifacts {
+            let dest = root.join("sources").join(&artifact.path);
+            fs::create_dir_all(dest.parent().unwrap()).unwrap();
+            fs::copy(source_root.join(&artifact.path), dest).unwrap();
+        }
+    }
+    let catalog =
+        Catalog::decode(include_bytes!("../../fixtures/storage-observed-v1.json")).unwrap();
+    let bundle = serde_json::json!({"catalog":catalog,"ephemerides":{"raw_response":include_str!("../../../../catalogs/sources/fixtures/jpl-earth-j2000.json")},"astrometry":{"missing_velocity":null}});
+    fs::write(
+        root.join("observed.json"),
+        serde_json::to_vec(&bundle).unwrap(),
+    )
+    .unwrap();
+    let request = serde_json::json!({"version":1,"revision":"private-observed-v1","source_manifest":"sources/manifest.json","cells":[{"key":key(),"input":"observed.json"}]});
+    let request_file = root.join("build.json");
+    fs::write(&request_file, serde_json::to_vec(&request).unwrap()).unwrap();
+    let output = root.join("output");
+    let first = pipeline::build(&request_file, &output).unwrap();
+    let before = fs::read(output.join("manifest.json")).unwrap();
+    assert_eq!(first.revision, "private-observed-v1");
+    assert!(first.cells[0].sidecars.contains_key("ephemerides"));
+    let stored = read_blob(&output, &first.cells[0].sidecars["ephemerides"]).unwrap();
+    assert_eq!(
+        serde_json::from_slice::<serde_json::Value>(&stored).unwrap(),
+        bundle["ephemerides"]
+    );
+    pipeline::build(&request_file, &output).unwrap();
+    assert_eq!(before, fs::read(output.join("manifest.json")).unwrap());
+    fs::write(
+        root.join("sources/fixtures/gaia-synthetic.csv"),
+        b"tampered",
+    )
+    .unwrap();
+    assert!(pipeline::build(&request_file, &output).is_err());
+    assert_eq!(before, fs::read(output.join("manifest.json")).unwrap());
+    let mut bad = request;
+    bad["source_manifest"] = "../escape".into();
+    fs::write(&request_file, serde_json::to_vec(&bad).unwrap()).unwrap();
+    assert!(pipeline::build(&request_file, &output).is_err());
+    fs::remove_dir_all(root).unwrap();
+}

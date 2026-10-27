@@ -1,0 +1,50 @@
+[
+  {
+    "number": 469,
+    "state": "open",
+    "title": "[Exploration X01] Player-known star chart, unknown Earth and coordinate provenance",
+    "url": "https://github.com/mr-exception/salimon/issues/469"
+  },
+  {
+    "number": 470,
+    "state": "open",
+    "title": "[Narrative N03] Recoverable distress and warning transmissions with investigation leads",
+    "url": "https://github.com/mr-exception/salimon/issues/470"
+  },
+  {
+    "number": 471,
+    "state": "open",
+    "title": "[Experience E05] Waking outside Scout on alien world and first-hour experiential slice",
+    "url": "https://github.com/mr-exception/salimon/issues/471"
+  },
+  {
+    "number": 472,
+    "state": "open",
+    "title": "[Absenat A01] Endgame gate and primordial circular Hall spatial prototype",
+    "url": "https://github.com/mr-exception/salimon/issues/472"
+  },
+  {
+    "number": 473,
+    "state": "open",
+    "title": "[Absenat A02] Completion ceremony, one blank inner-ring inscription and hidden main-menu unlock",
+    "url": "https://github.com/mr-exception/salimon/issues/473"
+  },
+  {
+    "number": 474,
+    "state": "open",
+    "title": "[Absenat A03] Backend endgame identity, moderated inscriptions and distance leaderboard",
+    "url": "https://github.com/mr-exception/salimon/issues/474"
+  },
+  {
+    "number": 475,
+    "state": "open",
+    "title": "[Absenat A04] Hall returning-visitor streaming, snapshots and account access integration",
+    "url": "https://github.com/mr-exception/salimon/issues/475"
+  },
+  {
+    "number": 568,
+    "state": "closed",
+    "title": "Automate cloud corpus and experience validation transferred from #537",
+    "url": "https://github.com/mr-exception/salimon/issues/568"
+  }
+]

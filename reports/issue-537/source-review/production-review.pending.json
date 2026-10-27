@@ -1,0 +1,57 @@
+{
+  "format": "salimon.universe.production-review",
+  "schema_version": 1,
+  "manifest_sha256": "eaa6c4ff059ae06464d72744302cc2b7696fed7cc965759ec9f43af09f79ee3d",
+  "intended_use": "Private development only",
+  "distribution": "No distribution approved",
+  "reviewer": null,
+  "reviewed_on": null,
+  "approval_evidence": null,
+  "sources": [
+    {
+      "id": "gaia:dr3",
+      "terms_url": "https://www.cosmos.esa.int/web/gaia-users/license",
+      "terms_checked_on": null,
+      "terms_evidence": null,
+      "credit_text": null,
+      "references": null,
+      "decision": "pending",
+      "permission_record": null,
+      "snapshot_scope": "pending_full_production_selection",
+      "acquisition": "SELECT source_id,ref_epoch,ra,dec,parallax,parallax_error,pmra,pmdec,radial_velocity FROM gaiadr3.gaia_source; full export is not downloaded by this fixture build",
+      "epoch": null,
+      "frame": null,
+      "snapshot_approval_evidence": null
+    },
+    {
+      "id": "jpl:horizons-earth-j2000",
+      "terms_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+      "terms_checked_on": null,
+      "terms_evidence": null,
+      "credit_text": null,
+      "references": null,
+      "decision": "pending",
+      "permission_record": null,
+      "snapshot_scope": "pending_full_production_selection",
+      "acquisition": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27399%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%271d%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "epoch": null,
+      "frame": null,
+      "snapshot_approval_evidence": null
+    },
+    {
+      "id": "nasa:exoplanet-ps",
+      "terms_url": "https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html",
+      "terms_checked_on": null,
+      "terms_evidence": null,
+      "credit_text": null,
+      "references": null,
+      "decision": "pending",
+      "permission_record": null,
+      "snapshot_scope": "pending_full_production_selection",
+      "acquisition": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name%2Chostname%2Cgaia_dr3_id%2Csy_dist%2Csy_disterr1%2Csy_disterr2%2Cpl_orbper%2Cpl_orbpererr1%2Cpl_orbpererr2%2Cpl_refname+from+ps+where+default_flag%3D1+and+pl_name%3D%27Proxima+Cen+b%27&format=csv",
+      "epoch": null,
+      "frame": null,
+      "snapshot_approval_evidence": null
+    }
+  ]
+}

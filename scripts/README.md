@@ -784,3 +784,17 @@ with the normal native capture command (and the matching new/idle/recolor/blacko
 reload/damage/repair routes). The used setup executes 600 actual locker open/close
 cycles before the first frame; the other declared seeds and independent renderer
 stress workload are documented in [the surface-age contract](../docs/surface-age.md).
+
+## Source review preparation (#537)
+
+```sh
+python3 scripts/prepare_source_review.py --output artifacts/source-review
+python3 -m unittest discover -s scripts -p 'test_*source*.py'
+```
+
+This offline command freezes verified bytes and a deliberately unapproved human
+review form without changing production eligibility. Existing output is preserved;
+corrupt inputs leave no published partial packet. Use the
+[source contract](../docs/universe-sources.md#preparing-the-human-source-review-537)
+and [decision checklist](../reports/issue-537/README.md) for current limitations,
+provider access, exact source/snapshot approval and physical balance evidence.

@@ -90,3 +90,27 @@ No full current terms were fetched in this restricted environment. Existing
 2026-10-21 references are historical guidance, not refreshed legal approval.
 U07 and U12 publication remain gated until that review; private fixture science
 and implementation may continue. See the [report](../reports/issue-513/README.md).
+
+## Preparing the human source review (#537)
+
+Run `python3 scripts/prepare_source_review.py --output artifacts/source-review`
+with a fresh output directory. The offline tool reuses validated atomic staging,
+freezes exact manifest/input bytes, and writes a deterministic inventory plus
+`production-review.pending.json`. The form intentionally lacks reviewer, date,
+terms/credit/permission evidence and full-selection approval; both the form and
+restricted/unreviewed inputs must fail production validation. No source status,
+query, input bytes or approval is changed by preparing a packet.
+
+The [current review packet and decision checklist](../reports/issue-537/README.md)
+record actual network failures and remaining owner actions. Historical manifest
+metadata is not a refreshed terms review. The current synthetic Gaia/two-epoch
+Earth/single-exoplanet inputs remain development fixtures. Full selected inputs
+require new acquisition decisions and a new manifest, followed by regeneration
+and human approval bound to that exact new digest. A blank form cannot promote
+these fixtures by changing status/origin flags.
+
+Source-use decisions can be recorded independently of #537's balance and future
+experience reviews. Production consumers follow the actual unresolved source
+permission/snapshot requirement; closure of an umbrella issue alone grants no
+source approval. The existing private-development-only owner decision remains
+in force until explicitly revised with the required evidence.

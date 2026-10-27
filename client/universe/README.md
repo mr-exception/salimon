@@ -48,3 +48,8 @@ publication does not change playable startup; U24 owns that migration.
 ## Incremental private offline packs (#413)
 
 See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Bounded read-only pack queries (#414)
+
+See the [implemented contract](../../docs/universe-reader.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

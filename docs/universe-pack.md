@@ -48,3 +48,21 @@ Producer bundles retain raw JSON field bytes. Duplicate root fields reject, and
 the nested catalog is decoded from its original bytes so duplicate/unknown U01
 fields cannot be hidden by intermediate JSON normalization. Source hashes and
 the previous active manifest remain unchanged on these failures.
+
+## Raw observed-source input
+
+Instead of `input`, a cell may supply `observed` to run the existing U07/U08
+production adapters directly: `gaia` and `exoplanets` each select
+`{source:"dataset:id",artifact:"frozen/path.csv"}` from the source manifest;
+`horizons` is a list of `{source,artifact,system,parent,body_kind}` selections.
+Optional `stellar_cross_matches:[[source_id,canonical_id],...]` supplies explicit
+exact-ID associations. No name/proximity matching or missing measurement values
+are invented. Body classification/parents are explicit input, validated by U01.
+
+Selected raw cell artifacts are bounded to 8 MiB before collector allocation and
+rehash-checked into immutable input bytes immediately before import. Larger
+selections must be partitioned into dependency-closed batches; they are never
+silently truncated. Gaia measurements/selection evidence, Archive observations
+and Horizons states/raw responses are packaged as typed producer sidecars.
+Exactly one of `input` and `observed` is required per cell; explicit additional
+sidecars can provide full canonical world manifests alongside either route.

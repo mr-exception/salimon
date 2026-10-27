@@ -33,3 +33,12 @@ bundle fields and nested duplicate catalog fields reject before publication.
 The same 73 universe tests (including the expanded pipeline regression) and
 all-target Clippy pass, with final logs under `cloud/413-final-*`. This avoids
 normalizing malformed producer JSON into a valid-looking catalog.
+
+The standalone request also runs the actual Gaia/PS/Horizons adapters directly
+through `observed` cells, rather than requiring custom Rust glue to prepare raw
+observations. Exact source/artifact selections, cross-matches and body parents
+are explicit; all U07/U08 provenance, quality and ephemeris evidence is packaged.
+Raw cell batches are capped at 8 MiB and hash-checked again into immutable bytes
+before conversion. The pipeline regression imports all three pinned raw sources
+and verifies packaged Earth identity and Gaia/planet/ephemeris sidecars. The
+expanded 73-test suite and all-target Clippy pass (`cloud/413-raw-*`).

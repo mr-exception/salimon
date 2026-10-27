@@ -569,3 +569,10 @@ See the [implemented contract](universe-gravity.md) for ownership, inputs, bound
 ## Gravity-aware ship trajectory (#417)
 
 See the [implemented contract](universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.

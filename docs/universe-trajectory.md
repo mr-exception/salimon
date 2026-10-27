@@ -25,3 +25,10 @@ reference tests; launch/support/landing #418, moving-body collision #420, world
 streaming #422 and later playable terrain/new-run integration retain their own
 scope. Current compressed controller behavior is deliberately preserved. No
 human gameplay, M1 qualification or future source-release review gates this PR.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.

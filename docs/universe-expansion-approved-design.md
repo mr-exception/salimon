@@ -150,3 +150,10 @@ U12 packaging, U14 evolving states and U23/U24 playable terrain/arrival/mining
 remain downstream. Current runtime startup, discovery/chart and save semantics
 are unchanged; cloud #436–#439 retain separate integration acceptance, with human
 presentation/platform/budget criteria routed to #561/#557/#563.
+
+
+## Real-scale surface flight (#418)
+
+See the [surface-flight contract](universe-surface-flight.md) for rotating/orbiting support,
+Core-funded physically bounded landing/takeoff, production source/tests and
+remaining playable-world adoption. Current compressed gameplay is unchanged.

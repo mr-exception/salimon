@@ -2,6 +2,7 @@
 pub mod coordinates;
 pub mod ephemerides;
 mod epoch;
+pub mod gravity;
 pub mod inference;
 pub mod ingestion;
 pub mod pack;

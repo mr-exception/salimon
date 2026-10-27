@@ -2057,6 +2057,7 @@ version = "0.1.0"
 dependencies = [
  "crc32fast",
  "flate2",
+ "salimon-math",
  "serde",
  "serde_json",
  "sha2",

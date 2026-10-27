@@ -82,3 +82,8 @@ See the [implemented contract](../../docs/universe-reader.md) for ownership, inp
 ## Time-addressable ephemeris models (#415)
 
 See the [implemented contract](../../docs/universe-ephemerides.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Dominant-source celestial gravity (#416)
+
+See the [implemented contract](../../docs/universe-gravity.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

@@ -16,6 +16,52 @@ The M1 performance target remains a hardware qualification target, not a prerequ
 for routine cloud feature delivery. Never loosen an approved numerical or physics
 contract simply to complete a cloud task.
 
+## Cloud-only routine acceptance (owner decision 2026-10-27)
+
+**Default:** AI develops, tests, reports and proposes ordinary feature/fix
+delivery entirely in ChatGPT-compatible cloud execution and repository CI.
+Do not require the owner to launch the game, operate a native workstation,
+perform gameplay walkthroughs, supply Apple M1/Metal screenshots, or sign off
+visual polish before such tickets can be delivered.
+
+For each implementation:
+1. Convert observable gameplay requirements into deterministic portable tests,
+   scripted input/session routes, state assertions, regression fixtures and
+   failure/restart cases. Execute them against production code rather than mocks
+   alone; keep test coverage proportionate to the change.
+2. For rendering, use an actual production wgpu path on cloud Linux with
+   Xvfb/Mesa software Vulkan, save original screenshots and compare measurable
+   geometry, layout, pixel or temporal invariants with approved baselines.
+   CPU-only DTO/pixel fixtures are supporting evidence, not substitute captures.
+3. Run feasible fmt, Clippy, build, Rust tests, affected script/asset tests and
+   relevant scenario/E2E suites. Record exact commands, revisions, environment,
+   input/backend and outcomes (pass/fail/skip/unrun) in the issue report.
+4. Fix failed required cloud-verifiable criteria before delivery. If a check
+   cannot run because cloud tooling is missing, attempt to supply that tooling
+   or automate an equivalent *meaningful* check; otherwise disclose it and
+   keep materially unverified functionality explicitly incomplete.
+5. Open/update the normal reviewable PR; do not require separate human/native
+   testing for routine acceptance. The owner still reviews/merges the PR.
+
+**Release qualification is separate:** Genuine Metal/Windows device behavior,
+physical input, suspend/wake, hardware GPU counters, reference-M1 FPS, subjective
+art/audio taste, legal source rights and product/balance decisions cannot be
+inferred from cloud results. Preserve these as accurately scoped release risks
+or decision issues (#557, #561, #563, #659, #660, #661 as relevant); they do not
+block unrelated cloud-verified implementation delivery. A release claim requiring
+one of these checks remains unqualified until its real evidence exists. Never
+treat an unrun, blocked or failed criterion as a pass, weaken numeric/physics
+requirements, approve assets/baselines/data rights automatically, or claim
+end-to-end features exist when dependencies are absent.
+
+**Issue hygiene:** New routine implementation tickets should use
+`auto-verification` and contain executable cloud acceptance criteria. For
+existing mixed/native-gated tickets, migrate the implementation criteria into
+cloud-executable assertions, keep any genuinely physical/subjective conditions
+as separately linked non-blocking release qualifications, and preserve failed
+or unrun historical evidence. Do not mass-close human issues or remove genuine
+functional blockers simply because this policy changed.
+
 ## Labels and scope
 
 Give each active issue one primary verification label, preserving unrelated labels.

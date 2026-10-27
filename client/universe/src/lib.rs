@@ -5,6 +5,7 @@ pub mod inference;
 pub mod ingestion;
 pub mod pack;
 pub mod partitions;
+pub mod reader;
 pub mod reference;
 pub mod sources;
 pub mod starting_system;

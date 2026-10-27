@@ -705,3 +705,8 @@ ship-assist owners remain cohesive; see the [maintenance map](maintenance-map.md
 ## Incremental private offline packs (#413)
 
 See the [implemented contract](universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Bounded read-only pack queries (#414)
+
+See the [implemented contract](universe-reader.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.

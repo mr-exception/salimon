@@ -1,6 +1,14 @@
 # Repository guidelines
 
-Use the owner-approved [cloud and human verification workflow](docs/verification-workflow.md).
+Use the owner-approved [cloud-first verification workflow](docs/verification-workflow.md).
+Routine implementation acceptance is cloud-only: do not require human gameplay,
+native macOS/Windows execution or physical M1 verification to deliver a normal
+feature PR. Run meaningful automated checks in the available cloud executor,
+including production Linux software-Vulkan rendering where appearance matters.
+When the cloud cannot exercise a platform-specific property, mark it unverified
+and route it to non-blocking release qualification, never claim it passed.
+Human approval is reserved for actual product/legal decisions and final release
+qualification, not routine ticket completion.
 Label active issues `auto-verification` or `human-verification`; retire the
 `native` label and title prefix. AI executes cloud checks, creates/updates a PR
 and updates its issue. Human issues give actionable capture instructions and

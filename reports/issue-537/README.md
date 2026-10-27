@@ -59,6 +59,25 @@ identity or bypass was attempted. Record/archive actual full terms and credits
 before asking the owner for a source-specific production decision. Changing a
 network rule itself would not approve reuse or full selected snapshots.
 
+## Retry after provider-access confirmation
+
+After the owner reported enabling provider access, all three requests were retried.
+They still failed before receiving any provider content with proxy-tunnel
+`403 Forbidden`; [retry URLs, times and errors](network/retry/gaia-license.json),
+[JPL retry](network/retry/jpl-manual.json) and
+[Exoplanet retry](network/retry/exoplanet-acknowledge.json) preserve the results.
+
+The [current runtime policy observation](network/retry-policy.json) reports
+specification revision **3**, matching observed revision 3, current observations
+and an enforced restricted policy. Its only preset is `package_managers`;
+`allowed_hosts` is empty and none of the four requested provider domains appears
+in the effective rules. Thus the running policy still excludes those hosts.
+This records the running instance, not a claim about what the owner saved in
+another configuration draft. No configuration-write capability is exposed here.
+The next action is to apply the four provider hostnames as allowed destinations
+to this chat's active environment; enabling a package-manager preset alone does
+not allow them. No additional permission to research the sources is needed.
+
 ## Refreshed balance and experience limits
 
 All six current portable survival-balance tests pass. Their assumed travel/setup

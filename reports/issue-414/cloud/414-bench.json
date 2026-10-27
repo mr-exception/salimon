@@ -1,0 +1,82 @@
+{
+  "arch": "x86_64",
+  "os": "linux",
+  "rows": [
+    {
+      "budget_bytes": 16384,
+      "catalog_io": {
+        "cache_hits": 82,
+        "catalog_blob_bytes": 34112316,
+        "catalog_blob_reads": 20118
+      },
+      "cells": 1024,
+      "latency_microseconds": {
+        "max": 1507.489,
+        "p50": 32.138000000000005,
+        "p95": 60.671
+      },
+      "max_resident_encoded_bytes": 16384,
+      "prefetch_error": null,
+      "random_seeks": 20000,
+      "rss_kib_after": 3340,
+      "rss_kib_before": 2580,
+      "rss_kib_quarters": [
+        2816,
+        3132,
+        3176,
+        3188
+      ]
+    },
+    {
+      "budget_bytes": 65536,
+      "catalog_io": {
+        "cache_hits": 319,
+        "catalog_blob_bytes": 33690118,
+        "catalog_blob_reads": 19869
+      },
+      "cells": 1024,
+      "latency_microseconds": {
+        "max": 801.686,
+        "p50": 45.488,
+        "p95": 63.465
+      },
+      "max_resident_encoded_bytes": 65536,
+      "prefetch_error": null,
+      "random_seeks": 20000,
+      "rss_kib_after": 3620,
+      "rss_kib_before": 3556,
+      "rss_kib_quarters": [
+        3556,
+        3608,
+        3608,
+        3608
+      ]
+    },
+    {
+      "budget_bytes": 262144,
+      "catalog_io": {
+        "cache_hits": 1269,
+        "catalog_blob_bytes": 32097988,
+        "catalog_blob_reads": 18930
+      },
+      "cells": 1024,
+      "latency_microseconds": {
+        "max": 1573.117,
+        "p50": 33.751000000000005,
+        "p95": 54.342000000000006
+      },
+      "max_resident_encoded_bytes": 262144,
+      "prefetch_error": null,
+      "random_seeks": 20000,
+      "rss_kib_after": 3792,
+      "rss_kib_before": 3620,
+      "rss_kib_quarters": [
+        3620,
+        3656,
+        3656,
+        3656
+      ]
+    }
+  ],
+  "scope": "actual filesystem reader/worker; RSS includes manifest/index, allocator and caller-owned decoded catalogs beyond encoded cache"
+}

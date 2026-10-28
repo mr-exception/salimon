@@ -173,3 +173,6 @@ certified earliest-event queries, atomic gravity/drag interception, body-relativ
 consequences, funded-work receipts, cloud tests and adoption/precision limits.
 
 Implementation status (#421): bounded coasting-gravity forecasts and a current-controller cockpit preview are delivered through separate explicit model boundaries; see [navigation prediction](universe-navigation.md). Neither provides autopilot, guaranteed arrival, new discoveries or complete runtime ephemeris adoption (#427/#432).
+
+
+U27 #428 implements the portable contact/history authority; see [scanner contract](universe-scanner.md). Pulses, saves and cockpit/chart consumers remain their separate downstream issues.

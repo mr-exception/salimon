@@ -120,6 +120,13 @@ impl GameplaySession {
         if header.schema_version >= 22 {
             let elapsed = launch_utc.saturating_sub(candidate.offline.watermark);
             candidate.reconcile_construction_offline(Duration::from_secs(elapsed), &[])?;
+            if candidate.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
+                candidate
+                    .scanner
+                    .advance_closed(elapsed.checked_mul(1000).ok_or_else(|| {
+                        salimon_persistence::invalid("scanner offline UTC overflow")
+                    })?)?;
+            }
         }
         candidate.offline.watermark = candidate.offline.watermark.max(launch_utc);
         candidate

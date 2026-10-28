@@ -565,3 +565,14 @@ resource/physics/Fabricator integration and schema-24 definition binding to owne
 and tests. It preserves the frozen terrain and explicit historical fixtures.
 
 Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+
+## Scanner source — schema 25 (#431)
+
+Canonical sessions require the validated versioned scanner checkpoint, parameters,
+logical UTC clock and sub-millisecond remainder. History retains exact identity,
+frame, sampled position/velocity, first/last-seen and refresh counts. Current missing
+or corrupt state rejects atomically; catalog mismatch is incompatible, not silently
+reseeded. Canonical schemas 1–24 migrate empty at checkpoint UTC; compressed test
+fixtures omit scanner source. Startup/restart binds new clocks and launch advances
+freshness exactly once without free detections. See the
+[scanner checkpoint contract](universe-scanner.md#checkpoints-and-launch-431).

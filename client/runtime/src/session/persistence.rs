@@ -15,6 +15,8 @@ use salimon_persistence::{SaveError, Validate, invalid};
 #[serde(deny_unknown_fields)]
 pub(crate) struct SessionState {
     physical: PhysicalState,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    scanner: Option<super::scanner::save::ScannerSave>,
     #[serde(default)]
     offline: Option<super::offline::OfflineClock>,
     #[serde(default)]
@@ -47,6 +49,9 @@ pub(crate) struct SessionState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(scanner) = &self.scanner {
+            scanner.validate()?;
+        }
         if let Some(clock) = &self.offline {
             clock.validate()?;
             clock.validate_sites(
@@ -95,6 +100,8 @@ impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            scanner: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
+                .then(|| self.scanner.capture()),
             offline: Some(
                 self.offline
                     .captured(now_unix_seconds, self.construction_safety_record()),
@@ -150,6 +157,12 @@ impl GameplaySession {
         let (fabricator, consumables) =
             super::fabrication::save::restore(save.state.fabrication, save.schema_version)?;
         let physical = save.state.physical.restore()?;
+        let scanner = super::scanner::Scanner::restore(
+            save.state.scanner,
+            save.schema_version,
+            physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
+            save.saved_at_unix_seconds,
+        )?;
         let mounts = super::mounts::save::restore(save.state.mounts, save.schema_version)?;
         super::finishes::save::validate_schema(&save.state.finishes, save.schema_version)?;
         super::core_upgrades::save::validate_schema(
@@ -157,6 +170,7 @@ impl GameplaySession {
             save.schema_version,
         )?;
         let mut restored = Self {
+            scanner,
             lighting: save.state.lighting,
             core_upgrades: save.state.core_upgrades,
             surface_age,

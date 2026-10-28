@@ -6,6 +6,7 @@
 //! This crate deliberately has no windowing or GPU dependency.
 
 mod camera;
+pub mod canonical;
 mod catalog;
 mod coordinates;
 mod geometry;

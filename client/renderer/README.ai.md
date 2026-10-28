@@ -223,3 +223,11 @@ capture, submission and observations. Keep facade/resource ownership in
 Resource geometry (#644): pure GLB validation and stable index packing live in
 `src/resource_mesh/geometry.rs`. Keep GPU staging/upload/culling in the parent;
 see [resource ownership](architecture.md#resource-geometry-owner-644).
+
+
+## Canonical terrain masks (#424)
+
+Terrain preparation passes the caller's validated mask radius to the existing
+shader instead of hard-coding the 4,096 m fixture cap. Canonical whole-planet
+meshes retain published relief at orbital LOD; old fixture mask radii and shader
+layouts are unchanged. See [canonical terrain](../../docs/universe-terrain.md).

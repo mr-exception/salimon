@@ -107,6 +107,9 @@ fn run_config(
                 "E2E desktop input isolated; protocol controls retained across focus resets"
             );
         }
+        if config.scenario == e2e::Scenario::CanonicalTerrain {
+            application.scout_reference = crate::scout_reference::find("universe-orbit");
+        }
         e2e::initialize(&mut application.session, config)
             .map(|()| application.e2e_config = Some(config))
             .map_err(|error| RunError::new("E2E setup failed", error))?;

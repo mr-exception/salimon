@@ -286,3 +286,11 @@ scene/overlay draw, asynchronous timing, capture/submission/present order; see
 Resource geometry extraction (#644) preserves authored triangle/facet order,
 index packing, CPU support values and 7-float vertex layout; source ownership
 is documented [here](architecture.md#resource-geometry-owner-644).
+
+
+## Canonical terrain masks (#424)
+
+Terrain preparation passes the caller's validated mask radius to the existing
+shader instead of hard-coding the 4,096 m fixture cap. Canonical whole-planet
+meshes retain published relief at orbital LOD; old fixture mask radii and shader
+layouts are unchanged. See [canonical terrain](../../docs/universe-terrain.md).

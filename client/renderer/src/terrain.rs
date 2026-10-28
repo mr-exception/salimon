@@ -212,8 +212,12 @@ impl TerrainRenderer {
         let camera = scene.camera;
         let patches = scene.terrain;
         let light = scene.light;
-        let mask = scene.terrain_mask;
         let invalid = |s| RendererError::new("terrain patch preparation failed", s);
+        let mask = scene.terrain_mask;
+        let mask_radius = mask.map_or(4096.0, |m| m.radius_meters as f32);
+        if !mask_radius.is_finite() || mask_radius <= 0.0 {
+            return Err(invalid("terrain mask radius"));
+        }
         if patches.len() > MAX_PATCHES {
             return Err(invalid("active patch budget exceeded"));
         }
@@ -344,7 +348,7 @@ impl TerrainRenderer {
                         light_color[2],
                     ])
                     .chain([light_position[0], light_position[1], light_position[2], 0.0])
-                    .chain([mask_offset[0], mask_offset[1], mask_offset[2], 4096.0])
+                    .chain([mask_offset[0], mask_offset[1], mask_offset[2], mask_radius])
                     .chain([
                         patch.anchor_meters[0] as f32,
                         patch.anchor_meters[1] as f32,

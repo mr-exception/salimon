@@ -6,11 +6,34 @@ use salimon_ship::ShipPose;
 #[serde(deny_unknown_fields)]
 pub(crate) struct View {
     pub(crate) name: String,
+    #[serde(default)]
+    absolute: bool,
     eye: [f64; 3],
     target: [f64; 3],
 }
 
 pub(crate) fn find(name: &str) -> Option<View> {
+    let radius = salimon_world::canonical::START
+        .manifest()
+        .physical
+        .radius_meters;
+    let eye = match name {
+        "universe-orbit" => Some([0., radius * 2.5, 0.]),
+        "universe-surface" => Some([45., radius + 3., 70.]),
+        "universe-edge" => {
+            let d = radius / 2.0_f64.sqrt();
+            Some([d + 500., d + 500., 0.])
+        }
+        _ => None,
+    };
+    if let Some(eye) = eye {
+        return Some(View {
+            name: name.into(),
+            absolute: true,
+            eye,
+            target: [0., radius, 0.],
+        });
+    }
     let views: Vec<View> =
         serde_json::from_str(include_str!("../../../scenarios/visual/scout-cameras.json"))
             .expect("checked-in reference camera contract");
@@ -31,6 +54,15 @@ pub(crate) fn find(name: &str) -> Option<View> {
 
 impl View {
     pub(crate) fn camera(&self, pose: ShipPose) -> CameraFrame {
+        if self.absolute {
+            return CameraFrame {
+                position_meters: self.eye,
+                target_meters: self.target,
+                up: [0., 0., 1.],
+                vertical_fov_radians: 70.0_f32.to_radians(),
+                near_plane_meters: 0.05,
+            };
+        }
         let frame = crate::session::frames::character_ship_frame(pose);
         CameraFrame {
             position_meters: frame.local_to_world(self.eye),

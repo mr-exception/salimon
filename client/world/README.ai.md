@@ -40,7 +40,7 @@ owning module rather than expanding the facade. Resource module paths are unchan
 
 ## Change checklist
 
-- Preserve the exact ordered membership: Sun, Mercury, Venus, Earth, Moon, Mars.
+- Preserve the exact ordered compressed-fixture membership: Sun, Mercury, Venus, Earth, Moon, Mars.
 - Keep the Sun visual-only and all five `1.15R` solid landing volumes disjoint.
 - Preserve the 24-second Earth-to-Mars surface trip at the catalog reference
   maximum speed unless a source-of-truth decision changes it.
@@ -80,3 +80,11 @@ The shared carry slot also accepts externally owned physical fixture IDs; fixtur
 
 
 Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.
+
+
+## Canonical terrain streaming (#424)
+
+See the [canonical terrain contract](../../docs/universe-terrain.md) for the exact U11
+evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
+and normal alien-world startup belong to #425/#426.

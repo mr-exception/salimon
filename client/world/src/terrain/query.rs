@@ -44,6 +44,11 @@ impl TerrainDefinition {
         })
     }
     fn evaluate(&self, direction: [f64; 3]) -> f64 {
+        if let Some(start) = &self.canonical {
+            return start
+                .height_meters(direction)
+                .expect("validated finite unit direction");
+        }
         let mut height = 0.0;
         for (index, layer) in self.layers.iter().enumerate() {
             let point = direction.map(|x| x * (self.radius_meters / layer.wavelength_meters));

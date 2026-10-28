@@ -151,6 +151,7 @@ impl BodyResourceDistribution {
             CelestialBodyId::Earth => "earth",
             CelestialBodyId::Moon => "moon",
             CelestialBodyId::Mars => "mars",
+            CelestialBodyId::Vesper => "salimon-fiction:awakening.s000000.p00",
         };
         let mut seed = hash_bytes(0xcbf29ce484222325, &world_seed.to_le_bytes());
         seed = hash_bytes(seed, &self.seed.to_le_bytes());
@@ -197,7 +198,7 @@ pub fn default_resource_distribution(body: CelestialBodyId) -> BodyResourceDistr
     use ResourceId::{IronOre, MedicinalCompounds, OrganicBiomass, SilicateRock, WaterIce};
     type ProfileEntry = (ResourceId, f64, f64, [f64; 2]);
     let (seed, entries): (u64, &[ProfileEntry]) = match body {
-        CelestialBodyId::Sun => (0, &[]),
+        CelestialBodyId::Sun | CelestialBodyId::Vesper => (0, &[]),
         CelestialBodyId::Mercury => (
             1,
             &[

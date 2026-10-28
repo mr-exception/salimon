@@ -1,0 +1,9 @@
+   Compiling salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.39s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-51a9b9987d94bb8e)
+
+running 1 test
+test app::interaction::tests::cockpit_prompt_is_shown_only_for_the_aimed_nearby_cockpit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 495 filtered out; finished in 0.03s
+

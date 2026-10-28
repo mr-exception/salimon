@@ -161,8 +161,5 @@ U12 #413 owns production merging/packaging; U14 #415 evolving states; U23 #424
 real-scale terrain LOD; U24 #425 playable arrival/resources integration.
 Cloud integration gates #436–#439 remain separate; human review/platform/budget
 criteria are #561/#557/#563 under the [verification workflow](verification-workflow.md).
-There is no runtime
-startup, save, scanner/chart, Earth-route, backend or asset change. Renderer/native
-appearance, environmental survival and real hull contact are not validated by
-this portable definition. Explicit all-player-consistent fictional revision
+The portable definition alone does not validate renderer/native appearance or hull contact. Runtime surface/save adoption is now delivered by #425 and normal startup/restart by #426; see [canonical gameplay](universe-gameplay.md) and its production evidence. Scanner/chart, Earth-route retirement (#427), backend and asset work remain separate. Explicit all-player-consistent fictional revision
 migration remains mandatory; no implicit update of a visited world is allowed.

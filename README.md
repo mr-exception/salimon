@@ -19,8 +19,8 @@ physical Core monitor shows conversion, consumption, depletion and warnings. Rou
 let the player walk past the console into the cockpit nose. Loose fragments can
 be dropped on the cabin deck and pile up; the separate cargo module is removed. See
 the [ship asset guide](client/assets/ship/README.md).
-The native client starts inside the custom
-Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
+The native client starts outside the custom
+Salimon scout landed on Vesper in Nacre Reach (over 30 light-years from Earth), with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed/open-space
 door, and radial surface traversal.
 

@@ -1,0 +1,11 @@
+
+running 6 tests
+test terrain::geology::tests::continuous_fields_at_cube_edges_and_province_junctions ... ok
+test terrain::geology::tests::frozen_recipe_roundtrip_and_query_order ... ok
+test terrain::geology::tests::golden_region_vector_is_stable_across_clients ... ok
+test terrain::geology::tests::profiles_history_and_invalid_directions ... ok
+test terrain::geology::tests::revision_and_upstream_changes_require_explicit_migration ... ok
+test terrain::geology::tests::vesper_remains_the_exact_published_surface_and_resources ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 45 filtered out; finished in 0.17s
+

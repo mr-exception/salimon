@@ -105,3 +105,11 @@ Automate reproducibility, numerical identities, resource conservation, reload/go
 Start with canonical terrain/geology/region contracts, then physically supported surface materials/atmosphere and independently coherent climate/weather. Build biosphere selection/organism grammars on those regions; integrate collision and harvesting through existing resource/carrying contracts. Add landmark site placements and visual observation on canonical positions; suit field marks/Scout planetary chart extend—not replace—existing player-known chart and scanner history. Finish with combined cloud tests and **separate** native visual, acoustic and performance signoff.
 
 Check existing #424 (terrain LOD), #425 (landing/mining), #419 (atmospheric drag), #423 (astronomical sky), #428–431 (scanner/history), #469 (player-known chart), #406 (universe saves), #561 (human presentation review), and #563 (hardware budgets) for integration; these are not claims that this new environmental scope is implemented. Implementation PRs must update the source-of-truth and any superseded docs, plus test evidence, not just ship visuals.
+
+
+## Implemented geology boundary (#612)
+
+[Terrain-bound geology](planetary-geology.md) now supplies versioned deterministic
+province, history, substrate and layer observations without changing published
+terrain or resources. This additive implementation does not implement weather,
+active sites, biospheres or new terrain migrations. Surface presentation is #613.

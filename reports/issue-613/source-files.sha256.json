@@ -1,0 +1,11 @@
+{
+  "client/renderer/src/spheres.rs": "8f50725bfea74824d9cf440b9cb4183dbbab85235aba571e4083d3c32921cac7",
+  "client/renderer/src/surface_textures.rs": "2c60fb0b032fe6945f147f2da658480d99cd460884abd9a80c28f4ce6cc3dcec",
+  "client/renderer/src/terrain.rs": "3220547e2a79d100b285767ec626e4fc3abee4136569ba08b51fe60370684118",
+  "client/renderer/src/terrain.wgsl": "6d859f461b0eaed841949f7947d52ccff33e47469d90335e32c647bd9131cba7",
+  "client/renderer/src/terrain_style_tests.rs": "156b0fec057d90721d5042fddc020275dc0d36e4e3451f39e1047a91ab1efd03",
+  "client/runtime/src/main.rs": "8846f37134e6a133fdfabc06466feb44aa7578b4ab5ea8b544a9655c978dac29",
+  "client/runtime/src/scout_reference.rs": "e0bbd8af61a1e2b7414a1c142cf75aa9733cd07d350b939680512f1d503719bf",
+  "client/runtime/src/terrain_materials.rs": "80b0f183301c0222838751237745c0c9f14eb3219e496c377eb46eacd54dd91b",
+  "client/runtime/src/terrain_patches.rs": "608140759be929d15a522b7e1a60e511bd6b98374da997ef260a98355549fced"
+}

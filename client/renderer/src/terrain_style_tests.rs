@@ -37,6 +37,8 @@ fn patch(material: SurfaceMaterial) -> Arc<TerrainPatch> {
                 offset_meters: [x, height(x, z), z],
                 normal: [-dx / length, 1.0 / length, -dz / length],
                 far_offset_meters: [x, 0.0, z],
+                albedo_factor: 1.0,
+                strata: [0.0, 1.0, 0.0],
             });
         }
     }
@@ -67,6 +69,16 @@ fn patch(material: SurfaceMaterial) -> Arc<TerrainPatch> {
 #[test]
 #[ignore = "requires GPU; SALIMON_TERRAIN_STYLE_DIR saves deterministic pixels and timestamp costs"]
 fn terrain_style_reference() {
+    render_reference(false);
+}
+
+#[test]
+#[ignore = "requires GPU; exports day/night geology/ice and neutral controls"]
+fn terrain_geology_reference() {
+    render_reference(true);
+}
+
+fn render_reference(geological: bool) {
     let directory = std::path::PathBuf::from(
         std::env::var("SALIMON_TERRAIN_STYLE_DIR").expect("set evidence directory"),
     );
@@ -107,15 +119,37 @@ fn terrain_style_reference() {
     let depth = crate::DepthTarget::new(&device, size.width, size.height);
     let mut csv = String::new();
     writeln!(csv, "scene,draws,triangles,patch_gpu_bytes,uniform_upload_bytes,gpu_samples,median_gpu_ms,p95_gpu_ms").unwrap();
-    for (name, material) in [
-        ("earth", SurfaceMaterial::Oceanic),
-        ("moon", SurfaceMaterial::Slate),
-        ("mars", SurfaceMaterial::Rust),
-    ] {
+    let cases = if geological {
+        vec![
+            ("rock-day", SurfaceMaterial::Slate),
+            ("rock-night", SurfaceMaterial::Slate),
+            ("ice-day", SurfaceMaterial::Ice),
+            ("ice-night", SurfaceMaterial::Ice),
+        ]
+    } else {
+        vec![
+            ("earth", SurfaceMaterial::Oceanic),
+            ("moon", SurfaceMaterial::Slate),
+            ("mars", SurfaceMaterial::Rust),
+        ]
+    };
+    for (name, material) in cases {
         let mut transition_previous: Option<Vec<u8>> = None;
         for distance in [60.0, 79.99, 80.01, 239.99, 240.01, 300.0, 3e6] {
             let orbital = distance > 1e6;
-            let patch = patch(material);
+            let mut patch = patch(material);
+            if geological {
+                let data = Arc::make_mut(&mut patch);
+                data.key.definition = name.as_bytes().to_vec();
+                for v in &mut data.vertices {
+                    v.albedo_factor = if name.starts_with("ice") { 0.98 } else { 0.86 };
+                    v.strata = [
+                        v.offset_meters[1],
+                        1.75,
+                        if name.starts_with("ice") { 0.18 } else { 0.5 },
+                    ];
+                }
+            }
             let patches = if orbital { vec![] } else { vec![patch] };
             let center = [1e12; 3];
             let target = [
@@ -153,7 +187,11 @@ fn terrain_style_reference() {
                 terrain: &patches,
                 terrain_mask: None,
                 light: Some(PointLight {
-                    position_meters: [1e12 - 3e6, 1e12 + 5e6, 1e12 + 2e6],
+                    position_meters: [
+                        1e12 - 3e6,
+                        1e12 + if name.ends_with("night") { -5e6 } else { 5e6 },
+                        1e12 + 2e6,
+                    ],
                     color: [1.0; 3],
                 }),
                 ship: None,

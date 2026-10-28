@@ -113,3 +113,11 @@ Check existing #424 (terrain LOD), #425 (landing/mining), #419 (atmospheric drag
 province, history, substrate and layer observations without changing published
 terrain or resources. This additive implementation does not implement weather,
 active sites, biospheres or new terrain migrations. Surface presentation is #613.
+
+
+## Implemented surface presentation (#613)
+
+[Geological materials](geological-materials.md) now map versioned geology into
+neutral exposure/weathering response and filtered layers in production terrain.
+Vesper remains unchanged. This does not implement climate, active sites, biology
+or physical terrain migrations.

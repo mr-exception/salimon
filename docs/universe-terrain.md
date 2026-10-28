@@ -27,7 +27,9 @@ identity. Mesh normals/heights are body-local; camera subtraction precedes f32.
 The renderer uses the declared mask radius for terrain morphing, so whole-planet
 meshes retain their relief rather than flattening everything beyond a fixture's
 4,096 m cap. The canonical patch and far sphere use the same Slate presentation
-material; biome/geology/material authoring remains its separately planned scope.
+material. [Geological shading](geological-materials.md) now supplies versioned
+non-displacing material observations for other profiles while preserving Vesper;
+climate and biospheres retain their separately planned scope.
 
 Existing bounds remain: 512 active / 1,024 cached CPU patches, eight generated
 per frame and 2 ms cooperative preparation admission (a final unit may overrun
@@ -53,3 +55,12 @@ rendering PR; #425/#426 integrate playable canonical spawning and interaction.
 Screenshots and CPU/GPU preparation/memory observations belong in the issue report.
 Software Vulkan establishes actual production rendering, not M1/Metal 60 FPS;
 subjective presentation and hardware budgets remain #561/#563.
+
+
+## Geological surface materials (#613)
+
+Follow the [geological material contract](geological-materials.md) for terrain-bound
+profile mapping, immutable material cache keys, the 52-byte vertex layout,
+filtered stratification and original software-Vulkan evidence. Runtime owns
+geology-to-DTO mapping; renderer owns shading only. Vesper and resource palettes,
+physical queries, geometry and save identities are preserved.

@@ -17,8 +17,9 @@ struct Output {
     @location(1) local: vec3<f32>,
     @location(2) radial: vec3<f32>,
     @location(3) facet_weight: f32,
+    @location(4) geology: vec4<f32>,
 };
-@vertex fn vs_main(@location(0) position: vec3<f32>, @location(1) normal: vec3<f32>, @location(2) far_position: vec3<f32>) -> Output {
+@vertex fn vs_main(@location(0) position: vec3<f32>, @location(1) normal: vec3<f32>, @location(2) far_position: vec3<f32>, @location(3) albedo_factor: f32, @location(4) strata: vec3<f32>) -> Output {
     var out: Output;
     let outer_blend = smoothstep(terrain_uniform.mask.w, terrain_uniform.mask.w * 1.5, length(position - terrain_uniform.mask.xyz));
     let blend = mix(1.0,outer_blend,terrain_uniform.anchor.w);
@@ -27,6 +28,7 @@ struct Output {
     let radial = normalize(local + terrain_uniform.anchor.xyz);
     out.normal = mix(normal,radial,blend);
     out.local = local;
+    out.geology = vec4(albedo_factor, strata);
     out.radial = radial;
     // Distance fades shading only. Vertex morph, shared borders and depth stay
     // unchanged; outer transition and startup converge to the analytic surface.
@@ -51,5 +53,11 @@ struct Output {
     let to_light=terrain_uniform.light.xyz-in.local;
     let light_direction=to_light/max(length(to_light),0.00001);
     let diffuse = max(dot(n,light_direction),0.0);
-    return vec4(base*(0.94+0.12*detail)*(vec3(0.22)+0.78*diffuse*terrain_uniform.material_light_color.yzw),1.0);
+    // Derivative filtering converges to the same mean at coarse LOD/quality;
+    // strata never displace vertices, normals, depth, collision or resource colors.
+    let phase = in.geology.y / max(in.geology.z, 0.01);
+    let visibility = 1.0 - smoothstep(0.15, 0.75, fwidth(phase));
+    let band = mix(0.96, 0.92 + 0.08 * abs(fract(phase) - 0.5) * 2.0, visibility);
+    let geological_albedo = in.geology.x * mix(1.0, band, in.geology.w);
+    return vec4(base*geological_albedo*(0.94+0.12*detail)*(vec3(0.22)+0.78*diffuse*terrain_uniform.material_light_color.yzw),1.0);
 }

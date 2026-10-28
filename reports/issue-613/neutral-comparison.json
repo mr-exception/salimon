@@ -1,0 +1,130 @@
+{
+  "scenes": [
+    {
+      "scene": "earth-fade-end-after",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "earth-fade-end-before",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "earth-fade-start-after",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "earth-fade-start-before",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 3,
+      "max_channel_delta": 1
+    },
+    {
+      "scene": "earth-far",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "earth-near",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "earth-orbit",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "mars-fade-end-after",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "mars-fade-end-before",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "mars-fade-start-after",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "mars-fade-start-before",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "mars-far",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "scene": "mars-near",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "scene": "mars-orbit",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "moon-fade-end-after",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "moon-fade-end-before",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "moon-fade-start-after",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "scene": "moon-fade-start-before",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 2,
+      "max_channel_delta": 1
+    },
+    {
+      "scene": "moon-far",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "scene": "moon-near",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "scene": "moon-orbit",
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    }
+  ]
+}

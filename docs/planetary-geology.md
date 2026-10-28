@@ -57,3 +57,11 @@ The [world architecture](../client/world/architecture.md) and
 [Approved direction](planetary-environment-art-direction.md) retains future
 requirements. No renderer changes occur in #612; actual rendered appearance is
 #613, with subjective/hardware qualification retained in #561/#563.
+
+
+## Implemented surface presentation (#613)
+
+[Geological materials](geological-materials.md) now map versioned geology into
+neutral exposure/weathering response and filtered layers in production terrain.
+Vesper remains unchanged. This does not implement climate, active sites, biology
+or physical terrain migrations.

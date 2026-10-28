@@ -3,6 +3,8 @@ use super::*;
 pub(super) fn key_code(name: &str) -> Option<KeyCode> {
     match name {
         "scanner_next" => Some(KeyCode::KeyM),
+        "chart" => Some(KeyCode::KeyP),
+        "chart_route" => Some(KeyCode::Enter),
         "consumable_wheel" => Some(KeyCode::KeyQ),
         "wheel_next" => Some(KeyCode::Tab),
         "wheel_confirm" => Some(KeyCode::Enter),

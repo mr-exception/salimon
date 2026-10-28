@@ -82,6 +82,16 @@ pub(crate) fn dispatch(session: &mut GameplaySession, key: Key, pressed: bool) {
         session.scanner_next_contact();
         return;
     }
+    if pressed && session.view_mode == ViewMode::Gameplay {
+        if key == Key::TourPause {
+            session.chart_toggle();
+            return;
+        }
+        if session.scanner.chart_mode && matches!(key, Key::Confirm | Key::ConfirmAlternate) {
+            session.chart_route_selected();
+            return;
+        }
+    }
     let command = if !pressed {
         if let Some(control) = control_key(key) {
             Some(Command::Control(control, false))

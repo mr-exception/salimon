@@ -1,0 +1,77 @@
+{
+  "parent_commit": "21c2d8ea151e35654652718b1b5a36d9e789a4d3",
+  "source_overlay_hashes": {
+    "README.md": "f94b719f046f4db8a5e7bf578e70b7f63fc0786bf458c8240e805cae7c2b87b8",
+    "client/persistence/README.ai.md": "e67afd64406279f29e1c937d2c45b7831c58bf778e920814770417fa618525fa",
+    "client/persistence/architecture.md": "ac1d025265f256c81de6f077a919d80b40b6c259782d3f1e38b2c5aa43971da0",
+    "client/persistence/invariants.md": "f5d63ee25b59f7a2ff1133bbf1211c5ecb7c1182bf8fcbcca3eb0a8be034df87",
+    "client/persistence/src/lib.rs": "908c4abf3c1f32a238a0135acc62c436706b872ba2a7edccc9965ca8c27ca474",
+    "client/renderer/README.ai.md": "628366896534ae5a6e62020f2459796168d606c17762677ac8d12c19c9a5f658",
+    "client/renderer/architecture.md": "da67789ba9984896af1f6c5630cd61651cc9639bcccac49c03b480f6d8a28734",
+    "client/renderer/invariants.md": "3373c9fdb5ac9073ac902624fb7e22d518bcfeb99d66a3b34bf3dc4e9622ca83",
+    "client/renderer/src/lib.rs": "d75c0bf3bae654bb437bd4230019daf55b3a3282b9f3a77b6ec06c4c5fe8baff",
+    "client/renderer/src/scanner_hologram.rs": "718d9a286630e074e4d90b6e24ef8fe5b3d366a9297c975dfe1c22a7c7665c1d",
+    "client/runtime/README.ai.md": "5dc5c84a0de17935737900c244d5ed4581057afb7a846d31979bffe19c67d3d7",
+    "client/runtime/architecture.md": "878b24c7dfa695c3dd67269e01ad7c27ffecf771a2fd8a89540ae7a767151eba",
+    "client/runtime/invariants.md": "6201b7d64b90fbdc85efec6a682b21657f40aee8de861af09160b1604dbb7ce9",
+    "client/runtime/src/automation/inspection.rs": "83df076e0a3e4e92ae1553b6327b12774abe97db5023ddf784ed98bf00c2349d",
+    "client/runtime/src/automation/keys.rs": "b0f0347bb7b10d2244c9a1afcfffc7b102caebede9a84ea444c5be9536ea8854",
+    "client/runtime/src/session.rs": "224dec7e8842a3d8dacaabc037ac7c9c74c4e80d41e3737b5216d56c34a98a0a",
+    "client/runtime/src/session/chart.rs": "2fc079e354795c09c27761fc667838cb312eea640cbf3e22bae7229c5b9c296a",
+    "client/runtime/src/session/chart/tests.rs": "16a8e7cb2e1478a81b43e1d25c27e349587229899f3a221a93753d3b7ee23801",
+    "client/runtime/src/session/init.rs": "10d5167be3f75063532078b4d15b60b4ee5adb4f06c1b82b70ad71d49ec7f037",
+    "client/runtime/src/session/input.rs": "6c6d915e7b8afc8b04af46371473dd3c9d126729bd7f6800a835854fcfecf5df",
+    "client/runtime/src/session/persistence.rs": "ddc6467862341e92253ffff0e48930ac4eff43571c42e7a1bec09c250dc522a8",
+    "client/runtime/src/session/scanner.rs": "232c440b4848d4fdc2acbff2b6d394efee0c680f90573dfbf7ecb036250f8b7b",
+    "client/runtime/src/session/scanner/presentation.rs": "3d1d4335650005c60c4ff0b2b3e656cf56bf4e99df222c1dfd0d0ff2cf5212a7",
+    "client/runtime/src/session/scanner/save.rs": "1f5e6ee8ec9f645c5c4c49fe812cec39ec7f9caebaf215b25837b0560b68ad90",
+    "client/universe/README.ai.md": "f7e5e4bcfd66f0b1414ad0a960b4168f8241d79bb18a84aa36f120b11ef719e2",
+    "client/universe/architecture.md": "31fcfbbc2f240acc4e640ec5ed746e53776ac3d080382588b2ae4b88522b96a5",
+    "client/universe/invariants.md": "139b6b81f9fac2f79a7d2c1ca7b7c65f15eb4bf461b0bc830dd57854015b319d",
+    "client/universe/src/lib.rs": "5870545a066f658bdd88606fdf6ba2f33f96f78c936bebf243f3065b0028ce5c",
+    "client/universe/src/scanner.rs": "cc891c50169958444398d35946c64773d9701b2568fa128c4cc37bc91429fef8",
+    "client/universe/src/scanner/chart.rs": "d39cd3a9c9eb3fd9cc8a30d24ba29d94a694d5be75dd9df19954c1110349bed2",
+    "client/universe/src/scanner/chart/tests.rs": "cf25036f7cc1c4bc69f81753ef28fe79eddf1a7df3d78aadadf190b621756ba2",
+    "docs/archive-recovery-and-navigation.md": "a8aee0b5208d31ff89112954e012465c0c3f2337cd3ad9c2370a34d7017ec074",
+    "docs/maintenance-map.md": "d62b4c213d5dc4d1b5d97879999801bae634bb729ef4f02079b2e64a8b964461",
+    "docs/save-contract.md": "ec13a66a0800bfdefed3e3f218fee634d539e926dd40d04c650cbbb139c4ed3e",
+    "docs/technical-architecture.md": "548ce2e5db82929ecbbdfdb238921a84608fda6e666afa027cdd0f777b4fbd8f",
+    "docs/universe-expansion-approved-design.md": "3df3a133a8760d2e944001c4c0dd5e1c0bf51ffa438961f904f0ac881d0863c0",
+    "docs/universe-scanner.md": "744df321b984af16d8e3f615b0dae6142115223ddd69fabbd0289cc81b765e4f",
+    "docs/validation.md": "bfffd6f7074a584f2cd06ee141dc96968175c1195c361ad241137ba6fc69bd54",
+    "scenarios/evidence/player-chart.json": "0e026a83466b8e2b377dec5a614f0ccf4bc2cdc77e701d62f4972ade66b49233",
+    "scripts/README.md": "d46bc6f12193fb320c1b4ccbd9cf8a928262c1efcb759d924dcc4a475eda19c7"
+  },
+  "binary_sha256": "28528800d0071bc285f4f521ed38ab97826b7f9a379498cd6af1006a86971dd6",
+  "scenario_sha256": "0e026a83466b8e2b377dec5a614f0ccf4bc2cdc77e701d62f4972ade66b49233",
+  "visual_context": {
+    "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+    "backend": "Vulkan",
+    "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+    "scale_factor": 1.0,
+    "viewport_pixels": [
+      1280,
+      800
+    ]
+  },
+  "window": {
+    "focused": false,
+    "inner_size": [
+      1280,
+      800
+    ],
+    "minimized": false,
+    "occluded": false
+  },
+  "backend_env": {
+    "WGPU_BACKEND": "vulkan",
+    "VK_DRIVER_FILES": "lvp_icd.json",
+    "LP_NUM_THREADS": 2
+  },
+  "captures": {
+    "observed.png": "f30cd0068bbad33f6b5f0545923c4d11a12d860988f0f6832cb4fe1b9973047f",
+    "empty.png": "251cc577588827592e8309c49815983f20ce124468b41c71c366a9f2c67f6d9f",
+    "resumed.png": "f9288cbdf884f65e5ce1b811a048581b1d87ff13bc62ffbf718d0632380b015c",
+    "historical.png": "c0b875920ad0968d5bca48eaac6177955c4dcea30973748b3c97002179fc8aff"
+  }
+}

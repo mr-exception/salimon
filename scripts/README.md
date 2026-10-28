@@ -822,3 +822,11 @@ landed cockpit fixture and the `scanner` reference camera. It exercises automati
 paid discovery, M selection and production GPU screenshots. Fixture placement and
 protocol keys do not establish physical input or normal-play travel. Run with
 Xvfb/Mesa software Vulkan and retain original images and state logs.
+
+## Player-known chart evidence (#469)
+
+`scenarios/evidence/player-chart.json` uses the canonical cockpit and dedicated
+scanner reference view. P switches chart/scanner view, M selects a discovered
+entry, Enter records a voluntary observed route. Assertions retain source and
+route history through real save/restore and scanner expiry, with empty/observed/
+historical production captures. Catalog loading never seeds player chart data.

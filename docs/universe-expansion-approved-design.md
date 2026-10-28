@@ -176,3 +176,11 @@ Implementation status (#421): bounded coasting-gravity forecasts and a current-c
 
 
 U27 #428 implements the portable contact/history authority; see [scanner contract](universe-scanner.md). Pulses, saves and cockpit/chart consumers remain their separate downstream issues.
+
+The scanner contact/pulse/checkpoint/projector and player-known chart boundaries
+(#428/#429/#431/#430/#469) are implemented in the [scanner contract](universe-scanner.md).
+Canonical surface observations retain their explicit body frame; no missing
+orbital phase or source motion is invented. Full global-frame playable adoption
+and closed-game trajectory/event production remain #427/#432/#433. Transmission
+production is #470. Chart knowledge survives contact expiry without revealing
+unknown catalog objects or granting autopilot/jump authority.

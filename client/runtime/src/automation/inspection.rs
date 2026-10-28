@@ -237,5 +237,6 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["recovery"] = app.recovery_observation();
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
     observation["scanner"] = scanner;
+    observation["chart"] = json!({"source":app.chart.checkpoint(),"mode":app.scanner.chart_mode,"note":app.scanner.chart_note,"entry_count":app.chart.entries().count(),"route_count":app.chart.routes().len()});
     observation
 }

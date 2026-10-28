@@ -3,6 +3,7 @@ use crate::{Catalog, CatalogId, Error, Record, coordinates::GalacticPosition, in
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+pub mod chart;
 pub mod checkpoint;
 pub mod pulses;
 
@@ -195,16 +196,20 @@ impl Contacts {
     }
 }
 pub(crate) fn validate_observation(catalog: &Catalog, o: &Observation) -> Result<(), Error> {
-    if let Position::BodyLocal { body, meters } = &o.position
-        && (!matches!(catalog.get(body), Some(Record::Body(_)))
-            || !meters.iter().all(|v| v.is_finite()))
-    {
-        return Err(invalid("scanner body frame/state"));
-    }
+    validate_position(catalog, &o.position)?;
     if !matches!(catalog.get(&o.id), Some(Record::Star(_) | Record::Body(_)))
         || !o.velocity_mps.into_iter().all(f64::is_finite)
     {
         return Err(invalid("scanner requires identified celestial state"));
+    }
+    Ok(())
+}
+pub(crate) fn validate_position(catalog: &Catalog, position: &Position) -> Result<(), Error> {
+    if let Position::BodyLocal { body, meters } = position
+        && (!matches!(catalog.get(body), Some(Record::Body(_)))
+            || !meters.iter().all(|v| v.is_finite()))
+    {
+        return Err(invalid("scanner body frame/state"));
     }
     Ok(())
 }

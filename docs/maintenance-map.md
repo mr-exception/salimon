@@ -326,7 +326,7 @@ Run universe and workspace Rust gates plus offline documentation validation.
 Owner: `client/persistence/src/universe.rs`; tests: `src/universe/tests.rs`.
 Persistence now depends on the portable universe leaf for validated IDs, split
 positions and epochs. Existing `SaveManager` protects catalog incompatibility as
-a fatal recovery error. Runtime retains its separate compressed-world envelope (now schema 7). See
+a fatal recovery error. Runtime retains its separate runtime envelope (now schema 26). See
 [save contract](save-contract.md#future-universe-new-run-contract--u05-406),
 [persistence architecture](../client/persistence/architecture.md) and
 [invariants](../client/persistence/invariants.md).
@@ -679,4 +679,10 @@ See the [scanner contract](universe-scanner.md).
 ## Scanner delivery (#430)
 
 Renderer `scanner_hologram.rs` owns bounded depth-tested ship-local 3D projection geometry; runtime `session/scanner/presentation.rs` maps only fresh same-frame discoveries to ship pose. The physical console projector shows logarithmic distance, true 3D direction/elevation and selected contacts. M cycles contacts only in an admitted canonical cockpit; power loss suppresses projection, not history.
+See the [scanner contract](universe-scanner.md).
+
+
+## Scanner delivery (#469)
+
+Universe `scanner/chart.rs` owns player-known observations, inferred/transmitted leads with explicit uncertainty, and immutable voluntary route annotations. Runtime `session/chart.rs` owns cockpit P/M/Enter controls and schema-26 pair validation with scanner history. Catalog truth never seeds the chart; observed knowledge outlives contact TTL and source frames are preserved without guessed transforms.
 See the [scanner contract](universe-scanner.md).

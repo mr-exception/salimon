@@ -52,6 +52,8 @@ impl Scanner {
                 s.validate()?;
                 Ok(Self {
                     selected: 0,
+                    chart_mode: false,
+                    chart_note: None,
                     contacts: Contacts::from_checkpoint(&CATALOG, s.contacts)
                         .map_err(|e| invalid(e.to_string()))?,
                     parameters: s.parameters,
@@ -204,6 +206,7 @@ mod tests {
                 .is_err()
         );
         missing["schema_version"] = 24.into();
+        missing["state"].as_object_mut().unwrap().remove("chart");
         s.restore_bytes(&serde_json::to_vec(&missing).unwrap())
             .unwrap();
         assert_eq!(s.scanner.contacts.history().count(), 0);

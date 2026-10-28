@@ -16,6 +16,8 @@ pub(crate) static CATALOG: LazyLock<Catalog> = LazyLock::new(|| {
 #[derive(Clone, Debug)]
 pub(crate) struct Scanner {
     pub(crate) selected: usize,
+    pub(crate) chart_mode: bool,
+    pub(crate) chart_note: Option<&'static str>,
     pub(crate) contacts: Contacts,
     pub(crate) parameters: Parameters,
     pub(crate) utc_millis: u64,
@@ -27,6 +29,8 @@ impl Default for Scanner {
     fn default() -> Self {
         Self {
             selected: 0,
+            chart_mode: false,
+            chart_note: None,
             contacts: Contacts::new(CATALOG.revision()).expect("checked revision"),
             parameters: serde_json::from_str(include_str!("../../config/scanner.json"))
                 .expect("checked scanner configuration"),
@@ -109,6 +113,11 @@ impl GameplaySession {
             .contacts
             .advance(end)
             .map_err(|e| e.to_string())?;
+        if powered && hit {
+            self.chart
+                .observe(&self.scanner.contacts)
+                .map_err(|e| e.to_string())?;
+        }
         self.scanner.utc_millis = end;
         self.scanner.sub_millis_nanos = (nanos % 1_000_000) as u32;
         self.scanner.powered = powered;

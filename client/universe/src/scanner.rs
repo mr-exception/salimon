@@ -3,16 +3,64 @@ use crate::{Catalog, CatalogId, Error, Record, coordinates::GalacticPosition, in
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+pub mod pulses;
+
+/// Explicit coordinate provenance. Current surface gameplay has a body-centered
+/// frame; it must not invent the body's absent galactic orbit phase/velocity.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "frame", rename_all = "snake_case", deny_unknown_fields)]
+pub enum Position {
+    Galactic { position: GalacticPosition },
+    BodyLocal { body: CatalogId, meters: [f64; 3] },
+}
+impl Position {
+    pub fn relative_meters(&self, origin: &Self) -> Result<[f64; 3], Error> {
+        match (self, origin) {
+            (Self::Galactic { position: a }, Self::Galactic { position: b }) => {
+                a.relative_meters(*b)
+            }
+            (Self::BodyLocal { body: a, meters: x }, Self::BodyLocal { body: b, meters: y })
+                if a == b =>
+            {
+                let delta = std::array::from_fn(|i| x[i] - y[i]);
+                if delta.into_iter().all(f64::is_finite) {
+                    Ok(delta)
+                } else {
+                    Err(invalid("scanner local position overflow"))
+                }
+            }
+            _ => Err(invalid("scanner position frame mismatch")),
+        }
+    }
+    pub fn translated(&self, delta: [f64; 3]) -> Result<Self, Error> {
+        match self {
+            Self::Galactic { position } => Ok(Self::Galactic {
+                position: position.translated(delta)?,
+            }),
+            Self::BodyLocal { body, meters } => {
+                let meters: [f64; 3] = std::array::from_fn(|i| meters[i] + delta[i]);
+                if !meters.into_iter().all(f64::is_finite) {
+                    return Err(invalid("scanner local translation"));
+                }
+                Ok(Self::BodyLocal {
+                    body: body.clone(),
+                    meters,
+                })
+            }
+        }
+    }
+}
+
 pub const CONTACT_TTL_MILLIS: u64 = 3 * 60 * 60 * 1000;
 pub const MAX_CONTACTS: usize = 65_536;
 
 /// Exact catalog evaluation at the successful observation time. Coordinates and
-/// velocity use the same galactic inertial axes; positions retain split cells.
+/// velocity use the explicitly named frame axes; galactic positions retain split cells.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Observation {
     pub id: CatalogId,
-    pub position: GalacticPosition,
+    pub position: Position,
     pub velocity_mps: [f64; 3],
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -146,6 +194,12 @@ impl Contacts {
     }
 }
 pub(crate) fn validate_observation(catalog: &Catalog, o: &Observation) -> Result<(), Error> {
+    if let Position::BodyLocal { body, meters } = &o.position
+        && (!matches!(catalog.get(body), Some(Record::Body(_)))
+            || !meters.iter().all(|v| v.is_finite()))
+    {
+        return Err(invalid("scanner body frame/state"));
+    }
     if !matches!(catalog.get(&o.id), Some(Record::Star(_) | Record::Body(_)))
         || !o.velocity_mps.into_iter().all(f64::is_finite)
     {

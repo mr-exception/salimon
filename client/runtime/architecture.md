@@ -1682,3 +1682,9 @@ Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: fro
 ## Bounded navigation prediction (#421)
 
 Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+
+## Scanner delivery (#429)
+
+Universe `scanner/pulses.rs` owns fixed five-second cadence and analytical funded linear-path detection. Runtime `session/scanner.rs` composes ordinary Core funding after construction, samples current body-local state and exposes read-only automation. Unknown orbital phase/velocity is never invented; body-local and galactic observations cannot be mixed.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.

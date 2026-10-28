@@ -20,6 +20,7 @@ impl GameplaySession {
         }
         self.advance_recovery(delta);
         self.advance_construction(delta);
+        self.advance_scanner(delta);
         let ship = self.ship.snapshot();
         if !ship.power_available
             || !ship.cockpit_control_active

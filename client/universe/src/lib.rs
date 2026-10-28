@@ -11,6 +11,7 @@ pub mod reader;
 pub mod reference;
 pub mod sources;
 pub mod starting_system;
+pub mod streaming;
 pub mod synthesis;
 pub use epoch::Epoch;
 mod identity;

@@ -98,3 +98,11 @@ See the [implemented contract](../../docs/universe-gravity.md) for ownership, in
 ## Gravity-aware ship trajectory (#417)
 
 See the [implemented contract](../../docs/universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery or replace gameplay yet.

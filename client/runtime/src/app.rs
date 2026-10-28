@@ -67,6 +67,15 @@ fn run_config(
     event_loop.set_control_flow(ControlFlow::Wait);
 
     let mut application = ClientApplication::default();
+    if let Some(path) = std::env::var_os("SALIMON_UNIVERSE_PACK") {
+        application.universe_stream = Some(
+            salimon_universe::streaming::Stream::open(
+                std::path::Path::new(&path),
+                Default::default(),
+            )
+            .map_err(|e| RunError::new("open universe stream", e))?,
+        );
+    }
     if config.is_none() && benchmark.is_none() {
         application.condition_feedback = crate::condition_feedback::Presenter::open();
         application.session = crate::session::GameplaySession::new_run();
@@ -157,6 +166,7 @@ pub(crate) struct ClientApplication {
     e2e_ready_sent: bool,
     pub(crate) e2e_input_isolated: bool,
     automation: Option<Receiver<Request>>,
+    pub(crate) universe_stream: Option<salimon_universe::streaming::Stream>,
     pub(crate) terrain_stream: crate::terrain_patches::TerrainStream,
     pub(crate) observations: crate::terrain_observations::Observations,
     pub(crate) capture_status: String,
@@ -191,6 +201,7 @@ impl Default for ClientApplication {
             e2e_ready_sent: false,
             e2e_input_isolated: false,
             automation: None,
+            universe_stream: None,
             terrain_stream: crate::terrain_patches::TerrainStream::default(),
             observations: crate::terrain_observations::Observations::default(),
             capture_status: "idle".into(),

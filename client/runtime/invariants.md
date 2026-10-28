@@ -721,3 +721,11 @@ Presentation composition (#643) remains observational: Scout scene mapping and
 prompt/overlay preparation cannot advance domain state or replace targeting
 admission. Native retry/capture/measurement sequencing is retained; see
 [owners](architecture.md#native-presentation-composition-643).
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery or replace gameplay yet.

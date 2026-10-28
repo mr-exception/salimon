@@ -1,10 +1,9 @@
 # Canonical universe schema — U01 (#402)
 
-`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage and sha2 digest dependencies. It is not yet a runtime dependency. `salimon-world`
+`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage and sha2 digest dependencies. Runtime consumes the read-only streaming service; other portable APIs remain explicitly integrated by their owning adapters. `salimon-world`
 continues owning the compressed six-body playable fixture, terrain/resource-v1
 identity and existing saves. Catalog data must never implicitly grant player
-navigation knowledge. No GPU/window/network, source download, real production catalog, orbital integration, OS clock,
-playable world replacement or backend is introduced. U11 adds only the selected
+navigation knowledge. No GPU/window/network, source download, OS clock or backend belongs to this leaf crate. Streaming does not itself replace the playable world. U11 adds only the selected
 world's portable surface query below. U04 adds consumer-supplied Read/Seek
 IO and an in-memory prototype encoder, not a production pack builder.
 
@@ -266,3 +265,11 @@ See the [implemented contract](../../docs/universe-gravity.md) for ownership, in
 ## Gravity-aware ship trajectory (#417)
 
 See the [implemented contract](../../docs/universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery or replace gameplay yet.

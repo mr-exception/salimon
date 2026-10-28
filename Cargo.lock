@@ -1978,6 +1978,7 @@ dependencies = [
  "salimon-renderer",
  "salimon-ship",
  "salimon-survival",
+ "salimon-universe",
  "salimon-world",
  "serde",
  "serde_json",

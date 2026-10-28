@@ -1651,3 +1651,11 @@ lighting, machinery, fabrication and habitation DTOs. New Scout visual fields
 normally change this adapter, rather than central app lifecycle code. No
 authoritative state, power rule, clock, shader layout or scheduler order changes.
 The runtime still supplies absolute f64 DTO positions; renderer owns rebasing.
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery or replace gameplay yet.

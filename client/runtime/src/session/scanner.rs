@@ -82,16 +82,24 @@ impl GameplaySession {
                 <= self.scanner.parameters.range_meters;
         let available = self.ship.snapshot().energy_core.stored_joules as f64;
         let powered = ship.power_available && available >= cost;
+        // Validate the contact transaction before spending Core joules. A
+        // rejected saved counter/state must not repeatedly bill the same pulse.
+        let refreshed = if powered && hit {
+            let mut contacts = self.scanner.contacts.clone();
+            contacts
+                .refresh(&CATALOG, end, true, &[target])
+                .map_err(|e| e.to_string())?;
+            Some(contacts)
+        } else {
+            None
+        };
         if !delta.is_zero() {
             self.ship
                 .fund_auxiliary_work(cost, 0., delta)
                 .map_err(|_| "scanner Core funding")?;
         }
-        if powered && hit {
-            self.scanner
-                .contacts
-                .refresh(&CATALOG, end, true, &[target])
-                .map_err(|e| e.to_string())?;
+        if let Some(contacts) = refreshed {
+            self.scanner.contacts = contacts;
         }
         self.scanner
             .contacts

@@ -128,3 +128,11 @@ or physical terrain migrations.
 [Regional climate](planetary-climate.md) supplies versioned geology-bound inputs
 and deterministic shared-TT weather metadata. Atmospheric rendering remains #616;
 active sites, biospheres and environmental audio retain their own scopes.
+
+
+## Implemented active source boundary (#617)
+
+[Active geological sources](active-geology.md) expose immutable suitable sites
+and bounded shared-TT plume/thermal/acoustic metadata without altering terrain,
+resources or hazards. Existing bodies gain no activity automatically; source
+presentation consumers and environmental sound retain their own owners.

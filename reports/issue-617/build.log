@@ -1,0 +1,5 @@
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 41.90s

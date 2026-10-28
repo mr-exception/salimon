@@ -376,3 +376,11 @@ strict versioned publication and stateless TT epoch queries. World owns pressure
 temperature, coherent storm/cloud/precipitation metadata and body-fixed tangent wind;
 presentation cannot rewrite them. Vacuum has no airborne effects. Existing terrain,
 resource identities, saves and drag physics remain unchanged. Weather visuals are #616.
+
+
+## Active geological sources (#617)
+
+The [active geology contract](docs/active-geology.md) owns explicit heat/mechanism inputs,
+stable terrain-bound sites, strict publication restore and shared-TT source levels.
+Spatial queries cannot create/rekey sources. Vacuum permits ballistic plumes and
+contact coupling, never atmospheric wind/sound. Source radii do not add colliders.

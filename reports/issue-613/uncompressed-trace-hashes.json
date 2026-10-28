@@ -14,5 +14,16 @@
   "probes/initial-earth-default-drawable/protocol.jsonl.xz": "0ca0115d100dbb0d116c30bed72d870f73f5fbd05261de527ce092432833ccd3",
   "probes/initial-earth-default-drawable/stdout.log.xz": "b684d990e942bdc319112df46b88eca6365e61fe6f2c3cddd98aeb1c416a67d4",
   "probes/parent-direct-readback/protocol.jsonl.xz": "ef2ef8bfa15e571afd4d5d4a7bfec4be37de6f4937c3b2459162794c0f3549a7",
-  "probes/parent-direct-readback/stdout.log.xz": "095b9431eeb7e08c5edcd49a90f0290d774b418cb18214498e7e6dbe4c4fe24b"
+  "probes/parent-direct-readback/stdout.log.xz": "095b9431eeb7e08c5edcd49a90f0290d774b418cb18214498e7e6dbe4c4fe24b",
+  "native-moon/result.json.xz": "22ba0f022ae69d87f5b08ab6be8e6c94eb0e790de128941cd23a0272a48db1a4",
+  "native-earth/result.json.xz": "545204bcf5e59d2afb56232ef46d095ad6cb71378e02d2b26df0c40e1a5e25ce",
+  "native-vesper/result.json.xz": "7607d5da24cd84fb74ad2b58dc61d394b8a94f43802f33a4bd23260b10bb781a",
+  "native-mars/result.json.xz": "b1c4e19c9261bc50f32fdb748c2e43fd9a7b3a2abc966252ff5eec76373378ce",
+  "native-parent-vesper/result.json.xz": "ae2b67d734b1990ae7acfb8371edfe7145875e3262e6e9f4b4a2afa97ab015b8",
+  "probes/initial-moon-inspection-timeout/failure-state.json.xz": "96086744d5ca8baf3b2285529090d6fed90ef874fd8b426d10a1b839105db083",
+  "probes/initial-moon-inspection-timeout/result.json.xz": "b04e12396492e58322fe22ba144dac191b15508628e5e0ac440fc6ce633efa5e",
+  "probes/initial-earth-default-drawable/failure-state.json.xz": "df93ba8a6f3a49053ee62bd520d7ce8a2b5da2d424721b41780496ca4e0fa0d0",
+  "probes/initial-earth-default-drawable/result.json.xz": "2f6a3f0ac23e72f9935d88c44db46173e51e3ce527921cbf235125b0c49f6be2",
+  "probes/parent-direct-readback/failure-state.json.xz": "01d4a0e548bc64856e3c9ef8b9ad637db04e25ae3c99704d1351b83f22a74470",
+  "probes/parent-direct-readback/result.json.xz": "bf3625a6146168fe5785798366dbb2a4a5cd0e11b7d09e26bcc401fa6adc4509"
 }

@@ -81,9 +81,9 @@ transport deadline was extended and no assertion was removed.
 
 Final live production routes passed **73/73 steps**: Vesper 22, Earth 17,
 Moon 17 and Mars 17. The matching parent Vesper control passed 22/22 steps.
-Original final results are retained in [Vesper](native-vesper/result.json),
-[Earth](native-earth/result.json), [Moon](native-moon/result.json),
-[Mars](native-mars/result.json) and [parent control](native-parent-vesper/result.json).
+Original final results are retained in [Vesper](native-vesper/result.json.xz),
+[Earth](native-earth/result.json.xz), [Moon](native-moon/result.json.xz),
+[Mars](native-mars/result.json.xz) and [parent control](native-parent-vesper/result.json.xz).
 
 Representative originals: [Vesper surface](native-vesper/step-012-universe-surface.png),
 [Earth near](native-earth/step-007-geology-earth-near.png),
@@ -93,14 +93,15 @@ Representative originals: [Vesper surface](native-vesper/step-012-universe-surfa
 and [ice day](gpu-geology/ice-day-near.png). Every distance/lighting original
 remains in the corresponding folder, not just these examples.
 
+The compact [native summary](native-results.json) lists final pass/fail and durations.
 Reproduce image/coverage, native outcome and real buffer-bound assertions with
 `python3 reports/issue-613/compare_evidence.py` (Pillow 12.3.0). The generated
 [comparison](comparison.json) includes per-image deltas and actual native maxima.
 [Capture context](capture-context.json), [source hashes](source-files.sha256.json)
 and `evidence-sha256.txt` bind source/binary and stored evidence. Full original
-stdout/protocol streams are losslessly compressed as `.xz`; decompressed-byte
+stdout/protocol streams and detailed result JSON are losslessly compressed as `.xz`; decompressed-byte
 hashes are in [uncompressed trace hashes](uncompressed-trace-hashes.json).
-Per-checkpoint states are retained in each original `result.json`; redundant
+Per-checkpoint states are retained in each original `result.json.xz`; redundant
 per-step JSON copies are omitted. No failed probe is relabeled a pass.
 
 ## Limits and ownership

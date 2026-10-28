@@ -1,6 +1,7 @@
 """Recheck retained original images and production-native outcomes; no baseline promotion."""
 from pathlib import Path
 import json
+import lzma
 from PIL import Image, ImageChops
 
 ROOT = Path(__file__).resolve().parent
@@ -28,7 +29,7 @@ assert len(vesper) == 4 and all(r['pixels'] == [1280, 800] for r in vesper)
 native = []
 for name, count in [('native-parent-vesper', 22), ('native-vesper', 22),
                     ('native-earth', 17), ('native-moon', 17), ('native-mars', 17)]:
-    data = json.loads((ROOT / name / 'result.json').read_text())
+    data = json.loads(lzma.decompress((ROOT / name / 'result.json.xz').read_bytes()))
     assert data['status'] == 'passed' and data['steps_completed'] == count
     terrain = [s['state']['terrain'] for s in data['steps'] if s.get('state', {}).get('terrain')]
     contexts = [s['state']['visual_context'] for s in data['steps']

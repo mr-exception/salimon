@@ -52,3 +52,13 @@ and physical platform checks #557 remain unverified; no M1/Metal claim follows.
 
 Final raw logs: [workspace tests](workspace-tests.log), [build](build.log),
 [Clippy](clippy.log), [tooling](tooling.log), [documentation](docs.log).
+
+## CI documentation correction
+
+The first Ubuntu CI run rejected the added ship composition test because the
+ship owning guide had not been updated. The pre-commit local comparison inspected
+`base...HEAD` and missed the then-uncommitted test. This PR now updates
+`client/ship/README.ai.md`; validation is repeated against the committed diff.
+No source or test behavior changed. Windows/macOS fiction-publication goldens
+passed on the initial revision; that is scoped publication evidence, not physical
+platform or graphics qualification.

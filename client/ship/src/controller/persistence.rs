@@ -4,6 +4,11 @@ use salimon_persistence::{SaveError, Validate, invalid};
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
 pub struct ShipSaveState(ShipController);
+impl ShipSaveState {
+    pub fn terrain_mode(&self) -> salimon_world::terrain::TerrainMode {
+        self.0.terrain
+    }
+}
 impl Validate for ShipSaveState {
     fn validate(&self) -> Result<(), SaveError> {
         self.0.validate_save()
@@ -24,6 +29,19 @@ impl ShipController {
         Ok(ship)
     }
     fn validate_save(&self) -> Result<(), SaveError> {
+        let body = match self.flight_state {
+            crate::FlightState::Flying => None,
+            crate::FlightState::Landed { body }
+            | crate::FlightState::AssistedLanding { body }
+            | crate::FlightState::AssistedTakeoff { body }
+            | crate::FlightState::Bouncing { body }
+            | crate::FlightState::GroundedAfterCrash { body } => Some(body),
+        };
+        if body.is_some_and(|id| !self.terrain.bodies().iter().any(|b| b.id == id)) {
+            return Err(invalid(
+                "ship surface identity is outside its selected world",
+            ));
+        }
         let pose = self.pose;
         let norm: f64 = pose.orientation.iter().map(|v| v * v).sum();
         if !pose

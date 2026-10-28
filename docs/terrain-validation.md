@@ -206,3 +206,10 @@ pending [native #313](https://github.com/mr-exception/salimon/issues/313).
 
 Canonical Vesper adds [planet-wide orbit-to-ground streaming](universe-terrain.md)
 with the same renderer budgets and the exact frozen publication evaluator.
+
+
+## Canonical surface integration (#425)
+
+The [canonical gameplay contract](universe-gameplay.md) maps current body/frame,
+resource/physics/Fabricator integration and schema-24 definition binding to owners
+and tests. It preserves the frozen terrain and explicit historical fixtures.

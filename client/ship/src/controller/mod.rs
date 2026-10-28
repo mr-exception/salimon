@@ -270,6 +270,7 @@ impl ShipController {
     pub fn snapshot(&self) -> ShipSnapshot {
         let velocity_meters_per_second = self.velocity_meters_per_second();
         ShipSnapshot {
+            terrain: self.terrain,
             pose: self.pose,
             flight_state: self.flight_state,
             door_state: self.door_state,

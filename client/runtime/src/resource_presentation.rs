@@ -1,11 +1,13 @@
 //! Composition-only resource mapping; world retains physical state.
 use salimon_renderer::{ResourceMesh, ResourceMeshInstance, SceneInstance};
+#[cfg(test)]
+use salimon_world::CELESTIAL_BODIES;
 use salimon_world::resource_distribution::default_resource_distribution;
 use salimon_world::resource_generation::{
     GenerationError, SurfaceDeposit, materialize_nearby_deposits,
 };
 use salimon_world::resources::{DepositState, ResourceFragment, ResourceId};
-use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
+use salimon_world::{BodyRole, WorldPosition};
 
 pub(crate) const ACTIVE_RADIUS_METERS: f64 = 120.0;
 type PlacementKey = (u8, u64, u64, Vec<u8>);
@@ -71,7 +73,8 @@ fn nearby_deposits_impl(
 ) -> Result<Vec<SurfaceDeposit>, GenerationError> {
     let player = WorldPosition::new(position[0], position[1], position[2]);
     let mut deposits = Vec::new();
-    for body in CELESTIAL_BODIES
+    for body in terrain
+        .bodies()
         .iter()
         .filter(|body| body.role == BodyRole::Solid)
     {
@@ -82,19 +85,23 @@ fn nearby_deposits_impl(
         if altitude.abs() > ACTIVE_RADIUS_METERS {
             continue;
         }
-        let entries = materialize_nearby_deposits(
-            *body,
-            &default_resource_distribution(body.id),
-            seed,
-            None,
-            if terrain == salimon_world::terrain::TerrainMode::Flat {
-                player
-            } else {
-                body.center
-                    .translated(direction.map(|v| v * body.radius_meters))
-            },
-            ACTIVE_RADIUS_METERS,
-        )?;
+        let entries = if body.id == salimon_world::CelestialBodyId::Vesper {
+            salimon_world::canonical::deposits(position, ACTIVE_RADIUS_METERS)?
+        } else {
+            materialize_nearby_deposits(
+                *body,
+                &default_resource_distribution(body.id),
+                seed,
+                None,
+                if terrain == salimon_world::terrain::TerrainMode::Flat {
+                    player
+                } else {
+                    body.center
+                        .translated(direction.map(|v| v * body.radius_meters))
+                },
+                ACTIVE_RADIUS_METERS,
+            )?
+        };
         let definition = terrain
             .definition(body.id)
             .map_or_else(Vec::new, |d| d.to_bytes());
@@ -263,10 +270,8 @@ pub(crate) fn deposit_mesh_with_terrain(
         orientation_xyzw: if terrain == salimon_world::terrain::TerrainMode::Flat {
             [0.0, 0.0, 0.0, 1.0]
         } else {
-            let body = *CELESTIAL_BODIES
-                .iter()
-                .find(|b| b.id == entry.deposit.id().body)
-                .expect("resource body");
+            let body =
+                *salimon_world::canonical::body(entry.deposit.id().body).expect("resource body");
             let local = entry.body_local_position_meters;
             let normal = terrain
                 .sample(body, local.map(|v| v / salimon_math::length(local)))

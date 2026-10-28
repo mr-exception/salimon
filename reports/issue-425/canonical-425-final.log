@@ -1,0 +1,31 @@
+   Compiling salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.61s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-51a9b9987d94bb8e)
+
+running 5 tests
+test session::canonical::tests::canonical_mining_funds_real_fragments_and_restore_never_replenishes_deposits ... ok
+test session::canonical::tests::canonical_mined_material_enters_existing_cargo_and_fabricator_exactly_once ... ok
+test session::canonical::tests::canonical_takeoff_and_landing_are_funded_partition_independent_and_restore_body_context ... ok
+test session::canonical::tests::canonical_restore_refuses_unknown_world_digest_and_inflated_or_unknown_depletion_atomically ... ok
+test session::canonical::tests::canonical_gameplay_all_surface_consumers_share_published_ground ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 487 filtered out; finished in 1.06s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-51a9b9987d94bb8e)
+
+running 2 tests
+test session::persistence::contracts::schema23_source_restores_to_version24_without_fixture_state_loss ... ok
+test session::persistence::contracts::unknown_domain_fields_and_late_restore_failure_never_publish_partial_state ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 490 filtered out; finished in 0.11s
+
+    Checking salimon-persistence v0.1.0 (/repo/client/persistence)
+    Checking salimon-world v0.1.0 (/repo/client/world)
+    Checking salimon-survival v0.1.0 (/repo/client/survival)
+    Checking salimon-physics v0.1.0 (/repo/client/physics)
+    Checking salimon-fabrication v0.1.0 (/repo/client/fabrication)
+    Checking salimon-ship v0.1.0 (/repo/client/ship)
+    Checking salimon-character v0.1.0 (/repo/client/character)
+    Checking salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.95s

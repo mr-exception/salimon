@@ -12,7 +12,6 @@ use crate::app::ClientApplication;
 use crate::session::GameplaySession;
 use crate::session::frames::character_ship_frame;
 use salimon_character::CharacterLocation;
-use salimon_world::CELESTIAL_BODIES;
 
 mod clock;
 mod construction;

@@ -383,3 +383,11 @@ assist compensation. Model validity, tests and playable-adoption limits are expl
 See the [continuous-contact contract](../../docs/universe-contact.md) for moving solids/terrain,
 certified earliest-event queries, atomic gravity/drag interception, body-relative
 consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.

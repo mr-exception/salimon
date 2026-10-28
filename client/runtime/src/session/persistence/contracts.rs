@@ -4,14 +4,17 @@ use super::*;
 const PARENT_SAVE: &[u8] = include_bytes!("../../../fixtures/save-schema23-new-run.json");
 
 #[test]
-fn schema23_wire_bytes_and_restore_match_parent_revision() {
+fn schema23_source_restores_to_version24_without_fixture_state_loss() {
+    let mut expected: serde_json::Value = serde_json::from_slice(PARENT_SAVE).unwrap();
+    expected["schema_version"] = salimon_persistence::SCHEMA_VERSION.into();
+    let current = GameplaySession::new_run().save_bytes(100).unwrap();
     assert_eq!(
-        GameplaySession::new_run().save_bytes(100).unwrap(),
-        PARENT_SAVE
+        serde_json::from_slice::<serde_json::Value>(&current).unwrap(),
+        expected
     );
     let mut restored = GameplaySession::default();
     restored.restore_bytes(PARENT_SAVE).unwrap();
-    assert_eq!(restored.save_bytes(100).unwrap(), PARENT_SAVE);
+    assert_eq!(restored.save_bytes(100).unwrap(), current);
 }
 
 #[test]

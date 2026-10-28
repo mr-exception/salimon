@@ -2,7 +2,9 @@
 //! this module: render/camera coordinates and time between saves never do.
 use salimon_character::{CharacterLocation, CharacterSnapshot};
 use salimon_persistence::{SaveError, Validate, invalid};
-use salimon_world::{CELESTIAL_BODIES, CelestialBodyId};
+#[cfg(test)]
+use salimon_world::CELESTIAL_BODIES;
+use salimon_world::CelestialBodyId;
 
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -128,8 +130,16 @@ pub(crate) struct NamedLocation {
     pub(crate) altitude_meters: f64,
 }
 impl NamedLocation {
+    #[cfg(test)]
     pub(crate) fn at(position: [f64; 3]) -> Self {
-        let body = CELESTIAL_BODIES
+        Self::with_terrain(position, salimon_world::terrain::TerrainMode::Flat)
+    }
+    pub(crate) fn with_terrain(
+        position: [f64; 3],
+        mode: salimon_world::terrain::TerrainMode,
+    ) -> Self {
+        let body = mode
+            .bodies()
             .iter()
             .min_by(|a, b| {
                 (distance(position, a.center.meters()) - a.radius_meters)

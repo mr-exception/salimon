@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 23).
+`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 24, with a canonical definition binding).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -133,3 +133,11 @@ Follow the [canonical schema-22 clock, energy, safety and atomic launch contract
 ## Cosmetic surface age (#581)
 
 Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs/surface-age.md). Ship owns bounded integer exposure; runtime admits physical identity/use and verified offline time; renderer consumes observations only. Recolor/repair retain age, replacements use fresh IDs, and no cosmetic state grants damage or collision authority.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.

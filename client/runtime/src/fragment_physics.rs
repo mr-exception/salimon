@@ -1,5 +1,7 @@
 //! Fragment/session adapter for the portable physical-object simulation.
 //! Selects geometry and frames; physical rules live in salimon-physics.
+#[cfg(test)]
+use salimon_world::CELESTIAL_BODIES;
 use std::time::{Duration, Instant};
 
 use salimon_math::{dot, length, sub};
@@ -9,7 +11,7 @@ use crate::mining::ResourceGameplay;
 use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
 use salimon_character::ShipFrame;
 use salimon_world::resources::{FragmentId, ResourceTransform};
-use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
+use salimon_world::{BodyRole, WorldPosition};
 
 use salimon_physics::{ObjectState, SphereSurface, Surface};
 
@@ -53,7 +55,11 @@ pub(crate) fn release(
             .transform()
             .position()
             .meters();
-        salimon_physics::release_velocity(player_forward, position, nearest_body(position))
+        salimon_physics::release_velocity(
+            player_forward,
+            position,
+            nearest_body(position, tool.terrain),
+        )
     };
     let world_orientation = tool
         .session
@@ -401,7 +407,11 @@ fn snapshots_into(
                 } else {
                     p.transform().position().meters()
                 };
-                let body = if ship { None } else { nearest_body(position) };
+                let body = if ship {
+                    None
+                } else {
+                    nearest_body(position, tool.terrain)
+                };
                 // Only creation installs an ejection. Missing/restored motion is at rest.
                 let initial = tool
                     .fragment_motion
@@ -466,9 +476,7 @@ fn snapshots_into(
                             }
                         } else {
                             body.map(|body| {
-                                if tool.terrain
-                                    == salimon_world::terrain::TerrainMode::Representative
-                                {
+                                if tool.terrain != salimon_world::terrain::TerrainMode::Flat {
                                     Surface::Sampled {
                                         body,
                                         query: crate::terrain::physics_ground,
@@ -506,8 +514,12 @@ pub(crate) fn support(fragment: salimon_world::resources::ResourceFragment, _up:
     sphere_radius(fragment)
 }
 
-fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
-    CELESTIAL_BODIES
+fn nearest_body(
+    position: [f64; 3],
+    terrain: salimon_world::terrain::TerrainMode,
+) -> Option<SphereSurface> {
+    terrain
+        .bodies()
         .iter()
         .filter(|body| body.role == BodyRole::Solid)
         .min_by(|a, b| {

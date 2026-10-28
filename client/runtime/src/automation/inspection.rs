@@ -9,7 +9,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let local_eye = frame.world_to_local(character.eye_position_meters);
     let local_look = frame.world_to_local(character.look_target_meters);
     let interaction = app.automation_interaction(local_eye, local_look);
-    let bodies: Vec<_> = CELESTIAL_BODIES.iter().map(|body| {
+    let bodies: Vec<_> = app.mining.terrain.bodies().iter().map(|body| {
         json!({"name": body.name, "center_meters": body.center.meters(),
             "radius_meters": body.radius_meters,
             "ship_surface_distance_meters": (body.center.meters().iter().zip(ship.pose.position_meters)
@@ -148,7 +148,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
         },
         "journey_ended": app.survival.snapshot().terminal.then(||app.ended_run().map(|r|crate::journey_ended::Report::from(&r)).expect("validated terminal report")),
         "survival_hud": {"visible":hud.visible,"penalties":hud.penalties,"statuses":hud.statuses},
-        "journey": {"active_duration":app.survival.snapshot().active_time, "distance_meters":app.run.journey.distance_meters, "location":crate::session::journey::NamedLocation::at(app.snapshot().character.eye_position_meters)},
+        "journey": {"active_duration":app.survival.snapshot().active_time, "distance_meters":app.run.journey.distance_meters, "location":crate::session::journey::NamedLocation::with_terrain(app.snapshot().character.eye_position_meters, app.mining.terrain)},
         "survival": {"hunger":app.survival.snapshot().hunger.value(),
             "health":app.survival.snapshot().health.value(), "fatigue":app.survival.snapshot().fatigue.value(),
             "terminal":app.survival.snapshot().terminal,

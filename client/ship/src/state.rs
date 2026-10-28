@@ -67,6 +67,7 @@ impl ShipPose {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipSnapshot {
+    pub terrain: salimon_world::terrain::TerrainMode,
     pub pose: ShipPose,
     pub flight_state: FlightState,
     pub door_state: DoorState,

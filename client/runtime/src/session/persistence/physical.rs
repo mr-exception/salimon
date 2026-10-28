@@ -13,6 +13,8 @@ pub(crate) struct PhysicalState {
     character: salimon_character::CharacterSaveState,
     ship: salimon_ship::ShipSaveState,
     terrain: salimon_world::terrain::TerrainMode,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    canonical_definition: Option<salimon_persistence::universe::DefinitionBinding>,
     ship_gravity_disabled: bool,
     mining_config: salimon_world::spherical_mining::MiningConfig,
     world: salimon_world::mining::MiningSaveState,
@@ -31,16 +33,43 @@ pub(crate) struct RestoredPhysical {
 }
 impl Validate for PhysicalState {
     fn validate(&self) -> Result<(), SaveError> {
+        let canonical = self.terrain == salimon_world::terrain::TerrainMode::Canonical;
+        if self.canonical_definition != canonical.then(super::super::canonical::definition_binding)
+        {
+            return Err(invalid(
+                "canonical world definition identity/version/digest mismatch",
+            ));
+        }
         self.character.validate()?;
         self.ship.validate()?;
+        if self.ship.terrain_mode() != self.terrain {
+            return Err(invalid("ship and world surface definitions disagree"));
+        }
         if let Some(s) = self.character.nearby_surface()
-            && !salimon_world::CELESTIAL_BODIES.iter().any(|b| {
+            && !self.terrain.bodies().iter().any(|b| {
                 b.center.meters() == s.body_center_meters && b.radius_meters == s.radius_meters
             })
         {
             return Err(invalid("character surface is not in world catalog"));
         }
         self.world.validate()?;
+        if canonical {
+            for (id, remaining) in &self.world.remaining {
+                let published = salimon_world::canonical::START
+                    .manifest()
+                    .resources
+                    .outcrops
+                    .iter()
+                    .find(|site| {
+                        salimon_world::canonical::outcrop_local_id(site.material) == id.local
+                    });
+                if id.body != salimon_world::CelestialBodyId::Vesper
+                    || published.is_none_or(|site| *remaining > site.initial_mass_kg)
+                {
+                    return Err(invalid("canonical deposit identity or remaining mass"));
+                }
+            }
+        }
         let mut total = salimon_ship::STARTER_DRY_MASS_KG;
         for fragment in &self.world.fragments {
             total += fragment.material().mass_kg();
@@ -100,6 +129,9 @@ impl PhysicalState {
             character: s.character.save_state(),
             ship: s.ship.save_state(),
             terrain: s.mining.terrain,
+            canonical_definition: (s.mining.terrain
+                == salimon_world::terrain::TerrainMode::Canonical)
+                .then(super::super::canonical::definition_binding),
             ship_gravity_disabled: s.mining.ship_gravity_disabled,
             mining_config: s.mining.config,
             world: s.mining.session.save_state(),
@@ -111,7 +143,7 @@ impl PhysicalState {
     pub(crate) fn restore(self) -> Result<RestoredPhysical, SaveError> {
         self.validate()?;
         let mut ship = salimon_ship::ShipController::from_save(self.ship)?;
-        let query = (self.terrain == salimon_world::terrain::TerrainMode::Representative)
+        let query = (self.terrain != salimon_world::terrain::TerrainMode::Flat)
             .then_some(crate::terrain::character_ground as salimon_character::GroundQuery);
         let character = salimon_character::CharacterController::from_save(self.character, query)?;
         let mut mining = ResourceGameplay::from_saved_world(
@@ -126,13 +158,15 @@ impl PhysicalState {
             mining.session.fragment(*id)?;
             let mut p = p.clone();
             if let salimon_physics::Surface::Sphere(body) = p.surface {
-                if !salimon_world::CELESTIAL_BODIES
+                if !mining
+                    .terrain
+                    .bodies()
                     .iter()
                     .any(|b| b.center.meters() == body.center && b.radius_meters == body.radius)
                 {
                     return None;
                 }
-                if mining.terrain == salimon_world::terrain::TerrainMode::Representative {
+                if mining.terrain != salimon_world::terrain::TerrainMode::Flat {
                     p.surface = salimon_physics::Surface::Sampled {
                         body,
                         query: crate::terrain::physics_ground,

@@ -1,6 +1,7 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
 pub(crate) mod archive;
 pub(crate) mod cabin;
+pub(crate) mod canonical;
 mod cargo;
 mod commands;
 pub(crate) mod construction;

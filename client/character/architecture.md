@@ -267,3 +267,11 @@ Scout cabin #577: follow [the canonical source, collision, posture and presentat
 ## Completed modular structure (#545)
 
 Follow the [canonical assembly, traversal, identity, mass and schema-18 contract](../../docs/modular-construction.md). Completed cell parts and face edits regenerate shared render/collision geometry; unpublished projects supply no support or colliders. Preserve the existing gate, per-cell identities, atomic restore and single-owner material ledger.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.

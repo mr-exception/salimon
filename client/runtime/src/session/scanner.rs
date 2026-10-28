@@ -1,4 +1,5 @@
 //! Scanner composition: ordinary Core-funded service; discovery owns no catalog truth.
+pub(crate) mod save;
 use super::GameplaySession;
 use salimon_universe::{
     Catalog,

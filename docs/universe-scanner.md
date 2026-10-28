@@ -55,3 +55,31 @@ Parameters are in `client/runtime/config/scanner.json`: initial 1e9 m range,
 not hardware/balance approval or a new upgrade acquisition mechanic. Checkpoint
 mapping/launch freshness follows in #431; generic closed-game timed integration
 remains #433 as explicitly scoped in that issue.
+
+## Checkpoints and launch (#431)
+
+`scanner/checkpoint.rs` owns version-1 contact source (catalog revision, logical
+UTC watermark and sorted encounter records). Reconstruction revalidates celestial
+IDs, frames/states, first/last-seen ordering, nonzero counts, duplicates and size.
+No contact is created merely by opening a catalog. Runtime
+`session/scanner/save.rs` owns schema-25 mapping of parameters, clock/remainder
+and those records; presentation selection/power/error are transient.
+
+Canonical schema 25 requires scanner source. Canonical versions 1–24 migrate to
+an empty scanner at their checkpoint UTC, preserving other source and granting
+no historic discoveries. Historical compressed fixtures omit scanner state.
+Wrong catalog revision is an incompatible-catalog error, not permission to load a
+new galaxy or silently discard history. Restore validates before session publication;
+a corrupt source cannot debit Core or partially replace a live session.
+
+Normal startup/restart binds an empty scanner to the supplied checkpoint UTC.
+Running simulation uses the shared admitted clock (including pause/terminal
+freeze) at 1:1 rate. Launch-only nonnegative elapsed time advances scanner
+freshness and retains history, after the existing chronological powered-work
+reconciliation. The launch watermark prevents duplicate credit and rollback.
+No offline observations are fabricated while the trajectory/event host #433 is
+absent. Expired contacts can be rediscovered by ordinary paid scans.
+
+Tests: `cargo test -p salimon-universe --locked scanner`,
+`cargo test -p salimon-client --locked scanner`, persistence/launch regressions,
+workspace build/tests/Clippy/fmt and parent-relative docs validation.

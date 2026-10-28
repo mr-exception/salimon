@@ -287,3 +287,9 @@ See the [scanner contract](../../docs/universe-scanner.md) for ownership, clock 
 
 Universe `scanner/pulses.rs` owns fixed five-second cadence and analytical funded linear-path detection. Runtime `session/scanner.rs` composes ordinary Core funding after construction, samples current body-local state and exposes read-only automation. Unknown orbital phase/velocity is never invented; body-local and galactic observations cannot be mixed.
 See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#431)
+
+Scanner contact checkpoints validate catalog revision, exact IDs/frames, timestamp ordering and bounds before atomic reconstruction. Runtime schema 25 saves canonical scanner parameters, clock/remainder and encounter history; legacy canonical saves migrate empty, current missing/malformed sources reject. Closed-app launch advances freshness once without inventing offline detections.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.

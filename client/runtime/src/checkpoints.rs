@@ -140,6 +140,7 @@ impl Checkpoints {
             // Corruption of both slots must not reuse an archived run identity.
             session.run.serial = manager.next_run_serial()?;
             // Bootstrap a verified checkpoint before the new run becomes playable.
+            session.bind_scanner_clock(launch_utc)?;
             let initial = session.save_bytes(launch_utc)?;
             manager.checkpoint(&initial, validate)?;
         }
@@ -284,8 +285,9 @@ impl Checkpoints {
         if !session.survival.snapshot().terminal {
             return Err(salimon_persistence::invalid("restart requires death"));
         }
-        let fresh = session.fresh_after_death()?;
+        let mut fresh = session.fresh_after_death()?;
         let utc = now()?;
+        fresh.bind_scanner_clock(utc)?;
         let job = SaveJob::Restart {
             serial: session.run.serial,
             report: session.ended_run_bytes()?,

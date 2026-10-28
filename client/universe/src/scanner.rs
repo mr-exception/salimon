@@ -3,6 +3,7 @@ use crate::{Catalog, CatalogId, Error, Record, coordinates::GalacticPosition, in
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+pub mod checkpoint;
 pub mod pulses;
 
 /// Explicit coordinate provenance. Current surface gameplay has a body-centered

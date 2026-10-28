@@ -141,3 +141,9 @@ Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
 Historical fixtures remain explicit; new-run startup is #426.
+
+
+## Scanner delivery (#431)
+
+Scanner contact checkpoints validate catalog revision, exact IDs/frames, timestamp ordering and bounds before atomic reconstruction. Runtime schema 25 saves canonical scanner parameters, clock/remainder and encounter history; legacy canonical saves migrate empty, current missing/malformed sources reject. Closed-app launch advances freshness once without inventing offline detections.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.

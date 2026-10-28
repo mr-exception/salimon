@@ -13,6 +13,16 @@ pub(crate) struct View {
 }
 
 pub(crate) fn find(name: &str) -> Option<View> {
+    // Engineering scanner view is separate from the approved four-camera
+    // authored Scout lighting corpus; adding it does not promote a baseline.
+    if name == "scanner" {
+        return Some(View {
+            name: name.into(),
+            absolute: false,
+            eye: [3.7, 1.95, -1.6],
+            target: [5.2, 1.65, -0.9],
+        });
+    }
     let radius = salimon_world::canonical::START
         .manifest()
         .physical

@@ -75,6 +75,7 @@ impl ClientApplication {
             crate::benchmark::Recorder::window_title,
         ));
         if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(self.session.scanner_geometry(presentation.ship.pose));
             scene_instances.extend(scene::room_lamps(&self.session, presentation.ship));
             scene_instances.extend(scene::cargo_door(&self.session, presentation.ship));
         }

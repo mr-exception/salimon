@@ -147,6 +147,7 @@ fn session_key(key: PhysicalKey) -> Option<crate::session::input::Key> {
         PhysicalKey::Code(KeyCode::KeyK) => Key::Secure,
         PhysicalKey::Code(KeyCode::KeyF) => Key::GrabDrop,
         PhysicalKey::Code(KeyCode::KeyP) => Key::TourPause,
+        PhysicalKey::Code(KeyCode::KeyM) => Key::ScannerNext,
         PhysicalKey::Code(KeyCode::Digit1) => Key::Slot1,
         PhysicalKey::Code(KeyCode::Digit2) => Key::Slot2,
         PhysicalKey::Code(KeyCode::Digit3) => Key::Slot3,

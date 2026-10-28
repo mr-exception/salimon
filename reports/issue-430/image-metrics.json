@@ -1,0 +1,26 @@
+{
+  "viewport": [
+    1280,
+    800
+  ],
+  "roi": [
+    520,
+    240,
+    760,
+    475
+  ],
+  "metrics": {
+    "undiscovered": {
+      "cyan_pixels": 0,
+      "selected_amber_pixels": 0
+    },
+    "identified": {
+      "cyan_pixels": 1096,
+      "selected_amber_pixels": 275
+    },
+    "blackout": {
+      "cyan_pixels": 0,
+      "selected_amber_pixels": 0
+    }
+  }
+}

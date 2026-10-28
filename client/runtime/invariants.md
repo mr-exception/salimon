@@ -764,3 +764,9 @@ See the [scanner contract](../../docs/universe-scanner.md) for source/test mappi
 
 Scanner contact checkpoints validate catalog revision, exact IDs/frames, timestamp ordering and bounds before atomic reconstruction. Runtime schema 25 saves canonical scanner parameters, clock/remainder and encounter history; legacy canonical saves migrate empty, current missing/malformed sources reject. Closed-app launch advances freshness once without inventing offline detections.
 See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#430)
+
+Renderer `scanner_hologram.rs` owns bounded depth-tested ship-local 3D projection geometry; runtime `session/scanner/presentation.rs` maps only fresh same-frame discoveries to ship pose. The physical console projector shows logarithmic distance, true 3D direction/elevation and selected contacts. M cycles contacts only in an admitted canonical cockpit; power loss suppresses projection, not history.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.

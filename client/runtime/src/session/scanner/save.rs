@@ -51,6 +51,7 @@ impl Scanner {
             (true, 25.., Some(s)) => {
                 s.validate()?;
                 Ok(Self {
+                    selected: 0,
                     contacts: Contacts::from_checkpoint(&CATALOG, s.contacts)
                         .map_err(|e| invalid(e.to_string()))?,
                     parameters: s.parameters,

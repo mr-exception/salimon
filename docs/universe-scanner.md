@@ -88,3 +88,34 @@ absent. Expired contacts can be rediscovered by ordinary paid scans.
 Tests: `cargo test -p salimon-universe --locked scanner`,
 `cargo test -p salimon-client --locked scanner`, persistence/launch regressions,
 workspace build/tests/Clippy/fmt and parent-relative docs validation.
+
+## Cockpit hologram (#430)
+
+The console projector sits on the existing console, with a 0.30 m projection
+radius centered at ship-local [5.2, 1.75, -0.9] m. Three orthogonal dotted rings,
+a ship-origin marker, contact cubes and elevation stems provide actual 3D depth
+through the ordinary production depth-tested instance pass. Logarithmic radial
+scaling compresses astronomical distances; direction/elevation remain 3D. Real
+sampled distance and age are shown in the cockpit hint. This is navigation
+presentation, never a physically rescaled celestial object or collision volume.
+
+M selects the next contact through the same native/automation input path. Only
+fresh same-frame identified contacts are projected; unknown catalog objects never
+appear. Power loss suppresses all projected rings/contacts and dims the housing;
+encounter history is unaffected. Selection is transient, does not control flight
+or scanner cadence, and is gated by cockpit, pause/terminal and modal admission.
+The existing flight/navigation monitor remains available. Mappings preserve the
+current interpolated ship pose and subtract/rebase through the ordinary renderer.
+
+Renderer geometry is bounded to 64 contacts and at most 227 cuboids, with the
+selected contact included even beyond the first page. No new draw pipeline,
+postprocessing, shadow, model service, authoritative collider or periodic asset
+regeneration is introduced. The base is procedural decorative projector hardware
+on the existing console. Projection uses ordinary scene lighting/depth; it is a
+low-poly holographic instrument, not a physical optics simulation.
+
+Validate renderer projection/blackout/bounds, runtime observation nonmutation,
+input gates, actual software-Vulkan captures and the maintained
+`scenarios/evidence/scanner-hologram.json` route. `scanner` is a close reference
+camera; it changes presentation only. Baseline/appearance, real physical controls
+and hardware/Metal costs remain separately unverified (#561/#557/#563).

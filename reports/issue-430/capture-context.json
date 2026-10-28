@@ -1,0 +1,64 @@
+{
+  "parent_commit": "666f072bb6225ad5a3a318a2a63cb7e7d34243f8",
+  "source_diff_sha256": "ccb40ddc115660b44ac00b221de0a7ac860e6a2526adc783adba44ed6314dd2b",
+  "binary_sha256": "2ec7025e11e71669e46fe9ec46efb206935292c84ca8a68c83991200cb16e490",
+  "scenario_sha256": "c2dc2f662788a666e84d62ca3eff46bffc3a6d1185ce0f424a9d3cbade709520",
+  "visual_context": {
+    "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+    "backend": "Vulkan",
+    "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+    "scale_factor": 1.0,
+    "viewport_pixels": [
+      1280,
+      800
+    ]
+  },
+  "window": {
+    "focused": false,
+    "inner_size": [
+      1280,
+      800
+    ],
+    "minimized": false,
+    "occluded": false
+  },
+  "native_input_isolated": true,
+  "backend_env": {
+    "WGPU_BACKEND": "vulkan",
+    "VK_DRIVER_FILES": "lvp_icd.json",
+    "LP_NUM_THREADS": 2
+  },
+  "captures": {
+    "identified.png": "49e3ecb31efaed16b935a9aa40a21ee5ce1947709b7bc3ed2a791ffc94764da8",
+    "blackout.png": "437a5a37446306c5a50ed322f893a0f72d7724b7027df1d7b2630f8826be3d55",
+    "undiscovered.png": "48a511bdb410b8c43b932964e2c5f0b943aeddc7225b13da38ebe886ce960e39",
+    "cockpit.png": "91aee2b27bf41568b1d3180d463a32813507b6d620580b7b03550380418485e3"
+  },
+  "source_overlay_hashes": {
+    "README.md": "b314b3ca36a6da8e669b4cf036d6f708628f3a92d26889a0a8044e1c10cc8619",
+    "client/renderer/README.ai.md": "4dd5275754a281ca95dca1737f76da67b86100169d9b4228d652ef05d048fc69",
+    "client/renderer/architecture.md": "3bd1b8a2142212fb83ec3281ef479f4da9da23404f5443b29079ab73542e3b4d",
+    "client/renderer/invariants.md": "0af0ca2a3adf36afabc4867876ece743c353e6dd2ed92770adda9c5c66b5f53c",
+    "client/renderer/src/lib.rs": "2580691420f5c0da78536f8bbe2d89aceae6212ab00ad3db7bdcc79a3781d70f",
+    "client/renderer/src/scanner_hologram.rs": "ca84ff09e2738bddbd2e0dabd74734e10f7d84e80efe92140e5c5517e4719cbb",
+    "client/runtime/README.ai.md": "25b02eb9c9db33dfee14c2bc55aa9f2131c65ac0433569d7ff1022b440aea3ac",
+    "client/runtime/architecture.md": "81ef9f380bd6352b5b31e28ad1eb5d68cb9076ded9fd896f5d9f81bd9ec1fead",
+    "client/runtime/invariants.md": "004e0754f7cae49a583f0416a6ddc28b985e85887dca345b325d2ded69d1a94c",
+    "client/runtime/src/app/input.rs": "c930686c8c4e3fc5ecc282193e613d510092b6d80c845111eb56f8c73cbffe9d",
+    "client/runtime/src/app/presentation.rs": "48195a329a7472eb7b7fe6ac09dc5e13134c3b700e8cd83ace52aef51ba546ca",
+    "client/runtime/src/app/presentation/prompts.rs": "ce96f6bfb84e8625bf514f88237909317a5516a6a0e4e6c91675479c6ae0c444",
+    "client/runtime/src/automation/inspection.rs": "a39c0cb7f100a4a9c64e9825960067c9111eaac2029567df2588f6eeeb15763c",
+    "client/runtime/src/automation/keys.rs": "15347c8397fd3f3dfc45c56ad3191a06ed832585bd6fd44c00cf451bd2b8c552",
+    "client/runtime/src/scout_reference.rs": "98977db9ac647101b11435156ce4d651c22237d053f20695d037b2393feb95ea",
+    "client/runtime/src/session/input.rs": "07a1900160030a0d2824e840eef633be1a30985afd3198a8b63c96edca4bc8af",
+    "client/runtime/src/session/scanner.rs": "dcb49904977cfc0bd06cd0d084ac24d8fbc885bce7eb1991cb6478b54f5ec34b",
+    "client/runtime/src/session/scanner/presentation.rs": "e231ee15fec5d1905860411576932f0245a1ad066f926d18160cfbfe000e1496",
+    "client/runtime/src/session/scanner/save.rs": "746305323914607a317d02062239191c0cffb5dbd62f551e3dbef15b238c73d8",
+    "docs/maintenance-map.md": "883d63cf4271805195faa8d28b16f60254a7e4f48d529ac13bc24117ac9ea4ae",
+    "docs/technical-architecture.md": "aeae00c1d9c5eaeee16c2ceb983624a60a4f798da890f1902ba2df4ac806dce2",
+    "docs/universe-scanner.md": "6dbb25c120b677e9f8144e16c7f1b8c0987d86418e5a4f9bebbeb89808ddaeb9",
+    "docs/validation.md": "c6622c8a0229c3d8a3ee2544dfab7fc24d37b2a688c26da14f8c9663f827b330",
+    "scenarios/evidence/scanner-hologram.json": "c2dc2f662788a666e84d62ca3eff46bffc3a6d1185ce0f424a9d3cbade709520",
+    "scripts/README.md": "9671811e011dfd9a13a3f6020da0e3dd0d7c89fe8e414528346f465f7c6538b1"
+  }
+}

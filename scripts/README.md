@@ -814,3 +814,11 @@ Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: fro
 ## Navigation forecasts (#421)
 
 See the [bounded prediction contract](../docs/universe-navigation.md): `ship/src/prediction.rs` (split-coordinate coasting gravity) and `ship/src/preview.rs` (actual playable power/contact model), `runtime/src/session/navigation.rs` disposable cache, `app/scene.rs` / `automation/inspection.rs` observation mapping, and renderer `cockpit_instruments.rs`. Run ship/runtime navigation and renderer tests, all-target Clippy/fmt/docs, runner tests and `scenarios/evidence/universe-navigation.json` in production software-Vulkan. No autopilot, source-energy mutation, chart reveal or certified arrival/error bound is introduced.
+
+## Scanner cockpit evidence (#430)
+
+`scenarios/evidence/scanner-hologram.json` uses the existing `canonical-flight`
+landed cockpit fixture and the `scanner` reference camera. It exercises automatic
+paid discovery, M selection and production GPU screenshots. Fixture placement and
+protocol keys do not establish physical input or normal-play travel. Run with
+Xvfb/Mesa software Vulkan and retain original images and state logs.

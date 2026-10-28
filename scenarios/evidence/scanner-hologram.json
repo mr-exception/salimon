@@ -1,0 +1,185 @@
+{
+  "setup": {
+    "scenario": "canonical-flight",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "scanner"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "undiscovered-projector",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 313
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.powered",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.selected",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "identified-local-contact",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "cockpit"
+      }
+    },
+    {
+      "screenshot": "cockpit-coexistence",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.last_seen_utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.powered",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "scanner"
+      }
+    },
+    {
+      "screenshot": "blackout-projector",
+      "timeout_ms": 180000
+    }
+  ]
+}

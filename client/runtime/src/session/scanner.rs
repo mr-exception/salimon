@@ -1,4 +1,5 @@
 //! Scanner composition: ordinary Core-funded service; discovery owns no catalog truth.
+mod presentation;
 pub(crate) mod save;
 use super::GameplaySession;
 use salimon_universe::{
@@ -14,6 +15,7 @@ pub(crate) static CATALOG: LazyLock<Catalog> = LazyLock::new(|| {
 });
 #[derive(Clone, Debug)]
 pub(crate) struct Scanner {
+    pub(crate) selected: usize,
     pub(crate) contacts: Contacts,
     pub(crate) parameters: Parameters,
     pub(crate) utc_millis: u64,
@@ -24,6 +26,7 @@ pub(crate) struct Scanner {
 impl Default for Scanner {
     fn default() -> Self {
         Self {
+            selected: 0,
             contacts: Contacts::new(CATALOG.revision()).expect("checked revision"),
             parameters: serde_json::from_str(include_str!("../../config/scanner.json"))
                 .expect("checked scanner configuration"),

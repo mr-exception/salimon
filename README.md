@@ -357,3 +357,8 @@ Core upgrades: aim at Core, I switches Fuel/Upgrade Materials; E contributes, Y 
 
 
 Optional construction: C → 7 places a utility processor; feed 3 kg iron with E and wait 60 active seconds. Aim at its completed case with C open and press G to plan an upgrade or restoration. Fully funded maintenance disables its recovery bonus until commissioning. See [costs, power and saved downtime](docs/non-core-modules.md).
+
+Canonical cockpit scanner: automatic five-second powered scans feed the physical
+3D console hologram. Press **M** in the cockpit to select the next fresh contact;
+the hint shows sampled distance/age and identifies the logarithmic display scale.
+No catalog entry is visible before discovery. See [scanner behavior and limits](docs/universe-scanner.md).

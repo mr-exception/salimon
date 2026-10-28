@@ -575,3 +575,9 @@ layouts are unchanged. See [canonical terrain](../../docs/universe-terrain.md).
 ## Bounded navigation prediction (#421)
 
 Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+
+## Scanner delivery (#430)
+
+Renderer `scanner_hologram.rs` owns bounded depth-tested ship-local 3D projection geometry; runtime `session/scanner/presentation.rs` maps only fresh same-frame discoveries to ship pose. The physical console projector shows logarithmic distance, true 3D direction/elevation and selected contacts. M cycles contacts only in an admitted canonical cockpit; power loss suppresses projection, not history.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.

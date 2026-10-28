@@ -64,6 +64,7 @@ pub(crate) enum Key {
     Secure,
     GrabDrop,
     TourPause,
+    ScannerNext,
     Slot1,
     Slot2,
     Slot3,
@@ -75,6 +76,10 @@ pub(crate) enum Key {
 
 pub(crate) fn dispatch(session: &mut GameplaySession, key: Key, pressed: bool) {
     if construction::handle(session, key, pressed) || modals::handle(session, key, pressed) {
+        return;
+    }
+    if pressed && key == Key::ScannerNext {
+        session.scanner_next_contact();
         return;
     }
     let command = if !pressed {

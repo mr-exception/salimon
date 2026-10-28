@@ -1,0 +1,96 @@
+   Compiling salimon-renderer v0.1.0 (/repo/client/renderer)
+   Compiling salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 14.54s
+    Checking salimon-renderer v0.1.0 (/repo/client/renderer)
+    Checking salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.97s
+   Compiling salimon-world v0.1.0 (/repo/client/world)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.51s
+     Running unittests src/lib.rs (target/debug/deps/salimon_world-75a8a7eb713e525c)
+
+running 2 tests
+test terrain::tests::canonical_surface_normals_and_translation_preserve_landing_cap_and_definition ... ok
+test terrain::tests::canonical_publication_is_the_exact_height_authority_and_has_strict_cache_identity ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 43 filtered out; finished in 0.08s
+
+     Running tests/consumable_resources.rs (target/debug/deps/consumable_resources-9036b56d5c5b6363)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/fragment_journal_cost.rs (target/debug/deps/fragment_journal_cost-149888d13fc20d8f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/mining.rs (target/debug/deps/mining-389c6c323afe7695)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/resource_distribution.rs (target/debug/deps/resource_distribution-b0a2405f1aa9e694)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/resource_fragments.rs (target/debug/deps/resource_fragments-680bda45a5b6ff8f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/resource_generation.rs (target/debug/deps/resource_generation-70a872c7efd4b8bd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/resource_streaming.rs (target/debug/deps/resource_streaming-41a37814a57e4bd8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/resources.rs (target/debug/deps/resources-7ecbef530771212f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/spherical_mining.rs (target/debug/deps/spherical_mining-8bdebef9f0af14d6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+   Compiling salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.98s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-51a9b9987d94bb8e)
+
+running 3 tests
+canonical altitude=29853590 direction=[0.0, 1.0, 0.0]: 6 patches
+canonical altitude=29853590 direction=[0.7071067811865475, 0.7071067811865475, 0.0]: 6 patches
+canonical altitude=29853590 direction=[0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 6 patches
+canonical altitude=2985359 direction=[0.0, 1.0, 0.0]: 9 patches
+canonical altitude=2985359 direction=[0.7071067811865475, 0.7071067811865475, 0.0]: 6 patches
+canonical altitude=2985359 direction=[0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 6 patches
+test benchmark::tests::canonical_adapter_retains_uninterrupted_solver_states_between_updates ... ok
+canonical altitude=100000 direction=[0.0, 1.0, 0.0]: 81 patches
+canonical altitude=100000 direction=[0.7071067811865475, 0.7071067811865475, 0.0]: 78 patches
+canonical altitude=100000 direction=[0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 105 patches
+canonical altitude=1000 direction=[0.0, 1.0, 0.0]: 165 patches
+canonical altitude=1000 direction=[0.7071067811865475, 0.7071067811865475, 0.0]: 150 patches
+canonical altitude=1000 direction=[0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 177 patches
+canonical altitude=3 direction=[0.0, 1.0, 0.0]: 213 patches
+canonical altitude=3 direction=[0.7071067811865475, 0.7071067811865475, 0.0]: 210 patches
+canonical altitude=3 direction=[0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 213 patches
+test terrain_patches::canonical_tests::canonical_orbit_to_surface_covers_all_faces_and_balances_seams ... ok
+test terrain_patches::canonical_tests::canonical_cpu_residency_eviction_and_revisit_keep_identical_geometry ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 484 filtered out; finished in 3.03s
+

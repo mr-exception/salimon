@@ -35,7 +35,7 @@ impl ClientApplication {
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface_frame = self.session.terrain_frame(ship_snapshot);
         let world_snapshot = self.session.camera_prototype.snapshot();
-        let (mut camera, mut scene_instances, mut spheres, light) =
+        let (mut camera, mut scene_instances, mut spheres, mut light) =
             map_world_to_renderer(world_snapshot);
         let mut resource_meshes = Vec::new();
         let character_snapshot = self.session.character.snapshot(ship_frame, surface_frame);
@@ -150,6 +150,28 @@ impl ClientApplication {
         } else {
             salimon_world::terrain::TerrainMode::Flat
         };
+        if render_terrain == salimon_world::terrain::TerrainMode::Canonical {
+            // Declared fixed illumination for canonical terrain presentation;
+            // the astronomical sky/ephemeris light adapter remains its own owner.
+            light.position_meters = [
+                0.,
+                salimon_world::canonical::START
+                    .manifest()
+                    .physical
+                    .semi_major_axis_meters,
+                0.,
+            ];
+
+            spheres = render_terrain
+                .bodies()
+                .iter()
+                .map(|b| salimon_renderer::SphereInstance {
+                    center_meters: b.center.meters(),
+                    radius_meters: b.radius_meters,
+                    material: salimon_renderer::SurfaceMaterial::Slate,
+                })
+                .collect();
+        }
         if let Err(error) = self
             .terrain_stream
             .update(camera.position_meters, render_terrain)

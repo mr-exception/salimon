@@ -1,0 +1,276 @@
+{
+  "status": "passed",
+  "steps_completed": 20,
+  "duration_ms": 95915,
+  "setup": {
+    "scenario": "canonical-terrain",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "rows": [
+    {
+      "step": 5,
+      "view": "universe-orbit",
+      "terrain": {
+        "active_patches": 6,
+        "cache_patches": 6,
+        "cpu_cache_bytes": 137792,
+        "generated_last_frame": 0,
+        "generated_peak": 3,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 2662,
+        "generation_total_micros": 6061,
+        "gpu_cache_bytes": 230360,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 100824,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 53,
+        "preparation_overruns": 2,
+        "preparation_peak_micros": 2693,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 6,
+        "triangles": 3072,
+        "uploaded_last_frame_bytes": 1536
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 60.83614,
+          "mean_ms": 8.639227199999999,
+          "min_ms": 1.594406,
+          "p95_ms": 60.83614,
+          "samples": 10
+        },
+        "cpu_update": {
+          "max_ms": 4.873207,
+          "mean_ms": 1.4182852000000001,
+          "min_ms": 0.34415599999999996,
+          "p95_ms": 4.873207,
+          "samples": 10
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": {
+          "allocated_bytes": 26679028,
+          "reserved_bytes": 62914560
+        },
+        "gpu_pass": {
+          "max_ms": 90.671547,
+          "mean_ms": 52.13402388888889,
+          "min_ms": 27.57128,
+          "p95_ms": 90.671547,
+          "samples": 9
+        },
+        "presented_interval": {
+          "max_ms": 144.91119,
+          "mean_ms": 88.513502,
+          "min_ms": 0.0,
+          "p95_ms": 144.91119,
+          "samples": 10
+        },
+        "samples": 10
+      }
+    },
+    {
+      "step": 10,
+      "view": "universe-surface",
+      "terrain": {
+        "active_patches": 300,
+        "cache_patches": 306,
+        "cpu_cache_bytes": 7052608,
+        "generated_last_frame": 0,
+        "generated_peak": 3,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 9702,
+        "generation_total_micros": 463392,
+        "gpu_cache_bytes": 5420852,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 2096916,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 868,
+        "preparation_overruns": 455,
+        "preparation_peak_micros": 12408,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 306,
+        "triangles": 162622,
+        "uploaded_last_frame_bytes": 76800
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 1008.764158,
+          "mean_ms": 6.138177010570825,
+          "min_ms": 1.3518709999999998,
+          "p95_ms": 8.890714,
+          "samples": 473
+        },
+        "cpu_update": {
+          "max_ms": 15.442931999999999,
+          "mean_ms": 3.3418459598308696,
+          "min_ms": 0.34415599999999996,
+          "p95_ms": 5.75735,
+          "samples": 473
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": {
+          "allocated_bytes": 15816780,
+          "reserved_bytes": 62914560
+        },
+        "gpu_pass": {
+          "max_ms": 413.215148,
+          "mean_ms": 101.4045581377119,
+          "min_ms": 27.57128,
+          "p95_ms": 182.768667,
+          "samples": 472
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 126.60670029386885,
+          "min_ms": 0.0,
+          "p95_ms": 237.349865,
+          "samples": 473
+        },
+        "samples": 473
+      }
+    },
+    {
+      "step": 15,
+      "view": "universe-edge",
+      "terrain": {
+        "active_patches": 162,
+        "cache_patches": 462,
+        "cpu_cache_bytes": 10550784,
+        "generated_last_frame": 0,
+        "generated_peak": 3,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 9702,
+        "generation_total_micros": 695114,
+        "gpu_cache_bytes": 2987744,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 2096916,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 2063,
+        "preparation_overruns": 570,
+        "preparation_peak_micros": 12408,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 462,
+        "triangles": 87828,
+        "uploaded_last_frame_bytes": 41472
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 1423.056839,
+          "mean_ms": 10.674697405042012,
+          "min_ms": 1.3518709999999998,
+          "p95_ms": 17.070917,
+          "samples": 595
+        },
+        "cpu_update": {
+          "max_ms": 15.442931999999999,
+          "mean_ms": 3.364513700840336,
+          "min_ms": 0.34415599999999996,
+          "p95_ms": 5.750797,
+          "samples": 595
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": {
+          "allocated_bytes": 21093664,
+          "reserved_bytes": 62914560
+        },
+        "gpu_pass": {
+          "max_ms": 507.44969399999997,
+          "mean_ms": 116.47222697979795,
+          "min_ms": 27.57128,
+          "p95_ms": 224.369918,
+          "samples": 594
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 141.84810089579827,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 595
+        },
+        "samples": 595
+      }
+    },
+    {
+      "step": 20,
+      "view": "universe-orbit",
+      "terrain": {
+        "active_patches": 6,
+        "cache_patches": 462,
+        "cpu_cache_bytes": 10505920,
+        "generated_last_frame": 0,
+        "generated_peak": 3,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 9702,
+        "generation_total_micros": 695114,
+        "gpu_cache_bytes": 230360,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 2096916,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 36,
+        "preparation_overruns": 570,
+        "preparation_peak_micros": 12408,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 462,
+        "triangles": 3072,
+        "uploaded_last_frame_bytes": 1536
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 1778.9495239999999,
+          "mean_ms": 13.546380023178804,
+          "min_ms": 1.3518709999999998,
+          "p95_ms": 17.070917,
+          "samples": 604
+        },
+        "cpu_update": {
+          "max_ms": 15.442931999999999,
+          "mean_ms": 3.3290092086092717,
+          "min_ms": 0.34415599999999996,
+          "p95_ms": 5.69931,
+          "samples": 604
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": {
+          "allocated_bytes": 15916236,
+          "reserved_bytes": 62914560
+        },
+        "gpu_pass": {
+          "max_ms": 507.44969399999997,
+          "mean_ms": 116.6949510298507,
+          "min_ms": 27.57128,
+          "p95_ms": 224.369918,
+          "samples": 603
+        },
+        "presented_interval": {
+          "max_ms": 250.0,
+          "mean_ms": 141.68273996192048,
+          "min_ms": 0.0,
+          "p95_ms": 250.0,
+          "samples": 604
+        },
+        "samples": 604
+      }
+    }
+  ]
+}

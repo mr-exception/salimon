@@ -798,3 +798,7 @@ corrupt inputs leave no published partial packet. Use the
 [source contract](../docs/universe-sources.md#preparing-the-human-source-review-537)
 and [decision checklist](../reports/issue-537/README.md) for current limitations,
 provider access, exact source/snapshot approval and physical balance evidence.
+
+Canonical terrain orbit/surface/face-edge captures use `scenarios/evidence/universe-terrain.json`;
+see [canonical geometry and bounds](../docs/universe-terrain.md). This explicit
+render fixture uses fixed light/cameras and does not change a playable save.

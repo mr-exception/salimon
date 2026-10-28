@@ -9,6 +9,7 @@ pub enum TerrainMode {
     #[default]
     Flat,
     Representative,
+    Canonical,
 }
 
 static DEFINITIONS: LazyLock<[TerrainDefinition; 3]> = LazyLock::new(|| {
@@ -25,6 +26,7 @@ static DEFINITIONS: LazyLock<[TerrainDefinition; 3]> = LazyLock::new(|| {
         TerrainDefinition::representative(body).expect("validated built-in terrain")
     })
 });
+static CANONICAL: LazyLock<TerrainDefinition> = LazyLock::new(TerrainDefinition::canonical_start);
 impl TerrainMode {
     /// Nonnegative sampled-surface distance; catalog order resolves exact ties.
     pub fn nearest_body(
@@ -36,7 +38,7 @@ impl TerrainMode {
         if !maximum_meters.is_finite() || maximum_meters < 0.0 {
             return None;
         }
-        CELESTIAL_BODIES
+        self.bodies()
             .iter()
             .filter(|b| !solid_only || b.role == crate::BodyRole::Solid)
             .filter_map(|b| {
@@ -54,7 +56,18 @@ impl TerrainMode {
             .min_by(|a, b| a.1.total_cmp(&b.1))
     }
 
+    pub fn bodies(self) -> &'static [CelestialBody] {
+        if self == Self::Canonical {
+            &crate::canonical::BODIES
+        } else {
+            CELESTIAL_BODIES
+        }
+    }
     pub fn definition(self, body: CelestialBodyId) -> Option<&'static TerrainDefinition> {
+        if self == Self::Canonical {
+            return (body == CelestialBodyId::Vesper).then_some(&*CANONICAL);
+        }
+
         (self == Self::Representative)
             .then(|| DEFINITIONS.iter().find(|d| d.body() == body))
             .flatten()

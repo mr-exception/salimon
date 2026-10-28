@@ -4,6 +4,10 @@ impl TerrainDefinition {
     /// Canonical little-endian encoding doubles as the complete cache identity.
     /// No world center is included; translating a planet leaves terrain unchanged.
     pub fn to_bytes(&self) -> Vec<u8> {
+        if let Some(start) = &self.canonical {
+            // Exact frozen digest binds every canonical input, not only its seed.
+            return [b"SLMCAN01".as_slice(), start.definition().sha256.as_bytes()].concat();
+        }
         let mut bytes = b"SLMTERR1".to_vec();
         bytes.extend(self.version.to_le_bytes());
         bytes.push(body_tag(self.body));
@@ -34,6 +38,17 @@ impl TerrainDefinition {
     /// Decode only against a known body. Reject mismatched identity/radius,
     /// malformed lengths, trailing data and versions rather than falling back.
     pub fn from_bytes(body: CelestialBody, bytes: &[u8]) -> Result<Self, TerrainError> {
+        if bytes.starts_with(b"SLMCAN01") {
+            let definition = Self::canonical_start();
+            if body.role != BodyRole::Solid
+                || body.id != CelestialBodyId::Vesper
+                || body.radius_meters.to_bits() != definition.radius_meters.to_bits()
+                || bytes != definition.to_bytes()
+            {
+                return Err(TerrainError::InvalidDefinition);
+            }
+            return Ok(definition);
+        }
         if bytes.len() < 32 || bytes.len() > MAX_DEFINITION_BYTES || &bytes[..8] != b"SLMTERR1" {
             return Err(TerrainError::InvalidEncoding);
         }
@@ -107,5 +122,6 @@ fn body_tag(id: CelestialBodyId) -> u8 {
         CelestialBodyId::Earth => 3,
         CelestialBodyId::Moon => 4,
         CelestialBodyId::Mars => 5,
+        CelestialBodyId::Vesper => 6,
     }
 }

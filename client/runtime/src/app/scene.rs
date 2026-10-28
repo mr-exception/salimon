@@ -102,6 +102,7 @@ pub(super) fn map_world_to_renderer(
                 CelestialBodyId::Earth => SurfaceMaterial::Oceanic,
                 CelestialBodyId::Moon => SurfaceMaterial::Slate,
                 CelestialBodyId::Mars => SurfaceMaterial::Rust,
+                CelestialBodyId::Vesper => SurfaceMaterial::Slate,
             },
         })
         .collect();

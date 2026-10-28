@@ -262,3 +262,60 @@ fn version_one_golden_samples() {
         }
     }
 }
+
+#[test]
+fn canonical_publication_is_the_exact_height_authority_and_has_strict_cache_identity() {
+    let definition = TerrainDefinition::canonical_start();
+    let body = crate::canonical::BODIES[0];
+    assert_eq!(body.id, CelestialBodyId::Vesper);
+    assert_eq!(
+        definition.radius_meters(),
+        crate::canonical::START.manifest().physical.radius_meters
+    );
+    for x in -32..=32 {
+        for z in -32..=32 {
+            let v = [f64::from(x), 13., f64::from(z)];
+            let n = v[0].hypot(v[1]).hypot(v[2]);
+            let d = v.map(|v| v / n);
+            assert_eq!(
+                definition.height(d).unwrap(),
+                crate::canonical::START.height_meters(d).unwrap()
+            );
+            let sample = definition.sample(d).unwrap();
+            assert!(sample.outward_normal.iter().all(|n| n.is_finite()));
+            assert!(sample.slope >= 0.);
+            assert!((0.0..=1800.0).contains(&sample.elevation_meters));
+        }
+    }
+    let bytes = definition.to_bytes();
+    assert_eq!(
+        TerrainDefinition::from_bytes(body, &bytes).unwrap(),
+        definition
+    );
+    let mut corrupt = bytes.clone();
+    *corrupt.last_mut().unwrap() ^= 1;
+    assert!(TerrainDefinition::from_bytes(body, &corrupt).is_err());
+    let mut changed = body;
+    changed.radius_meters += 1.;
+    assert!(TerrainDefinition::from_bytes(changed, &bytes).is_err());
+    assert!(TerrainDefinition::from_bytes(CELESTIAL_BODIES[3], &bytes).is_err());
+}
+
+#[test]
+fn canonical_surface_normals_and_translation_preserve_landing_cap_and_definition() {
+    let d = TerrainDefinition::canonical_start();
+    assert_eq!(d.height([0., 1., 0.]).unwrap(), 0.);
+    let sample = d.sample([0., 1., 0.]).unwrap();
+    assert_eq!(sample.outward_normal, [0., 1., 0.]);
+    assert_eq!(sample.slope, 0.);
+    assert!(d.sample([0.; 3]).is_err());
+    let a = crate::canonical::BODIES[0];
+    let mut b = a;
+    b.center = crate::WorldPosition::new(1e12, -1e12, 3e11);
+    assert_eq!(
+        TerrainMode::Canonical.sample(a, [0., 1., 0.]),
+        TerrainMode::Canonical.sample(b, [0., 1., 0.])
+    );
+    assert_eq!(TerrainMode::Canonical.bodies().len(), 1);
+    assert_eq!(CELESTIAL_BODIES.len(), 6);
+}

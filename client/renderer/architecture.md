@@ -562,3 +562,11 @@ helpers retain the same facet arithmetic, triangle iteration/deduplication order
 7-float vertex records and errors. Existing geometry, precision, batching and
 GPU equivalence tests consume this same private seam. No shaders, assets,
 layouts, public APIs or per-frame allocation policies change.
+
+
+## Canonical terrain masks (#424)
+
+Terrain preparation passes the caller's validated mask radius to the existing
+shader instead of hard-coding the 4,096 m fixture cap. Canonical whole-planet
+meshes retain published relief at orbital LOD; old fixture mask radii and shader
+layouts are unchanged. See [canonical terrain](../../docs/universe-terrain.md).

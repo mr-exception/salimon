@@ -6,6 +6,7 @@ use salimon_world::{CELESTIAL_BODIES, CelestialBody, terrain::TerrainMode};
 pub(crate) fn body_at(center: [f64; 3], radius: f64) -> CelestialBody {
     *CELESTIAL_BODIES
         .iter()
+        .chain(salimon_world::canonical::BODIES.iter())
         .find(|b| b.center.meters() == center && b.radius_meters == radius)
         .expect("ground frames originate in the immutable catalog")
 }
@@ -13,7 +14,12 @@ pub(crate) fn character_ground(frame: SurfaceFrame, world: [f64; 3]) -> GroundSa
     let body = body_at(frame.body_center_meters, frame.radius_meters);
     let local = sub(world, body.center.meters());
     let direction = scale(local, 1.0 / length(local));
-    let sample = TerrainMode::Representative.sample(body, direction);
+    let sample = (if body.id == salimon_world::CelestialBodyId::Vesper {
+        TerrainMode::Canonical
+    } else {
+        TerrainMode::Representative
+    })
+    .sample(body, direction);
     GroundSample {
         position_meters: add(body.center.meters(), sample.body_local_position_meters),
         normal: sample.outward_normal,

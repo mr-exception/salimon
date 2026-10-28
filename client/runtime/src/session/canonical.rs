@@ -57,10 +57,164 @@ pub(crate) fn mining_initial_conditions(session: &mut GameplaySession) -> Result
     Ok(())
 }
 
+impl GameplaySession {
+    /// A fresh journey, never a restore path. Grants the existing supplies once.
+    pub(crate) fn new_canonical_run() -> Result<Self, String> {
+        let mut session = Self::new_run();
+        initialize(&mut session)?;
+        let start = &salimon_world::canonical::START;
+        let arrival = &start.manifest().arrival;
+        let point = start
+            .surface_point(arrival.traveler_tangent_xz_meters)
+            .map_err(|e| e.to_string())?;
+        let surface = session.terrain_frame(session.ship.snapshot());
+        let character = salimon_character::CharacterController::on_surface(surface, point)
+            .map_err(str::to_owned)?;
+        let frame = super::frames::character_ship_frame(session.ship.snapshot().pose);
+        let snapshot = character.snapshot(frame, surface);
+        let local = frame.world_to_local(snapshot.eye_position_meters);
+        let feet = frame.world_to_local(point);
+        // Conservative startup-only margin around the standing capsule. The
+        // ordinary movement owner retains its precise collision geometry.
+        for b in salimon_character::ship_installation_obstacles() {
+            if local[0] + 0.5 >= b[0]
+                && local[0] - 0.5 <= b[1]
+                && local[2] + 0.5 >= b[4]
+                && local[2] - 0.5 <= b[5]
+                && feet[1] + salimon_character::PLAYER_BODY_HEIGHT_METERS >= b[2]
+                && feet[1] <= b[3]
+            {
+                return Err("published traveler spawn intersects authored ship clearance".into());
+            }
+        }
+        session.character = character;
+        let v = salimon_math::sub(
+            frame.local_to_world([0., 1., 0.]),
+            snapshot.eye_position_meters,
+        );
+        let direction = salimon_math::scale(v, 1.0 / salimon_math::length(v));
+        let yaw = salimon_math::dot(direction, frame.axes[2])
+            .atan2(salimon_math::dot(direction, frame.axes[0]));
+        let pitch = salimon_math::dot(direction, snapshot.up.map(f64::from))
+            .clamp(-1., 1.)
+            .asin();
+        session
+            .character
+            .apply_mouse_delta(yaw / 0.0022, -pitch / 0.0022);
+        Ok(session)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::time::Duration;
+    #[test]
+    fn canonical_new_journey_can_walk_around_hull_and_enter_ordinary_ramp() {
+        use super::super::{Command, ControlKey};
+        let mut s = GameplaySession::new_canonical_run().unwrap();
+        for (key, frames) in [(ControlKey::Left, 296), (ControlKey::Forward, 230)] {
+            s.command(Command::Control(key, true));
+            s.advance_automation(Duration::from_millis(frames * 16));
+            s.command(Command::Control(key, false));
+        }
+        s.command(Command::Look(713.9983303613166, 0.));
+        s.command(Command::Control(ControlKey::Forward, true));
+        s.advance_automation(Duration::from_millis(95 * 16));
+        s.command(Command::Control(ControlKey::Forward, false));
+        s.command(Command::Interact);
+        assert_eq!(s.ship.snapshot().door_state, salimon_ship::DoorState::Open);
+        s.advance_automation(Duration::from_millis(50 * 16));
+        s.command(Command::Control(ControlKey::Forward, true));
+        s.advance_automation(Duration::from_millis(160 * 16));
+        s.command(Command::Control(ControlKey::Forward, false));
+        assert_eq!(
+            s.snapshot().character.location,
+            salimon_character::CharacterLocation::InsideShip
+        );
+    }
+    #[test]
+    fn canonical_restart_replaces_historical_nonflat_world_but_retains_active_restore() {
+        let mut old = GameplaySession::new_run();
+        old.enable_terrain(salimon_world::CELESTIAL_BODIES[3], [0., 0., 1.])
+            .unwrap();
+        let bytes = old.save_bytes(1).unwrap();
+        let mut restored = GameplaySession::default();
+        restored.restore_bytes(&bytes).unwrap();
+        assert_eq!(
+            restored.mining.terrain,
+            salimon_world::terrain::TerrainMode::Representative
+        );
+        restored
+            .survival
+            .command(salimon_survival::Command::Damage(
+                salimon_survival::Points::FULL,
+            ))
+            .unwrap();
+        let next = restored.fresh_after_death().unwrap();
+        assert_eq!(
+            next.mining.terrain,
+            salimon_world::terrain::TerrainMode::Canonical
+        );
+        assert_eq!(next.run.serial, 2);
+    }
+    #[test]
+    fn canonical_new_journey_is_deterministic_safe_and_restores_without_supply_grants() {
+        let mut a = GameplaySession::new_canonical_run().unwrap();
+        let b = GameplaySession::new_canonical_run().unwrap();
+        assert_eq!(a.save_bytes(10).unwrap(), b.save_bytes(10).unwrap());
+        assert!(
+            salimon_world::canonical::START
+                .manifest()
+                .distance
+                .minimum_planet_earth_distance_light_years
+                >= 30.
+        );
+        let snap = a.snapshot();
+        assert_eq!(
+            snap.character.location,
+            salimon_character::CharacterLocation::Surface
+        );
+        let point = salimon_world::canonical::START
+            .surface_point([14., 0.])
+            .unwrap();
+        assert!(
+            salimon_math::length(salimon_math::sub(snap.character.eye_position_meters, point)) > 1.
+        );
+        let toward = salimon_math::sub(
+            snap.ship.pose.position_meters,
+            snap.character.eye_position_meters,
+        );
+        let look = salimon_math::sub(
+            snap.character.look_target_meters,
+            snap.character.eye_position_meters,
+        );
+        assert!(salimon_math::dot(toward, look) > 0.);
+        let fixture = GameplaySession::new_run();
+        assert_eq!(a.consumables, fixture.consumables);
+        assert_eq!(a.fabricator, fixture.fabricator);
+        a.advance_game(Duration::from_millis(16));
+        let bytes = a.save_bytes(10).unwrap();
+        let mut restored = GameplaySession::default();
+        restored.restore_bytes(&bytes).unwrap();
+        assert_eq!(restored.save_bytes(10).unwrap(), bytes);
+        assert!(a.fresh_after_death().is_err());
+        a.survival
+            .command(salimon_survival::Command::Damage(
+                salimon_survival::Points::FULL,
+            ))
+            .unwrap();
+        let fresh = a.fresh_after_death().unwrap();
+        assert_eq!(fresh.run.serial, 2);
+        assert_eq!(
+            fresh.snapshot().character.location,
+            salimon_character::CharacterLocation::Surface
+        );
+        assert_eq!(fresh.consumables, fixture.consumables);
+        assert_eq!(fresh.fabricator, fixture.fabricator);
+        assert_eq!(fresh.snapshot().ship, b.snapshot().ship);
+    }
+
     #[test]
     fn canonical_gameplay_all_surface_consumers_share_published_ground() {
         let mut app = GameplaySession::new_run();

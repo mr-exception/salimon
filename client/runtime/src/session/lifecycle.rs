@@ -85,24 +85,17 @@ impl GameplaySession {
             .serial
             .checked_add(1)
             .ok_or_else(|| invalid("run identity exhausted"))?;
-        let mut fresh = Self {
-            seed: self.seed,
-            policy: self.policy,
-            run: RunState {
-                serial,
-                ..Default::default()
-            },
-            ..Self::new_run()
+        let mut fresh = if self.mining.terrain == salimon_world::terrain::TerrainMode::Flat {
+            Self::new_run()
+        } else {
+            Self::new_canonical_run().map_err(invalid)?
         };
-        if self.mining.terrain == salimon_world::terrain::TerrainMode::Representative {
-            let earth = *salimon_world::CELESTIAL_BODIES
-                .iter()
-                .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
-                .expect("Earth catalog");
-            fresh
-                .enable_terrain(earth, [0.0, 1.0, 0.0])
-                .map_err(invalid)?;
-        }
+        fresh.seed = self.seed;
+        fresh.policy = self.policy;
+        fresh.run = RunState {
+            serial,
+            ..Default::default()
+        };
         fresh.view_mode = ViewMode::Gameplay;
         Ok(fresh)
     }

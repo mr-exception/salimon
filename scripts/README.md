@@ -807,3 +807,5 @@ Canonical gameplay routes: [boarding](../scenarios/evidence/universe-boarding.js
 [mining/carry/reload](../scenarios/evidence/universe-mining.json) and
 [takeoff/landing](../scenarios/evidence/universe-flight.json); see
 [contracts and fixture boundaries](../docs/universe-gameplay.md).
+
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.

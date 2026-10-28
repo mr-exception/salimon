@@ -78,15 +78,8 @@ fn run_config(
     }
     if config.is_none() && benchmark.is_none() {
         application.condition_feedback = crate::condition_feedback::Presenter::open();
-        application.session = crate::session::GameplaySession::new_run();
-        let earth = *salimon_world::CELESTIAL_BODIES
-            .iter()
-            .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
-            .expect("Earth catalog");
-        application
-            .session
-            .enable_terrain(earth, [0.0, 1.0, 0.0])
-            .map_err(|e| RunError::new("terrain startup failed", e))?;
+        application.session = crate::session::GameplaySession::new_canonical_run()
+            .map_err(|e| RunError::new("canonical journey startup failed", e))?;
     }
     if config.is_none() && benchmark.is_none() {
         application.checkpoints = Some(
@@ -292,6 +285,8 @@ impl ClientApplication {
 
         let mut attributes = window_attributes(self.e2e_config.is_some());
         if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Representative
+            || (self.e2e_config.is_none()
+                && self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
             || std::env::var_os("SALIMON_REFERENCE_SIZE").is_some()
         {
             attributes = attributes.with_inner_size(winit::dpi::PhysicalSize::new(1920, 1080));

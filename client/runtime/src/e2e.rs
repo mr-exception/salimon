@@ -15,6 +15,7 @@ pub(crate) enum Scenario {
     CanonicalSurface,
     CanonicalMining,
     CanonicalFlight,
+    CanonicalJourney,
     ConstructionModule,
     ConstructionModuleUpgrade,
     ConstructionModuleRestore,
@@ -84,6 +85,7 @@ impl Scenario {
             "canonical-surface" => Ok(Self::CanonicalSurface),
             "canonical-mining" => Ok(Self::CanonicalMining),
             "canonical-flight" => Ok(Self::CanonicalFlight),
+            "canonical-journey" => Ok(Self::CanonicalJourney),
             "surface-age-offline" => Ok(Self::SurfaceAgeOffline),
             "surface-age-replacement" => Ok(Self::SurfaceAgeReplacement),
             "surface-age-new" => Ok(Self::SurfaceAgeNew),
@@ -210,6 +212,7 @@ impl Scenario {
             Self::CanonicalSurface => "canonical-surface",
             Self::CanonicalMining => "canonical-mining",
             Self::CanonicalFlight => "canonical-flight",
+            Self::CanonicalJourney => "canonical-journey",
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
             Self::ResourceApproach => "resource-approach",
@@ -456,6 +459,9 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         | Scenario::CoreRestart
         | Scenario::CrashRecovery => crate::flight_regression::initialize(app, config.scenario)?,
         Scenario::LandedEarth => {}
+        Scenario::CanonicalJourney => {
+            *app = GameplaySession::new_canonical_run()?;
+        }
         Scenario::CanonicalFlight => {
             crate::session::canonical::initialize(app)?;
             app.character.enter_cockpit();

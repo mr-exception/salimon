@@ -4,7 +4,7 @@ use salimon_renderer::SurfaceSize;
 use winit::dpi::{LogicalSize, PhysicalSize};
 use winit::window::{CursorGrabMode, Window, WindowAttributes};
 
-pub(super) const WINDOW_TITLE: &str = "Salimon — Compressed Solar System";
+pub(super) const WINDOW_TITLE: &str = "Salimon";
 pub(super) const INITIAL_WIDTH: u32 = 1920;
 pub(super) const INITIAL_HEIGHT: u32 = 1080;
 const MINIMUM_WIDTH: f64 = 640.0;

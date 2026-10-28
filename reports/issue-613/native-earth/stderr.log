@@ -1,0 +1,7 @@
+[2026-10-28T15:37:13Z INFO  salimon_client] starting Salimon native client
+[2026-10-28T15:37:13Z INFO  salimon_client::app] E2E desktop input isolated; protocol controls retained across focus resets
+[2026-10-28T15:37:14Z WARN  salimon_client::app::native] could not lock cursor for mouse look: the requested operation is not supported by Winit
+[2026-10-28T15:37:14Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=1.00
+[2026-10-28T15:37:16Z INFO  salimon_client::app] renderer ready: adapter="llvmpipe (LLVM 19.1.7, 256 bits)" backend=Vulkan device_type=Cpu gpu_timestamps=true
+[2026-10-28T15:37:16Z WARN  salimon_client::app::native] could not lock cursor for mouse look: the requested operation is not supported by Winit
+[2026-10-28T15:37:16Z INFO  salimon_client::app] application resumed

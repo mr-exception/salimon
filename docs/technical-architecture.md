@@ -818,3 +818,12 @@ never displaces ground or reshuffles resource identities. See the
 [geology contract](planetary-geology.md) for codec, profiles, compatibility and tests.
 Vesper remains a homogeneous silicate interpretation with unchanged published
 terrain/resources; rendering and later environmental systems retain their owners.
+
+
+## Geological surface materials (#613)
+
+Follow the [geological material contract](geological-materials.md) for terrain-bound
+profile mapping, immutable material cache keys, the 52-byte vertex layout,
+filtered stratification and original software-Vulkan evidence. Runtime owns
+geology-to-DTO mapping; renderer owns shading only. Vesper and resource palettes,
+physical queries, geometry and save identities are preserved.

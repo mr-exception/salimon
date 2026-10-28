@@ -1,0 +1,299 @@
+{
+  "neutral": [
+    {
+      "image": "earth-fade-end-after.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "earth-fade-end-before.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "earth-fade-start-after.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "earth-fade-start-before.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 3,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "earth-far.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "earth-near.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "earth-orbit.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "mars-fade-end-after.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "mars-fade-end-before.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "mars-fade-start-after.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "mars-fade-start-before.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "mars-far.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "mars-near.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "mars-orbit.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "moon-fade-end-after.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "moon-fade-end-before.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "moon-fade-start-after.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "moon-fade-start-before.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 2,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "moon-far.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "moon-near.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 1,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "moon-orbit.png",
+      "pixels": [
+        512,
+        384
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    }
+  ],
+  "vesper": [
+    {
+      "image": "step-007-universe-orbit.png",
+      "pixels": [
+        1280,
+        800
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "image": "step-012-universe-surface.png",
+      "pixels": [
+        1280,
+        800
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 3,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "step-017-universe-edge.png",
+      "pixels": [
+        1280,
+        800
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 3,
+      "max_channel_delta": 1
+    },
+    {
+      "image": "step-022-universe-orbit.png",
+      "pixels": [
+        1280,
+        800
+      ],
+      "changed_coverage_pixels": 0,
+      "changed_color_pixels": 0,
+      "max_channel_delta": 0
+    }
+  ],
+  "native": [
+    {
+      "route": "native-parent-vesper",
+      "steps": 22,
+      "max_observed_gpu_cache_bytes": 5420852,
+      "peak_upload_bytes": 2096916,
+      "peak_preparation_micros": 23966,
+      "peak_generation_micros": 7255
+    },
+    {
+      "route": "native-vesper",
+      "steps": 22,
+      "max_observed_gpu_cache_bytes": 6904548,
+      "peak_upload_bytes": 2094368,
+      "peak_preparation_micros": 22377,
+      "peak_generation_micros": 20917
+    },
+    {
+      "route": "native-earth",
+      "steps": 17,
+      "max_observed_gpu_cache_bytes": 7044664,
+      "peak_upload_bytes": 2096916,
+      "peak_preparation_micros": 115092,
+      "peak_generation_micros": 114286
+    },
+    {
+      "route": "native-moon",
+      "steps": 17,
+      "max_observed_gpu_cache_bytes": 6942980,
+      "peak_upload_bytes": 2096496,
+      "peak_preparation_micros": 253388,
+      "peak_generation_micros": 244581
+    },
+    {
+      "route": "native-mars",
+      "steps": 17,
+      "max_observed_gpu_cache_bytes": 6820124,
+      "peak_upload_bytes": 2096496,
+      "peak_preparation_micros": 538373,
+      "peak_generation_micros": 531540
+    }
+  ],
+  "interpretation": "Identical coverage; any changed color is at most one 8-bit level. Software-renderer measurements are not hardware FPS acceptance."
+}

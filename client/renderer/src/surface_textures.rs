@@ -2,7 +2,7 @@
 
 pub(crate) const WIDTH: u32 = 512;
 pub(crate) const HEIGHT: u32 = 256;
-pub(crate) const LAYERS: u32 = 7;
+pub(crate) const LAYERS: u32 = 8;
 pub(crate) const MIP_COUNT: u32 = 10;
 
 /// Samples a continuous 3D field on the sphere so longitude seams and poles agree.
@@ -39,6 +39,16 @@ fn noise(point: [f64; 3], seed: u32) -> f64 {
 }
 
 fn albedo(normal: [f64; 3], layer: u32) -> [u8; 4] {
+    if layer == 7 {
+        // Approved pale ice hue from U11; resource meshes and all old swatches are untouched.
+        let value = 0.95 + 0.05 * noise(normal.map(|x| x * 4.0 + 7.0), 731);
+        let rgb = [181_u8, 222, 229].map(|c| {
+            let srgb = f64::from(c) / 255.0;
+            let linear = ((srgb + 0.055) / 1.055).powf(2.4);
+            (linear * value * 255.0) as u8
+        });
+        return [rgb[0], rgb[1], rgb[2], 255];
+    }
     let style = crate::planet_style::STYLES[layer.min(5) as usize];
     debug_assert_eq!(style.version, 1);
     let broad = noise(normal.map(|x| x * 4.0 + 7.0), style.seed);
@@ -174,5 +184,31 @@ mod tests {
                 albedo([0.0, 1.0, -0.0], layer)
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod geology_tests {
+    #[test]
+    fn ice_uses_the_approved_pale_hue_and_retains_the_shared_detail_slot() {
+        use super::*;
+        assert_eq!(crate::SurfaceMaterial::Ice as u8, 7);
+        for direction in [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.36, 0.48, 0.8]] {
+            let [r, g, b, a] = albedo(direction, 7);
+            assert!(r < g && g < b);
+            assert_eq!(a, 255);
+            assert!(
+                (105..=119).contains(&r) && (170..=189).contains(&g) && (185..=202).contains(&b)
+            );
+        }
+        let detail = mip_chain(6);
+        assert!(
+            detail[0]
+                .2
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .all(|p| p[0] == p[1] && p[1] == p[2])
+        );
     }
 }

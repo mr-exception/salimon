@@ -13,6 +13,32 @@ pub(crate) struct View {
 }
 
 pub(crate) fn find(name: &str) -> Option<View> {
+    // Explicit engineering cameras for the historical representative terrain fixtures.
+    if let Some(rest) = name.strip_prefix("geology-") {
+        let (body_name, range) = rest.split_once('-')?;
+        let body = salimon_world::CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.name.eq_ignore_ascii_case(body_name))?;
+        let altitude = match range {
+            "near" => 40.0,
+            "mid" => 400.0,
+            "far" => 4000.0,
+            _ => return None,
+        };
+        let definition = salimon_world::terrain::TerrainMode::Representative.definition(body.id)?;
+        let surface_radius = body.radius_meters + definition.height([0.0, 1.0, 0.0]).ok()?;
+        let center = body.center.meters();
+        return Some(View {
+            name: name.into(),
+            absolute: true,
+            eye: [
+                center[0],
+                center[1] + surface_radius + altitude,
+                center[2] + altitude * 1.2,
+            ],
+            target: [center[0], center[1] + surface_radius, center[2]],
+        });
+    }
     // Engineering scanner view is separate from the approved four-camera
     // authored Scout lighting corpus; adding it does not promote a baseline.
     if name == "scanner" {
@@ -111,5 +137,33 @@ mod tests {
             assert_eq!(next.up, c.up);
         }
         assert!(find("unknown").is_none());
+    }
+}
+
+#[cfg(test)]
+mod geology_camera_tests {
+    use super::*;
+    #[test]
+    fn geological_evidence_cameras_clear_actual_ground_and_reject_nonterrain_bodies() {
+        for body_name in ["earth", "moon", "mars"] {
+            let body = salimon_world::CELESTIAL_BODIES
+                .iter()
+                .find(|b| b.name.eq_ignore_ascii_case(body_name))
+                .unwrap();
+            let definition = salimon_world::terrain::TerrainMode::Representative
+                .definition(body.id)
+                .unwrap();
+            let ground = body.center.meters()[1]
+                + body.radius_meters
+                + definition.height([0.0, 1.0, 0.0]).unwrap();
+            for (range, altitude) in [("near", 40.0), ("mid", 400.0), ("far", 4000.0)] {
+                let view = find(&format!("geology-{body_name}-{range}")).unwrap();
+                assert!((view.target[1] - ground).abs() < 0.001);
+                assert!((view.eye[1] - ground - altitude).abs() < 0.001);
+                assert!(view.absolute);
+            }
+        }
+        assert!(find("geology-sun-near").is_none());
+        assert!(find("geology-moon-invalid").is_none());
     }
 }

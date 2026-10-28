@@ -42,10 +42,13 @@ rounding and pixel sampling; this is not a claim of infinite precision.
 albedo maps: stone, ochre, oceanic, slate, rust, and emissive. Three-dimensional
 seeded noise sampled over a sphere makes fictional features with matching
 longitude/pole topology. There is no recognizable planetary imagery. A seventh
-periodic grayscale map supplies subtle 128 m triplanar surface detail.
+periodic grayscale map supplies subtle 128 m triplanar surface detail. An eighth
+map (material slot 7) adds the approved pale ice hue for geological surfaces;
+all original six swatches and detail slot 6 are preserved. See the
+[geological material contract](../../docs/geological-materials.md).
 
 All ten mip levels down to 1×1 are generated once on the CPU in linear color and
-uploaded as one texture array (about 4.67 MiB). Per-pixel projected footprint,
+uploaded as one texture array (about 5.33 MiB). Per-pixel projected footprint,
 grazing angle, and longitude distortion select explicit trilinear texture LOD.
 This avoids longitude-wrap derivative artifacts and fades subpixel detail
 continuously during retreat. Near detail uses body-local camera coordinates

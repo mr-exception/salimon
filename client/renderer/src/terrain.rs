@@ -20,6 +20,10 @@ pub struct TerrainVertex {
     pub offset_meters: [f32; 3],
     pub normal: [f32; 3],
     pub far_offset_meters: [f32; 3],
+    /// Neutral luminance multiplier; does not replace the caller's material palette.
+    pub albedo_factor: f32,
+    /// [authoritative elevation meters, layer thickness meters, band strength].
+    pub strata: [f32; 3],
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct TerrainPatch {
@@ -37,6 +41,7 @@ pub struct TerrainMask {
     pub anchor_meters: [f64; 3],
     pub radius_meters: f64,
 }
+const VERTEX_BYTES: usize = 52;
 const MAX_PATCHES: usize = 512;
 const MAX_GPU_BYTES: usize = 32 * 1024 * 1024;
 const MAX_UPLOAD_BYTES: usize = 2 * 1024 * 1024;
@@ -111,7 +116,7 @@ impl TerrainRenderer {
             bind_group_layouts: &[Some(&layout)],
             immediate_size: 0,
         });
-        let attributes = wgpu::vertex_attr_array![0 => Float32x3, 1 => Float32x3, 2 => Float32x3];
+        let attributes = wgpu::vertex_attr_array![0 => Float32x3, 1 => Float32x3, 2 => Float32x3, 3 => Float32, 4 => Float32x3];
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("terrain patches"),
             layout: Some(&pipeline_layout),
@@ -119,7 +124,7 @@ impl TerrainRenderer {
                 module: &shader,
                 entry_point: Some("vs_main"),
                 buffers: &[Some(wgpu::VertexBufferLayout {
-                    array_stride: 36,
+                    array_stride: VERTEX_BYTES as u64,
                     step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &attributes,
                 })],
@@ -253,10 +258,17 @@ impl TerrainRenderer {
                         .iter()
                         .any(|i| *i as usize >= patch.vertices.len())
                     || patch.vertices.iter().any(|v| {
+                        !(0.5..=1.5).contains(&v.albedo_factor)
+                            || v.strata[1] < 0.01
+                            || !(0.0..=1.0).contains(&v.strata[2])
+                    })
+                    || patch.vertices.iter().any(|v| {
                         v.offset_meters
                             .iter()
                             .chain(&v.normal)
                             .chain(&v.far_offset_meters)
+                            .chain(std::iter::once(&v.albedo_factor))
+                            .chain(&v.strata)
                             .any(|x| !x.is_finite())
                     })
                     || patch
@@ -267,7 +279,7 @@ impl TerrainRenderer {
                 {
                     return Err(invalid("invalid patch geometry"));
                 }
-                let bytes = patch.vertices.len() * 36 + patch.indices.len() * 4;
+                let bytes = patch.vertices.len() * VERTEX_BYTES + patch.indices.len() * 4;
                 if uploaded + bytes > MAX_UPLOAD_BYTES {
                     continue;
                 }
@@ -282,6 +294,8 @@ impl TerrainRenderer {
                             .into_iter()
                             .chain(v.normal)
                             .chain(v.far_offset_meters)
+                            .chain([v.albedo_factor])
+                            .chain(v.strata)
                     })),
                     usage: wgpu::BufferUsages::VERTEX,
                 });

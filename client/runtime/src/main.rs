@@ -41,6 +41,7 @@ mod sphere_workloads;
 mod survival_balance;
 mod survival_hud;
 mod terrain;
+mod terrain_materials;
 mod terrain_observations;
 mod terrain_patches;
 mod update_clock;

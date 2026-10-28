@@ -25,6 +25,7 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
             engines_off: !ship.engines_enabled,
             fabricator: Default::default(),
             navigation: NavigationInstruments {
+                prediction: None,
                 direction_local: ship.navigation.velocity_direction_local,
                 angle_degrees: ship.navigation.heading_velocity_angle_degrees,
                 acceleration: ship.navigation.acceleration_meters_per_second_squared,
@@ -284,6 +285,7 @@ pub(super) fn gameplay_ship(
     mesh.fabricator_output_medical = session.fabricator_output_medical();
     mesh.fabricator_output_component = session.fabricator_output_component();
     mesh.instruments.fabricator = session.fabricator_instruments();
+    mesh.instruments.navigation.prediction = session.navigation_prediction();
     mesh.machinery = crate::scout_feedback::capture(session, ship);
     mesh
 }

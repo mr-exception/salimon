@@ -16,6 +16,7 @@ pub(crate) enum Scenario {
     CanonicalMining,
     CanonicalFlight,
     CanonicalJourney,
+    NavigationApproach,
     ConstructionModule,
     ConstructionModuleUpgrade,
     ConstructionModuleRestore,
@@ -86,6 +87,7 @@ impl Scenario {
             "canonical-mining" => Ok(Self::CanonicalMining),
             "canonical-flight" => Ok(Self::CanonicalFlight),
             "canonical-journey" => Ok(Self::CanonicalJourney),
+            "navigation-approach" => Ok(Self::NavigationApproach),
             "surface-age-offline" => Ok(Self::SurfaceAgeOffline),
             "surface-age-replacement" => Ok(Self::SurfaceAgeReplacement),
             "surface-age-new" => Ok(Self::SurfaceAgeNew),
@@ -213,6 +215,7 @@ impl Scenario {
             Self::CanonicalMining => "canonical-mining",
             Self::CanonicalFlight => "canonical-flight",
             Self::CanonicalJourney => "canonical-journey",
+            Self::NavigationApproach => "navigation-approach",
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
             Self::ResourceApproach => "resource-approach",
@@ -462,6 +465,24 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         Scenario::CanonicalJourney => {
             *app = GameplaySession::new_canonical_run()?;
         }
+        Scenario::NavigationApproach => {
+            crate::session::canonical::initialize(app)?;
+            let pose = app.ship.snapshot().pose;
+            app.ship = ShipController::flying_with_velocity(
+                ShipPose {
+                    position_meters: salimon_math::add(pose.position_meters, [0., 180., 0.]),
+                    ..pose
+                },
+                0,
+                [0., -30., 0.],
+            )
+            .map_err(|e| e.to_string())?;
+            app.ship.configure_terrain(
+                salimon_world::terrain::TerrainMode::Canonical,
+                crate::terrain::landing_footprint(),
+            );
+            app.character.enter_cockpit();
+        }
         Scenario::CanonicalFlight => {
             crate::session::canonical::initialize(app)?;
             app.character.enter_cockpit();
@@ -620,6 +641,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     if matches!(
         config.scenario,
         Scenario::FlightRegression
+            | Scenario::NavigationApproach
             | Scenario::ScoutLightingDark
             | Scenario::CargoFlight
             | Scenario::CargoBlackout

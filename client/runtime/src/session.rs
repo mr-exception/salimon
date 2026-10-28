@@ -31,6 +31,7 @@ pub(crate) mod surface_age;
 mod survival;
 pub(crate) mod tutorial;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
+pub(crate) mod navigation;
 pub(crate) mod offline;
 mod pause;
 #[allow(dead_code)]
@@ -55,6 +56,7 @@ use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    navigation_cache: std::cell::RefCell<Option<navigation::Cached>>,
     paused: bool,
     pub(crate) offline: offline::OfflineClock,
     offline_power: bool,

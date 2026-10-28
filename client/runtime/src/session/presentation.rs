@@ -143,6 +143,7 @@ fn rotate_vector(vector: [f64; 3], from: ShipFrame, to: ShipFrame) -> [f64; 3] {
 impl GameplaySession {
     pub(crate) fn reset_presentation(&mut self) {
         self.presentation = History::default();
+        self.navigation_cache.get_mut().take();
         self.mining.fragment_previous.clear();
     }
 

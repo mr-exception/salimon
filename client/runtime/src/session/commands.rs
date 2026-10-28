@@ -9,6 +9,7 @@ use salimon_survival::restrictions::Action;
 impl GameplaySession {
     pub(crate) fn command(&mut self, command: Command) {
         use Command::*;
+        self.navigation_cache.get_mut().take();
         if self.survival.snapshot().terminal {
             self.freeze_terminal();
             return;

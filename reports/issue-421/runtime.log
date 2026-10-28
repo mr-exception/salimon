@@ -1,0 +1,11 @@
+   Compiling salimon-renderer v0.1.0 (/repo/client/renderer)
+   Compiling salimon-ship v0.1.0 (/repo/client/ship)
+   Compiling salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.44s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-51a9b9987d94bb8e)
+
+running 1 test
+test session::navigation::tests::navigation_cache_is_disposable_and_controls_invalidate_without_changing_saves ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 495 filtered out; finished in 0.13s
+

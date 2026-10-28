@@ -1,0 +1,440 @@
+[
+  {
+    "step": 1,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 2,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 3,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 4,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 5,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 6,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 7,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 8,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 9,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 10,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 11,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 12,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 13,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 14,
+    "status": "passed",
+    "flight": "Flying",
+    "navigation": {
+      "acceleration": 0.0,
+      "angle_degrees": 90.0,
+      "braking": "AlignHeading",
+      "direction_local": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "prediction": {
+        "age_seconds": 0.0,
+        "closest_altitude_meters": 16.24434971343726,
+        "closest_seconds": 5.5680000000000005,
+        "contact_window_seconds": [
+          5.5040000000000004,
+          5.5680000000000005
+        ],
+        "convergence_meters": 4.564039409160614e-05,
+        "horizon_seconds": 5.5680000000000005,
+        "warning": "CONTACT ESTIMATE - HOLD INPUTS"
+      }
+    }
+  },
+  {
+    "step": 15,
+    "status": "passed",
+    "flight": "GroundedAfterCrash { body: Vesper }",
+    "navigation": {
+      "acceleration": null,
+      "angle_degrees": null,
+      "braking": "Stationary",
+      "direction_local": null,
+      "prediction": null
+    }
+  },
+  {
+    "step": 16,
+    "status": "passed",
+    "flight": "GroundedAfterCrash { body: Vesper }",
+    "navigation": {
+      "acceleration": null,
+      "angle_degrees": null,
+      "braking": "Stationary",
+      "direction_local": null,
+      "prediction": null
+    }
+  },
+  {
+    "step": 17,
+    "status": "passed",
+    "flight": "GroundedAfterCrash { body: Vesper }",
+    "navigation": {
+      "acceleration": null,
+      "angle_degrees": null,
+      "braking": "Stationary",
+      "direction_local": null,
+      "prediction": null
+    }
+  },
+  {
+    "step": 18,
+    "status": "passed",
+    "flight": "GroundedAfterCrash { body: Vesper }",
+    "navigation": {
+      "acceleration": null,
+      "angle_degrees": null,
+      "braking": "Stationary",
+      "direction_local": null,
+      "prediction": null
+    }
+  },
+  {
+    "step": 19,
+    "status": "passed",
+    "flight": "GroundedAfterCrash { body: Vesper }",
+    "navigation": {
+      "acceleration": null,
+      "angle_degrees": null,
+      "braking": "Stationary",
+      "direction_local": null,
+      "prediction": null
+    }
+  }
+]

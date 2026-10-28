@@ -42,7 +42,7 @@ use std::time::Duration;
 
 pub use cockpit_instruments::{
     CockpitInstruments, CoreInstruments, FabricatorInstruments, NavigationInstruments,
-    NearbyBodyInstruments,
+    NearbyBodyInstruments, PredictionInstruments,
 };
 pub use equipment_toolbar::{
     ConsumableIcon, EquipmentIcon, EquipmentSlot, EquipmentToolbar, toolbar_message_inset,

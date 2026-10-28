@@ -1,0 +1,8 @@
+{
+  "parent": "04327e7b951c9a7a964feb0e1acf810735723ecd",
+  "binary_sha256": "01ee531a1e3a5eead521b77d6a38cc5a8659c59db36b0e4e86231c835588806a",
+  "backend": "Vulkan",
+  "adapter": "llvmpipe (LLVM 15.0.6, 256 bits)",
+  "scenario": "scenarios/evidence/universe-navigation.json",
+  "camera": "cockpit reference camera; production physical monitor"
+}

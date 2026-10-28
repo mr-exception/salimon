@@ -106,3 +106,11 @@ See the [streaming contract](../../docs/universe-streaming.md) for worker owners
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
 loaded catalog truth does not grant player discovery or replace gameplay yet.
+
+
+## Scanner contacts (#428)
+
+`client/universe/src/scanner.rs` owns bounded player discovery, exact sampled
+celestial states, three-hour freshness and durable encounter history. Unknown
+catalog entries are never revealed implicitly; batches validate before mutation.
+See the [scanner contract](../../docs/universe-scanner.md) for ownership, clock semantics, tests and downstream integration.

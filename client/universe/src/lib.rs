@@ -9,6 +9,7 @@ pub mod pack;
 pub mod partitions;
 pub mod reader;
 pub mod reference;
+pub mod scanner;
 pub mod sources;
 pub mod starting_system;
 pub mod streaming;

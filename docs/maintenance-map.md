@@ -654,3 +654,11 @@ Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: fro
 ## Navigation forecasts (#421)
 
 See the [bounded prediction contract](universe-navigation.md): `ship/src/prediction.rs` (split-coordinate coasting gravity) and `ship/src/preview.rs` (actual playable power/contact model), `runtime/src/session/navigation.rs` disposable cache, `app/scene.rs` / `automation/inspection.rs` observation mapping, and renderer `cockpit_instruments.rs`. Run ship/runtime navigation and renderer tests, all-target Clippy/fmt/docs, runner tests and `scenarios/evidence/universe-navigation.json` in production software-Vulkan. No autopilot, source-energy mutation, chart reveal or certified arrival/error bound is introduced.
+
+
+## Scanner contacts (#428)
+
+`client/universe/src/scanner.rs` owns bounded player discovery, exact sampled
+celestial states, three-hour freshness and durable encounter history. Unknown
+catalog entries are never revealed implicitly; batches validate before mutation.
+See the [scanner contract](universe-scanner.md) for ownership, clock semantics, tests and downstream integration.

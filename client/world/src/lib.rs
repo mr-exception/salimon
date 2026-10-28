@@ -14,6 +14,7 @@ mod precision;
 mod proximity;
 
 pub mod carrying;
+pub mod environment;
 pub mod mining;
 pub mod resource_distribution;
 pub mod resource_fragments;

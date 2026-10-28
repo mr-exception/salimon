@@ -367,3 +367,12 @@ Press **P** in the canonical cockpit to switch the projector to the durable
 player-known chart, **M** to select an entry, and **Enter** to record an observed
 same-frame route. Charting never activates flight controls. Unverified leads keep
 their uncertainty; Earth has no default chart entry or route.
+
+
+## Regional climate and weather (#615)
+
+Follow the [climate contract](docs/planetary-climate.md) for immutable geology-bound climate inputs,
+strict versioned publication and stateless TT epoch queries. World owns pressure,
+temperature, coherent storm/cloud/precipitation metadata and body-fixed tangent wind;
+presentation cannot rewrite them. Vacuum has no airborne effects. Existing terrain,
+resource identities, saves and drag physics remain unchanged. Weather visuals are #616.

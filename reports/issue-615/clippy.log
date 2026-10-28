@@ -1,0 +1,11 @@
+    Blocking waiting for file lock on build directory
+    Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Checking salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Checking salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+    Checking salimon-math v0.1.0 (/workspace/salimon/client/math)
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Checking salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4m 37s

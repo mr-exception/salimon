@@ -121,3 +121,10 @@ active sites, biospheres or new terrain migrations. Surface presentation is #613
 neutral exposure/weathering response and filtered layers in production terrain.
 Vesper remains unchanged. This does not implement climate, active sites, biology
 or physical terrain migrations.
+
+
+## Implemented regional climate boundary (#615)
+
+[Regional climate](planetary-climate.md) supplies versioned geology-bound inputs
+and deterministic shared-TT weather metadata. Atmospheric rendering remains #616;
+active sites, biospheres and environmental audio retain their own scopes.

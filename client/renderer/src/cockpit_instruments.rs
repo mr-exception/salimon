@@ -36,6 +36,7 @@ pub struct FabricatorInstruments {
 /// Renderer-only navigation values; the ship owns braking feasibility.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct NavigationInstruments {
+    pub prediction: Option<PredictionInstruments>,
     pub direction_local: Option<[f64; 3]>,
     pub angle_degrees: Option<f64>,
     pub acceleration: Option<f64>,
@@ -45,11 +46,25 @@ pub struct NavigationInstruments {
     pub braking_status: &'static str,
 }
 
+/// Observations only. Runtime/ship own the forecast and its assumptions.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct PredictionInstruments {
+    pub horizon_seconds: f64,
+    pub closest_altitude_meters: f64,
+    pub closest_seconds: f64,
+    pub contact_window_seconds: Option<[f64; 2]>,
+    pub convergence_meters: f64,
+    pub age_seconds: f64,
+    pub warning: &'static str,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct NavigationDisplay {
     flight: [String; 3],
     brake: [String; 3],
     relative_speed: String,
+    prediction: [String; 2],
+    prediction_warning: &'static str,
 }
 fn reading(value: Option<f64>) -> String {
     value
@@ -68,7 +83,33 @@ fn reading(value: Option<f64>) -> String {
 }
 impl From<NavigationInstruments> for NavigationDisplay {
     fn from(v: NavigationInstruments) -> Self {
+        let prediction = match v.prediction {
+            Some(p) => [
+                match p.contact_window_seconds {
+                    Some([a, b]) => format!("CONTACT ~{}-{} s", reading(Some(a)), reading(Some(b))),
+                    None => format!(
+                        "{}s MIN ALT {}m AT {}s",
+                        reading(Some(p.horizon_seconds)),
+                        reading(Some(p.closest_altitude_meters)),
+                        reading(Some(p.closest_seconds))
+                    ),
+                },
+                format!(
+                    "STEP DIFF {}m AGE {}s",
+                    reading(Some(p.convergence_meters)),
+                    reading(Some(p.age_seconds))
+                ),
+            ],
+            None => [
+                "PREDICTION UNAVAILABLE".into(),
+                "LANDED / ASSIST / NO TARGET".into(),
+            ],
+        };
         Self {
+            prediction,
+            prediction_warning: v
+                .prediction
+                .map_or("FIXED HEADING - NO AUTOBRAKE", |p| p.warning),
             flight: [
                 format!(
                     "V XYZ {} {} {}",
@@ -356,6 +397,7 @@ impl InstrumentAtlas {
                 || previous.core_capacity != next.core_capacity
                 || previous.core_stored != next.core_stored
                 || previous.navigation.brake != next.navigation.brake
+                || previous.navigation.prediction_warning != next.navigation.prediction_warning
         }) {
             self.draw_core(next.core_stored, next.core_capacity, &next.navigation);
         }
@@ -363,9 +405,12 @@ impl InstrumentAtlas {
             previous.power_off
                 || previous.nearby != next.nearby
                 || previous.navigation.relative_speed != next.navigation.relative_speed
+                || previous.navigation.prediction != next.navigation.prediction
         }) {
             self.draw_nearby(next.nearby);
-            self.text(28, 222, &next.navigation.relative_speed, 2, CYAN);
+            self.text(28, 185, &next.navigation.relative_speed, 2, CYAN);
+            self.text(28, 207, &next.navigation.prediction[0], 2, AMBER);
+            self.text(28, 229, &next.navigation.prediction[1], 2, MUTED);
         }
         if self.displayed.as_ref().is_none_or(|previous| {
             previous.power_off
@@ -531,7 +576,7 @@ impl InstrumentAtlas {
         for (i, row) in nav.brake.iter().enumerate() {
             self.text(28, 115 + i as u32 * 32, row, 2, CYAN);
         }
-        self.text(28, 225, "FIXED HEADING - NO AUTOBRAKE", 2, MUTED);
+        self.text(28, 225, nav.prediction_warning, 2, MUTED);
     }
 
     fn draw_nearby(&mut self, nearby: Option<NearbyDisplay>) {
@@ -552,17 +597,17 @@ impl InstrumentAtlas {
                 };
                 self.text(
                     28,
-                    150,
+                    142,
                     direction,
-                    3,
+                    2,
                     match nearby.direction {
                         RadialDirection::Approaching => CYAN,
                         RadialDirection::Receding => AMBER,
                         _ => MUTED,
                     },
                 );
-                self.text(28, 177, &radial, 3, IVORY);
-                self.text(220, 177, radial_unit, 3, MUTED);
+                self.text(28, 162, &radial, 2, IVORY);
+                self.text(220, 162, radial_unit, 2, MUTED);
             }
             None => {
                 self.text(28, 83, "NO TARGET", 5, AMBER);
@@ -1222,5 +1267,57 @@ mod readability_tests {
             }
             std::fs::write(dir.join(format!("atlas-{name}.png")), bytes).unwrap();
         }
+    }
+}
+
+#[cfg(test)]
+mod prediction_tests {
+    use super::*;
+    #[test]
+    fn navigation_prediction_updates_visible_atlas_without_unchanged_uploads() {
+        let mut atlas = InstrumentAtlas::new();
+        let base = CockpitInstruments::default();
+        atlas.update(base);
+        let before = atlas.pixels.clone();
+        let prediction = PredictionInstruments {
+            horizon_seconds: 8.192,
+            closest_altitude_meters: 1234.5,
+            closest_seconds: 8.192,
+            contact_window_seconds: None,
+            convergence_meters: 0.12,
+            age_seconds: 0.,
+            warning: "HOLD INPUTS - NO AUTOPILOT",
+        };
+        let values = CockpitInstruments {
+            navigation: NavigationInstruments {
+                prediction: Some(prediction),
+                ..Default::default()
+            },
+            ..base
+        };
+        assert!(atlas.update(values));
+        assert_ne!(atlas.pixels, before);
+        assert!(!atlas.update(values));
+        let display = NavigationDisplay::from(values.navigation);
+        assert!(display.prediction[0].contains("MIN ALT"));
+        for row in &display.prediction {
+            assert!(row.len() <= 38);
+        }
+        let contact = CockpitInstruments {
+            navigation: NavigationInstruments {
+                prediction: Some(PredictionInstruments {
+                    contact_window_seconds: Some([5.824, 5.888]),
+                    warning: "CONTACT ESTIMATE - HOLD INPUTS",
+                    ..prediction
+                }),
+                ..values.navigation
+            },
+            ..values
+        };
+        assert!(atlas.update(contact));
+        assert!(NavigationDisplay::from(contact.navigation).prediction[0].contains("CONTACT"));
+        assert!(!atlas.update(contact));
+        assert!(atlas.update(base));
+        assert_eq!(atlas.pixels, before);
     }
 }

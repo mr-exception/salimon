@@ -1,0 +1,42 @@
+   Compiling salimon-ship v0.1.0 (/repo/client/ship)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.38s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-934e36938930620f)
+
+running 8 tests
+test controller::telemetry::navigation_tests::zero_unsupported_and_overflow_are_explicit ... ok
+test controller::telemetry::navigation_tests::tangential_and_backward_motion_never_claim_a_reverse_stop ... ok
+test controller::telemetry::navigation_tests::vector_angle_and_reverse_budget_use_full_velocity_and_mass ... ok
+test prediction::tests::navigation_rejects_invalid_and_provider_failures_atomically_and_reports_sampled_window ... ok
+test prediction::tests::navigation_coasting_matches_analytic_moving_target_across_cells_without_mutation ... ok
+test preview::tests::navigation_live_preview_matches_authoritative_and_never_mutates_power_or_controls ... ok
+test prediction::tests::navigation_gravity_forecast_equals_authoritative_half_steps_and_refines ... ok
+test preview::tests::navigation_live_contact_window_contains_actual_contact_and_power_loss_is_visible ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 140 filtered out; finished in 0.07s
+
+   Compiling salimon-renderer v0.1.0 (/repo/client/renderer)
+   Compiling salimon-ship v0.1.0 (/repo/client/ship)
+   Compiling salimon-client v0.1.0 (/repo/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.71s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-51a9b9987d94bb8e)
+
+running 1 test
+test session::navigation::tests::navigation_cache_is_disposable_and_controls_invalidate_without_changing_saves ... FAILED
+
+failures:
+
+---- session::navigation::tests::navigation_cache_is_disposable_and_controls_invalidate_without_changing_saves stdout ----
+
+thread 'session::navigation::tests::navigation_cache_is_disposable_and_controls_invalidate_without_changing_saves' (36918) panicked at client/runtime/src/session/navigation.rs:76:9:
+assertion `left == right` failed
+  left: 0.0
+ right: 0.016
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    session::navigation::tests::navigation_cache_is_disposable_and_controls_invalidate_without_changing_saves
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 495 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p salimon-client --bin salimon-client`

@@ -1,0 +1,142 @@
+{
+  "setup": {
+    "scenario": "navigation-approach",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "cockpit"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.navigation.prediction.warning",
+        "equals": "CONTACT ESTIMATE - HOLD INPUTS"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.navigation.prediction.contact_window_seconds.0",
+        "gt": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.navigation.prediction.contact_window_seconds.1",
+        "lt": 8.192
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.navigation.prediction.convergence_meters",
+        "lt": 1
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "predicted-contact",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.navigation.prediction.warning",
+        "equals": "CONTACT ESTIMATE - HOLD INPUTS"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "GroundedAfterCrash { body: Vesper }"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.navigation.prediction",
+        "equals": null
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "contact-unavailable",
+      "timeout_ms": 180000
+    }
+  ]
+}

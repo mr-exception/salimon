@@ -5,6 +5,7 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            navigation_cache: Default::default(),
             offline: Default::default(),
             offline_power: false,
             audio_epoch: 0,

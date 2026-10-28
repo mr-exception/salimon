@@ -171,3 +171,5 @@ assist compensation. Model validity, tests and playable-adoption limits are expl
 See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
 certified earliest-event queries, atomic gravity/drag interception, body-relative
 consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+Implementation status (#421): bounded coasting-gravity forecasts and a current-controller cockpit preview are delivered through separate explicit model boundaries; see [navigation prediction](universe-navigation.md). Neither provides autopilot, guaranteed arrival, new discoveries or complete runtime ephemeris adoption (#427/#432).

@@ -46,3 +46,8 @@ assist compensation. Model validity, tests and playable-adoption limits are expl
 See the [continuous-contact contract](universe-contact.md) for moving solids/terrain,
 certified earliest-event queries, atomic gravity/drag interception, body-relative
 consequences, funded-work receipts, cloud tests and adoption/precision limits.
+
+
+## Navigation forecasts (#421)
+
+See the [bounded prediction contract](universe-navigation.md): `ship/src/prediction.rs` (split-coordinate coasting gravity) and `ship/src/preview.rs` (actual playable power/contact model), `runtime/src/session/navigation.rs` disposable cache, `app/scene.rs` / `automation/inspection.rs` observation mapping, and renderer `cockpit_instruments.rs`. Run ship/runtime navigation and renderer tests, all-target Clippy/fmt/docs, runner tests and `scenarios/evidence/universe-navigation.json` in production software-Vulkan. No autopilot, source-energy mutation, chart reveal or certified arrival/error bound is introduced.

@@ -1,6 +1,7 @@
 use super::*;
 
 pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
+    let prediction=app.navigation_prediction().map(|p|json!({"horizon_seconds":p.horizon_seconds,"closest_altitude_meters":p.closest_altitude_meters,"closest_seconds":p.closest_seconds,"contact_window_seconds":p.contact_window_seconds,"convergence_meters":p.convergence_meters,"age_seconds":p.age_seconds,"warning":p.warning}));
     let snapshot = app.snapshot();
     let hud = crate::survival_hud::Observation::capture(app);
     let ship = snapshot.ship;
@@ -198,7 +199,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "thruster_percentage": ship.thruster_percentage, "total_mass_kg": ship.total_mass_kg, "speed_meters_per_second": ship.speed_meters_per_second,
             "velocity_meters_per_second": ship.velocity_meters_per_second,
             "power_available": ship.power_available,
-            "navigation": {"direction_local": ship.navigation.velocity_direction_local,
+            "navigation": {"prediction": prediction, "direction_local": ship.navigation.velocity_direction_local,
                 "angle_degrees": ship.navigation.heading_velocity_angle_degrees,
                 "acceleration": ship.navigation.acceleration_meters_per_second_squared,
                 "braking": format!("{:?}", ship.navigation.braking)},

@@ -294,3 +294,8 @@ Terrain preparation passes the caller's validated mask radius to the existing
 shader instead of hard-coding the 4,096 m fixture cap. Canonical whole-planet
 meshes retain published relief at orbital LOD; old fixture mask radii and shader
 layouts are unchanged. See [canonical terrain](../../docs/universe-terrain.md).
+
+
+## Bounded navigation prediction (#421)
+
+Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.

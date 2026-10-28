@@ -14,7 +14,10 @@ a central Energy Core, warm materials and detailed aft thrusters. Its compact
 nose and shorter cockpit glazing keep the exterior silhouette streamlined.
 One center cockpit console carries one wide monitor showing persistent velocity
 direction/speed, heading angle, signed throttle/acceleration, total mass, Core
-energy, nearby-body relative speed and reverse-braking estimates. A separate
+energy, nearby-body relative speed and reverse-braking estimates. A bounded flight
+preview shows approximate contact or minimum altitude, numerical difference and
+age, with held-input/power validity warnings; it never steers the ship. See the
+[navigation contract](docs/universe-navigation.md). A separate
 physical Core monitor shows conversion, consumption, depletion and warnings. Routes on both sides
 let the player walk past the console into the cockpit nose. Loose fragments can
 be dropped on the cabin deck and pile up; the separate cargo module is removed. See

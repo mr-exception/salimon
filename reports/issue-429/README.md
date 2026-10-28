@@ -45,3 +45,19 @@ Validation at the final source revision:
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
 - `cargo fmt --all -- --check`, `git diff --check`: passed.
 - `python3 scripts/check_docs.py --base codex/issue-428-scanner-contacts`: zero failures.
+
+## Final stack review correction
+
+Bulk offline sweeps now preserve the first sighting and exact pulse count as well
+as the latest sample, using at most two chronological events per object. The
+5/10/15-second crossing regression asserts first=5 s, last=15 s and count=3.
+A tiny-relative-speed regression also prevents inf-inf roots from inventing a
+crossing, including subnormal motion across a pulse boundary. Public last-detection
+API and bounded work remain unchanged. This owning-issue fix is propagated through
+the existing child PRs without force-pushing or dropping their changes.
+
+Correction validation: 100 universe tests and the real runtime scanner test pass;
+workspace all-target Clippy, fmt and parent-relative docs checks pass. Live contact
+transactions are staged before Core debit so rejected state cannot repeatedly bill
+the same pulse. The final chart PR adds a saved-counter rejection regression and
+reruns full-stack validation after this correction.

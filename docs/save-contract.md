@@ -556,3 +556,10 @@ restore/recapture bytes against it, alongside unknown-field and failed-publicati
 contracts. Update a golden only with a deliberate, reviewed source/format change.
 Save-file generations, atomic storage, fallback, rollback and launch/offline
 behavior retain their existing contracts and fault-injection tests.
+
+
+## Canonical surface integration (#425)
+
+The [canonical gameplay contract](universe-gameplay.md) maps current body/frame,
+resource/physics/Fabricator integration and schema-24 definition binding to owners
+and tests. It preserves the frozen terrain and explicit historical fixtures.

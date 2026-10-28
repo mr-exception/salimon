@@ -22,14 +22,23 @@ fn construction() -> GameplaySession {
 
 #[test]
 fn ordered_stages_and_partitioned_admission_match_parent_construction_save() {
+    // Only the authorized envelope version changes; retain every other frozen byte.
+    let expected = std::str::from_utf8(PARENT_TICK)
+        .unwrap()
+        .replacen(
+            "\"schema_version\":23",
+            &format!("\"schema_version\":{}", salimon_persistence::SCHEMA_VERSION),
+            1,
+        )
+        .into_bytes();
     let mut whole = construction();
     whole.advance_automation(Duration::from_secs(12));
-    assert_eq!(whole.save_bytes(100).unwrap(), PARENT_TICK);
+    assert_eq!(whole.save_bytes(100).unwrap(), expected);
     let mut split = construction();
     for _ in 0..120 {
         split.advance_automation(Duration::from_millis(100));
     }
-    assert_eq!(split.save_bytes(100).unwrap(), PARENT_TICK);
+    assert_eq!(split.save_bytes(100).unwrap(), expected);
 }
 
 #[test]

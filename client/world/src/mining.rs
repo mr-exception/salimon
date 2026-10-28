@@ -9,7 +9,7 @@ pub use save::MiningSaveState;
 
 use crate::resource_generation::SurfaceDeposit;
 use crate::resources::{DepositId, DepositState, ResourceDeposit, ResourceFragment};
-use crate::{BodyRole, CELESTIAL_BODIES, WorldPosition};
+use crate::{BodyRole, WorldPosition};
 
 pub const MINING_RANGE_METERS: f64 = 4.0;
 pub const MINING_RATE_KG_PER_SECOND: f64 = 2.0;
@@ -385,7 +385,8 @@ pub fn terrain_obstruction(
     terrain: crate::terrain::TerrainMode,
     range: f64,
 ) -> Option<f64> {
-    CELESTIAL_BODIES
+    terrain
+        .bodies()
         .iter()
         .filter(|body| body.role == BodyRole::Solid)
         .filter_map(|body| {

@@ -69,8 +69,9 @@ impl GameplaySession {
                 .ok_or_else(|| invalid("terminal cause missing"))?,
             position_meters: self.snapshot().character.eye_position_meters,
             journey: self.run.journey.clone(),
-            final_location: super::journey::NamedLocation::at(
+            final_location: super::journey::NamedLocation::with_terrain(
                 self.snapshot().character.eye_position_meters,
+                self.mining.terrain,
             ),
         })
     }

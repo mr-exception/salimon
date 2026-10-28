@@ -1,10 +1,12 @@
 //! Authored surface/clearance adapter. World owns allocation; physics owns impulses.
 use salimon_character::CharacterSnapshot;
 use salimon_math::{add, cross, dot, length, scale, sub};
+#[cfg(test)]
+use salimon_world::CELESTIAL_BODIES;
+use salimon_world::WorldPosition;
 use salimon_world::mining::MiningRay;
 use salimon_world::resource_generation::SurfaceDeposit;
 use salimon_world::resources::{FragmentId, RawMaterial, ResourceFragment, ResourceTransform};
-use salimon_world::{CELESTIAL_BODIES, WorldPosition};
 
 const CLEARANCE_METERS: f64 = 0.005;
 
@@ -35,10 +37,7 @@ impl EmissionSurface {
     ) -> Self {
         let visual = crate::resource_presentation::deposit_mesh_with_terrain(entry, terrain)
             .expect("mining target is nondepleted");
-        let body = CELESTIAL_BODIES
-            .iter()
-            .find(|b| b.id == entry.deposit.id().body)
-            .unwrap();
+        let body = salimon_world::canonical::body(entry.deposit.id().body).unwrap();
         let radial = entry.deposit.position().offset_from(body.center);
         let up = scale(radial, 1.0 / length(radial));
         let origin = ray.origin.offset_from(entry.deposit.position());

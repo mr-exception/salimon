@@ -802,3 +802,8 @@ provider access, exact source/snapshot approval and physical balance evidence.
 Canonical terrain orbit/surface/face-edge captures use `scenarios/evidence/universe-terrain.json`;
 see [canonical geometry and bounds](../docs/universe-terrain.md). This explicit
 render fixture uses fixed light/cameras and does not change a playable save.
+
+Canonical gameplay routes: [boarding](../scenarios/evidence/universe-boarding.json),
+[mining/carry/reload](../scenarios/evidence/universe-mining.json) and
+[takeoff/landing](../scenarios/evidence/universe-flight.json); see
+[contracts and fixture boundaries](../docs/universe-gameplay.md).

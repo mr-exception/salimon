@@ -471,3 +471,11 @@ See the [canonical terrain contract](../../docs/universe-terrain.md) for the exa
 evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
 CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
 and normal alien-world startup belong to #425/#426.
+
+
+## Canonical surface gameplay and schema 24 (#425)
+
+Follow the [canonical surface contract](../../docs/universe-gameplay.md):
+selected body/terrain context, immutable U11 deposits, shared physical ground,
+conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
+Historical fixtures remain explicit; new-run startup is #426.

@@ -151,7 +151,7 @@ pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot, fra
         player.eye_position_meters[i] + planar[i] * (0.65 + clearance) - right[i] * 0.20
             + up[i] * height
     });
-    if tool.terrain == salimon_world::terrain::TerrainMode::Representative
+    if tool.terrain != salimon_world::terrain::TerrainMode::Flat
         && player.location == CharacterLocation::Surface
         && let Some((body, _)) = tool.terrain.nearest_body(
             p,

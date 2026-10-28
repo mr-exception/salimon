@@ -1,0 +1,179 @@
+{
+  "setup": {
+    "scenario": "canonical-mining",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Surface"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "1",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "1",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "mining.target.id",
+        "equals": "Vesper:1"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "canonical-ore-before",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 125
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "gt": 3.5
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 1
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "canonical-carry",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 1
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Vesper:1.remaining_mass_kg",
+        "approx": 496.0,
+        "tolerance": 1e-08
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "canonical-reloaded",
+      "timeout_ms": 60000
+    }
+  ]
+}

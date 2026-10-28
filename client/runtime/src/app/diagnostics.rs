@@ -29,18 +29,21 @@ pub(super) fn camera_body_distances_with_terrain(
     terrain: salimon_world::terrain::TerrainMode,
 ) -> Vec<BodyDistance<'static>> {
     let position = WorldPosition::new(position_meters[0], position_meters[1], position_meters[2]);
-    snapshot
-        .celestial_bodies
-        .iter()
-        .map(|body| BodyDistance {
-            name: body.name,
-            distance_meters: if terrain == salimon_world::terrain::TerrainMode::Flat {
-                body.surface_distance_from(position)
-            } else {
-                terrain.clearance(*body, position_meters).max(0.0)
-            },
-        })
-        .collect()
+    (if terrain == salimon_world::terrain::TerrainMode::Canonical {
+        terrain.bodies()
+    } else {
+        snapshot.celestial_bodies
+    })
+    .iter()
+    .map(|body| BodyDistance {
+        name: body.name,
+        distance_meters: if terrain == salimon_world::terrain::TerrainMode::Flat {
+            body.surface_distance_from(position)
+        } else {
+            terrain.clearance(*body, position_meters).max(0.0)
+        },
+    })
+    .collect()
 }
 
 pub(super) fn gameplay_domain_metrics<'a>(

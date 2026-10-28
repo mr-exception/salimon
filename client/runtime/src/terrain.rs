@@ -104,7 +104,13 @@ pub(crate) fn physics_ground_point(
         frame.center,
         scale(
             direction,
-            frame.radius + TerrainMode::Representative.height(body, direction),
+            frame.radius
+                + (if body.id == salimon_world::CelestialBodyId::Vesper {
+                    TerrainMode::Canonical
+                } else {
+                    TerrainMode::Representative
+                })
+                .height(body, direction),
         ),
     )
 }
@@ -125,7 +131,7 @@ pub(crate) fn landing_footprint() -> salimon_ship::LandingFootprint {
 impl crate::session::GameplaySession {
     pub(crate) fn terrain_frame(&self, ship: salimon_ship::ShipSnapshot) -> SurfaceFrame {
         let mut frame = crate::session::frames::surface_frame_for_ship(ship);
-        if self.mining.terrain == TerrainMode::Representative {
+        if self.mining.terrain != TerrainMode::Flat {
             frame.query = Some(character_ground);
         }
         frame
@@ -140,7 +146,7 @@ impl crate::session::GameplaySession {
         .map(|(body, _)| SurfaceFrame {
             body_center_meters: body.center.meters(),
             radius_meters: body.radius_meters,
-            query: (mode == TerrainMode::Representative).then_some(character_ground),
+            query: (mode != TerrainMode::Flat).then_some(character_ground),
         })
     }
     pub(crate) fn enable_terrain(
@@ -149,11 +155,16 @@ impl crate::session::GameplaySession {
         direction: [f64; 3],
     ) -> Result<(), String> {
         let mut ship = self.ship.clone();
-        ship.configure_terrain(TerrainMode::Representative, landing_footprint());
+        let mode = if body.id == salimon_world::CelestialBodyId::Vesper {
+            TerrainMode::Canonical
+        } else {
+            TerrainMode::Representative
+        };
+        ship.configure_terrain(mode, landing_footprint());
         ship.spawn_on_terrain(body, direction)
             .map_err(str::to_owned)?;
         self.ship = ship;
-        self.mining.terrain = TerrainMode::Representative;
+        self.mining.terrain = mode;
         Ok(())
     }
 }

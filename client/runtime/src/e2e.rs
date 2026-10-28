@@ -12,6 +12,9 @@ use crate::session::GameplaySession;
 pub(crate) enum Scenario {
     LandedEarth,
     CanonicalTerrain,
+    CanonicalSurface,
+    CanonicalMining,
+    CanonicalFlight,
     ConstructionModule,
     ConstructionModuleUpgrade,
     ConstructionModuleRestore,
@@ -78,6 +81,9 @@ impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
             "canonical-terrain" => Ok(Self::CanonicalTerrain),
+            "canonical-surface" => Ok(Self::CanonicalSurface),
+            "canonical-mining" => Ok(Self::CanonicalMining),
+            "canonical-flight" => Ok(Self::CanonicalFlight),
             "surface-age-offline" => Ok(Self::SurfaceAgeOffline),
             "surface-age-replacement" => Ok(Self::SurfaceAgeReplacement),
             "surface-age-new" => Ok(Self::SurfaceAgeNew),
@@ -201,6 +207,9 @@ impl Scenario {
             Self::FragmentPile => "fragment-pile",
             Self::LandedEarth => "landed-earth",
             Self::CanonicalTerrain => "canonical-terrain",
+            Self::CanonicalSurface => "canonical-surface",
+            Self::CanonicalMining => "canonical-mining",
+            Self::CanonicalFlight => "canonical-flight",
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
             Self::ResourceApproach => "resource-approach",
@@ -447,6 +456,16 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         | Scenario::CoreRestart
         | Scenario::CrashRecovery => crate::flight_regression::initialize(app, config.scenario)?,
         Scenario::LandedEarth => {}
+        Scenario::CanonicalFlight => {
+            crate::session::canonical::initialize(app)?;
+            app.character.enter_cockpit();
+        }
+        Scenario::CanonicalMining => {
+            crate::session::canonical::mining_initial_conditions(app)?;
+        }
+        Scenario::CanonicalSurface => {
+            crate::session::canonical::initialize(app)?;
+        }
         Scenario::CanonicalTerrain => {
             app.mining.terrain = salimon_world::terrain::TerrainMode::Canonical;
         }

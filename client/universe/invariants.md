@@ -141,3 +141,9 @@ loaded catalog truth does not grant player discovery or replace gameplay yet.
 celestial states, three-hour freshness and durable encounter history. Unknown
 catalog entries are never revealed implicitly; batches validate before mutation.
 See the [scanner contract](../../docs/universe-scanner.md) for ownership, clock semantics, tests and downstream integration.
+
+
+## Scanner delivery (#429)
+
+Universe `scanner/pulses.rs` owns fixed five-second cadence and analytical funded linear-path detection. Runtime `session/scanner.rs` composes ordinary Core funding after construction, samples current body-local state and exposes read-only automation. Unknown orbital phase/velocity is never invented; body-local and galactic observations cannot be mixed.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.

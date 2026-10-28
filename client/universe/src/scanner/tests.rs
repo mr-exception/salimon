@@ -10,7 +10,9 @@ pub(super) fn fixture() -> (Catalog, Observation) {
         .clone();
     let o = Observation {
         id,
-        position: GalacticPosition::new([5_000_000; 3], [0.125, 2., 3.]).unwrap(),
+        position: Position::Galactic {
+            position: GalacticPosition::new([5_000_000; 3], [0.125, 2., 3.]).unwrap(),
+        },
         velocity_mps: [1., 2., 3.],
     };
     (c, o)

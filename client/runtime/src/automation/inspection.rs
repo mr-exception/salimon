@@ -117,6 +117,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let fabrication = app.fabrication_snapshot();
     let machinery = crate::scout_feedback::capture(app, ship);
     let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category), "effect":app.consumable_effects.get(item.recipe.key())});
+    let scanner = json!({"utc_millis":app.scanner.utc_millis,"powered":app.scanner.powered,"parameters":app.scanner.parameters,"active_count":app.scanner.contacts.active(app.scanner.utc_millis).count(),"history":app.scanner.contacts.history().collect::<Vec<_>>(),"error":app.scanner.error});
     let mut observation = json!({
         "consumable_wheel": {"open":app.wheel.open,"held":app.wheel.held,"hovered":app.wheel.hovered.map(salimon_fabrication::ConsumableSlot::index)},
         "paused": app.is_paused(),
@@ -235,5 +236,6 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
         json!({"source":app.archive, "open":app.archive_reader.open, "text":app.archive_text()});
     observation["recovery"] = app.recovery_observation();
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
+    observation["scanner"] = scanner;
     observation
 }

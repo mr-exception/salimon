@@ -40,6 +40,7 @@ pub(crate) mod persistence;
 mod persistence_scenarios;
 #[cfg(test)]
 mod propulsion_tests;
+pub(crate) mod scanner;
 #[cfg(test)]
 mod starting_supplies_tests;
 #[cfg(test)]
@@ -56,6 +57,7 @@ use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    pub(crate) scanner: scanner::Scanner,
     navigation_cache: std::cell::RefCell<Option<navigation::Cached>>,
     paused: bool,
     pub(crate) offline: offline::OfflineClock,

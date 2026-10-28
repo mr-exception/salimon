@@ -19,3 +19,7 @@ Linux x86_64, Rust 1.99.1, established 2 CPU / 8 GiB container. `/opt/rust/bin`,
 Two earlier routes failed: the first assumed the wrong ship-local axis for the world tangent offset, the second entered ramp swing clearance before opening. The final route uses the actual pose and opens outside the ramp. Portable and native routes pass without relaxing spawn, collision, geography or gate rules. Both failed raw results are retained.
 
 Physical GPU/Metal/60 FPS and subjective presentation remain unverified and separately owned by #557/#561/#563. No software-renderer timing establishes hardware claims.
+
+## CI follow-up
+
+[Initial Source build 40634664126](https://github.com/mr-exception/salimon/actions/runs/40634664126) compiled successfully but failed one old cockpit-title assertion: it expected `Compressed Solar System` after normal startup switched to the neutral `Salimon` title. Both expected strings now match the intended title; the actual aimed-cockpit/empty-context behavior stays tested. `cargo test -p salimon-client --locked cockpit_prompt_is_shown_only -j2`: 1 PASS, retained in `title-test.log`. Initial failed CI remains recorded; the new head reruns CI. macOS/Windows publication golden jobs passed on the initial head; these are portable publication checks, not native gameplay qualification.

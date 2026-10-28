@@ -362,3 +362,8 @@ Canonical cockpit scanner: automatic five-second powered scans feed the physical
 3D console hologram. Press **M** in the cockpit to select the next fresh contact;
 the hint shows sampled distance/age and identifies the logarithmic display scale.
 No catalog entry is visible before discovery. See [scanner behavior and limits](docs/universe-scanner.md).
+
+Press **P** in the canonical cockpit to switch the projector to the durable
+player-known chart, **M** to select an entry, and **Enter** to record an observed
+same-frame route. Charting never activates flight controls. Unverified leads keep
+their uncertainty; Earth has no default chart entry or route.

@@ -31,6 +31,7 @@ pub(crate) mod surface_age;
 mod survival;
 pub(crate) mod tutorial;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
+pub(crate) mod chart;
 pub(crate) mod navigation;
 pub(crate) mod offline;
 mod pause;
@@ -58,6 +59,7 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     pub(crate) scanner: scanner::Scanner,
+    pub(crate) chart: salimon_universe::scanner::chart::Chart,
     navigation_cache: std::cell::RefCell<Option<navigation::Cached>>,
     paused: bool,
     pub(crate) offline: offline::OfflineClock,

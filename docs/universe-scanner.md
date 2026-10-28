@@ -119,3 +119,65 @@ input gates, actual software-Vulkan captures and the maintained
 `scenarios/evidence/scanner-hologram.json` route. `scanner` is a close reference
 camera; it changes presentation only. Baseline/appearance, real physical controls
 and hardware/Metal costs remain separately unverified (#561/#557/#563).
+
+## Player-known chart (#469)
+
+`scanner/chart.rs` is independent of immutable catalog truth. It starts empty,
+including when Earth/Solar System identities exist in the scientific catalog.
+Only actual scanner encounter history grants observed/verified knowledge and
+catalog names. No autocomplete, hidden-location lookup or default Earth route
+exists. Earth and Absenat remain independent voluntary goals, with no forced
+mission or inferred wormhole use.
+
+The chart retains source ID, named position frame, sampled observation/velocity,
+first/last-seen UTC and discovery history after the three-hour contact TTL.
+Inferred and transmitted leads instead retain the supplied source, received UTC,
+explicit frame and either unknown uncertainty or a finite nonnegative radius in
+meters. Unknown uncertainty is never zero. Leads cannot verify themselves or
+create a verified route. `record_lead` consumes coordinates actually supplied by
+the trusted inference/recovered-message owner; it never fills missing coordinates
+from the catalog. Future #470 owns transmission production/recovery gameplay;
+its absence does not invent leads or mark that narrative implemented.
+
+The chart bounds observed identities to scanner capacity plus 256 independent
+leads, and retains up to 4,096 explicit route annotations. Observe/lead/route
+validation happens before mutation. Older observation history cannot overwrite
+newer knowledge; rediscovery refreshes observations while retaining lead evidence
+and immutable route snapshots. A route requires previously observed coordinates
+in the current ship's known frame, records origin/destination/time, and never
+commands thrust, landing, autopilot or teleportation. Unmapped frames are retained
+as evidence; no absent body-to-galaxy transform is guessed.
+
+In the canonical cockpit, **P** switches the projector between fresh scanner
+contacts and the durable chart, **M** selects a known entry, and **Enter** records
+a verified route. The hint names observed/historical/inferred/transmitted status,
+uncertainty, route result and controls. Unselected fresh/historical/lead markers
+use cyan/green/purple; selected entries remain amber, with textual provenance so
+color is not the sole cue. Historical plotted distance is sampled, not a current
+prediction. The chart expands only its presentation scale to fit known positions;
+scanner range/cadence, Core costs and flight authority do not change. Normal
+checkpoint scheduling persists discoveries/routes; view mode/selection are transient.
+
+Runtime schema **26** requires canonical chart source and validates it against the
+saved scanner's exact encountered identities/states/timestamps. Missing, forged,
+duplicate, future-dated or incompatible source rejects before publication.
+Canonical schemas 1–25 migrate from actual scanner history only, adding no free
+knowledge; pre-scanner saves remain empty. Route history and lead uncertainty
+roundtrip through save/launch and scanner upgrade/rediscovery.
+
+Validation: universe chart tests include a catalog containing synthetic Earth
+without a player observation, transmission/inference uncertainty, refused unverified
+routes, actual observed routing, expiry/rediscovery and checkpoint corruption.
+Runtime tests exercise real P/M/Enter admission, power/flight nonmutation,
+atomic malformed restore and schema-25 migration. The native
+`scenarios/evidence/player-chart.json` route captures empty, observed and historical
+chart states plus route retention across actual save/restore. These fixtures are
+not real galactic ephemerides, full source coverage or human/hardware qualification.
+
+Lead source identities are versioned: replaying the identical source is idempotent,
+while changing its coordinates/receipt/uncertainty under the same source key
+rejects. Runtime `chart_receive_lead` atomically admits actual source records,
+checks their clock/context and preserves prior data on failure; #470 supplies the
+production recovered transmissions. Route displays include saved route count,
+sampled distance, ship-local azimuth/elevation and explicit frame-unavailable
+status. A vertical target has undefined azimuth (`AZ--`), not invented zero heading.

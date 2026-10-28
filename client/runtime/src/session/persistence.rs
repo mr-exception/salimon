@@ -17,6 +17,8 @@ pub(crate) struct SessionState {
     physical: PhysicalState,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     scanner: Option<super::scanner::save::ScannerSave>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    chart: Option<salimon_universe::scanner::chart::ChartCheckpoint>,
     #[serde(default)]
     offline: Option<super::offline::OfflineClock>,
     #[serde(default)]
@@ -49,8 +51,25 @@ pub(crate) struct SessionState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(chart) = &self.chart {
+            super::chart::validate_saved(chart)?;
+        }
         if let Some(scanner) = &self.scanner {
             scanner.validate()?;
+        }
+        if let (Some(chart), Some(scanner)) = (&self.chart, &self.scanner) {
+            let scanner = super::scanner::Scanner::restore(
+                Some(scanner.clone()),
+                salimon_persistence::SCHEMA_VERSION,
+                true,
+                0,
+            )?;
+            super::chart::restore(
+                Some(chart.clone()),
+                salimon_persistence::SCHEMA_VERSION,
+                true,
+                &scanner,
+            )?;
         }
         if let Some(clock) = &self.offline {
             clock.validate()?;
@@ -100,6 +119,8 @@ impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            chart: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
+                .then(|| self.chart.checkpoint()),
             scanner: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
                 .then(|| self.scanner.capture()),
             offline: Some(
@@ -163,6 +184,12 @@ impl GameplaySession {
             physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
             save.saved_at_unix_seconds,
         )?;
+        let chart = super::chart::restore(
+            save.state.chart,
+            save.schema_version,
+            physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
+            &scanner,
+        )?;
         let mounts = super::mounts::save::restore(save.state.mounts, save.schema_version)?;
         super::finishes::save::validate_schema(&save.state.finishes, save.schema_version)?;
         super::core_upgrades::save::validate_schema(
@@ -171,6 +198,7 @@ impl GameplaySession {
         )?;
         let mut restored = Self {
             scanner,
+            chart,
             lighting: save.state.lighting,
             core_upgrades: save.state.core_upgrades,
             surface_age,

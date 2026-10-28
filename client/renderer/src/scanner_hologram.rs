@@ -4,9 +4,16 @@ pub const HOLOGRAM_CENTER: [f64; 3] = [5.2, 1.75, -0.9];
 pub const HOLOGRAM_RADIUS: f64 = 0.30;
 pub const MAX_HOLOGRAM_CONTACTS: usize = 64;
 #[derive(Clone, Copy, Debug)]
+pub enum HologramContactState {
+    Fresh,
+    Historical,
+    Lead,
+}
+#[derive(Clone, Copy, Debug)]
 pub struct HologramContact {
     pub relative_ship_meters: [f64; 3],
     pub selected: bool,
+    pub state: HologramContactState,
 }
 /// Depth-tested low-poly projector and three orthogonal dotted great circles.
 /// The caller maps these ship-local instances through the current ship frame.
@@ -78,7 +85,11 @@ pub fn scanner_hologram(
             if c.selected {
                 [1., 0.65, 0.10, 1.]
             } else {
-                [0.10, 0.90, 1., 1.]
+                match c.state {
+                    HologramContactState::Fresh => [0.10, 0.90, 1., 1.],
+                    HologramContactState::Historical => [0.35, 0.90, 0.45, 1.],
+                    HologramContactState::Lead => [0.8, 0.45, 1., 1.],
+                }
             },
         );
         // Elevation cue joins each contact to the horizontal projection plane.
@@ -105,10 +116,12 @@ mod tests {
             HologramContact {
                 relative_ship_meters: [0., 100., 0.],
                 selected: true,
+                state: HologramContactState::Fresh,
             },
             HologramContact {
                 relative_ship_meters: [0., -100., 0.],
                 selected: false,
+                state: HologramContactState::Fresh,
             },
         ];
         let v = scanner_hologram(&contacts, true, 100.);

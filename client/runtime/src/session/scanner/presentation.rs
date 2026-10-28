@@ -5,6 +5,7 @@ impl GameplaySession {
     pub(crate) fn scanner_next_contact(&mut self) {
         if self.scanner_controls_available() {
             self.scanner.selected = self.scanner.selected.wrapping_add(1);
+            self.scanner.chart_note = None;
         }
     }
     pub(crate) fn scanner_controls_available(&self) -> bool {
@@ -42,6 +43,9 @@ impl GameplaySession {
         &self,
         pose: salimon_ship::ShipPose,
     ) -> Vec<salimon_renderer::SceneInstance> {
+        if self.scanner.chart_mode {
+            return self.chart_geometry(pose);
+        }
         if self.mining.terrain != salimon_world::terrain::TerrainMode::Canonical {
             return Vec::new();
         }
@@ -54,6 +58,7 @@ impl GameplaySession {
             .map(|(i, (_, v))| salimon_renderer::HologramContact {
                 relative_ship_meters: source.map(|axis| salimon_math::dot(*v, axis)),
                 selected: Some(i) == index,
+                state: salimon_renderer::HologramContactState::Fresh,
             })
             .collect();
         let frame = super::super::frames::character_ship_frame(pose);
@@ -74,6 +79,9 @@ impl GameplaySession {
         if !self.scanner_controls_available() {
             return None;
         }
+        if self.scanner.chart_mode {
+            return Some(self.chart_hint());
+        }
         if !self.scanner.powered {
             return Some("SCANNER OFFLINE - CORE POWER REQUIRED".into());
         }
@@ -89,7 +97,7 @@ impl GameplaySession {
             "IDENTIFIED CONTACT"
         };
         Some(format!(
-            "SCANNER {}/{} {} CENTER {:.1} km | AGE {:.1}s | M NEXT | LOG SCALE",
+            "SCANNER {}/{} {} CENTER {:.1} km | AGE {:.1}s | M NEXT | P CHART | LOG SCALE",
             index + 1,
             contacts.len(),
             name,

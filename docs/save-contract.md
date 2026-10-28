@@ -368,7 +368,7 @@ checkpoint scheduling. See [source and input](../client/runtime/architecture.md#
 
 `salimon-persistence::universe::UniverseSave` is a **separate**
 `salimon.universe.save` version-1 wire envelope, not a migration of current
-`salimon.save` (now schema 10). It is delivered for future world integration; normal
+`salimon.save` (now schema 26). It is delivered for future world integration; normal
 startup still uses the compressed-world session source. Existing saves are never
 implicitly interpreted, discarded or rewritten by this API.
 
@@ -576,3 +576,15 @@ reseeded. Canonical schemas 1–24 migrate empty at checkpoint UTC; compressed t
 fixtures omit scanner source. Startup/restart binds new clocks and launch advances
 freshness exactly once without free detections. See the
 [scanner checkpoint contract](universe-scanner.md#checkpoints-and-launch-431).
+
+## Player-known chart — schema 26 (#469)
+
+Canonical saves require versioned player chart source: observed encounters,
+inferred/transmitted coordinate leads with provenance and explicit unknown/radius
+uncertainty, and voluntary immutable route snapshots. The scanner/chart pair must
+agree exactly on every verified discovery. Catalog truth alone is never a source
+of player navigation knowledge. Missing/malformed/current incompatible records,
+duplicate IDs, future timestamps and forged observed entries reject atomically.
+Versions 1–25 initialize from actual migrated scanner history only; no default
+Earth route or catalog reveal. View/selection are transient. See the
+[player chart contract](universe-scanner.md#player-known-chart-469).

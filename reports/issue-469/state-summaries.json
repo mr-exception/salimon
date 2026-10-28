@@ -1,0 +1,409 @@
+{
+  "empty": {
+    "chart": {
+      "entry_count": 0,
+      "mode": true,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "scanner": {
+      "active_count": 0,
+      "error": null,
+      "hint": "CHART EMPTY - EXPLORE TO DISCOVER | P SCANNER",
+      "history": [],
+      "parameters": {
+        "idle_watts": 1000.0,
+        "pulse_joules": 10000.0,
+        "range_meters": 1000000000.0
+      },
+      "powered": false,
+      "selected": 0,
+      "utc_millis": 0
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    }
+  },
+  "observed": {
+    "chart": {
+      "entry_count": 1,
+      "mode": true,
+      "note": "ROUTE SAVED - NO AUTOPILOT",
+      "route_count": 1,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [
+          {
+            "id": "salimon-fiction:awakening.s000000.p00",
+            "leads": [],
+            "observed": {
+              "first_seen_utc_millis": 5008,
+              "last_seen_utc_millis": 5008,
+              "observation": {
+                "id": "salimon-fiction:awakening.s000000.p00",
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "velocity_mps": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "successful_refreshes": 1
+            }
+          }
+        ],
+        "routes": [
+          {
+            "created_utc_millis": 5008,
+            "destination": "salimon-fiction:awakening.s000000.p00",
+            "from": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                2985361.108026866,
+                0.0
+              ]
+            },
+            "to": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        ],
+        "version": 1
+      }
+    },
+    "scanner": {
+      "active_count": 1,
+      "error": null,
+      "hint": "CHART 1/1 Vesper OBSERVED | SAMPLE 2985.4km AZ-- EL-90 | ROUTES 1 | ROUTE SAVED - NO AUTOPILOT",
+      "history": [
+        {
+          "first_seen_utc_millis": 5008,
+          "last_seen_utc_millis": 5008,
+          "observation": {
+            "id": "salimon-fiction:awakening.s000000.p00",
+            "position": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "velocity_mps": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "successful_refreshes": 1
+        }
+      ],
+      "parameters": {
+        "idle_watts": 1000.0,
+        "pulse_joules": 10000.0,
+        "range_meters": 1000000000.0
+      },
+      "powered": true,
+      "selected": 0,
+      "utc_millis": 5008
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    }
+  },
+  "resumed": {
+    "chart": {
+      "entry_count": 1,
+      "mode": true,
+      "note": null,
+      "route_count": 1,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [
+          {
+            "id": "salimon-fiction:awakening.s000000.p00",
+            "leads": [],
+            "observed": {
+              "first_seen_utc_millis": 5008,
+              "last_seen_utc_millis": 5008,
+              "observation": {
+                "id": "salimon-fiction:awakening.s000000.p00",
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "velocity_mps": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "successful_refreshes": 1
+            }
+          }
+        ],
+        "routes": [
+          {
+            "created_utc_millis": 5008,
+            "destination": "salimon-fiction:awakening.s000000.p00",
+            "from": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                2985361.108026866,
+                0.0
+              ]
+            },
+            "to": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        ],
+        "version": 1
+      }
+    },
+    "scanner": {
+      "active_count": 1,
+      "error": null,
+      "hint": "CHART 1/1 Vesper OBSERVED | SAMPLE 2985.4km AZ-- EL-90 | ROUTES 1 | M NEXT | ENTER ROUTE | P SCANNER",
+      "history": [
+        {
+          "first_seen_utc_millis": 5008,
+          "last_seen_utc_millis": 5008,
+          "observation": {
+            "id": "salimon-fiction:awakening.s000000.p00",
+            "position": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "velocity_mps": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "successful_refreshes": 1
+        }
+      ],
+      "parameters": {
+        "idle_watts": 1000.0,
+        "pulse_joules": 10000.0,
+        "range_meters": 1000000000.0
+      },
+      "powered": true,
+      "selected": 0,
+      "utc_millis": 5024
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    }
+  },
+  "historical": {
+    "chart": {
+      "entry_count": 1,
+      "mode": true,
+      "note": null,
+      "route_count": 1,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [
+          {
+            "id": "salimon-fiction:awakening.s000000.p00",
+            "leads": [],
+            "observed": {
+              "first_seen_utc_millis": 5008,
+              "last_seen_utc_millis": 5008,
+              "observation": {
+                "id": "salimon-fiction:awakening.s000000.p00",
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "velocity_mps": [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "successful_refreshes": 1
+            }
+          }
+        ],
+        "routes": [
+          {
+            "created_utc_millis": 5008,
+            "destination": "salimon-fiction:awakening.s000000.p00",
+            "from": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                2985361.108026866,
+                0.0
+              ]
+            },
+            "to": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        ],
+        "version": 1
+      }
+    },
+    "scanner": {
+      "active_count": 0,
+      "error": null,
+      "hint": "CHART 1/1 Vesper HISTORICAL | SAMPLE 2985.4km AZ-- EL-90 | ROUTES 1 | M NEXT | ENTER ROUTE | P SCANNER",
+      "history": [
+        {
+          "first_seen_utc_millis": 5008,
+          "last_seen_utc_millis": 5008,
+          "observation": {
+            "id": "salimon-fiction:awakening.s000000.p00",
+            "position": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "velocity_mps": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "successful_refreshes": 1
+        }
+      ],
+      "parameters": {
+        "idle_watts": 1000.0,
+        "pulse_joules": 10000.0,
+        "range_meters": 1000000000.0
+      },
+      "powered": true,
+      "selected": 0,
+      "utc_millis": 10805040
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    }
+  }
+}

@@ -58,6 +58,19 @@ pub fn last_detection(
     target: &Observation,
     range: f64,
 ) -> Result<Option<(u64, Observation)>, Error> {
+    Ok(detection_window(start_ms, end_ms, observer, target, range)?.map(|window| window.last))
+}
+struct DetectionWindow {
+    first: (u64, Observation),
+    last: (u64, Observation),
+}
+fn detection_window(
+    start_ms: u64,
+    end_ms: u64,
+    observer: &LinearTrack,
+    target: &Observation,
+    range: f64,
+) -> Result<Option<DetectionWindow>, Error> {
     let duration = end_ms
         .checked_sub(start_ms)
         .ok_or_else(|| invalid("scanner interval regressed"))? as f64
@@ -79,7 +92,7 @@ pub fn last_detection(
     if !speed.is_finite() {
         return Err(invalid("scanner relative speed overflow"));
     }
-    let (entry, exit) = if speed == 0. {
+    let (entry, exit) = if speed == 0. || speed * duration == 0. {
         if r[0].hypot(r[1]).hypot(r[2]) > range {
             return Ok(None);
         }
@@ -97,9 +110,19 @@ pub fn last_detection(
         if distance > range {
             return Ok(None);
         }
-        let half = ((range - distance) * (range + distance)).sqrt() / speed;
-        let middle = -projection / speed;
-        ((middle - half).max(0.), (middle + half).min(duration))
+        // Clip traveled distances before dividing by speed. Dividing both
+        // unbounded roots first gives inf-inf for tiny nonzero relative speeds.
+        let travel = speed * duration;
+        if !travel.is_finite() {
+            return Err(invalid("scanner trajectory travel overflow"));
+        }
+        let half = ((range - distance) * (range + distance)).sqrt();
+        let first_distance = (-projection - half).max(0.);
+        let last_distance = (-projection + half).min(travel);
+        if first_distance > last_distance || last_distance < 0. {
+            return Ok(None);
+        }
+        (first_distance / speed, last_distance / speed)
     };
     if entry > exit || exit < 0. {
         return Ok(None);
@@ -110,14 +133,35 @@ pub fn last_detection(
     if last <= start_ms || last > end_ms || (last - start_ms) as f64 * 0.001 < entry {
         return Ok(None);
     }
-    let seconds = (last - start_ms) as f64 * 0.001;
-    let at = Observation {
-        position: target
-            .position
-            .translated(target.velocity_mps.map(|v| v * seconds))?,
-        ..target.clone()
+    let first_offset_ms = (entry * 1000.).ceil() as u64;
+    let lower = start_ms
+        .checked_add(first_offset_ms)
+        .ok_or_else(|| invalid("scanner first pulse overflow"))?;
+    let first_index = lower
+        .div_ceil(PULSE_MILLIS)
+        .max(start_ms / PULSE_MILLIS + 1);
+    let first = first_index
+        .checked_mul(PULSE_MILLIS)
+        .ok_or_else(|| invalid("scanner first pulse overflow"))?;
+    if first > last {
+        return Ok(None);
+    }
+    let sample = |at| -> Result<_, Error> {
+        let seconds = (at - start_ms) as f64 * 0.001;
+        Ok((
+            at,
+            Observation {
+                position: target
+                    .position
+                    .translated(target.velocity_mps.map(|v| v * seconds))?,
+                ..target.clone()
+            },
+        ))
     };
-    Ok(Some((last, at)))
+    Ok(Some(DetectionWindow {
+        first: sample(first)?,
+        last: sample(last)?,
+    }))
 }
 #[cfg(test)]
 mod tests {
@@ -212,21 +256,34 @@ impl Contacts {
             if !ids.insert(&target.id) {
                 return Err(invalid("duplicate scanner sweep target"));
             }
-            if let Some(hit) = last_detection(
+            if let Some(window) = detection_window(
                 sweep.start_ms,
                 sweep.end_ms,
                 sweep.observer,
                 target,
                 sweep.parameters.range_meters,
             )? {
-                hits.push(hit);
+                let pulse_count = (window.last.0 - window.first.0) / PULSE_MILLIS + 1;
+                hits.push((window.first.0, window.first.1, 1));
+                if pulse_count > 1 {
+                    hits.push((window.last.0, window.last.1, pulse_count - 1));
+                }
             }
         }
         hits.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.id.cmp(&b.1.id)));
         let mut candidate = self.clone();
         if sweep.powered {
-            for (at, hit) in hits {
+            for (at, hit, count) in hits {
+                let id = hit.id.clone();
                 candidate.refresh(catalog, at, true, &[hit])?;
+                let encounter = candidate
+                    .encounters
+                    .get_mut(&id)
+                    .expect("published scanner hit");
+                encounter.successful_refreshes = encounter
+                    .successful_refreshes
+                    .checked_add(count - 1)
+                    .ok_or_else(|| invalid("scanner refresh count overflow"))?;
             }
         }
         candidate.advance(sweep.end_ms)?;
@@ -269,6 +326,8 @@ mod sweep_tests {
         )
         .unwrap();
         assert_eq!(s.history().next().unwrap().last_seen_utc_millis(), 15_000);
+        assert_eq!(s.history().next().unwrap().first_seen_utc_millis(), 5_000);
+        assert_eq!(s.history().next().unwrap().successful_refreshes(), 3);
         let end = 20_000 + CONTACT_TTL_MILLIS;
         s.scan_linear(
             &c,
@@ -332,5 +391,39 @@ mod sweep_tests {
             position: GalacticPosition::new([0; 3], [0.; 3]).unwrap(),
         };
         assert!(local.relative_meters(&galaxy).is_err());
+    }
+}
+
+#[cfg(test)]
+mod slow_motion_tests {
+    use super::*;
+    #[test]
+    fn scanner_tiny_nonzero_relative_speed_does_not_invent_range_crossing() {
+        let (_, mut target) = super::super::tests::fixture();
+        let origin = Position::Galactic {
+            position: GalacticPosition::new([0; 3], [0.; 3]).unwrap(),
+        };
+        let observer = LinearTrack {
+            position: origin.clone(),
+            velocity_mps: [0.; 3],
+        };
+        target.position = origin.translated([100., 0., 0.]).unwrap();
+        for speed in [1e-308, -1e-308] {
+            target.velocity_mps = [speed, 0., 0.];
+            assert!(
+                last_detection(0, 20_000, &observer, &target, 50.)
+                    .unwrap()
+                    .is_none()
+            );
+        }
+        target.position = origin;
+        target.velocity_mps = [f64::from_bits(1), 0., 0.];
+        assert_eq!(
+            last_detection(4999, 5000, &observer, &target, 50.)
+                .unwrap()
+                .unwrap()
+                .0,
+            5000
+        );
     }
 }

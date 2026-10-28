@@ -38,6 +38,11 @@ Unpowered intervals advance freshness without discoveries. The chronological
 U31/U32 host (#432/#433) supplies certified nonlinear path subdivisions and actual
 funding windows; the scanner never invents a gravitational trajectory.
 
+Bulk offline scans preserve the earliest successful sighting, latest sampled
+state and exact successful pulse count analytically (at most two chronological
+updates per object/piece). Near-zero nonzero motion clips traveled distances
+before time division, preventing overflow roots from inventing a range crossing.
+
 Current canonical surface gameplay samples Vesper in its explicitly named
 body-centered frame; absent generated orbital phase/velocity is not zero galactic
 motion. `Position` separates body-local coordinates from true split galactic

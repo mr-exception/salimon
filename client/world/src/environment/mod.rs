@@ -2,6 +2,7 @@
 //! Authoritative metadata only; presentation never owns weather, sites or ecology.
 pub mod activity;
 pub mod climate;
+pub mod ecology;
 
 use crate::terrain::TerrainError;
 use salimon_universe::{Epoch, TimeScale};

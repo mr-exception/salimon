@@ -212,3 +212,12 @@ The [active geology contract](../../docs/active-geology.md) owns explicit heat/m
 stable terrain-bound sites, strict publication restore and shared-TT source levels.
 Spatial queries cannot create/rekey sources. Vacuum permits ballistic plumes and
 contact coupling, never atmospheric wind/sound. Source radii do not add colliders.
+
+
+## Rare biospheres and ecological regions (#618)
+
+Follow the [ecology contract](../../docs/planetary-ecology.md) for independent fixed life decisions,
+geology/climate-bound potential, continuous realms and stable patch/grammar IDs.
+Suitability never grants life; observed bodies retain no procedural life claim
+and Vesper stays sterile. Strict catalog/save bindings reject incompatible
+publications. Organism meshes, physical instances and harvesting remain #619–#621.

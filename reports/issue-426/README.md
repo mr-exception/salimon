@@ -23,3 +23,5 @@ Physical GPU/Metal/60 FPS and subjective presentation remain unverified and sepa
 ## CI follow-up
 
 [Initial Source build 40634664126](https://github.com/mr-exception/salimon/actions/runs/40634664126) compiled successfully but failed one old cockpit-title assertion: it expected `Compressed Solar System` after normal startup switched to the neutral `Salimon` title. Both expected strings now match the intended title; the actual aimed-cockpit/empty-context behavior stays tested. `cargo test -p salimon-client --locked cockpit_prompt_is_shown_only -j2`: 1 PASS, retained in `title-test.log`. Initial failed CI remains recorded; the new head reruns CI. macOS/Windows publication golden jobs passed on the initial head; these are portable publication checks, not native gameplay qualification.
+
+The title assertion was also normalized with `cargo fmt --all`; final formatting is checked with the descendant workspace verification.

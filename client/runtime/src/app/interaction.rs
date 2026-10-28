@@ -209,10 +209,7 @@ mod tests {
             gameplay_window_title(None, Some(InteractionTarget::Cockpit)),
             format!("Salimon — {COCKPIT_INTERACTION_PROMPT}")
         );
-        assert_eq!(
-            gameplay_window_title(None, None),
-            "Salimon"
-        );
+        assert_eq!(gameplay_window_title(None, None), "Salimon");
     }
 
     #[test]

@@ -31,7 +31,7 @@ Proposed domain breakdown (implement only when the respective system is designed
 | Biomes / ecology | Future environmental regions and baseline biological distribution | Independently seeded, but may be an **explicit dependency** of resource distribution; biome keys cannot depend on player position/session randomness |
 | Discoveries | Future canonical natural/artificial site placement and stable site IDs | Authored site overrides and rare-event placement are shared, not per-run random rewards |
 
-A domain's seed **does not by itself** define its output. Bind its algorithm version, parameters, authored feature set, scientific-input provenance where applicable, explicit **upstream domain dependencies**, and stable identities into its versioned definition. **Seed independence prevents accidental coupling, not intentional physically meaningful coupling:** merely adding an unused domain or reordering generation must never reshuffle another domain; explicitly making terrain consume geology, or resources consume biome/geology, can intentionally change those outputs **only in a newly published compatible revision**, with saved identity/delta migration where needed. Consumers must resolve versioned inputs consistently on every platform and use the same canonical terrain query for physical interactions. Do not assume new geology, erosion, vegetation, dynamic weather or discoveries are implemented today.
+A domain's seed **does not by itself** define its output. Bind its algorithm version, parameters, authored feature set, scientific-input provenance where applicable, explicit **upstream domain dependencies**, and stable identities into its versioned definition. **Seed independence prevents accidental coupling, not intentional physically meaningful coupling:** merely adding an unused domain or reordering generation must never reshuffle another domain; explicitly making terrain consume geology, or resources consume biome/geology, can intentionally change those outputs **only in a newly published compatible revision**, with saved identity/delta migration where needed. Consumers must resolve versioned inputs consistently on every platform and use the same canonical terrain query for physical interactions. The additive geology interpretation is documented below; geology-driven physical migration, erosion, vegetation, dynamic weather and discoveries remain future work.
 
 For the existing version-1 terrain implementation, the validated `TerrainDefinition` already includes `u64` seed, generator version, radius, ordered layers and sparse authored features; retain that exact code/codec contract. Existing resources derive stable per-material inputs via FNV-1a and fixed SplitMix64 lanes. Do not silently rekey currently saved deposits/fixtures or treat the current six-body tag codec as the future galactic body-ID format.
 
@@ -116,3 +116,11 @@ one immutable selected-world baseline, not all fictional planets or gameplay
 adapters. U10's catalog recipe references remain unchanged and distinct; U12
 packages the expanded sidecar. U23/U24 real-scale geometry/mining/arrival, U14
 evolving states, native checks and explicit revision migration remain required.
+
+
+## Implemented geology boundary (#612)
+
+[Terrain-bound geology](planetary-geology.md) now supplies versioned deterministic
+province, history, substrate and layer observations without changing published
+terrain or resources. This additive implementation does not implement weather,
+active sites, biospheres or new terrain migrations. Surface presentation is #613.

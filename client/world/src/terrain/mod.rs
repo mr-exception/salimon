@@ -1,4 +1,5 @@
 //! Versioned body-local terrain contract shared by native rendering and gameplay.
+pub mod geology;
 mod query;
 mod surface;
 mod wire;

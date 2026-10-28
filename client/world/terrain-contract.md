@@ -139,3 +139,13 @@ Linux-only evidence is not evidence for the integrated M1 implementation.
 Caves, tunnels, overhangs and holes through rock require volumetric geometry;
 they remain deferred until after Phase 0, with a separate design and
 implementation phase. No placeholder cave mechanics are introduced.
+
+
+## Canonical geology (#612)
+
+World `terrain::geology` owns versioned terrain-bound province/history/substrate
+queries. The returned physical sample is the exact existing terrain; geology
+never displaces ground or reshuffles resource identities. See the
+[geology contract](../../docs/planetary-geology.md) for codec, profiles, compatibility and tests.
+Vesper remains a homogeneous silicate interpretation with unchanged published
+terrain/resources; rendering and later environmental systems retain their owners.

@@ -178,3 +178,11 @@ Climate wind is body-fixed; the composition owner must rotate it into inertial
 axes exactly once before supplying `Atmosphere::sample`. Density, body motion,
 rotation, passive drag and propulsion/Core energy retain their existing owners.
 The explicit test atmosphere is a fixture, not a newly published lunar atmosphere.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

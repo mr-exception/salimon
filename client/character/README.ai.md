@@ -91,3 +91,11 @@ Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
 Historical fixtures remain explicit; new-run startup is #426.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

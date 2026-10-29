@@ -588,3 +588,10 @@ duplicate IDs, future timestamps and forged observed entries reject atomically.
 Versions 1–25 initialize from actual migrated scanner history only; no default
 Earth route or catalog reveal. View/selection are transient. See the
 [player chart contract](universe-scanner.md#player-known-chart-469).
+
+
+## Physical organisms and clearance (#620)
+
+[Physical organism placement](physical-organisms.md) owns stable source/part
+bindings, root/exclusion rules, common physics sweeps and live character/ship
+clearance. Vesper remains sterile; mutable harvesting/removal remains #621.

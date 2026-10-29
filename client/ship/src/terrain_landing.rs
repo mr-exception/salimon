@@ -110,6 +110,9 @@ impl crate::ShipController {
             .ok_or("missing landing footprint")?;
         let pose = nearby_landing_pose(body, direction, self.terrain, footprint)
             .ok_or("no safe landing site within the bounded spawn search")?;
+        if !self.external_site_clear(pose) {
+            return Err("physical organism blocks full hull clearance");
+        };
         self.pose = pose;
         self.flight_state = crate::FlightState::Landed { body: body.id };
         self.assist = None;

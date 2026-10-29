@@ -396,3 +396,11 @@ Historical fixtures remain explicit; new-run startup is #426.
 ## Bounded navigation prediction (#421)
 
 Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

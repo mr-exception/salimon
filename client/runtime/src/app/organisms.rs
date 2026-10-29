@@ -24,30 +24,8 @@ pub(super) fn segments(
 /// The current canonical Vesper publication is sterile; no runtime reseeding or
 /// implied life is allowed. Other definitions use the explicit specimen adapter.
 pub(super) fn canonical(camera: [f64; 3]) -> Vec<OrganismSegment> {
-    use salimon_world::environment::{
-        climate::{ClimateDefinition, ClimateInputs},
-        ecology::{BiosphereDecision, BiosphereDefinition, BodyNature},
-        organisms::Grammar,
-    };
-    use std::sync::LazyLock;
-    static BIOSPHERE: LazyLock<BiosphereDefinition> = LazyLock::new(|| {
-        let climate = ClimateDefinition::new(
-            salimon_world::terrain::TerrainDefinition::canonical_start().geology(),
-            1,
-            0,
-            ClimateInputs::vacuum(86400., 31557600., 1361.),
-        )
-        .expect("explicit airless starting publication");
-        BiosphereDefinition::new(
-            salimon_world::canonical::START.manifest().planet.id.clone(),
-            BodyNature::Fictional,
-            BiosphereDecision::Sterile,
-            climate,
-            1,
-            0,
-        )
-        .expect("published sterile Vesper")
-    });
+    use salimon_world::canonical::BIOSPHERE;
+    use salimon_world::environment::organisms::Grammar;
     if Grammar::from_biosphere(&BIOSPHERE).is_none() {
         return vec![];
     }
@@ -101,6 +79,16 @@ pub(super) fn canonical(camera: [f64; 3]) -> Vec<OrganismSegment> {
             x[0] * up[1] - x[1] * up[0],
         ];
         out.extend(segments(&c.specimen, c.position_meters, [x, up, z]));
+    }
+    for object in salimon_world::canonical::ORGANISMS
+        .nearby(camera, 5000.)
+        .expect("finite admitted camera")
+    {
+        out.extend(segments(
+            &object.specimen,
+            object.position_meters,
+            object.axes,
+        ));
     }
     out
 }

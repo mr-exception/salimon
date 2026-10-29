@@ -78,3 +78,11 @@ Contact response (#644) lives in `src/response.rs`; root `src/lib.rs` schedules
 substeps and broad-phase traversal. Read the [response owner](architecture.md#contact-response-owner-644)
 and frozen iteration oracle before changing impulse order, tolerances, warm
 state or allocations. `convex.rs` remains the coherent hull/SAT/feature owner.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

@@ -55,3 +55,10 @@ checks, workspace build/Clippy/fmt, tooling/docs and native vacuum startup.
 Original media remains review candidates for #561; hardware #563 and physical
 platform #557 remain unverified. No rendered specimen is silently published as
 a canonical new world or promoted to an approved art baseline.
+
+
+## Physical organisms and clearance (#620)
+
+[Physical organism placement](physical-organisms.md) owns stable source/part
+bindings, root/exclusion rules, common physics sweeps and live character/ship
+clearance. Vesper remains sterile; mutable harvesting/removal remains #621.

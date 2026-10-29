@@ -437,3 +437,11 @@ pre-#592 reference; its ground/pair warm-continuation tests exercise production
 response through the same root seam. `convex.rs` remains cohesive immutable hull,
 SAT and supporting-feature geometry, with related tests; it is deliberately not
 split solely for length. See the [review evidence](../../reports/issue-644/README.md).
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

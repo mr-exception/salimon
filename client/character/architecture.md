@@ -3,8 +3,8 @@
 ## Internal ownership
 
 The crate root is a stable public facade; callers still import the same types,
-functions and constants from `salimon_character`. Internal modules introduce no
-new crate dependencies or native/platform types.
+functions and constants from `salimon_character`. Controller modules consume the shared portable physics static-sweep kernel;
+no native/platform types cross this boundary.
 
 | Source under `src/` | Responsibility |
 | --- | --- |
@@ -275,3 +275,11 @@ Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
 Historical fixtures remain explicit; new-run startup is #426.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

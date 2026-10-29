@@ -95,3 +95,48 @@ pub fn deposits(
     }
     Ok(output)
 }
+
+/// Explicit sterile biological publication for the frozen starting world.
+/// No arrival-time life lottery or player-specific generation is permitted.
+pub static BIOSPHERE: LazyLock<crate::environment::ecology::BiosphereDefinition> =
+    LazyLock::new(|| {
+        use crate::environment::{
+            climate::{ClimateDefinition, ClimateInputs},
+            ecology::{BiosphereDecision, BiosphereDefinition, BodyNature},
+        };
+        let climate = ClimateDefinition::new(
+            crate::terrain::TerrainDefinition::canonical_start().geology(),
+            1,
+            0,
+            ClimateInputs::vacuum(86400., 31557600., 1361.),
+        )
+        .expect("fixed published Vesper vacuum");
+        BiosphereDefinition::new(
+            START.manifest().planet.id.clone(),
+            BodyNature::Fictional,
+            BiosphereDecision::Sterile,
+            climate,
+            1,
+            0,
+        )
+        .expect("published sterile Vesper")
+    });
+pub static ORGANISMS: LazyLock<crate::environment::organism_placement::Population> =
+    LazyLock::new(|| {
+        use crate::environment::organism_placement::{Exclusion, Population};
+        let radius = START.manifest().physical.radius_meters;
+        let mut exclusions = vec![Exclusion {
+            id: "published-opening-hull-ramp-player".into(),
+            bounds: [-30., 30., radius - 10., radius + 40., -30., 30.],
+        }];
+        for (index, site) in START.manifest().resources.outcrops.iter().enumerate() {
+            let p = START
+                .surface_point(site.tangent_xz_meters)
+                .expect("fixed resource site");
+            exclusions.push(Exclusion {
+                id: format!("published-resource-{index}"),
+                bounds: std::array::from_fn(|i| p[i / 2] + if i % 2 == 0 { -8. } else { 8. }),
+            });
+        }
+        Population::publish(&BIOSPHERE, &exclusions).expect("validated fixed starting exclusions")
+    });

@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized] target(s) in 0.10s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-76c82414a9566291)
+
+running 1 test
+test app::sky::tests::canonical_sky_uses_published_radius_without_stream_or_discoveries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 510 filtered out; finished in 0.04s
+

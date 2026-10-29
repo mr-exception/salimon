@@ -130,10 +130,17 @@ impl ClientApplication {
             resource_meshes.push(preview);
         }
         if let Some(stream) = &mut self.universe_stream {
-            let result = salimon_universe::coordinates::GalacticPosition::new(
-                [0; 3],
-                camera.position_meters,
-            )
+            let result = if self.session.mining.terrain
+                == salimon_world::terrain::TerrainMode::Canonical
+            {
+                salimon_world::canonical::START
+                    .manifest()
+                    .distance
+                    .system_position
+                    .translated(camera.position_meters)
+            } else {
+                salimon_universe::coordinates::GalacticPosition::new([0; 3], camera.position_meters)
+            }
             .and_then(|position| {
                 stream.update(position, presentation.ship.velocity_meters_per_second)
             });
@@ -146,6 +153,21 @@ impl ClientApplication {
                 return;
             }
         }
+        let sky = if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
+            match super::sky::scene(
+                camera.position_meters,
+                self.session.elapsed,
+                self.universe_stream.as_ref(),
+            ) {
+                Ok(sky) => Some(sky),
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        } else {
+            None
+        };
         let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
             self.session.mining.terrain
         } else {
@@ -305,6 +327,7 @@ impl ClientApplication {
             .expect("redraws require an initialized renderer")
             .render(
                 SceneFrame {
+                    sky: sky.as_ref(),
                     camera,
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,

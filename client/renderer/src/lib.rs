@@ -31,7 +31,9 @@ mod ramp_geometry;
 mod resource_mesh;
 mod ship_mesh;
 pub use archive_terminal::ARCHIVE_TERMINAL_METERS;
+mod sky;
 mod spheres;
+pub use sky::{MAX_SKY_STARS, SkyScene, SkyStar};
 mod terrain;
 pub mod ui_style;
 pub use terrain::{TerrainMask, TerrainPatch, TerrainPatchKey, TerrainVertex};
@@ -139,6 +141,7 @@ pub struct SceneInstance {
 /// Borrowed scene snapshot for one renderer frame.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SceneFrame<'a> {
+    pub sky: Option<&'a SkyScene>,
     pub camera: CameraFrame,
     pub instances: &'a [SceneInstance],
     pub resource_meshes: &'a [ResourceMeshInstance],
@@ -675,6 +678,7 @@ pub struct Renderer {
     toolbar: overlay::OverlayRenderer,
     toolbar_raster: equipment_toolbar::ToolbarRaster,
     spheres: spheres::SphereRenderer,
+    sky: sky::SkyRenderer,
     terrain: terrain::TerrainRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
     fixtures: fixtures::FixtureMeshRenderer,
@@ -815,6 +819,7 @@ mod tests {
         }];
         let local = prepare_scene(
             SceneFrame {
+                sky: None,
                 camera: local_camera,
                 resource_meshes: &[],
                 fixtures: &[],
@@ -844,6 +849,7 @@ mod tests {
         }];
         let translated = prepare_scene(
             SceneFrame {
+                sky: None,
                 camera: translated_camera,
                 resource_meshes: &[],
                 fixtures: &[],
@@ -892,6 +898,7 @@ mod tests {
         assert_eq!(
             prepare_scene(
                 SceneFrame {
+                    sky: None,
                     camera: coincident_camera,
                     resource_meshes: &[],
                     fixtures: &[],
@@ -917,6 +924,7 @@ mod tests {
         assert_eq!(
             prepare_scene(
                 SceneFrame {
+                    sky: None,
                     camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                     resource_meshes: &[],
                     fixtures: &[],
@@ -964,6 +972,7 @@ mod tests {
         ];
         let prepared = prepare_scene(
             SceneFrame {
+                sky: None,
                 camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                 resource_meshes: &[],
                 fixtures: &[],

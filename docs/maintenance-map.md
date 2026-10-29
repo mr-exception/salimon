@@ -731,3 +731,10 @@ geology/climate-bound potential, continuous realms and stable patch/grammar IDs.
 Suitability never grants life; observed bodies retain no procedural life claim
 and Vesper stays sterile. Strict catalog/save bindings reject incompatible
 publications. Organism meshes, physical instances and harvesting remain #619–#621.
+
+
+## Hybrid astronomical sky (#423)
+
+The [implemented sky contract](universe-sky.md) maps the universe source/streaming,
+runtime projection and renderer pass/test owners. Full ephemeris-frame adoption,
+full source coverage and human/hardware release qualification remain separate.

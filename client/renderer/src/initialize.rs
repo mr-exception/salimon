@@ -195,6 +195,7 @@ impl Renderer {
         let action_bar = overlay::OverlayRenderer::new(&device, configuration.format);
         let reticle = overlay::OverlayRenderer::new(&device, configuration.format);
         let toolbar = overlay::OverlayRenderer::new(&device, configuration.format);
+        let sky = crate::sky::SkyRenderer::new(&device, configuration.format);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let terrain = terrain::TerrainRenderer::new(&device, configuration.format, &spheres);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
@@ -223,6 +224,7 @@ impl Renderer {
             toolbar,
             toolbar_raster: equipment_toolbar::ToolbarRaster::default(),
             spheres,
+            sky,
             terrain,
             ship_mesh,
             fixtures,

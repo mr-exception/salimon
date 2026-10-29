@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "steps_completed": 25,
+  "duration_ms": 110721,
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "scenario": "scenarios/evidence/universe-journey.json",
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ]
+}

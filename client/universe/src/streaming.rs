@@ -34,6 +34,7 @@ impl Default for Budget {
 pub struct LoadedCell {
     pub key: CellKey,
     pub catalog: Arc<Catalog>,
+    pub sky: Arc<Vec<crate::sky::StarSource>>,
 }
 struct Request {
     generation: u64,
@@ -42,7 +43,7 @@ struct Request {
 struct Reply {
     generation: u64,
     key: CellKey,
-    result: Result<Catalog, Error>,
+    result: Result<(Catalog, Vec<crate::sky::StarSource>), Error>,
     stats: Stats,
     resident: usize,
 }
@@ -80,7 +81,19 @@ impl Stream {
         let (results, receiver) = mpsc::sync_channel(1);
         let worker = thread::spawn(move || {
             while let Ok(request) = requests.recv() {
-                let result = reader.cell(request.key);
+                let result = reader.cell(request.key).and_then(|catalog| {
+                    let has_sky = reader
+                        .manifest()
+                        .cells
+                        .iter()
+                        .any(|c| c.key == request.key && c.sidecars.contains_key("sky"));
+                    let sky = if has_sky {
+                        crate::sky::decode(&reader.sidecar(request.key, "sky")?, &catalog)?
+                    } else {
+                        vec![]
+                    };
+                    Ok((catalog, sky))
+                });
                 if results
                     .send(Reply {
                         generation: request.generation,
@@ -163,9 +176,10 @@ impl Stream {
                     self.resident_encoded_bytes = reply.resident;
                     if reply.generation == self.generation && self.wanted.contains(&reply.key) {
                         match reply.result {
-                            Ok(catalog) => self.active.push(LoadedCell {
+                            Ok((catalog, sky)) => self.active.push(LoadedCell {
                                 key: reply.key,
                                 catalog: Arc::new(catalog),
+                                sky: Arc::new(sky),
                             }),
                             Err(error) => {
                                 self.last_error = Some(format!("{:?}: {error}", reply.key))

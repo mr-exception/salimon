@@ -14,7 +14,9 @@ pub use fixtures::{
 };
 mod cockpit_instruments;
 mod scanner_hologram;
+mod scanner_readout;
 pub use scanner_hologram::{HologramContact, HologramContactState, scanner_hologram};
+pub use scanner_readout::ScannerReadout;
 mod consumable_wheel;
 mod equipment_toolbar;
 #[allow(dead_code)]

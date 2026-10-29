@@ -452,7 +452,9 @@ colors, instruments own bounded formatting/caching and screen UV interpretation;
 runtime owns text selection, eligibility, focus and typed commands. Existing
 domain power/simulation/mass/persistence ownership is unchanged. Delivery evidence
 is [reports/issue-466](../reports/issue-466/README.md); M1 signoff is #502, and
-scanner integration #503 remains blocked by #430.
+scanner integration #503 now formats authoritative #430 observations through
+renderer `ScannerReadout` and the existing shared-face runtime action bar.
+Readout rows and 3D functional inks follow [Scout presentation](scout-presentation.md#scanner-readability-503).
 
 
 ## Scout Archive (#467)

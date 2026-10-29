@@ -1,0 +1,83 @@
+{
+  "parent_sha": "9ec1aadc494066c874ab3735703131136494ffa9",
+  "steps_passed": 28,
+  "visual_context": {
+    "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+    "backend": "Vulkan",
+    "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+    "scale_factor": 1.0,
+    "viewport_pixels": [
+      1280,
+      800
+    ]
+  },
+  "capture_source": "production GPU color surface",
+  "binary_sha256": "d4973e3245d490bd640a920884178d126bbfd129ca74c7553e48ffbc04f4e881",
+  "images": {
+    "undiscovered.png": {
+      "sha256": "e4df0f8162823e12f3ea140cb221d59ab6caa18cd120c419a8172d70a579ceb8",
+      "size": [
+        1280,
+        800
+      ]
+    },
+    "identified.png": {
+      "sha256": "cdba12183f07f28530636c52d5946b2c9fe170a7229b67bfab95e8fa7b52fc3f",
+      "size": [
+        1280,
+        800
+      ]
+    },
+    "cockpit.png": {
+      "sha256": "2094535f5634f33e191cc4779a81683b422ffec5e5bd54c92f25daf4ac68fec6",
+      "size": [
+        1280,
+        800
+      ]
+    },
+    "blackout.png": {
+      "sha256": "8d2b8b1c1f9f906fa8fab839e20e02ba9e1848aad00803132f6bdd1e7f7ee7f5",
+      "size": [
+        1280,
+        800
+      ]
+    }
+  },
+  "scanner": {
+    "active_count": 1,
+    "error": null,
+    "hint": "SCANNER 1/1 FRESH VESPER\nCENTER 2985.4 km | AGE 0.0 s\n[M] NEXT [P] CHART | LOG RANGE",
+    "history": [
+      {
+        "first_seen_utc_millis": 5008,
+        "last_seen_utc_millis": 5008,
+        "observation": {
+          "id": "salimon-fiction:awakening.s000000.p00",
+          "position": {
+            "body": "salimon-fiction:awakening.s000000.p00",
+            "frame": "body_local",
+            "meters": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "velocity_mps": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "successful_refreshes": 1
+      }
+    ],
+    "parameters": {
+      "idle_watts": 1000.0,
+      "pulse_joules": 10000.0,
+      "range_meters": 1000000000.0
+    },
+    "powered": true,
+    "selected": 1,
+    "utc_millis": 5008
+  }
+}

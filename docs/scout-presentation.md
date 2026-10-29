@@ -166,7 +166,8 @@ initial fixture placement is distinct from physical mining/travel. Human motion/
 readability review remains #561, physical input/platform checks #557 and hardware
 budgets #563. Fabricator orientation retains its three-screen geometry regression;
 cloud images do not approve readability.
-The absent scanner hologram will integrate through #430/#466 when available.
+The physical scanner projector follows the Scout face and functional palette (#503),
+using the existing contextual action bar and scanner-owned observations.
 No native appearance, mask/tolerance or baseline approval is granted here.
 
 ## Scout UI readability contract (#466)
@@ -192,7 +193,7 @@ physical review. No per-pixel/native accessibility certification is implied.
 | Fabricator recipe panel | Existing modal; readable status words, exact ingredients, queue selection `>` and no-refund controls | Existing atomic enqueue/cancel, focus/range revalidation and exclusive input remain authoritative |
 | Toolbar, Q and H | Shared face/ivory/cyan accents; original food/medical artwork, category colors, layout and modal rules retained | Equipment/inventory/survival selection and consumption stay with existing owners |
 | Reticle | Existing outlined white dot / equipped cross at the exact camera center; fixed physical size retained | Equipment decides the shape; no aim/ray/interaction rule changes |
-| Future scanner | Apply this language after the hologram exists | Blocked by #430; remaining integration is [#503](https://github.com/mr-exception/salimon/issues/503) |
+| Physical scanner | Three bounded rows: explicit FRESH / NO FRESH CONTACTS / OFFLINE, center distance in km, sampled age in s, bracketed M/P controls and logarithmic range notice; shared face and palette | Runtime maps authoritative same-frame contacts and power to renderer `ScannerReadout`; no detection, expiry, clock, save or input rule changes |
 
 Physical screens remain self-lit opaque geometry behind their existing housings;
 no glass opacity, material, draw, shader or pipeline change is introduced. The
@@ -250,3 +251,19 @@ and Blender mood originals remain separate dated corpora.
 ## Tactile audio and physical partitions (#583)
 
 The [maintained acoustics contract](scout-acoustics.md) describes actual mechanism/attachment events, finite cargo/privacy separation, differentiated floor contact and bounded continuous CPAL filtering. E2E mapping stays silent; actual output captures and human listening remain separately identified.
+
+## Scanner readability (#503)
+
+`scanner_readout.rs` formats observed values into at most 39 cells per row.
+Invalid readings show `--`; large finite values use scientific notation without
+losing km/s unit case. Labels are bounded to twelve visible ASCII cells. Existing
+`action_bar.rs` provides the shared opaque contrast-tested background, face and
+integer DPI scaling, without a second overlay. The 3D projector converts the
+shared sRGB palette to linear instance colors: cyan fresh/control, amber selected,
+muted history and ivory leads/origin. Selection also enlarges the marker; text
+names current freshness and power independently of color. Chart mode retains its
+separate explicit historical/lead provenance. No blink, new draw or detection is
+added. #438 owns the integration matrix; #502's historical review now follows
+#561 presentation, #557 physical devices and #563 hardware qualification.
+See [#466 foundation report](../reports/issue-466/README.md) and
+[PR #504](https://github.com/mr-exception/salimon/pull/504).

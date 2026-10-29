@@ -232,7 +232,8 @@ commands, GPU instruments, realistic-flight routes and human/hardware limits.
 Scout UI #466: prompt and crafting/status glyphs reuse renderer `ui_style`.
 See the [canonical surface matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466);
 retain contextual/expiry and modal admission tests, and keep power/interaction
-rules out of palette/raster changes. Scanner integration is separately #503.
+rules out of palette/raster changes. Scanner integration #503 maps authoritative observations to renderer `ScannerReadout`
+and reuses this action bar, preserving lowercase SI glyphs.
 
 
 Archive #467: follow [the source/persistence/input contract](architecture.md#scout-archive-467).

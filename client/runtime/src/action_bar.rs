@@ -208,11 +208,20 @@ fn fill_rect(
 // Runtime prose keeps the established uppercase label face. Instrument metric
 // readings use the same face's explicit case-preserving SI variants directly.
 pub(crate) fn glyph_rows(character: char) -> [u8; 7] {
-    salimon_renderer::ui_style::glyph_rows(character.to_ascii_uppercase())
+    salimon_renderer::ui_style::glyph_rows(character)
 }
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn prompt_face_preserves_scanner_si_unit_case() {
+        assert_ne!(super::glyph_rows('m'), super::glyph_rows('M'));
+        assert_ne!(super::glyph_rows('s'), super::glyph_rows('S'));
+        assert_eq!(
+            super::glyph_rows('k'),
+            salimon_renderer::ui_style::glyph_rows('k')
+        );
+    }
     #[test]
     fn tool_requirements_remain_visible_during_placement_feedback() {
         let mut bar = super::ActionBar::default();

@@ -16,6 +16,8 @@ pub struct OverlayImage<'a> {
 pub enum OverlayPlacement {
     #[default]
     TopLeft,
+    /// Right-aligned status panel above the central scene and bottom toolbar.
+    TopRight,
     BottomCenter,
     /// Bottom-center message above a renderer-reserved physical-pixel band.
     BottomCenterInset(u32),
@@ -96,6 +98,10 @@ fn overlay_origin(
         OverlayPlacement::World { .. } => unreachable!("world placement is projected separately"),
         OverlayPlacement::Fullscreen => [0.0; 2],
         OverlayPlacement::TopLeft => [OVERLAY_MARGIN_PIXELS as f32; 2],
+        OverlayPlacement::TopRight => [
+            (surface_size[0] as f32 - OVERLAY_MARGIN_PIXELS as f32 - display_size[0]).max(0.0),
+            OVERLAY_MARGIN_PIXELS as f32,
+        ],
         OverlayPlacement::Center => [
             (surface_size[0] as f32 - display_size[0]) * 0.5,
             (surface_size[1] as f32 - display_size[1]) * 0.5,
@@ -575,6 +581,10 @@ mod tests {
         assert_eq!(
             overlay_origin([1280, 720], [600.0, 80.0], OverlayPlacement::TopLeft),
             [16.0, 16.0]
+        );
+        assert_eq!(
+            overlay_origin([1280, 800], [600.0, 80.0], OverlayPlacement::TopRight),
+            [664.0, 16.0]
         );
     }
 

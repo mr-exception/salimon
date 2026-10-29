@@ -1,0 +1,369 @@
+{
+  "parent_sha": "27a8e08fc00e1bbcdfd38c4bc089032f5a74a042",
+  "binary_sha256": "cd0efa60d4e4cd6fb4770219d7f98da1f6fb0847ae878944ca2c9a1814597b47",
+  "source_sha256": {
+    "client/renderer/src/overlay.rs": "7b530188aab008fa323b5048704df655d9d2e6db961aaa7783eff40237688f6c",
+    "client/runtime/src/app/presentation/prompts.rs": "ff83eec43372196ec63e023ab31688c25bb9e6b9f887dfe3cf68a2d0b057a389",
+    "client/runtime/src/session/scanner/integration_tests.rs": "80e3ec471be5963994f1b52dc2ebccd8fbf69743c8ece4a5c4ea3f11fb9b6ec1"
+  },
+  "runs": {
+    "scale-1": {
+      "status": "passed",
+      "steps_completed": 81,
+      "captures": [
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-isolated/run-c6wf4f1u/step-011-idle.png",
+          "report_path": "scale-1/step-011-idle.png",
+          "sha256": "26b256b8d07ac7530eb6c4ab13728d3fd58687b8c2979770fdee4fedc5ce0bd9",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "idle"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-isolated/run-c6wf4f1u/step-019-fresh.png",
+          "report_path": "scale-1/step-019-fresh.png",
+          "sha256": "2f27dbec894a514d09939bb6614513e3287d3e90e4fea3b69c46c7564c0fcf17",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "fresh"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-isolated/run-c6wf4f1u/step-020-fresh-repeat.png",
+          "report_path": "scale-1/step-020-fresh-repeat.png",
+          "sha256": "2f27dbec894a514d09939bb6614513e3287d3e90e4fea3b69c46c7564c0fcf17",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "fresh-repeat"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-isolated/run-c6wf4f1u/step-053-wide.png",
+          "report_path": "scale-1/step-053-wide.png",
+          "sha256": "f597a9b2fd2cc582e73a19b443b960c23558a33eae9a2e460f8199c676ad3114",
+          "size": [
+            1920,
+            1080
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1920,
+              1080
+            ]
+          },
+          "label": "wide"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-isolated/run-c6wf4f1u/step-062-compact.png",
+          "report_path": "scale-1/step-062-compact.png",
+          "sha256": "ff8ca701869d72cddda9045ba066702cf1a671609a3e010d9409c234d38d3138",
+          "size": [
+            640,
+            360
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              640,
+              360
+            ]
+          },
+          "label": "compact"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-isolated/run-c6wf4f1u/step-071-restored.png",
+          "report_path": "scale-1/step-071-restored.png",
+          "sha256": "2f27dbec894a514d09939bb6614513e3287d3e90e4fea3b69c46c7564c0fcf17",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "restored"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-isolated/run-c6wf4f1u/step-081-blackout.png",
+          "report_path": "scale-1/step-081-blackout.png",
+          "sha256": "ba8e1b0fa3fe1f4d6d21cb1fadce261ac4d92445195c1b0f24956ae1ce2cab00",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "blackout"
+        }
+      ]
+    },
+    "scale-1_5": {
+      "status": "passed",
+      "steps_completed": 29,
+      "captures": [
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-1.5/run-ri_b5rmp/step-008-undiscovered-projector.png",
+          "report_path": "scale-1_5/step-008-undiscovered-projector.png",
+          "sha256": "26f33a5169e128a25d093e655fafaae1912f8621cc6f32ca6af3fd04217a0f11",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "undiscovered-projector"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-1.5/run-ri_b5rmp/step-015-identified-local-contact.png",
+          "report_path": "scale-1_5/step-015-identified-local-contact.png",
+          "sha256": "5703fd199109125e8678f18921e0a3e1dc599ca12677b334f8dce9126021efc3",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "identified-local-contact"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-1.5/run-ri_b5rmp/step-016-identified-repeat.png",
+          "report_path": "scale-1_5/step-016-identified-repeat.png",
+          "sha256": "5703fd199109125e8678f18921e0a3e1dc599ca12677b334f8dce9126021efc3",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "identified-repeat"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-1.5/run-ri_b5rmp/step-018-cockpit-coexistence.png",
+          "report_path": "scale-1_5/step-018-cockpit-coexistence.png",
+          "sha256": "51969be3542e584c55febe4c3b1dc3d0982dc8ca3c9a3c6bdeff5e270b607306",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "cockpit-coexistence"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-1.5/run-ri_b5rmp/step-029-blackout-projector.png",
+          "report_path": "scale-1_5/step-029-blackout-projector.png",
+          "sha256": "11f7bf9f8eef05e05aad6d09919b1382477c34a8c0f213db607797e0923ba125",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "blackout-projector"
+        }
+      ]
+    },
+    "scale-2": {
+      "status": "passed",
+      "steps_completed": 29,
+      "captures": [
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-2/run-30opgi2_/step-008-undiscovered-projector.png",
+          "report_path": "scale-2/step-008-undiscovered-projector.png",
+          "sha256": "4cef04f996e0e98dc13ac435390e8492f2b9d60cc619d5adf00537e0ac5dce40",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "undiscovered-projector"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-2/run-30opgi2_/step-015-identified-local-contact.png",
+          "report_path": "scale-2/step-015-identified-local-contact.png",
+          "sha256": "ff4b55696994bff56e07f9c68465f6efc949680d53c9238a9c8317ddafed3a55",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "identified-local-contact"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-2/run-30opgi2_/step-016-identified-repeat.png",
+          "report_path": "scale-2/step-016-identified-repeat.png",
+          "sha256": "ff4b55696994bff56e07f9c68465f6efc949680d53c9238a9c8317ddafed3a55",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "identified-repeat"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-2/run-30opgi2_/step-018-cockpit-coexistence.png",
+          "report_path": "scale-2/step-018-cockpit-coexistence.png",
+          "sha256": "cbf8bdfbc31924616069bf0749f046fc17456abb96924cd45e5f69bd9026599c",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "cockpit-coexistence"
+        },
+        {
+          "original_path": "/workspace/salimon/artifacts/issue-438-final-dpi-2/run-30opgi2_/step-029-blackout-projector.png",
+          "report_path": "scale-2/step-029-blackout-projector.png",
+          "sha256": "8eff7eb513f1930882688e509dbbae9d097a1c60109f3255830140d55c56f198",
+          "size": [
+            1280,
+            800
+          ],
+          "visual_context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "label": "blackout-projector"
+        }
+      ]
+    }
+  }
+}

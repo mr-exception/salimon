@@ -28,12 +28,13 @@ SCOUT_CONSTRUCTION = (
     "construction-damage.json", "construction-detachment.json",
     "construction-offline.json", "construction-offline-upgrade.json",
 )
-GROUPS = {"scout-construction": SCOUT_CONSTRUCTION, "realistic-flight": REALISTIC_FLIGHT, "terrain": TERRAIN, "ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
+SCANNER = ("scanner-integration.json", "scanner-hologram.json", "cockpit-nose.json")
+GROUPS = {"scanner": SCANNER, "scout-construction": SCOUT_CONSTRUCTION, "realistic-flight": REALISTIC_FLIGHT, "terrain": TERRAIN, "ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
 
 
 def select_scenarios(directory, group=None, evidence=False):
     # This integrated acceptance group always uses production capture routes.
-    if evidence or group == "scout-construction":
+    if evidence or group in {"scout-construction", "scanner"}:
         directory = directory / "evidence"
     if group in GROUPS:
         # Explicit paths ensure a missing prerequisite fails instead of being skipped.

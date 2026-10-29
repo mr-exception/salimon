@@ -697,3 +697,11 @@ Physical colliders/landing safety are #620; biological material response is #622
 [Physical organism placement](physical-organisms.md) owns stable source/part
 bindings, root/exclusion rules, common physics sweeps and live character/ship
 clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+## Scanner cloud integration (#438)
+
+Follow the [scanner acceptance contract](universe-scanner.md#cloud-scanner-acceptance-438)
+for the `scanner` evidence suite, exact charge/cadence/modal/persistence tests,
+viewport and simulated-DPI matrix, frozen GPU repeat/pixel review and retained
+qualification boundaries. Use production `--screenshot-command '["native"]'`;
+OS desktop images do not satisfy this GPU evidence check.

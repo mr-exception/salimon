@@ -776,3 +776,11 @@ See the [Scout presentation contract](scout-presentation.md). Renderer `ScannerR
 ## Scanner cloud integration (#438)
 
 See the [scanner acceptance contract](universe-scanner.md#cloud-scanner-acceptance-438). The existing action bar places fresh scanner status top-right at 1280+ physical pixels to leave the projector visible at simulated 2x scale; compact windows and chart mode retain their existing bottom placement. Renderer owns generic `TopRight` image placement; runtime chooses placement from viewport width without changing scanner, input, collision or saved authority. The required scanner suite and exact frozen-frame/pixel review preserve failure evidence and physical/hardware qualification limits.
+
+## Biological material response (#622)
+
+Follow [organism materials](planetary-organisms.md#biological-materials-and-weather-response-622)
+for runtime source/weather mapping, renderer instance/shader layout, root/bounds
+regressions and opt-in production Vulkan reference captures. Verify workspace
+build/tests/Clippy/fmt, script and documentation checks. Human art review #561,
+physical platform #557 and hardware #563 remain separately unverified.

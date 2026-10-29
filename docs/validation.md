@@ -705,3 +705,11 @@ for the `scanner` evidence suite, exact charge/cadence/modal/persistence tests,
 viewport and simulated-DPI matrix, frozen GPU repeat/pixel review and retained
 qualification boundaries. Use production `--screenshot-command '["native"]'`;
 OS desktop images do not satisfy this GPU evidence check.
+
+## Biological material response (#622)
+
+Follow [organism materials](planetary-organisms.md#biological-materials-and-weather-response-622)
+for runtime source/weather mapping, renderer instance/shader layout, root/bounds
+regressions and opt-in production Vulkan reference captures. Verify workspace
+build/tests/Clippy/fmt, script and documentation checks. Human art review #561,
+physical platform #557 and hardware #563 remain separately unverified.

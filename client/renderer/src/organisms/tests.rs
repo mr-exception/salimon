@@ -63,6 +63,18 @@ fn organism_production_reference() {
                 radius_start_meters: v["r0"].as_f64().unwrap(),
                 radius_end_meters: v["r1"].as_f64().unwrap(),
                 color: serde_json::from_value(v["color"].clone()).unwrap(),
+                material: v
+                    .get("material")
+                    .map(|v| serde_json::from_value(v.clone()).unwrap())
+                    .unwrap_or([0.8, 0., 0., 0.]),
+                flex_meters: v
+                    .get("flex")
+                    .map(|v| serde_json::from_value(v.clone()).unwrap())
+                    .unwrap_or([0.; 3]),
+                coating: v
+                    .get("coating")
+                    .map(|v| serde_json::from_value(v.clone()).unwrap())
+                    .unwrap_or([0.; 3]),
             })
             .collect();
         let origin: [f64; 3] = model
@@ -115,8 +127,12 @@ fn organism_production_reference() {
             held_item: None,
         };
         let matrix = crate::prepare_scene(scene, 1.).unwrap().view_projection;
+        let light = model.get("light").map(|v| PointLight {
+            position_meters: [100., 200., 300.],
+            color: serde_json::from_value(v.clone()).unwrap(),
+        });
         renderer
-            .prepare(&queue, camera, matrix, 512, None, &segments)
+            .prepare(&queue, camera, matrix, 512, light, &segments)
             .unwrap();
         assert_eq!(renderer.count(), segments.len() as u32);
         assert!(renderer.draws() <= 2);
@@ -172,7 +188,7 @@ fn organism_production_reference() {
                 .as_chunks::<4>()
                 .0
                 .iter()
-                .filter(|p| p[1] > 60)
+                .filter(|p| p[..3] != pixels[..3])
                 .count()
                 > 20
         );

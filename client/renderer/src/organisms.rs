@@ -9,6 +9,12 @@ pub struct OrganismSegment {
     pub radius_start_meters: f64,
     pub radius_end_meters: f64,
     pub color: [f32; 3],
+    /// Roughness, thin-tissue transmission, iridescence and localized emission.
+    pub material: [f32; 4],
+    /// Camera-independent body/world-space cosmetic displacement, contained by the radius.
+    pub flex_meters: [f32; 3],
+    /// Wetness, frost and dust fractions from the same environmental sample.
+    pub coating: [f32; 3],
 }
 fn mesh(sides: usize) -> Vec<[f32; 3]> {
     let mut v = Vec::new();
@@ -78,7 +84,7 @@ impl OrganismRenderer {
             bind_group_layouts: &[Some(&layout)],
             immediate_size: 0,
         });
-        let pipeline=device.create_render_pipeline(&wgpu::RenderPipelineDescriptor{label:Some("faceted organism segments"),layout:Some(&pl),vertex:wgpu::VertexState{module:&shader,entry_point:Some("vs_main"),buffers:&[Some(wgpu::VertexBufferLayout{array_stride:12,step_mode:wgpu::VertexStepMode::Vertex,attributes:&wgpu::vertex_attr_array![0=>Float32x3]}),Some(wgpu::VertexBufferLayout{array_stride:48,step_mode:wgpu::VertexStepMode::Instance,attributes:&wgpu::vertex_attr_array![1=>Float32x4,2=>Float32x4,3=>Float32x4]})],compilation_options:Default::default()},primitive:Default::default(),depth_stencil:Some(wgpu::DepthStencilState{format:crate::DEPTH_FORMAT,depth_write_enabled:Some(true),depth_compare:Some(wgpu::CompareFunction::Greater),stencil:Default::default(),bias:Default::default()}),multisample:Default::default(),fragment:Some(wgpu::FragmentState{module:&shader,entry_point:Some("fs_main"),targets:&[Some(wgpu::ColorTargetState{format,blend:Some(wgpu::BlendState::REPLACE),write_mask:wgpu::ColorWrites::ALL})],compilation_options:Default::default()}),multiview_mask:None,cache:None});
+        let pipeline=device.create_render_pipeline(&wgpu::RenderPipelineDescriptor{label:Some("faceted organism segments"),layout:Some(&pl),vertex:wgpu::VertexState{module:&shader,entry_point:Some("vs_main"),buffers:&[Some(wgpu::VertexBufferLayout{array_stride:12,step_mode:wgpu::VertexStepMode::Vertex,attributes:&wgpu::vertex_attr_array![0=>Float32x3]}),Some(wgpu::VertexBufferLayout{array_stride:96,step_mode:wgpu::VertexStepMode::Instance,attributes:&wgpu::vertex_attr_array![1=>Float32x4,2=>Float32x4,3=>Float32x4,4=>Float32x4,5=>Float32x4,6=>Float32x4]})],compilation_options:Default::default()},primitive:Default::default(),depth_stencil:Some(wgpu::DepthStencilState{format:crate::DEPTH_FORMAT,depth_write_enabled:Some(true),depth_compare:Some(wgpu::CompareFunction::Greater),stencil:Default::default(),bias:Default::default()}),multisample:Default::default(),fragment:Some(wgpu::FragmentState{module:&shader,entry_point:Some("fs_main"),targets:&[Some(wgpu::ColorTargetState{format,blend:Some(wgpu::BlendState::REPLACE),write_mask:wgpu::ColorWrites::ALL})],compilation_options:Default::default()}),multiview_mask:None,cache:None});
         Self {
             pipeline,
             uniform,
@@ -93,7 +99,7 @@ impl OrganismRenderer {
             instances: std::array::from_fn(|_| {
                 device.create_buffer(&wgpu::BufferDescriptor {
                     label: Some("bounded organism instances"),
-                    size: (MAX_ORGANISM_SEGMENTS * 48) as u64,
+                    size: (MAX_ORGANISM_SEGMENTS * 96) as u64,
                     usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
                     mapped_at_creation: false,
                 })
@@ -138,6 +144,20 @@ impl OrganismRenderer {
             {
                 return Err(invalid());
             }
+            if !s
+                .material
+                .iter()
+                .chain(&s.coating)
+                .all(|v| v.is_finite() && (0.0..=1.0).contains(v))
+                || !s.flex_meters.iter().all(|v| v.is_finite())
+                || f64::from(
+                    s.flex_meters[0]
+                        .hypot(s.flex_meters[1])
+                        .hypot(s.flex_meters[2]),
+                ) > s.radius_start_meters.min(s.radius_end_meters) * 0.1 + 1e-9
+            {
+                return Err(invalid());
+            }
             let start: [f64; 3] =
                 std::array::from_fn(|i| s.start_meters[i] - camera.position_meters[i]);
             let end: [f64; 3] =
@@ -174,6 +194,18 @@ impl OrganismRenderer {
                 s.color[1],
                 s.color[2],
                 1.,
+                s.material[0],
+                s.material[1],
+                s.material[2],
+                s.material[3],
+                s.flex_meters[0],
+                s.flex_meters[1],
+                s.flex_meters[2],
+                0.,
+                s.coating[0],
+                s.coating[1],
+                s.coating[2],
+                0.,
             ];
             if !values.iter().all(|v| v.is_finite()) {
                 return Err(invalid());
@@ -206,7 +238,7 @@ impl OrganismRenderer {
             ),
         );
         for (i, b) in batches.iter().enumerate() {
-            self.counts[i] = (b.len() / 12) as u32;
+            self.counts[i] = (b.len() / 24) as u32;
             if !b.is_empty() {
                 queue.write_buffer(&self.instances[i], 0, &encode_f32s(b.iter().copied()));
             }

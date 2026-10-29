@@ -15,7 +15,7 @@ Vesper explicitly retains its published sterile decision. Species do not
 reshuffle at visit/load; ecology/climate/geology and original terrain remain
 immutable. The existing macro-cover/realm/community metadata is the coarse
 coverage authority; fine visible cosmetic candidates sample that same ecology.
-Detailed biological material/animation consumers remain #622.
+Biological material and cosmetic weather response are described below.
 
 A `CoverTile` is a fixed level-16 cube-face cell, not a viewport or terrain LOD
 key. Up to 64 small mat/filament candidates have stable source IDs, body-fixed
@@ -32,11 +32,10 @@ geometry and lighting only, with six-sided near and three-sided unresolved LODs.
 LOD changes only below 0.75 projected radius pixels, retains every segment/root
 and endpoint, and never changes source population or physical bounds. It does
 not enlarge distant objects into navigation markers. At most 16,384 segments,
-two draws, 48 B per instance and two fixed 768 KiB instance buffers bound work.
+two draws, 96 B per instance and two fixed 1.5 MiB instance buffers bound work.
 A body-relative f64 subtraction precedes f32 upload; buffer/radius/color/end-point
 validation rejects malformed input. Opaque reverse-Z geometry participates in
-normal atmosphere/weather occlusion. No translucency/glow/weather motion is
-introduced here; #622 owns those enhancements.
+normal atmosphere/weather occlusion. Material response and bounded cosmetic weather motion use the same pipeline.
 
 ## Source and validation
 
@@ -62,3 +61,33 @@ a canonical new world or promoted to an approved art baseline.
 [Physical organism placement](physical-organisms.md) owns stable source/part
 bindings, root/exclusion rules, common physics sweeps and live character/ship
 clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+## Biological materials and weather response (#622)
+
+Runtime `app/organisms.rs` maps immutable grammar identity into matte, waxy,
+mineralized, thin-tissue, restrained iridescent and rough structural response.
+Pigments remain the existing species palette; no geometry/identity/publication
+version changes. Thin tissue uses an opaque rim/back-light approximation, not
+full subsurface scattering or alpha transparency. The shader uses spectral light
+RGB, roughness-dependent highlights and bounded iridescent sheen. Selected
+terminal colony organs alone may emit; emission remains visible without bloom,
+does not illuminate neighboring geometry, and never turns entire plants neon.
+
+`respond` consumes the same explicit climate `WeatherSample` and shared TT epoch.
+Water precipitation produces wetness above 273.15 K or frost below it; dry
+storms supply a dust coating. These are instantaneous presentation proxies,
+not saved weather accumulation or changes to friction/resources. Vacuum clears
+all three and suppresses wind motion. Frond/filament appendages move along the
+body-fixed sampled wind with a smooth shared-time gust; structural stems/root
+caps stay fixed. Displacement is bounded below 10% of minimum part radius, with
+an equal radial contraction so rendered surfaces remain inside the existing
+static physical envelopes. No collision/pushing/soft-body authority is added.
+
+The 96-byte GPU instance contains endpoints/radii, pigment, material, cosmetic
+flex and coating; input validation rejects invalid fractions and unbounded flex.
+Both quality LODs retain every physical part. The canonical Vesper publication
+remains sterile; positive life/weather scenarios are explicitly fictional inputs.
+Runtime tests cover warm/cold/dry/vacuum response, repeated TT samples, fixed
+source endpoints/roots and material bounds. Production Vulkan evidence includes
+all six families, day/red/night illumination and declared wet/frost/dust fixtures.
+Originals and unverified human/hardware scope are in `reports/issue-622/README.md`.

@@ -18,12 +18,88 @@ pub(super) fn segments(
             radius_start_meters: part.radius_start,
             radius_end_meters: part.radius_end,
             color: specimen.color,
+            material: material(specimen, part.id),
+            flex_meters: [0.; 3],
+            coating: [0.; 3],
         })
         .collect()
 }
+/// Species traits derive from immutable grammar identity, not visit time or camera.
+fn material(specimen: &Specimen, part: u16) -> [f32; 4] {
+    let key = specimen
+        .grammar_id
+        .bytes()
+        .fold(0u64, |a, b| a.wrapping_mul(131).wrapping_add(u64::from(b)));
+    let family = key % 6;
+    let roughness = [0.95, 0.3, 0.8, 0.6, 0.4, 0.7][family as usize];
+    // Sparse terminal organs alone emit; the rest of the plant remains dark at night.
+    let emission = if key.is_multiple_of(5) && part > 0 && part.is_multiple_of(7) {
+        0.7
+    } else {
+        0.
+    };
+    [
+        roughness,
+        if family == 3 { 0.6 } else { 0. },
+        if family == 4 { 0.35 } else { 0. },
+        emission,
+    ]
+}
+/// Stateless shared-TT response. No physical endpoints, identities or roots are changed.
+pub(super) fn respond(
+    segments: &mut [OrganismSegment],
+    specimen: &Specimen,
+    weather: &salimon_world::environment::climate::WeatherSample,
+    time_seconds: f64,
+) {
+    use salimon_world::environment::climate::Condensable;
+    let wind = weather.wind_mps;
+    let speed = wind[0].hypot(wind[1]).hypot(wind[2]);
+    let airborne = weather.pressure_pascal > 0.;
+    let wet = if airborne
+        && weather.precipitation == Condensable::Water
+        && weather.temperature_kelvin > 273.15
+    {
+        (weather.precipitation_kg_m2_s * 100.).clamp(0., 1.) as f32
+    } else {
+        0.
+    };
+    let frost = if airborne
+        && weather.precipitation == Condensable::Water
+        && weather.temperature_kelvin <= 273.15
+    {
+        (weather.precipitation_kg_m2_s * 100.).clamp(0., 1.) as f32
+    } else {
+        0.
+    };
+    let dust = if airborne && weather.precipitation == Condensable::None {
+        weather.storm_fraction.clamp(0., 1.) as f32
+    } else {
+        0.
+    };
+    for (segment, part) in segments.iter_mut().zip(&specimen.parts) {
+        segment.coating = [wet, frost, dust];
+        let flexible = matches!(
+            specimen.form,
+            salimon_world::environment::organisms::Form::Frond
+                | salimon_world::environment::organisms::Form::Filament
+        );
+        // Structural stem remains fixed; only fine flexible appendages move inside colliders.
+        let gain = if airborne && flexible && part.id > 0 && speed > 0. {
+            segment.radius_start_meters.min(segment.radius_end_meters)
+                * 0.08
+                * (speed / 20.).min(1.)
+                * (0.65 + 0.35 * (time_seconds * 1.7 + f64::from(part.id)).sin())
+                / speed
+        } else {
+            0.
+        };
+        segment.flex_meters = wind.map(|v| (v * gain) as f32);
+    }
+}
 /// The current canonical Vesper publication is sterile; no runtime reseeding or
 /// implied life is allowed. Other definitions use the explicit specimen adapter.
-pub(super) fn canonical(camera: [f64; 3]) -> Vec<OrganismSegment> {
+pub(super) fn canonical(camera: [f64; 3], epoch: salimon_universe::Epoch) -> Vec<OrganismSegment> {
     use salimon_world::canonical::BIOSPHERE;
     use salimon_world::environment::organisms::Grammar;
     if Grammar::from_biosphere(&BIOSPHERE).is_none() {
@@ -78,25 +154,147 @@ pub(super) fn canonical(camera: [f64; 3]) -> Vec<OrganismSegment> {
             x[2] * up[0] - x[0] * up[2],
             x[0] * up[1] - x[1] * up[0],
         ];
-        out.extend(segments(&c.specimen, c.position_meters, [x, up, z]));
+        let mut geometry = segments(&c.specimen, c.position_meters, [x, up, z]);
+        let source_radius = c.position_meters[0]
+            .hypot(c.position_meters[1])
+            .hypot(c.position_meters[2]);
+        let weather = BIOSPHERE
+            .climate()
+            .sample(c.position_meters.map(|x| x / source_radius), epoch)
+            .expect("published climate and TT epoch");
+        respond(&mut geometry, &c.specimen, &weather, super_time(epoch));
+        out.extend(geometry);
     }
     for object in salimon_world::canonical::ORGANISMS
         .nearby(camera, 5000.)
         .expect("finite admitted camera")
     {
-        out.extend(segments(
-            &object.specimen,
-            object.position_meters,
-            object.axes,
-        ));
+        let mut geometry = segments(&object.specimen, object.position_meters, object.axes);
+        let n = object
+            .position_meters
+            .iter()
+            .map(|x| x * x)
+            .sum::<f64>()
+            .sqrt();
+        let weather = BIOSPHERE
+            .climate()
+            .sample(object.position_meters.map(|x| x / n), epoch)
+            .expect("published climate");
+        respond(&mut geometry, &object.specimen, &weather, super_time(epoch));
+        out.extend(geometry);
     }
     out
+}
+fn super_time(epoch: salimon_universe::Epoch) -> f64 {
+    let origin = salimon_universe::Epoch::calendar(
+        [2000, 1, 1],
+        [12, 0, 0, 0],
+        salimon_universe::TimeScale::Tt,
+    )
+    .expect("fixed TT epoch");
+    epoch.seconds_since(origin).expect("same TT scale")
 }
 #[cfg(test)]
 mod tests {
     #[test]
     fn sterile_vesper_never_gets_visible_organisms() {
-        assert!(super::canonical([0., 3e6, 0.]).is_empty());
+        assert!(
+            super::canonical(
+                [0., 3e6, 0.],
+                salimon_universe::Epoch::calendar(
+                    [2000, 1, 1],
+                    [12, 0, 0, 0],
+                    salimon_universe::TimeScale::Tt
+                )
+                .unwrap()
+            )
+            .is_empty()
+        );
+    }
+    #[test]
+    fn biological_weather_response_keeps_source_bounds_and_stems() {
+        use salimon_world::environment::{
+            climate::{Condensable, WeatherSample},
+            organisms::{Form, Part, Specimen},
+        };
+        let specimen = Specimen {
+            id: "source".into(),
+            grammar_id: "species".into(),
+            form: Form::Frond,
+            color: [0.3; 3],
+            parts: (0..3)
+                .map(|id| Part {
+                    id,
+                    start: [0.; 3],
+                    end: [0., 2., 0.],
+                    radius_start: 0.2,
+                    radius_end: 0.1,
+                })
+                .collect(),
+        };
+        let epoch = salimon_universe::Epoch::calendar(
+            [2000, 1, 1],
+            [12, 0, 0, 0],
+            salimon_universe::TimeScale::Tt,
+        )
+        .unwrap();
+        let mut weather = WeatherSample {
+            definition_id: "test".into(),
+            province_id: "test".into(),
+            epoch,
+            climate_temperature_kelvin: 290.,
+            temperature_kelvin: 290.,
+            pressure_pascal: 1e5,
+            cloud_fraction: 1.,
+            storm_fraction: 0.8,
+            wind_mps: [10., 0., 0.],
+            precipitation: Condensable::Water,
+            precipitation_kg_m2_s: 0.01,
+            extinction_per_meter: 0.001,
+        };
+        let original = super::segments(
+            &specimen,
+            [1e12; 3],
+            [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]],
+        );
+        let mut geometry = original.clone();
+        super::respond(&mut geometry, &specimen, &weather, 3.);
+        assert_eq!(geometry[0].flex_meters, [0.; 3]);
+        assert!(geometry[1].flex_meters[0] > 0.);
+        assert_eq!(geometry[1].coating, [1., 0., 0.]);
+        for (before, after) in original.iter().zip(&geometry) {
+            assert_eq!(before.start_meters, after.start_meters);
+            assert_eq!(before.end_meters, after.end_meters);
+            assert!(after.flex_meters[0] <= after.radius_end_meters as f32 * 0.1);
+        }
+        let mut repeat = original.clone();
+        super::respond(&mut repeat, &specimen, &weather, 3.);
+        assert_eq!(repeat, geometry);
+        weather.temperature_kelvin = 260.;
+        super::respond(&mut geometry, &specimen, &weather, 3.);
+        assert_eq!(geometry[1].coating, [0., 1., 0.]);
+        weather.precipitation = Condensable::None;
+        super::respond(&mut geometry, &specimen, &weather, 3.);
+        assert_eq!(geometry[1].coating, [0., 0., 0.8]);
+        weather.pressure_pascal = 0.;
+        super::respond(&mut geometry, &specimen, &weather, 3.);
+        assert_eq!(geometry[1].coating, [0.; 3]);
+        assert_eq!(geometry[1].flex_meters, [0.; 3]);
+        // All six material families stay bounded; emission never covers entire anatomy.
+        let mut families = std::collections::BTreeSet::new();
+        for key in 0..100 {
+            let mut source = specimen.clone();
+            source.grammar_id = format!("species-{key}");
+            let root = super::material(&source, 0);
+            assert_eq!(root[3], 0.);
+            families.insert((root[0] * 100.) as u32);
+            assert!(
+                super::material(&source, 7)
+                    .iter()
+                    .all(|x| (0.0..=1.0).contains(x))
+            );
+        }
+        assert_eq!(families.len(), 6);
     }
     #[test]
     fn organism_segment_adapter_preserves_local_shape_and_large_f64_anchor() {
@@ -176,9 +374,62 @@ mod evidence {
                 let s = grammar.specimen(form, variant).unwrap();
                 let segments =
                     super::segments(&s, [0.; 3], [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
-                let data:Vec<_>=segments.iter().map(|s|serde_json::json!({"start":s.start_meters,"end":s.end_meters,"r0":s.radius_start_meters,"r1":s.radius_end_meters,"color":s.color})).collect();
+                let data:Vec<_>=segments.iter().map(|s|serde_json::json!({"start":s.start_meters,"end":s.end_meters,"r0":s.radius_start_meters,"r1":s.radius_end_meters,"color":s.color,"material":s.material,"flex":s.flex_meters,"coating":s.coating})).collect();
                 specimens.push(serde_json::json!({"name":format!("{form:?}-{variant}"),"id":s.id,"grammar":s.grammar_id,"segments":data}));
             }
+        }
+        let mut families = std::collections::BTreeSet::new();
+        for seed in 0..100 {
+            let b = BiosphereDefinition::new(
+                biosphere.catalog_body().clone(),
+                BodyNature::Fictional,
+                BiosphereDecision::Developed,
+                biosphere.climate().clone(),
+                1,
+                seed,
+            )
+            .unwrap();
+            let g = Grammar::from_biosphere(&b).unwrap();
+            let source = g.specimen(Form::Colony, 0).unwrap();
+            let family = (super::material(&source, 0)[0] * 100.) as u32;
+            if !families.insert(family) {
+                continue;
+            }
+            for (name, light) in [
+                ("day", [1., 1., 1.]),
+                ("red", [1., 0.3, 0.15]),
+                ("night", [0.; 3]),
+            ] {
+                let geometry =
+                    super::segments(&source, [0.; 3], [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+                let data:Vec<_>=geometry.iter().map(|s|serde_json::json!({"start":s.start_meters,"end":s.end_meters,"r0":s.radius_start_meters,"r1":s.radius_end_meters,"color":s.color,"material":s.material,"flex":s.flex_meters,"coating":s.coating})).collect();
+                specimens.push(serde_json::json!({"name":format!("material-{family}-{name}"),"id":source.id,"grammar":source.grammar_id,"light":light,"segments":data}));
+            }
+        }
+        let source = grammar.specimen(Form::Frond, 0).unwrap();
+        let epoch = salimon_universe::Epoch::calendar(
+            [2000, 1, 1],
+            [12, 0, 0, 0],
+            salimon_universe::TimeScale::Tt,
+        )
+        .unwrap();
+        for (name, temperature, precipitation) in [
+            ("wet", 290., Condensable::Water),
+            ("frost", 260., Condensable::Water),
+            ("dust", 290., Condensable::None),
+        ] {
+            // Declared weather-response fixture drives the actual runtime adapter.
+            let mut weather = biosphere.climate().sample([1., 0., 0.], epoch).unwrap();
+            weather.wind_mps = [15., 0., 0.];
+            weather.temperature_kelvin = temperature;
+            weather.precipitation = precipitation;
+            weather.precipitation_kg_m2_s = 0.01;
+            weather.storm_fraction = 0.8;
+            let mut geometry =
+                super::segments(&source, [0.; 3], [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+            super::respond(&mut geometry, &source, &weather, 3.);
+            let data:Vec<_>=geometry.iter().map(|s|serde_json::json!({"start":s.start_meters,"end":s.end_meters,"r0":s.radius_start_meters,"r1":s.radius_end_meters,"color":s.color,"material":s.material,"flex":s.flex_meters,"coating":s.coating})).collect();
+            specimens.push(serde_json::json!({"name":name,"id":source.id,"grammar":source.grammar_id,"fixture_weather":true,"segments":data}));
         }
         std::fs::write(
             std::env::var("SALIMON_ORGANISMS_FILE").unwrap(),

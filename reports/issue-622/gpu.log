@@ -1,0 +1,66 @@
+   Compiling bitflags v2.13.1
+   Compiling log v0.4.29
+   Compiling bytemuck v1.25.2
+   Compiling smallvec v1.16.0
+   Compiling gpu-allocator v0.28.0
+   Compiling spirv v0.4.0+sdk-1.4.341.0
+   Compiling parking_lot_core v0.9.12
+   Compiling wgpu-types v30.0.1
+   Compiling parking_lot v0.12.5
+   Compiling wayland-sys v0.31.11
+   Compiling serde v1.0.229
+   Compiling png v0.18.0
+   Compiling naga v30.0.1
+   Compiling gltf-json v1.4.1
+   Compiling gltf v1.4.1
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1 (/workspace/salimon/vendor/wgpu-hal)
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling wgpu v30.0.1
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.30s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-13cca2c4ca3c0afb)
+
+running 1 test
+Failed to create /home/agent/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+Failed to create /home/agent/.cache/mesa_shader_cache_db for shader cache (Read-only file system)---disabling.
+organisms AdapterInfo { name: "llvmpipe (LLVM 19.1.7, 256 bits)", vendor: 65541, device: 0, device_type: Cpu, device_pci_bus_id: "", driver: "llvmpipe", driver_info: "Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)", backend: Vulkan, subgroup_min_size: 8, subgroup_max_size: 8, transient_saves_memory: Some(false), limit_bucket: None }
+Failed to create /home/agent/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+Failed to create /home/agent/.cache/mesa_shader_cache_db for shader cache (Read-only file system)---disabling.
+"Mat-0" segments=6 submit/readback 219.064ms
+"Mat-1" segments=6 submit/readback 316.763ms
+"Column-0" segments=5 submit/readback 308.931ms
+"Column-1" segments=5 submit/readback 147.023ms
+"Frond-0" segments=7 submit/readback 181.434ms
+"Frond-1" segments=7 submit/readback 168.278ms
+"Filament-0" segments=5 submit/readback 167.600ms
+"Filament-1" segments=5 submit/readback 141.146ms
+"Colony-0" segments=14 submit/readback 140.952ms
+"Colony-1" segments=14 submit/readback 171.466ms
+"Giant-0" segments=11 submit/readback 175.240ms
+"Giant-1" segments=11 submit/readback 168.716ms
+"material-30-day" segments=14 submit/readback 173.212ms
+"material-30-red" segments=14 submit/readback 141.427ms
+"material-30-night" segments=14 submit/readback 105.734ms
+"material-95-day" segments=14 submit/readback 106.485ms
+"material-95-red" segments=14 submit/readback 105.737ms
+"material-95-night" segments=14 submit/readback 105.051ms
+"material-40-day" segments=14 submit/readback 107.086ms
+"material-40-red" segments=14 submit/readback 107.328ms
+"material-40-night" segments=14 submit/readback 105.219ms
+"material-80-day" segments=14 submit/readback 119.198ms
+"material-80-red" segments=14 submit/readback 109.479ms
+"material-80-night" segments=14 submit/readback 110.601ms
+"material-70-day" segments=14 submit/readback 114.761ms
+"material-70-red" segments=14 submit/readback 113.530ms
+"material-70-night" segments=14 submit/readback 119.041ms
+"material-60-day" segments=14 submit/readback 112.412ms
+"material-60-red" segments=14 submit/readback 111.674ms
+"material-60-night" segments=14 submit/readback 111.290ms
+"wet" segments=7 submit/readback 112.732ms
+"frost" segments=7 submit/readback 109.942ms
+"dust" segments=7 submit/readback 108.365ms
+test organisms::tests::organism_production_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 105 filtered out; finished in 5.46s

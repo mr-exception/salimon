@@ -21,7 +21,7 @@ pub(super) fn scene(
         view_samples: samples,
     }
 }
-pub(super) fn canonical() -> Result<Option<WeatherFrame>, String> {
+pub(super) fn canonical(epoch: salimon_universe::Epoch) -> Result<Option<WeatherFrame>, String> {
     use std::sync::LazyLock;
     static CLIMATE: LazyLock<ClimateDefinition> = LazyLock::new(|| {
         ClimateDefinition::new(
@@ -32,12 +32,6 @@ pub(super) fn canonical() -> Result<Option<WeatherFrame>, String> {
         )
         .expect("valid explicit Vesper vacuum")
     });
-    let epoch = salimon_universe::Epoch::calendar(
-        [2000, 1, 1],
-        [12, 0, 0, 0],
-        salimon_universe::TimeScale::Tt,
-    )
-    .map_err(|e| e.to_string())?;
     WeatherFrame::sample(&CLIMATE, epoch, [0., 1., 0.], false)
         .map_err(|e| format!("canonical weather: {e:?}"))
 }
@@ -45,7 +39,18 @@ pub(super) fn canonical() -> Result<Option<WeatherFrame>, String> {
 mod tests {
     #[test]
     fn canonical_weather_does_not_add_airborne_effects() {
-        assert_eq!(super::canonical().unwrap(), None);
+        assert_eq!(
+            super::canonical(
+                salimon_universe::Epoch::calendar(
+                    [2000, 1, 1],
+                    [12, 0, 0, 0],
+                    salimon_universe::TimeScale::Tt
+                )
+                .unwrap()
+            )
+            .unwrap(),
+            None
+        );
     }
 }
 

@@ -182,6 +182,7 @@ fn render_reference(geological: bool) {
                 sky: None,
                 atmosphere: None,
                 weather: None,
+                organisms: &[],
                 camera,
                 instances: &[],
                 resource_meshes: &[],

@@ -32,6 +32,8 @@ mod resource_mesh;
 mod ship_mesh;
 pub use archive_terminal::ARCHIVE_TERMINAL_METERS;
 mod atmosphere;
+mod organisms;
+pub use organisms::{MAX_ORGANISM_SEGMENTS, OrganismSegment};
 mod weather;
 pub use weather::{WEATHER_GRID, WeatherScene};
 mod sky;
@@ -148,6 +150,7 @@ pub struct SceneFrame<'a> {
     pub sky: Option<&'a SkyScene>,
     pub atmosphere: Option<AtmosphereScene>,
     pub weather: Option<&'a WeatherScene>,
+    pub organisms: &'a [OrganismSegment],
     pub camera: CameraFrame,
     pub instances: &'a [SceneInstance],
     pub resource_meshes: &'a [ResourceMeshInstance],
@@ -687,6 +690,7 @@ pub struct Renderer {
     sky: sky::SkyRenderer,
     atmosphere: atmosphere::AtmosphereRenderer,
     weather: weather::WeatherRenderer,
+    organisms: organisms::OrganismRenderer,
     terrain: terrain::TerrainRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
     fixtures: fixtures::FixtureMeshRenderer,
@@ -830,6 +834,7 @@ mod tests {
                 sky: None,
                 atmosphere: None,
                 weather: None,
+                organisms: &[],
                 camera: local_camera,
                 resource_meshes: &[],
                 fixtures: &[],
@@ -862,6 +867,7 @@ mod tests {
                 sky: None,
                 atmosphere: None,
                 weather: None,
+                organisms: &[],
                 camera: translated_camera,
                 resource_meshes: &[],
                 fixtures: &[],
@@ -913,6 +919,7 @@ mod tests {
                     sky: None,
                     atmosphere: None,
                     weather: None,
+                    organisms: &[],
                     camera: coincident_camera,
                     resource_meshes: &[],
                     fixtures: &[],
@@ -941,6 +948,7 @@ mod tests {
                     sky: None,
                     atmosphere: None,
                     weather: None,
+                    organisms: &[],
                     camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                     resource_meshes: &[],
                     fixtures: &[],
@@ -991,6 +999,7 @@ mod tests {
                 sky: None,
                 atmosphere: None,
                 weather: None,
+                organisms: &[],
                 camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                 resource_meshes: &[],
                 fixtures: &[],

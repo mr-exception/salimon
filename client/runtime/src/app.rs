@@ -5,6 +5,7 @@ pub(crate) mod input;
 mod input_tests;
 mod interaction;
 mod native;
+mod organisms;
 mod presentation;
 mod scene;
 mod sky;

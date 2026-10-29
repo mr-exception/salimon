@@ -291,6 +291,7 @@ fn scout_feedback_gpu_evidence() {
             sky: None,
             atmosphere: None,
             weather: None,
+            organisms: &[],
             camera,
             instances: &[],
             spheres: &[],

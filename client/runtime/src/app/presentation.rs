@@ -198,6 +198,7 @@ impl ClientApplication {
         if let Some(frame) = &weather_frame {
             light.color = light.color.map(|c| c * frame.local_light_transmission());
         }
+        let organisms = super::organisms::canonical(camera.position_meters);
         let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
             self.session.mining.terrain
         } else {
@@ -360,6 +361,7 @@ impl ClientApplication {
                     sky: sky.as_ref(),
                     atmosphere,
                     weather: weather.as_ref(),
+                    organisms: &organisms,
                     camera,
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,

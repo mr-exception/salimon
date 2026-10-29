@@ -1,0 +1,21 @@
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Finished `test` profile [unoptimized] target(s) in 3.17s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-a528e5e631dbba0c)
+
+running 1 test
+organisms AdapterInfo { name: "llvmpipe (LLVM 19.1.7, 256 bits)", vendor: 65541, device: 0, device_type: Cpu, device_pci_bus_id: "", driver: "llvmpipe", driver_info: "Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)", backend: Vulkan, subgroup_min_size: 8, subgroup_max_size: 8, transient_saves_memory: Some(false), limit_bucket: None }
+"Mat-0" segments=6 submit/readback 248.651ms
+"Mat-1" segments=6 submit/readback 148.660ms
+"Column-0" segments=5 submit/readback 156.964ms
+"Column-1" segments=5 submit/readback 155.761ms
+"Frond-0" segments=7 submit/readback 131.436ms
+"Frond-1" segments=7 submit/readback 127.924ms
+"Filament-0" segments=5 submit/readback 134.606ms
+"Filament-1" segments=5 submit/readback 127.503ms
+"Colony-0" segments=14 submit/readback 126.870ms
+"Colony-1" segments=14 submit/readback 127.145ms
+"Giant-0" segments=11 submit/readback 166.798ms
+"Giant-1" segments=11 submit/readback 152.818ms
+test organisms::tests::organism_production_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 104 filtered out; finished in 2.16s

@@ -1,0 +1,144 @@
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized] target(s) in 21.70s
+     Running unittests src/lib.rs (target/debug/deps/salimon_character-930644691cba75e1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/salimon_client-76c82414a9566291)
+
+running 2 tests
+test app::organisms::tests::sterile_vesper_never_gets_visible_organisms ... ok
+test app::organisms::tests::organism_segment_adapter_preserves_local_shape_and_large_f64_anchor ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 515 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_diagnostics-d65d55d8f985dfac)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_fabrication-a502bdf71903b8f7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/fabricator.rs (target/debug/deps/fabricator-031fb4245155f598)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 0.00s
+
+     Running tests/starting_supplies.rs (target/debug/deps/starting_supplies-0ff5fcd2c70ae1cc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_math-48e6ff563029188e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_persistence-988b76e8d33c61bb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_physics-5cc04d2de94a3100)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-429bfa483c9063b4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 103 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-2f4c5cde74983a32)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 148 filtered out; finished in 0.00s
+
+     Running tests/regional_weather.rs (target/debug/deps/regional_weather-dfa9db508717090e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_survival-032b4dc913d77f3a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/consumables.rs (target/debug/deps/consumables-7fdff0a2d8fe8550)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/foods.rs (target/debug/deps/foods-b0764f224e5db206)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/meters.rs (target/debug/deps/meters-745582ebdfbdadb1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/restrictions.rs (target/debug/deps/restrictions-fc8129f99c4d76d2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/statuses.rs (target/debug/deps/statuses-a5d79e19e06959e7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_universe-242f304da315a068)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 106 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_world-847f65aa7fd6f0b6)
+
+running 3 tests
+test environment::ecology::tests::ecology_potential_never_implies_actual_life_or_visible_organisms ... ok
+test environment::organisms::tests::organism_families_have_stable_related_bounded_forms_and_part_identities ... ok
+test environment::organisms::tests::cosmetic_cover_quality_is_a_stable_subset_and_never_physical_authority ... FAILED
+
+failures:
+
+---- environment::organisms::tests::cosmetic_cover_quality_is_a_stable_subset_and_never_physical_authority stdout ----
+
+thread 'environment::organisms::tests::cosmetic_cover_quality_is_a_stable_subset_and_never_physical_authority' (41354) panicked at client/world/src/environment/organisms/tests.rs:82:5:
+assertion failed: !large.is_empty()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    environment::organisms::tests::cosmetic_cover_quality_is_a_stable_subset_and_never_physical_authority
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 74 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p salimon-world --lib`

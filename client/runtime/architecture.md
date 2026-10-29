@@ -1776,3 +1776,10 @@ runtime owns source/weather mapping; neither changes world identities.
 sites to actual published terrain relief. Keep physical source, renderer vertices,
 immutable site IDs and save/reference binding consistent across LOD and eviction.
 No chart/scanner discovery, duplicate terrain surface or invented cave geometry.
+
+## Natural signature sites (#624)
+
+[Biological signature contract](../../docs/biological-signature-sites.md) maps rare
+site metadata onto exact physical organisms and geological/activity provenance.
+No source geometry, collision/LOD anatomy, identity or player knowledge changes;
+strict publication binding survives reconstruction and rejects mismatched sources.

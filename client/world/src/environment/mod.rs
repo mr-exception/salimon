@@ -7,6 +7,7 @@ pub mod ecology;
 pub mod landmarks;
 pub mod organism_placement;
 pub mod organisms;
+pub mod signature_sites;
 pub mod weather_visuals;
 
 use crate::terrain::TerrainError;

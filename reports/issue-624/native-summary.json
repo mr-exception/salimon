@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "steps_completed": 10,
+  "duration_ms": 12257,
+  "scenario": "scenarios/evidence/natural-sites-canonical.json"
+}

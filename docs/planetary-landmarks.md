@@ -55,5 +55,5 @@ Run affected landmark/terrain tests, workspace build/tests/Clippy/fmt and
 `python scripts/check_docs.py --base <parent>`. Production `universe-terrain.json`
 verifies canonical orbit/surface/edge streaming and revisit. Evidence lives in
 `reports/issue-623/README.md`. Human art review #561, physical platform #557 and
-hardware/M1/Metal #563 remain unverified. Biological signature sites are #624;
+hardware/M1/Metal #563 remain unverified. [Biological signature sites](biological-signature-sites.md) extend this inventory;
 chart/field observations #625/#626, never auto-seeded from this private inventory.

@@ -80,3 +80,7 @@ build/all-target Clippy/fmt, tooling and documentation checks. Actual art review
 #561, physical platform #557 and hardware/M1/Metal budgets #563 remain unverified.
 No harvesting, mass allocation, breakage, regrowth, fauna or soft-body simulation
 is implied; those remain their explicitly owned downstream features.
+
+[Biological signature sites](biological-signature-sites.md) now name rare existing
+physical giants, dense colonies and real geological intersections without changing
+placement, source identity, roots, part geometry or collision authority.

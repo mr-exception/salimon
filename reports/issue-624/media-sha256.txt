@@ -1,0 +1,3 @@
+b07e1664cc1f27ccca512816175ff7940c3521ee5c223d938dd61e708076ce14  natural-DenseColony.png
+2a7d669644e7ce79aa7e98d3b68221628912ee69ce22b9486d4fff13f8473c51  natural-GiantOrganism.png
+2a052ae6254ab3b81f01f6b81b2ab9c1c3d8c102933a3aca64d9878926f0b550  sterile-natural-sites.png

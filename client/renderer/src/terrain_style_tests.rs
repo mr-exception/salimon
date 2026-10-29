@@ -330,3 +330,163 @@ fn render_reference(geological: bool) {
     }
     std::fs::write(directory.join("costs.csv"), csv).unwrap();
 }
+
+#[test]
+#[ignore = "production landmark patch capture; set SALIMON_LANDMARK_PATCH_FILE and SALIMON_TERRAIN_STYLE_DIR"]
+fn landmark_production_reference() {
+    let data: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(std::env::var("SALIMON_LANDMARK_PATCH_FILE").unwrap()).unwrap(),
+    )
+    .unwrap();
+    let anchor: [f64; 3] = serde_json::from_value(data["anchor"].clone()).unwrap();
+    let patch = Arc::new(TerrainPatch {
+        key: TerrainPatchKey {
+            body: 4,
+            definition: serde_json::from_value(data["definition"].clone()).unwrap(),
+            face: 2,
+            level: 12,
+            u: 2048,
+            v: 2048,
+            edge_levels: [12; 4],
+        },
+        body_center_meters: [1e12; 3],
+        anchor_meters: anchor,
+        vertices: data["vertices"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| TerrainVertex {
+                offset_meters: serde_json::from_value(v["offset"].clone()).unwrap(),
+                normal: serde_json::from_value(v["normal"].clone()).unwrap(),
+                far_offset_meters: serde_json::from_value(v["far"].clone()).unwrap(),
+                albedo_factor: v["albedo"].as_f64().unwrap() as f32,
+                strata: serde_json::from_value(v["strata"].clone()).unwrap(),
+            })
+            .collect(),
+        indices: serde_json::from_value(data["indices"].clone()).unwrap(),
+        material: SurfaceMaterial::Slate,
+    });
+    let directory = std::path::PathBuf::from(std::env::var("SALIMON_TERRAIN_STYLE_DIR").unwrap());
+    std::fs::create_dir_all(&directory).unwrap();
+    let instance = wgpu::Instance::default();
+    let adapter = block_on(instance.request_adapter(&Default::default())).unwrap();
+    println!("landmark {:?}", adapter.get_info());
+    let (device, queue) = block_on(adapter.request_device(&Default::default())).unwrap();
+    let format = wgpu::TextureFormat::Rgba8UnormSrgb;
+    let spheres = crate::spheres::SphereRenderer::new(&device, &queue, format);
+    let mut terrain = TerrainRenderer::new(&device, format, &spheres);
+    let texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("actual landmark relief"),
+        size: wgpu::Extent3d {
+            width: 512,
+            height: 384,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format,
+        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
+        view_formats: &[],
+    });
+    let view = texture.create_view(&Default::default());
+    let depth = crate::DepthTarget::new(&device, 512, 384);
+    let mut originals = Vec::new();
+    for (label, distance) in [("approach", 1800.), ("regional", 900.), ("local", 400.)] {
+        let target = std::array::from_fn(|i| 1e12 + anchor[i]);
+        let camera = CameraFrame {
+            position_meters: [
+                target[0] + distance * 0.3,
+                target[1] + distance * 0.8,
+                target[2] + distance * 0.6,
+            ],
+            target_meters: target,
+            up: [0., 1., 0.],
+            vertical_fov_radians: 1.,
+            near_plane_meters: 0.05,
+        };
+        let patches = [patch.clone()];
+        let scene = SceneFrame {
+            sky: None,
+            atmosphere: None,
+            weather: None,
+            organisms: &[],
+            camera,
+            instances: &[],
+            resource_meshes: &[],
+            fixtures: &[],
+            spheres: &[],
+            terrain: &patches,
+            terrain_mask: Some(crate::TerrainMask {
+                body_center_meters: [1e12; 3],
+                anchor_meters: anchor,
+                radius_meters: 1e6,
+            }),
+            light: Some(PointLight {
+                position_meters: [1e12 - 1e6, 1e12 + 2e6, 1e12 + 1e6],
+                color: [1.; 3],
+            }),
+            ship: None,
+            held_item: None,
+        };
+        let matrix = crate::prepare_scene(scene, 512. / 384.)
+            .unwrap()
+            .view_projection;
+        terrain.fade_body = Some(4);
+        terrain.fade_started = Some(std::time::Instant::now() - std::time::Duration::from_secs(1));
+        terrain.prepare(&device, &queue, scene, matrix).unwrap();
+        assert!(terrain.ready(&patches));
+        let mut previous = None;
+        for _ in 0..2 {
+            let mut encoder = device.create_command_encoder(&Default::default());
+            {
+                let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        depth_slice: None,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
+                            store: wgpu::StoreOp::Store,
+                        },
+                    })],
+                    depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                        view: &depth.view,
+                        depth_ops: Some(wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(0.),
+                            store: wgpu::StoreOp::Store,
+                        }),
+                        stencil_ops: None,
+                    }),
+                    ..Default::default()
+                });
+                terrain.draw(&mut pass);
+            }
+            let read = crate::capture::Readback::encode(&device, &mut encoder, &texture).unwrap();
+            queue.submit([encoder.finish()]);
+            let png = read.finish(&device).unwrap();
+            let mut reader = png::Decoder::new(std::io::Cursor::new(&png))
+                .read_info()
+                .unwrap();
+            let mut pixels = vec![0; reader.output_buffer_size().unwrap()];
+            reader.next_frame(&mut pixels).unwrap();
+            assert!(
+                pixels
+                    .as_chunks::<4>()
+                    .0
+                    .iter()
+                    .filter(|p| p[..3] != [0, 0, 0])
+                    .count()
+                    > 100
+            );
+            if let Some(before) = &previous {
+                assert_eq!(&png, before);
+            }
+            previous = Some(png);
+        }
+        let png = previous.unwrap();
+        std::fs::write(directory.join(format!("{label}.png")), &png).unwrap();
+        originals.push(png);
+    }
+    assert!(originals.windows(2).all(|p| p[0] != p[1]));
+}

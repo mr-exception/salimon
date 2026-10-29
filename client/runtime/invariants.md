@@ -839,3 +839,10 @@ map stable species traits and explicit shared-time weather to bounded renderer
 instances. Keep root/physical anatomy, collision envelopes and quality population
 invariant; shader flex stays inside the canonical bounds. Renderer owns shading,
 runtime owns source/weather mapping; neither changes world identities.
+
+## Geological site identity (#623)
+
+[Landmark source and validation](../../docs/planetary-landmarks.md) binds sparse
+sites to actual published terrain relief. Keep physical source, renderer vertices,
+immutable site IDs and save/reference binding consistent across LOD and eviction.
+No chart/scanner discovery, duplicate terrain surface or invented cave geometry.

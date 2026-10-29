@@ -1095,3 +1095,109 @@ mod geology_material_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod landmark_tests {
+    use super::*;
+    use salimon_world::environment::landmarks::{Geography, Landmarks, Scale, Signature};
+    fn source() -> (CelestialBody, TerrainDefinition, Cell, Landmarks) {
+        let body = *CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == salimon_world::CelestialBodyId::Moon)
+            .unwrap();
+        let cell = Cell {
+            face: 2,
+            level: 12,
+            u: 2048,
+            v: 2048,
+        };
+        let d = cell.direction(0.5, 0.5);
+        let terrain = TerrainDefinition::new(
+            body,
+            1,
+            91,
+            vec![],
+            vec![salimon_world::terrain::Feature {
+                direction: d,
+                radius_meters: 400.,
+                elevation_meters: -160.,
+            }],
+        )
+        .unwrap();
+        let sites = Landmarks::publish(
+            terrain.geology(),
+            Geography::Observed,
+            0,
+            &[Signature {
+                key: "declared-basin-fixture".into(),
+                direction: d,
+                scale: Scale::Regional,
+            }],
+        )
+        .unwrap();
+        (body, terrain, cell, sites)
+    }
+    #[test]
+    fn landmark_render_lods_and_checkpoint_binding_share_physical_terrain() {
+        let (body, terrain, cell, sites) = source();
+        let binding = sites.binding();
+        let original = terrain.to_bytes();
+        for level in [11, 12, 13] {
+            let c = Cell {
+                level,
+                u: cell.u >> (12 - level.min(12)),
+                v: cell.v >> (12 - level.min(12)),
+                ..cell
+            };
+            let c = if level > 12 {
+                Cell {
+                    u: cell.u * 2,
+                    v: cell.v * 2,
+                    ..c
+                }
+            } else {
+                c
+            };
+            let patches = BTreeSet::from([c]);
+            let p = generate(body, &terrain, key(c, body, &terrain, &patches));
+            for v in &p.vertices {
+                let position =
+                    std::array::from_fn(|i| p.anchor_meters[i] + f64::from(v.offset_meters[i]));
+                let physical = terrain.sample(unit(position)).unwrap();
+                assert!(length(sub(position, physical.body_local_position_meters)) < 0.001);
+            }
+        }
+        let restored = TerrainDefinition::from_bytes(body, &original).unwrap();
+        let site = &sites.sites()[0];
+        let rebuilt = Landmarks::publish(
+            restored.geology(),
+            Geography::Observed,
+            0,
+            &[Signature {
+                key: "declared-basin-fixture".into(),
+                direction: site.direction,
+                scale: Scale::Regional,
+            }],
+        )
+        .unwrap();
+        rebuilt.verify_binding(&binding).unwrap();
+        assert_eq!(terrain.to_bytes(), original);
+        // The publication is authoritative metadata only, never player-known chart input.
+        assert!(salimon_world::canonical::LANDMARKS.sites().is_empty());
+    }
+    #[test]
+    #[ignore = "exports production terrain patch for actual landmark source; set SALIMON_LANDMARK_PATCH_FILE"]
+    fn landmark_production_patch_export() {
+        let (body, terrain, cell, sites) = source();
+        let leaves = BTreeSet::from([cell]);
+        let p = generate(body, &terrain, key(cell, body, &terrain, &leaves));
+        let vertices:Vec<_>=p.vertices.iter().map(|v|serde_json::json!({"offset":v.offset_meters,"normal":v.normal,"far":v.far_offset_meters,"albedo":v.albedo_factor,"strata":v.strata})).collect();
+        let site = &sites.sites()[0];
+        let data = serde_json::json!({"id":site.id,"publication":sites.identity(),"binding":sites.binding(),"geology":terrain.geology().to_bytes(),"anchor":p.anchor_meters,"position":site.position_meters,"radius":site.radius_meters,"relief":site.relief_meters,"vertices":vertices,"indices":p.indices,"definition":p.key.definition});
+        std::fs::write(
+            std::env::var("SALIMON_LANDMARK_PATCH_FILE").unwrap(),
+            serde_json::to_vec_pretty(&data).unwrap(),
+        )
+        .unwrap();
+    }
+}

@@ -180,9 +180,25 @@ impl ClientApplication {
             } else {
                 None
             };
+        let origin = salimon_universe::Epoch::calendar(
+            [2000, 1, 1],
+            [12, 0, 0, 0],
+            salimon_universe::TimeScale::Tt,
+        )
+        .expect("fixed TT epoch");
+        let environment_epoch = match i64::try_from(self.session.elapsed.as_nanos())
+            .ok()
+            .and_then(|ns| origin.advance_nanos(ns).ok())
+        {
+            Some(epoch) => epoch,
+            None => {
+                self.fail(event_loop, "environment clock exceeds supported TT epoch");
+                return;
+            }
+        };
         let weather_frame =
             if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
-                match super::weather::canonical() {
+                match super::weather::canonical(environment_epoch) {
                     Ok(frame) => frame,
                     Err(e) => {
                         self.fail(event_loop, e);
@@ -198,7 +214,7 @@ impl ClientApplication {
         if let Some(frame) = &weather_frame {
             light.color = light.color.map(|c| c * frame.local_light_transmission());
         }
-        let organisms = super::organisms::canonical(camera.position_meters);
+        let organisms = super::organisms::canonical(camera.position_meters, environment_epoch);
         let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
             self.session.mining.terrain
         } else {

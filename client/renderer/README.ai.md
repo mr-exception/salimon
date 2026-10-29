@@ -293,3 +293,11 @@ The [physical organism contract](../../docs/physical-organisms.md) maps canonica
 placement/part/baseline identity, physics-owned swept boxes, character/ship typed
 adapters, runtime residency and matching renderer evidence. Quality never changes
 physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+## Biological material response (#622)
+
+[Organism materials](../../docs/planetary-organisms.md#biological-materials-and-weather-response-622)
+map stable species traits and explicit shared-time weather to bounded renderer
+instances. Keep root/physical anatomy, collision envelopes and quality population
+invariant; shader flex stays inside the canonical bounds. Renderer owns shading,
+runtime owns source/weather mapping; neither changes world identities.

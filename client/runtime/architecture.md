@@ -1761,3 +1761,11 @@ See the [Scout presentation contract](../../docs/scout-presentation.md). Rendere
 ## Scanner cloud integration (#438)
 
 See the [scanner acceptance contract](../../docs/universe-scanner.md#cloud-scanner-acceptance-438). The existing action bar places fresh scanner status top-right at 1280+ physical pixels to leave the projector visible at simulated 2x scale; compact windows and chart mode retain their existing bottom placement. Renderer owns generic `TopRight` image placement; runtime chooses placement from viewport width without changing scanner, input, collision or saved authority. The required scanner suite and exact frozen-frame/pixel review preserve failure evidence and physical/hardware qualification limits.
+
+## Biological material response (#622)
+
+[Organism materials](../../docs/planetary-organisms.md#biological-materials-and-weather-response-622)
+map stable species traits and explicit shared-time weather to bounded renderer
+instances. Keep root/physical anatomy, collision envelopes and quality population
+invariant; shader flex stays inside the canonical bounds. Renderer owns shading,
+runtime owns source/weather mapping; neither changes world identities.

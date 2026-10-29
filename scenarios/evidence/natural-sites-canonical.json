@@ -1,0 +1,70 @@
+{
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "natural_sites.canonical",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "natural_sites.count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.entry_count",
+        "lte": 1
+      }
+    },
+    {
+      "screenshot": "sterile-natural-sites",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 400
+      }
+    },
+    {
+      "assert": {
+        "path": "natural_sites.count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.entry_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.source.entries.0.id",
+        "equals": "salimon-fiction:awakening.s000000.p00"
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.source.entries.0.leads",
+        "equals": []
+      }
+    }
+  ]
+}

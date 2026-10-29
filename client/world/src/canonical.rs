@@ -151,3 +151,16 @@ pub static LANDMARKS: LazyLock<crate::environment::landmarks::Landmarks> = LazyL
     )
     .expect("checked fixed geological publication")
 });
+
+/// Stable natural signature metadata only; ordinary discovery remains explicit.
+pub static NATURAL_SITES: LazyLock<crate::environment::signature_sites::SignatureSites> =
+    LazyLock::new(|| {
+        crate::environment::signature_sites::SignatureSites::publish(
+            &BIOSPHERE,
+            &ORGANISMS,
+            &LANDMARKS,
+            None,
+            &[],
+        )
+        .expect("checked immutable natural site publication")
+    });

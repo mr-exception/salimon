@@ -720,3 +720,10 @@ physical platform #557 and hardware #563 remain separately unverified.
 actual runtime mesh/LOD export and production renderer reference checks. Run
 landmark/terrain tests, workspace gates and `universe-terrain.json` captures;
 source/site identity never comes from render LOD or player chart state.
+
+## Natural signature sites (#624)
+
+[Biological signatures](biological-signature-sites.md) maps world publication,
+rarity/mixed-source tests, runtime physical/render endpoint equality and opt-in
+source export to actual production Vulkan reference captures. Preserve source
+IDs, root/exclusion rules, true physical scale and explicit player discovery.

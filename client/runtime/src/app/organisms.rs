@@ -438,3 +438,127 @@ mod evidence {
         .unwrap();
     }
 }
+
+#[cfg(test)]
+mod natural_site_evidence {
+    use super::*;
+    use salimon_world::{
+        environment::{
+            climate::{Chemistry, ClimateDefinition, ClimateInputs, Condensable},
+            ecology::{BiosphereDecision, BiosphereDefinition, BodyNature},
+            landmarks::{Geography, Landmarks},
+            organism_placement::Population,
+            signature_sites::{Kind, SignatureSites},
+        },
+        terrain::TerrainDefinition,
+    };
+    fn sources(seed: u64) -> (BiosphereDefinition, Population, Landmarks) {
+        let body = *salimon_world::CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == salimon_world::CelestialBodyId::Moon)
+            .unwrap();
+        let mut p = ClimateInputs::vacuum(86400., 31557600., 1361.);
+        p.chemistry = Chemistry::Nitrogen;
+        p.pressure_pascal = 101325.;
+        p.scale_height_meters = 8000.;
+        p.condensable = Condensable::Water;
+        p.condensable_fraction = 0.8;
+        p.greenhouse_kelvin = 30.;
+        let c = ClimateDefinition::new(
+            TerrainDefinition::new(body, 1, 5, vec![], vec![])
+                .unwrap()
+                .geology(),
+            1,
+            37,
+            p,
+        )
+        .unwrap();
+        let b = BiosphereDefinition::new(
+            salimon_universe::CatalogId::from_source("fixture", "fictional-biology").unwrap(),
+            BodyNature::Fictional,
+            BiosphereDecision::Developed,
+            c,
+            1,
+            seed,
+        )
+        .unwrap();
+        let population = Population::publish(&b, &[]).unwrap();
+        let geology = Landmarks::publish(
+            b.climate().geology().clone(),
+            Geography::PublishedFictional,
+            0,
+            &[],
+        )
+        .unwrap();
+        (b, population, geology)
+    }
+    #[test]
+    fn natural_site_render_and_collision_parts_survive_quality_and_reconstruction() {
+        let mut kinds = std::collections::BTreeSet::new();
+        for seed in 0..128 {
+            let (b, p, g) = sources(seed);
+            let sites = SignatureSites::publish(&b, &p, &g, None, &[]).unwrap();
+            for site in sites.sites() {
+                kinds.insert(format!("{:?}", site.kind));
+                for id in &site.organism_ids {
+                    let o = p.objects().iter().find(|o| o.id == *id).unwrap();
+                    let geometry = segments(&o.specimen, o.position_meters, o.axes);
+                    assert_eq!(geometry.len(), o.parts.len());
+                    for (v, physical) in geometry.iter().zip(&o.parts) {
+                        assert_eq!(v.start_meters, physical.start_meters);
+                        assert_eq!(v.end_meters, physical.end_meters);
+                    }
+                }
+                let b2 = SignatureSites::publish(
+                    &b,
+                    &Population::publish(&b, &[]).unwrap(),
+                    &g,
+                    None,
+                    &[],
+                )
+                .unwrap();
+                b2.verify_binding(&sites.binding()).unwrap();
+            }
+        }
+        assert!(kinds.contains("GiantOrganism") && kinds.contains("DenseColony"));
+        assert!(salimon_world::canonical::NATURAL_SITES.sites().is_empty());
+    }
+    #[test]
+    #[ignore = "exports actual rare source/site/population geometry; set SALIMON_NATURAL_SITES_FILE"]
+    fn natural_site_production_export() {
+        let mut models = vec![];
+        let mut found = std::collections::BTreeSet::new();
+        for seed in 0..128 {
+            let (b, p, g) = sources(seed);
+            let sites = SignatureSites::publish(&b, &p, &g, None, &[]).unwrap();
+            for site in sites.sites() {
+                if !matches!(site.kind, Kind::GiantOrganism | Kind::DenseColony)
+                    || !found.insert(format!("{:?}", site.kind))
+                {
+                    continue;
+                }
+                let objects: Vec<_> = site
+                    .organism_ids
+                    .iter()
+                    .map(|id| p.objects().iter().find(|o| o.id == *id).unwrap())
+                    .collect();
+                let first = objects[0];
+                let geometry: Vec<_> = objects
+                    .iter()
+                    .flat_map(|o| segments(&o.specimen, o.position_meters, o.axes))
+                    .collect();
+                let data:Vec<_>=geometry.iter().map(|s|serde_json::json!({"start":s.start_meters,"end":s.end_meters,"r0":s.radius_start_meters,"r1":s.radius_end_meters,"color":s.color,"material":s.material,"flex":s.flex_meters,"coating":s.coating})).collect();
+                models.push(serde_json::json!({"name":format!("natural-{:?}",site.kind),"id":site.id,"publication":sites.identity(),"source_ids":site.organism_ids,"bounds":site.bounds,"binding":sites.binding(),"biosphere":b.to_bytes(),"population_binding":p.binding(),"origin":first.position_meters,"axes":first.axes,"segments":data}));
+            }
+            if found.len() == 2 {
+                break;
+            }
+        }
+        assert_eq!(found.len(), 2);
+        std::fs::write(
+            std::env::var("SALIMON_NATURAL_SITES_FILE").unwrap(),
+            serde_json::to_vec_pretty(&models).unwrap(),
+        )
+        .unwrap();
+    }
+}

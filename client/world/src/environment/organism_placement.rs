@@ -30,6 +30,7 @@ pub struct Organism {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct Population {
+    biosphere_identity: String,
     identity: String,
     objects: Vec<Organism>,
 }
@@ -186,7 +187,14 @@ impl Population {
             }
         }
         objects.sort_by(|a, b| a.id.cmp(&b.id));
-        Ok(Self { identity, objects })
+        Ok(Self {
+            biosphere_identity: biosphere.identity().into(),
+            identity,
+            objects,
+        })
+    }
+    pub fn biosphere_identity(&self) -> &str {
+        &self.biosphere_identity
     }
     pub fn identity(&self) -> &str {
         &self.identity

@@ -267,3 +267,5 @@ added. #438 owns the integration matrix; #502's historical review now follows
 #561 presentation, #557 physical devices and #563 hardware qualification.
 See [#466 foundation report](../reports/issue-466/README.md) and
 [PR #504](https://github.com/mr-exception/salimon/pull/504).
+
+The [#438 cloud matrix](universe-scanner.md#cloud-scanner-acceptance-438) adds a top-right placement for fresh scanner status at 1280+ physical pixels. It keeps the enlarged 2x toolbar/status stack from covering the selected 3D contact; compact and chart-mode placement remains bottom-aligned. See the report for original failed and corrected captures.

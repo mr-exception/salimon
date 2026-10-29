@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "results": [
+    {
+      "scenario": "/workspace/salimon/scenarios/evidence/scanner-integration.json",
+      "status": "passed",
+      "steps_completed": 81,
+      "duration_ms": 50178,
+      "artifact_directory": "/workspace/salimon/artifacts/issue-438-final-suite/run-a2a820su",
+      "result_file": "/workspace/salimon/artifacts/issue-438-final-suite/run-a2a820su/result.json"
+    },
+    {
+      "scenario": "/workspace/salimon/scenarios/evidence/scanner-hologram.json",
+      "status": "passed",
+      "steps_completed": 28,
+      "duration_ms": 33967,
+      "artifact_directory": "/workspace/salimon/artifacts/issue-438-final-suite/run-bfw38vxe",
+      "result_file": "/workspace/salimon/artifacts/issue-438-final-suite/run-bfw38vxe/result.json"
+    },
+    {
+      "scenario": "/workspace/salimon/scenarios/evidence/cockpit-nose.json",
+      "status": "passed",
+      "steps_completed": 31,
+      "duration_ms": 5148,
+      "artifact_directory": "/workspace/salimon/artifacts/issue-438-final-suite/run-5uoqrbic",
+      "result_file": "/workspace/salimon/artifacts/issue-438-final-suite/run-5uoqrbic/result.json"
+    }
+  ]
+}

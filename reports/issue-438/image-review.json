@@ -1,0 +1,372 @@
+{
+  "status": "passed",
+  "runs": [
+    {
+      "result": "artifacts/issue-438-isolated/run-c6wf4f1u/result.json",
+      "captures": [
+        {
+          "label": "idle",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 0,
+          "fresh": false
+        },
+        {
+          "label": "fresh",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 275,
+          "fresh": true
+        },
+        {
+          "label": "fresh-repeat",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 275,
+          "fresh": true
+        },
+        {
+          "label": "wide",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1920,
+              1080
+            ]
+          },
+          "roi": [
+            798,
+            324,
+            1122,
+            641
+          ],
+          "selected_amber_pixels": 496,
+          "fresh": true
+        },
+        {
+          "label": "compact",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              640,
+              360
+            ]
+          },
+          "roi": [
+            266,
+            108,
+            374,
+            214
+          ],
+          "selected_amber_pixels": 50,
+          "fresh": true
+        },
+        {
+          "label": "restored",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 275,
+          "fresh": true
+        },
+        {
+          "label": "blackout",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 0,
+          "fresh": false
+        }
+      ],
+      "exact_repeats": 1
+    },
+    {
+      "result": "artifacts/issue-438-final-dpi-1.5/run-ri_b5rmp/result.json",
+      "captures": [
+        {
+          "label": "undiscovered-projector",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 0,
+          "fresh": false
+        },
+        {
+          "label": "identified-local-contact",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 275,
+          "fresh": true
+        },
+        {
+          "label": "identified-repeat",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 275,
+          "fresh": true
+        },
+        {
+          "label": "cockpit-coexistence",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "checks": [
+            "native source",
+            "viewport dimensions"
+          ]
+        },
+        {
+          "label": "blackout-projector",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.5,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 0,
+          "fresh": false
+        }
+      ],
+      "exact_repeats": 1
+    },
+    {
+      "result": "artifacts/issue-438-final-dpi-2/run-30opgi2_/result.json",
+      "captures": [
+        {
+          "label": "undiscovered-projector",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 0,
+          "fresh": false
+        },
+        {
+          "label": "identified-local-contact",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 275,
+          "fresh": true
+        },
+        {
+          "label": "identified-repeat",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 275,
+          "fresh": true
+        },
+        {
+          "label": "cockpit-coexistence",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "checks": [
+            "native source",
+            "viewport dimensions"
+          ]
+        },
+        {
+          "label": "blackout-projector",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 2.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "roi": [
+            520,
+            240,
+            760,
+            475
+          ],
+          "selected_amber_pixels": 0,
+          "fresh": false
+        }
+      ],
+      "exact_repeats": 1
+    }
+  ]
+}

@@ -890,3 +890,8 @@ Physical colliders/landing safety are #620; biological material response is #622
 [Physical organism placement](physical-organisms.md) owns stable source/part
 bindings, root/exclusion rules, common physics sweeps and live character/ship
 clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+
+## Scanner cloud integration (#438)
+
+See the [scanner acceptance contract](universe-scanner.md#cloud-scanner-acceptance-438). The existing action bar places fresh scanner status top-right at 1280+ physical pixels to leave the projector visible at simulated 2x scale; compact windows and chart mode retain their existing bottom placement. Renderer owns generic `TopRight` image placement; runtime chooses placement from viewport width without changing scanner, input, collision or saved authority. The required scanner suite and exact frozen-frame/pixel review preserve failure evidence and physical/hardware qualification limits.

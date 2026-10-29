@@ -113,7 +113,13 @@ impl ClientApplication {
             Some(crate::resource_context::Prompt {
                 fragment: None,
                 text,
-                placement: OverlayPlacement::BottomCenter,
+                placement: if self.session.scanner.chart_mode {
+                    OverlayPlacement::BottomCenter
+                } else {
+                    scanner_readout_placement(
+                        self.window.as_ref().map_or(0, |w| w.inner_size().width),
+                    )
+                },
             })
         } else if let Some(text) = self.session.core_upgrade_hint() {
             Some(crate::resource_context::Prompt {
@@ -179,6 +185,33 @@ impl ClientApplication {
             interaction,
             mining_target: mining_target.is_some(),
             contextual_placement,
+        }
+    }
+}
+
+fn scanner_readout_placement(width: u32) -> OverlayPlacement {
+    // At 1280+ px even the 39-cell/3x face and maximum compact survival HUD
+    // fit side by side. Keep the center clear when the 2x toolbar grows upward.
+    if width >= 1280 {
+        OverlayPlacement::TopRight
+    } else {
+        OverlayPlacement::BottomCenter
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn scanner_readout_reserves_the_center_at_wide_and_high_dpi_viewports() {
+        for width in [1280, 1920, 2560] {
+            assert_eq!(scanner_readout_placement(width), OverlayPlacement::TopRight);
+        }
+        for width in [640, 960, 1279] {
+            assert_eq!(
+                scanner_readout_placement(width),
+                OverlayPlacement::BottomCenter
+            );
         }
     }
 }

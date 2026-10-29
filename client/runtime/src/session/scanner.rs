@@ -1,4 +1,6 @@
 //! Scanner composition: ordinary Core-funded service; discovery owns no catalog truth.
+#[cfg(test)]
+mod integration_tests;
 mod presentation;
 pub(crate) mod save;
 use super::GameplaySession;

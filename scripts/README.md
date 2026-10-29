@@ -830,3 +830,15 @@ scanner reference view. P switches chart/scanner view, M selects a discovered
 entry, Enter records a voluntary observed route. Assertions retain source and
 route history through real save/restore and scanner expiry, with empty/observed/
 historical production captures. Catalog loading never seeds player chart data.
+
+## Scanner integration evidence
+
+`salimon-test suite --group scanner --binary target/debug/salimon-client
+--screenshot-command '["native"]' --summary` runs the required scanner integration,
+hologram and cockpit collision evidence routes (join as one shell line).
+`review_scanner_captures.py RESULT_JSON ... --output REVIEW_JSON` checks original
+GPU capture dimensions/provenance, engineering-camera selection visibility and
+exact frozen repeats. It needs Pillow from `visual-requirements.txt` and rejects
+failed scenarios, changed repeats, missing files and OS screenshots. Details,
+scale limitations and evidence mapping are in the
+[scanner contract](../docs/universe-scanner.md#cloud-scanner-acceptance-438).

@@ -12,6 +12,15 @@ from salimon_test import ScenarioError, parse_scenario
 
 
 class ScenarioSuiteTests(unittest.TestCase):
+    def test_scanner_suite_requires_integration_hologram_and_cockpit_collision_routes(self):
+        root = Path(__file__).resolve().parents[1] / "scenarios"
+        for evidence in (False, True):
+            selected = select_scenarios(root, "scanner", evidence)
+            self.assertEqual([p.name for p in selected], ["scanner-integration.json", "scanner-hologram.json", "cockpit-nose.json"])
+            self.assertTrue(all(p.parent == root / "evidence" for p in selected))
+            for path in selected:
+                parse_scenario(path)
+
     def test_integrated_construction_always_selects_capture_routes(self):
         root = Path(__file__).resolve().parents[1] / "scenarios"
         for evidence in (False, True):
@@ -28,7 +37,7 @@ class ScenarioSuiteTests(unittest.TestCase):
                 for evidence in (False, True):
                     paths = select_scenarios(root, group, evidence)
                     self.assertEqual([path.name for path in paths], list(names))
-                    self.assertEqual(paths[0].parent, root / "evidence" if evidence or group == "scout-construction" else root)
+                    self.assertEqual(paths[0].parent, root / "evidence" if evidence or group in {"scout-construction", "scanner"} else root)
                     with self.assertRaises(ScenarioError):
                         parse_scenario(paths[0])
 

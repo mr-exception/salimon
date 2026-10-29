@@ -637,3 +637,8 @@ physical populations. Explicit obstruction safety overrides ordinary assist cont
 ## Scanner readability (#503)
 
 See the [Scout presentation contract](../../docs/scout-presentation.md). Renderer `ScannerReadout` owns bounded text/units and `ui_style` owns the face and functional palette, including linear 3D inks. Runtime maps only scanner-owned power and sampled same-frame contacts to the existing action bar. Presentation cannot reveal catalog truth, mutate discovery, change five-second cadence or TTL, allocate a second HUD or bypass cockpit/modal gates.
+
+
+## Scanner cloud integration (#438)
+
+See the [scanner acceptance contract](../../docs/universe-scanner.md#cloud-scanner-acceptance-438). The existing action bar places fresh scanner status top-right at 1280+ physical pixels to leave the projector visible at simulated 2x scale; compact windows and chart mode retain their existing bottom placement. Renderer owns generic `TopRight` image placement; runtime chooses placement from viewport width without changing scanner, input, collision or saved authority. The required scanner suite and exact frozen-frame/pixel review preserve failure evidence and physical/hardware qualification limits.

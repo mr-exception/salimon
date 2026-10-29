@@ -181,3 +181,43 @@ checks their clock/context and preserves prior data on failure; #470 supplies th
 production recovered transmissions. Route displays include saved route count,
 sampled distance, ship-local azimuth/elevation and explicit frame-unavailable
 status. A vertical target has undefined azimuth (`AZ--`), not invented zero heading.
+
+## Cloud scanner acceptance (#438)
+
+Run `python3 scripts/salimon-test suite --group scanner --binary
+ target/debug/salimon-client --screenshot-command '["native"]' --summary`
+(as one shell line). This named suite always selects evidence routes:
+`scanner-integration.json`, `scanner-hologram.json` and `cockpit-nose.json`.
+Missing routes fail instead of silently reducing coverage. The integration route
+checks 4,992/5,008 ms cadence, paid discoveries, Q/pause isolation, zero-elapsed
+checkpoint restoration, preserved last-seen times, 640x360/1280x800/1920x1080
+viewports, exact frozen-frame repeats and real Core blackout/expiry. The existing
+cockpit route exercises the production character/controller collision boundary;
+its compressed-world setup remains an explicit fixture, not new universe proof.
+`scanner/integration_tests.rs` separately isolates exact 1 kW idle/10 kJ pulse
+funding and unfunded pulses, plus pause/archive/crafting/Q/exterior/tour/terminal
+gates; persistence tests cover malformed and incompatible checkpoints atomically.
+
+The fresh scanner readout uses the existing action bar in the top-right at
+1280+ physical pixels, where its bounded face and compact survival HUD fit
+side by side. Smaller windows retain bottom placement. Chart mode retains its
+existing placement and explicit provenance. This avoids the selected projector
+contact being covered by the tall 2x toolbar/status stack. Renderer `TopRight`
+only places the existing image; it grants no input, physics or knowledge.
+
+Use `WINIT_X11_SCALE_FACTOR=1.5` and `=2` for **simulated**, separately launched
+scale checks. Retain actual `visual_context` from every capture; environment
+configuration alone does not prove the resulting scale or viewport. Run
+`python3 scripts/review_scanner_captures.py RESULT_JSON ... --output REVIEW_JSON`
+with Pillow (`scripts/visual-requirements.txt`) for native-source/dimension checks,
+selected-marker presence/blackout absence in the engineering-camera ROI and
+byte-exact frozen repeats. The wide cockpit camera has source/dimension checks
+only; its projector has a different camera projection. No baseline is promoted
+and no pixel threshold is widened to accept an obscured contact. See the
+[acceptance report](../reports/issue-438/README.md) for original captures, failed
+2x evidence, corrected outcomes, exact commands and scope boundaries.
+
+Offline freshness checks establish the existing quiet launch adapter only;
+uncertified global-frame discovery and nonlinear trajectory/catch-up remain
+#427/#432/#433. Subjective readability #561, physical DPI/input/platform #557 and
+actual hardware/M1/Metal budgets #563 remain separate unverified qualifications.

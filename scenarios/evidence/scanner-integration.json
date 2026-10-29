@@ -1,0 +1,566 @@
+{
+  "setup": {
+    "scenario": "canonical-flight",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 900000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "scanner"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.utc_millis",
+        "equals": 16
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.powered",
+        "equals": true
+      }
+    },
+    {
+      "screenshot": "idle",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 311
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.utc_millis",
+        "equals": 4992
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.last_seen_utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "screenshot": "fresh",
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "fresh-repeat",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "consumable_wheel",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.hint",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.selected",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "consumable_wheel",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.selected",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.selected",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.selected",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.last_seen_utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.last_seen_utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "resize",
+        "width": 1920,
+        "height": 1080
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "visual_context.viewport_pixels.0",
+        "equals": 1920
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "visual_context.viewport_pixels.1",
+        "equals": 1080
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "wide",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "resize",
+        "width": 640,
+        "height": 360
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "visual_context.viewport_pixels.0",
+        "equals": 640
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "visual_context.viewport_pixels.1",
+        "equals": 360
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "compact",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "resize",
+        "width": 1280,
+        "height": 800
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "visual_context.viewport_pixels.0",
+        "equals": 1280
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "visual_context.viewport_pixels.1",
+        "equals": 800
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "restored",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.last_seen_utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.powered",
+        "equals": false
+      }
+    },
+    {
+      "screenshot": "blackout",
+      "timeout_ms": 180000
+    }
+  ]
+}

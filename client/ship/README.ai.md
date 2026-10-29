@@ -169,3 +169,12 @@ Historical fixtures remain explicit; new-run startup is #426.
 ## Bounded navigation prediction (#421)
 
 Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+## Regional weather composition regression (#615)
+
+`tests/regional_weather.rs` exercises the real world climate evaluator with the
+existing U18 gas and drag operators. See the [climate contract](../../docs/planetary-climate.md).
+Climate wind is body-fixed; the composition owner must rotate it into inertial
+axes exactly once before supplying `Atmosphere::sample`. Density, body motion,
+rotation, passive drag and propulsion/Core energy retain their existing owners.
+The explicit test atmosphere is a fixture, not a newly published lunar atmosphere.

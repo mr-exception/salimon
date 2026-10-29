@@ -106,3 +106,12 @@ never displaces ground or reshuffles resource identities. See the
 [geology contract](../../docs/planetary-geology.md) for codec, profiles, compatibility and tests.
 Vesper remains a homogeneous silicate interpretation with unchanged published
 terrain/resources; rendering and later environmental systems retain their owners.
+
+
+## Regional climate and weather (#615)
+
+Follow the [climate contract](../../docs/planetary-climate.md) for immutable geology-bound climate inputs,
+strict versioned publication and stateless TT epoch queries. World owns pressure,
+temperature, coherent storm/cloud/precipitation metadata and body-fixed tangent wind;
+presentation cannot rewrite them. Vacuum has no airborne effects. Existing terrain,
+resource identities, saves and drag physics remain unchanged. Weather visuals are #616.

@@ -1,0 +1,12 @@
+{
+  "setup":{"scenario":"canonical-journey","seed":0,"step_ms":16},
+  "timeout_ms":600000,
+  "steps":[
+    {"wait":{"path":"terrain.presentation_ready","equals":true},"frames":1,"timeout_ms":180000},
+    {"assert":{"path":"ship.flight_state","equals":"Landed { body: Vesper }"}},
+    {"action":{"op":"look","dx":0,"dy":-650}},
+    {"action":{"op":"step","frames":1}},
+    {"screenshot":"airless-zenith","timeout_ms":180000},
+    {"assert":{"path":"player.location","equals":"Surface"}}
+  ]
+}

@@ -1,0 +1,28 @@
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Finished `test` profile [unoptimized] target(s) in 2.88s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-a528e5e631dbba0c)
+
+running 1 test
+atmosphere AdapterInfo { name: "llvmpipe (LLVM 19.1.7, 256 bits)", vendor: 65541, device: 0, device_type: Cpu, device_pci_bus_id: "", driver: "llvmpipe", driver_info: "Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)", backend: Vulkan, subgroup_min_size: 8, subgroup_max_size: 8, transient_saves_memory: Some(false), limit_bucket: None }
+day: synchronous submit/readback 162.174 ms
+night: synchronous submit/readback 51.388 ms
+eclipse: synchronous submit/readback 58.845 ms
+descent: synchronous submit/readback 87.452 ms
+orbit: synchronous submit/readback 70.832 ms
+near-occlusion: synchronous submit/readback 62.583 ms
+vacuum: synchronous submit/readback 49.421 ms
+pixel means {"day": [52.69390869140625, 71.98850504557292, 90.72733561197917], "descent": [47.80762736002604, 68.37635294596355, 92.27919514973958], "eclipse": [0.0, 0.0, 0.0], "near-occlusion": [0.0, 0.0, 0.0], "night": [0.0, 0.0, 0.0], "orbit": [20.204630533854168, 27.157979329427082, 33.789947509765625], "vacuum": [0.0, 0.0, 0.0]}
+
+thread 'atmosphere::tests::atmosphere_production_reference' (20928) panicked at client/renderer/src/atmosphere/tests.rs:152:5:
+assertion failed: means["descent"][2] < means["day"][2]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test atmosphere::tests::atmosphere_production_reference ... FAILED
+
+failures:
+
+failures:
+    atmosphere::tests::atmosphere_production_reference
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 101 filtered out; finished in 0.68s
+
+error: test failed, to rerun pass `-p salimon-renderer --lib`

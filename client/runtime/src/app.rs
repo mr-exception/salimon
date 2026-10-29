@@ -1,3 +1,4 @@
+mod atmosphere;
 mod diagnostics;
 pub(crate) mod input;
 #[cfg(test)]

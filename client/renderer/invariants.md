@@ -327,3 +327,10 @@ physical queries, geometry and save identities are preserved.
 See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
 split-origin/source validation, explicit frame/epoch limits and production
 verification. Sky visibility grants no scanner/chart knowledge or simulation authority.
+
+
+## Optical atmosphere (#614)
+
+The [atmosphere contract](../../docs/planetary-atmosphere.md) maps immutable climate
+optics, runtime light inputs and depth-limited production scattering. Vacuum
+remains empty; presentation never changes gas physics, weather or canonical identity.

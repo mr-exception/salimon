@@ -860,3 +860,10 @@ publications. Organism meshes, physical instances and harvesting remain #619–#
 The [implemented sky contract](universe-sky.md) maps the universe source/streaming,
 runtime projection and renderer pass/test owners. Full ephemeris-frame adoption,
 full source coverage and human/hardware release qualification remain separate.
+
+
+## Optical atmosphere implementation (#614)
+
+See [planetary optical atmosphere](planetary-atmosphere.md) for source/test ownership,
+physical inputs, bounded depth-aware scattering and exact fixture/native limits.
+Clouds/weather presentation remains #616; human/hardware qualification is separate.

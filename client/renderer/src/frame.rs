@@ -74,6 +74,15 @@ impl Renderer {
             scene.atmosphere,
             &self.depth_target.view,
         )?;
+        self.weather.prepare(
+            &self.device,
+            &self.queue,
+            scene.camera,
+            [self.configuration.width, self.configuration.height],
+            scene.atmosphere,
+            scene.weather,
+            &self.depth_target.view,
+        )?;
         self.terrain.prepare(
             &self.device,
             &self.queue,
@@ -270,6 +279,7 @@ impl Renderer {
                 multiview_mask: None,
             });
             self.atmosphere.draw(&mut pass);
+            self.weather.draw(&mut pass);
         }
         {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -343,7 +353,8 @@ impl Renderer {
             + u32::from(self.action_bar.is_visible())
             + u32::from(self.reticle.is_visible())
             + u32::from(self.toolbar.is_visible());
-        let scene_draw_calls = self.atmosphere.draws()
+        let scene_draw_calls = self.weather.draws()
+            + self.atmosphere.draws()
             + self.sky.draws()
             + scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())

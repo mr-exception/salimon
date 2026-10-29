@@ -1,0 +1,17 @@
+    Checking salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Checking salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+error: digits grouped inconsistently by underscores
+   --> client/world/src/environment/weather_visuals.rs:149:29
+    |
+149 |             t.advance_nanos(3600_000_000_000).unwrap(),
+    |                             ^^^^^^^^^^^^^^^^ help: consider: `3_600_000_000_000`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#inconsistent_digit_grouping
+    = note: `-D clippy::inconsistent-digit-grouping` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::inconsistent_digit_grouping)]`
+
+error: could not compile `salimon-world` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

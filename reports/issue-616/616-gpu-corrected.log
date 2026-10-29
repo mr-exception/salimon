@@ -1,0 +1,19 @@
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Finished `test` profile [unoptimized] target(s) in 1.21s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-a528e5e631dbba0c)
+
+running 1 test
+weather AdapterInfo { name: "llvmpipe (LLVM 19.1.7, 256 bits)", vendor: 65541, device: 0, device_type: Cpu, device_pci_bus_id: "", driver: "llvmpipe", driver_info: "Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)", backend: Vulkan, subgroup_min_size: 8, subgroup_max_size: 8, transient_saves_memory: Some(false), limit_bucket: None }
+clouds: synchronous submit/readback 134.746 ms
+reload: synchronous submit/readback 129.491 ms
+day-end: synchronous submit/readback 133.620 ms
+day-start: synchronous submit/readback 124.088 ms
+low-quality: synchronous submit/readback 110.758 ms
+dust: synchronous submit/readback 116.049 ms
+rain: synchronous submit/readback 192.434 ms
+orbit: synchronous submit/readback 70.897 ms
+clear: synchronous submit/readback 83.910 ms
+pixel means {"clear": [0.0, 0.0, 0.0], "clouds": [104.14571126302083, 106.19021606445313, 109.6891377766927], "day-end": [103.91565958658855, 105.9523417154948, 109.44193522135417], "day-start": [103.91567993164063, 105.95235188802083, 109.44191487630208], "dust": [86.07358805338542, 66.71627807617188, 47.50434366861979], "low-quality": [104.4009297688802, 106.45911661783855, 109.96534220377605], "orbit": [31.853830973307293, 32.534647623697914, 33.59693400065104], "rain": [92.50975545247395, 94.72959391276042, 97.90500895182292], "reload": [104.14571126302083, 106.19021606445313, 109.6891377766927]}
+test weather::tests::weather_production_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 102 filtered out; finished in 1.27s

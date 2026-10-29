@@ -1,5 +1,6 @@
 //! Published environmental definitions and stateless body-fixed epoch queries.
 //! Authoritative metadata only; presentation never owns weather, sites or ecology.
+pub mod activity;
 pub mod climate;
 
 use crate::terrain::TerrainError;

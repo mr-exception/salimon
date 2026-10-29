@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "steps_completed": 20,
+  "duration_ms": 46261,
+  "scenario": "scenarios/evidence/universe-terrain.json"
+}

@@ -1,0 +1,65 @@
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.72s
+     Running unittests src/lib.rs (target/debug/deps/salimon_world-75a8a7eb713e525c)
+
+running 3 tests
+test environment::landmarks::tests::landmark_authoring_observed_geography_empty_worlds_and_invalid_bindings ... ok
+test environment::landmarks::tests::landmark_canonical_and_source_bytes_never_change_geography ... ok
+rarity audit: 126 sites across 32 fully surveyed fictional publications
+test environment::landmarks::tests::landmarks_are_existing_physical_terrain_across_reconstruction_query_order_and_quality ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 79 filtered out; finished in 0.07s
+
+     Running tests/consumable_resources.rs (target/debug/deps/consumable_resources-9036b56d5c5b6363)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/fragment_journal_cost.rs (target/debug/deps/fragment_journal_cost-149888d13fc20d8f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/mining.rs (target/debug/deps/mining-389c6c323afe7695)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/resource_distribution.rs (target/debug/deps/resource_distribution-b0a2405f1aa9e694)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/resource_fragments.rs (target/debug/deps/resource_fragments-680bda45a5b6ff8f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/resource_generation.rs (target/debug/deps/resource_generation-70a872c7efd4b8bd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/resource_streaming.rs (target/debug/deps/resource_streaming-41a37814a57e4bd8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/resources.rs (target/debug/deps/resources-7ecbef530771212f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/spherical_mining.rs (target/debug/deps/spherical_mining-8bdebef9f0af14d6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s

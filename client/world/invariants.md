@@ -189,3 +189,10 @@ The [physical organism contract](../../docs/physical-organisms.md) maps canonica
 placement/part/baseline identity, physics-owned swept boxes, character/ship typed
 adapters, runtime residency and matching renderer evidence. Quality never changes
 physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+## Geological site identity (#623)
+
+[Landmark source and validation](../../docs/planetary-landmarks.md) binds sparse
+sites to actual published terrain relief. Keep physical source, renderer vertices,
+immutable site IDs and save/reference binding consistent across LOD and eviction.
+No chart/scanner discovery, duplicate terrain surface or invented cave geometry.

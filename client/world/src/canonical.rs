@@ -140,3 +140,14 @@ pub static ORGANISMS: LazyLock<crate::environment::organism_placement::Populatio
         }
         Population::publish(&BIOSPHERE, &exclusions).expect("validated fixed starting exclusions")
     });
+
+/// Immutable geological site inventory; ordinary chart/scanner knowledge never reads it.
+pub static LANDMARKS: LazyLock<crate::environment::landmarks::Landmarks> = LazyLock::new(|| {
+    crate::environment::landmarks::Landmarks::publish(
+        crate::terrain::TerrainDefinition::canonical_start().geology(),
+        crate::environment::landmarks::Geography::PublishedFictional,
+        0,
+        &[],
+    )
+    .expect("checked fixed geological publication")
+});

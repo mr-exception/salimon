@@ -784,3 +784,10 @@ for runtime source/weather mapping, renderer instance/shader layout, root/bounds
 regressions and opt-in production Vulkan reference captures. Verify workspace
 build/tests/Clippy/fmt, script and documentation checks. Human art review #561,
 physical platform #557 and hardware #563 remain separately unverified.
+
+## Geological landmarks (#623)
+
+[Landmark contract](planetary-landmarks.md) maps world publication/relief tests,
+actual runtime mesh/LOD export and production renderer reference checks. Run
+landmark/terrain tests, workspace gates and `universe-terrain.json` captures;
+source/site identity never comes from render LOD or player chart state.

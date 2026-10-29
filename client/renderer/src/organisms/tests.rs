@@ -65,16 +65,36 @@ fn organism_production_reference() {
                 color: serde_json::from_value(v["color"].clone()).unwrap(),
             })
             .collect();
+        let origin: [f64; 3] = model
+            .get("origin")
+            .map(|v| serde_json::from_value(v.clone()).unwrap())
+            .unwrap_or([0.; 3]);
+        let axes: [[f64; 3]; 3] = model
+            .get("axes")
+            .map(|v| serde_json::from_value(v.clone()).unwrap())
+            .unwrap_or([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
         let size = segments
             .iter()
-            .flat_map(|s| s.start_meters.into_iter().chain(s.end_meters))
-            .map(f64::abs)
+            .flat_map(|s| {
+                s.start_meters
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, v)| (v - origin[i]).abs())
+                    .chain(
+                        s.end_meters
+                            .into_iter()
+                            .enumerate()
+                            .map(|(i, v)| (v - origin[i]).abs()),
+                    )
+            })
             .fold(0.5, f64::max)
             * 1.5;
         let camera = CameraFrame {
-            position_meters: [size * 0.6, size * 0.7, size * 2.],
-            target_meters: [0., size * 0.35, 0.],
-            up: [0., 1., 0.],
+            position_meters: std::array::from_fn(|i| {
+                origin[i] + size * (axes[0][i] * 0.6 + axes[1][i] * 0.7 + axes[2][i] * 2.)
+            }),
+            target_meters: std::array::from_fn(|i| origin[i] + axes[1][i] * size * 0.35),
+            up: axes[1].map(|v| v as f32),
             vertical_fov_radians: 1.,
             near_plane_meters: 0.01,
         };
@@ -163,8 +183,10 @@ fn organism_production_reference() {
         )
         .unwrap();
         let far = CameraFrame {
-            position_meters: [0., size, 1e6],
-            target_meters: [0., size, 0.],
+            position_meters: std::array::from_fn(|i| {
+                origin[i] + axes[1][i] * size + axes[2][i] * 1e6
+            }),
+            target_meters: std::array::from_fn(|i| origin[i] + axes[1][i] * size),
             ..camera
         };
         let scene = crate::SceneFrame {
@@ -184,5 +206,6 @@ fn organism_production_reference() {
         assert_eq!(renderer.count(), segments.len() as u32);
         assert_eq!(renderer.counts[1], segments.len() as u32);
     }
-    assert_eq!(hashes.len(), 12);
+    assert!(!hashes.is_empty());
+    assert_eq!(hashes.len(), models.as_array().unwrap().len());
 }

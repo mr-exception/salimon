@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "steps_completed": 25,
+  "duration_ms": 25371,
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  }
+}

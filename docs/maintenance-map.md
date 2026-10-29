@@ -759,3 +759,10 @@ fields. Acoustic integration remains #627 and hardware/human qualification separ
 [Procedural organism families](planetary-organisms.md) map the world grammar,
 stable cosmetic surface tiles, runtime adapter and bounded renderer/test owners.
 Physical colliders/landing safety are #620; biological material response is #622.
+
+
+## Physical organisms and clearance (#620)
+
+[Physical organism placement](physical-organisms.md) owns stable source/part
+bindings, root/exclusion rules, common physics sweeps and live character/ship
+clearance. Vesper remains sterile; mutable harvesting/removal remains #621.

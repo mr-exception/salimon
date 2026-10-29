@@ -1,0 +1,14 @@
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized] target(s) in 3.92s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-a9737787c32fd0fb)
+
+running 2 tests
+controlled physical fixture seed=18
+controlled physical fixture seed=18
+physical population=4a608693bc571f26cdc8dbeebd252303987a167452498d1df205957d0154a7e3 objects=4 first-capture-count=4
+character source=55f0943f84a982c3d9d28961194b00fd2b21273197937b07cbe1aef3a7afc289 stopped tangent=-3.56384401152589
+ship source=55f0943f84a982c3d9d28961194b00fd2b21273197937b07cbe1aef3a7afc289 stopped tangent=-16.59485189663632
+test session::organisms::integration::physical_population_live_character_and_ship_use_same_source_colliders ... ok
+test session::organisms::integration::physical_population_geometry_export ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 520 filtered out; finished in 0.01s

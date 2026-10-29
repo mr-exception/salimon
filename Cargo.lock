@@ -1958,6 +1958,7 @@ version = "0.1.0"
 dependencies = [
  "salimon-math",
  "salimon-persistence",
+ "salimon-physics",
  "serde",
 ]
 
@@ -2038,6 +2039,7 @@ version = "0.1.0"
 dependencies = [
  "salimon-math",
  "salimon-persistence",
+ "salimon-physics",
  "salimon-universe",
  "salimon-world",
  "serde",

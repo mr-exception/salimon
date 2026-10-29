@@ -1333,3 +1333,5 @@ mod terrain_tests {
 #[cfg(test)]
 #[path = "iteration_oracle.rs"]
 mod iteration_oracle;
+
+pub mod static_boxes;

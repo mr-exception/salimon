@@ -20,6 +20,7 @@ mod eva;
 mod interior;
 mod modular;
 pub mod persistence;
+mod static_obstacles;
 mod surface;
 #[cfg(test)]
 mod test_support;
@@ -62,6 +63,8 @@ pub struct CharacterController {
     #[serde(skip)]
     interior_obstacles: Vec<[f64; 6]>,
     #[serde(skip)]
+    surface_obstacles: Option<std::sync::Arc<salimon_physics::static_boxes::StaticField>>,
+    #[serde(skip)]
     modular: crate::modular::ModularInterior,
 }
 
@@ -85,6 +88,7 @@ impl Default for CharacterController {
             ship_gravity_enabled: true,
             cargo_door_blocking: false,
             interior_obstacles: Vec::new(),
+            surface_obstacles: None,
             modular: Default::default(),
         }
     }
@@ -259,6 +263,7 @@ impl CharacterController {
             doorway_passable,
             jump_started,
         };
+        let before = self.position;
         match self.position {
             PositionState::Cockpit => {}
             PositionState::Inside { local } => self.advance_interior(local, &step),
@@ -270,6 +275,7 @@ impl CharacterController {
             PositionState::Space { world } => self.advance_eva(world, &step),
             PositionState::Surface { world } => self.advance_surface(world, &step),
         }
+        self.constrain_surface_obstacles(before, surface);
     }
 }
 

@@ -24,6 +24,9 @@ impl GameplaySession {
         }
     }
     pub(crate) fn advance_game(&mut self, requested: Duration) {
+        if !self.sync_organism_collisions() {
+            return;
+        }
         let Some(delta) = self.admit_tick(requested) else {
             return;
         };

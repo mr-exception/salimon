@@ -1743,3 +1743,11 @@ separation. Vacuum stays empty; no terrain, hydrology, weather truth or sound is
 Follow the [organism contract](../../docs/planetary-organisms.md) for stable
 family/part identities, cosmetic tile sampling, neutral segment mapping, bounded
 instanced geometry and source-driven GPU evidence. Physical population remains #620.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

@@ -16,6 +16,7 @@ pub(crate) mod frames;
 mod habitation;
 mod init;
 pub(crate) mod input;
+mod organisms;
 pub(crate) mod policy;
 mod tick;
 pub(crate) use input::ShipControlInput;

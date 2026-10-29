@@ -26,7 +26,8 @@ Update order remains door animation, clamped steering, then flight or full-delta
 assist dispatch. Module methods use only parent-visible access where needed;
 external consumers still observe `ShipSnapshot`. `clear_steering_input` discards
 both target and ramp on runtime lifecycle/view discontinuities without changing
-pose, momentum or selected throttle. Dependencies are unchanged.
+pose, momentum or selected throttle. The shared static-sweep kernel is now a
+typed `salimon-physics` dependency for physical organism clearance.
 
 `ShipController` is authoritative portable state. It owns a double-precision
 world pose, landed/flying/assisted state, door state, cockpit authority, persistent
@@ -578,3 +579,11 @@ Historical fixtures remain explicit; new-run startup is #426.
 ## Bounded navigation prediction (#421)
 
 Follow the [prediction/telemetry contract](../../docs/universe-navigation.md): ship owns cloned real-scale coasting and current-controller previews, runtime owns disposable observation caching, renderer owns instrument DTO/rasterization only. Preserve explicit model assumptions, bounded horizon, sampled contact/arrival semantics, empirical convergence (not a certified error bound), visible validity/age and nonmutation of controls, power, source saves and simulation clocks.
+
+
+## Physical organisms and static clearance (#620)
+
+The [physical organism contract](../../docs/physical-organisms.md) maps canonical
+placement/part/baseline identity, physics-owned swept boxes, character/ship typed
+adapters, runtime residency and matching renderer evidence. Quality never changes
+physical populations. Explicit obstruction safety overrides ordinary assist continuation.

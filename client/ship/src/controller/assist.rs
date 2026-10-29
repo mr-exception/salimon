@@ -225,6 +225,10 @@ impl ShipController {
             assist.destination_distance =
                 vector_length(sub(pose.position_meters, body.center.meters()));
             assist.aligned_orientation = pose.orientation;
+            if !self.external_site_clear(pose) {
+                self.cockpit_message = Some(CockpitMessage::UnsafeLandingSite);
+                return;
+            }
             assist.landing_pose = Some(pose);
         }
         if recovering {

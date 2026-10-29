@@ -223,4 +223,4 @@ pub fn cosmetic_tile(
     Ok(out)
 }
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;

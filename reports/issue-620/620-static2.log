@@ -1,0 +1,26 @@
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-character v0.1.0 (/workspace/salimon/client/character)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized] target(s) in 13.19s
+     Running unittests src/lib.rs (target/debug/deps/salimon_character-603c34e21b3c0994)
+
+running 1 test
+test controller::static_obstacles::tests::character_static_organisms_block_swept_body_and_allow_retreat ... FAILED
+
+failures:
+
+---- controller::static_obstacles::tests::character_static_organisms_block_swept_body_and_allow_retreat stdout ----
+
+thread 'controller::static_obstacles::tests::character_static_organisms_block_swept_body_and_allow_retreat' (50604) panicked at client/character/src/controller/static_obstacles.rs:99:9:
+assertion failed: world[0] < 0.71 && world[0] > 0.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    controller::static_obstacles::tests::character_static_organisms_block_swept_body_and_allow_retreat
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p salimon-character --lib`

@@ -1,0 +1,192 @@
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized] target(s) in 5.93s
+     Running unittests src/lib.rs (target/debug/deps/salimon_character-930644691cba75e1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/salimon_client-76c82414a9566291)
+
+running 1 test
+test app::weather::tests::canonical_weather_does_not_add_airborne_effects ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 513 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_diagnostics-d65d55d8f985dfac)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_fabrication-a502bdf71903b8f7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/fabricator.rs (target/debug/deps/fabricator-031fb4245155f598)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 0.00s
+
+     Running tests/starting_supplies.rs (target/debug/deps/starting_supplies-0ff5fcd2c70ae1cc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_math-48e6ff563029188e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_persistence-988b76e8d33c61bb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_physics-5cc04d2de94a3100)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-429bfa483c9063b4)
+
+running 1 test
+test weather::tests::weather_production_reference ... ignored, production atmosphere captures; set SALIMON_WEATHER_DIR
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 102 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-2f4c5cde74983a32)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 148 filtered out; finished in 0.00s
+
+     Running tests/regional_weather.rs (target/debug/deps/regional_weather-dfa9db508717090e)
+
+running 1 test
+test regional_weather_feeds_existing_inertial_gas_and_dissipative_drag ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_survival-032b4dc913d77f3a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/consumables.rs (target/debug/deps/consumables-7fdff0a2d8fe8550)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/foods.rs (target/debug/deps/foods-b0764f224e5db206)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/meters.rs (target/debug/deps/meters-745582ebdfbdadb1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/restrictions.rs (target/debug/deps/restrictions-fc8129f99c4d76d2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/statuses.rs (target/debug/deps/statuses-a5d79e19e06959e7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_universe-242f304da315a068)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 106 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/salimon_world-847f65aa7fd6f0b6)
+
+running 10 tests
+test environment::climate::tests::weather_codec_migrations_and_invalid_inputs_fail_closed ... ok
+test environment::climate::tests::weather_elevation_and_geological_substrate_use_authoritative_surface ... ok
+test environment::climate::tests::weather_frozen_numerical_vector ... ok
+test environment::climate::tests::weather_roundtrip_reconstruction_offline_and_concurrent_hosts ... ok
+test environment::activity::tests::activity_atmospheric_sources_use_the_same_weather_and_contact_medium ... ok
+test environment::climate::tests::weather_unit_tolerance_at_poles_cannot_produce_nan ... ok
+test environment::climate::tests::weather_spherical_seams_poles_and_temporal_fronts_are_continuous ... ok
+test environment::climate::tests::weather_vacuum_has_no_airborne_effects_at_any_epoch_or_latitude ... ok
+test environment::weather_visuals::tests::weather_visuals_vacuum_has_no_cloud_dust_rain_or_wind_frame ... ok
+test environment::weather_visuals::tests::weather_visuals_repeat_after_reconstruction_and_have_no_load_time_or_quality_input ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.12s
+
+     Running tests/consumable_resources.rs (target/debug/deps/consumable_resources-b506fddf7a2a20ed)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/fragment_journal_cost.rs (target/debug/deps/fragment_journal_cost-d4012a202d9c956f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/mining.rs (target/debug/deps/mining-777c9e18540e1a41)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/resource_distribution.rs (target/debug/deps/resource_distribution-628dbeb2d5326fea)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/resource_fragments.rs (target/debug/deps/resource_fragments-9f2c476b7fe9aae6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/resource_generation.rs (target/debug/deps/resource_generation-1f9d55cace920cc6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/resource_streaming.rs (target/debug/deps/resource_streaming-48d7b368495ff01e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/resources.rs (target/debug/deps/resources-0aeb18b631b95065)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/spherical_mining.rs (target/debug/deps/spherical_mining-9cb00edb89bd252b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s

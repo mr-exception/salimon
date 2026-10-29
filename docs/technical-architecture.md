@@ -867,3 +867,10 @@ full source coverage and human/hardware release qualification remain separate.
 See [planetary optical atmosphere](planetary-atmosphere.md) for source/test ownership,
 physical inputs, bounded depth-aware scattering and exact fixture/native limits.
 Clouds/weather presentation remains #616; human/hardware qualification is separate.
+
+
+## Coherent weather presentation (#616)
+
+[Implemented weather visuals](planetary-weather-visuals.md) route authoritative
+shared-time samples through runtime lighting and fixed production renderer
+fields. Acoustic integration remains #627 and hardware/human qualification separate.

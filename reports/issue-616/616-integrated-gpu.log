@@ -1,0 +1,31 @@
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Finished `test` profile [unoptimized] target(s) in 1.17s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-a528e5e631dbba0c)
+
+running 1 test
+weather AdapterInfo { name: "llvmpipe (LLVM 19.1.7, 256 bits)", vendor: 65541, device: 0, device_type: Cpu, device_pci_bus_id: "", driver: "llvmpipe", driver_info: "Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)", backend: Vulkan, subgroup_min_size: 8, subgroup_max_size: 8, transient_saves_memory: Some(false), limit_bucket: None }
+actual world/runtime frame definition "5d1b7c2048e4ab5b429552c65aba7bd8df4e672efad3b2dc0357c76f5f99b10d" epoch {"day":10957,"nanos":43200000000000,"scale":"tt"}
+clouds: synchronous submit/readback 90.045 ms
+reload: synchronous submit/readback 79.060 ms
+day-end: synchronous submit/readback 79.203 ms
+day-start: synchronous submit/readback 78.982 ms
+low-quality: synchronous submit/readback 64.480 ms
+dust: synchronous submit/readback 98.726 ms
+rain: synchronous submit/readback 152.570 ms
+orbit: synchronous submit/readback 55.565 ms
+clear: synchronous submit/readback 76.488 ms
+pixel means {"clear": [0.0, 0.0, 0.0], "clouds": [0.10894775390625, 0.13765462239583334, 0.173736572265625], "day-end": [0.10894775390625, 0.13765462239583334, 0.173736572265625], "day-start": [0.10894775390625, 0.13765462239583334, 0.173736572265625], "dust": [86.07358805338542, 66.71627807617188, 47.50434366861979], "low-quality": [0.10721842447916667, 0.13250732421875, 0.16252644856770834], "orbit": [0.249420166015625, 0.2845560709635417, 0.32415771484375], "rain": [69.27396647135417, 78.02334594726563, 87.97574869791667], "reload": [0.10894775390625, 0.13765462239583334, 0.173736572265625]}
+
+thread 'weather::tests::weather_production_reference' (37621) panicked at client/renderer/src/weather/tests.rs:197:5:
+assertion failed: means["clouds"][2] > 20.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test weather::tests::weather_production_reference ... FAILED
+
+failures:
+
+failures:
+    weather::tests::weather_production_reference
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 102 filtered out; finished in 0.93s
+
+error: test failed, to rerun pass `-p salimon-renderer --lib`

@@ -56,3 +56,10 @@ Run `cargo test -p salimon-world --locked environment::climate`, then the worksp
 build/tests/Clippy/format and documentation checks in [validation](validation.md).
 This portable metadata implementation changes no rendered route. Human appearance
 and hardware qualification remain separately unverified under #561/#563.
+
+
+## Coherent weather presentation (#616)
+
+[Implemented weather visuals](planetary-weather-visuals.md) route authoritative
+shared-time samples through runtime lighting and fixed production renderer
+fields. Acoustic integration remains #627 and hardware/human qualification separate.

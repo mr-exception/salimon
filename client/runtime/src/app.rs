@@ -8,6 +8,7 @@ mod native;
 mod presentation;
 mod scene;
 mod sky;
+mod weather;
 
 use std::error::Error;
 use std::fmt;

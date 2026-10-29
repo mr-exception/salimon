@@ -180,6 +180,24 @@ impl ClientApplication {
             } else {
                 None
             };
+        let weather_frame =
+            if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
+                match super::weather::canonical() {
+                    Ok(frame) => frame,
+                    Err(e) => {
+                        self.fail(event_loop, e);
+                        return;
+                    }
+                }
+            } else {
+                None
+            };
+        let weather = weather_frame
+            .as_ref()
+            .map(|f| super::weather::scene(f, 16, [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]));
+        if let Some(frame) = &weather_frame {
+            light.color = light.color.map(|c| c * frame.local_light_transmission());
+        }
         let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
             self.session.mining.terrain
         } else {
@@ -341,6 +359,7 @@ impl ClientApplication {
                 SceneFrame {
                     sky: sky.as_ref(),
                     atmosphere,
+                    weather: weather.as_ref(),
                     camera,
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,

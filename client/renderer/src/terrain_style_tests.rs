@@ -181,6 +181,7 @@ fn render_reference(geological: bool) {
             let scene = SceneFrame {
                 sky: None,
                 atmosphere: None,
+                weather: None,
                 camera,
                 instances: &[],
                 resource_meshes: &[],

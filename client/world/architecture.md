@@ -221,3 +221,10 @@ geology/climate-bound potential, continuous realms and stable patch/grammar IDs.
 Suitability never grants life; observed bodies retain no procedural life claim
 and Vesper stays sterile. Strict catalog/save bindings reject incompatible
 publications. Organism meshes, physical instances and harvesting remain #619–#621.
+
+
+## Optical atmosphere (#614)
+
+The [atmosphere contract](../../docs/planetary-atmosphere.md) maps immutable climate
+optics, runtime light inputs and depth-limited production scattering. Vacuum
+remains empty; presentation never changes gas physics, weather or canonical identity.

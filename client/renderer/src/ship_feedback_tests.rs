@@ -289,6 +289,7 @@ fn scout_feedback_gpu_evidence() {
         };
         let scene = SceneFrame {
             sky: None,
+            atmosphere: None,
             camera,
             instances: &[],
             spheres: &[],

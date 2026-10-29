@@ -145,3 +145,10 @@ suitability, with continuous geology/climate-bound ecological regions, independe
 family/patch identity and strict catalog/save references. Observed bodies gain no
 confirmed life and Vesper stays sterile. Organism meshes/physical instances and
 harvesting remain #619–#621; this metadata does not introduce them or hydrology.
+
+
+## Optical atmosphere implementation (#614)
+
+See [planetary optical atmosphere](planetary-atmosphere.md) for source/test ownership,
+physical inputs, bounded depth-aware scattering and exact fixture/native limits.
+Clouds/weather presentation remains #616; human/hardware qualification is separate.

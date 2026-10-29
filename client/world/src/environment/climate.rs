@@ -67,7 +67,7 @@ impl ClimateInputs {
             0.0,
         ]
     }
-    fn validate(self) -> Result<(), Error> {
+    pub(super) fn validate(self) -> Result<(), Error> {
         if !self.values().iter().all(|v| v.is_finite())
             || !(0.0..=1e9).contains(&self.pressure_pascal)
             || !(1.0..=1e7).contains(&self.scale_height_meters)

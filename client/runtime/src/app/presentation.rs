@@ -168,6 +168,18 @@ impl ClientApplication {
         } else {
             None
         };
+        let atmosphere =
+            if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
+                match super::atmosphere::canonical() {
+                    Ok(a) => a,
+                    Err(e) => {
+                        self.fail(event_loop, e);
+                        return;
+                    }
+                }
+            } else {
+                None
+            };
         let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
             self.session.mining.terrain
         } else {
@@ -328,6 +340,7 @@ impl ClientApplication {
             .render(
                 SceneFrame {
                     sky: sky.as_ref(),
+                    atmosphere,
                     camera,
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,

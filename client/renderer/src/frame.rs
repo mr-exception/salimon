@@ -66,6 +66,14 @@ impl Renderer {
             [self.configuration.width, self.configuration.height],
             scene.sky,
         )?;
+        self.atmosphere.prepare(
+            &self.device,
+            &self.queue,
+            scene.camera,
+            [self.configuration.width, self.configuration.height],
+            scene.atmosphere,
+            &self.depth_target.view,
+        )?;
         self.terrain.prepare(
             &self.device,
             &self.queue,
@@ -245,6 +253,25 @@ impl Renderer {
             self.held_item.draw(&mut render_pass);
         }
         {
+            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("atmospheric scattering"),
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: &view,
+                    depth_slice: None,
+                    resolve_target: None,
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+                        store: wgpu::StoreOp::Store,
+                    },
+                })],
+                depth_stencil_attachment: None,
+                timestamp_writes: None,
+                occlusion_query_set: None,
+                multiview_mask: None,
+            });
+            self.atmosphere.draw(&mut pass);
+        }
+        {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Salimon overlay pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -316,7 +343,8 @@ impl Renderer {
             + u32::from(self.action_bar.is_visible())
             + u32::from(self.reticle.is_visible())
             + u32::from(self.toolbar.is_visible());
-        let scene_draw_calls = self.sky.draws()
+        let scene_draw_calls = self.atmosphere.draws()
+            + self.sky.draws()
             + scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
             + self.terrain.count()

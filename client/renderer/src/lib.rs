@@ -31,7 +31,9 @@ mod ramp_geometry;
 mod resource_mesh;
 mod ship_mesh;
 pub use archive_terminal::ARCHIVE_TERMINAL_METERS;
+mod atmosphere;
 mod sky;
+pub use atmosphere::AtmosphereScene;
 mod spheres;
 pub use sky::{MAX_SKY_STARS, SkyScene, SkyStar};
 mod terrain;
@@ -142,6 +144,7 @@ pub struct SceneInstance {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SceneFrame<'a> {
     pub sky: Option<&'a SkyScene>,
+    pub atmosphere: Option<AtmosphereScene>,
     pub camera: CameraFrame,
     pub instances: &'a [SceneInstance],
     pub resource_meshes: &'a [ResourceMeshInstance],
@@ -679,6 +682,7 @@ pub struct Renderer {
     toolbar_raster: equipment_toolbar::ToolbarRaster,
     spheres: spheres::SphereRenderer,
     sky: sky::SkyRenderer,
+    atmosphere: atmosphere::AtmosphereRenderer,
     terrain: terrain::TerrainRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
     fixtures: fixtures::FixtureMeshRenderer,
@@ -820,6 +824,7 @@ mod tests {
         let local = prepare_scene(
             SceneFrame {
                 sky: None,
+                atmosphere: None,
                 camera: local_camera,
                 resource_meshes: &[],
                 fixtures: &[],
@@ -850,6 +855,7 @@ mod tests {
         let translated = prepare_scene(
             SceneFrame {
                 sky: None,
+                atmosphere: None,
                 camera: translated_camera,
                 resource_meshes: &[],
                 fixtures: &[],
@@ -899,6 +905,7 @@ mod tests {
             prepare_scene(
                 SceneFrame {
                     sky: None,
+                    atmosphere: None,
                     camera: coincident_camera,
                     resource_meshes: &[],
                     fixtures: &[],
@@ -925,6 +932,7 @@ mod tests {
             prepare_scene(
                 SceneFrame {
                     sky: None,
+                    atmosphere: None,
                     camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                     resource_meshes: &[],
                     fixtures: &[],
@@ -973,6 +981,7 @@ mod tests {
         let prepared = prepare_scene(
             SceneFrame {
                 sky: None,
+                atmosphere: None,
                 camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                 resource_meshes: &[],
                 fixtures: &[],

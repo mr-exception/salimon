@@ -136,3 +136,12 @@ active sites, biospheres and environmental audio retain their own scopes.
 and bounded shared-TT plume/thermal/acoustic metadata without altering terrain,
 resources or hazards. Existing bodies gain no activity automatically; source
 presentation consumers and environmental sound retain their own owners.
+
+
+## Implemented biosphere boundary (#618)
+
+[Rare biosphere publications](planetary-ecology.md) separate fixed existence from
+suitability, with continuous geology/climate-bound ecological regions, independent
+family/patch identity and strict catalog/save references. Observed bodies gain no
+confirmed life and Vesper stays sterile. Organism meshes/physical instances and
+harvesting remain #619–#621; this metadata does not introduce them or hydrology.

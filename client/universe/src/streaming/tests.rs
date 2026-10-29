@@ -195,3 +195,64 @@ fn predicted_region_is_requested_without_changing_current_cell_identity() {
     drop(stream);
     std::fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn sky_sidecar_is_verified_on_worker_and_does_not_grant_discovery() {
+    let root = fixture();
+    // Build an explicit single-cell catalog with a typed physical star sidecar.
+    let path = root.join("sky-fixture");
+    let catalog = Catalog::decode(include_bytes!("../../fixtures/schema-v1.json")).unwrap();
+    let id = catalog
+        .records()
+        .iter()
+        .find_map(|r| {
+            if let crate::Record::Star(s) = r {
+                Some(s.header.id.clone())
+            } else {
+                None
+            }
+        })
+        .unwrap();
+    let star = crate::sky::StarSource {
+        id,
+        position: GalacticPosition::new([1, 0, 0], [0.; 3]).unwrap(),
+        epoch: crate::epoch::Epoch::calendar([2000, 1, 1], [0; 4], crate::TimeScale::Tt).unwrap(),
+        velocity_mps: None,
+        radius_meters: 7e8,
+        temperature_kelvin: None,
+        luminosity_solar: None,
+    };
+    for (name, bytes, valid) in [
+        ("valid", serde_json::to_vec(&vec![star]).unwrap(), true),
+        ("invalid", b"[{}]".to_vec(), false),
+    ] {
+        let dir = path.join(name);
+        let mut builder = Builder::new(
+            &dir,
+            catalog.revision().into(),
+            include_bytes!("../../../../catalogs/sources/manifest-v1.json"),
+        )
+        .unwrap();
+        builder
+            .add_cell(
+                CellKey {
+                    galactic: [0; 3],
+                    shard: 0,
+                },
+                &catalog,
+                &BTreeMap::from([("sky".into(), bytes)]),
+            )
+            .unwrap();
+        builder.finish(None, BTreeMap::new()).unwrap();
+        let mut stream = Stream::open(&dir, Budget::default()).unwrap();
+        settle(&mut stream, GalacticPosition::new([0; 3], [0.; 3]).unwrap());
+        if valid {
+            assert!(stream.ready());
+            assert_eq!(stream.active()[0].sky.len(), 1);
+        } else {
+            assert!(stream.last_error.is_some());
+            assert!(stream.active().is_empty());
+        }
+    }
+    std::fs::remove_dir_all(root).unwrap();
+}

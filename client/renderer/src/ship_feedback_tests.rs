@@ -288,6 +288,7 @@ fn scout_feedback_gpu_evidence() {
             near_plane_meters: 0.05,
         };
         let scene = SceneFrame {
+            sky: None,
             camera,
             instances: &[],
             spheres: &[],

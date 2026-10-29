@@ -60,6 +60,12 @@ impl Renderer {
         let aspect_ratio = self.configuration.width as f32 / self.configuration.height as f32;
         let prepared_scene = prepare_scene(scene, aspect_ratio)
             .map_err(|error| RendererError::new("failed to prepare scene", error))?;
+        self.sky.prepare(
+            &self.queue,
+            scene.camera,
+            [self.configuration.width, self.configuration.height],
+            scene.sky,
+        )?;
         self.terrain.prepare(
             &self.device,
             &self.queue,
@@ -222,6 +228,7 @@ impl Renderer {
                 occlusion_query_set: None,
                 multiview_mask: None,
             });
+            self.sky.draw(&mut render_pass);
             if prepared_scene.instance_count > 0 {
                 render_pass.set_pipeline(&self.pipeline);
                 render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
@@ -309,7 +316,8 @@ impl Renderer {
             + u32::from(self.action_bar.is_visible())
             + u32::from(self.reticle.is_visible())
             + u32::from(self.toolbar.is_visible());
-        let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
+        let scene_draw_calls = self.sky.draws()
+            + scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
             + self.terrain.count()
             + self.ship_mesh.draw_count()

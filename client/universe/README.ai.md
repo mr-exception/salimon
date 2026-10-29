@@ -132,3 +132,10 @@ See the [scanner contract](../../docs/universe-scanner.md) for source/test mappi
 
 Universe `scanner/chart.rs` owns player-known observations, inferred/transmitted leads with explicit uncertainty, and immutable voluntary route annotations. Runtime `session/chart.rs` owns cockpit P/M/Enter controls and schema-26 pair validation with scanner history. Catalog truth never seeds the chart; observed knowledge outlives contact TTL and source frames are preserved without guessed transforms.
 See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Hybrid astronomical sky (#423)
+
+See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
+split-origin/source validation, explicit frame/epoch limits and production
+verification. Sky visibility grants no scanner/chart knowledge or simulation authority.

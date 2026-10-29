@@ -1,0 +1,13 @@
+    Checking x11rb v0.13.2
+    Checking salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Checking salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+    Checking salimon-character v0.1.0 (/workspace/salimon/client/character)
+    Checking winit v0.30.13
+    Checking salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+    Checking salimon-math v0.1.0 (/workspace/salimon/client/math)
+    Checking salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `dev` profile [unoptimized] target(s) in 23.86s

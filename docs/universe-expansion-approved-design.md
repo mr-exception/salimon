@@ -184,3 +184,10 @@ orbital phase or source motion is invented. Full global-frame playable adoption
 and closed-game trajectory/event production remain #427/#432/#433. Transmission
 production is #470. Chart knowledge survives contact expiry without revealing
 unknown catalog objects or granting autopilot/jump authority.
+
+
+## Hybrid astronomical sky (#423)
+
+The [implemented sky contract](universe-sky.md) maps the universe source/streaming,
+runtime projection and renderer pass/test owners. Full ephemeris-frame adoption,
+full source coverage and human/hardware release qualification remain separate.

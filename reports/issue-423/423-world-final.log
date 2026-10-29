@@ -1,0 +1,173 @@
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Finished `test` profile [unoptimized] target(s) in 3.79s
+     Running unittests src/lib.rs (target/debug/deps/salimon_world-49ce4545f0161549)
+
+running 72 tests
+test camera::tests::approach_is_monotonic_and_reaches_the_near_dwell ... ok
+test camera::tests::a_large_delta_wraps_to_the_same_deterministic_sample ... ok
+test camera::tests::default_snapshot_starts_at_the_far_approach_endpoint ... ok
+test camera::tests::inspection_tours_reach_every_catalog_surface_and_keep_the_scene_immutable ... ok
+test camera::tests::jump_to_near_selects_the_exact_near_dwell_endpoint_and_pauses ... ok
+test camera::tests::logarithmic_midpoint_is_the_geometric_mean ... ok
+test camera::tests::near_and_far_dwells_hold_their_endpoints ... ok
+test camera::tests::near_camera_is_twelve_meters_above_earth_surface ... ok
+test camera::tests::pause_freezes_the_timeline_and_toggle_resumes_it ... ok
+test camera::tests::restart_returns_to_the_far_endpoint_and_resumes ... ok
+test camera::tests::retreat_is_monotonic_and_cycle_wraps_to_the_far_endpoint ... ok
+test camera::tests::snapshots_borrow_stable_immutable_scene_sets ... ok
+test camera::tests::transition_phase_reports_whether_the_camera_is_moving ... ok
+test carrying::tests::permanent_single_slot_rejects_replacement_until_release ... ok
+test carrying::tests::sphere_pickup_rejects_old_cube_corners_and_ignores_rotation ... ok
+test carrying::tests::targeting_checks_sphere_range_occlusion_and_carried_identity ... ok
+test catalog::tests::catalog_has_exact_membership_order_and_unique_identity ... ok
+test catalog::tests::catalog_has_five_solids_and_one_visual_only_sun ... ok
+test catalog::tests::catalog_values_are_finite_positive_and_visually_distinct ... ok
+test catalog::tests::earth_surface_is_the_camera_anchor ... ok
+test catalog::tests::earth_to_mars_surface_gap_tunes_to_24_seconds ... ok
+test coordinates::tests::subtracting_in_f64_preserves_local_offsets_at_the_large_anchor ... ok
+test camera::tests::snapshots_remain_finite_through_an_entire_cycle ... ok
+test environment::activity::tests::activity_codec_errors_do_not_create_or_rekey_sources ... ok
+test environment::activity::tests::activity_atmospheric_sources_use_the_same_weather_and_contact_medium ... ok
+test environment::activity::tests::activity_stable_sources_restore_streaming_and_exact_ground ... ok
+test environment::activity::tests::activity_timeline_is_partition_independent_periodic_and_bounded ... ok
+test environment::activity::tests::activity_vacuum_plumes_are_ballistic_and_never_airborne_sound_or_wind ... ok
+test environment::climate::tests::weather_codec_migrations_and_invalid_inputs_fail_closed ... ok
+test environment::climate::tests::weather_elevation_and_geological_substrate_use_authoritative_surface ... ok
+test environment::climate::tests::weather_frozen_numerical_vector ... ok
+test environment::climate::tests::weather_roundtrip_reconstruction_offline_and_concurrent_hosts ... ok
+test environment::climate::tests::weather_spherical_seams_poles_and_temporal_fronts_are_continuous ... ok
+test environment::climate::tests::weather_unit_tolerance_at_poles_cannot_produce_nan ... ok
+test environment::activity::tests::activity_mechanisms_require_suitable_explicit_physical_context ... ok
+test environment::climate::tests::weather_vacuum_has_no_airborne_effects_at_any_epoch_or_latitude ... ok
+test environment::ecology::tests::ecology_frozen_homogeneous_potential_vector ... ok
+test environment::ecology::tests::ecology_potential_never_implies_actual_life_or_visible_organisms ... ok
+test environment::ecology::tests::ecology_catalog_save_bindings_are_exact_sorted_and_fail_closed ... ok
+test environment::ecology::tests::ecology_rejects_corrupt_definitions_and_incompatible_revisions ... ok
+test environment::ecology::tests::ecology_site_ids_and_physical_anchors_survive_reload_streaming_and_concurrent_queries ... ok
+test environment::ecology::tests::ecology_spherical_regions_have_smooth_transitions_and_environmental_variation ... ok
+test environment::ecology::tests::ecology_vesper_is_sterile_and_publication_resources_are_unchanged ... ok
+test geometry::tests::every_pair_of_solid_landing_volumes_is_disjoint ... ok
+test geometry::tests::radial_speed_distinguishes_approaching_receding_and_zero ... ok
+test geometry::tests::sphere_surface_separation_distinguishes_overlap_tangency_and_gap ... ok
+test precision::tests::earth_proxy_near_face_exposes_its_reported_center_rounding_limit ... ok
+test precision::tests::near_camera_rebase_stays_within_the_reported_local_budget ... ok
+test precision::tests::precision_report_matches_the_representative_float_spacings ... ok
+test proximity::nearby_solid_tests::solid_influence_is_inclusive_shared_and_deterministic_for_every_body ... ok
+test proximity::tests::nearby_body_selection_uses_surface_distance_and_an_inclusive_threshold ... ok
+test resource_fragments::mutation_tests::fragment_index_cost ... ignored, opt-in indexed vs historical linear lookup attribution, CPU only
+test resource_fragments::mutation_tests::growth_is_coalesced_and_consumed_identity_is_never_reused ... ok
+test resource_fragments::mutation_tests::identical_poses_emit_nothing_but_pickup_drop_and_removal_still_emit ... ok
+test resource_fragments::mutation_tests::ordered_removal_growth_and_journal_keep_index_consistent ... ok
+test resource_size::tests::geometry_enlarges_every_axis_without_changing_material_volume_or_mass ... ok
+test terrain::geology::tests::continuous_fields_at_cube_edges_and_province_junctions ... ok
+test terrain::geology::tests::frozen_recipe_roundtrip_and_query_order ... ok
+test terrain::geology::tests::golden_region_vector_is_stable_across_clients ... ok
+test terrain::geology::tests::profiles_history_and_invalid_directions ... ok
+test terrain::geology::tests::revision_and_upstream_changes_require_explicit_migration ... ok
+test terrain::geology::tests::vesper_remains_the_exact_published_surface_and_resources ... ok
+test terrain::tests::canonical_publication_is_the_exact_height_authority_and_has_strict_cache_identity ... ok
+test terrain::tests::canonical_surface_normals_and_translation_preserve_landing_cap_and_definition ... ok
+test terrain::tests::crater_depth_support_and_normal_match_radial_surface ... ok
+test terrain::tests::decoding_rejects_truncation_corruption_and_wrong_body ... ok
+test terrain::tests::full_capacity_wire_budget_and_definition_identity ... ok
+test environment::ecology::tests::ecology_rare_fixed_decisions_and_independent_seeds_do_not_change_climate ... ok
+test terrain::tests::rejects_invalid_inputs_and_unbounded_definitions ... ok
+test terrain::tests::roundtrip_profiles_order_and_world_translation ... ok
+test terrain::tests::version_one_golden_samples ... ok
+test terrain::tests::poles_seams_bounds_and_normals_are_continuous ... ok
+
+test result: ok. 71 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests/consumable_resources.rs (target/debug/deps/consumable_resources-842a5e3431b8b3ec)
+
+running 1 test
+test feedstocks_preserve_mineral_generation_and_have_real_session_lifecycles ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/fragment_journal_cost.rs (target/debug/deps/fragment_journal_cost-a84a21209c13122e)
+
+running 1 test
+test fragment_journal_cost ... ignored, release CPU no-op pose/journal attribution; never native FPS
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mining.rs (target/debug/deps/mining-e75daa9409f7b844)
+
+running 4 tests
+test extraction_is_time_based_conservative_and_cannot_overdraw ... ok
+test planet_surface_blocks_buried_target_at_large_coordinates ... ok
+test targeting_rejects_misses_range_obstruction_and_depletion ... ok
+test session_deltas_restore_the_same_deposit_without_inventory_credit ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/resource_distribution.rs (target/debug/deps/resource_distribution-92db63b13e9fcc21)
+
+running 6 tests
+test biome_overrides_replace_base_and_unknown_biomes_fall_back ... ok
+test deterministic_inputs_do_not_depend_on_entry_order_or_other_resources ... ok
+test distribution_parameters_reach_generation_unchanged ... ok
+test empty_solid_body_and_single_resource_are_supported ... ok
+test every_supported_body_has_a_valid_explicit_profile ... ok
+test invalid_parameters_and_ambiguous_configuration_are_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/resource_fragments.rs (target/debug/deps/resource_fragments-5b8b117f7e86b501)
+
+running 4 tests
+test collected_piece_preserves_identity_mass_and_pose_during_further_extraction ... ok
+test exact_two_second_fill_does_not_allocate_a_roundoff_only_tail ... ok
+test separate_deposits_have_unique_ids_and_requery_does_not_duplicate_output ... ok
+test physical_output_conserves_every_material_for_small_and_large_steps ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/resource_generation.rs (target/debug/deps/resource_generation-3471ff44bdff107d)
+
+running 5 tests
+test empty_far_invalid_and_excessive_requests_are_bounded ... ok
+test nearby_sampling_matches_full_small_sphere_reference ... ok
+test overlapping_queries_agree_and_cover_cube_seams ... ok
+test seeds_weights_mass_ranges_order_and_large_world_translation ... ok
+test deterministic_bounded_surface_geometry_and_reload_identity ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/resource_streaming.rs (target/debug/deps/resource_streaming-bb5ec8959a58e23e)
+
+running 2 tests
+test extraction_reconciles_fresh_or_stale_copies_before_emitting_mass ... ok
+test generated_untouched_partial_and_depleted_deposits_survive_repeated_streaming ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/resources.rs (target/debug/deps/resources-29a31539bfec498f)
+
+running 5 tests
+test deposit_transitions_are_bounded_and_preserve_identity ... ok
+test catalog_keys_are_stable_unique_and_round_trip ... ok
+test invalid_quantities_never_enter_material_or_deposit_state ... ok
+test moving_a_fragment_preserves_mass_volume_material_and_provenance ... ok
+test transforms_reject_nonfinite_positions_and_invalid_rotations ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/spherical_mining.rs (target/debug/deps/spherical_mining-1187498b98c6764d)
+
+running 4 tests
+test bounded_work_tiny_mass_radius_and_validated_tool_upgrades ... ok
+test release_precedence_switching_interrupt_and_zero_time ... ok
+test fixed_tick_conserves_cap_cycles_and_final_partial_sphere ... ok
+test session_identity_reserved_mass_streaming_and_rapid_transitions ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests salimon_world
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

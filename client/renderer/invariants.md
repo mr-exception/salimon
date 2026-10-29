@@ -320,3 +320,10 @@ profile mapping, immutable material cache keys, the 52-byte vertex layout,
 filtered stratification and original software-Vulkan evidence. Runtime owns
 geology-to-DTO mapping; renderer owns shading only. Vesper and resource palettes,
 physical queries, geometry and save identities are preserved.
+
+
+## Hybrid astronomical sky (#423)
+
+See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
+split-origin/source validation, explicit frame/epoch limits and production
+verification. Sky visibility grants no scanner/chart knowledge or simulation authority.

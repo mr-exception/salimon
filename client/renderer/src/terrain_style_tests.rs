@@ -179,6 +179,7 @@ fn render_reference(geological: bool) {
                 vec![]
             };
             let scene = SceneFrame {
+                sky: None,
                 camera,
                 instances: &[],
                 resource_meshes: &[],

@@ -8,6 +8,18 @@ pub const IVORY: [u8; 4] = [236, 243, 232, 255];
 pub const CYAN: [u8; 4] = [89, 224, 215, 255];
 pub const AMBER: [u8; 4] = [245, 185, 98, 255];
 
+/// Functional palette for the linear-color 3D instance pass.
+pub fn scene_ink(ink: [u8; 4]) -> [f32; 4] {
+    std::array::from_fn(|i| {
+        let v = f32::from(ink[i]) / 255.;
+        if i == 3 || v <= 0.04045 {
+            if i == 3 { v } else { v / 12.92 }
+        } else {
+            ((v + 0.055) / 1.055).powf(2.4)
+        }
+    })
+}
+
 /// Five by seven cells. Callers may uppercase labels; metric readings retain m/k/s/g.
 pub fn glyph_rows(character: char) -> [u8; 7] {
     // Deliberately preserve the case of metric prefixes: m/s and Mm/s denote
@@ -77,6 +89,8 @@ fn uppercase_glyph(character: char) -> [u8; 7] {
         ')' => [8, 4, 2, 2, 2, 4, 8],
         '=' => [0, 0, 31, 0, 31, 0, 0],
         '_' => [0, 0, 0, 0, 0, 0, 31],
+        '|' => [4; 7],
+        '?' => [14, 17, 1, 2, 4, 0, 4],
         _ => [0; 7],
     }
 }
@@ -87,7 +101,7 @@ mod tests {
 
     #[test]
     fn controls_and_readings_have_visible_punctuation_and_distinct_si_prefixes() {
-        for ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789[]<>+-/%:.,#()=_mksg".chars() {
+        for ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789[]<>+-/%:.,#()=_|?mksg".chars() {
             assert_ne!(glyph_rows(ch), [0; 7], "missing {ch}");
         }
         assert_ne!(glyph_rows('m'), glyph_rows('M'));

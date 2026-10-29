@@ -475,7 +475,7 @@ Scout UI #466 reuses one renderer-owned face/palette. Prompt shape/anchors/expir
 reticle dimensions/center and all modal/interaction gates retain their owners.
 Readable Fabricator status text and queue-selection chevrons never enqueue,
 consume, change recipe unlocks or advance simulation. Native review is #502;
-future scanner UI #503 is blocked by #430.
+Scanner UI #503 consumes the delivered #430 hologram through the same shared face.
 
 
 Archive #467: follow [the source/persistence/input contract](architecture.md#scout-archive-467).
@@ -821,3 +821,8 @@ The [physical organism contract](../../docs/physical-organisms.md) maps canonica
 placement/part/baseline identity, physics-owned swept boxes, character/ship typed
 adapters, runtime residency and matching renderer evidence. Quality never changes
 physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+
+## Scanner readability (#503)
+
+See the [Scout presentation contract](../../docs/scout-presentation.md). Renderer `ScannerReadout` owns bounded text/units and `ui_style` owns the face and functional palette, including linear 3D inks. Runtime maps only scanner-owned power and sampled same-frame contacts to the existing action bar. Presentation cannot reveal catalog truth, mutate discovery, change five-second cadence or TTL, allocate a second HUD or bypass cockpit/modal gates.

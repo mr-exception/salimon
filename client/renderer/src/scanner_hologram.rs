@@ -1,5 +1,6 @@
 //! Bounded ship-local holographic projection geometry; no discovery authority.
 use crate::SceneInstance;
+use crate::ui_style::{AMBER, CYAN, IVORY, MUTED, RULE, scene_ink};
 pub const HOLOGRAM_CENTER: [f64; 3] = [5.2, 1.75, -0.9];
 pub const HOLOGRAM_RADIUS: f64 = 0.30;
 pub const MAX_HOLOGRAM_CONTACTS: usize = 64;
@@ -41,9 +42,9 @@ pub fn scanner_hologram(
         [5.2, 1.315, -0.9],
         [0.08, 0.015, 0.08],
         if powered {
-            [0.1, 0.9, 1., 1.]
+            scene_ink(CYAN)
         } else {
-            [0.16, 0.18, 0.20, 1.]
+            scene_ink(MUTED)
         },
     );
     if !powered || !range_meters.is_finite() || range_meters <= 0. {
@@ -55,10 +56,10 @@ pub fn scanner_hologram(
             let mut p = HOLOGRAM_CENTER;
             p[(plane + 1) % 3] += HOLOGRAM_RADIUS * angle.cos();
             p[(plane + 2) % 3] += HOLOGRAM_RADIUS * angle.sin();
-            cube(p, [0.004; 3], [0.04, 0.35, 0.48, 1.]);
+            cube(p, [0.004; 3], scene_ink(RULE));
         }
     }
-    cube(HOLOGRAM_CENTER, [0.012; 3], [0.9, 0.95, 1., 1.]);
+    cube(HOLOGRAM_CENTER, [0.012; 3], scene_ink(IVORY));
     for c in contacts
         .iter()
         .filter(|c| c.selected)
@@ -83,12 +84,12 @@ pub fn scanner_hologram(
             p,
             [if c.selected { 0.020 } else { 0.012 }; 3],
             if c.selected {
-                [1., 0.65, 0.10, 1.]
+                scene_ink(AMBER)
             } else {
                 match c.state {
-                    HologramContactState::Fresh => [0.10, 0.90, 1., 1.],
-                    HologramContactState::Historical => [0.35, 0.90, 0.45, 1.],
-                    HologramContactState::Lead => [0.8, 0.45, 1., 1.],
+                    HologramContactState::Fresh => scene_ink(CYAN),
+                    HologramContactState::Historical => scene_ink(MUTED),
+                    HologramContactState::Lead => scene_ink(IVORY),
                 }
             },
         );
@@ -101,7 +102,7 @@ pub fn scanner_hologram(
                     ((p[1] - HOLOGRAM_CENTER[1]).abs() * 0.5) as f32,
                     0.002,
                 ],
-                [0.10, 0.40, 0.50, 1.],
+                scene_ink(CYAN),
             );
         }
     }
@@ -125,6 +126,11 @@ mod tests {
             },
         ];
         let v = scanner_hologram(&contacts, true, 100.);
+        assert_eq!(v[1].color, scene_ink(CYAN));
+        assert!(
+            v.iter()
+                .any(|p| p.color == scene_ink(AMBER) && p.half_extents_meters == [0.020; 3])
+        );
         assert!(v.iter().any(
             |p| (p.center_meters[1] - HOLOGRAM_CENTER[1] - HOLOGRAM_RADIUS).abs() < 1e-12
                 && p.half_extents_meters[0] == 0.020

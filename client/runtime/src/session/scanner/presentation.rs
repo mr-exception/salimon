@@ -82,33 +82,63 @@ impl GameplaySession {
         if self.scanner.chart_mode {
             return Some(self.chart_hint());
         }
-        if !self.scanner.powered {
-            return Some("SCANNER OFFLINE - CORE POWER REQUIRED".into());
-        }
         let contacts = self.scanner_observations();
-        let Some(index) = self.scanner.selected.checked_rem(contacts.len()) else {
-            return Some("SCANNER - NO FRESH CONTACTS | AUTOMATIC 5s PULSES".into());
-        };
-        let (e, v) = contacts[index];
-        let distance = v[0].hypot(v[1]).hypot(v[2]);
-        let name = if e.observation().id == salimon_world::canonical::START.manifest().planet.id {
+        let index = self.scanner.selected.checked_rem(contacts.len());
+        let selected = index.map(|i| contacts[i]);
+        let name = if selected.is_some_and(|(e, _)| {
+            e.observation().id == salimon_world::canonical::START.manifest().planet.id
+        }) {
             "VESPER"
         } else {
-            "IDENTIFIED CONTACT"
+            "CONTACT"
         };
-        Some(format!(
-            "SCANNER {}/{} {} CENTER {:.1} km | AGE {:.1}s | M NEXT | P CHART | LOG SCALE",
-            index + 1,
-            contacts.len(),
-            name,
-            distance / 1000.,
-            (self.scanner.utc_millis - e.last_seen_utc_millis()) as f64 / 1000.
-        ))
+        Some(
+            salimon_renderer::ScannerReadout {
+                powered: self.scanner.powered,
+                selected: index.unwrap_or(0),
+                contacts: contacts.len(),
+                label: name,
+                center_meters: selected.map(|(_, v)| v[0].hypot(v[1]).hypot(v[2])),
+                age_seconds: selected.map(|(e, _)| {
+                    (self.scanner.utc_millis - e.last_seen_utc_millis()) as f64 / 1000.
+                }),
+            }
+            .text(),
+        )
     }
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn scanner_readout_uses_shared_face_bounded_rows_and_observed_state_only() {
+        let mut s = GameplaySession::new_canonical_run().unwrap();
+        s.character = Default::default();
+        s.character.enter_cockpit();
+        s.ship.set_cockpit_control(true);
+        s.advance_automation(Duration::from_millis(16));
+        assert!(s.scanner_hint().unwrap().contains("NO FRESH CONTACTS"));
+        s.advance_automation(Duration::from_millis(5008));
+        let saved = s.save_bytes(100).unwrap();
+        let text = s.scanner_hint().unwrap();
+        assert!(text.contains("FRESH VESPER"));
+        assert!(text.contains(" km | AGE "));
+        assert!(text.contains("[M] NEXT [P] CHART"));
+        for scale in [2, 3] {
+            let (width, height, pixels) = crate::action_bar::rasterize_action_bar(&text, scale);
+            assert!(width <= 720 && height <= 100);
+            assert!(
+                pixels
+                    .as_chunks::<4>()
+                    .0
+                    .contains(&salimon_renderer::ui_style::IVORY)
+            );
+        }
+        assert_eq!(saved, s.save_bytes(100).unwrap());
+        s.scanner.powered = false;
+        assert!(s.scanner_hint().unwrap().contains("CORE POWER REQUIRED"));
+        assert_eq!(s.scanner.contacts.history().count(), 1);
+    }
     #[test]
     fn scanner_hologram_unknown_contact_pose_and_power_are_observational() {
         let mut s = GameplaySession::new_canonical_run().unwrap();

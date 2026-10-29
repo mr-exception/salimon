@@ -181,8 +181,8 @@ Scout UI #466: one presentation-only font/palette, case-preserving SI readings,
 explicit textual warning and truncation, and viewer-right/top-left physical screen
 orientation. No display text may spill into adjacent atlas sections. The current
 Fabricator import-only U correction is deliberate and must be reconciled with
-any future authored UV change. Native acceptance remains #502; future scanner
-integration remains #503 after #430.
+any future authored UV change. Historical native acceptance #502 follows #561/#557/#563; scanner
+integration #503 now shares this face and palette.
 
 
 ## Archive terminal (#467)
@@ -356,3 +356,8 @@ The [physical organism contract](../../docs/physical-organisms.md) maps canonica
 placement/part/baseline identity, physics-owned swept boxes, character/ship typed
 adapters, runtime residency and matching renderer evidence. Quality never changes
 physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+
+## Scanner readability (#503)
+
+See the [Scout presentation contract](../../docs/scout-presentation.md). Renderer `ScannerReadout` owns bounded text/units and `ui_style` owns the face and functional palette, including linear 3D inks. Runtime maps only scanner-owned power and sampled same-frame contacts to the existing action bar. Presentation cannot reveal catalog truth, mutate discovery, change five-second cadence or TTL, allocate a second HUD or bypass cockpit/modal gates.

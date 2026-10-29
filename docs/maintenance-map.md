@@ -284,7 +284,7 @@ The ignored `scout_ui_raster_evidence` / `scout_prompt_raster_evidence` tests em
 CPU pixels with `SALIMON_SCOUT_UI_DIR` set to an **absolute** evidence directory.
 Existing `scout_feedback_gpu_evidence` supplies opt-in synthetic GPU views.
 [Delivery report](../reports/issue-466/README.md); native M1 acceptance #502;
-future scanner UI #503 after #430. Closed source scope is not native/scanner approval.
+scanner readability #503 uses the delivered #430 hologram. Physical/subjective approval remains separate.
 
 
 ## Scout Archive (#467)
@@ -434,7 +434,7 @@ Subsequent intake/menu/power/work/collection uses production session/window rout
 `reports/issue-489/walkthrough.py` retains GPU motion frames plus authoritative
 state, with two additional close cameras consumed by `scout_reference.rs`.
 See [evidence/limits](../reports/issue-489/README.md); subjective review #561,
-physical platform/input #557, hardware budgets #563, scanner integration #503/#430.
+physical platform/input #557, hardware budgets #563; delivered scanner integration #503/#430 is cloud-verified separately.
 
 Recovery cloud verification (#515): `scout_walkthrough.rs` owns declared initial
 materials, `automation.rs` exposes read-only recovery source and the R alias,
@@ -766,3 +766,8 @@ Physical colliders/landing safety are #620; biological material response is #622
 [Physical organism placement](physical-organisms.md) owns stable source/part
 bindings, root/exclusion rules, common physics sweeps and live character/ship
 clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+
+## Scanner readability (#503)
+
+See the [Scout presentation contract](scout-presentation.md). Renderer `ScannerReadout` owns bounded text/units and `ui_style` owns the face and functional palette, including linear 3D inks. Runtime maps only scanner-owned power and sampled same-frame contacts to the existing action bar. Presentation cannot reveal catalog truth, mutate discovery, change five-second cadence or TTL, allocate a second HUD or bypass cockpit/modal gates.

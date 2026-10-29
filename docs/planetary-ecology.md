@@ -76,3 +76,10 @@ Mutable biological depletion/organisms and their runtime save integration remain
   checks in [validation](validation.md). No renderer/runtime mesh, source resource,
   collider or audio code changes; graphical captures are not applicable. Appearance
   and hardware qualification remain separately unverified under #561/#563.
+
+
+## Organism family presentation (#619)
+
+[Procedural organism families](planetary-organisms.md) map the world grammar,
+stable cosmetic surface tiles, runtime adapter and bounded renderer/test owners.
+Physical colliders/landing safety are #620; biological material response is #622.

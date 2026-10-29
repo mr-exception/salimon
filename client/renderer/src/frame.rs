@@ -83,6 +83,14 @@ impl Renderer {
             scene.weather,
             &self.depth_target.view,
         )?;
+        self.organisms.prepare(
+            &self.queue,
+            scene.camera,
+            prepared_scene.view_projection,
+            self.configuration.height,
+            scene.light,
+            scene.organisms,
+        )?;
         self.terrain.prepare(
             &self.device,
             &self.queue,
@@ -255,6 +263,7 @@ impl Renderer {
             }
             self.spheres.draw(&mut render_pass);
             self.terrain.draw(&mut render_pass);
+            self.organisms.draw(&mut render_pass);
             self.ship_mesh.draw_opaque(&mut render_pass);
             self.fixtures.draw(&mut render_pass);
             self.resource_meshes.draw(&mut render_pass);
@@ -353,7 +362,8 @@ impl Renderer {
             + u32::from(self.action_bar.is_visible())
             + u32::from(self.reticle.is_visible())
             + u32::from(self.toolbar.is_visible());
-        let scene_draw_calls = self.weather.draws()
+        let scene_draw_calls = self.organisms.draws()
+            + self.weather.draws()
             + self.atmosphere.draws()
             + self.sky.draws()
             + scene_draw_calls(prepared_scene.instance_count)
@@ -363,7 +373,8 @@ impl Renderer {
             + self.fixtures.draw_count()
             + self.held_item.count()
             + self.resource_meshes.draw_count();
-        let object_count = prepared_scene.instance_count
+        let object_count = self.organisms.count()
+            + prepared_scene.instance_count
             + self.spheres.count()
             + self.terrain.count()
             + self.ship_mesh.count()

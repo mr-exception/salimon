@@ -146,3 +146,10 @@ remains empty; presentation never changes gas physics, weather or canonical iden
 See [weather visuals](../../docs/planetary-weather-visuals.md): shared-TT source
 fields, fixed body-frame maps, bounded optical rendering and exact source/quality
 separation. Vacuum stays empty; no terrain, hydrology, weather truth or sound is invented.
+
+
+## Organism family grammar and presentation (#619)
+
+Follow the [organism contract](../../docs/planetary-organisms.md) for stable
+family/part identities, cosmetic tile sampling, neutral segment mapping, bounded
+instanced geometry and source-driven GPU evidence. Physical population remains #620.

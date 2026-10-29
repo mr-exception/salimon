@@ -195,6 +195,7 @@ impl Renderer {
         let action_bar = overlay::OverlayRenderer::new(&device, configuration.format);
         let reticle = overlay::OverlayRenderer::new(&device, configuration.format);
         let toolbar = overlay::OverlayRenderer::new(&device, configuration.format);
+        let organisms = crate::organisms::OrganismRenderer::new(&device, configuration.format);
         let weather = crate::weather::WeatherRenderer::new(&device, configuration.format);
         let atmosphere = crate::atmosphere::AtmosphereRenderer::new(&device, configuration.format);
         let sky = crate::sky::SkyRenderer::new(&device, configuration.format);
@@ -229,6 +230,7 @@ impl Renderer {
             sky,
             atmosphere,
             weather,
+            organisms,
             terrain,
             ship_mesh,
             fixtures,

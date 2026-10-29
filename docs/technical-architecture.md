@@ -874,3 +874,10 @@ Clouds/weather presentation remains #616; human/hardware qualification is separa
 [Implemented weather visuals](planetary-weather-visuals.md) route authoritative
 shared-time samples through runtime lighting and fixed production renderer
 fields. Acoustic integration remains #627 and hardware/human qualification separate.
+
+
+## Organism family presentation (#619)
+
+[Procedural organism families](planetary-organisms.md) map the world grammar,
+stable cosmetic surface tiles, runtime adapter and bounded renderer/test owners.
+Physical colliders/landing safety are #620; biological material response is #622.

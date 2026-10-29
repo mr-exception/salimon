@@ -4,6 +4,7 @@ pub mod activity;
 pub mod atmosphere;
 pub mod climate;
 pub mod ecology;
+pub mod organisms;
 pub mod weather_visuals;
 
 use crate::terrain::TerrainError;

@@ -96,7 +96,7 @@ per-frame CPU and software-GPU samples, draw rows, allocator readings, cumulativ
 aggregates and per-view observations remain in the original results and review.
 No timing threshold was relaxed and no native hardware FPS claim follows.
 
-- [Suite summary](native-suite-summary.json), [image review](image-review.json), [original PNG hashes](capture-manifest.json), [source/binary hashes](source-manifest.json), [environment](environment.json).
+- [Suite summary](native-suite-summary.json), [image review](image-review.json.gz), [original PNG hashes](capture-manifest.json), [source/binary hashes](source-manifest.json), [environment](environment.json).
 - [Orbit](terrain/step-012-universe-orbit.png), [surface](terrain/step-025-universe-surface.png), [corrected face edge](terrain/step-038-universe-edge.png), [orbit revisit](terrain/step-051-universe-orbit-revisit.png).
 - [Canonical start](journey/step-004-published-start.png), [entered ship](journey/step-024-entered-ship.png), [carrying mined material](mining/step-017-canonical-carry.png), [reload](mining/step-024-canonical-reloaded.png).
 - [Sky](sky/sky.png), [translated sky](sky/translated.png), [occluded sky](sky/occluded.png).

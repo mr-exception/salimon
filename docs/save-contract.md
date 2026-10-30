@@ -368,7 +368,7 @@ checkpoint scheduling. See [source and input](../client/runtime/architecture.md#
 
 `salimon-persistence::universe::UniverseSave` is a **separate**
 `salimon.universe.save` version-1 wire envelope, not a migration of current
-`salimon.save` (now schema 26). It is delivered for future world integration; normal
+`salimon.save` (now schema 27). It is delivered for future world integration; normal
 startup still uses the compressed-world session source. Existing saves are never
 implicitly interpreted, discarded or rewritten by this API.
 
@@ -598,3 +598,9 @@ clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
 
 
 Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](universe-gameplay.md#ordinary-canonical-play-427).
+
+
+## Suit observations (#625)
+
+See [suit measurements and field marks](suit-observations.md) for source/validation
+ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundaries.

@@ -109,6 +109,12 @@ impl ClientApplication {
                     placement: OverlayPlacement::BottomCenter,
                 })
             }
+        } else if let Some(text) = self.session.field_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
         } else if let Some(text) = self.session.scanner_hint() {
             Some(crate::resource_context::Prompt {
                 fragment: None,

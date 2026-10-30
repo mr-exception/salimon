@@ -1,0 +1,9 @@
+{
+  "parent": "8d6aa969e978c87b243895a00a78bc94fd164a69",
+  "binary_sha256": "0dc1693b9be9fc58d1cfbf8226cfa1561b50ce3c5424d3d50635f5cccccab649",
+  "captures": {
+    "step-017-navigation-unavailable.png": "e8a8eb19da2b702ab64b15e41ec9fff8d0d42cbb54d2e31df1fc3e7cc2672077",
+    "step-013-bearing-only.png": "5f2533bf6bff3a53f095422331fd5affbf0918e52d91e33406c038991376761d",
+    "step-009-bounded-fix.png": "7d410c40ec5f7ed959fefb83b3600d863defcfefe7371dc238b54cf0e48b20b6"
+  }
+}

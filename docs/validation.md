@@ -727,3 +727,9 @@ source/site identity never comes from render LOD or player chart state.
 rarity/mixed-source tests, runtime physical/render endpoint equality and opt-in
 source export to actual production Vulkan reference captures. Preserve source
 IDs, root/exclusion rules, true physical scale and explicit player discovery.
+
+
+## Suit observations (#625)
+
+See [suit measurements and field marks](suit-observations.md) for source/validation
+ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundaries.

@@ -582,3 +582,10 @@ strict publication binding survives reconstruction and rejects mismatched source
 
 
 Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](../../docs/universe-gameplay.md#ordinary-canonical-play-427).
+
+
+## Suit observations (#625)
+
+Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
+Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
+validated reload cannot reveal catalog POIs or invent a target range.

@@ -129,3 +129,5 @@ impl Catalog {
 mod tests;
 
 pub mod sky;
+
+pub mod surface_observations;

@@ -861,3 +861,10 @@ Follow the [canonical play isolation contract](../../docs/universe-gameplay.md#o
 Normal launch rejects prototype checkpoints without overwrite. Canonical scenes
 exclude engineering markers/bodies, and ship telemetry/preview selection does
 not apply the compressed 3 Mm cutoff. Explicit fixtures retain their contracts.
+
+
+## Suit observations (#625)
+
+Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
+Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
+validated reload cannot reveal catalog POIs or invent a target range.

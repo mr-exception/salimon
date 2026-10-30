@@ -238,6 +238,8 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
     observation["scanner"] = scanner;
     observation["chart"] = json!({"source":app.chart.checkpoint(),"mode":app.scanner.chart_mode,"note":app.scanner.chart_note,"entry_count":app.chart.entries().count(),"route_count":app.chart.routes().len()});
+    observation["field_marks"] =
+        json!({"source":app.field_capture().ok().flatten(),"hint":app.field_hint()});
     observation["natural_sites"] = json!({
         "canonical": app.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
         "count": if app.mining.terrain == salimon_world::terrain::TerrainMode::Canonical { salimon_world::canonical::NATURAL_SITES.sites().len() } else { 0 },

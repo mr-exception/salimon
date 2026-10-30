@@ -41,7 +41,6 @@ use diagnostics::{
 use input::{InputPolicy, InputSource, release_cursor_pressed};
 use interaction::{action_bar_context, gameplay_window_title};
 use native::{capture_cursor, release_cursor, surface_size, window_attributes};
-use scene::map_world_to_renderer;
 
 use crate::action_bar::ActionBar;
 use crate::automation::{self, Request};

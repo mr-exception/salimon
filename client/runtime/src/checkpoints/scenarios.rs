@@ -108,7 +108,7 @@ fn persistence_scenario_failed_manual_save_never_acknowledges_and_previous_full_
     for fault in [Fault::Before, Fault::Torn, Fault::After] {
         let store = Store::default();
         let mut s = GameplaySession::new_run();
-        let mut host = Checkpoints::with_store_at(store.clone(), &mut s, 100).unwrap();
+        let mut host = Checkpoints::with_store_at(store.clone(), &mut s, 100, false).unwrap();
         s.toggle_pause();
         let previous = s.consumables.clone();
         // A real inventory change makes recovering the wrong generation detectable.
@@ -143,7 +143,7 @@ fn persistence_scenario_failed_manual_save_never_acknowledges_and_previous_full_
         }
         disarm(&store);
         let mut loaded = GameplaySession::default();
-        let host = Checkpoints::with_store_at(store.clone(), &mut loaded, 100).unwrap();
+        let host = Checkpoints::with_store_at(store.clone(), &mut loaded, 100, false).unwrap();
         assert!(!loaded.is_paused() && !loaded.wheel.open && !loaded.wheel.primary_down);
         assert_eq!(host.status().0, control::Status::Idle);
         drop(host);
@@ -157,7 +157,7 @@ fn persistence_scenario_death_restart_failure_at_every_transaction_boundary() {
             // Two terminal copies, archive, two fresh copies.
             let store = Store::default();
             let mut s = GameplaySession::new_run();
-            let mut host = Checkpoints::with_store_at(store.clone(), &mut s, 100).unwrap();
+            let mut host = Checkpoints::with_store_at(store.clone(), &mut s, 100, false).unwrap();
             s.survival.command(Command::Damage(Points::FULL)).unwrap();
             s.advance_automation(Duration::from_millis(16));
             // Start from a verified terminal checkpoint, as a normal death does.
@@ -186,7 +186,8 @@ fn persistence_scenario_death_restart_failure_at_every_transaction_boundary() {
             }
             disarm(&store);
             let mut visible = GameplaySession::default();
-            let mut host = Checkpoints::with_store_at(store.clone(), &mut visible, 100).unwrap();
+            let mut host =
+                Checkpoints::with_store_at(store.clone(), &mut visible, 100, false).unwrap();
             if visible.survival.snapshot().terminal {
                 host.restart(&mut visible).unwrap();
             }

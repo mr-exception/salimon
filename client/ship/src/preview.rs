@@ -25,7 +25,11 @@ impl ShipController {
         }
         let (body, _) = self.terrain.nearest_body(
             start.pose.position_meters,
-            crate::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
+            if self.terrain == salimon_world::terrain::TerrainMode::Canonical {
+                f64::MAX
+            } else {
+                crate::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS
+            },
             true,
         )?;
         let altitude = |ship: &ShipController| {

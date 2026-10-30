@@ -1,0 +1,9 @@
+{
+  "source_parent": "33befc07",
+  "binary_sha256": "158da142d4092fd27567cea4ffbde0b566bb109a3ec039bd088b2421fc089438",
+  "captures": {
+    "step-024-entered-ship.png": "b2982a73cdcfc06f64fac33cf074c3c1f3a3706aa3bdfd5da41be1071d4fbfc3",
+    "step-017-approach-rear-door.png": "afb02ec797ebed629d406257b296635f078c03c9181c384d40bd3bb68d43b3d8",
+    "step-004-published-start.png": "2a052ae6254ab3b81f01f6b81b2ab9c1c3d8c102933a3aca64d9878926f0b550"
+  }
+}

@@ -772,7 +772,7 @@ The [canonical gameplay contract](universe-gameplay.md) maps current body/frame,
 resource/physics/Fabricator integration and schema-24 definition binding to owners
 and tests. It preserves the frozen terrain and explicit historical fixtures.
 
-Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit; normal launch rejects prototype saves under #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
 
 
 ## Navigation forecasts (#421)
@@ -895,3 +895,6 @@ clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
 ## Scanner cloud integration (#438)
 
 See the [scanner acceptance contract](universe-scanner.md#cloud-scanner-acceptance-438). The existing action bar places fresh scanner status top-right at 1280+ physical pixels to leave the projector visible at simulated 2x scale; compact windows and chart mode retain their existing bottom placement. Renderer owns generic `TopRight` image placement; runtime chooses placement from viewport width without changing scanner, input, collision or saved authority. The required scanner suite and exact frozen-frame/pixel review preserve failure evidence and physical/hardware qualification limits.
+
+
+Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](universe-gameplay.md#ordinary-canonical-play-427).

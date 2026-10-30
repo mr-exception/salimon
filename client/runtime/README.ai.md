@@ -67,7 +67,8 @@ native shell; `execute` adds native-only operations/observations.
   telemetry semantics and keep screen drawing in the renderer.
 - Field-map Core energy and optional nearby-body distance/radial telemetry from
   the same snapshot. Do not select bodies or derive velocity in runtime.
-- Map all six world bodies to spheres, the Sun to a point light, and the three
+- For the explicit engineering camera, map all six fixture bodies to spheres,
+  the Sun to a point light, and the three
   noncanonical markers to separate cuboids; preserve absolute `f64` centers
   and nominal catalog radii. Gameplay far-envelope radii and bounded terrain DTOs
   follow the canonical terrain integration guide; keep material selection here.
@@ -481,7 +482,7 @@ selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
 Historical fixtures remain explicit; normal new-run startup uses the canonical constructor.
 
-Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit; normal launch rejects prototype saves under #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
 
 
 ## Bounded navigation prediction (#421)
@@ -578,3 +579,6 @@ No chart/scanner discovery, duplicate terrain surface or invented cave geometry.
 site metadata onto exact physical organisms and geological/activity provenance.
 No source geometry, collision/LOD anatomy, identity or player knowledge changes;
 strict publication binding survives reconstruction and rejects mismatched sources.
+
+
+Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](../../docs/universe-gameplay.md#ordinary-canonical-play-427).

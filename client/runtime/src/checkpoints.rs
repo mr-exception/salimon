@@ -18,6 +18,28 @@ use std::{
 fn validate(bytes: &[u8]) -> Result<(), SaveError> {
     GameplaySession::default().restore_bytes(bytes)
 }
+/// Ordinary play must never silently import a prototype/engineering world.
+fn validate_playable(bytes: &[u8]) -> Result<(), SaveError> {
+    #[derive(serde::Deserialize)]
+    struct Header {
+        schema_version: u32,
+    }
+    let header: Header =
+        serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
+    if header.schema_version < 24 {
+        return Err(SaveError::IncompatibleCatalog(
+            "prototype checkpoint retired; use a new isolated save directory".into(),
+        ));
+    }
+    let mut session = GameplaySession::default();
+    session.restore_bytes(bytes)?;
+    if session.mining.terrain != salimon_world::terrain::TerrainMode::Canonical {
+        return Err(SaveError::IncompatibleCatalog(
+            "engineering checkpoint is not an ordinary canonical journey".into(),
+        ));
+    }
+    Ok(())
+}
 fn now() -> Result<u64, SaveError> {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -87,27 +109,34 @@ impl Checkpoints {
         directory: PathBuf,
         session: &mut GameplaySession,
     ) -> Result<Self, SaveError> {
-        Self::open_at(directory, session, now()?)
+        Self::with_store_at(NativeStore::open(directory)?, session, now()?, true)
     }
+    #[cfg(test)]
     pub(crate) fn open_at(
         directory: PathBuf,
         session: &mut GameplaySession,
         launch_utc: u64,
     ) -> Result<Self, SaveError> {
-        Self::with_store_at(NativeStore::open(directory)?, session, launch_utc)
+        Self::with_store_at(NativeStore::open(directory)?, session, launch_utc, false)
     }
     #[cfg(test)]
     fn with_store<S: CheckpointStore + Send + 'static>(
         store: S,
         session: &mut GameplaySession,
     ) -> Result<Self, SaveError> {
-        Self::with_store_at(store, session, 1)
+        Self::with_store_at(store, session, 1, false)
     }
     fn with_store_at<S: CheckpointStore + Send + 'static>(
         store: S,
         session: &mut GameplaySession,
         launch_utc: u64,
+        ordinary_play: bool,
     ) -> Result<Self, SaveError> {
+        let validate: fn(&[u8]) -> Result<(), SaveError> = if ordinary_play {
+            validate_playable
+        } else {
+            validate
+        };
         let mut manager = SaveManager::new(store);
         let recovery = manager.recover(validate)?;
         let had_save = recovery.bytes.is_some();
@@ -384,7 +413,7 @@ mod tests {
         session.command(Command::Wheel(WheelAction::Primary(true)));
         assert!(session.wheel.open && session.wheel.primary_down);
         assert_eq!(session.checkpoint_events(), events);
-        let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
+        let mut saves = Checkpoints::open_at(dir.clone(), &mut session, now().unwrap()).unwrap();
         let launch = now().unwrap();
         saves.finish(&session).unwrap();
         drop(saves);
@@ -403,7 +432,7 @@ mod tests {
     fn periodic_boundary_and_discrete_events_schedule_without_waiting_for_render_time() {
         let dir = std::env::temp_dir().join(format!("salimon-timer-save-{}", std::process::id()));
         let mut session = GameplaySession::default();
-        let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
+        let mut saves = Checkpoints::open_at(dir.clone(), &mut session, now().unwrap()).unwrap();
         saves.poll(&session);
         saves.results.recv().unwrap().unwrap();
         saves.busy = false;
@@ -439,7 +468,7 @@ mod tests {
         session.update_clock.accumulate(Duration::from_millis(7));
         let expected = logical(session.save_bytes(1).unwrap());
         let launch = now().unwrap();
-        let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
+        let mut saves = Checkpoints::open_at(dir.clone(), &mut session, now().unwrap()).unwrap();
         saves.finish(&session).unwrap();
         drop(saves);
         let mut restored = GameplaySession::default();
@@ -453,7 +482,7 @@ mod tests {
     fn startup_exit_roundtrip_and_corrupted_latest_fallback() {
         let dir = std::env::temp_dir().join(format!("salimon-runtime-save-{}", std::process::id()));
         let mut session = GameplaySession::default();
-        let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
+        let mut saves = Checkpoints::open_at(dir.clone(), &mut session, now().unwrap()).unwrap();
         saves.poll(&session);
         session.advance_automation(Duration::from_secs(1));
         let expected = logical(session.save_bytes(123).unwrap());
@@ -831,5 +860,73 @@ mod manual_tests {
             super::tests::logical(loaded.save_bytes(1).unwrap()),
             super::tests::logical(before)
         );
+    }
+}
+
+#[cfg(test)]
+mod canonical_gate_tests {
+    use super::*;
+    #[test]
+    fn normal_launch_refuses_prototype_slots_without_overwriting_either_generation() {
+        let dir = std::env::temp_dir().join(format!("salimon-427-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let fixture = GameplaySession::new_run();
+        let bytes = fixture.save_bytes(100).unwrap();
+        let mut manager = SaveManager::new(NativeStore::open(dir.clone()).unwrap());
+        manager.checkpoint(&bytes, validate).unwrap();
+        manager.checkpoint(&bytes, validate).unwrap();
+        drop(manager);
+        let slots: Vec<_> = (0..2)
+            .map(|i| std::fs::read(dir.join(format!("checkpoint-{i}.sav"))).unwrap())
+            .collect();
+        let mut session = GameplaySession::new_canonical_run().unwrap();
+        let before = session.save_bytes(100).unwrap();
+        assert!(matches!(
+            Checkpoints::open(dir.clone(), &mut session),
+            Err(SaveError::IncompatibleCatalog(_))
+        ));
+        assert_eq!(session.save_bytes(100).unwrap(), before);
+        for (i, expected) in slots.iter().enumerate() {
+            assert_eq!(
+                &std::fs::read(dir.join(format!("checkpoint-{i}.sav"))).unwrap(),
+                expected
+            );
+        }
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
+    fn ordinary_canonical_bootstrap_exit_and_reopen_use_the_protected_store() {
+        let dir = std::env::temp_dir().join(format!("salimon-427-play-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let mut session = GameplaySession::new_canonical_run().unwrap();
+        let mut host = Checkpoints::open(dir.clone(), &mut session).unwrap();
+        host.finish(&session).unwrap();
+        drop(host);
+        let mut restored = GameplaySession::new_canonical_run().unwrap();
+        let host = Checkpoints::open(dir.clone(), &mut restored).unwrap();
+        assert_eq!(
+            restored.mining.terrain,
+            salimon_world::terrain::TerrainMode::Canonical
+        );
+        assert_eq!(restored.ship.snapshot().pose, session.ship.snapshot().pose);
+        assert_eq!(
+            serde_json::to_value(&restored.consumables).unwrap(),
+            serde_json::to_value(&session.consumables).unwrap()
+        );
+        drop(host);
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
+    fn canonical_checkpoint_is_admitted_and_pre_binding_versions_reject() {
+        let s = GameplaySession::new_canonical_run().unwrap();
+        let bytes = s.save_bytes(100).unwrap();
+        validate_playable(&bytes).unwrap();
+        let mut old: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        old["schema_version"] = 23.into();
+        assert!(matches!(
+            validate_playable(&serde_json::to_vec(&old).unwrap()),
+            Err(SaveError::IncompatibleCatalog(_))
+        ));
+        validate(&GameplaySession::new_run().save_bytes(100).unwrap()).unwrap();
     }
 }

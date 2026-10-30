@@ -5,7 +5,7 @@ use super::{
     OverlayPlacement, RENDER_RETRY_DELAY, RenderOutcome, Renderer, RendererOverlayImage,
     SceneFrame, TIMING_LOG_INTERVAL, ViewMode, Window, camera_body_distances_with_terrain,
     camera_domain_metrics, character_ship_frame, diagnostics, gameplay_domain_metrics,
-    gameplay_window_title, map_world_to_renderer, scene,
+    gameplay_window_title, scene,
 };
 use std::io::Write;
 use std::time::Duration;
@@ -35,8 +35,11 @@ impl ClientApplication {
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface_frame = self.session.terrain_frame(ship_snapshot);
         let world_snapshot = self.session.camera_prototype.snapshot();
-        let (mut camera, mut scene_instances, mut spheres, mut light) =
-            map_world_to_renderer(world_snapshot);
+        let (mut camera, mut scene_instances, mut spheres, mut light) = scene::map_session_world(
+            world_snapshot,
+            self.session.view_mode == ViewMode::Gameplay
+                && self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
+        );
         let mut resource_meshes = Vec::new();
         let character_snapshot = self.session.character.snapshot(ship_frame, surface_frame);
         let presentation = self.session.presentation();
@@ -220,28 +223,6 @@ impl ClientApplication {
         } else {
             salimon_world::terrain::TerrainMode::Flat
         };
-        if render_terrain == salimon_world::terrain::TerrainMode::Canonical {
-            // Declared fixed illumination for canonical terrain presentation;
-            // the astronomical sky/ephemeris light adapter remains its own owner.
-            light.position_meters = [
-                0.,
-                salimon_world::canonical::START
-                    .manifest()
-                    .physical
-                    .semi_major_axis_meters,
-                0.,
-            ];
-
-            spheres = render_terrain
-                .bodies()
-                .iter()
-                .map(|b| salimon_renderer::SphereInstance {
-                    center_meters: b.center.meters(),
-                    radius_meters: b.radius_meters,
-                    material: salimon_renderer::SurfaceMaterial::Slate,
-                })
-                .collect();
-        }
         if let Err(error) = self
             .terrain_stream
             .update(camera.position_meters, render_terrain)

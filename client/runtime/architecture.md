@@ -1821,3 +1821,12 @@ World owns explicit source designations, revision/depletion journals and physica
 publication; runtime composes F/tool input, current anatomy and source-bound restore.
 Schema 29 preserves missing/partial parts and natural object identity. Vesper
 remains sterile; positive sources are explicit fictional geometry fixtures.
+
+
+## Canonical render acceptance (#436)
+
+See the [cloud render acceptance contract](../../docs/universe-terrain.md#cloud-integration-acceptance-436) for the required
+`universe-render` suite, native frozen/revisit pixel checks, canonical stitched
+seam tests and bounded raw frame/draw observations. Measurements remain
+observational; missing GPU counters stay null and software timings do not
+establish hardware FPS.

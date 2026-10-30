@@ -1,0 +1,15 @@
+{
+  "os": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "pillow": "12.3.0",
+  "cpu_quota": "200000 100000",
+  "display": ":98",
+  "LP_NUM_THREADS": 2,
+  "viewport": [
+    1280,
+    800
+  ],
+  "scale_factor": 1,
+  "graphics": "llvmpipe / Mesa 25.0.7-2+deb13u1 / LLVM 19.1.7 / Vulkan",
+  "rustc": "1.99.1 (58cf8f9c3 2026-10-13)"
+}

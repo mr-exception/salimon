@@ -867,3 +867,12 @@ explicit fictional representative-Moon-geometry sources through ordinary F/tool
 commands, pause/reload, original natural-object drawing and depletion. They do
 not populate canonical Vesper or claim actual Moon life. See
 [source and evidence contract](../docs/biological-harvesting.md).
+
+
+## Canonical render acceptance (#436)
+
+See the [cloud render acceptance contract](../docs/universe-terrain.md#cloud-integration-acceptance-436) for the required
+`universe-render` suite, native frozen/revisit pixel checks, canonical stitched
+seam tests and bounded raw frame/draw observations. Measurements remain
+observational; missing GPU counters stay null and software timings do not
+establish hardware FPS.

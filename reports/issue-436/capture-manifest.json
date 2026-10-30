@@ -1,0 +1,70 @@
+[
+  {
+    "path": "terrain/step-012-universe-orbit.png",
+    "sha256": "78e4959ed70f75cf7e337b069d81099d1f7e18689c0b81e80e10d2151e734dc6"
+  },
+  {
+    "path": "terrain/step-013-universe-orbit-repeat.png",
+    "sha256": "78e4959ed70f75cf7e337b069d81099d1f7e18689c0b81e80e10d2151e734dc6"
+  },
+  {
+    "path": "terrain/step-025-universe-surface.png",
+    "sha256": "8aa26bc5c3fd3569cc249c87f8541b347d883f3cccb020f485359ed593b9374e"
+  },
+  {
+    "path": "terrain/step-026-universe-surface-repeat.png",
+    "sha256": "8aa26bc5c3fd3569cc249c87f8541b347d883f3cccb020f485359ed593b9374e"
+  },
+  {
+    "path": "terrain/step-038-universe-edge.png",
+    "sha256": "01fbadd78039ceb4f77fbcaef4a0dd9f86f598870789787cd3f839024c880e17"
+  },
+  {
+    "path": "terrain/step-039-universe-edge-repeat.png",
+    "sha256": "01fbadd78039ceb4f77fbcaef4a0dd9f86f598870789787cd3f839024c880e17"
+  },
+  {
+    "path": "terrain/step-051-universe-orbit-revisit.png",
+    "sha256": "78e4959ed70f75cf7e337b069d81099d1f7e18689c0b81e80e10d2151e734dc6"
+  },
+  {
+    "path": "terrain/step-052-universe-orbit-revisit-repeat.png",
+    "sha256": "78e4959ed70f75cf7e337b069d81099d1f7e18689c0b81e80e10d2151e734dc6"
+  },
+  {
+    "path": "journey/step-004-published-start.png",
+    "sha256": "2a052ae6254ab3b81f01f6b81b2ab9c1c3d8c102933a3aca64d9878926f0b550"
+  },
+  {
+    "path": "journey/step-017-approach-rear-door.png",
+    "sha256": "afb02ec797ebed629d406257b296635f078c03c9181c384d40bd3bb68d43b3d8"
+  },
+  {
+    "path": "journey/step-024-entered-ship.png",
+    "sha256": "93c12e2194efa019011c91d71e0749562264c8f999068b2ae49f336375814116"
+  },
+  {
+    "path": "mining/step-006-canonical-ore-before.png",
+    "sha256": "96fb0781b0db3c8d845ee9093c5f89d6958cdfe0d7e92919ebff4fb4accf02c5"
+  },
+  {
+    "path": "mining/step-017-canonical-carry.png",
+    "sha256": "ae16e074896c48f6e565aabb30db0460a9f3670061e43e2921fc5abc5c8b3610"
+  },
+  {
+    "path": "mining/step-024-canonical-reloaded.png",
+    "sha256": "9fd5cf3361ea8b9cc702c0bd09979b57542340c93ccc46e591687a4c474c5f49"
+  },
+  {
+    "path": "sky/occluded.png",
+    "sha256": "e2288298b399609d636bb47acc81ea8d5c7f8728ba1f760315454be85a62c222"
+  },
+  {
+    "path": "sky/sky.png",
+    "sha256": "411c32f32ee3ac915ec89f79ee5a132328caa8c761a1a986c343d7f81d68763a"
+  },
+  {
+    "path": "sky/translated.png",
+    "sha256": "411c32f32ee3ac915ec89f79ee5a132328caa8c761a1a986c343d7f81d68763a"
+  }
+]

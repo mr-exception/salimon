@@ -165,24 +165,7 @@ pub(super) fn canonical(camera: [f64; 3], epoch: salimon_universe::Epoch) -> Vec
         respond(&mut geometry, &c.specimen, &weather, super_time(epoch));
         out.extend(geometry);
     }
-    for object in salimon_world::canonical::ORGANISMS
-        .nearby(camera, 5000.)
-        .expect("finite admitted camera")
-    {
-        let mut geometry = segments(&object.specimen, object.position_meters, object.axes);
-        let n = object
-            .position_meters
-            .iter()
-            .map(|x| x * x)
-            .sum::<f64>()
-            .sqrt();
-        let weather = BIOSPHERE
-            .climate()
-            .sample(object.position_meters.map(|x| x / n), epoch)
-            .expect("published climate");
-        respond(&mut geometry, &object.specimen, &weather, super_time(epoch));
-        out.extend(geometry);
-    }
+
     out
 }
 fn super_time(epoch: salimon_universe::Epoch) -> f64 {
@@ -561,4 +544,128 @@ mod natural_site_evidence {
         )
         .unwrap();
     }
+}
+
+/// Current physical anatomy and detached natural objects share the same segment renderer.
+pub(super) fn physical(
+    session: &crate::session::GameplaySession,
+    camera: [f64; 3],
+    epoch: salimon_universe::Epoch,
+    presentation: &crate::session::Presentation,
+) -> Vec<OrganismSegment> {
+    use crate::session::biology::{FIXTURE, origin, population};
+    let base = origin(session.biology.fixture);
+    let local = std::array::from_fn(|i| camera[i] - base[i]);
+    let climate = if session.biology.fixture {
+        FIXTURE.biosphere.climate()
+    } else {
+        salimon_world::canonical::BIOSPHERE.climate()
+    };
+    let mut out = Vec::new();
+    for object in population(session.biology.fixture)
+        .nearby(local, 5000.)
+        .expect("finite camera")
+    {
+        let position = std::array::from_fn(|i| object.position_meters[i] + base[i]);
+        let mut geometry = segments(&object.specimen, position, object.axes);
+        let n = salimon_math::length(object.position_meters);
+        let weather = climate
+            .sample(object.position_meters.map(|v| v / n), epoch)
+            .expect("published weather");
+        respond(&mut geometry, &object.specimen, &weather, super_time(epoch));
+        for (part, mut segment) in object.specimen.parts.iter().zip(geometry) {
+            let fraction = session.biological_fraction(&object.id, part.id);
+            if fraction <= 0. {
+                continue;
+            }
+            segment.radius_start_meters *= fraction.sqrt();
+            segment.radius_end_meters *= fraction.sqrt();
+            segment.flex_meters = segment.flex_meters.map(|v| v * fraction.sqrt() as f32);
+            if let Some(p) = &session.biology.pending
+                && p.key.organism == object.id
+                && p.key.part == part.id
+            {
+                let tension = (p.elapsed.as_secs_f64() / 0.25).clamp(0., 1.) * 0.02;
+                segment.end_meters = std::array::from_fn(|i| {
+                    segment.end_meters[i]
+                        + (segment.start_meters[i] - segment.end_meters[i]) * tension
+                });
+            }
+            out.push(segment);
+        }
+    }
+    for f in session.mining.nearby_fragments(camera) {
+        let Some(shape) = f.natural_shape() else {
+            continue;
+        };
+        let mesh = presentation.fragment_mesh(session, f);
+        let point = |v: [f64; 3]| {
+            let d = salimon_physics::rotate(mesh.orientation_xyzw, v);
+            std::array::from_fn(|i| mesh.center_meters[i] + d[i])
+        };
+        out.push(OrganismSegment {
+            start_meters: point(shape.start),
+            end_meters: point(shape.end),
+            radius_start_meters: shape.radii[0],
+            radius_end_meters: shape.radii[1],
+            color: shape.color,
+            material: crate::session::biology::catalog(session.biology.fixture)
+                .sources()
+                .iter()
+                .find(|s| s.shape == shape)
+                .and_then(|source| {
+                    population(session.biology.fixture)
+                        .objects()
+                        .iter()
+                        .find(|o| o.id == source.key.organism)
+                })
+                .map_or([0.8, 0., 0., 0.], |o| material(&o.specimen, shape.part_id)),
+            flex_meters: [0.; 3],
+            coating: [0.; 3],
+        });
+    }
+    out
+}
+
+#[cfg(test)]
+#[test]
+fn harvested_natural_segment_uses_original_geometry_and_material_at_its_physical_pose() {
+    use crate::session::{Command, GameplaySession, biology};
+    let mut s = GameplaySession::default();
+    biology::initialize_fixture(&mut s, false).unwrap();
+    let key = s.biological_target().unwrap();
+    let source = biology::catalog(true).get(&key).unwrap();
+    let base = biology::origin(true);
+    let old_start: [f64; 3] =
+        std::array::from_fn(|i| base[i] + source.center[i] + source.shape.start[i]);
+    let old_end: [f64; 3] =
+        std::array::from_fn(|i| base[i] + source.center[i] + source.shape.end[i]);
+    s.command(Command::GrabDrop(true));
+    s.command(Command::GrabDrop(false));
+    s.advance_automation(std::time::Duration::from_millis(288));
+    let f = *s
+        .mining
+        .session
+        .fragment(s.mining.session.carried_id().unwrap())
+        .unwrap();
+    let shape = f.natural_shape().unwrap();
+    let out = physical(
+        &s,
+        s.snapshot().character.eye_position_meters,
+        crate::session::field_marks::epoch(s.elapsed).unwrap(),
+        &s.presentation(),
+    );
+    let point = |v: [f64; 3]| {
+        let r = salimon_physics::rotate(f.transform().orientation_xyzw(), v);
+        std::array::from_fn(|i| f.transform().position().meters()[i] + r[i])
+    };
+    let near = |a: [f64; 3], b: [f64; 3]| salimon_math::length(salimon_math::sub(a, b)) < 1e-5;
+    assert!(out.iter().any(|p| near(p.start_meters, point(shape.start))
+        && near(p.end_meters, point(shape.end))
+        && p.radius_start_meters == shape.radii[0]
+        && p.color == shape.color));
+    assert!(
+        !out.iter()
+            .any(|p| near(p.start_meters, old_start) && near(p.end_meters, old_end))
+    );
 }

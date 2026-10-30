@@ -175,3 +175,12 @@ No chart/scanner discovery, duplicate terrain surface or invented cave geometry.
 site metadata onto exact physical organisms and geological/activity provenance.
 No source geometry, collision/LOD anatomy, identity or player knowledge changes;
 strict publication binding survives reconstruction and rejects mismatched sources.
+
+
+## Biological harvesting and schema 29 (#621)
+
+Follow the [yield, atomic transfer, geometry and persistence contract](../../docs/biological-harvesting.md).
+World owns explicit source designations, revision/depletion journals and physical
+publication; runtime composes F/tool input, current anatomy and source-bound restore.
+Schema 29 preserves missing/partial parts and natural object identity. Vesper
+remains sterile; positive sources are explicit fictional geometry fixtures.

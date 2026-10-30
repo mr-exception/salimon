@@ -859,3 +859,11 @@ Vesper vacuum, pause/settings toggles and GPU settings captures. `key` aliases
 `settings`, `environment_audio`, `environment_volume`, `environment_cues` invoke
 focused native pause-menu keys, not simulation mutations. See
 [contract](../docs/planetary-audio.md).
+
+## Biological harvesting (#621)
+
+`scenarios/evidence/biological-harvest.json` and `biological-mining.json` exercise
+explicit fictional representative-Moon-geometry sources through ordinary F/tool
+commands, pause/reload, original natural-object drawing and depletion. They do
+not populate canonical Vesper or claim actual Moon life. See
+[source and evidence contract](../docs/biological-harvesting.md).

@@ -21,6 +21,9 @@ pub(crate) struct FragmentOutput {
 }
 
 impl FragmentOutput {
+    pub(crate) fn can_allocate(&self) -> bool {
+        self.next_id < u64::MAX
+    }
     pub(crate) fn import_salvage(
         &mut self,
         pieces: &[(crate::resources::DepositId, RawMaterial, ResourceTransform)],
@@ -181,7 +184,11 @@ impl FragmentOutput {
 
 /// Analytic sphere diameter; solid material volume remains density-derived.
 pub fn diameter_meters(fragment: ResourceFragment) -> f64 {
-    crate::resource_size::fragment_diameter_meters(fragment.material())
+    if fragment.natural_shape().is_some() {
+        2. * fragment.contact_radius_meters()
+    } else {
+        crate::resource_size::fragment_diameter_meters(fragment.material())
+    }
 }
 
 pub(crate) fn spawn_position(deposit: ResourceDeposit) -> WorldPosition {

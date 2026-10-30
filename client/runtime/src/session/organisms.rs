@@ -2,6 +2,7 @@
 use super::GameplaySession;
 use salimon_physics::static_boxes::{StaticBox, StaticField};
 use std::sync::{Arc, LazyLock};
+#[cfg(test)]
 pub(crate) static FIELD: LazyLock<Arc<StaticField>> = LazyLock::new(|| {
     let boxes = salimon_world::canonical::ORGANISMS
         .objects()
@@ -37,11 +38,14 @@ static HULL: LazyLock<StaticBox> = LazyLock::new(|| {
 });
 impl GameplaySession {
     pub(super) fn sync_organism_collisions(&mut self) -> bool {
-        let field = if self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
-            FIELD.clone()
+        let field = if self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical
+            || self.biology.fixture
+        {
+            self.organism_field()
         } else {
             Arc::new(StaticField::default())
         };
+        self.mining.biological_obstacles = field.clone();
         let mut bounds = HULL.bounds();
         if !field.boxes().is_empty() {
             for part in self.construction_solids() {

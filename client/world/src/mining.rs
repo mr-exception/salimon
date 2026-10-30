@@ -1,10 +1,13 @@
 //! Portable aimed extraction. Runtime supplies proximity candidates and obstruction distance.
 use std::time::Duration;
 
+#[path = "biological_session.rs"]
+mod biological_session;
 #[path = "mining_save.rs"]
 mod save;
 #[path = "sphere_session.rs"]
 mod sphere_session;
+pub use biological_session::HarvestError;
 pub use save::MiningSaveState;
 
 use crate::resource_generation::SurfaceDeposit;
@@ -205,7 +208,12 @@ impl MiningSession {
     }
 
     pub fn pick_up(&mut self, id: crate::resources::FragmentId) -> bool {
-        if self.attached_sphere_id == Some(id)
+        if self.fragments.get(id).is_some_and(|f| {
+            f.natural_shape().is_some()
+                && (f.contact_radius_meters()
+                    > crate::environment::harvest::MAX_CARRY_RADIUS_METERS
+                    || f.material().mass_kg() > crate::environment::harvest::MAX_CARRY_MASS_KG)
+        }) || self.attached_sphere_id == Some(id)
             || self.fragments.get(id).is_none()
             || !self
                 .carry

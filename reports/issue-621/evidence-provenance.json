@@ -1,0 +1,16 @@
+{
+  "harvest": {
+    "run": "artifacts/issue-621-harvest/run-il4h7lbb",
+    "original_protocol_sha256": "86c30a9bd75c55afffd168c3a7333632e02e732892103ab13b80598caf35d8ad",
+    "original_protocol_bytes": 69502992,
+    "retained_command_envelopes": 774,
+    "selection": "Complete original result snapshots + PNGs retained; repeated read-only inspect polling omitted from command trace. stdout duplicates protocol responses and is not promoted."
+  },
+  "mining": {
+    "run": "artifacts/issue-621-mining-complete/run-ojgxqmnd",
+    "original_protocol_sha256": "cc83d13cc827de3c63a2d85247389208f0b20374e28a711c6b2fe7f7483c5784",
+    "original_protocol_bytes": 49864810,
+    "retained_command_envelopes": 542,
+    "selection": "Complete original result snapshots + PNGs retained; repeated read-only inspect polling omitted from command trace. stdout duplicates protocol responses and is not promoted."
+  }
+}

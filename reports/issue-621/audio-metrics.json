@@ -1,0 +1,9 @@
+{
+  "cpu_ns": 839022305,
+  "frames": 96000,
+  "mailbox_bytes": 672,
+  "mixer_bytes": 3240,
+  "peak": 0.002684319159016013,
+  "sample_rate": 48000,
+  "voices": 32
+}

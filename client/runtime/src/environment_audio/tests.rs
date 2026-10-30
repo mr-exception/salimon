@@ -87,7 +87,18 @@ fn evaluate(
     l: Listener,
     seconds: i64,
 ) -> Frame {
-    sample(&f.0, &f.1, &f.2, epoch(seconds), l, 0., |_| false)
+    sample(
+        &f.0,
+        &f.1,
+        Anatomy {
+            population: &f.2,
+            remaining: None,
+        },
+        epoch(seconds),
+        l,
+        0.,
+        |_| false,
+    )
 }
 #[test]
 fn vacuum_is_quiet_and_ground_activity_requires_actual_contact_and_range() {
@@ -140,8 +151,30 @@ fn local_weather_drives_wind_alignment_precipitation_and_no_remote_storm() {
             .abs()
             < 1e-6
     );
-    let no_dust = sample(&f.0, &f.1, &f.2, epoch(250), l, 0., |_| false);
-    let dust = sample(&f.0, &f.1, &f.2, epoch(250), l, 0.001, |_| false);
+    let no_dust = sample(
+        &f.0,
+        &f.1,
+        Anatomy {
+            population: &f.2,
+            remaining: None,
+        },
+        epoch(250),
+        l,
+        0.,
+        |_| false,
+    );
+    let dust = sample(
+        &f.0,
+        &f.1,
+        Anatomy {
+            population: &f.2,
+            remaining: None,
+        },
+        epoch(250),
+        l,
+        0.001,
+        |_| false,
+    );
     assert!(dust.bands[1].gain >= no_dust.bands[1].gain);
     let space = evaluate(&f, listener([0., n + 1e6, 0.]), 250);
     assert!(space.bands[0].gain < 1e-20);
@@ -163,7 +196,18 @@ fn biological_rustle_uses_physical_population_and_occlusion_not_visual_density()
             .unwrap();
     let l = listener(o.position_meters);
     let a = evaluate(&f, l, 50);
-    let blocked = sample(&f.0, &f.1, &f.2, epoch(50), l, 0., |_| true);
+    let blocked = sample(
+        &f.0,
+        &f.1,
+        Anatomy {
+            population: &f.2,
+            remaining: None,
+        },
+        epoch(50),
+        l,
+        0.,
+        |_| true,
+    );
     assert!(a.bands[3].gain > 0.);
     assert!(blocked.bands[3].gain < a.bands[3].gain);
     let before = f.2.binding();
@@ -242,7 +286,18 @@ fn scout_actual_partition_geometry_and_airborne_geology_attenuate_sources() {
         .find(|&s| f.1.sample(&site.id, epoch(s)).unwrap().intensity > 0.5)
         .unwrap();
     let a = evaluate(&f, l, seconds);
-    let blocked = sample(&f.0, &f.1, &f.2, epoch(seconds), l, 0., |_| true);
+    let blocked = sample(
+        &f.0,
+        &f.1,
+        Anatomy {
+            population: &f.2,
+            remaining: None,
+        },
+        epoch(seconds),
+        l,
+        0.,
+        |_| true,
+    );
     assert!(a.bands[2].gain > 0.);
     assert!(blocked.bands[2].gain < a.bands[2].gain);
 }
@@ -359,4 +414,31 @@ fn export_environment_audio_627() {
         serde_json::to_vec_pretty(&metrics).unwrap(),
     )
     .unwrap();
+}
+
+#[test]
+fn removed_physical_anatomy_cannot_keep_emitting_rustle() {
+    let f = fixture(false, false);
+    let o =
+        f.2.objects()
+            .iter()
+            .find(|o| matches!(o.specimen.form, Form::Frond | Form::Filament))
+            .unwrap();
+    let l = listener(o.position_meters);
+    let gone = |_: &str, _: u16| 0.;
+    let intact = evaluate(&f, l, 50);
+    let removed = sample(
+        &f.0,
+        &f.1,
+        Anatomy {
+            population: &f.2,
+            remaining: Some(&gone),
+        },
+        epoch(50),
+        l,
+        0.,
+        |_| false,
+    );
+    assert!(intact.bands[3].gain > 0.);
+    assert_eq!(removed.bands[3].gain, 0.);
 }

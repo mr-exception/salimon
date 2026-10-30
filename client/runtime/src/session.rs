@@ -1,5 +1,6 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
 pub(crate) mod archive;
+pub(crate) mod biology;
 pub(crate) mod cabin;
 pub(crate) mod canonical;
 mod cargo;
@@ -61,6 +62,7 @@ use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    pub(crate) biology: biology::State,
     pub(crate) scanner: scanner::Scanner,
     pub(crate) chart: salimon_universe::scanner::chart::Chart,
     pub(crate) surface_chart: surface_chart::State,
@@ -274,7 +276,8 @@ impl GameplaySession {
                 && self.view_mode == ViewMode::Gameplay
                 && self.restrictions().permits(Action::Mine)
                 && self.equipment.mining_equipped()
-                && self.mining.session.carried_id().is_none(),
+                && self.mining.session.carried_id().is_none()
+                && self.biology.pending.is_none(),
         );
     }
 

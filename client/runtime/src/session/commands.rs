@@ -135,6 +135,9 @@ impl GameplaySession {
                 self.reset_presentation();
             }
             Select(slot) => {
+                if self.biology.pending.is_some() {
+                    return;
+                }
                 let previous = self.equipment.selected();
                 self.equipment
                     .select(slot, self.mining.session.carried_object().is_some());
@@ -158,6 +161,8 @@ impl GameplaySession {
                         .is_some()
                     {
                         self.carry_action(pickup);
+                    } else {
+                        self.begin_biological_pull();
                     }
                 }
             }

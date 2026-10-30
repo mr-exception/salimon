@@ -144,7 +144,8 @@ impl GameplaySession {
                 .is_none_or(|d| d >= distance - 0.05)
             });
         let clear = clear
-            && super::organisms::FIELD
+            && self
+                .organism_field()
                 .sweep(p, beacon, [0.; 3])
                 .is_ok_and(|hit| hit.is_none());
         let mut book = self.field_capture()?.expect("canonical field source");

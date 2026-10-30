@@ -54,6 +54,7 @@ struct Voice {
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Observation {
     environment: crate::environment_audio::Frame,
+    biological_contact: (u64, Option<salimon_world::resources::ResourceId>),
     extracted_kg: f64,
     harvest_material: Option<salimon_world::resources::ResourceId>,
     active: bool,
@@ -103,6 +104,7 @@ impl Observation {
         ];
         Self {
             environment: crate::environment_audio::capture(s),
+            biological_contact: s.biology.contact_audio,
             extracted_kg: s.mining.session.extracted_mass_kg(),
             harvest_material: s
                 .mining
@@ -375,6 +377,7 @@ fn spatial(eye: [f64; 3], right: [f64; 3], source: [f64; 3]) -> (f64, f64) {
 #[derive(Default)]
 pub(crate) struct Presenter {
     mixer: Mixer,
+    biological_contact: Option<u64>,
     extracted_kg: Option<f64>,
     environment: crate::environment_audio::Frame,
     last_control: crate::native_audio::Control,
@@ -401,6 +404,7 @@ impl Presenter {
     pub(crate) fn stop(&mut self) {
         self.mixer = Mixer::default();
         self.extracted_kg = None;
+        self.biological_contact = None;
         self.environment = Default::default();
         self.last_run = None;
         self.last_control = Default::default();
@@ -452,6 +456,14 @@ impl Presenter {
         {
             environment.bands[4] = crate::environment_audio::harvest(material);
         }
+        if self
+            .biological_contact
+            .is_some_and(|last| last != o.biological_contact.0)
+            && let Some(material) = o.biological_contact.1
+        {
+            environment.bands[4] = crate::environment_audio::harvest(material);
+        }
+        self.biological_contact = Some(o.biological_contact.0);
         self.extracted_kg = Some(o.extracted_kg);
         self.environment = environment;
         crate::environment_audio::apply(environment, &mut control, settings);

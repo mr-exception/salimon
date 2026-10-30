@@ -62,6 +62,8 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             let sphere = crate::resource_presentation::fragment_mesh(piece);
             json!({
                 "id": piece.id().0,
+                "natural_shape":piece.natural_shape(),
+                "physical_radius_meters":piece.contact_radius_meters(),
                 "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
                 "carried": app.mining.session.carried_id() == Some(piece.id()),
                 "attached_to_tool": app.mining.session.attached_sphere_id() == Some(piece.id()),
@@ -174,7 +176,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "context": crate::carrying::context(&app.mining, fragment_target, character),
             "last_action_feedback": app.mining.carry_feedback},
         "mining": { "equipped": app.equipment.mining_equipped(), "held": app.mining.input.held,
-            "active": app.mining.input.held && mining_target.is_some(),
+            "active": app.mining.input.held && (mining_target.is_some() || app.biological_target().and_then(|key|crate::session::biology::catalog(app.biology.fixture).get(&key)).is_some_and(|s|s.method==salimon_world::environment::harvest::Method::Embedded)),
             "held_item_visible": app.held_item(character, mining_target.is_some()).is_some(),
             "extracted_mass_kg": app.mining.session.extracted_mass_kg(),
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
@@ -241,6 +243,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["surface_chart"] = json!({"source":app.surface_capture().ok().flatten(),"open":app.surface_chart.open,"editing":app.surface_chart.editing,"hint":app.surface_hint()});
     observation["field_marks"] =
         json!({"source":app.field_capture().ok().flatten(),"hint":app.field_hint()});
+    observation["biology"] = json!({"fixture":app.biology.fixture,"target":app.biological_target(),"pending":app.biology.pending.is_some(),"journal":app.biology.journal,"hint":app.biological_hint(),"sources":crate::session::biology::catalog(app.biology.fixture).sources().iter().map(|s|json!({"key":s.key,"method":format!("{:?}",s.method),"initial_mass_kg":s.initial_mass_kg,"fraction":app.biological_fraction(&s.key.organism,s.key.part),"radius":s.shape.radius()})).collect::<Vec<_>>()});
     observation["natural_sites"] = json!({
         "canonical": app.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
         "count": if app.mining.terrain == salimon_world::terrain::TerrainMode::Canonical { salimon_world::canonical::NATURAL_SITES.sites().len() } else { 0 },

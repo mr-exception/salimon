@@ -180,3 +180,10 @@ The [implemented source and transmission contract](planetary-audio.md) maps loca
 world definitions into the continuous mixer. Positive listening fixtures are
 explicit atmospheric worlds; canonical Vesper remains quiet/sterile. Hardware
 listening and subjective tuning remain #561.
+
+## Biological harvesting delivery (#621)
+
+The [implemented transfer/depletion contract](biological-harvesting.md) uses explicit
+source authoring, a brief F separation, one original natural object, existing
+spherical mining and source-bound checkpoints. Vesper remains sterile. Subjective
+art/listening and M1 qualification remain #561/#563.

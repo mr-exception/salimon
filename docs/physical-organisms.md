@@ -26,8 +26,8 @@ biosphere/terrain/climate identity and sorted length-delimited exclusion IDs and
 bounds. `Population::binding` additionally records exact object/part identities;
 `verify_binding` rejects changed source/version/corruption. This is the immutable
 baseline binding, not a new mutable harvest save format. Existing Vesper
-checkpoints reconstruct the same empty baseline; future #621 part-removal/resource
-state must bind this exact source and explicit migrations. Changing an exclusion
+checkpoints reconstruct the same empty baseline; [#621 part-removal/resource state](biological-harvesting.md) binds this exact source
+and explicit migrations. Changing an exclusion
 or recipe is a versioned all-player publication change, never a silent relocation.
 
 ## Common collision owner and live consumers
@@ -78,9 +78,13 @@ with `SALIMON_ORGANISM_DIR` to capture the same anchored/basis-oriented geometry
 Keep source JSON/binding, original captures and hashes. Run workspace tests,
 build/all-target Clippy/fmt, tooling and documentation checks. Actual art review
 #561, physical platform #557 and hardware/M1/Metal budgets #563 remain unverified.
-No harvesting, mass allocation, breakage, regrowth, fauna or soft-body simulation
-is implied; those remain their explicitly owned downstream features.
+Harvesting/mass allocation now follow [#621](biological-harvesting.md);
+regrowth, fauna and soft-body simulation remain absent.
 
 [Biological signature sites](biological-signature-sites.md) now name rare existing
 physical giants, dense colonies and real geological intersections without changing
 placement, source identity, roots, part geometry or collision authority.
+
+Current runtime collision residency, drawing, sound and inspection consume the
+[#621 current anatomy journal](biological-harvesting.md), including after restore;
+the immutable population remains the baseline identity, not a regenerated yield.

@@ -7,18 +7,21 @@ impl GameplaySession {
         if self.view_mode == ViewMode::Gameplay {
             let frame = character_ship_frame(ship.pose);
             let extracted_before = self.mining.session.extracted_mass_kg();
-            self.mining.advance(
-                &self.equipment,
-                self.mining_delta(delta),
-                self.character.snapshot(frame, self.terrain_frame(ship)),
-                frame,
-                door_passable(ship),
-                self.world_seed(),
-            );
+            if !self.advance_biology(delta) {
+                self.mining.advance(
+                    &self.equipment,
+                    self.mining_delta(delta),
+                    self.character.snapshot(frame, self.terrain_frame(ship)),
+                    frame,
+                    door_passable(ship),
+                    self.world_seed(),
+                );
+            }
             if self.mining.session.extracted_mass_kg() > extracted_before {
                 self.surface_age
                     .contact(salimon_ship::surface_age::TOOL, delta);
             }
+            self.mining.biological_obstacles = self.organism_field();
             let player = self
                 .character
                 .snapshot(frame, self.terrain_frame(ship))

@@ -50,10 +50,8 @@ pub fn aimed_fragment(
             if carried == Some(WorldObjectId::ResourceFragment(piece.id())) {
                 return None;
             }
-            let distance = ray.sphere_distance(
-                piece.transform().position(),
-                crate::resource_size::fragment_contact_radius_meters(piece.material()),
-            )?;
+            let distance =
+                ray.sphere_distance(piece.transform().position(), piece.contact_radius_meters())?;
             (distance <= PICKUP_RANGE_METERS && distance < blocked_at)
                 .then_some((piece.id(), distance))
         })

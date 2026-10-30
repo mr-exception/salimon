@@ -91,3 +91,9 @@ Runtime tests cover warm/cold/dry/vacuum response, repeated TT samples, fixed
 source endpoints/roots and material bounds. Production Vulkan evidence includes
 all six families, day/red/night illumination and declared wet/frost/dust fixtures.
 Originals and unverified human/hardware scope are in `reports/issue-622/README.md`.
+
+## Physical harvesting (#621)
+
+[Source-bound natural anatomy and depletion](biological-harvesting.md) now filter
+physical parts and weather flex. Cosmetic cover has no harvest authority. Detached
+objects reuse the segment renderer with original shape/color/species material.

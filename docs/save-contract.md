@@ -1,9 +1,9 @@
-# Canonical whole-game save contract (schema 20)
+# Canonical whole-game save contract (schema 29)
 
-> This is the **current compressed-world runtime save schema 23**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+> Current runtime captures use **schema 29**; schema 23 was the historical compressed-world baseline, and schema 24+ additionally binds canonical Vesper definitions. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
-version 20. Decode accepts versions 1–19 for explicit runtime migration; the
+version 29. Decode accepts versions 1–28 for explicit runtime migration; the
 following v1–v3 paragraphs record that historical migration:
 retain the complete physical/Fabricator/equipment payload, initialize newly
 introduced survival meters at 100 with no effects or retrospective active time,
@@ -368,7 +368,7 @@ checkpoint scheduling. See [source and input](../client/runtime/architecture.md#
 
 `salimon-persistence::universe::UniverseSave` is a **separate**
 `salimon.universe.save` version-1 wire envelope, not a migration of current
-`salimon.save` (now schema 28). It is delivered for future world integration; normal
+`salimon.save` (now schema 29). It is delivered for future world integration; normal
 startup still uses the compressed-world session source. Existing saves are never
 implicitly interpreted, discarded or rewritten by this API.
 
@@ -610,3 +610,12 @@ ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundarie
 
 [Planetary chart](planetary-chart.md) maps personal history, physical inspection,
 native text/keys, uncertainty presentation and schema-28 validation to owners/tests.
+
+## Biological source journal — schema 29 (#621)
+
+[Exact source/shape/depletion/restore contract](biological-harvesting.md). Captures
+include the catalog-bound biological journal and explicit fixture context; pending
+grips/audio/caches are excluded. Versions 1–28 migrate empty; new biological data
+cannot be backdated. Natural fragment anatomy is optional on older objects.
+Publication, geometry, mass, allocator, carry and source-debit cross-checks precede
+atomic publication. Missing and partial anatomy never regrows on stream/reload.

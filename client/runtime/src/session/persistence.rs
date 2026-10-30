@@ -15,6 +15,8 @@ use salimon_persistence::{SaveError, Validate, invalid};
 #[serde(deny_unknown_fields)]
 pub(crate) struct SessionState {
     physical: PhysicalState,
+    #[serde(default)]
+    biology: Option<super::biology::Save>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     field_marks: Option<salimon_universe::surface_observations::Book>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -55,6 +57,9 @@ pub(crate) struct SessionState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(b) = &self.biology {
+            b.validate(self.physical.world_state(), self.physical.terrain_mode())?;
+        }
         if let Some(book) = &self.field_marks {
             book.validate().map_err(|e| invalid(e.to_string()))?;
         }
@@ -129,6 +134,7 @@ impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            biology: Some(self.biology_capture()?),
             field_marks: self.field_capture()?,
             surface_chart: self.surface_capture()?,
             chart: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
@@ -189,6 +195,12 @@ impl GameplaySession {
         super::lighting::save::validate_schema(&save.state.lighting, save.schema_version)?;
         let (fabricator, consumables) =
             super::fabrication::save::restore(save.state.fabrication, save.schema_version)?;
+        let biology = Self::biology_restore(
+            save.state.biology,
+            save.schema_version,
+            save.state.physical.world_state(),
+            save.state.physical.terrain_mode(),
+        )?;
         let physical = save.state.physical.restore()?;
         let scanner = super::scanner::Scanner::restore(
             save.state.scanner,
@@ -221,6 +233,7 @@ impl GameplaySession {
             save.schema_version,
         )?;
         let mut restored = Self {
+            biology,
             scanner,
             chart,
             field_marks,
@@ -288,6 +301,7 @@ impl GameplaySession {
         if restored.survival.snapshot().terminal {
             restored.freeze_terminal();
         }
+        restored.mining.biological_obstacles = restored.organism_field();
         restored.reset_field_sample();
         restored.audio_epoch = self.audio_epoch.wrapping_add(1);
         *self = restored;

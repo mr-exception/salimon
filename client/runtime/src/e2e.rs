@@ -17,6 +17,8 @@ pub(crate) enum Scenario {
     CanonicalFlight,
     CanonicalJourney,
     PlanetaryChart,
+    BiologicalHarvest,
+    BiologicalMining,
     NavigationApproach,
     ConstructionModule,
     ConstructionModuleUpgrade,
@@ -87,6 +89,8 @@ impl Scenario {
             "canonical-surface" => Ok(Self::CanonicalSurface),
             "canonical-mining" => Ok(Self::CanonicalMining),
             "canonical-flight" => Ok(Self::CanonicalFlight),
+            "biological-harvest" => Ok(Self::BiologicalHarvest),
+            "biological-mining" => Ok(Self::BiologicalMining),
             "planetary-chart" => Ok(Self::PlanetaryChart),
             "canonical-journey" => Ok(Self::CanonicalJourney),
             "navigation-approach" => Ok(Self::NavigationApproach),
@@ -216,6 +220,8 @@ impl Scenario {
             Self::CanonicalSurface => "canonical-surface",
             Self::CanonicalMining => "canonical-mining",
             Self::CanonicalFlight => "canonical-flight",
+            Self::BiologicalHarvest => "biological-harvest",
+            Self::BiologicalMining => "biological-mining",
             Self::PlanetaryChart => "planetary-chart",
             Self::CanonicalJourney => "canonical-journey",
             Self::NavigationApproach => "navigation-approach",
@@ -465,6 +471,12 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         | Scenario::CoreRestart
         | Scenario::CrashRecovery => crate::flight_regression::initialize(app, config.scenario)?,
         Scenario::LandedEarth => {}
+        Scenario::BiologicalHarvest | Scenario::BiologicalMining => {
+            crate::session::biology::initialize_fixture(
+                app,
+                config.scenario == Scenario::BiologicalMining,
+            )?;
+        }
         Scenario::PlanetaryChart => {
             *app = GameplaySession::new_canonical_run()?;
             app.command(crate::session::Command::Control(

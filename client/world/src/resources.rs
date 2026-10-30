@@ -265,6 +265,53 @@ impl ResourceTransform {
     }
 }
 
+/// Original tapered anatomy in the object's local metre frame; immutable identity survives release.
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NaturalShape {
+    pub source_key: [u8; 32],
+    pub part_id: u16,
+    pub start: [f64; 3],
+    pub end: [f64; 3],
+    pub radii: [f64; 2],
+    pub color: [f32; 3],
+}
+impl NaturalShape {
+    pub fn length(self) -> f64 {
+        (0..3)
+            .map(|i| (self.end[i] - self.start[i]).powi(2))
+            .sum::<f64>()
+            .sqrt()
+    }
+    pub fn radius(self) -> f64 {
+        [self.start, self.end]
+            .iter()
+            .map(|p| p.iter().map(|v| v * v).sum::<f64>().sqrt())
+            .fold(0., f64::max)
+            + self.radii.into_iter().fold(0., f64::max)
+    }
+    pub fn validate(self) -> Result<(), ResourceError> {
+        if self.part_id == 0
+            || self.source_key == [0; 32]
+            || !self
+                .start
+                .iter()
+                .chain(&self.end)
+                .chain(&self.radii)
+                .all(|v| v.is_finite())
+            || self.radii.iter().any(|v| *v <= 0.)
+            || self
+                .color
+                .iter()
+                .any(|v| !v.is_finite() || !(0.0..=1.).contains(v))
+            || self.length() <= 0.
+            || self.radius() > 1000.
+        {
+            return Err(ResourceError::InvalidTransform);
+        }
+        Ok(())
+    }
+}
 /// A physical world object, not an inventory quantity. Pose can change; identity cannot.
 #[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -273,6 +320,8 @@ pub struct ResourceFragment {
     source: DepositId,
     material: RawMaterial,
     transform: ResourceTransform,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    natural_shape: Option<NaturalShape>,
 }
 
 impl ResourceFragment {
@@ -287,7 +336,20 @@ impl ResourceFragment {
             source,
             material,
             transform,
+            natural_shape: None,
         }
+    }
+    pub const fn natural_shape(self) -> Option<NaturalShape> {
+        self.natural_shape
+    }
+    pub(crate) fn set_natural_shape(&mut self, shape: NaturalShape) {
+        self.natural_shape = Some(shape);
+    }
+    pub fn contact_radius_meters(self) -> f64 {
+        self.natural_shape.map_or_else(
+            || crate::resource_size::fragment_contact_radius_meters(self.material),
+            |s| s.radius(),
+        )
     }
     pub const fn id(self) -> FragmentId {
         self.id

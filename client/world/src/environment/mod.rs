@@ -4,6 +4,8 @@ pub mod activity;
 pub mod atmosphere;
 pub mod climate;
 pub mod ecology;
+pub mod harvest;
+pub mod harvest_fixture;
 pub mod landmarks;
 pub mod organism_placement;
 pub mod organisms;

@@ -4,6 +4,7 @@ use super::*;
 impl Default for GameplaySession {
     fn default() -> Self {
         Self {
+            biology: Default::default(),
             paused: false,
             scanner: Default::default(),
             chart: salimon_universe::scanner::chart::Chart::new(scanner::CATALOG.revision())

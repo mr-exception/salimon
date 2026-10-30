@@ -1,0 +1,302 @@
+{
+  "setup": {
+    "scenario": "biological-harvest",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.fixture",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "biology.target.part",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "attached-biomass-part",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 6
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.pending",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "gripping-source",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.pending",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "biology.sources.0.fraction",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 18
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "biology.sources.0.fraction",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.natural_shape.part_id",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "same-natural-part-in-hand",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "biology.sources.0.fraction",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 10
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.id",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "released-natural-part",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.id",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "biology.sources.0.fraction",
+        "equals": 0
+      }
+    }
+  ]
+}

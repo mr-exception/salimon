@@ -38,11 +38,16 @@ static ACTIVITY: LazyLock<ActivityDefinition> = LazyLock::new(|| {
     )
     .expect("published Vesper has no active sources")
 });
+type PartFraction<'a> = dyn Fn(&str, u16) -> f64 + 'a;
+pub(crate) struct Anatomy<'a> {
+    pub population: &'a Population,
+    pub remaining: Option<&'a PartFraction<'a>>,
+}
 /// Explicit physical particulate loading; dry weather alone is not a dust source.
 pub(crate) fn sample(
     climate: &ClimateDefinition,
     activity: &ActivityDefinition,
-    population: &Population,
+    anatomy: Anatomy<'_>,
     epoch: Epoch,
     listener: Listener,
     dust_kg_m3: f64,
@@ -131,7 +136,7 @@ pub(crate) fn sample(
     }
     // Only published physical flexible material. Never use camera/LOD micro-cover.
     if air > 0. && wind > 0. {
-        for o in population.objects() {
+        for o in anatomy.population.objects() {
             if !matches!(o.specimen.form, Form::Frond | Form::Filament) {
                 continue;
             }
@@ -140,8 +145,14 @@ pub(crate) fn sample(
             if distance > 40. {
                 continue;
             }
-            let flexible = o.specimen.parts.iter().filter(|p| p.id > 0).count();
-            let gain = air * (wind / 20.).min(1.) * (flexible as f64 / 20.).min(1.) * 0.12
+            let flexible: f64 = o
+                .specimen
+                .parts
+                .iter()
+                .filter(|p| p.id > 0)
+                .map(|p| anatomy.remaining.map_or(1., |f| f(&o.id, p.id)).sqrt())
+                .sum();
+            let gain = air * (wind / 20.).min(1.) * (flexible / 20.).min(1.) * 0.12
                 / (1. + distance * distance / 9.)
                 * if blocked(o.position_meters) { 0.1 } else { 1. };
             if gain * listener.transmission > f64::from(out.bands[3].gain) {
@@ -172,7 +183,7 @@ pub(crate) fn shelter(eye: [f64; 3], ramp: f64, cargo: f64, screen: f64) -> (f64
     (t.0 * (0.025 + 0.975 * ramp), t.1 * (0.04 + 0.56 * ramp))
 }
 pub(crate) fn capture(s: &GameplaySession) -> Frame {
-    if s.mining.terrain != salimon_world::terrain::TerrainMode::Canonical {
+    if s.mining.terrain != salimon_world::terrain::TerrainMode::Canonical && !s.biology.fixture {
         return Frame::default();
     }
     let state = s.snapshot();
@@ -218,13 +229,36 @@ pub(crate) fn capture(s: &GameplaySession) -> Frame {
     let Ok(epoch) = crate::session::field_marks::epoch(s.elapsed) else {
         return Frame::default();
     };
+    let climate = if s.biology.fixture {
+        crate::session::biology::FIXTURE.biosphere.climate()
+    } else {
+        salimon_world::canonical::BIOSPHERE.climate()
+    };
+    static FIXTURE_ACTIVITY: LazyLock<ActivityDefinition> = LazyLock::new(|| {
+        ActivityDefinition::new(
+            crate::session::biology::FIXTURE.biosphere.climate().clone(),
+            1,
+            0,
+            ActivityInputs::dormant(),
+        )
+        .expect("explicit dormant fixture")
+    });
+    let body_origin = crate::session::biology::origin(s.biology.fixture);
+    let remaining = |id: &str, part: u16| s.biological_fraction(id, part);
     sample(
-        salimon_world::canonical::BIOSPHERE.climate(),
-        &ACTIVITY,
-        &salimon_world::canonical::ORGANISMS,
+        climate,
+        if s.biology.fixture {
+            &FIXTURE_ACTIVITY
+        } else {
+            &ACTIVITY
+        },
+        Anatomy {
+            population: crate::session::biology::population(s.biology.fixture),
+            remaining: Some(&remaining),
+        },
         epoch,
         Listener {
-            eye,
+            eye: sub(eye, body_origin),
             right,
             contact,
             transmission,
@@ -232,6 +266,7 @@ pub(crate) fn capture(s: &GameplaySession) -> Frame {
         },
         0.,
         |p| {
+            let p = std::array::from_fn(|i| p[i] + body_origin[i]);
             let ray = salimon_world::mining::MiningRay::new(
                 salimon_world::WorldPosition::new(eye[0], eye[1], eye[2]),
                 salimon_world::WorldPosition::new(p[0], p[1], p[2]),

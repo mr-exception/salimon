@@ -68,3 +68,9 @@ Apple/Windows and M1 qualification remain unverified release work.
 E2E normally leaves personal preferences unopened. An explicit
 `SALIMON_SETTINGS_FILE` enables the real preference IO adapter against a
 caller-owned isolated file for native settings verification.
+
+## Current anatomy (#621)
+
+[Biological source deltas](biological-harvesting.md) filter rustle eligibility and
+produce contact audio only after actual separation commit. Explicit fictional
+fixtures query their own publication and body-relative listener; Vesper unchanged.

@@ -820,3 +820,11 @@ native text/keys, uncertainty presentation and schema-28 validation to owners/te
 [Source and verification contract](planetary-audio.md): runtime `environment_audio.rs`
 feeds the existing native continuous mixer from local world definitions. Run its
 portable regressions, production callback export and native environment-audio scenario.
+
+
+## Biological harvesting (#621)
+
+[Source, frame, shape, transaction and schema contract](biological-harvesting.md).
+World `environment/harvest.rs` and `biological_session.rs` own source/mass rules;
+runtime `session/biology.rs` composes input, current anatomy and checkpoint restore.
+Run world/runtime harvest tests, full gates and both native biological scenarios.

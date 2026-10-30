@@ -36,13 +36,27 @@ impl ClientApplication {
         } else {
             None
         };
-        let mining_target = self.session.mining.target(
-            &self.session.equipment,
-            character_snapshot,
-            ship_frame,
-            door_passable(ship_snapshot),
-            self.world_seed(),
-        );
+        let mining_target = (self.session.equipment.mining_equipped()
+            && self
+                .session
+                .biological_target()
+                .and_then(|key| {
+                    crate::session::biology::catalog(self.session.biology.fixture).get(&key)
+                })
+                .is_some_and(|s| {
+                    s.method == salimon_world::environment::harvest::Method::Embedded
+                }))
+            || self
+                .session
+                .mining
+                .target(
+                    &self.session.equipment,
+                    character_snapshot,
+                    ship_frame,
+                    door_passable(ship_snapshot),
+                    self.world_seed(),
+                )
+                .is_some();
         let fragment_interaction = !matches!(
             interaction,
             Some(
@@ -102,6 +116,12 @@ impl ClientApplication {
             placement: OverlayPlacement::BottomCenter,
         });
         let contextual_action = if let Some(text) = self.session.surface_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if let Some(text) = self.session.biological_hint() {
             Some(crate::resource_context::Prompt {
                 fragment: None,
                 text,
@@ -208,7 +228,7 @@ impl ClientApplication {
         PromptFrame {
             monitor_message,
             interaction,
-            mining_target: mining_target.is_some(),
+            mining_target,
             contextual_placement,
         }
     }

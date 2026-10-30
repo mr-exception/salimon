@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the runtime envelope (now schema 28, with a canonical definition binding).
+`salimon-universe` IDs/frames/epochs. It does not replace the runtime envelope (now schema 29, with a canonical definition binding).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -166,3 +166,12 @@ validated reload cannot reveal catalog POIs or invent a target range.
 
 Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
 Personal edits/targets never mutate canonical sites, suit observations or scanner history.
+
+
+## Biological harvesting and schema 29 (#621)
+
+Follow the [yield, atomic transfer, geometry and persistence contract](../../docs/biological-harvesting.md).
+World owns explicit source designations, revision/depletion journals and physical
+publication; runtime composes F/tool input, current anatomy and source-bound restore.
+Schema 29 preserves missing/partial parts and natural object identity. Vesper
+remains sterile; positive sources are explicit fictional geometry fixtures.

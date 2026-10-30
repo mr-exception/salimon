@@ -144,6 +144,7 @@ pub(crate) fn dispatch(session: &mut GameplaySession, key: Key, pressed: bool) {
 
 impl GameplaySession {
     pub(crate) fn clear_held_controls(&mut self) {
+        self.biology.pending = None;
         self.crafting_ui.open = false;
         self.archive_reader.open = false;
         self.wheel = Default::default();

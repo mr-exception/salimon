@@ -1812,3 +1812,12 @@ Follow the [observational source, media, lifecycle and accessibility contract](.
 `environment_audio.rs` maps actual local definitions into five reserved continuous
 callback channels; audio has no simulation/save authority. Preserve vacuum silence,
 physical contact gates and independent environment settings.
+
+
+## Biological harvesting and schema 29 (#621)
+
+Follow the [yield, atomic transfer, geometry and persistence contract](../../docs/biological-harvesting.md).
+World owns explicit source designations, revision/depletion journals and physical
+publication; runtime composes F/tool input, current anatomy and source-bound restore.
+Schema 29 preserves missing/partial parts and natural object identity. Vesper
+remains sterile; positive sources are explicit fictional geometry fixtures.

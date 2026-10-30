@@ -49,7 +49,7 @@ impl GameplaySession {
         !self.mining.session.fragments().iter().any(|p| {
             salimon_character::cargo::sphere_overlaps_box(
                 frame.world_to_local(p.transform().position().meters()),
-                salimon_world::resource_size::fragment_contact_radius_meters(p.material()),
+                p.contact_radius_meters(),
                 b,
             )
         })

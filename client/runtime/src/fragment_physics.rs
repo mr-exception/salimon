@@ -316,7 +316,27 @@ pub(crate) fn advance_measured(
     let solver_time = solver_start
         .map(|start| start.elapsed())
         .unwrap_or_default();
-    for (&id, piece) in ids.iter().zip(states.drain(..)) {
+    for (&id, mut piece) in ids.iter().zip(states.drain(..)) {
+        if !matches!(
+            piece.surface,
+            Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
+        ) && let Some(previous) = tool.session.fragment(id)
+            && let Ok(Some(hit)) = tool.biological_obstacles.sweep(
+                previous.transform().position().meters(),
+                piece.position,
+                half_extents(*previous, piece.orientation),
+            )
+        {
+            let from = previous.transform().position().meters();
+            piece.position = std::array::from_fn(|i| {
+                from[i]
+                    + (piece.position[i] - from[i]) * (hit.fraction - 1e-7).max(0.)
+                    + hit.normal[i] * 0.00001
+            });
+            let inward = dot(piece.velocity, hit.normal).min(0.);
+            piece.velocity = std::array::from_fn(|i| piece.velocity[i] - inward * hit.normal[i]);
+        }
+
         tool.fragment_motion.insert(
             id,
             FragmentMotion {
@@ -502,12 +522,21 @@ pub(crate) fn to_local_orientation(frame: ShipFrame, world: [f64; 4]) -> [f64; 4
     salimon_physics::compose([-q[0], -q[1], -q[2], q[3]], world)
 }
 
-pub(crate) fn sphere_radius(fragment: salimon_world::resources::ResourceFragment) -> f64 {
-    salimon_world::spherical_mining::GrowingSphere {
-        source: fragment.source(),
-        material: fragment.material(),
+pub(crate) fn half_extents(
+    fragment: salimon_world::resources::ResourceFragment,
+    orientation: [f64; 4],
+) -> [f64; 3] {
+    if let Some(shape) = fragment.natural_shape() {
+        let a = salimon_physics::rotate(orientation, shape.start);
+        let b = salimon_physics::rotate(orientation, shape.end);
+        let r = shape.radii[0].max(shape.radii[1]);
+        std::array::from_fn(|i| a[i].abs().max(b[i].abs()) + r)
+    } else {
+        [sphere_radius(fragment); 3]
     }
-    .radius_meters()
+}
+pub(crate) fn sphere_radius(fragment: salimon_world::resources::ResourceFragment) -> f64 {
+    fragment.contact_radius_meters()
 }
 
 pub(crate) fn support(fragment: salimon_world::resources::ResourceFragment, _up: [f64; 3]) -> f64 {

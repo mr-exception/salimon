@@ -117,6 +117,12 @@ impl Validate for PhysicalState {
     }
 }
 impl PhysicalState {
+    pub(super) fn world_state(&self) -> &salimon_world::mining::MiningSaveState {
+        &self.world
+    }
+    pub(super) fn terrain_mode(&self) -> salimon_world::terrain::TerrainMode {
+        self.terrain
+    }
     pub(super) fn has_carried_fragment(&self) -> bool {
         self.world.carried.is_some()
     }

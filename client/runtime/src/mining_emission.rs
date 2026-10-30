@@ -159,9 +159,7 @@ impl EmissionSurface {
             }
             if existing.iter().any(|p| {
                 length(position.offset_from(p.transform().position()))
-                    < radius
-                        + salimon_world::resource_size::fragment_contact_radius_meters(p.material())
-                        + CLEARANCE_METERS
+                    < radius + p.contact_radius_meters() + CLEARANCE_METERS
             }) {
                 continue;
             }

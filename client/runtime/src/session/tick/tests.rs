@@ -22,7 +22,8 @@ fn construction() -> GameplaySession {
 
 #[test]
 fn ordered_stages_and_partitioned_admission_match_parent_construction_save() {
-    // Only the authorized envelope version changes; retain every other frozen byte.
+    // Schema 29 adds only the explicit empty biological publication; all older
+    // source bytes remain frozen beside the envelope version change.
     let expected = std::str::from_utf8(PARENT_TICK)
         .unwrap()
         .replacen(
@@ -30,6 +31,7 @@ fn ordered_stages_and_partitioned_admission_match_parent_construction_save() {
             &format!("\"schema_version\":{}", salimon_persistence::SCHEMA_VERSION),
             1,
         )
+        .replacen("\"offline\":", &format!("\"biology\":{{\"fixture\":false,\"journal\":{{\"identity\":\"{}\",\"deltas\":[]}}}},\"offline\":",crate::session::biology::catalog(false).identity()),1)
         .into_bytes();
     let mut whole = construction();
     whole.advance_automation(Duration::from_secs(12));

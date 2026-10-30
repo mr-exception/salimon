@@ -31,6 +31,7 @@ pub(crate) struct MiningTool {
 
 #[derive(Default)]
 pub(crate) struct ResourceGameplay {
+    pub(crate) biological_obstacles: std::sync::Arc<salimon_physics::static_boxes::StaticField>,
     pub(crate) modular_interior: salimon_character::modular::ModularInterior,
     pub(crate) carry_blocked: bool,
     pub(crate) interior_solids: Vec<[f64; 6]>,
@@ -280,7 +281,7 @@ impl ResourceGameplay {
     }
 }
 
-fn attachment_pose(
+pub(crate) fn attachment_pose(
     player: CharacterSnapshot,
 ) -> Option<salimon_world::resources::ResourceTransform> {
     preview_pose(player)

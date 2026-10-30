@@ -121,7 +121,9 @@ impl ClientApplication {
                 if self.session.mining.session.attached_sphere_id() == Some(fragment.id()) {
                     continue;
                 }
-                resource_meshes.push(presentation.fragment_mesh(&self.session, fragment));
+                if fragment.natural_shape().is_none() {
+                    resource_meshes.push(presentation.fragment_mesh(&self.session, fragment));
+                }
             }
         }
         if self.session.view_mode == ViewMode::Gameplay
@@ -217,7 +219,13 @@ impl ClientApplication {
         if let Some(frame) = &weather_frame {
             light.color = light.color.map(|c| c * frame.local_light_transmission());
         }
-        let organisms = super::organisms::canonical(camera.position_meters, environment_epoch);
+        let mut organisms = super::organisms::canonical(camera.position_meters, environment_epoch);
+        organisms.extend(super::organisms::physical(
+            &self.session,
+            camera.position_meters,
+            environment_epoch,
+            &presentation,
+        ));
         let render_terrain = if self.session.view_mode == ViewMode::Gameplay {
             self.session.mining.terrain
         } else {

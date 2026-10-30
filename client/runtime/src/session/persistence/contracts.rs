@@ -7,6 +7,7 @@ const PARENT_SAVE: &[u8] = include_bytes!("../../../fixtures/save-schema23-new-r
 fn schema23_source_restores_to_version24_without_fixture_state_loss() {
     let mut expected: serde_json::Value = serde_json::from_slice(PARENT_SAVE).unwrap();
     expected["schema_version"] = salimon_persistence::SCHEMA_VERSION.into();
+    expected["state"]["biology"] = serde_json::json!({"fixture":false,"journal":{"identity":crate::session::biology::catalog(false).identity(),"deltas":[]}});
     let current = GameplaySession::new_run().save_bytes(100).unwrap();
     assert_eq!(
         serde_json::from_slice::<serde_json::Value>(&current).unwrap(),

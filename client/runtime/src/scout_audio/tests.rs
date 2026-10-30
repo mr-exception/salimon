@@ -2,6 +2,7 @@ use super::*;
 pub(super) fn observation() -> Observation {
     Observation {
         environment: Default::default(),
+        biological_contact: (0, None),
         extracted_kg: 0.,
         harvest_material: None,
         epoch: 0,
@@ -430,4 +431,47 @@ fn environmental_harvest_requires_mass_change_and_restore_does_not_replay() {
     s.restore_bytes(&bytes).unwrap();
     p.preview(Observation::capture(&s, true), Settings::default());
     assert_eq!(p.last_control.gains[31], 0.);
+}
+
+#[test]
+#[ignore = "exports actual biological separation observations through the production callback"]
+fn biological_contact_audio_evidence_621() {
+    let root = std::path::PathBuf::from(std::env::var_os("SALIMON_AUDIO_EVIDENCE").unwrap());
+    std::fs::create_dir_all(&root).unwrap();
+    let mut s = GameplaySession::default();
+    crate::session::biology::initialize_fixture(&mut s, false).unwrap();
+    let fixture = &crate::session::biology::FIXTURE;
+    std::fs::write(root.join("source-context.json"),serde_json::to_vec_pretty(&serde_json::json!({
+        "scope":"explicit fictional representative-Moon-geometry publication; no canonical Vesper life",
+        "biosphere_identity":fixture.biosphere.identity(),"population_identity":fixture.population.identity(),
+        "population_binding_sha256":salimon_universe::synthesis::sha256(&fixture.population.binding()),
+        "catalog_identity":fixture.catalog.identity(),"world_origin_meters":crate::session::biology::origin(true),
+        "elapsed_seconds":s.elapsed.as_secs_f64(),"character_eye_meters":s.snapshot().character.eye_position_meters,
+        "sources":fixture.catalog.sources().iter().map(|source|serde_json::json!({"key":source.key,"method":format!("{:?}",source.method),"resource":source.material.key(),"initial_mass_kg":source.initial_mass_kg,"body_fixed_center_meters":source.center,"shape":source.shape})).collect::<Vec<_>>()
+    })).unwrap()).unwrap();
+    let mut presenter = Presenter::default();
+    presenter.preview(Observation::capture(&s, true), Settings::default());
+    s.command(crate::session::Command::GrabDrop(true));
+    s.command(crate::session::Command::GrabDrop(false));
+    let mut controls = Vec::new();
+    let mut contact = false;
+    for _ in 0..125 {
+        s.advance_automation(Duration::from_millis(16));
+        presenter.preview(Observation::capture(&s, true), Settings::default());
+        contact |= presenter.last_control.gains[31] > 0.;
+        controls.push(presenter.last_control);
+    }
+    assert!(contact);
+    assert_eq!(s.mining.session.fragments().len(), 1);
+    let bytes = s.save_bytes(100).unwrap();
+    s.restore_bytes(&bytes).unwrap();
+    presenter.preview(Observation::capture(&s, true), Settings::default());
+    assert_eq!(presenter.last_control.gains[31], 0.);
+    let (wav, metrics) = crate::native_audio::sequence_wav(&controls);
+    std::fs::write(root.join("actual-separation.wav"), wav).unwrap();
+    std::fs::write(
+        root.join("audio-metrics.json"),
+        serde_json::to_vec_pretty(&metrics).unwrap(),
+    )
+    .unwrap();
 }

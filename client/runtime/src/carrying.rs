@@ -73,6 +73,17 @@ pub(crate) fn target(
             &tool.interior_solids,
             player.look_target_meters,
         ))
+        .chain(
+            tool.biological_obstacles
+                .sweep(
+                    player.eye_position_meters,
+                    std::array::from_fn(|i| player.eye_position_meters[i] + ray.direction[i] * 4.),
+                    [0.; 3],
+                )
+                .ok()
+                .flatten()
+                .map(|hit| hit.fraction * 4.),
+        )
         .min_by(f64::total_cmp)
         .unwrap_or(f64::INFINITY);
     aimed_fragment(
@@ -141,7 +152,7 @@ pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot, fra
         .iter()
         .find(|piece| piece.id() == id)
         .expect("carried fragment exists");
-    let clearance = salimon_world::resource_size::fragment_contact_radius_meters(piece.material());
+    let clearance = piece.contact_radius_meters();
     // Keep the entire object ahead of the player's vertical capsule even when
     // looking straight down; eye-only clearance would clip the torso/legs.
     let support = crate::fragment_physics::support(*piece, up);
@@ -204,6 +215,16 @@ pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot, fra
             return;
         }
     }
+    let half = crate::fragment_physics::half_extents(*piece, orientation);
+    if tool.biological_obstacles.overlaps(p, half).unwrap_or(true)
+        || tool
+            .biological_obstacles
+            .sweep(player.eye_position_meters, p, [0.; 3])
+            .is_ok_and(|hit| hit.is_some())
+    {
+        blocked_in_frame(tool, id, frame);
+        return;
+    }
     if let Ok(pose) = ResourceTransform::new(position(p), orientation) {
         tool.session.move_carried(pose);
     }
@@ -230,7 +251,7 @@ pub(crate) fn release_pose(
             player.location != CharacterLocation::InsideShip
                 || tool.cargo_allowed(
                     frame.world_to_local(piece.transform().position().meters()),
-                    salimon_world::resource_size::fragment_contact_radius_meters(piece.material()),
+                    piece.contact_radius_meters(),
                 )
         })
         .map(|piece| piece.transform())
@@ -408,8 +429,7 @@ mod tests {
                 assert_eq!(tool.session.fragments().len(), 1);
                 let piece = tool.session.fragments()[0];
                 assert!(tool.session.pick_up(piece.id()));
-                let radius =
-                    salimon_world::resource_size::fragment_contact_radius_meters(piece.material());
+                let radius = piece.contact_radius_meters();
                 for pitch in [-100.0, 0.0, 100.0] {
                     let player = CharacterSnapshot {
                         location: CharacterLocation::Surface,

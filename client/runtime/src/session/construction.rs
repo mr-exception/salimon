@@ -387,7 +387,7 @@ impl GameplaySession {
         }
         let mut placed: Vec<([f64; 3], f64)> = Vec::new();
         for f in &mut refunds {
-            let radius = salimon_world::resource_size::fragment_contact_radius_meters(f.material());
+            let radius = f.contact_radius_meters();
             let mut destination = None;
             'search: for x in -6..=6 {
                 for z in -6..=6 {

@@ -296,6 +296,9 @@ impl GameplaySession {
                 .filter(|o| site.organism_ids.contains(&o.id))
             {
                 for part in &organism.parts {
+                    if self.biological_fraction(&organism.id, part.id) <= 0. {
+                        continue;
+                    }
                     if let Some(d) = salimon_character::cargo::box_sight_obstruction(
                         eye,
                         point(10.),
@@ -321,7 +324,8 @@ impl GameplaySession {
         let ship = self.ship.snapshot();
         let frame = super::frames::character_ship_frame(ship.pose);
         if terrain_hit.is_some_and(|d| d < distance - 0.25)
-            || super::organisms::FIELD
+            || self
+                .organism_field()
                 .sweep(eye, site, [0.; 3])
                 .is_ok_and(|hit| hit.is_some_and(|h| h.fraction * distance < distance - 0.25))
             || salimon_character::ship_sight_obstruction(

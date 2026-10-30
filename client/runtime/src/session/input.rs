@@ -20,6 +20,9 @@ mod tests;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Key {
+    FieldSpot,
+    FieldBearing,
+    FieldPower,
     Forward,
     Backward,
     Left,
@@ -75,6 +78,16 @@ pub(crate) enum Key {
 }
 
 pub(crate) fn dispatch(session: &mut GameplaySession, key: Key, pressed: bool) {
+    if matches!(key, Key::FieldSpot | Key::FieldBearing | Key::FieldPower) {
+        if pressed {
+            session.field_action(match key {
+                Key::FieldSpot => 0,
+                Key::FieldBearing => 1,
+                _ => 2,
+            });
+        }
+        return;
+    }
     if construction::handle(session, key, pressed) || modals::handle(session, key, pressed) {
         return;
     }

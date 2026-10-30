@@ -306,3 +306,10 @@ See the [scanner contract](../../docs/universe-scanner.md) for source/test mappi
 See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
 split-origin/source validation, explicit frame/epoch limits and production
 verification. Sky visibility grants no scanner/chart knowledge or simulation authority.
+
+
+## Suit observations (#625)
+
+Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
+Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
+validated reload cannot reveal catalog POIs or invent a target range.

@@ -71,6 +71,7 @@ impl GameplaySession {
             journey_character_end,
             !delta.is_zero(),
         );
+        self.update_field_tick();
         self.sync_carried();
         self.validate_crafting_focus();
         self.validate_archive_focus();

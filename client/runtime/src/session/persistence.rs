@@ -16,6 +16,8 @@ use salimon_persistence::{SaveError, Validate, invalid};
 pub(crate) struct SessionState {
     physical: PhysicalState,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    field_marks: Option<salimon_universe::surface_observations::Book>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     scanner: Option<super::scanner::save::ScannerSave>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     chart: Option<salimon_universe::scanner::chart::ChartCheckpoint>,
@@ -51,6 +53,9 @@ pub(crate) struct SessionState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(book) = &self.field_marks {
+            book.validate().map_err(|e| invalid(e.to_string()))?;
+        }
         if let Some(chart) = &self.chart {
             super::chart::validate_saved(chart)?;
         }
@@ -119,6 +124,7 @@ impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            field_marks: self.field_capture()?,
             chart: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
                 .then(|| self.chart.checkpoint()),
             scanner: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
@@ -190,6 +196,12 @@ impl GameplaySession {
             physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
             &scanner,
         )?;
+        let field_marks = super::field_marks::restore(
+            save.state.field_marks,
+            save.schema_version,
+            physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
+            save.simulated_time,
+        )?;
         let mounts = super::mounts::save::restore(save.state.mounts, save.schema_version)?;
         super::finishes::save::validate_schema(&save.state.finishes, save.schema_version)?;
         super::core_upgrades::save::validate_schema(
@@ -199,6 +211,7 @@ impl GameplaySession {
         let mut restored = Self {
             scanner,
             chart,
+            field_marks,
             lighting: save.state.lighting,
             core_upgrades: save.state.core_upgrades,
             surface_age,
@@ -262,6 +275,7 @@ impl GameplaySession {
         if restored.survival.snapshot().terminal {
             restored.freeze_terminal();
         }
+        restored.reset_field_sample();
         restored.audio_epoch = self.audio_epoch.wrapping_add(1);
         *self = restored;
         Ok(())

@@ -387,3 +387,7 @@ set `SALIMON_SAVE_DIR` to a new empty directory; do not delete old evidence.
 F2 remains the explicitly separate compressed precision camera; returning to
 gameplay restores the canonical scene. E2E fixtures never import user saves.
 See [canonical gameplay](../../docs/universe-gameplay.md#ordinary-canonical-play-427).
+
+
+Suit field marks (#625): F10 estimated spot, F11 bearing-only mark, F12 navigation power.
+[Controls, uncertainty and persistence](../../docs/suit-observations.md).

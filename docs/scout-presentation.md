@@ -78,16 +78,17 @@ join the same output rather than a second OS player.
 (CoreAudio, WASAPI, ALSA defaults) for one continuous default-device stream.
 `native_audio/mix.rs` owns deterministic original sample synthesis. Thirteen loop
 slots, eleven ship transient slots and three survival slots bound the callback
-to 27 voices. Runtime admits at most 24 scene voices and 12 pending events;
+to 32 voices, including five [environmental channels](planetary-audio.md). Runtime admits at most 24 Scout scene voices and 12 pending events,
+plus the five environment channels;
 repeated callback event counters coalesce to the latest event. Physical partitions
 and tactile mechanism channels follow [the acoustics contract](scout-acoustics.md).
 Gain/pan converge over 10 ms without chunk-boundary fades. Low-pass procedural
 noise and smooth saturation preserve headroom; no downloaded media is used.
 Original survival timbre/envelope/relative level remain observational.
 
-The producer publishes a fixed 240-byte atomic mailbox; the callback attempts at
+The producer publishes a fixed 672-byte atomic mailbox; the callback attempts at
 most three coherent reads and retains its previous observation on contention.
-Callback state is 1,080 bytes and neither allocates, locks, writes files, logs nor
+Callback state is 3,240 bytes and neither allocates, locks, writes files, logs nor
 calls back into CPAL. Sample phase persists across arbitrary buffer sizes. A
 250 ms producer watchdog fades stalled input to silence and consumes stale event
 counters. Pause/focus/occlusion/terminal/menu/reset/master mute retire events and

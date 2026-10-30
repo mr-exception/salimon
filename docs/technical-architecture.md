@@ -910,3 +910,10 @@ ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundarie
 
 [Planetary chart](planetary-chart.md) maps personal history, physical inspection,
 native text/keys, uncertainty presentation and schema-28 validation to owners/tests.
+
+
+## Planetary audio (#627)
+
+[Source and verification contract](planetary-audio.md): runtime `environment_audio.rs`
+feeds the existing native continuous mixer from local world definitions. Run its
+portable regressions, production callback export and native environment-audio scenario.

@@ -595,3 +595,11 @@ validated reload cannot reveal catalog POIs or invent a target range.
 
 Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
 Personal edits/targets never mutate canonical sites, suit observations or scanner history.
+
+
+## Planetary environmental audio (#627)
+
+Follow the [observational source, media, lifecycle and accessibility contract](../../docs/planetary-audio.md).
+`environment_audio.rs` maps actual local definitions into five reserved continuous
+callback channels; audio has no simulation/save authority. Preserve vacuum silence,
+physical contact gates and independent environment settings.

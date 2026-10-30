@@ -84,6 +84,11 @@ fn run_config(
         application.session = crate::session::GameplaySession::new_canonical_run()
             .map_err(|e| RunError::new("canonical journey startup failed", e))?;
     }
+    // Isolated automation stays off personal preferences unless its caller supplies
+    // an explicit test-owned file. Exercise real settings IO without user saves.
+    if config.is_some() && std::env::var_os("SALIMON_SETTINGS_FILE").is_some() {
+        application.condition_feedback = crate::condition_feedback::Presenter::open();
+    }
     if config.is_none() && benchmark.is_none() {
         application.checkpoints = Some(
             crate::checkpoints::Checkpoints::open(
@@ -225,7 +230,10 @@ impl Default for ClientApplication {
 
 impl ClientApplication {
     pub(crate) fn audio_telemetry(&self) -> serde_json::Value {
-        self.scout_audio.telemetry()
+        let mut v = self.scout_audio.telemetry();
+        v["settings"] =
+            serde_json::to_value(self.condition_feedback.settings).expect("bounded settings");
+        v
     }
     pub(crate) fn ship_resource_stats(&self) -> Option<[u64; 4]> {
         self.renderer.as_ref().map(Renderer::ship_resource_stats)
@@ -587,6 +595,15 @@ impl ClientApplication {
                 }
                 PhysicalKey::Code(KeyCode::KeyB) if self.condition_feedback.settings_open => {
                     self.condition_feedback.toggle_setting(4)
+                }
+                PhysicalKey::Code(KeyCode::KeyE) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(6)
+                }
+                PhysicalKey::Code(KeyCode::KeyF) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(7)
+                }
+                PhysicalKey::Code(KeyCode::KeyT) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(8)
                 }
                 PhysicalKey::Code(KeyCode::KeyG) if self.condition_feedback.settings_open => {
                     self.condition_feedback.toggle_setting(5)

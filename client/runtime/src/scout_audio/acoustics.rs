@@ -1,6 +1,6 @@
 //! Cheap geometric partition separation. Observation only; never pressure/physics.
 #[derive(Clone, Copy, Debug)]
-pub(super) struct Partition {
+pub(crate) struct Partition {
     pub axis: usize,
     pub at: f64,
     pub span: [(f64, f64); 3],
@@ -10,7 +10,7 @@ pub(super) struct Partition {
 }
 /// A segment crosses each physical boundary at most once. Finite apertures permit
 /// sleep screens; an unbounded plane represents a connected cargo room/door.
-pub(super) fn transmission(
+pub(crate) fn transmission(
     eye: [f64; 3],
     source: [f64; 3],
     partitions: &[Partition],
@@ -34,7 +34,7 @@ pub(super) fn transmission(
     }
     (gain, filter)
 }
-pub(super) fn scout(door: f64, screen: f64) -> [Partition; 2] {
+pub(crate) fn scout(door: f64, screen: f64) -> [Partition; 2] {
     [
         Partition {
             axis: 0,
@@ -54,7 +54,7 @@ pub(super) fn scout(door: f64, screen: f64) -> [Partition; 2] {
         },
     ]
 }
-pub(super) fn area(p: [f64; 3]) -> &'static str {
+pub(crate) fn area(p: [f64; 3]) -> &'static str {
     if p[0] < salimon_character::cargo::CARGO_DOOR_TARGET[0] {
         "cargo"
     } else if p[0] >= salimon_character::COCKPIT_SEAT_MARKER_METERS[0] - 1.5 {

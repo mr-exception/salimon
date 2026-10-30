@@ -173,3 +173,10 @@ Physical colliders/landing safety are #620; biological material response is #622
 [Physical organism placement](physical-organisms.md) owns stable source/part
 bindings, root/exclusion rules, common physics sweeps and live character/ship
 clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+## Environmental sound delivery (#627)
+
+The [implemented source and transmission contract](planetary-audio.md) maps local
+world definitions into the continuous mixer. Positive listening fixtures are
+explicit atmospheric worlds; canonical Vesper remains quiet/sterile. Hardware
+listening and subjective tuning remain #561.

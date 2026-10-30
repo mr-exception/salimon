@@ -1,5 +1,5 @@
 //! Observational ship soundscape. No simulation, save or power authority.
-mod acoustics;
+pub(crate) mod acoustics;
 #[cfg(test)]
 mod synth;
 #[cfg(test)]
@@ -53,6 +53,9 @@ struct Voice {
 }
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Observation {
+    environment: crate::environment_audio::Frame,
+    extracted_kg: f64,
+    harvest_material: Option<salimon_world::resources::ResourceId>,
     active: bool,
     interior: bool,
     walking: bool,
@@ -99,6 +102,14 @@ impl Observation {
             s.cargo_door.open_fraction,
         ];
         Self {
+            environment: crate::environment_audio::capture(s),
+            extracted_kg: s.mining.session.extracted_mass_kg(),
+            harvest_material: s
+                .mining
+                .session
+                .attached_sphere_id()
+                .and_then(|id| s.mining.session.fragment(id))
+                .map(|f| f.material().resource()),
             epoch: s.audio_epoch,
             motions,
             mounts: s.mount_audio.0,
@@ -364,8 +375,10 @@ fn spatial(eye: [f64; 3], right: [f64; 3], source: [f64; 3]) -> (f64, f64) {
 #[derive(Default)]
 pub(crate) struct Presenter {
     mixer: Mixer,
+    extracted_kg: Option<f64>,
+    environment: crate::environment_audio::Frame,
     last_control: crate::native_audio::Control,
-    event_counts: [u64; 27],
+    event_counts: [u64; 32],
     preview_only: bool,
     output: crate::native_audio::Output,
     epoch: u64,
@@ -378,6 +391,7 @@ impl Presenter {
         v["area"] = self.mixer.last.map(|o| acoustics::area(o.eye)).into();
         v["scene_events"] = serde_json::json!(self.event_counts);
         v["scene_gains"] = serde_json::json!(self.last_control.gains);
+        v["environment_warning"] = self.environment.warning.into();
         v["scene_filters"] = serde_json::json!(self.last_control.filters);
         v
     }
@@ -386,6 +400,8 @@ impl Presenter {
     }
     pub(crate) fn stop(&mut self) {
         self.mixer = Mixer::default();
+        self.extracted_kg = None;
+        self.environment = Default::default();
         self.last_run = None;
         self.last_control = Default::default();
         self.epoch = self.epoch.wrapping_add(1);
@@ -429,7 +445,16 @@ impl Presenter {
         } else {
             Vec::new()
         };
-        let control = controls(voices, self.epoch, scene, condition, settings);
+        let mut control = controls(voices, self.epoch, scene, condition, settings);
+        let mut environment = o.environment;
+        if self.extracted_kg.is_some_and(|last| o.extracted_kg > last)
+            && let Some(material) = o.harvest_material
+        {
+            environment.bands[4] = crate::environment_audio::harvest(material);
+        }
+        self.extracted_kg = Some(o.extracted_kg);
+        self.environment = environment;
+        crate::environment_audio::apply(environment, &mut control, settings);
         for (i, event) in control.events.iter().enumerate() {
             if *event {
                 self.event_counts[i] = self.event_counts[i].saturating_add(1);

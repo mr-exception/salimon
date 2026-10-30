@@ -1,7 +1,7 @@
 use super::*;
 fn control() -> Control {
     Control {
-        enabled: (1 << VOICES) - 1,
+        enabled: u32::MAX,
         gains: [0.15; VOICES],
         ..Default::default()
     }
@@ -92,7 +92,7 @@ fn continuous_audio_evidence_582() {
         ("thrust", 19, 0),
         ("survival", 0x1c00, 0x1c00),
         ("blackout", 1 << 7, 1 << 7),
-        ("stress", (1 << VOICES) - 1, (1 << VOICES) - 1),
+        ("stress", u32::MAX, u32::MAX),
         ("muted", 0, 0),
     ] {
         let mb = Mailbox::default();

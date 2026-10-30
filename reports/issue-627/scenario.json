@@ -1,0 +1,471 @@
+{
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "audio_output.preview_only",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.27",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.28",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.29",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.30",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.31",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "vacuum-quiet",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "settings",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "settings",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "environment-settings",
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "audio_output.settings.environment_audio",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_audio",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_audio",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "audio_output.settings.environment_audio",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_volume",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_volume",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "audio_output.settings.environment_volume_percent",
+        "equals": 80
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_cues",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_cues",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "audio_output.settings.environment_cues",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "independent-settings",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_audio",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_audio",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_cues",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "environment_cues",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 4
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.27",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.28",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.29",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.30",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.31",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 296
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 230
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 713.9983303613166,
+        "dy": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 95
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "interact"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 50
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 160
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.27",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.28",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.29",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.30",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "audio_output.scene_gains.31",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "scout-interior-vacuum",
+      "timeout_ms": 180000
+    }
+  ]
+}

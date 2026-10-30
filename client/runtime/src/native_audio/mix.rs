@@ -1,6 +1,6 @@
 //! Fixed-memory callback state. No locks, allocation, logging or platform calls.
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering::SeqCst};
-pub(super) const VOICES: usize = 27;
+pub(super) const VOICES: usize = 32;
 #[derive(Clone, Copy)]
 pub(crate) struct Control {
     pub epoch: u64,
@@ -178,7 +178,8 @@ impl Mix {
             v.noise += 0.035 * (noise - v.noise);
             let hz = [
                 67., 47., 180., 220., 43., 120., 90., 180., 140., 440., 65., 360., 110., 72., 95.,
-                80., 125., 45., 110., 38., 150., 52., 170., 105., 125., 180., 65.,
+                80., 125., 45., 110., 38., 150., 52., 170., 105., 125., 180., 65., 37., 310., 22.,
+                490., 130.,
             ][i];
             v.phase = (v.phase + dt).rem_euclid(64.);
             let t = v.phase;
@@ -215,6 +216,11 @@ impl Mix {
                 }
                 12 => tone(hz) * (std::f64::consts::PI * a.min(1.)).sin().powi(2) * 0.35,
                 13..=19 => v.noise * 0.7 + tone(hz) * 0.06 + tone(hz * 2.13) * 0.025,
+                27 => v.noise * (0.7 + 0.2 * tone(0.7)),
+                28 => noise * 0.35 + v.noise * 0.3,
+                29 => tone(hz) * 0.35 + v.noise * 0.5,
+                30 => noise * 0.2 * (0.6 + 0.4 * tone(3.1)),
+                31 => tone(hz) * 0.25 + noise * 0.2,
                 20..=23 | 25..=26 => {
                     (noise * 0.65 + tone(hz) * 0.18)
                         * (-a * if i == 21 || i == 26 { 18. } else { 45. }).exp()
@@ -241,7 +247,7 @@ impl Mix {
     }
 }
 fn loop_voice(i: usize) -> bool {
-    i < 6 || (13..20).contains(&i)
+    i < 6 || (13..20).contains(&i) || i >= 27
 }
 #[cfg(test)]
 mod tests;

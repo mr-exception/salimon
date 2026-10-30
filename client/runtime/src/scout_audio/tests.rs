@@ -1,6 +1,9 @@
 use super::*;
 pub(super) fn observation() -> Observation {
     Observation {
+        environment: Default::default(),
+        extracted_kg: 0.,
+        harvest_material: None,
         epoch: 0,
         motions: [0., 0., 0., 1., 1., 0., 1.],
         restraints: 0,
@@ -405,4 +408,26 @@ fn construction_machine_audio_is_spatial_bounded_and_lifecycle_gated() {
     o.now += Duration::from_millis(16);
     m.observe(o, settings);
     assert!(!cues(&m.voices(settings)).contains(&Cue::Fabricator));
+}
+
+#[test]
+fn environmental_harvest_requires_mass_change_and_restore_does_not_replay() {
+    let mut s = GameplaySession::default();
+    crate::session::canonical::mining_initial_conditions(&mut s).unwrap();
+    let mut p = Presenter::default();
+    p.preview(Observation::capture(&s, true), Settings::default());
+    s.command(crate::session::Command::Select(
+        crate::equipment::ToolbarSlot::One,
+    ));
+    s.command(crate::session::Command::Mining(true));
+    s.advance_automation(Duration::from_millis(64));
+    assert!(s.mining.session.extracted_mass_kg() > 0.);
+    p.preview(Observation::capture(&s, true), Settings::default());
+    assert!(p.last_control.gains[31] > 0.);
+    p.preview(Observation::capture(&s, true), Settings::default());
+    assert_eq!(p.last_control.gains[31], 0.);
+    let bytes = s.save_bytes(100).unwrap();
+    s.restore_bytes(&bytes).unwrap();
+    p.preview(Observation::capture(&s, true), Settings::default());
+    assert_eq!(p.last_control.gains[31], 0.);
 }

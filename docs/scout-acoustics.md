@@ -35,7 +35,7 @@ sounds remain possible during blackout if the mechanism actually moves.
 
 ## Continuous playback and bounded work
 
-The existing CPAL stream now owns 27 fixed voice slots (including three survival
+The existing CPAL stream now owns 32 fixed voice slots (including three survival
 slots); runtime admits at most 24 scene voices and 12 pending events, with alerts
 prioritized. Dense incidental transients may be coalesced/dropped at that budget.
 Mechanism friction uses restrained filtered noise/resonance, with heavier shutter
@@ -44,7 +44,8 @@ There is no queued file/process playback or per-callback allocation/locking/logg
 A per-voice one-pole filter is calibrated to 48 kHz and adjusted to actual device
 rate; its coefficient is prepared once per callback, not once per sample.
 
-Callback mixer storage is 2,736 bytes; atomic mailbox 568 bytes. Input sources,
+Callback mixer/mailbox storage is bounded and reported by production telemetry
+and the current evidence; historical byte counts below predate the five environment slots. Input sources,
 volume/mute, pause, focus, exterior/terminal and stale-control retirement remain
 bounded. Reset/restore increments an excluded observational audio epoch even
 when restored simulation time is identical. Checkpoints contain no audio events,
@@ -66,3 +67,6 @@ Human #561 owns listening/timbre/stereo approval on suitable headphones/speakers
 #557 real device behavior/latency and #563 hardware/CPU budgets. Existing volume
 and master/ship mute controls remain the user controls. Original WAVs and native
 images are review candidates, not promoted baselines or hardware signoff.
+
+Environmental sources and separate settings follow [planetary audio](planetary-audio.md);
+this adds five fixed channels without changing ship event ownership.

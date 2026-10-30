@@ -851,3 +851,11 @@ Run `scripts/salimon-test run scenarios/evidence/planetary-chart.json`. The expl
 cockpit review initial conditions. `chart_text` submits text to the admitted session
 editor; `surface_chart` and `inspect_site` key aliases map real Backslash/Comma.
 [Source, UI controls, limits and verification](../docs/planetary-chart.md).
+
+## Environmental audio (#627)
+
+`scenarios/evidence/environment-audio.json` checks silent device-preview gains,
+Vesper vacuum, pause/settings toggles and GPU settings captures. `key` aliases
+`settings`, `environment_audio`, `environment_volume`, `environment_cues` invoke
+focused native pause-menu keys, not simulation mutations. See
+[contract](../docs/planetary-audio.md).

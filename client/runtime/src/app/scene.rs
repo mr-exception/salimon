@@ -130,6 +130,53 @@ pub(super) fn map_world_to_renderer(
     (camera, instances, spheres, light)
 }
 
+/// The engineering camera retains its old scene; ordinary canonical play never
+/// constructs the compressed Solar System or its precision markers.
+pub(super) fn map_session_world(
+    snapshot: WorldSnapshot<'_>,
+    canonical_play: bool,
+) -> (
+    CameraFrame,
+    Vec<SceneInstance>,
+    Vec<SphereInstance>,
+    PointLight,
+) {
+    if !canonical_play {
+        return map_world_to_renderer(snapshot);
+    }
+    let camera = snapshot.camera;
+    (
+        CameraFrame {
+            position_meters: camera.position.meters(),
+            target_meters: camera.target.meters(),
+            up: camera.up.map(|v| v as f32),
+            vertical_fov_radians: camera.vertical_field_of_view_radians as f32,
+            near_plane_meters: camera.physical_near_plane_meters as f32,
+        },
+        Vec::new(),
+        salimon_world::canonical::BODIES
+            .iter()
+            .map(|b| SphereInstance {
+                center_meters: b.center.meters(),
+                radius_meters: b.radius_meters,
+                material: SurfaceMaterial::Slate,
+            })
+            .collect(),
+        // Fixed local illumination is explicitly separate from future ephemeris lighting.
+        PointLight {
+            position_meters: [
+                0.,
+                salimon_world::canonical::START
+                    .manifest()
+                    .physical
+                    .semi_major_axis_meters,
+                0.,
+            ],
+            color: [1., 0.96, 0.88],
+        },
+    )
+}
+
 /// Map paid-progress edges and completed shared structural/furnishing solids into the ordinary
 /// oriented instance pass. Session-owned solids also feed physical collision.
 pub(super) fn construction_wireframes(
@@ -498,5 +545,35 @@ mod tests {
                 body.name
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod canonical_scene_tests {
+    #[test]
+    fn ordinary_scene_has_no_compressed_bodies_or_precision_markers() {
+        let prototype = salimon_world::CameraPrototype::default();
+        let snapshot = prototype.snapshot();
+        let (_, markers, bodies, light) = super::map_session_world(snapshot, true);
+        assert!(markers.is_empty());
+        assert_eq!(bodies.len(), salimon_world::canonical::BODIES.len());
+        assert_eq!(bodies[0].center_meters, [0.; 3]);
+        assert_eq!(
+            bodies[0].radius_meters,
+            salimon_world::canonical::START
+                .manifest()
+                .physical
+                .radius_meters
+        );
+        assert_eq!(
+            light.position_meters[1],
+            salimon_world::canonical::START
+                .manifest()
+                .physical
+                .semi_major_axis_meters
+        );
+        let (_, markers, bodies, _) = super::map_session_world(snapshot, false);
+        assert_eq!(markers.len(), 3);
+        assert_eq!(bodies.len(), 6);
     }
 }

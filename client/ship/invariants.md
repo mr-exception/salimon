@@ -404,3 +404,11 @@ The [physical organism contract](../../docs/physical-organisms.md) maps canonica
 placement/part/baseline identity, physics-owned swept boxes, character/ship typed
 adapters, runtime residency and matching renderer evidence. Quality never changes
 physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+
+## Ordinary canonical play (#427)
+
+Follow the [canonical play isolation contract](../../docs/universe-gameplay.md#ordinary-canonical-play-427).
+Normal launch rejects prototype checkpoints without overwrite. Canonical scenes
+exclude engineering markers/bodies, and ship telemetry/preview selection does
+not apply the compressed 3 Mm cutoff. Explicit fixtures retain their contracts.

@@ -376,3 +376,14 @@ places 50% (60 s) and 99% (118.8 s) exactly on the live 16 ms scheduler, without
 mutating progress or changing the catalog. The [integrated suite](../../scripts/README.md#integrated-scout-and-construction-acceptance-551)
 checks exact physical refunds and absent partial colliders; the fixture does not
 measure real-world acquisition or authorize source, balance or hardware budgets.
+
+
+## Canonical play and engineering saves (#427)
+
+Ordinary launch uses the permanent Vesper journey and accepts only schema 24+
+canonical checkpoints bound to that publication. A prototype/engineering save
+produces an incompatibility error and is left intact. To start a separate journey,
+set `SALIMON_SAVE_DIR` to a new empty directory; do not delete old evidence.
+F2 remains the explicitly separate compressed precision camera; returning to
+gameplay restores the canonical scene. E2E fixtures never import user saves.
+See [canonical gameplay](../../docs/universe-gameplay.md#ordinary-canonical-play-427).

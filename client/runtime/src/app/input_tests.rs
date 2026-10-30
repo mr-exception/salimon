@@ -481,7 +481,7 @@ fn pause_save_menu_requires_initial_focus_and_preserves_paused_state() {
     let dir = std::env::temp_dir().join(format!("salimon-382-menu-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     app.checkpoints =
-        Some(crate::checkpoints::Checkpoints::open(dir.clone(), &mut app.session).unwrap());
+        Some(crate::checkpoints::Checkpoints::open_at(dir.clone(), &mut app.session, 100).unwrap());
     native(&mut app, KeyCode::Escape, true);
     let before = app.session.save_bytes(123).unwrap();
     let key = PhysicalKey::Code(KeyCode::KeyX);

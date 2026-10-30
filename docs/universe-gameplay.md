@@ -69,7 +69,7 @@ render light/material are inherited from #424; planetary art/atmosphere remains
 its own planned work. Hardware/Metal/FPS, subjective presentation and physical
 platform checks remain #563/#561/#557, separately unverified.
 
-Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit; normal launch rejects prototype saves under #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
 
 
 ## Physical organisms and clearance (#620)
@@ -77,3 +77,20 @@ Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: fro
 [Physical organism placement](physical-organisms.md) owns stable source/part
 bindings, root/exclusion rules, common physics sweeps and live character/ship
 clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+
+## Ordinary canonical play (#427)
+
+Normal startup accepts only schema 24+ canonical checkpoints with the exact
+immutable definition binding. Prototype/engineering saves fail as incompatible
+without overwriting either slot; select a separate save directory for a fresh
+journey. Explicit test reconstruction still supports the historical fixtures.
+Canonical rendering constructs only published local bodies and no precision
+markers; F2 remains an explicit isolated engineering camera view. Canonical
+ship telemetry and preview selection have no compressed 3 Mm neighborhood cutoff;
+local collision/interaction ranges keep their own physical meaning.
+
+Source/tests: runtime `checkpoints.rs` canonical gate tests, `app/scene.rs`
+canonical scene test and ship `controller/telemetry.rs` range regression.
+Ephemeris-driven ordinary flight, offline trajectory and full observed source
+coverage retain their existing owners and limitations.

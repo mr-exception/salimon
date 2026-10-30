@@ -1676,7 +1676,7 @@ selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
 Historical fixtures remain explicit; normal new-run startup uses the canonical constructor.
 
-Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit, old active checkpoints remain resumable until #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit; normal launch rejects prototype saves under #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
 
 
 ## Bounded navigation prediction (#421)
@@ -1783,3 +1783,11 @@ No chart/scanner discovery, duplicate terrain surface or invented cave geometry.
 site metadata onto exact physical organisms and geological/activity provenance.
 No source geometry, collision/LOD anatomy, identity or player knowledge changes;
 strict publication binding survives reconstruction and rejects mismatched sources.
+
+
+## Ordinary canonical play (#427)
+
+Follow the [canonical play isolation contract](../../docs/universe-gameplay.md#ordinary-canonical-play-427).
+Normal launch rejects prototype checkpoints without overwrite. Canonical scenes
+exclude engineering markers/bodies, and ship telemetry/preview selection does
+not apply the compressed 3 Mm cutoff. Explicit fixtures retain their contracts.

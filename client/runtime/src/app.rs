@@ -594,6 +594,13 @@ impl ClientApplication {
                 _ => {}
             }
         }
+        if pause_key && self.session.surface_chart.open && !self.session.is_paused() {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                self.session
+                    .surface_key(crate::session::input::Key::Cancel, true);
+            }
+            return;
+        }
         if pause_key && self.session.building.active && !self.session.is_paused() {
             if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
                 self.session.command(crate::session::Command::Build(
@@ -1161,6 +1168,18 @@ impl ApplicationHandler for ClientApplication {
                 is_synthetic,
                 ..
             } => {
+                if self.session.surface_chart.editing
+                    && event.state == ElementState::Pressed
+                    && !is_synthetic
+                    && self.input_policy().admits_press(InputSource::Native, false)
+                    && let Some(text) = &event.text
+                    && !text.is_empty()
+                    && !text.chars().any(char::is_control)
+                {
+                    let _ = self.session.surface_text(text);
+                    window.request_redraw();
+                    return;
+                }
                 self.dispatch_key(
                     event.physical_key,
                     event.state == ElementState::Pressed,

@@ -807,3 +807,9 @@ Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](univ
 
 See [suit measurements and field marks](suit-observations.md) for source/validation
 ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundaries.
+
+
+## Personal planetary chart (#626)
+
+[Planetary chart](planetary-chart.md) maps personal history, physical inspection,
+native text/keys, uncertainty presentation and schema-28 validation to owners/tests.

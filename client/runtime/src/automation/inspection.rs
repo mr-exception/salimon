@@ -238,6 +238,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
     observation["scanner"] = scanner;
     observation["chart"] = json!({"source":app.chart.checkpoint(),"mode":app.scanner.chart_mode,"note":app.scanner.chart_note,"entry_count":app.chart.entries().count(),"route_count":app.chart.routes().len()});
+    observation["surface_chart"] = json!({"source":app.surface_capture().ok().flatten(),"open":app.surface_chart.open,"editing":app.surface_chart.editing,"hint":app.surface_hint()});
     observation["field_marks"] =
         json!({"source":app.field_capture().ok().flatten(),"hint":app.field_hint()});
     observation["natural_sites"] = json!({

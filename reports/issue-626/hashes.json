@@ -1,0 +1,10 @@
+{
+  "parent": "74c7cb539a0b631d9c39b680b3214310c7ba82b1",
+  "binary_sha256": "639d85cc01c76e37f4361b78bfaa5a22a96c4278198503773aa7ac3107d53465",
+  "captures": {
+    "step-018-named-manual-target.png": "e8a60795d6e9757c40eba58169d88bd1b9fa1d50665662a76b505e467795a380",
+    "step-031-bearing-cone.png": "9ee37823d2f8b830baaf49e74dec522ab7063acac8dd46a44b2e598a9f280bc9",
+    "step-007-spot-uncertainty.png": "5fe393698721d49aee6e2f26e93c8dceab9fdb9b5e25da692cd0224b5318b687",
+    "step-042-deleted-personal-marks.png": "8a81cf5b52d0a52916aa01bd45562378f58fdcc45f91a840d6dc9dd62a3fea3f"
+  }
+}

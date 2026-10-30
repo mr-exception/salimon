@@ -6,6 +6,18 @@ pub(super) fn handle(
 ) -> Option<CommandResult> {
     let command = request.fields;
     let result = match Some(request.operation) {
+        Some("chart_text") => match command.get("text").and_then(Value::as_str) {
+            Some(text) => app
+                .surface_text(text)
+                .map(|()| json!({"accepted":true}))
+                .map_err(|_| {
+                    (
+                        "invalid_argument",
+                        "note editor unavailable or invalid text",
+                    )
+                }),
+            None => Err(("invalid_argument", "note text required")),
+        },
         Some("key") => {
             let key = command.get("key").and_then(Value::as_str);
             let pressed = command.get("pressed").and_then(Value::as_bool);

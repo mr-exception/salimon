@@ -174,6 +174,7 @@ impl GameplaySession {
             || self.wheel.open
             || self.crafting_ui.open
             || self.archive_reader.open
+            || self.surface_chart.open
             || self.building.active
             || self.mining.terrain != salimon_world::terrain::TerrainMode::Canonical
         {

@@ -20,6 +20,9 @@ mod tests;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Key {
+    SurfaceChart,
+    SurfaceInspect,
+    NoteBackspace,
     FieldSpot,
     FieldBearing,
     FieldPower,
@@ -78,6 +81,9 @@ pub(crate) enum Key {
 }
 
 pub(crate) fn dispatch(session: &mut GameplaySession, key: Key, pressed: bool) {
+    if session.surface_key(key, pressed) {
+        return;
+    }
     if matches!(key, Key::FieldSpot | Key::FieldBearing | Key::FieldPower) {
         if pressed {
             session.field_action(match key {

@@ -21,6 +21,18 @@ impl GameplaySession {
         if self.paused {
             return;
         }
+        if self.surface_chart.open
+            && !matches!(
+                command,
+                ToggleView
+                    | Control(_, false)
+                    | Throttle(_, false)
+                    | Mining(false)
+                    | GrabDrop(false)
+            )
+        {
+            return;
+        }
         self.finish_offline_remainder();
         self.enforce_survival_restrictions();
         if self.view_mode == ViewMode::Gameplay {

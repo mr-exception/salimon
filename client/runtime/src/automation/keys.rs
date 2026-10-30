@@ -2,6 +2,9 @@ use super::*;
 
 pub(super) fn key_code(name: &str) -> Option<KeyCode> {
     match name {
+        "surface_chart" => Some(KeyCode::Backslash),
+        "inspect_site" => Some(KeyCode::Comma),
+        "note_backspace" => Some(KeyCode::Backspace),
         "field_spot" => Some(KeyCode::F10),
         "field_bearing" => Some(KeyCode::F11),
         "field_power" => Some(KeyCode::F12),

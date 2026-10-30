@@ -18,6 +18,8 @@ pub(crate) struct SessionState {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     field_marks: Option<salimon_universe::surface_observations::Book>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    surface_chart: Option<salimon_universe::surface_chart::Chart>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     scanner: Option<super::scanner::save::ScannerSave>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     chart: Option<salimon_universe::scanner::chart::ChartCheckpoint>,
@@ -55,6 +57,9 @@ impl Validate for SessionState {
         self.physical.validate()?;
         if let Some(book) = &self.field_marks {
             book.validate().map_err(|e| invalid(e.to_string()))?;
+        }
+        if let (Some(chart), Some(book)) = (&self.surface_chart, &self.field_marks) {
+            chart.validate(book).map_err(|e| invalid(e.to_string()))?;
         }
         if let Some(chart) = &self.chart {
             super::chart::validate_saved(chart)?;
@@ -125,6 +130,7 @@ impl GameplaySession {
         let state = SessionState {
             physical: PhysicalState::capture(self),
             field_marks: self.field_capture()?,
+            surface_chart: self.surface_capture()?,
             chart: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
                 .then(|| self.chart.checkpoint()),
             scanner: (self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical)
@@ -202,6 +208,12 @@ impl GameplaySession {
             physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
             save.simulated_time,
         )?;
+        let surface_chart = super::surface_chart::restore(
+            save.state.surface_chart,
+            save.schema_version,
+            field_marks.book.as_ref(),
+            save.simulated_time,
+        )?;
         let mounts = super::mounts::save::restore(save.state.mounts, save.schema_version)?;
         super::finishes::save::validate_schema(&save.state.finishes, save.schema_version)?;
         super::core_upgrades::save::validate_schema(
@@ -212,6 +224,7 @@ impl GameplaySession {
             scanner,
             chart,
             field_marks,
+            surface_chart,
             lighting: save.state.lighting,
             core_upgrades: save.state.core_upgrades,
             surface_age,

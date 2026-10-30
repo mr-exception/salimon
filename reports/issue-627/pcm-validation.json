@@ -1,0 +1,58 @@
+{
+  "scout-ramp-closed.wav": {
+    "sha256": "988d3908d3b0aa5181568b9f56361f5b02a4af62fb77dc7f66f8f71f705eb3a7",
+    "frames": 96000,
+    "peak_pcm16": 1,
+    "left_energy": 0,
+    "right_energy": 5918
+  },
+  "scout-ramp-open.wav": {
+    "sha256": "cb400abbd46d6bd5c2731c09e47f63c30c767fd2da28d18d6fe4bf4a9658c5b0",
+    "frames": 96000,
+    "peak_pcm16": 172,
+    "left_energy": 7141788,
+    "right_energy": 151831044
+  },
+  "vacuum-contact-geology.wav": {
+    "sha256": "dacc4b0d984027478e5fc4eadc466c08256e19bac3dbd46ca82bf2a2eb805328",
+    "frames": 96000,
+    "peak_pcm16": 80,
+    "left_energy": 224996890,
+    "right_energy": 224996890
+  },
+  "vacuum-quiet.wav": {
+    "sha256": "e3a90286b3b5420103c5d188beff5aeb90737b9ee66c505ee43582c8af92a32b",
+    "frames": 96000,
+    "peak_pcm16": 0,
+    "left_energy": 0,
+    "right_energy": 0
+  },
+  "physical-flexible-biology.wav": {
+    "sha256": "98daa67d8381f4b781538a8bfee38a0097ec9b8ee3164a027b1230dac7886ad8",
+    "frames": 96000,
+    "peak_pcm16": 5,
+    "left_energy": 998,
+    "right_energy": 87653
+  },
+  "suit-local-weather.wav": {
+    "sha256": "5a633cbe85a4e8b2fcfabcdad52feb4ebf3c2af537c189b412b6d60447cf24d4",
+    "frames": 96000,
+    "peak_pcm16": 68,
+    "left_energy": 1123596,
+    "right_energy": 26307480
+  },
+  "organic-contact-harvest.wav": {
+    "sha256": "a1b9b5a7bec125afafa3bf792a4b50451e025cc05e14f246c4a5b713a66f6234",
+    "frames": 96000,
+    "peak_pcm16": 137,
+    "left_energy": 606056354,
+    "right_energy": 606056354
+  },
+  "mineral-contact-harvest.wav": {
+    "sha256": "bb373ccf666a1d407aa799f4d61031ec1b858127b359d775828ff32fb4948406",
+    "frames": 96000,
+    "peak_pcm16": 218,
+    "left_energy": 909890430,
+    "right_energy": 909890430
+  }
+}

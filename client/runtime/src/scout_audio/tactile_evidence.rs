@@ -119,14 +119,14 @@ fn tactile_audio_evidence_583() {
     // Simultaneous worst bounded mix, with explicit controls rather than physical motion claims.
     let mut c = crate::native_audio::Control {
         enabled: (1 << 27) - 1,
-        gains: [0.3; 27],
-        events: [true; 27],
+        gains: [0.3; 32],
+        events: [true; 32],
         ..Default::default()
     };
     let mut seq = Vec::new();
     for _ in 0..180 {
         seq.push(c);
-        c.events = [false; 27];
+        c.events = [false; 32];
     }
     let (wav, metrics) = crate::native_audio::sequence_wav(&seq);
     std::fs::write(root.join("simultaneous-stress.wav"), wav).unwrap();

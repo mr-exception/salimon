@@ -104,6 +104,10 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
                 command.get("key").and_then(Value::as_str),
                 Some(
                     "pause"
+                        | "settings"
+                        | "environment_audio"
+                        | "environment_volume"
+                        | "environment_cues"
                         | "resume"
                         | "diagnostics"
                         | "status"
@@ -115,6 +119,10 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             if let Some(pressed) = command.get("pressed").and_then(Value::as_bool) {
                 let key = match command["key"].as_str() {
                     Some("pause") => KeyCode::Escape,
+                    Some("settings") => KeyCode::KeyS,
+                    Some("environment_audio") => KeyCode::KeyE,
+                    Some("environment_volume") => KeyCode::KeyF,
+                    Some("environment_cues") => KeyCode::KeyT,
                     Some("resume") => KeyCode::Enter,
                     Some("status") => KeyCode::KeyH,
                     Some("status_previous") => KeyCode::BracketLeft,

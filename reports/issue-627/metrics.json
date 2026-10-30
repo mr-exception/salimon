@@ -1,0 +1,74 @@
+{
+  "mineral-contact-harvest": {
+    "cpu_ns": 230516687,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.006662547588348389,
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "organic-contact-harvest": {
+    "cpu_ns": 242955597,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.004202459938824177,
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "physical-flexible-biology": {
+    "cpu_ns": 263513659,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.00015906953194644302,
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "scout-ramp-closed": {
+    "cpu_ns": 221581360,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.00005556708129006438,
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "scout-ramp-open": {
+    "cpu_ns": 249860345,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.0052506341598927975,
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "suit-local-weather": {
+    "cpu_ns": 267087458,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.0020856724586337805,
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "vacuum-contact-geology": {
+    "cpu_ns": 234988411,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.0024597961455583572,
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "vacuum-quiet": {
+    "cpu_ns": 234845720,
+    "frames": 96000,
+    "mailbox_bytes": 672,
+    "mixer_bytes": 3240,
+    "peak": 0.0,
+    "sample_rate": 48000,
+    "voices": 32
+  }
+}

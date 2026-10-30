@@ -90,6 +90,17 @@ impl ClientApplication {
                 },
             }
         });
+        let environment_warning = self
+            .condition_feedback
+            .settings
+            .environment_cues
+            .then(|| crate::environment_audio::capture(&self.session).warning)
+            .flatten();
+        let environment_prompt = environment_warning.map(|text| crate::resource_context::Prompt {
+            fragment: None,
+            text: text.to_owned(),
+            placement: OverlayPlacement::BottomCenter,
+        });
         let contextual_action = if let Some(text) = self.session.surface_hint() {
             Some(crate::resource_context::Prompt {
                 fragment: None,
@@ -156,9 +167,9 @@ impl ClientApplication {
                 placement: OverlayPlacement::BottomCenter,
             })
         } else if fragment_interaction {
-            resource_context.or(ship_context)
+            resource_context.or(ship_context).or(environment_prompt)
         } else {
-            ship_context.or(resource_context)
+            ship_context.or(resource_context).or(environment_prompt)
         };
         let mut contextual_placement = contextual_action
             .as_ref()

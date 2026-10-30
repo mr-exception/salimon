@@ -9,6 +9,7 @@ mod carrying;
 mod checkpoints;
 mod condition_feedback;
 mod e2e;
+mod environment_audio;
 mod equipment;
 mod flight_profile;
 mod flight_regression;

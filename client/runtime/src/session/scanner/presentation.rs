@@ -43,6 +43,9 @@ impl GameplaySession {
         &self,
         pose: salimon_ship::ShipPose,
     ) -> Vec<salimon_renderer::SceneInstance> {
+        if self.surface_chart.open {
+            return self.surface_geometry(pose);
+        }
         if self.scanner.chart_mode {
             return self.chart_geometry(pose);
         }

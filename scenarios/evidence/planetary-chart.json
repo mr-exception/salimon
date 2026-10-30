@@ -1,0 +1,285 @@
+{
+  "setup": {
+    "scenario": "planetary-chart",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "scanner"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "surface_chart",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "surface_chart.open",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "spot-uncertainty",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "recovery",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "chart_text",
+        "text": "Quiet valley"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "note_backspace",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "chart_text",
+        "text": "y parking"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart_route",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "surface_chart.source.entries.1.edits.1.note",
+        "equals": "Quiet valley parking"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart_route",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "surface_chart.source.target",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "named-manual-target",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "recovery",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "chart_text",
+        "text": " UNSAVED"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "assert": {
+        "path": "surface_chart.open",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "paused",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "surface_chart.source.entries.1.edits.1.note",
+        "equals": "Quiet valley parking"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "surface_chart",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "scanner_next",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart_route",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "surface_chart.source.target",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "bearing-cone",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "remove_partition",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "surface_chart.source.entries.2.edits.1.deleted",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "surface_chart.open",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "surface_chart.source.entries.1.edits.1.note",
+        "equals": "Quiet valley parking"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "surface_chart",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "remove_partition",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "surface_chart.source.target",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "deleted-personal-marks",
+      "timeout_ms": 180000
+    }
+  ]
+}

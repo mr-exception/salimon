@@ -90,7 +90,13 @@ impl ClientApplication {
                 },
             }
         });
-        let contextual_action = if let Some(text) = self.session.construction_hint() {
+        let contextual_action = if let Some(text) = self.session.surface_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if let Some(text) = self.session.construction_hint() {
             Some(crate::resource_context::Prompt {
                 fragment: None,
                 text,
@@ -174,7 +180,9 @@ impl ClientApplication {
             contextual_placement = OverlayPlacement::BottomCenter;
         }
         self.action_bar.set_combined_contextual(
-            self.session.building.active || interaction == Some(InteractionTarget::Core),
+            self.session.building.active
+                || self.session.surface_chart.open
+                || interaction == Some(InteractionTarget::Core),
         );
         self.action_bar
             .set_contextual(if self.session.survival.snapshot().terminal {

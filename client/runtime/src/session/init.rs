@@ -8,6 +8,7 @@ impl Default for GameplaySession {
             scanner: Default::default(),
             chart: salimon_universe::scanner::chart::Chart::new(scanner::CATALOG.revision())
                 .expect("checked chart catalog"),
+            surface_chart: Default::default(),
             field_marks: Default::default(),
             navigation_cache: Default::default(),
             offline: Default::default(),

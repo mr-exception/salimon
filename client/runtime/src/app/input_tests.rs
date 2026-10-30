@@ -583,3 +583,39 @@ fn blueprint_keys_share_native_admission_stow_tools_and_close_without_pausing() 
     assert!(!app.session.building.active);
     assert!(!app.session.is_paused());
 }
+
+#[test]
+fn surface_chart_native_escape_discards_draft_before_pause_and_respects_focus() {
+    let mut app = ClientApplication {
+        native_focused: true,
+        cursor_captured: true,
+        ..Default::default()
+    };
+    crate::e2e::initialize(
+        &mut app.session,
+        crate::e2e::Config {
+            scenario: crate::e2e::Scenario::PlanetaryChart,
+            seed: 0,
+            step: std::time::Duration::from_millis(16),
+            fragment_load: None,
+        },
+    )
+    .unwrap();
+    native(&mut app, KeyCode::Backslash, true);
+    native(&mut app, KeyCode::KeyR, true);
+    app.session.surface_text("discard this draft").unwrap();
+    app.native_focused = false;
+    native(&mut app, KeyCode::Escape, true);
+    assert!(app.session.surface_chart.open);
+    app.native_focused = true;
+    native(&mut app, KeyCode::Escape, true);
+    assert!(
+        !app.session.surface_chart.open
+            && !app.session.surface_chart.editing
+            && !app.session.is_paused()
+    );
+    assert_eq!(
+        app.session.surface_capture().unwrap().unwrap().entries[&1].note(),
+        ""
+    );
+}

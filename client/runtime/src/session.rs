@@ -46,6 +46,7 @@ mod propulsion_tests;
 pub(crate) mod scanner;
 #[cfg(test)]
 mod starting_supplies_tests;
+pub(crate) mod surface_chart;
 #[cfg(test)]
 mod tests;
 use self::frames::character_ship_frame;
@@ -62,6 +63,7 @@ use std::time::Duration;
 pub(crate) struct GameplaySession {
     pub(crate) scanner: scanner::Scanner,
     pub(crate) chart: salimon_universe::scanner::chart::Chart,
+    pub(crate) surface_chart: surface_chart::State,
     pub(crate) field_marks: field_marks::State,
     navigation_cache: std::cell::RefCell<Option<navigation::Cached>>,
     paused: bool,
@@ -226,6 +228,8 @@ impl GameplaySession {
         if self.paused {
             return;
         }
+        self.surface_chart.open = false;
+        self.surface_chart.editing = false;
         self.view_mode = match self.view_mode {
             ViewMode::Gameplay => ViewMode::PrecisionTour,
             ViewMode::PrecisionTour => ViewMode::Gameplay,

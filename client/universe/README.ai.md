@@ -146,3 +146,9 @@ verification. Sky visibility grants no scanner/chart knowledge or simulation aut
 Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
 Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
 validated reload cannot reveal catalog POIs or invent a target range.
+
+
+## Personal planetary chart (#626)
+
+Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
+Personal edits/targets never mutate canonical sites, suit observations or scanner history.

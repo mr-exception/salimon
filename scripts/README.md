@@ -842,3 +842,12 @@ exact frozen repeats. It needs Pillow from `visual-requirements.txt` and rejects
 failed scenarios, changed repeats, missing files and OS screenshots. Details,
 scale limitations and evidence mapping are in the
 [scanner contract](../docs/universe-scanner.md#cloud-scanner-acceptance-438).
+
+
+## Personal planetary chart (#626)
+
+Run `scripts/salimon-test run scenarios/evidence/planetary-chart.json`. The explicit
+`planetary-chart` fixture creates suit marks through production actions, then sets
+cockpit review initial conditions. `chart_text` submits text to the admitted session
+editor; `surface_chart` and `inspect_site` key aliases map real Backslash/Comma.
+[Source, UI controls, limits and verification](../docs/planetary-chart.md).

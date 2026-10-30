@@ -16,6 +16,7 @@ pub(crate) enum Scenario {
     CanonicalMining,
     CanonicalFlight,
     CanonicalJourney,
+    PlanetaryChart,
     NavigationApproach,
     ConstructionModule,
     ConstructionModuleUpgrade,
@@ -86,6 +87,7 @@ impl Scenario {
             "canonical-surface" => Ok(Self::CanonicalSurface),
             "canonical-mining" => Ok(Self::CanonicalMining),
             "canonical-flight" => Ok(Self::CanonicalFlight),
+            "planetary-chart" => Ok(Self::PlanetaryChart),
             "canonical-journey" => Ok(Self::CanonicalJourney),
             "navigation-approach" => Ok(Self::NavigationApproach),
             "surface-age-offline" => Ok(Self::SurfaceAgeOffline),
@@ -214,6 +216,7 @@ impl Scenario {
             Self::CanonicalSurface => "canonical-surface",
             Self::CanonicalMining => "canonical-mining",
             Self::CanonicalFlight => "canonical-flight",
+            Self::PlanetaryChart => "planetary-chart",
             Self::CanonicalJourney => "canonical-journey",
             Self::NavigationApproach => "navigation-approach",
             Self::CockpitEarth => "cockpit-earth",
@@ -462,6 +465,23 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         | Scenario::CoreRestart
         | Scenario::CrashRecovery => crate::flight_regression::initialize(app, config.scenario)?,
         Scenario::LandedEarth => {}
+        Scenario::PlanetaryChart => {
+            *app = GameplaySession::new_canonical_run()?;
+            app.command(crate::session::Command::Control(
+                crate::session::ControlKey::Backward,
+                true,
+            ));
+            app.advance_automation(Duration::from_secs(8));
+            app.command(crate::session::Command::Control(
+                crate::session::ControlKey::Backward,
+                false,
+            ));
+            app.field_action(0);
+            app.field_action(1);
+            // Explicit review initial condition, not a claimed walking/boarding route.
+            app.character = Default::default();
+            app.character.enter_cockpit();
+        }
         Scenario::CanonicalJourney => {
             *app = GameplaySession::new_canonical_run()?;
         }

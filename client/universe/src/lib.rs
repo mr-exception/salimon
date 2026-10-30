@@ -131,3 +131,5 @@ mod tests;
 pub mod sky;
 
 pub mod surface_observations;
+
+pub mod surface_chart;

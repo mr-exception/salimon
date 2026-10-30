@@ -391,3 +391,8 @@ See [canonical gameplay](../../docs/universe-gameplay.md#ordinary-canonical-play
 
 Suit field marks (#625): F10 estimated spot, F11 bearing-only mark, F12 navigation power.
 [Controls, uncertainty and persistence](../../docs/suit-observations.md).
+
+
+Planetary chart (#626): Backslash opens cockpit review; M next, R personal note,
+Enter save/manual target, Backspace text edit, Delete personal removal, Escape close.
+Comma inspects a nearby aimed marked source. [Contract and fixture](../../docs/planetary-chart.md).

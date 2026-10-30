@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the runtime envelope (now schema 27, with a canonical definition binding).
+`salimon-universe` IDs/frames/epochs. It does not replace the runtime envelope (now schema 28, with a canonical definition binding).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -160,3 +160,9 @@ See the [scanner contract](../../docs/universe-scanner.md) for source/test mappi
 Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
 Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
 validated reload cannot reveal catalog POIs or invent a target range.
+
+
+## Personal planetary chart (#626)
+
+Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
+Personal edits/targets never mutate canonical sites, suit observations or scanner history.

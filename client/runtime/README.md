@@ -170,7 +170,7 @@ networking, or persistence responsibilities.
 
 See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before changing lifecycle or timing behavior.
-Use the root [native smoke check](../../README.md#native-smoke-check) to validate
+Use the root [native smoke check](../../README.md#historical-engineering-fixture-smoke-check) to validate
 launch, resize, minimize/restore, close, and relaunch behavior.
 
 ## Planetary deposit presentation

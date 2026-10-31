@@ -509,13 +509,19 @@
     {
       "assert": {
         "path": "scanner.active_count",
-        "equals": 0
+        "equals": 1
       }
     },
     {
       "assert": {
         "path": "scanner.history.0.last_seen_utc_millis",
-        "equals": 5008
+        "equals": 86405000
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.successful_refreshes",
+        "equals": 17281
       }
     },
     {
@@ -556,6 +562,24 @@
       "assert": {
         "path": "scanner.powered",
         "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.first_seen_utc_millis",
+        "equals": 5008
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.history.0.successful_refreshes",
+        "gt": 17281
       }
     },
     {

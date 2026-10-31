@@ -39,7 +39,7 @@ def input_key(pid, key):
             command(["xdotool", "windowfocus", "--sync", window])
         command(["xdotool", "key", "--clearmodifiers", "--delay", "80", key])
     elif sys.platform == "darwin":
-        code = 120
+        code = {"F2": 120, "Return": 36}[key]
         command(["osascript", "-e", f'''tell application "System Events"
 set gameProcess to first application process whose unix id is {pid}
 set frontmost of gameProcess to true
@@ -90,6 +90,19 @@ def run(binary, root, timeout=60):
             report["startup_screenshot"] = evidence.screenshot("startup")
             if report["startup_screenshot"]["status"] != "captured":
                 raise RuntimeError(f"Startup capture failed: {report['startup_screenshot']}")
+            # A normal launch now starts in verified-resume admission. Send
+            # real Enter presses until the game acknowledges successful admission;
+            # an early press is ignored and cannot bypass region readiness.
+            while True:
+                input_key(process.pid, "Return")
+                try:
+                    wait_log(process, stderr, "verified journey resumed",
+                             min(deadline, time.monotonic() + 1))
+                    break
+                except TimeoutError:
+                    if time.monotonic() >= deadline:
+                        raise
+            report["checks"].append("OS Enter continued the verified journey")
             for mode in ("PrecisionTour", "Gameplay"):
                 offset = len(stderr.read_text(encoding="utf-8", errors="replace"))
                 input_key(process.pid, "F2")

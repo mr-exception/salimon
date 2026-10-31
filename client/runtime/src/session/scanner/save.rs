@@ -93,6 +93,12 @@ impl Scanner {
 }
 impl GameplaySession {
     pub(crate) fn bind_scanner_clock(&mut self, utc: u64) -> Result<(), SaveError> {
+        if let Some(clock) = &mut self.motion {
+            // This entry point is called for a new journey, never ordinary
+            // restore. Native startup binds both clocks before first publication.
+            *clock = salimon_universe::starting_motion::Clock::at(utc)
+                .map_err(|e| invalid(e.to_string()))?;
+        }
         if self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical
             && self.scanner.utc_millis == 0
             && self.scanner.contacts.history().next().is_none()

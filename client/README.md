@@ -4,7 +4,7 @@ All current client runtime implementation lives here, including the Phase 0
 baseline and subsequent mining, carrying, fragment physics and EVA. Packages provide
 the `salimon-client`
 runtime binary, `salimon-renderer` GPU library, `salimon-diagnostics`
-metrics/overlay library, and portable `salimon-world` compressed Solar System,
+metrics/overlay library, and portable `salimon-world` canonical Vesper and explicit compressed engineering fixtures,
 coordinate/camera model, portable character and ship domains, and the custom
 ship asset/runtime mesh path. Add future Cargo packages explicitly to the root workspace.
 
@@ -15,7 +15,7 @@ ship asset/runtime mesh path. Add future Cargo packages explicitly to the root w
 | `runtime/` | Native lifecycle, redraw/update scheduling, typed key routing, timing, and client composition |
 | `renderer/` | `wgpu` resources, camera-relative conversion, reverse-Z scene/ship/overlay pipelines, measurements, and presentation |
 | `fabrication/` | Portable recipes, raw storage/reservation, FIFO crafting and output tray; physical/Core/inventory integration remains separate |
-| `world/` | Immutable six-body compressed Solar System, portable `f64` coordinates, camera state, geometry math, precision markers, resource generation, mining session state, and carrying |
+| `world/` | Canonical Vesper terrain/resources and separate six-body engineering catalog, local `f64` frames, camera state, geometry, precision fixtures, mining and carrying |
 | `physics/` | Portable physical-object gravity, velocity, contact and substeps with caller-supplied geometry |
 | `math/` | Dependency-free `f64` vector primitives; units, frames and normalization policy remain caller-owned |
 | `character/` | First-person state, typed movement, fixed gravity, cockpit/doorway/surface traversal and open-space/nearby-body EVA |
@@ -41,7 +41,7 @@ salimon-client (runtime, winit lifecycle, clocks, snapshot mapping)
 ```
 
 World keeps absolute body, camera, and marker coordinates in `f64` meters without
-GPU or window types. Its static catalog contains exactly Sun, Mercury, Venus,
+GPU or window types. Its separate engineering catalog contains exactly Sun, Mercury, Venus,
 Earth, Moon, and Mars; the Sun is visual-only, and the five solid bodies expose
 disjoint `1.15R` landing volumes. The runtime creates the window, routes lifecycle
 and resize events, schedules redraws/updates, maps P/R/N/1–6 into typed world commands,
@@ -59,13 +59,12 @@ behavior grows or another native target needs an adapter. Future domain modules
 must consume typed input/presentation data rather than GPU or window types.
 Current client crates have no dependency on `core/`.
 
-No ECS, physics engine, WASM host, orbital simulation or backend scaffolding
-is present. Renderer owns analytic spheres, generated mipmapped textures and Sun
+No full ECS/physics engine, WASM host or backend is present. Canonical orbital
+coasting and offline ship/timed progression use a versioned motion publication. Renderer owns analytic spheres, generated mipmapped textures and Sun
 illumination. The engineering camera tour is separate from player/ship state;
 world supplies camera-to-body observations without presenting it as gameplay.
 Mining, carrying, custom fragment motion/contact and EVA are implemented.
-Resource state survives local streaming within an in-memory session; disk/backend
-persistence remains deferred. Use the
+Resource state survives local streaming within an in-memory session; disk persistence is implemented; backend persistence remains deferred. Use the
 [feature maintenance map](../docs/maintenance-map.md) for source/test routing.
 As major components gain behavior, maintain the contracts, ownership
 documentation, architecture, invariants, and relevant validation required by the
@@ -90,3 +89,5 @@ CPU workload suite, not an Apple M1 frame-rate certification.
 catalog records and explicit provenance/uncertainty. It is intentionally not in
 the runtime dependency graph yet; `world/` remains the playable fixture owner.
 See [U01 architecture](universe/architecture.md).
+
+Current source/test boundaries: [U36 universe audit](../reports/issue-441/README.md).

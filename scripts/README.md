@@ -936,3 +936,35 @@ full PS default-row selection/count and 18 reviewed JPL targets to new files.
 checks an offline production-adapter pack against those original scientific bytes.
 See [the canonical coverage contract](../docs/observed-source-coverage.md) for exact
 build/test commands, physical formats, selection, budgets and scientific limits.
+
+
+## Offline launch menu evidence (#434)
+
+Run `python scripts/salimon-test run scenarios/evidence/offline-resume-progress.json --binary target/debug/salimon-client --artifacts artifacts/offline-resume --screenshot-command '["native"]' --summary`, then the equivalent `offline-clock-recovery.json` route. Use the established Xvfb/Mesa environment. The progress route performs actual takeoff, starts the real launch/checkpoint worker on an isolated saved source, rejects early Resume, captures held measured progress and continues only after publication/current-region readiness. The clock route rejects a controlled backward date and proves Retry/Continue recovery.
+
+New E2E-only native operations are `offline_launch` (`seconds`: integer 0..86400; optional `hold` and `backward_clock` booleans) and `launch_release`. A hold pauses a private worker at actual nonzero progress for at most 30 seconds; it creates no ordinary-game gate. `inspect.launch` exposes source/current-region readiness, exact elapsed progress, errors and the isolated fixture path. Continue/Retry/Quit use native menu key operations `resume`, `launch_retry`, `launch_quit`. `SALIMON_E2E_LAUNCH_DIR=/absolute/isolated/store` with `--e2e --scenario canonical-journey` reopens that store on the real local clock for process-restart probes; never point a probe at personal saves. Native GPU frames prove the actual software-Vulkan path, not physical input/Metal/hardware FPS. [Source/clock/receipt contract](../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434).
+
+`verify_offline_resume.py --binary target/debug/salimon-client --output artifacts/offline-restart`
+uses isolated canonical E2E saves and an actual native renderer. It SIGKILLs a
+worker held at real partial progress, proves byte-exact checkpoint retention,
+then performs two actual-clock restarts and compares physical epoch advancement
+to each durable timestamp delta. The aborted controlled +60 seconds must never
+publish. It records measured load-to-region time, process RSS/high water and raw
+frame observations; software/debug values do not qualify hardware 60 FPS.
+
+`verify_universe_expansion.py --binary target/debug/salimon-client --output artifacts/universe-expansion`
+runs the complete 21-route native flight, canonical render, scanner, environment
+and offline menu matrix with production GPU capture. It records source/binary
+hashes and validates every route/step/capture/raw timing through `review_native`.
+Use repeated `--scenario NAME` only for an explicitly scoped rerun after a
+failure. Hardware FPS is always unqualified; raw software timing is diagnostic.
+
+`benchmark_canonical.py --binary target/debug/salimon-client --output artifacts/canonical-benchmark`
+launches an isolated ordinary journey, uses actual OS Enter to Continue, warms
+for five seconds and records 30 seconds of consecutive foreground frames and
+Linux process RSS/high water. It enables per-frame game logs without E2E command
+pacing. The result distinguishes successful measurement from passing the
+16.667-ms software p95 comparison; it never qualifies hardware or M1 60 FPS.
+The existing FrameClock caps long observed intervals at 250 ms; raw logs and the
+instrumentation/profile limitations are retained. Run it alone after CPU/GPU
+campaigns finish.

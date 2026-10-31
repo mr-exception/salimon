@@ -3,16 +3,14 @@ use salimon_renderer::{SkyScene, SkyStar};
 
 pub(super) fn scene(
     camera: [f64; 3],
-    elapsed: std::time::Duration,
+    epoch: salimon_universe::Epoch,
     stream: Option<&salimon_universe::streaming::Stream>,
 ) -> Result<SkyScene, String> {
     let start = &salimon_world::canonical::START;
     let mut sky = SkyScene::default();
     let manifest = start.manifest();
-    let a = manifest.physical.semi_major_axis_meters;
-    // Published starting-system adapter currently has fixed body-local axes and illumination.
-    // Do not invent orbital phase: nearby pack stars require an explicit galactic observer below.
-    let relative = [-camera[0], a - camera[1], -camera[2]];
+    let star = host_position(epoch)?;
+    let relative = std::array::from_fn::<_, 3, _>(|i| star[i] - camera[i]);
     let distance = relative[0].hypot(relative[1]).hypot(relative[2]);
     let radius = manifest.physical.star_radius_meters;
     if distance > radius {
@@ -24,11 +22,9 @@ pub(super) fn scene(
         });
     }
     if let Some(stream) = stream {
-        let observer = manifest
-            .distance
-            .system_position
-            .translated(camera)
-            .map_err(|e| e.to_string())?;
+        let observer = salimon_universe::starting_motion::inertial(epoch, camera, [0.; 3])
+            .map_err(|e| e.to_string())?
+            .0;
         let mut sources = std::collections::BTreeMap::new();
         for cell in stream.active() {
             for star in cell.sky.iter() {
@@ -40,11 +36,14 @@ pub(super) fn scene(
             if let Some(p) = star
                 .project(
                     observer,
-                    star.epoch
-                        .advance_nanos(
-                            i64::try_from(elapsed.as_nanos()).map_err(|_| "sky elapsed range")?,
-                        )
-                        .map_err(|e| e.to_string())?,
+                    // Unknown velocity holds the published reference position.
+                    // Moving sources require the same explicit time scale;
+                    // project rejects TT/TDB mixing instead of fabricating conversion.
+                    if star.velocity_mps.is_some() {
+                        epoch
+                    } else {
+                        star.epoch
+                    },
                 )
                 .map_err(|e| e.to_string())?
             {
@@ -74,16 +73,42 @@ pub(super) fn scene(
     Ok(sky)
 }
 
+/// Nacre's centre in the nonrotating, translating Vesper frame, shared by
+/// point lighting and the host disk. No separate visual orbit is generated.
+pub(super) fn host_position(epoch: salimon_universe::Epoch) -> Result<[f64; 3], String> {
+    salimon_universe::starting_motion::planet(epoch)
+        .map(|planet| planet.position_meters.map(|x| -x))
+        .map_err(|e| e.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
     fn canonical_sky_uses_published_radius_without_stream_or_discoveries() {
         let p = salimon_world::canonical::START.manifest();
-        let sky = super::scene([0.; 3], std::time::Duration::ZERO, None).unwrap();
+        let sky = super::scene(
+            [0.; 3],
+            salimon_universe::starting_motion::DEFINITION.reference_epoch,
+            None,
+        )
+        .unwrap();
         assert_eq!(sky.stars.len(), 1);
-        assert_eq!(sky.stars[0].direction, [0., 1., 0.]);
+        assert_eq!(sky.stars[0].direction, [-1., 0., 0.]);
         let angle =
             (p.physical.star_radius_meters / p.physical.semi_major_axis_meters).asin() as f32;
         assert_eq!(sky.stars[0].angular_radius_radians, angle);
+        let epoch = salimon_universe::starting_motion::Clock::at(1_793_404_800)
+            .unwrap()
+            .epoch;
+        let camera = [123., 456., 789.];
+        let sky = super::scene(camera, epoch, None).unwrap();
+        let star = super::host_position(epoch).unwrap();
+        let relative = std::array::from_fn::<_, 3, _>(|i| star[i] - camera[i]);
+        let distance = salimon_math::length(relative);
+        assert_eq!(
+            sky.stars[0].direction,
+            relative.map(|v| (v / distance) as f32)
+        );
+        assert_ne!(sky.stars[0].direction, [-1., 0., 0.]);
     }
 }

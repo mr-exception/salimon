@@ -526,7 +526,9 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
             crate::session::canonical::initialize(app)?;
         }
         Scenario::CanonicalTerrain => {
-            app.mining.terrain = salimon_world::terrain::TerrainMode::Canonical;
+            // Render fixtures still need the complete canonical frame/clock;
+            // selecting only the mesh mode leaves physical adapters inconsistent.
+            crate::session::canonical::initialize(app)?;
         }
         Scenario::TerrainEarthApproach
         | Scenario::TerrainMoonApproach
@@ -975,6 +977,28 @@ mod tests {
             orbit.ship.snapshot().door_state,
             salimon_ship::DoorState::Closed
         );
+    }
+
+    #[test]
+    fn canonical_terrain_fixture_binds_physical_frame_and_motion_before_rendering() {
+        let mut app = GameplaySession::default();
+        initialize(
+            &mut app,
+            Config {
+                fragment_load: None,
+                scenario: Scenario::CanonicalTerrain,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            app.ship.snapshot().terrain,
+            salimon_world::terrain::TerrainMode::Canonical
+        );
+        assert!(app.environment_epoch().is_ok());
+        app.advance_automation(Duration::from_millis(16));
+        assert!(app.motion_error.is_none());
     }
 
     #[test]

@@ -15,6 +15,8 @@ use salimon_persistence::{SaveError, Validate, invalid};
 #[serde(deny_unknown_fields)]
 pub(crate) struct SessionState {
     physical: PhysicalState,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    motion: Option<salimon_universe::starting_motion::Clock>,
     #[serde(default)]
     biology: Option<super::biology::Save>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -57,6 +59,19 @@ pub(crate) struct SessionState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(motion) = &self.motion {
+            if self.physical.terrain_mode() != salimon_world::terrain::TerrainMode::Canonical {
+                return Err(invalid(
+                    "motion source belongs only to the canonical body frame",
+                ));
+            }
+            if motion.version != salimon_universe::starting_motion::VERSION
+                || motion.definition_sha256 != *salimon_universe::starting_motion::SHA256
+            {
+                return Err(SaveError::IncompatibleCatalog("Unrecognized canonical motion model. Use a compatible game version; the saved journey was not replaced.".into()));
+            }
+            motion.validate().map_err(|e| invalid(e.to_string()))?;
+        }
         if let Some(b) = &self.biology {
             b.validate(self.physical.world_state(), self.physical.terrain_mode())?;
         }
@@ -132,8 +147,12 @@ impl Validate for SessionState {
 }
 impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
+        if let Some(error) = &self.motion_error {
+            return Err(invalid(format!("motion remains unverified: {error}")));
+        }
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            motion: self.motion.clone(),
             biology: Some(self.biology_capture()?),
             field_marks: self.field_capture()?,
             surface_chart: self.surface_capture()?,
@@ -202,6 +221,23 @@ impl GameplaySession {
             save.state.physical.terrain_mode(),
         )?;
         let physical = save.state.physical.restore()?;
+        let canonical = physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical;
+        let motion = match (canonical, save.schema_version, save.state.motion) {
+            (true, _, Some(clock)) => {
+                clock.validate().map_err(|e| invalid(e.to_string()))?;
+                Some(clock)
+            }
+            (true, 1..=29, None) => Some(
+                salimon_universe::starting_motion::Clock::at(save.saved_at_unix_seconds)
+                    .map_err(|e| invalid(e.to_string()))?,
+            ),
+            (false, _, None) => None,
+            _ => {
+                return Err(invalid(
+                    "canonical motion source missing or incompatible with schema/world",
+                ));
+            }
+        };
         let scanner = super::scanner::Scanner::restore(
             save.state.scanner,
             save.schema_version,
@@ -233,6 +269,7 @@ impl GameplaySession {
             save.schema_version,
         )?;
         let mut restored = Self {
+            motion,
             biology,
             scanner,
             chart,

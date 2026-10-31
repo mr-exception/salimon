@@ -17,6 +17,7 @@ mod mass;
 pub use mass::{MassObjectId, ShipMass};
 pub mod atmosphere;
 pub mod contact;
+pub mod offline;
 pub mod prediction;
 pub mod preview;
 mod propulsion;

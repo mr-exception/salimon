@@ -135,8 +135,8 @@ coverage. CI repeats and compares the entire report. The ten-to-forty-percent
 per-bin coverage screen is intentionally broad, not empirical goodness-of-fit.
 See [measured report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-410/README.md).
 
-Production source reuse/full reviewed inputs remain #513/#524/#526; U10/U11 own
-population/canonical world generation, U12 packaging, U14 state evaluation and
-#436–#439 cloud integration/verification, with human criteria routed by the
-[verification workflow](verification-workflow.md). Those are existing downstream scopes,
-not approvals established by this portable heuristic inference delivery.
+Private source usage is owner-authorized. Selected JPL/PS coverage is implemented
+by #526; full Gaia acceptance remains #524 and release reuse remains #659.
+U10/U11 generation, U12 packaging and U14 evaluation are implemented consumers;
+[the U36 matrix](../reports/issue-441/README.md) maps their current limits.
+Heuristic inference is not empirical calibration or an independent rights approval.

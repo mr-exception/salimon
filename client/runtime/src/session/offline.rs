@@ -1,5 +1,5 @@
-//! Construction's chronological powered-work adapter, shared with future U32.
-//! The current host retains its saved ship/region frame. No scanner/orbit logic.
+//! Shared closed-game motion, funded scanner and chronological timed-work adapter.
+//! Stages the complete source before verification and durable host publication.
 pub(super) mod save;
 use super::GameplaySession;
 use salimon_persistence::{SaveError, Validate, invalid};
@@ -79,7 +79,7 @@ pub(crate) struct TimedEvent {
     pub(crate) event: Event,
 }
 #[derive(Clone, Debug)]
-#[allow(dead_code)] // U32 host integration seam; exercised by owning tests now.
+#[allow(dead_code)] // Optional verified external-event seam; canonical contact is produced internally.
 pub(crate) enum Event {
     Impact(super::construction::damage::Impact),
     Motion {
@@ -95,6 +95,14 @@ impl GameplaySession {
         &mut self,
         interval: Duration,
         events: &[TimedEvent],
+    ) -> Result<(), SaveError> {
+        self.reconcile_closed_reported(interval, events, &mut |_| Ok(()))
+    }
+    pub(in crate::session) fn reconcile_closed_reported(
+        &mut self,
+        interval: Duration,
+        events: &[TimedEvent],
+        progress: &mut impl FnMut(Duration) -> Result<(), SaveError>,
     ) -> Result<(), SaveError> {
         if interval
             .checked_add(Duration::from_nanos(self.offline.pending_nanos))
@@ -118,7 +126,9 @@ impl GameplaySession {
         // never invokes this on an in-game pause frame.
         previous = Duration::ZERO;
         for e in events {
-            next.advance_closed_interval(e.after - previous);
+            next.advance_closed_interval(e.after - previous, &mut |done| {
+                progress(previous + done)
+            })?;
             // A verified event is an exact boundary, including a partial tick.
             next.finish_offline_remainder();
             match &e.event {
@@ -140,7 +150,10 @@ impl GameplaySession {
             }
             previous = e.after;
         }
-        next.advance_closed_interval(interval - previous);
+        next.advance_closed_interval(interval - previous, &mut |done| progress(previous + done))?;
+        if let Some(error) = &next.motion_error {
+            return Err(invalid(format!("offline motion: {error}")));
+        }
         // Verify the final authoritative source through the ordinary reconstruction
         // path before it is eligible for the host's durable publication.
         next.building.running = None;
@@ -151,9 +164,17 @@ impl GameplaySession {
         *self = next;
         Ok(())
     }
-    fn advance_closed_interval(&mut self, interval: Duration) {
+    fn advance_closed_interval(
+        &mut self,
+        interval: Duration,
+        progress: &mut impl FnMut(Duration) -> Result<(), SaveError>,
+    ) -> Result<(), SaveError> {
         let mut nanos = interval.as_nanos() + u128::from(self.offline.pending_nanos);
+        let initial = nanos;
+        let debt = u128::from(self.offline.pending_nanos);
+        let mut iterations = 0_u64;
         self.offline.pending_nanos = 0;
+        progress(Duration::ZERO)?;
         while nanos >= u128::from(TICK_NANOS) {
             let core = self.ship.snapshot().core_status;
             let possible = self.construction_offline_pending() || self.recovery_work_pending();
@@ -163,21 +184,86 @@ impl GameplaySession {
             // With no eligible auxiliary work (or future energy), ordinary power
             // and Fabricator already split at their exact source/output boundaries.
             // Skip quiet time, never grant work or cap real elapsed time.
-            let step = if possible && funded {
+            let moving = self.motion.is_some()
+                && !matches!(
+                    self.ship.snapshot().flight_state,
+                    salimon_ship::FlightState::Landed { .. }
+                        | salimon_ship::FlightState::GroundedAfterCrash { .. }
+                );
+            let ordinary_funded =
+                self.ship.stored_core_joules_exact() > 0. || core.conversion_remaining_joules > 0.;
+            let timed = self.motion.is_some()
+                && (self.fabricator.power_demand().is_some()
+                    || core.conversion_remaining_joules > 0.);
+            let scanner_samples = self.motion.is_some() && !self.stationary_scanner_certified();
+            if self.motion.is_some()
+                && !moving
+                && !possible
+                && !scanner_samples
+                && self.fabricator.power_demand().is_none()
+                && core.conversion_remaining_joules == 0.
+            {
+                let step = nanos / u128::from(TICK_NANOS) * u128::from(TICK_NANOS);
+                let delta =
+                    Duration::new((step / 1_000_000_000) as u64, (step % 1_000_000_000) as u32);
+                if let Err(error) = self.advance_closed_stationary(delta) {
+                    self.motion_error = Some(error.to_string());
+                    return Ok(());
+                }
+                nanos -= step;
+                progress(interval.min(duration_nanos(
+                    initial.saturating_sub(nanos).saturating_sub(debt),
+                )))?;
+                continue;
+            }
+            let step = if (possible && funded)
+                || moving
+                || ((timed || scanner_samples) && ordinary_funded)
+            {
                 u128::from(TICK_NANOS)
             } else {
                 nanos / u128::from(TICK_NANOS) * u128::from(TICK_NANOS)
             };
             let delta = Duration::new((step / 1_000_000_000) as u64, (step % 1_000_000_000) as u32);
             self.closed_work_tick(delta);
+            if self.motion_error.is_some() {
+                return Ok(());
+            }
             nanos -= step;
+            iterations += 1;
+            if iterations.is_multiple_of(64) {
+                progress(interval.min(duration_nanos(
+                    initial.saturating_sub(nanos).saturating_sub(debt),
+                )))?;
+            }
         }
         self.offline.pending_nanos = nanos as u64;
+        progress(interval.min(duration_nanos(
+            initial.saturating_sub(nanos).saturating_sub(debt),
+        )))?;
+        Ok(())
     }
     fn closed_work_tick(&mut self, delta: Duration) {
+        self.advance_closed_sources(delta);
+        if self.motion.is_some() && self.motion_error.is_none() {
+            self.advance_scanner(delta);
+            if let Some(error) = &self.scanner.error {
+                self.motion_error = Some(error.clone());
+            }
+        }
+    }
+    pub(in crate::session) fn advance_closed_sources(&mut self, delta: Duration) {
         self.offline_power = true;
+        let before = self.ship.snapshot().flight_state;
         self.advance_surface_age(delta);
         self.advance_fabrication(delta);
+        let after = self.ship.snapshot().flight_state;
+        if !matches!(before, salimon_ship::FlightState::GroundedAfterCrash { .. })
+            && matches!(after, salimon_ship::FlightState::GroundedAfterCrash { .. })
+        {
+            self.interrupt_construction_after_crash();
+        }
+        self.stop_airborne_construction();
         self.advance_recovery(delta);
         self.advance_construction(delta);
         let powered = self.ship.snapshot().power_available;
@@ -192,5 +278,14 @@ impl GameplaySession {
         }
     }
 }
+fn duration_nanos(nanos: u128) -> Duration {
+    Duration::new(
+        (nanos / 1_000_000_000) as u64,
+        (nanos % 1_000_000_000) as u32,
+    )
+}
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod motion_tests;

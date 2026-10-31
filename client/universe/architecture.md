@@ -272,7 +272,7 @@ See the [implemented contract](../../docs/universe-trajectory.md) for ownership,
 See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
-loaded catalog truth does not grant player discovery or replace gameplay yet.
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
 
 
 ## Scanner contacts (#428)
@@ -329,3 +329,8 @@ source identity, acquisition/verification commands and explicit scientific limit
 The private pack preserves all original measurements and sidecars; source terms
 remain unreviewed for public release. Runtime/save schemas and player discovery
 are unchanged.
+
+
+## Authored starting-system kinematics (#432)
+
+`src/starting_motion.rs` publishes versioned fixed fictional orbital axes/phase/epoch and zero axial spin, with a geographic-bound SHA256. It supplies checked uniform game clocks, analytic body position/velocity/acceleration, a complete two-body field and split-anchor inertial reconstruction. [Model, validity and migration contract](../../docs/universe-offline-propagation.md). Imported-source ephemeris validity is unchanged.

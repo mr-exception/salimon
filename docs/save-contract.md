@@ -619,3 +619,24 @@ grips/audio/caches are excluded. Versions 1–28 migrate empty; new biological d
 cannot be backdated. Natural fragment anatomy is optional on older objects.
 Publication, geometry, mass, allocator, carry and source-debit cross-checks precede
 atomic publication. Missing and partial anatomy never regrows on stream/reload.
+
+
+## Canonical motion source — schema 30 (#432)
+
+Canonical sessions persist `state.motion`: version 1, exact motion-definition SHA256 and a TT uniform game epoch. The motion publication includes the unchanged geographic SHA256. Physical ship position/velocity remain in the explicit nonrotating translating Vesper frame; the model reconstructs inertial state using the split galactic system anchor. Schema 24–29 sources lacking motion migrate from `saved_at_unix_seconds`, preserving physical, resource and geographic state. Schema-30 missing/mismatched sources and canonical motion on an engineering world reject atomically. Restore alone advances no time. Closing and launch disable engines while retaining momentum and committed paid assistance. [Full model, clock policy, numerical regime and validity limits](universe-offline-propagation.md).
+
+
+Schema-30 canonical launch settles final motion/work/scanner sub-ticks before publication (#433). Legacy construction-only remainder debt is settled before introducing the migrated motion epoch, preserving saved body-relative geography. Fatigue-only recovery, frozen survival sources, containment and paid-work receipts retain their existing owners. [Chronology and analytic scanner applicability](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+## Asynchronous launch publication (#434)
+
+The native menu owns admission while one worker reads/reconstructs/propagates/verifies and atomically checkpoints through SaveManager. Verified source bytes reconstruct thread-local domain caches on the main thread; no private partial source is playable. Continue also waits for the restored camera region to be ready. A rollback/invalid clock or pre-publication cancellation leaves recoverable generations intact. Retry starts a new verified attempt, without a public staging save slot. Menu wall time does not erase previously admitted saved backlog. [Full source/IO/region contract](universe-offline-propagation.md#native-progress-and-verified-resume-434).
+
+
+Unknown present canonical world/motion publications are incompatible catalogs,
+not corrupt generations eligible for a fresh bootstrap. Launch preserves both
+slots and shows a compatible-version recovery message. Malformed/absent required
+source retains the existing validation/fallback policy. Tests: runtime
+`launch::incompatible_tests` exercises both publication pointers with valid-length
+unknown digests and byte-exact slot preservation.

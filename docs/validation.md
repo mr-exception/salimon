@@ -138,7 +138,7 @@ verification** for a nightly/weekly suite; neither adds a PR test gate.
 
 Linux software Vulkan establishes launch, gameplay/state and capture coverage;
 it does not establish macOS Metal/Windows hardware fidelity or performance.
-Use the root [native smoke check](../README.md#native-smoke-check) for gameplay,
+Use the root [native smoke check](../README.md#historical-engineering-fixture-smoke-check) for gameplay,
 F2 precision, F3 telemetry, resize, minimize/restore, close and relaunch. Record
 reference Apple M1 iMac 1920×1080 performance separately; no substitute machine
 can establish reference-machine performance. Record rolling FPS, average/p95
@@ -788,3 +788,18 @@ See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen input
 star/parent mapping, acquisition and independent verification scripts, exact
 commands and scientific/release boundaries. Full Gaia acceptance remains #524;
 this private observed pack does not grant player knowledge or publish a release.
+
+
+Canonical offline propagation #432: `cargo test -p salimon-ship --locked offline::` exercises portable propagation/rollback/orbit/contact fixtures. See the [frame and host boundary](universe-offline-propagation.md); this does not replace eventual native progress/resume or integrated offline acceptance.
+
+
+Offline timed/scanner #433: `cargo test -p salimon-client --locked session::scanner` and `cargo test -p salimon-client --locked session::offline` cover funded-prefix/TTL/partition/long-idle, curved motion, starvation, frozen survival, paused play, legacy debt and atomic failure. [Contract and source owners](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+Verified native resume #434: `cargo test -p salimon-client --locked launch`, affected runner contracts and the production native routes `scenarios/evidence/offline-resume-progress.json` / `offline-clock-recovery.json` with `--screenshot-command '["native"]'`. Keep controlled-clock fixtures distinct from the real-clock launch test/probe, and retain exact backend/media provenance. [Admission, cancel/restart and publication contract](universe-offline-propagation.md#native-progress-and-verified-resume-434).
+
+
+U36 consistency audit: [matrix and current-model limits](../reports/issue-441/README.md).
+Canonical source, preview, shared sky/light and physical-environment clock
+regressions are included in workspace tests. U34 runs the integrated gates after
+U36 repairs, without creating a dependency from U36 to U34.

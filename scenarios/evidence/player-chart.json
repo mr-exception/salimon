@@ -1,40 +1,287 @@
 {
-  "setup":{"scenario":"canonical-flight","seed":0,"step_ms":16},
-  "timeout_ms":600000,
-  "steps":[
-    {"action":{"op":"scout_reference","view":"scanner"},"timeout_ms":180000},
-    {"action":{"op":"key","key":"pause","pressed":true}},
-    {"action":{"op":"key","key":"pause","pressed":false}},
-    {"wait":{"path":"terrain.presentation_ready","equals":true},"frames":1,"timeout_ms":180000},
-    {"action":{"op":"key","key":"pause","pressed":true}},
-    {"action":{"op":"key","key":"pause","pressed":false}},
-    {"action":{"op":"key","key":"chart","pressed":true}},
-    {"action":{"op":"key","key":"chart","pressed":false}},
-    {"assert":{"path":"chart.mode","equals":true}},
-    {"assert":{"path":"chart.entry_count","equals":0}},
-    {"screenshot":"empty-chart","timeout_ms":180000},
-    {"action":{"op":"step","frames":313},"timeout_ms":180000},
-    {"assert":{"path":"chart.entry_count","equals":1}},
-    {"action":{"op":"key","key":"chart_route","pressed":true}},
-    {"action":{"op":"key","key":"chart_route","pressed":false}},
-    {"assert":{"path":"chart.route_count","equals":1}},
-    {"screenshot":"observed-route","timeout_ms":180000},
-    {"action":{"op":"offline_resume","seconds":0},"timeout_ms":180000},
-    {"assert":{"path":"chart.entry_count","equals":1}},
-    {"assert":{"path":"chart.route_count","equals":1}},
-    {"assert":{"path":"chart.mode","equals":false}},
-    {"action":{"op":"key","key":"chart","pressed":true}},
-    {"action":{"op":"key","key":"chart","pressed":false}},
-    {"action":{"op":"step","frames":1}},
-    {"screenshot":"resumed-route","timeout_ms":180000},
-    {"action":{"op":"offline_resume","seconds":10800},"timeout_ms":180000},
-    {"assert":{"path":"scanner.active_count","equals":0}},
-    {"assert":{"path":"chart.entry_count","equals":1}},
-    {"assert":{"path":"chart.route_count","equals":1}},
-    {"action":{"op":"key","key":"chart","pressed":true}},
-    {"action":{"op":"key","key":"chart","pressed":false}},
-    {"action":{"op":"step","frames":1}},
-    {"assert":{"path":"scanner.active_count","equals":0}},
-    {"screenshot":"historical-chart","timeout_ms":180000}
+  "setup": {
+    "scenario": "canonical-flight",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "scanner"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "pause",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.mode",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.entry_count",
+        "equals": 0
+      }
+    },
+    {
+      "screenshot": "empty-chart",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 313
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "chart.entry_count",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart_route",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart_route",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.route_count",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "observed-route",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "chart.entry_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.route_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.mode",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      }
+    },
+    {
+      "screenshot": "resumed-route",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 10800
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.entry_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.route_count",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "chart",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "offline-refreshed-chart",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 86400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "scanner.active_count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.entry_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "chart.route_count",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "blackout-history-retained",
+      "timeout_ms": 180000
+    }
   ]
 }

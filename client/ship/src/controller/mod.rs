@@ -8,6 +8,7 @@ use salimon_world::{CELESTIAL_BODIES, CelestialBodyId};
 use std::time::Duration;
 
 pub(crate) mod assist;
+mod celestial;
 pub(crate) mod cockpit;
 mod collision;
 mod door;
@@ -30,6 +31,8 @@ pub struct ShipController {
     pub(crate) landing_footprint: Option<crate::LandingFootprint>,
     #[serde(skip)]
     surface_obstacles: Option<static_obstacles::ExternalObstacles>,
+    #[serde(skip, default = "verified_contact_default")]
+    contact_verified: bool,
     pub(crate) flight_state: FlightState,
     door_state: DoorState,
     door_open_fraction: f64,
@@ -55,6 +58,10 @@ pub struct ShipController {
     bounce: Option<collision::Bounce>,
 }
 
+fn verified_contact_default() -> bool {
+    true
+}
+
 impl Default for ShipController {
     fn default() -> Self {
         let earth = CELESTIAL_BODIES
@@ -69,6 +76,7 @@ impl Default for ShipController {
             terrain: salimon_world::terrain::TerrainMode::Flat,
             landing_footprint: None,
             surface_obstacles: None,
+            contact_verified: true,
             pose: ShipPose {
                 position_meters,
                 orientation: [0.0, 0.0, 0.0, 1.0],
@@ -106,6 +114,7 @@ impl ShipController {
             terrain: salimon_world::terrain::TerrainMode::Flat,
             landing_footprint: None,
             surface_obstacles: None,
+            contact_verified: true,
             pose,
             flight_state: FlightState::Flying,
             door_state: DoorState::Closed,

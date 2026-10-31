@@ -106,6 +106,29 @@ pub(crate) fn find(name: &str) -> Option<View> {
 }
 
 impl View {
+    /// Evidence camera follows the actual anti-stellar direction; it changes no
+    /// body, player position, lighting, terrain recipe or physical source.
+    pub(crate) fn at_epoch(&self, epoch: Option<salimon_universe::Epoch>) -> Self {
+        let mut view = self.clone();
+        if self.name == "universe-night"
+            && let Some(epoch) = epoch
+            && let Ok(planet) = salimon_universe::starting_motion::planet(epoch)
+        {
+            let distance = salimon_math::length(planet.position_meters);
+            let direction = planet.position_meters.map(|v| v / distance);
+            let height = salimon_world::terrain::TerrainDefinition::canonical_start()
+                .height(direction)
+                .expect("published canonical terrain");
+            let radius = salimon_world::canonical::START
+                .manifest()
+                .physical
+                .radius_meters;
+            view.eye = direction.map(|v| v * (radius + height + 40.));
+            view.target = salimon_math::add(view.eye, [0., 1000., 0.]);
+        }
+        view
+    }
+
     /// Evidence-only clearance against the physical canonical evaluator.
     pub(crate) fn canonical_ground_clearance(&self) -> Option<f64> {
         if !matches!(
@@ -134,7 +157,8 @@ impl View {
                 position_meters: self.eye,
                 target_meters: self.target,
                 up: if self.name == "universe-night" {
-                    [0., -1., 0.]
+                    salimon_math::scale(self.eye, 1. / salimon_math::length(self.eye))
+                        .map(|v| v as f32)
                 } else {
                     [0., 0., 1.]
                 },
@@ -156,6 +180,18 @@ impl View {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn night_reference_remains_above_actual_terrain_on_the_anti_stellar_side() {
+        for unix in [0, 1_767_225_600, 1_793_404_800] {
+            let epoch = salimon_universe::starting_motion::Clock::at(unix)
+                .unwrap()
+                .epoch;
+            let view = find("universe-night").unwrap().at_epoch(Some(epoch));
+            let planet = salimon_universe::starting_motion::planet(epoch).unwrap();
+            assert!(salimon_math::dot(view.eye, planet.position_meters) > 0.);
+            assert!((view.canonical_ground_clearance().unwrap() - 40.).abs() < 1e-6);
+        }
+    }
     #[test]
     fn shared_cameras_are_finite_and_follow_ship_pose_without_changing_it() {
         let pose = salimon_ship::ShipController::default().snapshot().pose;

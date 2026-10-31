@@ -150,3 +150,14 @@ Fine-grid pitch is per blueprint (currently 0.5 m); the structural lattice stays
 ## Core upgrade balance — owner direction 2026-10-24 (#548)
 
 The owner answered the unresolved-values question with “guess them yourself” and asked for balanced costs so play is neither too grindy nor too easy. This explicitly authorizes the reviewable data catalog: 90/120/180 GJ, incremental iron/silicate costs 20/10, 30/10, 40/20 kg. Rationale, exact source/transaction semantics and limits are in [Core upgrades](core-upgrades.md). These are selected gameplay parameters, not empirical material measurements, a measured playtest, or blanket approval of the unrelated construction economy.
+
+## Approved canonical motion publication for offline journeys (#432, 2026-10-31)
+
+The five-task single-PR batch (#432/#433/#434/#441/#435) reached a missing
+canonical input: Vesper publishes orbit size/period, but no phase, axes, epoch or
+spin; its current saves use a static body frame. The proposal is to publish an
+explicit fixed fictional motion definition and saved identity/migration, retaining
+terrain, resources and body-relative poses. The proposed zero axial spin would
+preserve the current nonrotating body frame. The [concrete proposal, source map
+and incomplete implementation boundary](universe-offline-propagation.md) record
+what is and is not implemented. The owner answered “Use that motion model and continue the five-task PR.” The separate version-1 motion publication and schema-30 migration are authorized. Existing terrain/resource definitions remain unchanged.

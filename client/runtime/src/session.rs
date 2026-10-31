@@ -70,6 +70,8 @@ pub(crate) struct GameplaySession {
     navigation_cache: std::cell::RefCell<Option<navigation::Cached>>,
     paused: bool,
     pub(crate) offline: offline::OfflineClock,
+    pub(crate) motion: Option<salimon_universe::starting_motion::Clock>,
+    pub(crate) motion_error: Option<String>,
     offline_power: bool,
     pub(crate) audio_epoch: u64,
     pub(crate) mount_audio: (u64, [f64; 3]),

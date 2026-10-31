@@ -40,7 +40,7 @@ fn validate_playable(bytes: &[u8]) -> Result<(), SaveError> {
     }
     Ok(())
 }
-fn now() -> Result<u64, SaveError> {
+pub(crate) fn now() -> Result<u64, SaveError> {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_secs())
@@ -76,6 +76,15 @@ enum SaveJob {
     },
 }
 impl SaveJob {
+    fn closing(session: &GameplaySession, utc: u64) -> Result<Self, SaveError> {
+        if session.motion.is_none() {
+            return Self::checkpoint(session, utc);
+        }
+        let mut candidate = GameplaySession::default();
+        candidate.restore_bytes(&session.save_bytes(utc)?)?;
+        candidate.ship.shut_down_for_close();
+        Self::checkpoint(&candidate, utc)
+    }
     fn checkpoint(session: &GameplaySession, utc: u64) -> Result<Self, SaveError> {
         Ok(Self::Checkpoint {
             bytes: session.save_bytes(utc)?,
@@ -105,11 +114,26 @@ pub(crate) struct Checkpoints {
     pub(crate) warning: Option<&'static str>,
 }
 impl Checkpoints {
+    #[cfg(test)]
     pub(crate) fn open(
         directory: PathBuf,
         session: &mut GameplaySession,
     ) -> Result<Self, SaveError> {
-        Self::with_store_at(NativeStore::open(directory)?, session, now()?, true)
+        Self::open_reported_at(directory, session, now()?, &mut |_| Ok(()))
+    }
+    pub(crate) fn open_reported_at(
+        directory: PathBuf,
+        session: &mut GameplaySession,
+        launch_utc: u64,
+        progress: &mut impl FnMut(crate::launch_progress::Progress) -> Result<(), SaveError>,
+    ) -> Result<Self, SaveError> {
+        Self::with_store_reported(
+            NativeStore::open(directory)?,
+            session,
+            launch_utc,
+            true,
+            progress,
+        )
     }
     #[cfg(test)]
     pub(crate) fn open_at(
@@ -126,12 +150,24 @@ impl Checkpoints {
     ) -> Result<Self, SaveError> {
         Self::with_store_at(store, session, 1, false)
     }
+    #[cfg(test)]
     fn with_store_at<S: CheckpointStore + Send + 'static>(
         store: S,
         session: &mut GameplaySession,
         launch_utc: u64,
         ordinary_play: bool,
     ) -> Result<Self, SaveError> {
+        Self::with_store_reported(store, session, launch_utc, ordinary_play, &mut |_| Ok(()))
+    }
+    fn with_store_reported<S: CheckpointStore + Send + 'static>(
+        store: S,
+        session: &mut GameplaySession,
+        launch_utc: u64,
+        ordinary_play: bool,
+        progress: &mut impl FnMut(crate::launch_progress::Progress) -> Result<(), SaveError>,
+    ) -> Result<Self, SaveError> {
+        use crate::launch_progress::{Progress, Stage};
+        progress(Progress::at(Stage::Reading))?;
         let validate: fn(&[u8]) -> Result<(), SaveError> = if ordinary_play {
             validate_playable
         } else {
@@ -142,7 +178,7 @@ impl Checkpoints {
         let had_save = recovery.bytes.is_some();
         if let Some(bytes) = recovery.bytes {
             let mut candidate = GameplaySession::default();
-            candidate.restore_for_launch(&bytes, launch_utc)?;
+            candidate.restore_for_launch_reported(&bytes, launch_utc, progress)?;
             #[derive(serde::Deserialize)]
             struct Version {
                 schema_version: u32,
@@ -153,6 +189,9 @@ impl Checkpoints {
                 candidate.run.serial = manager.next_run_serial()?;
             }
             let credited = candidate.save_bytes(launch_utc)?;
+            // Cancellation before this point cannot replace the active source.
+            // Once publication starts, its atomic receipt owns success.
+            progress(Progress::at(Stage::Publishing))?;
             if candidate.survival.snapshot().terminal {
                 manager.checkpoint_terminal(
                     ARCHIVE_VERSION,
@@ -171,6 +210,7 @@ impl Checkpoints {
             // Bootstrap a verified checkpoint before the new run becomes playable.
             session.bind_scanner_clock(launch_utc)?;
             let initial = session.save_bytes(launch_utc)?;
+            progress(Progress::at(Stage::Publishing))?;
             manager.checkpoint(&initial, validate)?;
         }
         let (sender, jobs) = mpsc::sync_channel::<SaveJob>(1);
@@ -257,7 +297,14 @@ impl Checkpoints {
             return;
         }
         match now()
-            .and_then(|now| SaveJob::checkpoint(session, now).map(|job| (now, job)))
+            .and_then(|now| {
+                (if self.control.exit_requested {
+                    SaveJob::closing(session, now)
+                } else {
+                    SaveJob::checkpoint(session, now)
+                })
+                .map(|job| (now, job))
+            })
             .and_then(|(now, job)| {
                 self.sender
                     .as_ref()
@@ -350,7 +397,7 @@ impl Checkpoints {
     }
     /// Drain the in-flight write, then verify the final snapshot before returning.
     pub(crate) fn finish(&mut self, session: &GameplaySession) -> Result<(), SaveError> {
-        let job = now().and_then(|now| SaveJob::checkpoint(session, now))?;
+        let job = now().and_then(|now| SaveJob::closing(session, now))?;
         if self.busy {
             let _ = self.results.recv();
             self.busy = false;
@@ -928,5 +975,58 @@ mod canonical_gate_tests {
             Err(SaveError::IncompatibleCatalog(_))
         ));
         validate(&GameplaySession::new_run().save_bytes(100).unwrap()).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod reported_launch_tests {
+    use super::*;
+    #[test]
+    fn rejecting_publication_after_full_catchup_keeps_source_slots_and_visible_session() {
+        let directory =
+            std::env::temp_dir().join(format!("salimon-434-publication-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&directory);
+        let mut source = GameplaySession::new_canonical_run().unwrap();
+        source.bind_scanner_clock(100).unwrap();
+        let bytes = source.save_bytes(100).unwrap();
+        let mut manager = SaveManager::new(NativeStore::open(directory.clone()).unwrap());
+        manager.checkpoint(&bytes, validate).unwrap();
+        manager.checkpoint(&bytes, validate).unwrap();
+        drop(manager);
+        let original: Vec<_> = (0..2)
+            .map(|n| std::fs::read(directory.join(format!("checkpoint-{n}.sav"))).unwrap())
+            .collect();
+        let mut visible = GameplaySession::new_canonical_run().unwrap();
+        let unchanged = visible.save_bytes(100).unwrap();
+        let mut stages = Vec::new();
+        let result = Checkpoints::with_store_reported(
+            NativeStore::open(directory.clone()).unwrap(),
+            &mut visible,
+            160,
+            true,
+            &mut |p| {
+                stages.push(p.stage);
+                if p.stage == crate::launch_progress::Stage::Publishing {
+                    Err(salimon_persistence::invalid(
+                        "injected publication cancellation",
+                    ))
+                } else {
+                    Ok(())
+                }
+            },
+        );
+        assert!(result.is_err());
+        assert_eq!(visible.save_bytes(100).unwrap(), unchanged);
+        assert!(stages.contains(&crate::launch_progress::Stage::Propagating));
+        assert!(stages.contains(&crate::launch_progress::Stage::Verifying));
+        for (n, bytes) in original.iter().enumerate() {
+            assert_eq!(
+                &std::fs::read(directory.join(format!("checkpoint-{n}.sav"))).unwrap(),
+                bytes
+            );
+        }
+        assert!(!directory.join("checkpoint-0.tmp").exists());
+        assert!(!directory.join("checkpoint-1.tmp").exists());
+        std::fs::remove_dir_all(directory).unwrap();
     }
 }

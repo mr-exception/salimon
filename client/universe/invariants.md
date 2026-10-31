@@ -132,7 +132,7 @@ See the [implemented contract](../../docs/universe-trajectory.md) for ownership,
 See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
-loaded catalog truth does not grant player discovery or replace gameplay yet.
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
 
 
 ## Scanner contacts (#428)
@@ -185,3 +185,8 @@ identity before publication. Explicit star/parent classification passes ordinary
 referential checks. Recognized physical headers preserve spaced errors and missing
 quantities without deriving mass from GM. The [coverage contract](../../docs/observed-source-coverage.md)
 separates decoder error, source uncertainty, sample coverage and release eligibility.
+
+
+## Canonical motion publication (#432)
+
+Motion identity is separate from immutable terrain/resource identity. Unknown model versions/hashes, non-TT epochs and unsupported calendar arithmetic reject atomically. Fixed fictional phase/orientation/spin never become inferred observations. Uniform local game-clock admission is explicitly defined relative to its reference instant, not a general UTC/TT conversion. [Canonical contract](../../docs/universe-offline-propagation.md).

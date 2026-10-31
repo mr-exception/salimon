@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][int]$GamePid,
-    [Parameter(Mandatory=$true)][ValidateSet('F2')][string]$Key
+    [Parameter(Mandatory=$true)][ValidateSet('F2', 'Return')][string]$Key
 )
 $ErrorActionPreference = 'Stop'
 Add-Type @'
@@ -16,7 +16,7 @@ $game = Get-Process -Id $GamePid
 if ($game.MainWindowHandle -eq 0) { throw 'Game has no visible main window' }
 if (-not [SalimonInput]::SetForegroundWindow($game.MainWindowHandle)) { throw 'Cannot focus game window' }
 if ([SalimonInput]::GetForegroundWindow() -ne $game.MainWindowHandle) { throw 'Game did not receive focus' }
-$code = [byte]0x71
+$code = if ($Key -eq 'Return') { [byte]0x0D } else { [byte]0x71 }
 [SalimonInput]::keybd_event($code, 0, 0, [UIntPtr]::Zero)
 Start-Sleep -Milliseconds 80
 [SalimonInput]::keybd_event($code, 0, 2, [UIntPtr]::Zero)

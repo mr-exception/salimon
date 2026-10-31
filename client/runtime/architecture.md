@@ -1570,7 +1570,7 @@ Follow the [canonical damage, physical salvage and schema-21 contract](../../doc
 
 ## Offline construction (#550)
 
-Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Canonical motion and scanner event production are now implemented by #432/#433; see the offline propagation contract. Body-local loose objects retain saved containment/anchors; ship motion advances.
 
 
 ## Cosmetic surface age (#581)
@@ -1658,15 +1658,14 @@ The runtime still supplies absolute f64 DTO positions; renderer owns rebasing.
 See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
-loaded catalog truth does not grant player discovery or replace gameplay yet.
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
 
 
 ## Canonical terrain streaming (#424)
 
 See the [canonical terrain contract](../../docs/universe-terrain.md) for the exact U11
 evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
-CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
-and normal alien-world startup belong to #425/#426.
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Ordinary canonical gameplay and alien-world startup are implemented by #425/#426.
 
 
 ## Canonical surface gameplay and schema 24 (#425)
@@ -1836,3 +1835,24 @@ Its fixed native group composes the production scenario/session paths and existi
 world-to-renderer exports without changing canonical publications. The night
 reference camera samples actual Vesper ground on the hemisphere opposite the
 fixed local light; it changes only the evidence view, never session time/physics.
+
+
+## Canonical motion and launch (#432)
+
+`session/persistence.rs` owns schema-30 motion migration/validation; `session/lifecycle.rs` admits closed seconds and disables engines; `session/fabrication.rs` routes the actual ship/Core step through `ShipController::advance_celestial`. `checkpoints.rs` captures engine-off closing snapshots. `session/offline/motion_tests.rs` exercises production restore/coast/contact/geography invariants. [Frame, epoch and failure contract](../../docs/universe-offline-propagation.md).
+
+
+## Offline timed consumers and scanner (#433)
+
+`session/offline.rs` composes real motion, ordinary power/Fabricator, Recovery, construction and scanner in chronological order. `session/scanner/offline.rs` analytically settles idle grounded pulse windows; `scanner/offline_tests.rs` checks funded-prefix/TTL/partition/starvation/failure behavior. [Contract and applicability guards](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+## Native asynchronous launch (#434)
+
+`launch.rs` owns one candidate/IO worker and transfers verified source bytes; `launch_progress.rs` owns observable stages and calculable elapsed ratios. `checkpoints.rs::open_reported_at` retains the protected two-slot transaction. `app.rs`/`app/presentation.rs` gate Continue on the receipt, reconstruction and actual current-region readiness; `update_clock.rs::reset_wall_anchor` preserves saved admitted work while excluding menu wall time. [Source, cancellation and E2E contract](../../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434).
+
+
+Current U01–U33 truth and explicit fixture boundaries are mapped in the
+[U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
+streaming observer/velocity, physical environment and preview share the saved
+motion source; suit field-mark timestamps remain personal active-time metadata.

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "binary": "/workspace/salimon/target/debug/salimon-client",
+  "platform": "linux",
+  "artifacts": "/workspace/salimon/artifacts/offline-final-os-smoke/run-_fqc_wes",
+  "checks": [
+    "native window created:",
+    "renderer ready:",
+    "render attempt 1 completed with Presented",
+    "OS Enter continued the verified journey",
+    "OS F2 switched to PrecisionTour",
+    "OS F2 switched to Gameplay",
+    "game remains playable after OS input"
+  ],
+  "success": true,
+  "pid": 43490,
+  "startup_screenshot": {
+    "status": "captured",
+    "path": "/workspace/salimon/artifacts/offline-final-os-smoke/run-_fqc_wes/startup.png",
+    "retained_path": "os-startup.png"
+  },
+  "gameplay_screenshot": {
+    "status": "captured",
+    "path": "/workspace/salimon/artifacts/offline-final-os-smoke/run-_fqc_wes/gameplay.png",
+    "retained_path": "os-gameplay.png"
+  },
+  "process_exit_code": -15,
+  "duration_ms": 40395
+}

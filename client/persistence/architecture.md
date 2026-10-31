@@ -125,7 +125,7 @@ Follow the [canonical damage, physical salvage and schema-21 contract](../../doc
 
 ## Offline construction (#550)
 
-Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Canonical motion and scanner event production are now implemented by #432/#433; see the offline propagation contract. Body-local loose objects retain saved containment/anchors; ship motion advances.
 
 
 ## Cosmetic surface age (#581)
@@ -138,7 +138,7 @@ Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs
 Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
-Historical fixtures remain explicit; new-run startup is #426.
+Historical fixtures remain explicit; ordinary new-run startup uses the canonical constructor (#426).
 
 
 ## Scanner delivery (#431)
@@ -173,3 +173,8 @@ World owns explicit source designations, revision/depletion journals and physica
 publication; runtime composes F/tool input, current anatomy and source-bound restore.
 Schema 29 preserves missing/partial parts and natural object identity. Vesper
 remains sterile; positive sources are explicit fictional geometry fixtures.
+
+
+## Canonical motion schema 30 (#432)
+
+The shared envelope admits version 30. Runtime validates `state.motion` against the exact separate motion publication and migrates earlier canonical sources without changing physical/geographic identities. Existing verified two-slot atomic storage and corruption recovery remain the sole durable publication path. [Contract](../../docs/universe-offline-propagation.md).

@@ -105,6 +105,14 @@ impl GameplaySession {
         bytes: &[u8],
         launch_utc: u64,
     ) -> Result<(), SaveError> {
+        self.restore_for_launch_reported(bytes, launch_utc, &mut |_| Ok(()))
+    }
+    pub(crate) fn restore_for_launch_reported(
+        &mut self,
+        bytes: &[u8],
+        launch_utc: u64,
+        progress: &mut impl FnMut(crate::launch_progress::Progress) -> Result<(), SaveError>,
+    ) -> Result<(), SaveError> {
         #[derive(serde::Deserialize)]
         struct Header {
             saved_at_unix_seconds: u64,
@@ -115,24 +123,52 @@ impl GameplaySession {
             ..Default::default()
         };
         candidate.restore_bytes(bytes)?;
+        if candidate.motion.is_some() {
+            candidate.ship.shut_down_for_close();
+        }
         let header: Header =
             serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
+        if candidate.motion.is_some() && launch_utc < candidate.offline.watermark {
+            return Err(invalid(
+                "System clock precedes the saved journey. Correct the local date/time and retry; the checkpoint was not changed.",
+            ));
+        }
+        if candidate.motion.is_some() {
+            salimon_universe::starting_motion::Clock::at(launch_utc)
+                .map_err(|e| invalid(format!("invalid local clock: {e}")))?;
+        }
+        if header.schema_version < 30 && candidate.motion.is_some() {
+            // Legacy sub-tick debt belongs to paid construction work, before
+            // the new motion epoch exists. Settle it without inventing earlier
+            // trajectory/scanner time or changing the migration's saved pose.
+            let clock = candidate.motion.take();
+            candidate.finish_offline_remainder();
+            candidate.motion = clock;
+        }
         if header.schema_version >= 22 {
             let elapsed = launch_utc.saturating_sub(candidate.offline.watermark);
-            candidate.reconcile_construction_offline(Duration::from_secs(elapsed), &[])?;
-            if candidate.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
-                candidate
-                    .scanner
-                    .advance_closed(elapsed.checked_mul(1000).ok_or_else(|| {
-                        salimon_persistence::invalid("scanner offline UTC overflow")
-                    })?)?;
+            let total = Duration::from_secs(elapsed);
+            candidate.reconcile_closed_reported(total, &[], &mut |done| {
+                progress(crate::launch_progress::Progress::propagating(done, total))
+            })?;
+            if candidate.motion.is_some() {
+                candidate.finish_offline_remainder();
             }
+            if let Some(error) = &candidate.motion_error {
+                return Err(invalid(format!("offline motion/scanner: {error}")));
+            }
+            progress(crate::launch_progress::Progress::propagating(total, total))?;
         }
         candidate.offline.watermark = candidate.offline.watermark.max(launch_utc);
         candidate
             .survival
             .recover_offline(header.saved_at_unix_seconds, launch_utc);
         candidate.enforce_survival_restrictions();
+        progress(crate::launch_progress::Progress::at(
+            crate::launch_progress::Stage::Verifying,
+        ))?;
+        let mut verified = GameplaySession::default();
+        verified.restore_bytes(&candidate.save_bytes(launch_utc)?)?;
         *self = candidate;
         Ok(())
     }

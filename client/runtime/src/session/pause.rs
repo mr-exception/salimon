@@ -4,7 +4,21 @@ impl GameplaySession {
     pub(crate) fn is_paused(&self) -> bool {
         self.paused
     }
+    pub(crate) fn wait_for_verified_launch(&mut self) {
+        self.paused = true;
+        self.clear_held_controls();
+        self.reset_presentation();
+    }
+    pub(crate) fn resume_verified_launch(&mut self) {
+        if self.motion_error.is_none() {
+            self.paused = false;
+            self.update_clock.reset_wall_anchor();
+        }
+    }
     pub(crate) fn toggle_pause(&mut self) {
+        if self.motion_error.is_some() {
+            return;
+        }
         if self.view_mode != ViewMode::Gameplay || self.survival.snapshot().terminal {
             return;
         }

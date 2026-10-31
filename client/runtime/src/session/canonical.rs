@@ -9,7 +9,10 @@ pub(crate) fn definition_binding() -> salimon_persistence::universe::DefinitionB
     }
 }
 pub(crate) fn initialize(session: &mut GameplaySession) -> Result<(), String> {
-    session.enable_terrain(salimon_world::canonical::BODIES[0], [0., 1., 0.])
+    session.enable_terrain(salimon_world::canonical::BODIES[0], [0., 1., 0.])?;
+    session.motion =
+        Some(salimon_universe::starting_motion::Clock::at(0).map_err(|e| e.to_string())?);
+    Ok(())
 }
 
 /// Evidence fixture: standing near a real published ore deposit, then ordinary
@@ -58,6 +61,25 @@ pub(crate) fn mining_initial_conditions(session: &mut GameplaySession) -> Result
 }
 
 impl GameplaySession {
+    /// Physical environment follows the published motion clock, including closed
+    /// elapsed time. Engineering fixtures retain their isolated active-time epoch.
+    pub(crate) fn environment_epoch(
+        &self,
+    ) -> Result<salimon_universe::Epoch, salimon_persistence::SaveError> {
+        if let Some(clock) = &self.motion {
+            clock
+                .validate()
+                .map_err(|e| salimon_persistence::invalid(e.to_string()))?;
+            Ok(clock.epoch)
+        } else if self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
+            Err(salimon_persistence::invalid(
+                "canonical environment requires motion source",
+            ))
+        } else {
+            super::field_marks::epoch(self.elapsed)
+        }
+    }
+
     /// A fresh journey, never a restore path. Grants the existing supplies once.
     pub(crate) fn new_canonical_run() -> Result<Self, String> {
         let mut session = Self::new_run();
@@ -457,5 +479,35 @@ mod tests {
                 body: salimon_world::CelestialBodyId::Vesper
             }
         );
+    }
+}
+
+#[cfg(test)]
+mod environment_clock_tests {
+    use super::*;
+    #[test]
+    fn environment_tracks_closed_motion_while_personal_observation_clock_stays_frozen() {
+        let mut session = GameplaySession::new_canonical_run().unwrap();
+        let active = session.elapsed;
+        let before = session.environment_epoch().unwrap();
+        session.motion = Some(
+            session
+                .motion
+                .as_ref()
+                .unwrap()
+                .advanced(std::time::Duration::from_secs(86400))
+                .unwrap(),
+        );
+        assert_eq!(
+            session
+                .environment_epoch()
+                .unwrap()
+                .seconds_since(before)
+                .unwrap(),
+            86400.
+        );
+        assert_eq!(session.elapsed, active);
+        session.motion = None;
+        assert!(session.environment_epoch().is_err());
     }
 }

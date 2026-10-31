@@ -140,7 +140,16 @@ impl GameplaySession {
     }
 
     fn advance_ship_power(&mut self, delta: std::time::Duration) {
-        if self.offline_power {
+        if let Some(clock) = &mut self.motion {
+            if let Err(error) = self
+                .ship
+                .advance_celestial(clock, delta, self.offline_power)
+            {
+                self.motion_error = Some(error.to_string());
+                self.paused = true;
+                self.feedback = Some("Motion verification failed - resume unavailable");
+            }
+        } else if self.offline_power {
             self.ship.advance_offline_power(delta);
         } else {
             self.ship.advance(delta);

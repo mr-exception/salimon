@@ -162,7 +162,8 @@ pub(super) fn map_session_world(
                 material: SurfaceMaterial::Slate,
             })
             .collect(),
-        // Fixed local illumination is explicitly separate from future ephemeris lighting.
+        // Fixture default; native presentation replaces this with the shared
+        // motion-epoch host position before ordinary canonical rendering.
         PointLight {
             position_meters: [
                 0.,

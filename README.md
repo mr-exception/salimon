@@ -130,10 +130,10 @@ cargo build --workspace --locked
 cargo run --locked -p salimon-client
 ```
 
-The run command opens the **Salimon — Compressed Solar System** native window at
-a requested physical 1920×1080 drawable size and continues until the
-window is closed. It captures the cursor for mouse look and starts inside the
-landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
+The run command opens the native **Salimon** journey window. A responsive
+menu reads, catches up and verifies the checkpoint, then prepares the current
+region before Continue is available. A fresh journey starts beside the landed
+Scout on Vesper. Enter Continue captures the cursor for mouse look. Use **WASD** to walk, the mouse to look, and
 **Space** to jump. During open-space EVA, **WASD** translates relative to the
 view (including pitch), **Space** ascends, and **Left Shift** descends. Release
 translation input to stop assisted relative movement while retaining inherited
@@ -181,7 +181,7 @@ pause there for inspection. Only the initial physical key press is acted on;
 repeats and releases are ignored.
 
 In precision-tour view, press **1–6** to restart the approach for **Sun, Mercury, Venus, Earth, Moon,
-Mars**, respectively. Earth is selected at launch. Selection is an engineering
+Mars**, respectively. Earth is selected on entering the explicit tour. Selection is an engineering
 camera fixture; it does not move bodies or implement flight/landing gameplay.
 
 At health zero, the **Journey Ended** screen shows cause, active survival time,
@@ -221,7 +221,12 @@ cargo run --locked --release -p salimon-client
 Cargo builds for the host architecture by default; outputs go to the ignored
 root `target/` directory. No application bundle or installer exists yet.
 
-### Native smoke check
+### Historical engineering fixture smoke check
+
+This checklist targets the explicit prototype/F2 fixtures. Current ordinary
+canonical acceptance is automated by the universe/offline routes and recorded
+in the [U36 audit](reports/issue-441/README.md) and U34 evidence. It does not
+prescribe a compressed Earth startup for new journeys.
 
 Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
@@ -319,8 +324,9 @@ Mining, carrying, fragment motion/contact, ship flight and assisted landing,
 airlock access, and EVA are implemented. Modified deposits and physical fragments
 are retained in memory across local streaming during the current session.
 Core storage, physical conversion, assisted-flight reservations and power loss/
-restoration are implemented. Orbital simulation, disk/backend persistence,
-networking, survival, upgrade progression and manual power management remain deferred.
+restoration, survival, paid upgrades, disk checkpoints and canonical orbital/offline
+progression are implemented. Backend persistence, networking and manual power
+management retain their separate future scope.
 
 Add future crates explicitly to the root workspace and inherit its package
 metadata and lints. Keep `Cargo.lock` committed; validate normal changes with
@@ -393,3 +399,11 @@ geology/climate-bound potential, continuous realms and stable patch/grammar IDs.
 Suitability never grants life; observed bodies retain no procedural life claim
 and Vesper stays sterile. Strict catalog/save bindings reject incompatible
 publications. Organism meshes, physical instances and harvesting remain #619–#621.
+
+
+Current universe and offline behavior is mapped in the [U36 audit](reports/issue-441/README.md)
+and [motion/resume contract](docs/universe-offline-propagation.md). Disk checkpoints,
+canonical gravity, closed chronological work and verified resume are implemented;
+scientific full-Gaia coverage and hardware/platform release qualification retain
+their separately tracked limits. Historical six-body walkthroughs below the tour
+controls are engineering-fixture checks, not ordinary Vesper startup acceptance.

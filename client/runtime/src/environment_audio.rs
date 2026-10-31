@@ -226,7 +226,7 @@ pub(crate) fn capture(s: &GameplaySession) -> Frame {
     } else {
         (0.45, 0.35)
     };
-    let Ok(epoch) = crate::session::field_marks::epoch(s.elapsed) else {
+    let Ok(epoch) = s.environment_epoch() else {
         return Frame::default();
     };
     let climate = if s.biology.fixture {

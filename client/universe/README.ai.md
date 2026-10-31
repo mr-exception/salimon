@@ -105,7 +105,7 @@ See the [implemented contract](../../docs/universe-trajectory.md) for ownership,
 See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
-loaded catalog truth does not grant player discovery or replace gameplay yet.
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
 
 
 ## Scanner contacts (#428)
@@ -162,3 +162,6 @@ source identity, acquisition/verification commands and explicit scientific limit
 The private pack preserves all original measurements and sidecars; source terms
 remain unreviewed for public release. Runtime/save schemas and player discovery
 are unchanged.
+
+
+Canonical motion #432: [motion publication, game-clock policy and schema-30 frame](../../docs/universe-offline-propagation.md). `src/starting_motion.rs` owns the separate authored circular model; geographic identity remains unchanged.

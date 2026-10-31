@@ -62,6 +62,10 @@ impl UpdateClock {
         self.lifecycle_excluded = self.lifecycle_excluded.saturating_add(self.backlog);
         self.backlog = Duration::ZERO;
     }
+    /// Exclude launch-menu wall time while retaining saved admitted work.
+    pub(crate) fn reset_wall_anchor(&mut self) {
+        self.last_update_at = None;
+    }
 }
 
 impl UpdateClock {
@@ -146,5 +150,23 @@ mod tests {
             clock.step(origin + Duration::from_secs(5)),
             Duration::from_millis(16)
         );
+    }
+}
+
+#[cfg(test)]
+mod launch_tests {
+    use super::*;
+    #[test]
+    fn verified_launch_excludes_menu_wall_time_without_erasing_saved_work() {
+        let mut clock = UpdateClock::from_saved_backlog(Duration::from_millis(50));
+        let before = Instant::now();
+        clock.step(before);
+        clock.reset_wall_anchor();
+        assert_eq!(
+            clock.step(before + Duration::from_secs(600)),
+            Duration::ZERO
+        );
+        assert_eq!(clock.backlog(), Duration::from_millis(50));
+        assert_eq!(clock.take_tick(), Some(GAME_TICK));
     }
 }

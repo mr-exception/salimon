@@ -79,11 +79,11 @@ a corrupt source cannot debit Core or partially replace a live session.
 
 Normal startup/restart binds an empty scanner to the supplied checkpoint UTC.
 Running simulation uses the shared admitted clock (including pause/terminal
-freeze) at 1:1 rate. Launch-only nonnegative elapsed time advances scanner
-freshness and retains history, after the existing chronological powered-work
-reconciliation. The launch watermark prevents duplicate credit and rollback.
-No offline observations are fabricated while the trajectory/event host #433 is
-absent. Expired contacts can be rediscovered by ordinary paid scans.
+freeze) at 1:1 rate. Launch-only nonnegative elapsed time runs chronological funded pulses through
+the #433 motion/event host, advances freshness and retains history. The launch
+watermark prevents duplicate credit and rollback. A still-funded in-range source
+refreshes while closed; blackout/out-of-range intervals expire contacts normally.
+Expired contacts can be rediscovered by ordinary paid scans.
 
 Tests: `cargo test -p salimon-universe --locked scanner`,
 `cargo test -p salimon-client --locked scanner`, persistence/launch regressions,
@@ -217,7 +217,13 @@ and no pixel threshold is widened to accept an obscured contact. See the
 [acceptance report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-438/README.md) for original captures, failed
 2x evidence, corrected outcomes, exact commands and scope boundaries.
 
-Offline freshness checks establish the existing quiet launch adapter only;
-uncertified global-frame discovery and nonlinear trajectory/catch-up remain
-#427/#432/#433. Subjective readability #561, physical DPI/input/platform #557 and
+The historical #438 captures established the earlier quiet launch adapter only.
+Current #432/#433 supply canonical nonlinear trajectory and funded offline pulses;
+the native integration route asserts exact first-day refreshes, then expiry after
+real Core exhaustion while preserving the original history. Subjective readability #561, physical DPI/input/platform #557 and
 actual hardware/M1/Metal budgets #563 remain separate unverified qualifications.
+
+
+## Closed-game runtime integration (#433)
+
+[Chronological funding, stationary analytic pulses and curved-path boundaries](universe-offline-propagation.md#offline-timed-systems-and-scanner-433) are implemented in runtime `session/offline.rs`, `scanner.rs` and `scanner/offline.rs`. Actual Nacre/Vesper sources share the canonical model epoch; contacts/chart validate before exact fractional Core debit. The idle fast lane retains early funded returns, checked pulse counts and three-hour expiry without per-pulse replay. Active paths retain actual physical samples. Final sub-ticks settle before canonical launch publication; reconstruction alone invents no detections.

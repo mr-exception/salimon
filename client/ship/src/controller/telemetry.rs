@@ -222,6 +222,11 @@ impl ShipController {
     pub fn energy_config(&self) -> crate::EnergyConfig {
         self.energy_core.config()
     }
+    /// Authoritative unreserved storage for exact service admission; display
+    /// snapshots intentionally round whole joules and cannot fund a transaction.
+    pub fn stored_core_joules_exact(&self) -> f64 {
+        self.energy_core.stored_joules()
+    }
     pub fn fund_auxiliary_work(
         &mut self,
         requested: f64,

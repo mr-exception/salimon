@@ -79,6 +79,14 @@ while True:
 
 
 class PortableContracts(unittest.TestCase):
+    def test_invalid_capture_argv_rejected_before_launch(self):
+        for value in ('"shell command"', '[1]', '["capture-without-output"]'):
+            with self.subTest(value=value):
+                result = subprocess.run([sys.executable, str(Path(smoke.__file__)), '--binary',
+                                         'missing', '--screenshot-command', value],
+                                        capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 2)
+
     def test_missing_binary_emits_nonzero_and_result(self):
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run([sys.executable, str(Path(smoke.__file__)), '--binary',

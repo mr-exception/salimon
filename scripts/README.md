@@ -959,15 +959,24 @@ hashes and validates every route/step/capture/raw timing through `review_native`
 Use repeated `--scenario NAME` only for an explicitly scoped rerun after a
 failure. Hardware FPS is always unqualified; raw software timing is diagnostic.
 
-`benchmark_canonical.py --binary target/debug/salimon-client --output artifacts/canonical-benchmark`
+`benchmark_canonical.py --binary target/debug/salimon-client --profile debug --output artifacts/canonical-benchmark`
 launches an isolated ordinary journey, uses actual OS Enter to Continue, warms
 for five seconds and records 30 seconds of consecutive foreground frames and
-Linux process RSS/high water. It enables per-frame game logs without E2E command
+process RSS (Linux additionally supplies kernel high water). It enables per-frame game logs without E2E command
 pacing. The result distinguishes successful measurement from passing the
-16.667-ms software p95 comparison; it never qualifies hardware or M1 60 FPS.
+16.667-ms submitted-interval p95 comparison; it never establishes physical scanout
+or approves hardware budgets. Use `--profile release` with an optimized executable
+for hardware evidence. macOS uses PID-scoped System Events input, `ps` RSS and
+the reviewed `macos_window.swift` helper for CoreGraphics window inventory and a
+window-only compositor capture. Xcode command-line tools, Accessibility/Automation
+and Screen Recording access must already be available; failures remain failures.
+Missing macOS process high water and GPU memory remain null/unmeasured.
 The existing FrameClock caps long observed intervals at 250 ms; raw logs and the
 instrumentation/profile limitations are retained. Run it alone after CPU/GPU
 campaigns finish.
+
+See [Mac qualification](../docs/macos-qualification.md) for separate automated
+collection, physical input/sleep trials and owner presentation/budget decisions.
 
 ## Internal Hall prototype (#472)
 

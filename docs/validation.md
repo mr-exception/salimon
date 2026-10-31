@@ -777,3 +777,5 @@ personal chart and sound verification plus repeated source exports and productio
 GPU/PCM component captures. `planetary-environment` always selects evidence routes.
 Preserve its exact commands, original media and state/context/metric report;
 software timings and fictional positive fixtures have the limits stated there.
+
+Flight acceptance #437: see [the reproducible matrix](universe-flight-verification.md) for nine GPU routes, production orbital/contact/session contracts and separate X11 input coverage.

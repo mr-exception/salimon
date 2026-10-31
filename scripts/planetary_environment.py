@@ -39,15 +39,15 @@ def distribution(values):
             "p95": values[math.ceil(len(values) * .95) - 1], "max": values[-1]}
 
 
-def review_native(summary):
+def review_native(summary, routes=PLANETARY_ENVIRONMENT):
     """Require complete routes, real captures and raw metrics, retaining each context."""
     if summary.get("status") != "passed":
         raise ValueError("native suite failed")
     results = summary["results"]
-    if len(results) != len(PLANETARY_ENVIRONMENT):
+    if len(results) != len(routes):
         raise ValueError("incomplete native matrix")
     rows = []
-    for expected, result in zip(PLANETARY_ENVIRONMENT, results):
+    for expected, result in zip(routes, results):
         path = Path(result["result_file"])
         source = json.loads(path.read_text())
         scenario = json.loads((path.parent / "scenario.json").read_text())

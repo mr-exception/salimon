@@ -595,3 +595,13 @@ Follow the [canonical play isolation contract](../../docs/universe-gameplay.md#o
 Normal launch rejects prototype checkpoints without overwrite. Canonical scenes
 exclude engineering markers/bodies, and ship telemetry/preview selection does
 not apply the compressed 3 Mm cutoff. Explicit fixtures retain their contracts.
+
+## Flight acceptance replay (#437)
+
+The [flight matrix](../../docs/universe-flight-verification.md) runs the existing
+orbital, drag, surface, swept-contact and forecast contracts alongside native
+session routes. `trajectory/tests.rs::funded_tangential_burn_inserts_a_bound_orbit_only_for_the_actual_mass`
+adds a production 1 ms tangential circularization burn at 7,000 km, independent
+osculating eccentricity/energy checks, a doubled-mass negative control and more
+than one orbit of unpowered continuation. This is real-scale API evidence with
+a declared Earth source, separate from the playable local-controller routes.

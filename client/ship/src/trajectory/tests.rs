@@ -326,3 +326,61 @@ fn fixed_steps_are_exactly_repeatable_and_escape_energy_remains_positive() {
     assert!(energy > 0.0);
     assert!((energy - initial).abs() / initial < 1e-5);
 }
+
+#[test]
+fn funded_tangential_burn_inserts_a_bound_orbit_only_for_the_actual_mass() {
+    // A 1 ms circularization burn at 7,000 km uses the real gravity and
+    // symmetric funded-impulse path. Doubling mass must not receive the same dv.
+    let radius = 7_000_000.0_f64;
+    let mu = earth().mu_m3_per_s2;
+    let circular_speed = (mu / radius).sqrt();
+    let initial_speed = 0.9 * circular_speed;
+    let mass_kg = 100_000.0;
+    let impulse_per_joule = 1.0;
+    let funded_joules = mass_kg * (circular_speed - initial_speed) / impulse_per_joule;
+    let original = trajectory(pos(radius), [0.0, initial_speed, 0.0]);
+    let elements = |s: State| {
+        let r = s.position.relative_meters(pos(0.0)).unwrap();
+        let distance = length(r);
+        let v = s.velocity_mps;
+        let h = salimon_math::cross(r, v);
+        let eccentricity_vector = salimon_math::sub(
+            salimon_math::scale(salimon_math::cross(v, h), 1.0 / mu),
+            salimon_math::scale(r, 1.0 / distance),
+        );
+        (
+            length(eccentricity_vector),
+            length(v).powi(2) / 2.0 - mu / distance,
+        )
+    };
+    assert!((elements(original.state()).0 - 0.19).abs() < 1e-12);
+    let mut inserted = original.clone();
+    let mut loaded = original;
+    for (flight, mass) in [(&mut inserted, mass_kg), (&mut loaded, mass_kg * 2.0)] {
+        flight
+            .step(
+                1_000_000,
+                Thrust {
+                    direction: [0.0, 1.0, 0.0],
+                    funded_joules,
+                    propulsion: Propulsion::new(mass, impulse_per_joule).unwrap(),
+                },
+                |_, _| Ok(vec![earth()]),
+            )
+            .unwrap();
+    }
+    let (eccentricity, energy) = elements(inserted.state());
+    assert!(eccentricity < 1e-6);
+    assert!((energy + mu / (2.0 * radius)).abs() < 0.01);
+    assert!(elements(loaded.state()).0 > 0.09);
+    // More than one orbit, unpowered: a 1 s Verlet step has O(dt^2) radial
+    // error. The 10 m envelope is below 1.5 ppm of this declared radius.
+    for _ in 0..6000 {
+        inserted
+            .step(1_000_000_000, coast(), |_, _| Ok(vec![earth()]))
+            .unwrap();
+        let distance = length(inserted.state().position.relative_meters(pos(0.0)).unwrap());
+        assert!((distance - radius).abs() < 10.0);
+    }
+    assert!(elements(inserted.state()).1 < 0.0);
+}

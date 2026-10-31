@@ -1,0 +1,35 @@
+{
+  "active": {
+    "available": true,
+    "backend": "cpal-0.18.2",
+    "callback_cpu_overruns": 0,
+    "callbacks": 211,
+    "channels": 2,
+    "device_id": "Ok(DeviceId(CoreAudio, \"BuiltInSpeakerDevice\"))",
+    "frames": 108032,
+    "mailbox_bytes": 672,
+    "max_callback_frames": 512,
+    "max_callback_ns": 2228459,
+    "mixer_bytes": 3240,
+    "sample_format": "F32",
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "muted": {
+    "available": true,
+    "backend": "cpal-0.18.2",
+    "callback_cpu_overruns": 0,
+    "callbacks": 220,
+    "channels": 2,
+    "device_id": "Ok(DeviceId(CoreAudio, \"BuiltInSpeakerDevice\"))",
+    "frames": 112640,
+    "mailbox_bytes": 672,
+    "max_callback_frames": 512,
+    "max_callback_ns": 2228459,
+    "mixer_bytes": 3240,
+    "sample_format": "F32",
+    "sample_rate": 48000,
+    "voices": 32
+  },
+  "scope": "actual default-device callbacks; not a microphone/loopback recording or physical device-switch qualification"
+}

@@ -732,10 +732,12 @@ resolutions. Scales 1/1.5/2 are simulated via X11, not physical DPI evidence.
 `scout-recovery` explicitly starts with a held 2 kg iron identity and a 0.5 kg
 silicate bin, no module/job/progress. `key: recovery` maps to physical R through
 normal Archive dispatch; `inspect.recovery` is immutable source evidence. Use
-`reports/issue-515/verify.py --binary target/debug/salimon-client --output
+`scripts/verify_recovery.py --binary target/release/salimon-client --output
 artifacts/new-515` under Xvfb/Vulkan. It drives intake, menu, funded craft, tray
 collection/installation, real cabin walking, R start/stop and both paid records.
 This fixture does not measure mining/acquisition, balance or physical OS input.
+The maintained script restores the historical #515 route with its self-contained
+read-only aiming helper; it also runs on a native Mac with `WGPU_BACKEND=metal`.
 
 The #566 collector adds the explicit `--profile cloud-llvmpipe-1280` admission
 profile for Xvfb 1280×800, scale1, Vulkan llvmpipe. The default M1/Metal profile
@@ -959,15 +961,24 @@ hashes and validates every route/step/capture/raw timing through `review_native`
 Use repeated `--scenario NAME` only for an explicitly scoped rerun after a
 failure. Hardware FPS is always unqualified; raw software timing is diagnostic.
 
-`benchmark_canonical.py --binary target/debug/salimon-client --output artifacts/canonical-benchmark`
+`benchmark_canonical.py --binary target/debug/salimon-client --profile debug --output artifacts/canonical-benchmark`
 launches an isolated ordinary journey, uses actual OS Enter to Continue, warms
 for five seconds and records 30 seconds of consecutive foreground frames and
-Linux process RSS/high water. It enables per-frame game logs without E2E command
+process RSS (Linux additionally supplies kernel high water). It enables per-frame game logs without E2E command
 pacing. The result distinguishes successful measurement from passing the
-16.667-ms software p95 comparison; it never qualifies hardware or M1 60 FPS.
+16.667-ms submitted-interval p95 comparison; it never establishes physical scanout
+or approves hardware budgets. Use `--profile release` with an optimized executable
+for hardware evidence. macOS uses PID-scoped System Events input, `ps` RSS and
+the reviewed `macos_window.swift` helper for CoreGraphics window inventory and a
+window-only compositor capture. Xcode command-line tools, Accessibility/Automation
+and Screen Recording access must already be available; failures remain failures.
+Missing macOS process high water and GPU memory remain null/unmeasured.
 The existing FrameClock caps long observed intervals at 250 ms; raw logs and the
 instrumentation/profile limitations are retained. Run it alone after CPU/GPU
 campaigns finish.
+
+See [Mac qualification](../docs/macos-qualification.md) for separate automated
+collection, physical input/sleep trials and owner presentation/budget decisions.
 
 ## Internal Hall prototype (#472)
 

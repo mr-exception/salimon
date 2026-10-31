@@ -47,7 +47,7 @@ For each implementation:
 physical input, suspend/wake, hardware GPU counters, reference-M1 FPS, subjective
 art/audio taste, legal source rights and product/balance decisions cannot be
 inferred from cloud results. Preserve these as accurately scoped release risks
-or decision issues (#557, #561, #563, #659, #660, #661 as relevant); they do not
+or decision issues (#720, #721, #722, #659, #723, #661 as relevant); they do not
 block unrelated cloud-verified implementation delivery. A release claim requiring
 one of these checks remains unqualified until its real evidence exists. Never
 treat an unrun, blocked or failed criterion as a pass, weaken numeric/physics
@@ -150,14 +150,20 @@ than blocking routine cloud PRs on desktop availability.
 
 ## Active verification ownership
 
+The 2026-10-31 local M1 collection delivers reports for #557/#561/#563/#660.
+Their unresolved physical trials and explicit owner decisions transfer respectively
+to #720/#721/#722/#723; source closure records evidence delivery, not qualification.
+Existing links to the source issues retain historical context. Use the current
+owners below and the [Mac procedure](macos-qualification.md) for new evidence.
+
 | Work | Auto issues | Human evidence/decision owner |
 | --- | --- | --- |
-| Universe render/flight/scanner/restore and scientific workload | #436–#439, #521 and implementation issues | #561 presentation; #557 physical platform checks; #563 hardware budgets |
-| Scout lighting, machinery, engine, UI, Archive, recovery and audio | #483, #485, #489, #498, #502, #505, #515, #566 | #561 visual/audio/handling review; #660 route/balance decisions |
-| Construction implementation and integrated routes | #538–#550, #551 | #561 spatial/preview review; #557 physical platform checks; #563 budgets |
-| Physics stress optimization | #559 | #563 stress limits and hardware budget decision |
-| Corpus/experience/balance automation | #568 | #659 source rights; #660 balance; #661 experience decisions; #561 corpus approval |
-| Actual OS suspend/wake and physical display/input | AI prepares harnesses and analyzes evidence | #557 |
+| Universe render/flight/scanner/restore and scientific workload | #436–#439, #521 and implementation issues | #721 presentation; #720 physical platform checks; #722 hardware budgets |
+| Scout lighting, machinery, engine, UI, Archive, recovery and audio | #483, #485, #489, #498, #502, #505, #515, #566 | #721 visual/audio/handling review; #723 route/balance decisions |
+| Construction implementation and integrated routes | #538–#550, #551 | #721 spatial/preview review; #720 physical platform checks; #722 budgets |
+| Physics stress optimization | #559 | #722 stress limits and hardware budget decision |
+| Corpus/experience/balance automation | #568 | #659 source rights; #723 balance; #661 experience decisions; #721 corpus approval |
+| Actual OS suspend/wake and physical display/input | AI prepares harnesses and analyzes evidence | #720 |
 
 This table is routing, not a claim any blocked implementation, human review or
 hardware target has passed. Issue bodies carry detailed current scope; dated

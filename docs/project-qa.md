@@ -14,7 +14,7 @@
   link the question to its new follow-up issue under the
   [completion workflow](coding-conventions.md#issue-completion-and-follow-up).
 ## Open questions
-### What budget should complete legacy active 500-piece M1 signoff (#563)?
+### What budget should complete legacy active 500-piece M1 signoff (#722)?
 
 The [2026-10-21 native evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-255/2026-10-21/README.md)
 retains 150 completed moving intervals across ten fresh drops: frame p95
@@ -29,7 +29,7 @@ Owner review must decide whether the proposed active/launch-period limits and
 remaining historical evidence justify acceptance or whether more profiling is
 required. Fresh exact historical binary pairs pass the 20% relative checks, but
 the six prior whole-window and three prior same-state CPU-render failures remain
-recorded failures without an attributed cause. [#563](https://github.com/mr-exception/salimon/issues/563)
+recorded failures without an attributed cause. [#722](https://github.com/mr-exception/salimon/issues/722)
 owns this decision and any required attribution after the
 [#479 reverified decision package](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-479/README.md). Keep this
 question open until explicit review resolves it; source closure grants no signoff.
@@ -82,22 +82,24 @@ owns validation, identity conflicts, exact continuation and offline freeze.
 
 ### When can the native Metal candidates become approved baselines?
 
-The 2026-10-21 [#314 delivery](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#561](https://github.com/mr-exception/salimon/issues/561) owns human corpus decisions/review, with #557 physical platform checks and #568 cloud automation. Earlier #477/#453 findings remain dated evidence. Source issue closure grants no appearance or interpolation acceptance.
+The 2026-10-21 [#314 delivery](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#721](https://github.com/mr-exception/salimon/issues/721) owns human corpus decisions/review, with #720 physical platform checks and #568 cloud automation. Earlier #477/#453 findings remain dated evidence. Source issue closure grants no appearance or interpolation acceptance.
 
-Scout #463 lighting is a bounded presentation proposal: #483/#566 own cloud capture/regression/timing evidence, #561 human image/readability review and #563 hardware budget decisions under the [verification workflow](verification-workflow.md). Its cool blackout floor is visibility fill, not emergency electrical energy. Native #451/#477 captures from older shaders do not approve this change.
+Scout #463 lighting is a bounded presentation proposal: #483/#566 own cloud capture/regression/timing evidence, #721 human image/readability review and #722 hardware budget decisions under the [verification workflow](verification-workflow.md). Its cool blackout floor is visibility fill, not emergency electrical energy. Native #451/#477 captures from older shaders do not approve this change.
 
 Scout #465 cloud synthesis/routing/playback lifecycle and matched audio-on/off
 measurements remain [#485](https://github.com/mr-exception/salimon/issues/485);
-human timbre/mix/listening review is #561, physical OS playback/device checks
-#557 and hardware budget decisions #563.
-Portable synthesis is bounded but cannot grant listening or M1 performance
-acceptance; the minimal shared OS playback seam may need a continuous backend.
+human timbre/mix/listening review is #721, physical OS playback/device checks
+#720 and hardware budget decisions #722.
+The production continuous CPAL mixer is implemented. The
+[2026-10-31 M1 default-device probe](../reports/issue-557/README.md) confirms real
+CoreAudio callbacks, not subjective listening, physical device switching/sleep
+or matched whole-frame audio-on/off budget acceptance. Those decisions remain open.
 
 ## Survival difficulty budget review (#384 / #496)
 
 Portable balance evidence is [documented](survival-balance.md). Proposed comfortable
 360-second and break-even 720-second one-ration budgets await explicit owner
-approval in [#660](https://github.com/mr-exception/salimon/issues/660) after #496
+approval in [#723](https://github.com/mr-exception/salimon/issues/723) after #496
 evidence delivery. Physical routes/subjective native timing remain unmeasured;
 current non-Earth profiles have no biomass. Approved meter durations are unchanged.
 
@@ -115,10 +117,10 @@ On 2026-10-27 the owner authorized proceeding with the verified #537 preparation
 in PR #658 and verifying personally later. This accepts delivery with deferred
 review, not unrun checks or new source permissions. [#659](https://github.com/mr-exception/salimon/issues/659)
 owns source-specific full terms, exact credits/permissions and full production
-snapshot approval; #660 owns measured survival/recovery routes and balance
-choices; #661 owns future full-experience/backend acceptance. #561 retains human
+snapshot approval; #723 owns measured survival/recovery routes and balance
+choices; #661 owns future full-experience/backend acceptance. #721 retains human
 image/mask/tolerance approval and independent hosted software-Vulkan corpus
-review, with #557 physical platform experiments and #563 hardware qualification.
+review, with #720 physical platform experiments and #722 hardware qualification.
 The owner permits private development; public/commercial release review remains
 #659. Closing #537 grants no appearance or release-data approval.
 

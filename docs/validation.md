@@ -791,3 +791,6 @@ this private observed pack does not grant player knowledge or publish a release.
 
 
 Canonical offline propagation #432: `cargo test -p salimon-ship --locked offline::` exercises portable propagation/rollback/orbit/contact fixtures. See the [frame and host boundary](universe-offline-propagation.md); this does not replace eventual native progress/resume or integrated offline acceptance.
+
+
+Offline timed/scanner #433: `cargo test -p salimon-client --locked session::scanner` and `cargo test -p salimon-client --locked session::offline` cover funded-prefix/TTL/partition/long-idle, curved motion, starvation, frozen survival, paused play, legacy debt and atomic failure. [Contract and source owners](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

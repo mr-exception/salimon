@@ -858,3 +858,6 @@ this private observed pack does not grant player knowledge or publish a release.
 ## Canonical offline propagation (#432)
 
 [Source and frame contract](universe-offline-propagation.md): ship `src/offline.rs`, regressions `src/offline/tests.rs`. Ordinary canonical motion publication and saved-journey integration are implemented; timed/scanner composition and native progress follow in #433/#434.
+
+
+Offline timed/scanner #433: runtime `session/offline.rs`, `session/scanner.rs`, `session/scanner/offline.rs` and `scanner/offline_tests.rs`; [canonical chronology, fast-path guards and failure contracts](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

@@ -120,15 +120,22 @@ impl GameplaySession {
         }
         let header: Header =
             serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
+        if header.schema_version < 30 && candidate.motion.is_some() {
+            // Legacy sub-tick debt belongs to paid construction work, before
+            // the new motion epoch exists. Settle it without inventing earlier
+            // trajectory/scanner time or changing the migration's saved pose.
+            let clock = candidate.motion.take();
+            candidate.finish_offline_remainder();
+            candidate.motion = clock;
+        }
         if header.schema_version >= 22 {
             let elapsed = launch_utc.saturating_sub(candidate.offline.watermark);
             candidate.reconcile_construction_offline(Duration::from_secs(elapsed), &[])?;
-            if candidate.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
-                candidate
-                    .scanner
-                    .advance_closed(elapsed.checked_mul(1000).ok_or_else(|| {
-                        salimon_persistence::invalid("scanner offline UTC overflow")
-                    })?)?;
+            if candidate.motion.is_some() {
+                candidate.finish_offline_remainder();
+            }
+            if let Some(error) = &candidate.motion_error {
+                return Err(invalid(format!("offline motion/scanner: {error}")));
             }
         }
         candidate.offline.watermark = candidate.offline.watermark.max(launch_utc);

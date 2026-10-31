@@ -172,7 +172,33 @@ impl GameplaySession {
                     salimon_ship::FlightState::Landed { .. }
                         | salimon_ship::FlightState::GroundedAfterCrash { .. }
                 );
-            let step = if (possible && funded) || moving {
+            let ordinary_funded =
+                self.ship.stored_core_joules_exact() > 0. || core.conversion_remaining_joules > 0.;
+            let timed = self.motion.is_some()
+                && (self.fabricator.power_demand().is_some()
+                    || core.conversion_remaining_joules > 0.);
+            let scanner_samples = self.motion.is_some() && !self.stationary_scanner_certified();
+            if self.motion.is_some()
+                && !moving
+                && !possible
+                && !scanner_samples
+                && self.fabricator.power_demand().is_none()
+                && core.conversion_remaining_joules == 0.
+            {
+                let step = nanos / u128::from(TICK_NANOS) * u128::from(TICK_NANOS);
+                let delta =
+                    Duration::new((step / 1_000_000_000) as u64, (step % 1_000_000_000) as u32);
+                if let Err(error) = self.advance_closed_stationary(delta) {
+                    self.motion_error = Some(error.to_string());
+                    return;
+                }
+                nanos -= step;
+                continue;
+            }
+            let step = if (possible && funded)
+                || moving
+                || ((timed || scanner_samples) && ordinary_funded)
+            {
                 u128::from(TICK_NANOS)
             } else {
                 nanos / u128::from(TICK_NANOS) * u128::from(TICK_NANOS)
@@ -187,9 +213,26 @@ impl GameplaySession {
         self.offline.pending_nanos = nanos as u64;
     }
     fn closed_work_tick(&mut self, delta: Duration) {
+        self.advance_closed_sources(delta);
+        if self.motion.is_some() && self.motion_error.is_none() {
+            self.advance_scanner(delta);
+            if let Some(error) = &self.scanner.error {
+                self.motion_error = Some(error.clone());
+            }
+        }
+    }
+    pub(in crate::session) fn advance_closed_sources(&mut self, delta: Duration) {
         self.offline_power = true;
+        let before = self.ship.snapshot().flight_state;
         self.advance_surface_age(delta);
         self.advance_fabrication(delta);
+        let after = self.ship.snapshot().flight_state;
+        if !matches!(before, salimon_ship::FlightState::GroundedAfterCrash { .. })
+            && matches!(after, salimon_ship::FlightState::GroundedAfterCrash { .. })
+        {
+            self.interrupt_construction_after_crash();
+        }
+        self.stop_airborne_construction();
         self.advance_recovery(delta);
         self.advance_construction(delta);
         let powered = self.ship.snapshot().power_available;

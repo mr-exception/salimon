@@ -1,6 +1,7 @@
 //! Scanner composition: ordinary Core-funded service; discovery owns no catalog truth.
 #[cfg(test)]
 mod integration_tests;
+pub(in crate::session) mod offline;
 mod presentation;
 pub(crate) mod save;
 use super::GameplaySession;
@@ -75,6 +76,22 @@ impl GameplaySession {
             },
             velocity_mps: [0.; 3],
         };
+        let mut targets = vec![target];
+        if let Some(clock) = &self.motion {
+            let orbit = salimon_universe::starting_motion::planet(clock.epoch)
+                .map_err(|e| e.to_string())?;
+            targets.push(Observation {
+                id: salimon_universe::CatalogId::try_from(
+                    salimon_universe::starting_system::STAR_ID.to_owned(),
+                )
+                .map_err(|e| e.to_string())?,
+                position: Position::BodyLocal {
+                    body: body.clone(),
+                    meters: orbit.position_meters.map(|v| -v),
+                },
+                velocity_mps: orbit.velocity_mps.map(|v| -v),
+            });
+        }
         // Online simulation samples the completed authoritative tick. Pulse
         // cadence is absolute; observed states are timestamped at this tick,
         // never backdated using an uncertified linear extrapolation.
@@ -82,44 +99,43 @@ impl GameplaySession {
             body,
             meters: ship.pose.position_meters,
         };
-        let relative = target
-            .position
-            .relative_meters(&observer)
-            .map_err(|e| e.to_string())?;
         let due = end / 5000 > start / 5000;
-        let hit = due
-            && relative[0].hypot(relative[1]).hypot(relative[2])
-                <= self.scanner.parameters.range_meters;
-        let available = self.ship.snapshot().energy_core.stored_joules as f64;
+        let mut hits = Vec::new();
+        for target in targets {
+            let relative = target
+                .position
+                .relative_meters(&observer)
+                .map_err(|e| e.to_string())?;
+            if due
+                && relative[0].hypot(relative[1]).hypot(relative[2])
+                    <= self.scanner.parameters.range_meters
+            {
+                hits.push(target);
+            }
+        }
+        let hit = !hits.is_empty();
+        let available = self.ship.stored_core_joules_exact();
         let powered = ship.power_available && available >= cost;
         // Validate the contact transaction before spending Core joules. A
         // rejected saved counter/state must not repeatedly bill the same pulse.
-        let refreshed = if powered && hit {
-            let mut contacts = self.scanner.contacts.clone();
+        let mut contacts = self.scanner.contacts.clone();
+        if powered && hit {
             contacts
-                .refresh(&CATALOG, end, true, &[target])
+                .refresh(&CATALOG, end, true, &hits)
                 .map_err(|e| e.to_string())?;
-            Some(contacts)
-        } else {
-            None
-        };
+        }
+        contacts.advance(end).map_err(|e| e.to_string())?;
+        let mut chart = self.chart.clone();
+        if powered && hit {
+            chart.observe(&contacts).map_err(|e| e.to_string())?;
+        }
         if !delta.is_zero() {
             self.ship
                 .fund_auxiliary_work(cost, 0., delta)
                 .map_err(|_| "scanner Core funding")?;
         }
-        if let Some(contacts) = refreshed {
-            self.scanner.contacts = contacts;
-        }
-        self.scanner
-            .contacts
-            .advance(end)
-            .map_err(|e| e.to_string())?;
-        if powered && hit {
-            self.chart
-                .observe(&self.scanner.contacts)
-                .map_err(|e| e.to_string())?;
-        }
+        self.scanner.contacts = contacts;
+        self.chart = chart;
         self.scanner.utc_millis = end;
         self.scanner.sub_millis_nanos = (nanos % 1_000_000) as u32;
         self.scanner.powered = powered;
@@ -164,3 +180,6 @@ mod tests {
         assert_eq!(s.scanner.utc_millis, clock);
     }
 }
+
+#[cfg(test)]
+mod offline_tests;

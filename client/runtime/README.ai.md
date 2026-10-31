@@ -621,3 +621,6 @@ Flight acceptance #437: see [the reproducible matrix](../../docs/universe-flight
 
 
 Canonical offline motion #432: [source, schema-30 and verification contract](../../docs/universe-offline-propagation.md). Runtime stores the model epoch/frame, composes the same ship step online/offline, disables engines on closing/launch and refuses unverified motion publication.
+
+
+Offline timed/scanner integration #433: [chronology and analytic idle pulses](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433). `session/scanner/offline.rs` owns the stationary certified fast path; active motion/work retains the actual scheduler.

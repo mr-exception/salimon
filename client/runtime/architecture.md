@@ -1841,3 +1841,8 @@ fixed local light; it changes only the evidence view, never session time/physics
 ## Canonical motion and launch (#432)
 
 `session/persistence.rs` owns schema-30 motion migration/validation; `session/lifecycle.rs` admits closed seconds and disables engines; `session/fabrication.rs` routes the actual ship/Core step through `ShipController::advance_celestial`. `checkpoints.rs` captures engine-off closing snapshots. `session/offline/motion_tests.rs` exercises production restore/coast/contact/geography invariants. [Frame, epoch and failure contract](../../docs/universe-offline-propagation.md).
+
+
+## Offline timed consumers and scanner (#433)
+
+`session/offline.rs` composes real motion, ordinary power/Fabricator, Recovery, construction and scanner in chronological order. `session/scanner/offline.rs` analytically settles idle grounded pulse windows; `scanner/offline_tests.rs` checks funded-prefix/TTL/partition/starvation/failure behavior. [Contract and applicability guards](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

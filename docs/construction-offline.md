@@ -93,3 +93,8 @@ publication behavior. Render routes are
 See [actual evidence and limits](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-550/README.md). Human appearance
 review remains #561, physical platform/input/OS checks #557 and hardware/Metal
 budgets #563.
+
+
+## Canonical universe host (#433)
+
+[The real motion/scanner host](universe-offline-propagation.md#offline-timed-systems-and-scanner-433) now composes the same powered work with canonical frame/epoch progression and actual terrain crashes. Canonical launch flushes its final sub-tick before verification; historical engineering queues retain their existing remainder behavior. Analytic idle scanner windows never bypass runnable work/conversion, emergency reserves or physical safety.

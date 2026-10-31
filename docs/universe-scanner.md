@@ -221,3 +221,8 @@ Offline freshness checks establish the existing quiet launch adapter only;
 uncertified global-frame discovery and nonlinear trajectory/catch-up remain
 #427/#432/#433. Subjective readability #561, physical DPI/input/platform #557 and
 actual hardware/M1/Metal budgets #563 remain separate unverified qualifications.
+
+
+## Closed-game runtime integration (#433)
+
+[Chronological funding, stationary analytic pulses and curved-path boundaries](universe-offline-propagation.md#offline-timed-systems-and-scanner-433) are implemented in runtime `session/offline.rs`, `scanner.rs` and `scanner/offline.rs`. Actual Nacre/Vesper sources share the canonical model epoch; contacts/chart validate before exact fractional Core debit. The idle fast lane retains early funded returns, checked pulse counts and three-hour expiry without per-pulse replay. Active paths retain actual physical samples. Final sub-ticks settle before canonical launch publication; reconstruction alone invents no detections.

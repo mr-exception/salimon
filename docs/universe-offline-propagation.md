@@ -63,3 +63,14 @@ orbit against an independent analytic solution and half-step reference, progress
 partitioning, first impact/support and atomic provider/consumer failure. Fixture
 models are declared test inputs, not publication of Vesper motion or full-data
 scientific coverage. See the [work log](../reports/issue-432/README.md).
+
+
+## Offline timed systems and scanner (#433)
+
+Runtime advances actual motion and ordinary power/Fabricator first, then Recovery, construction and scanner service. Active timed work/conversion and curved trajectories use physical chronological samples with their real energy/source boundaries. Only fatigue recovers among survival meters; hunger, health, active effects and active run duration freeze. Existing cargo containment/anchors remain the source of hull-relative frozen objects. Closing never grants engines, autopilot or jump authority.
+
+For a grounded stationary body-frame observer with no runnable Fabricator, conversion, Recovery or construction, `session/scanner/offline.rs` solves the monotone combined service/idle/pulse budget for its fully funded prefix, then uses the production analytic linear-window API for the fixed Vesper target. Nacre must be provably outside range for every orbital direction (or storage empty); otherwise the actual source is sampled chronologically. Early funded contacts survive later blackout; the final interval advances three-hour expiry while retaining encounter/player-chart history. Pulse counts are checked and updated analytically, including a year-long fixture, without replaying every five-second frame.
+
+`scanner.rs` includes Vesper and the orbiting Nacre source, uses exact fractional Core storage and validates contacts plus chart before debit/publication. Moving paths use the actual completed physical sample and existing tick timestamps, never an uncertified long affine chord. The default scanner has 1,000 W idle draw, 10,000 J per absolute five-second pulse and a 1,000,000,000 m range; upgrades/configuration retain the same source checks.
+
+Canonical launch flushes its final sub-tick work before source verification, aligning work, motion and scanner clocks. For pre-30 saves, legacy construction-only debt is settled without earlier motion/scanner time before the new epoch is introduced. Engineering fixtures retain their historical remainder queue. All launch mutations remain private until verification and durable checkpoint replacement. [Focused report](../reports/issue-433/README.md).

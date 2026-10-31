@@ -56,6 +56,6 @@ Native graphical evidence and complete shared workspace/script gates run once af
 
 ## Limits
 
-The live field is the complete published two-body Vesper/Morrow region. The generic portable selector/trajectory/contact APIs retain declared multi-body/atmosphere providers. The authored Vesper publication is vacuum; missing atmospheres are never guessed. The stellar interior is outside this model and rejects unverifiable coasting instead of teleporting or granting a safe landing. General observed-source coverage and full-data budgets remain #524 and their own source validity contracts.
+The live field is the complete published two-body Vesper/Nacre region. The generic portable selector/trajectory/contact APIs retain declared multi-body/atmosphere providers. The authored Vesper publication is vacuum; missing atmospheres are never guessed. The stellar interior is outside this model and rejects unverifiable coasting instead of teleporting or granting a safe landing. General observed-source coverage and full-data budgets remain #524 and their own source validity contracts.
 
 Routine cloud work does not establish physical platform/input (#557), subjective presentation (#561), hardware/Metal performance (#563), source redistribution review (#659), balance (#660) or first-hour experience approval (#661).

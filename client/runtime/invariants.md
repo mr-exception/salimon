@@ -909,3 +909,6 @@ never supplies an atmosphere, biosphere or gameplay location/time change.
 ## Verified canonical motion (#432)
 
 Current canonical saves require the exact authored motion identity and epoch. Migration retains body-relative physics/resources. Active and closed flight share the same gravity operator; closed mode cannot grant manual thrust. Motion errors prevent save/resume and retain the last verified checkpoint. A default/engineering session never acquires a canonical frame accidentally. [Contract](../../docs/universe-offline-propagation.md).
+
+
+Offline #433 retains hunger/health/status/active time, grants fatigue-only recovery and never enables engines. Only fully funded pulse windows refresh contacts; future blackout cannot erase earlier returns. Long curved orbital paths are not treated as certified affine tracks. The analytic fast lane requires no runnable work/conversion and a stationary body-frame observer with other sources certified out of range. [Chronology contract](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

@@ -948,3 +948,6 @@ this private observed pack does not grant player knowledge or publish a release.
 ## Canonical offline propagation (#432)
 
 [Canonical motion/propagation](universe-offline-propagation.md) is owned by ship `offline.rs` over the existing trajectory/contact operators. `controller/celestial.rs` and runtime compose the same active/closed gravity operator, with schema-30 migration; #434 owns asynchronous native progress.
+
+
+Offline timed/scanner host #433: [source-order and certified idle-window routing](universe-offline-propagation.md#offline-timed-systems-and-scanner-433). Runtime owns cross-domain chronology; ship owns actual Core debit and physical flight; universe owns pulse/contact history.

@@ -189,3 +189,6 @@ physical populations. Explicit obstruction safety overrides ordinary assist cont
 
 
 Canonical offline motion (#432): [motion/frame and host contract](../../docs/universe-offline-propagation.md). `controller/celestial.rs` supplies the live body-frame gravity path; schema-30 integration preserves geographical identity.
+
+
+`stored_core_joules_exact` is the authoritative fractional-storage read for scanner admission (#433); whole-joule telemetry remains display only. [Timed-system contract](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

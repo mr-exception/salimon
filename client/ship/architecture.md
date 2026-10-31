@@ -610,3 +610,6 @@ a declared Earth source, separate from the playable local-controller routes.
 ## Canonical offline propagation (#432)
 
 `src/offline.rs` owns bounded propagation jobs over the production trajectory/contact APIs and transactional cloned timed consumers. [Motion and host contract](../../docs/universe-offline-propagation.md). Canonical motion/save integration is implemented; asynchronous progress/Resume is #434.
+
+
+Exact auxiliary-service admission #433 reads fractional storage through `controller/telemetry.rs::stored_core_joules_exact`; `fund_auxiliary_work` remains the sole debit, respecting actual unreserved storage and caller reserve. [Offline service composition](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

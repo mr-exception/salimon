@@ -417,3 +417,6 @@ not apply the compressed 3 Mm cutoff. Explicit fixtures retain their contracts.
 ## Canonical offline propagation (#432)
 
 Incomplete jobs cannot expose a verified resume. Each poll stages trajectory and its privately cloned timed consumer together; late errors roll back both. Providers supply complete epoch-valid source/air/collision/support data. No provider absence becomes a physical default. See the [motion/frame and host contract](../../docs/universe-offline-propagation.md).
+
+
+Scanner funding cannot use rounded display joules. Authoritative fractional availability and actual post-bus auxiliary debit remain distinct from telemetry; no partially funded pulse earns discovery (#433). [Contract](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

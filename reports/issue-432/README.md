@@ -59,3 +59,13 @@ Native graphical evidence and complete shared workspace/script gates run once af
 The live field is the complete published two-body Vesper/Nacre region. The generic portable selector/trajectory/contact APIs retain declared multi-body/atmosphere providers. The authored Vesper publication is vacuum; missing atmospheres are never guessed. The stellar interior is outside this model and rejects unverifiable coasting instead of teleporting or granting a safe landing. General observed-source coverage and full-data budgets remain #524 and their own source validity contracts.
 
 Routine cloud work does not establish physical platform/input (#557), subjective presentation (#561), hardware/Metal performance (#563), source redistribution review (#659), balance (#660) or first-hour experience approval (#661).
+
+
+## Shared batch acceptance
+
+Subsequent implementation and final cloud evidence are complete in the same
+combined PR: [integrated results, original media and limits](../issue-435/README.md).
+That final index supersedes earlier pending-batch statements while preserving
+historical focused-check revisions/counts above. No merge or hardware acceptance
+is implied. The audit precedes integrated verification; this link is additional
+evidence, not a dependency from #441 to #435.

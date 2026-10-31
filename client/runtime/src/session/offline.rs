@@ -1,5 +1,5 @@
-//! Construction's chronological powered-work adapter, shared with future U32.
-//! The current host retains its saved ship/region frame. No scanner/orbit logic.
+//! Shared closed-game motion, funded scanner and chronological timed-work adapter.
+//! Stages the complete source before verification and durable host publication.
 pub(super) mod save;
 use super::GameplaySession;
 use salimon_persistence::{SaveError, Validate, invalid};
@@ -79,7 +79,7 @@ pub(crate) struct TimedEvent {
     pub(crate) event: Event,
 }
 #[derive(Clone, Debug)]
-#[allow(dead_code)] // U32 host integration seam; exercised by owning tests now.
+#[allow(dead_code)] // Optional verified external-event seam; canonical contact is produced internally.
 pub(crate) enum Event {
     Impact(super::construction::damage::Impact),
     Motion {

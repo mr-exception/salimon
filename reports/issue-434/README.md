@@ -75,3 +75,13 @@ gate from these environment settings alone.
 
 No native workstation, Metal, physical input, OS suspend/wake or M1 FPS is claimed
 (#557/#563); subjective presentation remains #561. No merge/deployment is done.
+
+
+## Shared batch acceptance
+
+Subsequent implementation and final cloud evidence are complete in the same
+combined PR: [integrated results, original media and limits](../issue-435/README.md).
+That final index supersedes earlier pending-batch statements while preserving
+historical focused-check revisions/counts above. No merge or hardware acceptance
+is implied. The audit precedes integrated verification; this link is additional
+evidence, not a dependency from #441 to #435.

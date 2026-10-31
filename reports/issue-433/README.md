@@ -62,3 +62,13 @@ The two-body authored local model does not establish full Gaia-pack coverage or
 observed ephemeris validity. Hardware/Metal, physical input and subjective review
 remain #563/#557/#561, separately unverified. Native progress/verified publication
 is #434; final documentation audit and integrated evidence are #441/#435.
+
+
+## Shared batch acceptance
+
+Subsequent implementation and final cloud evidence are complete in the same
+combined PR: [integrated results, original media and limits](../issue-435/README.md).
+That final index supersedes earlier pending-batch statements while preserving
+historical focused-check revisions/counts above. No merge or hardware acceptance
+is implied. The audit precedes integrated verification; this link is additional
+evidence, not a dependency from #441 to #435.

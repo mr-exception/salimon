@@ -37,7 +37,7 @@ benchmark was rerun. Exact current integrated runs are recorded separately by #4
 | --- | --- | --- | --- | --- |
 | U01 #402 | Catalog/schema | [client/universe/src/records.rs](../../client/universe/src/records.rs) | [client/universe/src/validation.rs](../../client/universe/src/validation.rs) | [client/universe/architecture.md](../../client/universe/architecture.md) |
 | U02 #403 | Split coordinates/epochs | [client/universe/src/coordinates.rs](../../client/universe/src/coordinates.rs) | [client/universe/src/coordinates/tests.rs](../../client/universe/src/coordinates/tests.rs) | [client/universe/architecture.md](../../client/universe/architecture.md) |
-| U03 #404 | Independent reference harness | [client/universe/src/lib.rs](../../client/universe/src/lib.rs) | [client/universe/src/tests.rs](../../client/universe/src/tests.rs) | [docs/technical-architecture.md](../../docs/technical-architecture.md) |
+| U03 #404 | Independent reference harness | [client/universe/src/reference.rs](../../client/universe/src/reference.rs) | [client/universe/src/reference/tests.rs](../../client/universe/src/reference/tests.rs) | [docs/universe-reference-fixtures.md](../../docs/universe-reference-fixtures.md) |
 | U04 #405 | Partition codec | [client/universe/src/partitions.rs](../../client/universe/src/partitions.rs) | [client/universe/src/partitions/tests.rs](../../client/universe/src/partitions/tests.rs) | [docs/universe-storage.md](../../docs/universe-storage.md) |
 | U05 #406 | Catalog save binding | [client/persistence/src/universe.rs](../../client/persistence/src/universe.rs) | [client/persistence/src/universe/tests.rs](../../client/persistence/src/universe/tests.rs) | [docs/save-contract.md](../../docs/save-contract.md) |
 | U06 #407 | Frozen source metadata | [client/universe/src/sources.rs](../../client/universe/src/sources.rs) | [scripts/test_import_universe_sources.py](../../scripts/test_import_universe_sources.py) | [docs/universe-sources.md](../../docs/universe-sources.md) |
@@ -104,3 +104,13 @@ are deliberately run once after this audit by #435.
 No broken path or unresolved current-model contradiction is intentionally
 deferred to #435. Documentation checks validate local links and same-PR owner
 coverage; the model remains explicitly limited as above.
+
+
+## Shared batch acceptance
+
+Subsequent implementation and final cloud evidence are complete in the same
+combined PR: [integrated results, original media and limits](../issue-435/README.md).
+That final index supersedes earlier pending-batch statements while preserving
+historical focused-check revisions/counts above. No merge or hardware acceptance
+is implied. The audit precedes integrated verification; this link is additional
+evidence, not a dependency from #441 to #435.

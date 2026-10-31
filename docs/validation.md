@@ -138,7 +138,7 @@ verification** for a nightly/weekly suite; neither adds a PR test gate.
 
 Linux software Vulkan establishes launch, gameplay/state and capture coverage;
 it does not establish macOS Metal/Windows hardware fidelity or performance.
-Use the root [native smoke check](../README.md#native-smoke-check) for gameplay,
+Use the root [native smoke check](../README.md#historical-engineering-fixture-smoke-check) for gameplay,
 F2 precision, F3 telemetry, resize, minimize/restore, close and relaunch. Record
 reference Apple M1 iMac 1920×1080 performance separately; no substitute machine
 can establish reference-machine performance. Record rolling FPS, average/p95

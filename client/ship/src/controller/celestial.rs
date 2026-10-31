@@ -281,6 +281,9 @@ mod reference_tests {
             reference.pose.position_meters,
         ));
         let velocity_error = length(sub(whole.velocity, reference.velocity));
+        println!(
+            "one_hour_canonical_reference position_error_m={position_error:.12} velocity_error_mps={velocity_error:.12} position_budget_m=25 velocity_budget_mps=0.05"
+        );
         assert!(
             position_error < 25.,
             "position difference {position_error} m"

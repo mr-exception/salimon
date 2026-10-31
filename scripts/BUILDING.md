@@ -110,7 +110,7 @@ See [CI coverage](README.md#continuous-integration-coverage) and the
 [check-name migration](../docs/validation.md#automatic-ci).
 
 The [periodic workflow](../docs/periodic-ci.md) verifies macOS/Windows builds
-weekly and Linux graphical suites nightly. Run additional validation on a suitable host. Use the [manual smoke checks](../README.md#native-smoke-check),
+weekly and Linux graphical suites nightly. Run additional validation on a suitable host. Use the [manual smoke checks](../README.md#historical-engineering-fixture-smoke-check),
 [E2E runner](README.md) and [black-box smoke command](PACKAGED_SMOKE.md).
 Linux software rendering checks gameplay, not native hardware fidelity.
 

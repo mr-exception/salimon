@@ -28,6 +28,9 @@ while True:
     if signal.exists():
         key = signal.read_text()
         signal.unlink()
+        if key == 'Return':
+            print("verified journey resumed", file=sys.stderr, flush=True)
+            continue
         if key == 'Escape':
             print("application exiting cleanly", file=sys.stderr, flush=True)
             sys.exit(0)
@@ -42,14 +45,14 @@ while True:
             binary = self.fixture(root)
             modes = iter(['PrecisionTour', 'Gameplay'])
             def key(pid, value):
-                (root / 'key').write_text('Escape' if value == 'Escape' else next(modes))
+                (root / 'key').write_text(value if value in ('Escape', 'Return') else next(modes))
             with patch.object(smoke, 'input_key', side_effect=key), \
                     patch.object(smoke.Artifacts, 'screenshot', return_value={'status': 'captured'}):
                 report = smoke.run(binary, root / 'evidence', 3)
             self.assertTrue(report['success'], report)
             self.assertIsNotNone(report['process_exit_code'])
             self.assertNotEqual((root / 'cwd').read_text(), str(binary.parent))
-            self.assertEqual(len(report['checks']), 6)
+            self.assertEqual(len(report['checks']), 7)
             self.assertEqual(json.loads((Path(report['artifacts']) / 'result.json').read_text()), report)
 
     def test_crash_and_missing_present_fail_with_logs(self):

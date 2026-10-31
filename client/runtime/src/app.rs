@@ -650,6 +650,7 @@ impl ClientApplication {
                 {
                     self.launch.take();
                     self.session.resume_verified_launch();
+                    log::info!("verified journey resumed");
                     self.frame_clock.reset_interval();
                     if let Some(window) = &self.window {
                         self.cursor_captured = capture_cursor(window);

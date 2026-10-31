@@ -191,3 +191,12 @@ unknown catalog objects or granting autopilot/jump authority.
 The [implemented sky contract](universe-sky.md) maps the universe source/streaming,
 runtime projection and renderer pass/test owners. Full ephemeris-frame adoption,
 full source coverage and human/hardware release qualification remain separate.
+
+
+## Selected observed-source coverage (#526)
+
+See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen inputs,
+`ingestion/horizons.rs` physical formats, `pack/observed.rs` expected targets and
+star/parent mapping, acquisition and independent verification scripts, exact
+commands and scientific/release boundaries. Full Gaia acceptance remains #524;
+this private observed pack does not grant player knowledge or publish a release.

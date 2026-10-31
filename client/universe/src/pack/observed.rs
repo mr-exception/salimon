@@ -1,7 +1,7 @@
 //! Raw selected-source adapters for the standalone offline pack pipeline.
 use super::*;
 use crate::{
-    BodyKind, Dataset, Header, Record, System,
+    BodyKind, Dataset, Header, Record, Star, System,
     ingestion::{exoplanets, gaia, horizons::Ephemeris},
     sources::SourceManifest,
 };
@@ -29,7 +29,17 @@ pub struct HorizonsInput {
     pub artifact: String,
     pub system: CatalogId,
     pub parent: CatalogId,
-    pub body_kind: BodyKind,
+    pub target: Option<CatalogId>,
+    #[serde(alias = "body_kind")]
+    pub object_kind: HorizonsKind,
+}
+#[derive(Clone, Copy, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HorizonsKind {
+    Star,
+    Planet,
+    Moon,
+    MinorBody,
 }
 fn artifact(
     root: &Path,
@@ -150,7 +160,13 @@ pub(super) fn import(
             &selected.artifact,
             &reference,
         )?;
-        let e = Ephemeris::decode(&bytes, &dataset)?;
+        let e = Ephemeris::decode(&bytes, &dataset)
+            .map_err(|e| invalid(format!("Horizons {}: {e}", selected.artifact)))?;
+        if selected.target.as_ref().is_some_and(|id| id != e.target()) {
+            return Err(invalid(
+                "Horizons response differs from selected target identity",
+            ));
+        }
         if !records.iter().any(|r| r.id() == &selected.system) {
             records.push(Record::System(System {
                 header: Header {
@@ -160,11 +176,33 @@ pub(super) fn import(
                 },
             }));
         }
-        records.push(Record::Body(e.body(
-            selected.system,
-            selected.parent,
-            selected.body_kind,
-        )));
+        records.push(match selected.object_kind {
+            HorizonsKind::Star => {
+                if selected.parent != selected.system {
+                    return Err(invalid("Horizons star parent must be its system"));
+                }
+                Record::Star(Star {
+                    header: Header {
+                        id: e.target().clone(),
+                        display_name: None,
+                        provenance: e.provenance().clone(),
+                    },
+                    system: selected.system,
+                    mass_kg: e.mass_kg().cloned(),
+                    radius_meters: e.mean_radius_meters().cloned(),
+                })
+            }
+            kind => Record::Body(e.body(
+                selected.system,
+                selected.parent,
+                match kind {
+                    HorizonsKind::Planet => BodyKind::Planet,
+                    HorizonsKind::Moon => BodyKind::Moon,
+                    HorizonsKind::MinorBody => BodyKind::MinorBody,
+                    HorizonsKind::Star => unreachable!(),
+                },
+            )),
+        });
         ephemerides.push(serde_json::to_value(&e).map_err(|e| Error::Encoding(e.to_string()))?);
         datasets.insert(dataset.id.clone(), dataset);
     }

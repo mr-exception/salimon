@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "revision": "observed-526-v1",
+  "source_manifest": "manifest.json",
+  "cells": [
+    {
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 0
+      },
+      "observed": {
+        "exoplanets": {
+          "source": "nasa:exoplanet-ps",
+          "artifact": "ps.csv"
+        },
+        "horizons": [
+          {
+            "source": "jpl:horizons-10-j2000",
+            "artifact": "jpl-10.json",
+            "system": "system:solar",
+            "parent": "system:solar",
+            "object_kind": "star",
+            "target": "jpl:10"
+          },
+          {
+            "source": "jpl:horizons-199-j2000",
+            "artifact": "jpl-199.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:199"
+          },
+          {
+            "source": "jpl:horizons-299-j2000",
+            "artifact": "jpl-299.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:299"
+          },
+          {
+            "source": "jpl:horizons-399-j2000",
+            "artifact": "jpl-399.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:399"
+          },
+          {
+            "source": "jpl:horizons-301-j2000",
+            "artifact": "jpl-301.json",
+            "system": "system:solar",
+            "parent": "jpl:399",
+            "object_kind": "moon",
+            "target": "jpl:301"
+          },
+          {
+            "source": "jpl:horizons-499-j2000",
+            "artifact": "jpl-499.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:499"
+          },
+          {
+            "source": "jpl:horizons-599-j2000",
+            "artifact": "jpl-599.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:599"
+          },
+          {
+            "source": "jpl:horizons-501-j2000",
+            "artifact": "jpl-501.json",
+            "system": "system:solar",
+            "parent": "jpl:599",
+            "object_kind": "moon",
+            "target": "jpl:501"
+          },
+          {
+            "source": "jpl:horizons-502-j2000",
+            "artifact": "jpl-502.json",
+            "system": "system:solar",
+            "parent": "jpl:599",
+            "object_kind": "moon",
+            "target": "jpl:502"
+          },
+          {
+            "source": "jpl:horizons-503-j2000",
+            "artifact": "jpl-503.json",
+            "system": "system:solar",
+            "parent": "jpl:599",
+            "object_kind": "moon",
+            "target": "jpl:503"
+          },
+          {
+            "source": "jpl:horizons-504-j2000",
+            "artifact": "jpl-504.json",
+            "system": "system:solar",
+            "parent": "jpl:599",
+            "object_kind": "moon",
+            "target": "jpl:504"
+          },
+          {
+            "source": "jpl:horizons-699-j2000",
+            "artifact": "jpl-699.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:699"
+          },
+          {
+            "source": "jpl:horizons-606-j2000",
+            "artifact": "jpl-606.json",
+            "system": "system:solar",
+            "parent": "jpl:699",
+            "object_kind": "moon",
+            "target": "jpl:606"
+          },
+          {
+            "source": "jpl:horizons-799-j2000",
+            "artifact": "jpl-799.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:799"
+          },
+          {
+            "source": "jpl:horizons-899-j2000",
+            "artifact": "jpl-899.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "planet",
+            "target": "jpl:899"
+          },
+          {
+            "source": "jpl:horizons-801-j2000",
+            "artifact": "jpl-801.json",
+            "system": "system:solar",
+            "parent": "jpl:899",
+            "object_kind": "moon",
+            "target": "jpl:801"
+          },
+          {
+            "source": "jpl:horizons-999-j2000",
+            "artifact": "jpl-999.json",
+            "system": "system:solar",
+            "parent": "jpl:10",
+            "object_kind": "minor_body",
+            "target": "jpl:999"
+          },
+          {
+            "source": "jpl:horizons-901-j2000",
+            "artifact": "jpl-901.json",
+            "system": "system:solar",
+            "parent": "jpl:999",
+            "object_kind": "moon",
+            "target": "jpl:901"
+          }
+        ]
+      }
+    }
+  ]
+}

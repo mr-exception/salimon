@@ -844,3 +844,12 @@ Planetary environment combined verification: `scripts/planetary_environment.py`,
 links production path coverage and hardware/perception limits.
 
 Flight acceptance #437: see [the reproducible matrix](universe-flight-verification.md) for nine GPU routes, production orbital/contact/session contracts and separate X11 input coverage.
+
+
+## Selected observed-source coverage (#526)
+
+See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen inputs,
+`ingestion/horizons.rs` physical formats, `pack/observed.rs` expected targets and
+star/parent mapping, acquisition and independent verification scripts, exact
+commands and scientific/release boundaries. Full Gaia acceptance remains #524;
+this private observed pack does not grant player knowledge or publish a release.

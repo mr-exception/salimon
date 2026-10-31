@@ -151,3 +151,9 @@ above permits real public data for private noncommercial development. #659 now
 retains only future public/commercial release review; its open state must not be
 used to block that private work. Exact scientific and implementation checks
 remain required, and an umbrella issue closure does not turn them into passes.
+
+
+The separate [#526 selection](observed-source-coverage.md) freezes the full PS
+default-row table and explicitly selected JPL targets for private development.
+It preserves original provider statuses and does not modify the historical
+fixture manifest above or satisfy future public-release review.

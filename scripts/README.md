@@ -926,3 +926,13 @@ granting owner acceptance. Its tests read `fixtures/active-budget-proposal.json`
 The periodic flight benchmark reads `fixtures/flight-profile-baseline.json`.
 Both fixtures retain exact original bytes and scope; see their
 [provenance](fixtures/README.md).
+
+
+## Selected observed source acquisition and verification (#526)
+
+`acquire_observed_sources.py --output NEW_DIRECTORY` explicitly downloads the
+full PS default-row selection/count and 18 reviewed JPL targets to new files.
+`verify_observed_sources.py --snapshot SNAPSHOT --pack PACK --output RESULT.json`
+checks an offline production-adapter pack against those original scientific bytes.
+See [the canonical coverage contract](../docs/observed-source-coverage.md) for exact
+build/test commands, physical formats, selection, budgets and scientific limits.

@@ -19,13 +19,13 @@ reference Apple M1 measurements remain a separate gate.
 
 U07 `ingestion/gaia.rs` adds streaming local CSV decoding and bounded canonical
 matching with typed source measurements; see the [Gaia contract](../../docs/universe-gaia-ingestion.md).
-Production reuse/full-data acceptance remain gated on #513.
+Private source use is authorized; full Gaia scientific acceptance remains #524 and public release review #659.
 
 U08 `ingestion/{horizons,exoplanets}.rs` imports source-labeled Solar System states,
 physical measurements and PS default-row planets; see the [observed ingestion
 contract](../../docs/universe-observed-ingestion.md) before editing frame/epoch,
 unit/error/limit or identity behavior. `observed_import` is a deterministic local
-fixture example, not production packaging. Full source coverage remains #526.
+fixture example, not production packaging. Selected real source coverage follows #526 below.
 
 U09 adds [offline missing-data inference](../../docs/universe-inference.md) with
 explicit model classes, deterministic proposals, provenance and conservative
@@ -68,3 +68,13 @@ See the [implemented contract](../../docs/universe-gravity.md) for ownership, in
 ## Gravity-aware ship trajectory (#417)
 
 See the [implemented contract](../../docs/universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Selected observed-source coverage (#526)
+
+Follow the [real-source coverage contract](../../docs/observed-source-coverage.md) for
+frozen full PS rows, selected JPL targets/parents and physical formats, expected
+source identity, acquisition/verification commands and explicit scientific limits.
+The private pack preserves all original measurements and sidecars; source terms
+remain unreviewed for public release. Runtime/save schemas and player discovery
+are unchanged.

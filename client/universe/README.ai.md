@@ -39,7 +39,7 @@ U08 `ingestion/{horizons,exoplanets}.rs` imports source-labeled Solar System sta
 physical measurements and PS default-row planets; see the [observed ingestion
 contract](../../docs/universe-observed-ingestion.md) before editing frame/epoch,
 unit/error/limit or identity behavior. `observed_import` is a deterministic local
-fixture example, not production packaging. Full source coverage remains #526.
+fixture example, not production packaging. Selected real source coverage follows #526 below.
 
 U09 `inference.rs` owns bounded system completion; `inference/observed.rs` adapts
 U08 measurements and `inference/tests.rs` owns preservation/failure regressions.
@@ -152,3 +152,13 @@ validated reload cannot reveal catalog POIs or invent a target range.
 
 Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
 Personal edits/targets never mutate canonical sites, suit observations or scanner history.
+
+
+## Selected observed-source coverage (#526)
+
+Follow the [real-source coverage contract](../../docs/observed-source-coverage.md) for
+frozen full PS rows, selected JPL targets/parents and physical formats, expected
+source identity, acquisition/verification commands and explicit scientific limits.
+The private pack preserves all original measurements and sidecars; source terms
+remain unreviewed for public release. Runtime/save schemas and player discovery
+are unchanged.

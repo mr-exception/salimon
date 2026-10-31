@@ -179,3 +179,9 @@ validated reload cannot reveal catalog POIs or invent a target range.
 
 Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
 Personal edits/targets never mutate canonical sites, suit observations or scanner history.
+
+Selected observed inputs (#526) bind every requested target to its returned JPL
+identity before publication. Explicit star/parent classification passes ordinary
+referential checks. Recognized physical headers preserve spaced errors and missing
+quantities without deriving mass from GM. The [coverage contract](../../docs/observed-source-coverage.md)
+separates decoder error, source uncertainty, sample coverage and release eligibility.

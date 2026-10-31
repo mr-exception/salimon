@@ -184,3 +184,61 @@ fn offline_pipeline_accepts_observed_input_and_preserves_old_pack_on_source_fail
     assert!(pipeline::build(&request_file, &output).is_err());
     fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn complete_selected_real_release_build_is_repeatable_and_rejects_wrong_target() {
+    let snapshot =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../catalogs/sources/observed-526-v1");
+    let output = root();
+    let first = pipeline::build(&snapshot.join("build.json"), &output).unwrap();
+    assert!(!first.production_eligible);
+    assert_eq!(first.cells.len(), 1);
+    let before = fs::read(output.join("manifest.json")).unwrap();
+    let mut reader = partitions::Reader::open(std::io::Cursor::new(
+        read_blob(&output, &first.cells[0].catalog).unwrap(),
+    ))
+    .unwrap();
+    let catalog = reader.read_cell(key()).unwrap();
+    let id = |s: &str| CatalogId::try_from(s.to_owned()).unwrap();
+    assert!(matches!(
+        catalog.get(&id("jpl:10")),
+        Some(crate::Record::Star(_))
+    ));
+    assert!(
+        matches!(catalog.get(&id("jpl:399")), Some(crate::Record::Body(b)) if b.parent == id("jpl:10"))
+    );
+    assert!(
+        matches!(catalog.get(&id("jpl:301")), Some(crate::Record::Body(b)) if b.parent == id("jpl:399"))
+    );
+    let observations: serde_json::Value = serde_json::from_slice(
+        &read_blob(&output, &first.cells[0].sidecars["planet_observations"]).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(observations.as_array().unwrap().len(), 6451);
+    let ephemerides: serde_json::Value = serde_json::from_slice(
+        &read_blob(&output, &first.cells[0].sidecars["ephemerides"]).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(ephemerides.as_array().unwrap().len(), 18);
+    pipeline::build(&snapshot.join("build.json"), &output).unwrap();
+    assert_eq!(before, fs::read(output.join("manifest.json")).unwrap());
+    let cases = [
+        serde_json::json!({"source":"jpl:horizons-399-j2000","artifact":"jpl-399.json","system":"system:solar","parent":"system:solar","object_kind":"planet","target":"jpl:299"}),
+        serde_json::json!({"source":"jpl:horizons-10-j2000","artifact":"jpl-10.json","system":"system:solar","parent":"jpl:399","object_kind":"star","target":"jpl:10"}),
+    ];
+    let source_bytes = fs::read(snapshot.join("manifest.json")).unwrap();
+    for case in cases {
+        let input = serde_json::from_value(serde_json::json!({"horizons":[case]})).unwrap();
+        assert!(
+            super::observed::import(
+                input,
+                &snapshot.join("manifest.json"),
+                &source_bytes,
+                "observed-526-v1"
+            )
+            .is_err()
+        );
+    }
+    assert_eq!(before, fs::read(output.join("manifest.json")).unwrap());
+    fs::remove_dir_all(output).unwrap();
+}

@@ -25,16 +25,13 @@ nonfinite or overflowed vectors and malformed physical fields fail. Full respons
 text retains model, headers, printed values, retrieval context and citation;
 state covariance is not supplied and no certainty is fabricated.
 
-Physical import currently recognizes `Vol. Mean Radius (km)` and
-`Mass x10^N (kg)` header forms, with optional printed `+-` error. It converts values
-and errors to SI `Quantity`, preserves unknown confidence/temporal validity, and
-never replaces missing/unsupported source formats with defaults or estimates.
-Unrecognized physical columns remain in raw text. The frozen Earth response
-provides 6,371,010 m mean radius (+/-20 m) and 5.97219e24 kg mass (+/-6e20 kg).
-These header measurements are not assigned the vector-table interval as their
-physical validity. `body` exports those quantities with caller-supplied reviewed
-system/parent/kind; `Catalog::new` remains the referential publication gate.
-No Sun, moons or parent hierarchy are invented from target numbers.
+The physical parser now supports the selected real-release variants described in
+[coverage and header formats](observed-source-coverage.md#supported-physical-headers),
+including spaced errors and the Sun. Raw source headers remain intact; unsupported
+or absent quantities never gain defaults or GM-derived mass. `body` exports
+quantities with caller-reviewed system/parent/kind; the pack adapter can also
+publish an explicitly classified star. Canonical referential validation remains
+mandatory. Physical header validity is independent of vector sample coverage.
 
 `validity()` is the **imported sample coverage**, not DE441's entire model validity.
 `state_at` exposes exact imported epochs only. It rejects both outside-coverage
@@ -123,12 +120,11 @@ Tests in `src/ingestion/{horizons,exoplanets}/tests.rs` compare the production
 importer directly to independent U03 Earth SI/epoch goldens, physical quantities,
 Proxima period/distance/errors/references, synthetic Gaia reconciliation, missing
 orbits, limits/minimum masses, deterministic duplicates and failure paths.
-See [report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-409/README.md) for actual results. Full reviewed
-release coverage, source-specific format extensions and production scientific
-acceptance remain [#526](https://github.com/mr-exception/salimon/issues/526), after
-[#513](https://github.com/mr-exception/salimon/issues/513); pack integration remains
-U12, arbitrary-date evaluation U14, native/playable integration U34 and its own
-evidence. Portable fixture closure is not production/native approval.
+See [report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-409/README.md) for historical fixture results. The [#526 frozen selection](observed-source-coverage.md)
+now adds full PS default-row input coverage, selected Solar System hierarchy and
+private-pack sidecars with independent coverage/storage evidence. This does not
+claim all Solar System small bodies, full Gaia science (#524), complete orbits,
+playable adoption, native qualification or public-release approval (#659).
 
 ## U09 inference consumer
 

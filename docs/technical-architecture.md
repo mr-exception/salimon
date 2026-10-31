@@ -934,3 +934,12 @@ See the [cloud render acceptance contract](universe-terrain.md#cloud-integration
 seam tests and bounded raw frame/draw observations. Measurements remain
 observational; missing GPU counters stay null and software timings do not
 establish hardware FPS.
+
+
+## Selected observed-source coverage (#526)
+
+See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen inputs,
+`ingestion/horizons.rs` physical formats, `pack/observed.rs` expected targets and
+star/parent mapping, acquisition and independent verification scripts, exact
+commands and scientific/release boundaries. Full Gaia acceptance remains #524;
+this private observed pack does not grant player knowledge or publish a release.

@@ -80,6 +80,14 @@ impl Trajectory {
     pub fn state(&self) -> State {
         self.state
     }
+    pub(crate) fn replace_offline_state(&mut self, state: State) -> Result<(), Error> {
+        finite(state.velocity_mps)?;
+        if state.epoch.scale() != self.state.epoch.scale() {
+            return Err(error("offline state time-scale mismatch"));
+        }
+        self.state = state;
+        Ok(())
+    }
     /// Velocity Verlet in split galactic cells, symmetric funded-impulse kicks.
     /// Calls the epoch-aware candidate provider at both endpoints. Caller uses a
     /// fixed step and supplies fresh ledger-derived Propulsion when mass changes.

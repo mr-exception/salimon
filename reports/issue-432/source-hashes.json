@@ -1,0 +1,8 @@
+{
+  "client/ship/src/offline.rs": "c3fa8b0e54489cbd2eed21210422e870d12646d87f0bc6e86de011796e984337",
+  "client/ship/src/offline/tests.rs": "a797f4c87e138448ea3cd0533a03970fd064a1d6c0d872a9b4bcf3ef1051d630",
+  "client/ship/src/trajectory.rs": "888563dbce2246691aba93819cac05894b9d1304cda69a03d83ba5b6f17b2fa6",
+  "client/ship/src/lib.rs": "2381fe3a8d509119fea163c476d46e6ac9f9d13752766b918cf2eeb159ac1db9",
+  "Cargo.lock": "014b0072a1eec3c8eb816e3816d8c3f017b9bb29be61ea4b021488cb9629929d",
+  "rust-toolchain.toml": "7458b2d74495e6fb1c1edeea4d5a793705476431dadb60627187111f91441e13"
+}

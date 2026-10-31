@@ -788,3 +788,6 @@ See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen input
 star/parent mapping, acquisition and independent verification scripts, exact
 commands and scientific/release boundaries. Full Gaia acceptance remains #524;
 this private observed pack does not grant player knowledge or publish a release.
+
+
+Offline propagation candidate #432: `cargo test -p salimon-ship --locked offline::` exercises portable propagation/rollback/orbit/contact fixtures. See the [incomplete host boundary](universe-offline-propagation.md); this does not replace eventual native progress/resume or integrated offline acceptance.

@@ -186,3 +186,6 @@ The [physical organism contract](../../docs/physical-organisms.md) maps canonica
 placement/part/baseline identity, physics-owned swept boxes, character/ship typed
 adapters, runtime residency and matching renderer evidence. Quality never changes
 physical populations. Explicit obstruction safety overrides ordinary assist continuation.
+
+
+Local offline propagation work (#432): [candidate contract and pending host integration](../../docs/universe-offline-propagation.md). This core alone does not deliver ordinary offline journeys.

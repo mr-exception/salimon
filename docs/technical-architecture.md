@@ -943,3 +943,8 @@ See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen input
 star/parent mapping, acquisition and independent verification scripts, exact
 commands and scientific/release boundaries. Full Gaia acceptance remains #524;
 this private observed pack does not grant player knowledge or publish a release.
+
+
+## Offline propagation candidate (#432)
+
+[Local propagation work](universe-offline-propagation.md) is owned by ship `offline.rs` over the existing trajectory/contact operators. It does not yet change ordinary runtime/save/UI behavior; the canonical motion decision and host integration remain pending.

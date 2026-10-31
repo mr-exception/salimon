@@ -226,7 +226,7 @@ See the [canonical dispatch policy](architecture.md#gameplay-input-dispatch-302)
   object history; current ship/camera attachments use presented frames.
 - E2E presentation bypasses all interpolation. Normal-clock recordings and
   explicit human/native review remain required for smoothness/capture/latency
-  signoff; portable schedules cannot establish it. See the [reference review](../../reports/issue-477/README.md).
+  signoff; portable schedules cannot establish it. See the [reference review](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-477/README.md).
 
 ## Fabricator physical input (#339)
 
@@ -498,7 +498,7 @@ Crafting, Archive, pause/settings, terminal and Q-wheel overlays suppress world
 action prompts and the gameplay reticle while they own the screen. Opening a
 modal does not clear prompt state or change interaction authority; closing it
 restores ordinary presentation from current state. Native evidence lives in
-[the Fabricator report](../../reports/issue-348/README.md).
+[the Fabricator report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-348/README.md).
 
 Archive cloud evidence (#505) initializes position only at opt-in E2E startup.
 Read-only protocol source/text cannot mark a record read; E navigation retains

@@ -78,5 +78,5 @@ changes are discrete autosave events. World reserved returns retain the allocate
 ID, seal it against extraction-tail growth, and reject duplicates/occupied slots.
 A blocked physical refund rolls back without deleting the contribution.
 
-See [the dated report](../reports/issue-548/README.md) for checks, native evidence,
+See [the dated report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-548/README.md) for checks, native evidence,
 input fixtures, balance rationale and human/hardware limitations.

@@ -90,6 +90,6 @@ wall-clock wait or a disk failure test; the separate native-store tests establis
 publication behavior. Render routes are
 `scenarios/evidence/construction-offline.json` and
 `scenarios/evidence/construction-offline-upgrade.json`.
-See [actual evidence and limits](../reports/issue-550/README.md). Human appearance
+See [actual evidence and limits](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-550/README.md). Human appearance
 review remains #561, physical platform/input/OS checks #557 and hardware/Metal
 budgets #563.

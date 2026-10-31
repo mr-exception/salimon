@@ -156,7 +156,7 @@ Preserve the existing stable patch keys, shared-edge samples and 2:1 fans,
 4,096–6,144 m outer morph, 0.25 s activation blend, conservative sphere envelope,
 and upload/memory limits in [terrain validation](terrain-validation.md). No
 randomness is generated per frame and no LOD triangle is moved for art direction.
-The [GPU comparison recipe and report](../reports/issue-278/README.md) describes
+The [GPU comparison recipe and report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-278/README.md) describes
 matched near/far/orbit scenes, fade-boundary continuity, unchanged coverage and
 costs. Native M1 gameplay/visual approval remains #279/#229.
 

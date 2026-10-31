@@ -107,7 +107,7 @@ Ship/character and workspace tests/build/Clippy remain required.
 intake; protocol steps pay the full 300 seconds. Retain real wgpu screenshots of
 reservation/progress/completion both decks, the clipped exterior shell, and surface exit/reboarding. The fixture is explicit setup,
 not evidence of mining a 40 kg piece or physical OS input. See the
-[issue report](../reports/issue-545/README.md) for actual results and limitations.
+[issue report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-545/README.md) for actual results and limitations.
 Human presentation review remains #561; physical devices #557 and hardware/Metal
 budgets #563. Software Vulkan images do not establish hardware frame rate.
 

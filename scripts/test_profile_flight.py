@@ -12,6 +12,13 @@ def report():
 
 
 class FlightProfileTests(unittest.TestCase):
+    def test_retained_weekly_baseline_is_a_complete_valid_profile(self):
+        import json
+        from pathlib import Path
+        baseline = json.loads((Path(__file__).parent / "fixtures/flight-profile-baseline.json").read_text())
+        self.assertEqual(len(rows(baseline)), 2 * len(WORKLOADS))
+        self.assertEqual(compare(baseline, baseline), [])
+
     def test_relative_regression_fails_and_reports_exact_workload(self):
         baseline = report()
         current = copy.deepcopy(baseline)

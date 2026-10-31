@@ -92,6 +92,6 @@ conservation and reopening. Runtime tests exercise real F/tool/controller gates,
 focus/pause/aim/range, mid-grip save, natural shape rendering and malformed atomic
 restore. Native evidence scenarios use the same commands and production wgpu
 under Xvfb/Mesa. An opt-in actual-separation audio export passes these observations
-to the production continuous callback. See [completion evidence](../reports/issue-621/README.md).
+to the production continuous callback. See [completion evidence](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-621/README.md).
 Hardware/native input, subjective art/listening and M1/Metal budgets remain
 separate unverified qualification under #557/#561/#563.

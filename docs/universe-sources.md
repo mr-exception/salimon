@@ -81,7 +81,7 @@ raw staging remains separate and production gates above still apply.
 ## Private-development decision and production evidence (#513)
 
 On 2026-10-22 the owner selected **private development only** in the task
-conversation. [Decision and exact input inventory](../reports/issue-513/private-development-decision.json)
+conversation. [Decision and exact input inventory](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-513/private-development-decision.json)
 bind that scope to the current manifest. Keep synthetic Gaia and the existing
 small JPL/PS development inputs; no actual Gaia release, commercial distribution,
 production source approval or alternative scientific source is authorized by
@@ -119,7 +119,7 @@ review remain incomplete. Existing 2026-10-21 references are historical guidance
 not refreshed legal approval.
 Public/commercial U07 and U12 distribution remains gated until release review;
 private real-data science, implementation and local packs are authorized above.
-See the historical [report](../reports/issue-513/README.md).
+See the historical [report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-513/README.md).
 
 ## Preparing the human source review (#537)
 
@@ -131,7 +131,7 @@ terms/credit/permission evidence and full-selection approval; both the form and
 restricted/unreviewed inputs must fail production validation. No source status,
 query, input bytes or approval is changed by preparing a packet.
 
-The [current review packet and decision checklist](../reports/issue-537/README.md)
+The [current review packet and decision checklist](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-537/README.md)
 record historical network failures, newly archived provider evidence and remaining
 owner actions. The finalization retry retrieved the three original provider pages
 and linked ESA credits/terms and JPL image policy; the linked Creative Commons

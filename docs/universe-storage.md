@@ -83,7 +83,7 @@ The workload reports total bytes including index/source map, bytes/record,
 encode/index-open/reverse-cell-read times and conditional 5/10 GB capacities.
 1 cell is the actual four-record fixture; 32/512 cells remap identities and repeat
 fields synthetically to expose overhead sensitivity. They do not simulate Gaia
-or establish a full-pack estimate. [Report and raw results](../reports/issue-405/README.md)
+or establish a full-pack estimate. [Report and raw results](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-405/README.md)
 retain the budget exception: 2–5 GB remains the goal and <=10 GB the initial target;
 there is insufficient population/schema/compression evidence to approve either
 or a larger budget. U12 must measure representative full inputs and escalate if

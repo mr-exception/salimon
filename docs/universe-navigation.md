@@ -26,4 +26,4 @@ Runtime `session/navigation.rs` refreshes at most every 500 ms of admitted simul
 - `cargo test -p salimon-client --locked navigation_`: cache expiry, invalidation, restore/source byte preservation.
 - `cargo test -p salimon-renderer --locked`: visible atlas changes, compact text and unchanged upload caching.
 - `scenarios/evidence/universe-navigation.json`: declared Vesper approach initial pose/velocity; actual free-flight preview, restore, production contact and invalidation, with physical cockpit original software-Vulkan captures.
-- All owning ship/runtime/renderer README.ai, architecture and invariant guides link here. [Report](../reports/issue-421/README.md) records exact results, failures and limitations. Hardware/subjective qualification remains #557/#561/#563.
+- All owning ship/runtime/renderer README.ai, architecture and invariant guides link here. [Report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-421/README.md) records exact results, failures and limitations. Hardware/subjective qualification remains #557/#561/#563.

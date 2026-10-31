@@ -113,7 +113,7 @@ raw samples plus existing aggregate timing, allocator, terrain preparation,
 cache and upload observations. This diagnostic window has no simulation or save
 authority and is not a hardware performance threshold.
 
-The [#436 report](../reports/issue-436/README.md) records actual commands, results,
+The [#436 report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-436/README.md) records actual commands, results,
 originals and model limits. Fixed host illumination, authored Milky Way and optional
 bounded star sources remain as documented in [the sky contract](universe-sky.md).
 Arbitrary real ephemeris-frame gameplay and complete scientific catalogs are not

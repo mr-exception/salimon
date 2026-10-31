@@ -133,7 +133,7 @@ orbits and 1024 seeded rocky/giant constraint cases.
 residuals; its nonzero exit gates physical failures or collapsed histogram
 coverage. CI repeats and compares the entire report. The ten-to-forty-percent
 per-bin coverage screen is intentionally broad, not empirical goodness-of-fit.
-See [measured report](../reports/issue-410/README.md).
+See [measured report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-410/README.md).
 
 Production source reuse/full reviewed inputs remain #513/#524/#526; U10/U11 own
 population/canonical world generation, U12 packaging, U14 state evaluation and

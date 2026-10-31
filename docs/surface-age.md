@@ -91,6 +91,6 @@ conditions do not claim an organically elapsed 120-day playthrough.
 --locked modular_fixture_gpu_evidence -- --ignored --nocapture` compares fresh,
 aged, damaged, repaired and blackout output, plus 500 independent fresh/aged
 fixtures, with repeated frozen frames and raw resource/timing rows.
-See [results, captures and limitations](../reports/issue-581/README.md).
+See [results, captures and limitations](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-581/README.md).
 Human appearance remains #561; physical platform checks #557; real GPU/Metal
 budget qualification #563.

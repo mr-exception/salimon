@@ -358,13 +358,13 @@ Archive verification adds opt-in `scout-archive` initial placement at the physic
 terminal with ordinary unread new-run source. Use the existing key channel
 (`interact` = E, arrows and Tab) and immutable `inspect.archive` source/open/text;
 no command sets record progress. See the [runner](../../scripts/README.md#archive-cloud-verification-505)
-and [cloud report](../../reports/issue-505/README.md). Normal launches are unchanged.
+and [cloud report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-505/README.md). Normal launches are unchanged.
 
 `scout-recovery` is an opt-in E2E fixture near Fabricator, with one held 2 kg iron
 fragment and 0.5 kg raw silicate in the bin. It starts without a module/job/work.
 The `recovery` key alias maps to R; `inspect.recovery` observes captured config,
 identity, active record and paid joules without modifying them. See the
-[Recovery report](../../reports/issue-515/README.md) for the production craft,
+[Recovery report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-515/README.md) for the production craft,
 collection, cabin walk and funded reconstruction route.
 
 ### Integrated construction cancellation fixture (#551)

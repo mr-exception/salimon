@@ -164,7 +164,7 @@ uploads at most `64 + 48 * visible_count` bytes. The existing scratch counter no
 reports retained staging plus last-uploaded byte capacities, not temporary
 expanded vertices or total allocator traffic. See the
 [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md) and
-[issue #158 evidence](../../reports/issue-158/README.md).
+[issue #158 evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-158/README.md).
 
 ## Authored water-ice deposits (#88)
 
@@ -464,7 +464,7 @@ triangles. Human appearance is #561, physical input/DPI #557 and budgets #563.
 
 The current power-aware shader remains owned by the
 [Scout lighting/contrast contract](../../docs/scout-presentation.md#core-contrast-verification-condition-451).
-The [dated native report](../../reports/issue-451/README.md) binds current M1
+The [dated native report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-451/README.md) binds current M1
 captures to the shader/binary; it does not promote image baselines or change GPU
 work, authored materials or simulation authority.
 

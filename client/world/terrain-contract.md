@@ -11,7 +11,7 @@ remain zero-elevation and Sun stays visual-only. Read the canonical
 [integration/validation guide](../../docs/terrain-validation.md) for ownership,
 slope/landing policy, patch budgets, approximations and native commands.
 The original contract-first validation is historical in
-[the stage-1 report](../../reports/issue-170/README.md).
+[the stage-1 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-170/README.md).
 
 ## Definition, coordinates and evaluation
 

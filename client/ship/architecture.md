@@ -539,7 +539,7 @@ boundary; most remaining length is its related regression/safety tests. Splittin
 for line count would scatter the captured path/energy invariants without
 isolating an independent policy. No flight code or numeric behavior changed in
 this review. Revisit only with function-level co-change/test-isolation evidence;
-see [review evidence](../../reports/issue-644/README.md).
+see [review evidence](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-644/README.md).
 
 
 ## Real-scale trajectory foundation (#417)

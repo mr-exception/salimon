@@ -47,4 +47,4 @@ occupied/obstructed mechanisms, exact save restoration, corrupt-state rejection,
 legacy layout and authored geometry/sweep agreement. `scenarios/evidence/habitation-use.json`
 uses real native inputs after an explicit initial camera setup. Native appearance
 and comfort still require #561; hardware budgets remain #563. See the dated
-[implementation report](../reports/issue-577/README.md) for actual results.
+[implementation report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-577/README.md) for actual results.

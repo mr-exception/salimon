@@ -372,7 +372,7 @@ captured kinematics with a conservative watt-time budget, not a mass-dependent
 physical-work solver. Free-flight force, mass, power and braking remain governed
 by their existing physics/energy contracts.
 
-The [#295 report](../reports/issue-295/README.md) contains before/after production
+The [#295 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-295/README.md) contains before/after production
 controller traces and exact portable validation. Native M1 flight/input/EVA
 signoff remains [#312](https://github.com/mr-exception/salimon/issues/312).
 

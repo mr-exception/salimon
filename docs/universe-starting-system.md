@@ -155,7 +155,7 @@ The first command emits canonical manifest JSON plus newline; `--audit` includes
 all 26 assessments, source hashes, subsystem definitions and the manifest.
 CI compares repeated Ubuntu output to the committed golden and runs the same
 U11 tests on macOS/Windows in debug/release. Retain workspace build/tests,
-all-target Clippy/fmt and documentation gates. See [measured report](../reports/issue-412/README.md).
+all-target Clippy/fmt and documentation gates. See [measured report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-412/README.md).
 
 U12 #413 owns production merging/packaging; U14 #415 evolving states; U23 #424
 real-scale terrain LOD; U24 #425 playable arrival/resources integration.

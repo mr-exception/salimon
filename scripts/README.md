@@ -115,7 +115,7 @@ python3 reports/issue-505/verify.py --binary target/debug/salimon-client \
 Use fresh output directories and the Linux Xvfb/software-Vulkan setup in
 [validation](../docs/validation.md#native-graphical-gates). Preserve per-step state,
 protocol/process logs, original images and source/binary hashes. The current
-[#551 report](../reports/issue-551/README.md) records coverage, actual failures and
+[#551 report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-551/README.md) records coverage, actual failures and
 human/platform/performance handoffs. These fixed-step protocol routes do not
 establish human appearance approval, Metal compatibility or physical 60 FPS.
 
@@ -700,7 +700,7 @@ and backlog). Ordinary debug output remains sampled every300 frames. Use the
 same log level/output for both reference variants and preserve warmup/spikes;
 logging IO is measurement overhead, never free production performance. Frozen
 E2E reference scenes measure presentation without normal-play simulation work.
-See the [lighting report](../reports/issue-483/README.md) for exact context and
+See the [lighting report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-483/README.md) for exact context and
 limits. The logger never changes scheduling, input or GPU polling.
 
 ## Scout machinery fixtures (#489)
@@ -714,7 +714,7 @@ normal player's save or imply physical mining/travel.
 `reports/issue-489/walkthrough.py` captures real GPU surfaces through the existing
 window adapter. Named `pedals-close` and `fabricator-close` cameras only change
 presentation; the original four Scout lighting/Blender cameras are unchanged.
-See [validation and limits](../reports/issue-489/README.md).
+See [validation and limits](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-489/README.md).
 
 ## Archive cloud verification (#505)
 
@@ -743,7 +743,7 @@ remains strict. Both require100 consecutive focused, non-occluded, zero-tick
 frames and unchanged source/context. The X11 helper verifies exact target PID,
 focused window, viewable map state and geometry; it does not certify physical
 input or scanout. Every repeated frozen capture must have the same PNG hash.
-See [matched cloud lighting evidence](../reports/issue-566/README.md) for commands,
+See [matched cloud lighting evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-566/README.md) for commands,
 all failures, expression-only control lineage and hardware-counter limitations.
 
 
@@ -765,7 +765,7 @@ response may still be outstanding. It never issues a second request into a
 possibly desynchronized channel or hides the original failure with a PATH error.
 Contract tests cover bounded polling payload, original PNG validation, the native
 marker and failure-state preservation. Actual native corpus captures remain a
-separate required test. See [the #568 report](../reports/issue-568/README.md).
+separate required test. See [the #568 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-568/README.md).
 
 Cabin evidence: `python3 scripts/salimon-test run scenarios/evidence/habitation-use.json --binary target/debug/salimon-client --screenshot-command '["native"]'` uses the explicit `scout-cabin` camera setup and production E/X/U commands.
 
@@ -796,7 +796,7 @@ This offline command freezes verified bytes and a deliberately unapproved human
 review form without changing production eligibility. Existing output is preserved;
 corrupt inputs leave no published partial packet. Use the
 [source contract](../docs/universe-sources.md#preparing-the-human-source-review-537)
-and [decision checklist](../reports/issue-537/README.md) for current limitations,
+and [decision checklist](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-537/README.md) for current limitations,
 provider access, exact source/snapshot approval and physical balance evidence.
 
 Canonical terrain orbit/surface/face-edge captures use `scenarios/evidence/universe-terrain.json`;
@@ -909,10 +909,20 @@ routes, failed steps/captures, wrong scenario contracts and differing source
 exports fail. Original PNG/WAV/JSON/log hashes bind the artifact directory.
 The run stops on failure and writes a failed report; it does not overwrite a
 prior packet. #561 owns actual perceptual/listening review, #557 physical input
-and #563 hardware qualification. See the [current report](../reports/issue-628/README.md).
+and #563 hardware qualification. See the [current report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-628/README.md).
 
 After an interrupted session, `--native-summary /path/to/summary.json` may reuse
 completed results from the same binary. Preserve the source/binary provenance;
 the runner rechecks the complete ordered scenario contracts, steps, GPU originals
 and raw metrics. Incomplete or failed rows cannot satisfy the matrix. A successful
 summary must contain all nine routes before component verification proceeds.
+
+## Historical report dependencies
+
+Archived report-local commands require the immutable revision linked by their
+report; see [report retention](../reports/README.md#archived-evidence-references).
+Current `active_budget.py` evaluates the retained proposed thresholds without
+granting owner acceptance. Its tests read `fixtures/active-budget-proposal.json`.
+The periodic flight benchmark reads `fixtures/flight-profile-baseline.json`.
+Both fixtures retain exact original bytes and scope; see their
+[provenance](fixtures/README.md).

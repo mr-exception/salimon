@@ -226,7 +226,7 @@ Engine cloud verification #498 adds a clear-space disk regression in
 `Checkpoints::open_at` launch preserve engine-off, selected throttle and momentum.
 Refueling cannot enable the switch; a fresh command is required. This tests the
 existing save/engine contract without changing source ownership or gameplay.
-The [report and native driver](../../reports/issue-498/README.md) retain exact
+The [report and native driver](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-498/README.md) retain exact
 commands, GPU instruments, realistic-flight routes and human/hardware limits.
 
 

@@ -349,7 +349,7 @@ visible session on error, recover valid durable state and converge to exactly on
 archive/new run. CRC-valid invalid-domain saves must fall back; future schemas
 must abort launch without replacing visible state. Existing native-store tests
 retain crash-temp-file, lease and platform durability coverage. See the
-[acceptance matrix and raw results](../reports/issue-375/README.md).
+[acceptance matrix and raw results](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-375/README.md).
 
 
 ## Scout Archive schema 6 (#467)

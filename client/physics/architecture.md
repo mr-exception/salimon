@@ -132,7 +132,7 @@ is A.face_axes + B.face_axes + A.edge_axes * B.edge_axes; parallel deduplication
 early rejection and retained projections reduce actual work. These counts do
 not change contact geometry or measure per-frame projection work.
 
-The [#160 evaluation](../../reports/issue-160/README.md) retains today's authored
+The [#160 evaluation](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-160/README.md) retains today's authored
 envelopes. Extent-derived eight-vertex box controls reduce active pair cost but
 introduce unacceptable additional support clearance. No replacement collision
 proxy or visibility-dependent simulation policy is adopted; smaller authored
@@ -304,7 +304,7 @@ substeps at the cap. Neither path is general continuous collision detection.
 ## Solver selection (#161)
 
 Keep the custom solver for the accepted Phase 0 settled 500-cargo iteration.
-The [evaluation decision](../../reports/issue-161/README.md) defers Rapier's
+The [evaluation decision](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-161/README.md) defers Rapier's
 isolated comparison and adoption; it does not establish superiority, current
 reference-machine budgets or efficient dense active behavior. No prototype or
 dependency is introduced. Reopen comparison on repeated active-budget failures,
@@ -436,7 +436,7 @@ contact traversal order are unchanged. `iteration_oracle.rs` remains a frozen
 pre-#592 reference; its ground/pair warm-continuation tests exercise production
 response through the same root seam. `convex.rs` remains cohesive immutable hull,
 SAT and supporting-feature geometry, with related tests; it is deliberately not
-split solely for length. See the [review evidence](../../reports/issue-644/README.md).
+split solely for length. See the [review evidence](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-644/README.md).
 
 
 ## Physical organisms and static clearance (#620)

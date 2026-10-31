@@ -99,7 +99,7 @@ restoration, damaged/outage/stopped work, commissioning failure, mass, migration
 and exact reload. Run workspace build/tests/fmt/Clippy and runner/document checks.
 Production wgpu routes are `scenarios/evidence/construction-module*.json`; their
 explicit seeded material/prior-work setup is documented in the
-[completion report](../reports/issue-547/README.md). Human appearance, physical
+[completion report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-547/README.md). Human appearance, physical
 platform and hardware/Metal budgets remain #561, #557 and #563 respectively.
 
 ## Deferred Jump Drive

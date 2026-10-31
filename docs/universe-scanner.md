@@ -214,7 +214,7 @@ selected-marker presence/blackout absence in the engineering-camera ROI and
 byte-exact frozen repeats. The wide cockpit camera has source/dimension checks
 only; its projector has a different camera projection. No baseline is promoted
 and no pixel threshold is widened to accept an obscured contact. See the
-[acceptance report](../reports/issue-438/README.md) for original captures, failed
+[acceptance report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-438/README.md) for original captures, failed
 2x evidence, corrected outcomes, exact commands and scope boundaries.
 
 Offline freshness checks establish the existing quiet launch adapter only;

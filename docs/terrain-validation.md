@@ -158,8 +158,8 @@ Record that distinction, machine/revision, sample counts, CPU/GPU timings,
 cold generation cost and requested/RSS memory. Never infer an FPS floor from
 averages or software Vulkan.
 
-Completion evidence lives in [#179](../reports/issue-179/README.md),
-[#180](../reports/issue-180/README.md) and [#181](../reports/issue-181/README.md).
+Completion evidence lives in [#179](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-179/README.md),
+[#180](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-180/README.md) and [#181](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-181/README.md).
 
 ## Option A shader evidence (#278)
 
@@ -201,7 +201,7 @@ introduced. Run the opt-in CPU traversal probe with:
     cargo test -p salimon-client --locked preparation_profile -- --ignored --nocapture
 
 CPU observations and measured cold/steady costs are recorded in
-[the #307 report](../reports/issue-307/README.md); hardware budgets/FPS remain
+[the #307 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-307/README.md); hardware budgets/FPS remain
 pending [native #313](https://github.com/mr-exception/salimon/issues/313).
 
 Canonical Vesper adds [planet-wide orbit-to-ground streaming](universe-terrain.md)

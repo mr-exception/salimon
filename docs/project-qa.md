@@ -16,11 +16,11 @@
 ## Open questions
 ### What budget should complete legacy active 500-piece M1 signoff (#563)?
 
-The [2026-10-21 native evidence](../reports/issue-255/2026-10-21/README.md)
+The [2026-10-21 native evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-255/2026-10-21/README.md)
 retains 150 completed moving intervals across ten fresh drops: frame p95
 23.446 ms, physics p95 5.932 ms, no intervals over 50 ms and a 1.064 ratio to
 matched empty launch prefixes. All numerical checks in the existing
-[#288 proposal](../reports/issue-288/README.md) pass; its status remains
+[#288 proposal](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-288/README.md) pass; its status remains
 `proposed_pending_owner_review`. Requesting a proposal did not approve its limits.
 The active results still exceed settled 17.5 ms guidance and the provisional
 5 ms physics partition; neither is silently replaced.
@@ -31,7 +31,7 @@ required. Fresh exact historical binary pairs pass the 20% relative checks, but
 the six prior whole-window and three prior same-state CPU-render failures remain
 recorded failures without an attributed cause. [#563](https://github.com/mr-exception/salimon/issues/563)
 owns this decision and any required attribution after the
-[#479 reverified decision package](../reports/issue-479/README.md). Keep this
+[#479 reverified decision package](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-479/README.md). Keep this
 question open until explicit review resolves it; source closure grants no signoff.
 Current-cap/mixed-sphere overload is independently tracked in #455.
 
@@ -82,7 +82,7 @@ owns validation, identity conflicts, exact continuation and offline freeze.
 
 ### When can the native Metal candidates become approved baselines?
 
-The 2026-10-21 [#314 delivery](../reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#561](https://github.com/mr-exception/salimon/issues/561) owns human corpus decisions/review, with #557 physical platform checks and #568 cloud automation. Earlier #477/#453 findings remain dated evidence. Source issue closure grants no appearance or interpolation acceptance.
+The 2026-10-21 [#314 delivery](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#561](https://github.com/mr-exception/salimon/issues/561) owns human corpus decisions/review, with #557 physical platform checks and #568 cloud automation. Earlier #477/#453 findings remain dated evidence. Source issue closure grants no appearance or interpolation acceptance.
 
 Scout #463 lighting is a bounded presentation proposal: #483/#566 own cloud capture/regression/timing evidence, #561 human image/readability review and #563 hardware budget decisions under the [verification workflow](verification-workflow.md). Its cool blackout floor is visibility fill, not emergency electrical energy. Native #451/#477 captures from older shaders do not approve this change.
 

@@ -160,7 +160,7 @@ and [`resource-loop.json`](../../scenarios/evidence/resource-loop.json), retaini
 state assertions and native evidence. Closing and relaunching the executable
 starts a fresh session, even with the same seed; it cannot certify restoration
 of previous fragments or mined deposits. The native
-[#236 report](../../reports/issue-236/README.md) records this distinction.
+[#236 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-236/README.md) records this distinction.
 
 The scope clarification above is proposed for owner approval through #268's PR;
 [Project Q&A](../../docs/project-qa.md#what-does-236-require-by-savereload)

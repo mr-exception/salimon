@@ -60,7 +60,7 @@ exercise real canonical mining, measured mass admission and restore retirement.
 metrics; `scenarios/evidence/environment-audio.json` checks native quiet Vesper,
 settings and lifecycle through the real window adapter.
 
-See [completion evidence](../reports/issue-627/README.md). Exported PCM is listening
+See [completion evidence](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-627/README.md). Exported PCM is listening
 material for [#561](https://github.com/mr-exception/salimon/issues/561), not a device
 recording, physical acoustic measurement or subjective sign-off. Physical device,
 Apple/Windows and M1 qualification remain unverified release work.

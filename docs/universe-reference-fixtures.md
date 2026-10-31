@@ -82,8 +82,8 @@ rustc/OS/CPU/context and fixture hashes beside raw JSON; repeat on matched hardw
 before interpreting a change. No timing thresholds, invented FPS or extrapolated
 native speed are installed by these CPU harnesses.
 
-[Portable report](../reports/issue-404/README.md) preserves Linux output and injected
-failure evidence. [Cloud measurements #521](../reports/issue-521/README.md)
+[Portable report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-404/README.md) preserves Linux output and injected
+failure evidence. [Cloud measurements #521](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-521/README.md)
 retain seven serial release processes per workload, raw timings, peak RSS,
 fixture/binary hashes and matched-size historical Linux comparisons. The report's
 `measure.py` uses its small C `measure_rss.c` supervisor to avoid inheriting the

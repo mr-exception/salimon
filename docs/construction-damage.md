@@ -74,7 +74,7 @@ malformed saves and exhausted allocator atomicity. Production wgpu routes:
 `scenarios/evidence/construction-damage.json` and
 `scenarios/evidence/construction-detachment.json`.
 
-[Completion evidence](../reports/issue-549/README.md) records actual results.
+[Completion evidence](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-549/README.md) records actual results.
 Human presentation review remains #561, physical platform/input checks #557,
 and hardware/Metal budgets #563. Offline chronology follows [the schema-22 contract](construction-offline.md); universe/scanner
 integration remains #433. No new combat system, decompression simulation or

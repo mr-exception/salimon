@@ -78,7 +78,7 @@ finishes, refreshed next visit, preserved original inscription/best distance,
 one visible sign/account, own latest placement and active-run isolation.
 Human native comparisons and reference performance remain required separately.
 
-[Current delivery/report](../reports/issue-476/README.md) records actual passed,
+[Current delivery/report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-476/README.md) records actual passed,
 blocked and unrun outcomes. [Follow-up #661](https://github.com/mr-exception/salimon/issues/661)
 owns full native/backend experience acceptance after #476 matrix/runner delivery.
 Closing #476 does not resolve the feature dependencies or grant native signoff.
@@ -92,6 +92,6 @@ future protocols retain exact `blocked_by` issue IDs. A runner exit of 3 is
 pending coverage, not a whole-matrix pass. Open #469–#475 still own their real
 navigation, alien opening, location, completion/account/backend and revisit
 features. Source rights remain #659 and physical-route/balance decisions #660;
-appearance/audio/baseline review remains #561. See the [current report](../reports/issue-568/README.md)
+appearance/audio/baseline review remains #561. See the [current report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-568/README.md)
 for fresh results, dependency snapshots, raw balance/availability and blank
 physical-trial worksheets. Do not count those unfilled worksheets as evidence.

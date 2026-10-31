@@ -272,7 +272,7 @@ state, key edges with ship controls/orientation, and capture release. Focus
 transitions are logged at debug level. These observations do not change admission,
 controller state or timing. Posting an OS event alone is not proof of delivery;
 compare this boundary trace with native state changes, as in the
-[#453 report](../../reports/issue-453/README.md).
+[#453 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-453/README.md).
 
 Native key translation and automation call `dispatch_key`. The explicit
 `InputSource::Automation` harness policy bypasses desktop focus/capture/occlusion,
@@ -529,7 +529,7 @@ visual delay; mouse look remains immediate. Portable synthetic 60/120/144 Hz,
 zero/multiple tick, fractional/overloaded backlog, distant-anchor and frame-reset
 regressions do not establish native smoothness or input latency. Native signoff
 requires normal-clock evidence and explicit human review; see the
-[#477 report](../../reports/issue-477/README.md).
+[#477 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-477/README.md).
 
 Native benchmark samples sum solver work/time across all completed ticks in a
 render and retain the final activation counts. Zero-tick renders record zero new

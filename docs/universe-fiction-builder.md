@@ -120,7 +120,7 @@ identity stability, collisions, invalid/bounded requests, Roche/Hill/Kepler
 constraints and 512 fixed-seed systems with expected age/metallicity trends.
 These broad heuristic screens are not empirical goodness-of-fit tests.
 
-See [U10 evidence](../reports/issue-411/README.md). U11 now publishes the [selected-world definition](universe-starting-system.md);
+See [U10 evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-411/README.md). U11 now publishes the [selected-world definition](universe-starting-system.md);
 other worlds' full definitions,
 U12 production batching/packaging, U14 dynamics, source reuse/coverage
 #659/#524/#526, and cloud integration #436–#439 remain their existing

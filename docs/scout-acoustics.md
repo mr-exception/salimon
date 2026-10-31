@@ -61,7 +61,7 @@ the configured virtual ALSA file sink, retaining original float32 PCM, listening
 WAV and callback counters. That sink is unpaced and reports one-frame callbacks
 and overruns; it cannot certify physical latency, device scheduling or speaker
 quality. Production-control WAV sequences and isolated synthetic timbre/stress
-references are labeled separately in [the report](../reports/issue-583/README.md).
+references are labeled separately in [the report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-583/README.md).
 
 Human #561 owns listening/timbre/stereo approval on suitable headphones/speakers;
 #557 real device behavior/latency and #563 hardware/CPU budgets. Existing volume

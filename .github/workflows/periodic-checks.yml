@@ -200,7 +200,7 @@ jobs:
       - name: Flight and cargo regression profiles
         id: flight
         timeout-minutes: 6
-        run: python scripts/profile_flight.py --binary target/release/salimon-client --samples 100 --baseline reports/issue-196/baseline.json --output artifacts/periodic/flight-profile.json
+        run: python scripts/profile_flight.py --binary target/release/salimon-client --samples 100 --baseline scripts/fixtures/flight-profile-baseline.json --output artifacts/periodic/flight-profile.json
       - name: Spherical mining CPU and batch matrix
         id: spheres
         timeout-minutes: 10

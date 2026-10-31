@@ -81,6 +81,6 @@ The conditional 1.8-billion-object projection and 5/10 GB capacities are explici
 arithmetic at that density. They exclude extra quality columns, partition/index
 costs and nonstellar content. Do not use them to approve the 2–5/10 GB pack target;
 full reviewed data, release-specific quality selection and actual U12 codec
-measurements remain necessary under [#524](https://github.com/mr-exception/salimon/issues/524). [Report](../reports/issue-408/README.md) records
+measurements remain necessary under [#524](https://github.com/mr-exception/salimon/issues/524). [Report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-408/README.md) records
 measured results and follow-up ownership. Native integration remains U34 and the
 reference hardware gates; this offline ingestion does not establish native signoff.

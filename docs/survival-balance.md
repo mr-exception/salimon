@@ -32,13 +32,13 @@ per solid body near +Y within 200 m; it cannot establish a global worst case.
 - Default Core resource yields and conversion rate remain catalog-owned; the
   suite neither makes fuel free nor changes them. See the [ship contract](../client/ship/architecture.md).
 
-[Raw balance rows](../reports/issue-384/balance.json) report actual first-ration
+[Raw balance rows](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-384/balance.json) report actual first-ration
 net hunger, total two-ration cycle, Core debit and declared time budgets. The
 900-second travel +30-second setup case is net-negative per ration; this is an
 expected sensitivity finding. Do not interpret its test pass as balance approval.
 The four selected rows are scenarios, not a probabilistic player failure rate.
 
-[Availability samples](../reports/issue-384/availability.json) find both required
+[Availability samples](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-384/availability.json) find both required
 feedstocks in all sixteen Earth samples; largest sampled nearest distances are
 about 30 m biomass and 166 m ice. Current Mercury/Venus/Moon/Mars profiles lack
 biomass entirely, so their samples cannot sustain basic-ration production. No
@@ -65,11 +65,11 @@ GPU, audio device, native baseline approval or network source is needed.
 
 ## Physical route review (#496)
 
-[Current reproduction and review packet](../reports/issue-496/README.md) retains
+[Current reproduction and review packet](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-496/README.md) retains
 fresh portable JSON, explicit failures/assumptions and an unfilled native trial
 worksheet. No measured native route or owner balance approval is implied.
 
-Copy [the trial template](../reports/issue-496/physical-trial-template.json) to a
+Copy [the trial template](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-496/physical-trial-template.json) to a
 new file; fill actual revision, reference hardware/OS/backend, body/seed,
 health/fatigue/hunger, layout/obstacles, operator/date and recording/log evidence.
 Time the full route through discovery, setup, outbound navigation, gathering,

@@ -22,11 +22,11 @@ Budget delta: zero new vertices, textures, buffers, draws or pipelines. The same
 original 160-byte uniform carried the bus bit in its previously unused `center.w`.
 Additional vertex arithmetic is bounded (two smoothstep zones, no light loop).
 The machinery extension below enlarges that uniform to 192 bytes.
-Historical Linux costs belong in the [delivery report](../reports/issue-463/README.md).
-The [native lighting review](../reports/issue-483/README.md) retains actual M1/Metal
+Historical Linux costs belong in the [delivery report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-463/README.md).
+The [native lighting review](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-483/README.md) retains actual M1/Metal
 1280/1920 power pairs, repeat checks and separate Blender 4.5 LTS mood references.
 Cloud power transitions and repeatability are reproduced in that report.
-[Matched cloud timings](../reports/issue-566/README.md) are also delivered;
+[Matched cloud timings](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-566/README.md) are also delivered;
 subjective appearance belongs to #561 and
 hardware timing/budget acceptance to #563. No measured hardware budget is approved.
 
@@ -52,7 +52,7 @@ through the production interaction, advances one tick, and captures them again.
 Repeated frames must stay identical within the declared tolerance. Keep native
 captures separate from Blender mood references and from approved image corpora.
 Inspect screens, glass, walking-lane edges and dark housings; never promote a
-candidate without human image/mask/tolerance review. The [#451 native report](../reports/issue-451/README.md) verifies the current Core
+candidate without human image/mask/tolerance review. The [#451 native report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-451/README.md) verifies the current Core
 blackout condition. Broader lighting/art/baseline approval remains #561;
 cloud/reference fixture passes do not grant that acceptance.
 
@@ -112,7 +112,7 @@ retain the same separately persisted settings schema and visual alternatives.
 E2E/benchmarks suppress device playback. Pure tests verify chunk invariance,
 bounded onset, headroom, stale/reset/mute admission, exterior silence, real
 production mappings and unchanged saved authority. Opt-in original stereo WAVs
-and callback telemetry are retained in the [#582 report](../reports/issue-582/README.md).
+and callback telemetry are retained in the [#582 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-582/README.md).
 Historical #465/#485 chunk/process evidence remains historical; those subprocess
 lifecycle tests are replaced by callback lifecycle tests. Human listening #561,
 physical output/device switching #557 and whole-frame hardware budgets #563
@@ -148,7 +148,7 @@ Renderer adds one f32 role per immutable ship vertex (72 -> 76-byte stride) and
 two vec4 uniform slots (160 -> 192 bytes per rendered ship frame). Geometry counts,
 textures, two opaque/glass draws, buffers and pipelines remain fixed. The role
 shader adds bounded arithmetic with no source loop or dynamic allocation.
-[Report](../reports/issue-464/README.md) records actual software-Vulkan debug costs
+[Report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-464/README.md) records actual software-Vulkan debug costs
 and limits, rather than claiming a full-frame or M1 budget pass.
 
 An opt-in offscreen production-pipeline test records 14 synthetic reference
@@ -160,7 +160,7 @@ Run with an absolute output directory:
 SALIMON_SCOUT_FEEDBACK_DIR="$PWD/artifacts/scout-feedback" VK_DRIVER_FILES=/usr/share/vulkan/icd.d/lvp_icd.json cargo test -p salimon-renderer --locked scout_feedback_gpu_evidence -- --ignored --nocapture
 ```
 
-The [#489 cloud walkthrough](../reports/issue-489/README.md) retains production
+The [#489 cloud walkthrough](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-489/README.md) retains production
 window/session state, actual GPU close views and stepped motion sequences for
 pedals, work sweep, blocked output, Core recovery and ramp reversal. Explicit
 initial fixture placement is distinct from physical mining/travel. Human motion/
@@ -212,7 +212,7 @@ rerasterized; unchanged full display keys skip GPU uploads. The five-section
 2560x256 atlas is unchanged in size (2.5 MiB per CPU/GPU RGBA copy). Native M1
 appearance/input/frame-tail acceptance is [#502](https://github.com/mr-exception/salimon/issues/502),
 separate from CPU rasters and software Vulkan. See the
-[delivery report and evidence](../reports/issue-466/README.md).
+[delivery report and evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-466/README.md).
 
 ## Core contrast verification condition (#451)
 
@@ -232,13 +232,13 @@ oblique and receding views. Keep their original state assertions; native capture
 verify the shader/material/screen contrast at the recorded context without
 promoting any baseline or weakening an authored contract.
 
-See [#451 native evidence](../reports/issue-451/README.md) for the exact binary,
+See [#451 native evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-451/README.md) for the exact binary,
 shader digest, Metal/drawable context, images, pass results and remaining wider
 appearance/performance limits. The dated #299 report is retained unchanged.
 
 ## Matched cloud lighting timings (#566)
 
-The [#566 report](../reports/issue-566/README.md) owns serial current/control
+The [#566 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-566/README.md) owns serial current/control
 software-Vulkan measurements and original repeated1280×800 captures. The control
 changes only the retained pre-#463 lighting expressions within current interfaces;
 it is not a historical whole-game build. The named cloud admission profile keeps
@@ -266,7 +266,7 @@ names current freshness and power independently of color. Chart mode retains its
 separate explicit historical/lead provenance. No blink, new draw or detection is
 added. #438 owns the integration matrix; #502's historical review now follows
 #561 presentation, #557 physical devices and #563 hardware qualification.
-See [#466 foundation report](../reports/issue-466/README.md) and
+See [#466 foundation report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-466/README.md) and
 [PR #504](https://github.com/mr-exception/salimon/pull/504).
 
 The [#438 cloud matrix](universe-scanner.md#cloud-scanner-acceptance-438) adds a top-right placement for fresh scanner status at 1280+ physical pixels. It keeps the enlarged 2x toolbar/status stack from covering the selected 3D contact; compact and chart-mode placement remains bottom-aligned. See the report for original failed and corrected captures.

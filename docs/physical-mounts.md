@@ -66,5 +66,5 @@ python3 scripts/salimon-test run scenarios/evidence/physical-mounts.json --binar
 ```
 
 Captures come directly from production wgpu; no desktop pixels or baseline approval
-are implied. See the [delivery report](../reports/issue-576/README.md) for exact
+are implied. See the [delivery report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-576/README.md) for exact
 results, original images and environment.

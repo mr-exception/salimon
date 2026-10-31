@@ -217,19 +217,19 @@ p95/max/spikes and missed interaction deadlines. 1,000 has no 60 FPS requirement
 
 ### Proposed active launch budget (#288; pending owner review)
 
-The [#288 proposal](../reports/issue-288/README.md) separates ten fresh,
+The [#288 proposal](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-288/README.md) separates ten fresh,
 naturally settling 500×0.032 kg onboard drops from the long settled reference.
-Its [machine-readable limits](../reports/issue-288/proposed-budget.json) and
-[raw-evidence evaluation](../reports/issue-288/analysis.json) are review material,
+Its [machine-readable limits](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-288/proposed-budget.json) and
+[raw-evidence evaluation](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-288/analysis.json) are review material,
 not approved replacement guidance. The owner requested this proposal on
 2026-10-17; approval of the thresholds remains a PR review decision.
 The proposal preserves the settled guidance above and independently reports
 the existing whole-window 20% relative checks, including their failures.
 Passing the proposed numbers does not grant #255/#288 signoff or establish
 continuous motion, larger-piece, dense-contact or #236 sphere acceptance.
-The [2026-10-21 refresh](../reports/issue-255/2026-10-21/README.md) passes all
+The [2026-10-21 refresh](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-255/2026-10-21/README.md) passes all
 numerical proposal checks and fresh historical relative comparisons; prior failed
-windows remain recorded. [#479 reanalysis and decision package](../reports/issue-479/README.md) reverify
+windows remain recorded. [#479 reanalysis and decision package](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-479/README.md) reverify
 the unchanged archive/proposal without repeating completed collection.
 [#563](https://github.com/mr-exception/salimon/issues/563) owns the remaining
 explicit owner budget/limitation decision. Until recorded, the proposal remains
@@ -335,7 +335,7 @@ The probe uses 500/1,000 separated analytic spheres, ten warmups and 100 fresh
 queries, all-awake swept activation queries and exact grid refresh. Setup is
 excluded; the old repeated-query pattern remains an attribution control. This
 does not establish authored cargo or native FPS acceptance. See the
-[matched M1 evidence and remaining signoff](../reports/issue-255/2026-10-17-remediation/README.md).
+[matched M1 evidence and remaining signoff](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-255/2026-10-17-remediation/README.md).
 
 ## Tick/backlog diagnosis (#159)
 
@@ -402,7 +402,7 @@ Static transforms do not prove gameplay sleep. Unsupported timestamps are
 explicitly reported. Software Vulkan results cannot establish hardware GPU
 budgets or justify a native LOD choice.
 
-See [the decision and evidence](../reports/issue-160/README.md). Reconsider
+See [the decision and evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-160/README.md). Reconsider
 authored proxies only with an accepted contact error budget and measured native
 benefit; reconsider projected-size LOD/hysteresis only with resource-specific GPU
 evidence. Any selected shapes/LODs must follow the existing `models/` source,
@@ -410,7 +410,7 @@ export and validation workflow, while visibility must never suspend physics.
 
 ## Solver replacement decision (#161)
 
-The [keep/defer evaluation](../reports/issue-161/README.md) retains the custom
+The [keep/defer evaluation](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-161/README.md) retains the custom
 solver for accepted settled 500 cargo and defers the Rapier comparison. It
 contains historical evidence, an untested candidate behavior matrix and explicit
 reopening gates; no head-to-head speedup or active budget is established.
@@ -665,4 +665,4 @@ solver replay parity and records selection/history, adapter, frame-sync and
 mass costs. `SALIMON_FRAGMENT_COST_SAMPLES` controls repeats; do not combine
 with `SALIMON_FRAGMENT_COST_QUICK`. The fixture/schema stays version 1; additive
 `scope` identifies this subset. This CPU timing lane does not replace the
-current-cap/current-mixed native matrix. See the [#455 report](../reports/issue-455/README.md).
+current-cap/current-mixed native matrix. See the [#455 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-455/README.md).

@@ -40,3 +40,12 @@ recorded digests were checked against the original and retained Git blobs.
 Historical capture filenames in archived logs describe their recorded revision,
 not files guaranteed to exist in the current checkout. Keep useful current
 evidence and its validation limitations unchanged.
+
+## Archived evidence references
+
+Earlier report directories were removed from the current tree. Maintained guides
+link to verified, immutable Git revisions for that historical evidence. Report-local
+commands in those historical instructions require checking out the linked revision;
+they are not available in a fresh current checkout. Reusable active-budget tests
+and the weekly flight baseline live under `scripts/` and `scripts/fixtures/` so
+current verification does not depend on historical report retention.

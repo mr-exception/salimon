@@ -146,7 +146,7 @@ comparator compatibility, image hashes and pixel thresholds are unchanged.
 ## Local Linux reproduction (#568)
 
 When hosted dispatch is denied, retain its actual error and use the
-[container recipe and nightly-equivalent runner](../reports/issue-568/README.md).
+[container recipe and nightly-equivalent runner](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-568/README.md).
 Start from a clean tracked default-branch revision, record the resolved stable
 Rust version, image/ICD/adapter/driver and every command/status, and preserve
 original logs/corpus/temporal data. Local Linux software Vulkan is a distinct

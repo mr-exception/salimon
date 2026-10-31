@@ -268,7 +268,7 @@ exercises the real worker/launch/restart composition with before/torn/after
 publication faults, including every archive/restart write. The two extended
 `persistence_extended` tests are opt-in locally and run nightly. See
 [commands and operation reference](../scenarios/portable/README.md) and
-[acceptance traceability](../reports/issue-375/README.md). Existing #377–#384 owner
+[acceptance traceability](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-375/README.md). Existing #377–#384 owner
 tests remain part of workspace CI; this matrix composes their production owners.
 
 ## Scout UI readability (#466)
@@ -283,7 +283,7 @@ contrast, line-fit, three-screen orientation and modal/interaction regressions.
 The ignored `scout_ui_raster_evidence` / `scout_prompt_raster_evidence` tests emit
 CPU pixels with `SALIMON_SCOUT_UI_DIR` set to an **absolute** evidence directory.
 Existing `scout_feedback_gpu_evidence` supplies opt-in synthetic GPU views.
-[Delivery report](../reports/issue-466/README.md); native M1 acceptance #502;
+[Delivery report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-466/README.md); native M1 acceptance #502;
 scanner readability #503 uses the delivered #430 hologram. Physical/subjective approval remains separate.
 
 
@@ -370,7 +370,7 @@ See [reference wire/budget/workload guide](universe-reference-fixtures.md),
 [architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
 and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
 and CPU diagnostics only; no solver/world migration or scientific model approval.
-Repeated cloud reference/RSS measurements are recorded in [the #521 report](../reports/issue-521/README.md);
+Repeated cloud reference/RSS measurements are recorded in [the #521 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-521/README.md);
 full-game cloud gates remain #435–#439. Human hardware budgets remain #563.
 
 ## Universe Gaia ingestion (#408)
@@ -433,7 +433,7 @@ validated E2E initial fixtures; `e2e.rs` and `scripts/salimon_test.py` select th
 Subsequent intake/menu/power/work/collection uses production session/window routes.
 `reports/issue-489/walkthrough.py` retains GPU motion frames plus authoritative
 state, with two additional close cameras consumed by `scout_reference.rs`.
-See [evidence/limits](../reports/issue-489/README.md); subjective review #561,
+See [evidence/limits](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-489/README.md); subjective review #561,
 physical platform/input #557, hardware budgets #563; delivered scanner integration #503/#430 is cloud-verified separately.
 
 Recovery cloud verification (#515): `scout_walkthrough.rs` owns declared initial
@@ -441,7 +441,7 @@ materials, `automation.rs` exposes read-only recovery source and the R alias,
 `session/recovery/tests.rs` owns exact concurrent funding/migration/disk coverage.
 Renderer `ship_mesh.rs` normalizes the generic tray package's per-face artwork UVs;
 its geometry regression and the matched native before/after images cover the
-correction. See [the report](../reports/issue-515/README.md) and renderer architecture.
+correction. See [the report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-515/README.md) and renderer architecture.
 
 ## Blueprint placement (#542)
 

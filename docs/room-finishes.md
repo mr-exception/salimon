@@ -47,7 +47,7 @@ preserve physical source and custom colors without ticking or spending resources
 Future modular rooms supply the same stable room/part identities to the registry
 and renderer during actual installation/removal; no spatial connected-component
 recoloring is permitted. This boundary does not generate physical geometry.
-See [the report](../reports/issue-579/README.md) for actual native captures/resource
+See [the report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-579/README.md) for actual native captures/resource
 counters and separate human appearance/hardware limitations.
 
 

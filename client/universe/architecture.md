@@ -152,7 +152,7 @@ adapter plus production U02 workload, not a U08 importer/solver. The comparator
 CLI and seven-sample CPU workload are `examples/reference_compare.rs` and
 `examples/reference_bench.rs`. Read the [reference/budget contract](../../docs/universe-reference-fixtures.md).
 No gameplay/model accuracy or M1 performance is inferred;
-[cloud workload evidence #521](../../reports/issue-521/README.md) records repeated
+[cloud workload evidence #521](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-521/README.md) records repeated
 release CPU/RSS measurements and retained Linux comparisons. Hardware budget
 decisions remain #563; no numerical/model threshold changes.
 

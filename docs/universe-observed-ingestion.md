@@ -123,7 +123,7 @@ Tests in `src/ingestion/{horizons,exoplanets}/tests.rs` compare the production
 importer directly to independent U03 Earth SI/epoch goldens, physical quantities,
 Proxima period/distance/errors/references, synthetic Gaia reconciliation, missing
 orbits, limits/minimum masses, deterministic duplicates and failure paths.
-See [report](../reports/issue-409/README.md) for actual results. Full reviewed
+See [report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-409/README.md) for actual results. Full reviewed
 release coverage, source-specific format extensions and production scientific
 acceptance remain [#526](https://github.com/mr-exception/salimon/issues/526), after
 [#513](https://github.com/mr-exception/salimon/issues/513); pack integration remains

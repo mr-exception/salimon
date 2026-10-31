@@ -193,6 +193,6 @@ art/listening and M1 qualification remain #561/#563.
 The [maintained environment matrix](../scripts/README.md#planetary-environment-matrix-628)
 combines canonical sterile Vesper day/night and streaming with explicit fictional
 weather/biology positives, harvesting/reload, field marks/chart and sound evidence.
-The [dated report](../reports/issue-628/README.md) records exact fixture/publication
+The [dated report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-628/README.md) records exact fixture/publication
 boundaries and original captures. It does not approve perceptual presentation,
 physical platform behavior or hardware budgets; those remain #561/#557/#563.

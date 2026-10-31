@@ -39,6 +39,11 @@ require the old `build (ubuntu-24.04)`, `build (macos-14)` or `build (windows-20
 checks, a maintainer must replace those requirements with the new check before
 merging under that policy. This workflow change does not edit protection settings.
 
+Historical report-local commands below require the commit linked by their report;
+see [archived evidence references](../reports/README.md#archived-evidence-references).
+Current test fixtures live under `scripts/fixtures/` and preserve their original
+machine context and unapproved budget status.
+
 ## CPU and tooling gates
 
 | Area | Exact command | Prerequisite/coverage |
@@ -186,7 +191,7 @@ Clippy/fmt. `inertial-flight.json` and `landing-speed-cutoff.json` now exercise
 Physical B input, handling and instrument appearance need #498 reference evidence.
 Cloud production-protocol engine captures, the seven realistic-flight routes and
 engine-off disk relaunch regression are recorded in
-[the #498 report](../reports/issue-498/README.md). Run its `verify.py` against a
+[the #498 report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-498/README.md). Run its `verify.py` against a
 built native executable on Xvfb/software Vulkan; fresh output paths are required.
 Human handling/physical input and hardware qualification remain #561/#557/#563.
 The same runtime flight regression module replays the landing-cutoff and cockpit
@@ -209,7 +214,7 @@ the 500-fragment whole-session continuation and full eighteen-hour 16/33/100 ms
 survival partition matrix. Nightly verification runs this exact filter in its
 Rust step and retains the raw output with periodic artifacts. Do not replace it
 with an unrestricted `--ignored`, which also selects unrelated opt-in GPU tests.
-See the [coverage/results report](../reports/issue-375/README.md); reference M1,
+See the [coverage/results report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-375/README.md); reference M1,
 OS input and physical route acceptance remain #348/#376/#496/#498 as applicable.
 
 
@@ -223,7 +228,7 @@ pixel evidence: set `SALIMON_SCOUT_UI_DIR` to an absolute directory and run
 and `cargo test -p salimon-client --locked scout_prompt_raster_evidence -- --ignored`.
 These pixels are not native screenshots. M1 view/DPI/OS-input/frame-tail review
 remains #502; scanner integration #503 waits for #430. See the
-[UI report](../reports/issue-466/README.md) and
+[UI report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-466/README.md) and
 [canonical matrix](scout-presentation.md#scout-ui-readability-contract-466).
 
 
@@ -326,7 +331,7 @@ gates. `cargo run -p salimon-universe --example inference_sanity --locked` emits
 8192 fixed-seed synthetic systems, proposal histograms and numerical/physical
 checks; repeat output must compare identically on the tested toolchain. CI runs
 this gate and repeat comparison. See [model limits](universe-inference.md) and
-[measured evidence](../reports/issue-410/README.md). No empirical frequency fit,
+[measured evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-410/README.md). No empirical frequency fit,
 production source approval, runtime migration or native M1 signoff is implied.
 
 ## Universe fictional builder (#411)
@@ -352,7 +357,7 @@ macOS/Windows portable CI runs debug/release U11 goldens; Ubuntu repeats/compare
 the manifest. Tests cover independent >=30 ly proof, physical screens, immutable
 IDs/digests, altered/unknown/oversized data, single-surface queries, all five
 resources, ship-clearing walk paths and visual independence. See
-[contract](universe-starting-system.md) and [evidence](../reports/issue-412/README.md).
+[contract](universe-starting-system.md) and [evidence](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-412/README.md).
 These CPU checks do not replace U24 integration or cloud #436–#439 rendered and
 session acceptance. Human presentation/platform/budget criteria are #561/#557/#563.
 
@@ -365,7 +370,7 @@ must not already exist. Fixtures explicitly set reduced meters, apply production
 medkit/damage/crafting transactions and use existing #375 placement fixtures;
 they do not prove physical travel or naturally elapsed death. Each checkpoint
 round-trips through production validation and the real two-slot disk manager.
-Run [the native review harness](../reports/issue-376/native_restore.py) only against
+Run [the native review harness](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-376/native_restore.py) only against
 those isolated directories with the locally authorized OS-input helper. Retain
 source/binary/adapter/DPI, input/checkpoint records and actual images. Fixture
 rendering never grants full gameplay, balance or representative FPS acceptance.
@@ -380,7 +385,7 @@ The output directory must not exist. This test reuses the existing seeded
 FragmentPile fixture, advances production ticks, aims at an existing identity,
 validates exact save roundtrip with automation absent after restore, and proves
 the typed F route can pick that identity. Only then does it write two verified
-slots. Use the [#477 native harnesses](../reports/issue-477/README.md) against a
+slots. Use the [#477 native harnesses](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-477/README.md) against a
 copy in a fresh isolated save directory. Normal launch uses the real wall clock
 and native OS events; no stdin stepping or rendering override is active.
 Fixture placement/aiming is not physical mining/travel, visual approval or FPS
@@ -426,10 +431,10 @@ With Xvfb and lavapipe active, run `python reports/issue-489/walkthrough.py
 It uses production protocol/window adapters and direct GPU capture, isolated
 native input, explicit seeded initial states and fixed simulation steps.
 Its motion frames/encoded clips are not wall-clock/display-FPS evidence.
-See the [report](../reports/issue-489/README.md) for native routes, source/context
+See the [report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-489/README.md) for native routes, source/context
 hashes, exact results and remaining #561/#557/#563 criteria.
 
-Scout UI cloud matrix #502: the [report and driver](../reports/issue-502/README.md)
+Scout UI cloud matrix #502: the [report and driver](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-502/README.md)
 record actual wgpu screens at 1280x800/1920x1080 and simulated X11 scales 1/1.5/2,
 power restoration through Core intake, physical Fabricator prompts/modal exclusion
 and the existing anchored-world-prompt route. Device DPI remains #557 and human
@@ -437,17 +442,17 @@ readability/appearance remains #561.
 
 Archive #505: `cargo test -p salimon-client --locked archive` includes the real
 Save Now worker, normal relaunch and verified restart reset. The
-[cloud report/driver](../reports/issue-505/README.md) captures all seven intact and
+[cloud report/driver](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-505/README.md) captures all seven intact and
 damaged records via physical E/arrow/Tab dispatch at both supported resolutions.
 
 Recovery #515: `cargo test -p salimon-client --locked session::recovery` covers
 concurrent craft/thrust/recovery funding, old-schema resource/job retention and
 real Save Now/normal-launch/restart with zero offline work. The
-[cloud report/driver](../reports/issue-515/README.md) exercises production
+[cloud report/driver](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-515/README.md) exercises production
 intake/Fabricator/tray/installation/Archive controls and GPU captures.
 
 Scientific CPU cloud evidence #521: build the three documented release examples,
-then use the [report-local measurement driver](../reports/issue-521/README.md)
+then use the [report-local measurement driver](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-521/README.md)
 for seven serial processes each of `reference_bench` and `partition_bench`.
 The C supervisor records Linux `wait4` peak RSS without Python's inherited memory
 floor. Raw inner JSON, process time/memory, fixture/binary/compiler/CPU context,
@@ -480,7 +485,7 @@ Run physics and math tests, workspace tests/build, Clippy and documentation gate
 for changes to the shared arithmetic/contact boundary. The retained
 `iteration_oracle` compares exact old ground/pair response and warm continuation;
 spatial all-pairs, correction-created contact and sleep/retained-projection tests
-remain required. The [serial reproducer](../reports/issue-592/reproduce.sh) builds
+remain required. The [serial reproducer](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-592/reproduce.sh) builds
 an isolated archived-layout fixture and records every sample with immutable
 binary/source inventories. Never run builds, render workloads or other timing
 lanes concurrently with its release measurements. Diagnostic prefix snapshots
@@ -542,7 +547,7 @@ and Archive drivers. Validate the Scout export with
 `python3 models/assets/ships/salimon-scout/validate.py`; retain current measured
 asset metrics without claiming pending hardware ceilings are approved. Coverage,
 original production images, state and platform limitations belong in the
-[completion report](../reports/issue-551/README.md). Human visual/audio review
+[completion report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-551/README.md). Human visual/audio review
 remains #561, physical devices/sleep/wake #557 and hardware budgets #563.
 
 

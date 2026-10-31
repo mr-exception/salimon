@@ -1,18 +1,16 @@
 """Guard the distinction between #288's numerical proposal and acceptance."""
 import copy
-import importlib.util
 from pathlib import Path
+import json
+import active_budget as verify
 import unittest
 
-REPORT = Path(__file__).resolve().parents[1] / 'reports/issue-288'
-spec = importlib.util.spec_from_file_location('active_budget_verify', REPORT / 'verify.py')
-verify = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(verify)
+BUDGET = Path(__file__).resolve().parent / 'fixtures/active-budget-proposal.json'
 
 
 class ActiveBudgetEvidenceTests(unittest.TestCase):
     def setUp(self):
-        self.budget = verify.prior.load(REPORT / 'proposed-budget.json')
+        self.budget = json.loads(BUDGET.read_text())
         metrics = {}
         for path, limit in self.budget['maximums'].items():
             metric, statistic = path.split('.')

@@ -904,3 +904,8 @@ establish hardware FPS.
 The `universe-night` evidence camera clears canonical terrain by 40 m on the
 negative-Y hemisphere, opposite the current fixed positive-Y local light. It
 never supplies an atmosphere, biosphere or gameplay location/time change.
+
+
+## Verified canonical motion (#432)
+
+Current canonical saves require the exact authored motion identity and epoch. Migration retains body-relative physics/resources. Active and closed flight share the same gravity operator; closed mode cannot grant manual thrust. Motion errors prevent save/resume and retain the last verified checkpoint. A default/engineering session never acquires a canonical frame accidentally. [Contract](../../docs/universe-offline-propagation.md).

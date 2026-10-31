@@ -132,4 +132,5 @@ pub mod sky;
 
 pub mod surface_observations;
 
+pub mod starting_motion;
 pub mod surface_chart;

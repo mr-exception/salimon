@@ -55,6 +55,16 @@ fn sphere_interval(start: [f64; 3], movement: [f64; 3], radius: f64) -> Option<[
 /// has per-axis derivative <=3A/w; folded ridges double it. Sparse smoothstep
 /// features contribute <=1.5|elevation|/radius. No terrain tessellation or scan.
 fn clearance_lipschitz(mode: TerrainMode, body: CelestialBody) -> f64 {
+    if mode == TerrainMode::Canonical {
+        let t = &salimon_world::canonical::START.manifest().terrain;
+        // Product rule for folded wave times smoothstep cap taper. The wave
+        // has unit amplitude, |d wave / d direction| <= 2 f sqrt(1.25);
+        // the cap taper has |d smooth / d distance| <= 1.5 / width.
+        return 1.0
+            + t.ridge_height_meters
+                * (2.0 * f64::from(t.ridge_frequency) * 1.25_f64.sqrt() / body.radius_meters
+                    + 1.5 / t.transition_width_meters);
+    }
     let Some(definition) = mode.definition(body.id) else {
         return 1.0;
     };
@@ -85,6 +95,7 @@ fn terrain_contact(
     body: CelestialBody,
     start: [f64; 3],
     end: [f64; 3],
+    verified: &mut bool,
 ) -> Option<f64> {
     let center = body.center.meters();
     let local = sub(start, center);
@@ -131,6 +142,7 @@ fn terrain_contact(
         }
         visited += 1;
         if visited == MAX_SWEEP_INTERVALS {
+            *verified = false;
             // Conservative fail-closed contact on the earliest unresolved interval;
             // work stays bounded and a high-speed crossing cannot tunnel through.
             return Some(a);
@@ -151,6 +163,7 @@ impl ShipController {
         initial_velocity: [f64; 3],
         delta: Duration,
     ) {
+        self.contact_verified = true;
         let mut first: Option<(f64, CelestialBodyId)> = None;
         for body in self
             .terrain
@@ -158,7 +171,8 @@ impl ShipController {
             .iter()
             .filter(|body| body.role == BodyRole::Solid)
         {
-            if let Some(fraction) = terrain_contact(self.terrain, *body, start, end)
+            if let Some(fraction) =
+                terrain_contact(self.terrain, *body, start, end, &mut self.contact_verified)
                 && first.is_none_or(|(previous, _)| fraction < previous)
             {
                 first = Some((fraction, body.id));
@@ -448,7 +462,7 @@ mod tests {
             let end = add(body.center.meters(), add(b, [0.0, y, 0.0]));
             assert!(mode.clearance(body, start) > COLLISION_RADIUS_METERS);
             assert!(mode.clearance(body, end) > COLLISION_RADIUS_METERS);
-            assert!(terrain_contact(mode, body, start, end).is_some());
+            assert!(terrain_contact(mode, body, start, end, &mut true).is_some());
             found = true;
             break;
         }
@@ -466,7 +480,9 @@ mod tests {
             [-1000.0, earth.radius_meters + 1000.0, 0.0],
         );
         let end = add(start, [2000.0, 0.0, 0.0]);
-        assert!(terrain_contact(TerrainMode::Representative, earth, start, end).is_none());
+        assert!(
+            terrain_contact(TerrainMode::Representative, earth, start, end, &mut true).is_none()
+        );
         let sun = CELESTIAL_BODIES
             .iter()
             .find(|body| body.role != BodyRole::Solid)

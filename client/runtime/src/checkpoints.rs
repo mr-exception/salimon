@@ -76,6 +76,15 @@ enum SaveJob {
     },
 }
 impl SaveJob {
+    fn closing(session: &GameplaySession, utc: u64) -> Result<Self, SaveError> {
+        if session.motion.is_none() {
+            return Self::checkpoint(session, utc);
+        }
+        let mut candidate = GameplaySession::default();
+        candidate.restore_bytes(&session.save_bytes(utc)?)?;
+        candidate.ship.shut_down_for_close();
+        Self::checkpoint(&candidate, utc)
+    }
     fn checkpoint(session: &GameplaySession, utc: u64) -> Result<Self, SaveError> {
         Ok(Self::Checkpoint {
             bytes: session.save_bytes(utc)?,
@@ -257,7 +266,14 @@ impl Checkpoints {
             return;
         }
         match now()
-            .and_then(|now| SaveJob::checkpoint(session, now).map(|job| (now, job)))
+            .and_then(|now| {
+                (if self.control.exit_requested {
+                    SaveJob::closing(session, now)
+                } else {
+                    SaveJob::checkpoint(session, now)
+                })
+                .map(|job| (now, job))
+            })
             .and_then(|(now, job)| {
                 self.sender
                     .as_ref()
@@ -350,7 +366,7 @@ impl Checkpoints {
     }
     /// Drain the in-flight write, then verify the final snapshot before returning.
     pub(crate) fn finish(&mut self, session: &GameplaySession) -> Result<(), SaveError> {
-        let job = now().and_then(|now| SaveJob::checkpoint(session, now))?;
+        let job = now().and_then(|now| SaveJob::closing(session, now))?;
         if self.busy {
             let _ = self.results.recv();
             self.busy = false;

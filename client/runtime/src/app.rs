@@ -837,6 +837,11 @@ impl ClientApplication {
         let mut text = String::from(
             "SALIMON / PAUSED\n\nENTER / ESC   RESUME\nN   SAVE NOW\nS   SETTINGS\nX   SAVE & EXIT\n\n",
         );
+        if let Some(error) = &self.session.motion_error {
+            return Some(format!(
+                "SALIMON / MOTION UNVERIFIED\n\nResume unavailable\n{error}\n\nClose and restore the last verified checkpoint."
+            ));
+        }
         use crate::checkpoints::control::Status;
         match &self.checkpoints {
             None => text.push_str("Saving unavailable in this session"),

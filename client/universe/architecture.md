@@ -329,3 +329,8 @@ source identity, acquisition/verification commands and explicit scientific limit
 The private pack preserves all original measurements and sidecars; source terms
 remain unreviewed for public release. Runtime/save schemas and player discovery
 are unchanged.
+
+
+## Authored starting-system kinematics (#432)
+
+`src/starting_motion.rs` publishes versioned fixed fictional orbital axes/phase/epoch and zero axial spin, with a geographic-bound SHA256. It supplies checked uniform game clocks, analytic body position/velocity/acceleration, a complete two-body field and split-anchor inertial reconstruction. [Model, validity and migration contract](../../docs/universe-offline-propagation.md). Imported-source ephemeris validity is unchanged.

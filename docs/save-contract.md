@@ -619,3 +619,8 @@ grips/audio/caches are excluded. Versions 1–28 migrate empty; new biological d
 cannot be backdated. Natural fragment anatomy is optional on older objects.
 Publication, geometry, mass, allocator, carry and source-debit cross-checks precede
 atomic publication. Missing and partial anatomy never regrows on stream/reload.
+
+
+## Canonical motion source — schema 30 (#432)
+
+Canonical sessions persist `state.motion`: version 1, exact motion-definition SHA256 and a TT uniform game epoch. The motion publication includes the unchanged geographic SHA256. Physical ship position/velocity remain in the explicit nonrotating translating Vesper frame; the model reconstructs inertial state using the split galactic system anchor. Schema 24–29 sources lacking motion migrate from `saved_at_unix_seconds`, preserving physical, resource and geographic state. Schema-30 missing/mismatched sources and canonical motion on an engineering world reject atomically. Restore alone advances no time. Closing and launch disable engines while retaining momentum and committed paid assistance. [Full model, clock policy, numerical regime and validity limits](universe-offline-propagation.md).

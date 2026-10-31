@@ -5,6 +5,9 @@ impl GameplaySession {
         self.paused
     }
     pub(crate) fn toggle_pause(&mut self) {
+        if self.motion_error.is_some() {
+            return;
+        }
         if self.view_mode != ViewMode::Gameplay || self.survival.snapshot().terminal {
             return;
         }

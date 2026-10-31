@@ -9,7 +9,10 @@ pub(crate) fn definition_binding() -> salimon_persistence::universe::DefinitionB
     }
 }
 pub(crate) fn initialize(session: &mut GameplaySession) -> Result<(), String> {
-    session.enable_terrain(salimon_world::canonical::BODIES[0], [0., 1., 0.])
+    session.enable_terrain(salimon_world::canonical::BODIES[0], [0., 1., 0.])?;
+    session.motion =
+        Some(salimon_universe::starting_motion::Clock::at(0).map_err(|e| e.to_string())?);
+    Ok(())
 }
 
 /// Evidence fixture: standing near a real published ore deposit, then ordinary

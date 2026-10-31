@@ -141,6 +141,9 @@ impl GameplaySession {
             previous = e.after;
         }
         next.advance_closed_interval(interval - previous);
+        if let Some(error) = &next.motion_error {
+            return Err(invalid(format!("offline motion: {error}")));
+        }
         // Verify the final authoritative source through the ordinary reconstruction
         // path before it is eligible for the host's durable publication.
         next.building.running = None;
@@ -163,13 +166,22 @@ impl GameplaySession {
             // With no eligible auxiliary work (or future energy), ordinary power
             // and Fabricator already split at their exact source/output boundaries.
             // Skip quiet time, never grant work or cap real elapsed time.
-            let step = if possible && funded {
+            let moving = self.motion.is_some()
+                && !matches!(
+                    self.ship.snapshot().flight_state,
+                    salimon_ship::FlightState::Landed { .. }
+                        | salimon_ship::FlightState::GroundedAfterCrash { .. }
+                );
+            let step = if (possible && funded) || moving {
                 u128::from(TICK_NANOS)
             } else {
                 nanos / u128::from(TICK_NANOS) * u128::from(TICK_NANOS)
             };
             let delta = Duration::new((step / 1_000_000_000) as u64, (step % 1_000_000_000) as u32);
             self.closed_work_tick(delta);
+            if self.motion_error.is_some() {
+                return;
+            }
             nanos -= step;
         }
         self.offline.pending_nanos = nanos as u64;
@@ -194,3 +206,6 @@ impl GameplaySession {
 }
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod motion_tests;

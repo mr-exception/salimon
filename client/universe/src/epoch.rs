@@ -95,6 +95,10 @@ impl Epoch {
     pub fn scale(self) -> TimeScale {
         self.scale
     }
+    /// Exact uniform-clock phase for deterministic work grids; no float date conversion.
+    pub fn nanosecond_of_day(self) -> u64 {
+        self.nanos
+    }
     /// Uniform scale seconds. UTC subtraction is restricted to a single day:
     /// crossing UTC midnight needs leap-table conversion to TT/TDB first.
     pub fn seconds_since(self, earlier: Self) -> Result<f64, Error> {

@@ -173,3 +173,6 @@ World owns explicit source designations, revision/depletion journals and physica
 publication; runtime composes F/tool input, current anatomy and source-bound restore.
 Schema 29 preserves missing/partial parts and natural object identity. Vesper
 remains sterile; positive sources are explicit fictional geometry fixtures.
+
+
+Schema-30 canonical motion is runtime validated before publication; missing/current unknown motion never silently substitutes a new model. Earlier canonical sources migrate explicitly; engineering sources remain independent. Storage does not infer world frames or advance a motion clock. See the [runtime motion contract](../../docs/universe-offline-propagation.md).

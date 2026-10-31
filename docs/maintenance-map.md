@@ -855,6 +855,6 @@ commands and scientific/release boundaries. Full Gaia acceptance remains #524;
 this private observed pack does not grant player knowledge or publish a release.
 
 
-## Offline propagation candidate (#432)
+## Canonical offline propagation (#432)
 
-[Work in progress contract](universe-offline-propagation.md): ship `src/offline.rs`, regressions `src/offline/tests.rs`. Ordinary canonical motion publication, saved-journey integration, timed/scanner composition and resume UI remain incomplete.
+[Source and frame contract](universe-offline-propagation.md): ship `src/offline.rs`, regressions `src/offline/tests.rs`. Ordinary canonical motion publication and saved-journey integration are implemented; timed/scanner composition and native progress follow in #433/#434.

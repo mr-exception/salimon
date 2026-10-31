@@ -1836,3 +1836,8 @@ Its fixed native group composes the production scenario/session paths and existi
 world-to-renderer exports without changing canonical publications. The night
 reference camera samples actual Vesper ground on the hemisphere opposite the
 fixed local light; it changes only the evidence view, never session time/physics.
+
+
+## Canonical motion and launch (#432)
+
+`session/persistence.rs` owns schema-30 motion migration/validation; `session/lifecycle.rs` admits closed seconds and disables engines; `session/fabrication.rs` routes the actual ship/Core step through `ShipController::advance_celestial`. `checkpoints.rs` captures engine-off closing snapshots. `session/offline/motion_tests.rs` exercises production restore/coast/contact/geography invariants. [Frame, epoch and failure contract](../../docs/universe-offline-propagation.md).

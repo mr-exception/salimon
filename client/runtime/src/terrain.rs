@@ -165,6 +165,11 @@ impl crate::session::GameplaySession {
             .map_err(str::to_owned)?;
         self.ship = ship;
         self.mining.terrain = mode;
+        self.motion = if mode == TerrainMode::Canonical {
+            Some(salimon_universe::starting_motion::Clock::at(0).map_err(|e| e.to_string())?)
+        } else {
+            None
+        };
         Ok(())
     }
 }

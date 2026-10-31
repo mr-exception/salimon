@@ -229,6 +229,8 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["cabin"] = serde_json::to_value(&app.habitation.cabin).expect("validated cabin");
     observation["mounts"] = serde_json::to_value(&app.mounts).expect("validated attachment state");
     observation["habitation"] = json!({"bunk_open_fraction":app.habitation.bunk_open_fraction,"bunk_deploying":app.habitation.bunk_deploying});
+    observation["motion"] = json!({"source":app.motion,"frame":"vesper-body-nonrotating", "error":app.motion_error,
+        "inertial":app.motion.as_ref().map(|clock|salimon_universe::starting_motion::inertial(clock.epoch,ship.pose.position_meters,ship.velocity_meters_per_second).map(|(position,velocity)|json!({"position":position,"velocity_mps":velocity})).map_err(|e|e.to_string()))});
     observation["cargo_door"] =
         json!({"open_fraction":app.cargo_door.open_fraction,"opening":app.cargo_door.opening});
     observation["lighting"] = app.light_inspect();

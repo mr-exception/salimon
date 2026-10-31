@@ -185,3 +185,8 @@ identity before publication. Explicit star/parent classification passes ordinary
 referential checks. Recognized physical headers preserve spaced errors and missing
 quantities without deriving mass from GM. The [coverage contract](../../docs/observed-source-coverage.md)
 separates decoder error, source uncertainty, sample coverage and release eligibility.
+
+
+## Canonical motion publication (#432)
+
+Motion identity is separate from immutable terrain/resource identity. Unknown model versions/hashes, non-TT epochs and unsupported calendar arithmetic reject atomically. Fixed fictional phase/orientation/spin never become inferred observations. Uniform local game-clock admission is explicitly defined relative to its reference instant, not a general UTC/TT conversion. [Canonical contract](../../docs/universe-offline-propagation.md).

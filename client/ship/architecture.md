@@ -607,6 +607,6 @@ than one orbit of unpowered continuation. This is real-scale API evidence with
 a declared Earth source, separate from the playable local-controller routes.
 
 
-## Offline propagation candidate (#432)
+## Canonical offline propagation (#432)
 
-`src/offline.rs` owns bounded propagation jobs over the production trajectory/contact APIs and transactional cloned timed consumers. [Current contract and incomplete host boundary](../../docs/universe-offline-propagation.md). Canonical motion/save/UI integration is pending.
+`src/offline.rs` owns bounded propagation jobs over the production trajectory/contact APIs and transactional cloned timed consumers. [Motion and host contract](../../docs/universe-offline-propagation.md). Canonical motion/save integration is implemented; asynchronous progress/Resume is #434.

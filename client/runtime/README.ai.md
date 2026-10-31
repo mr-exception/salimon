@@ -618,3 +618,6 @@ Combined planetary environment evidence: see the [matrix runner](../../scripts/R
 positive atmosphere/life evidence remains explicitly fictional component fixtures.
 
 Flight acceptance #437: see [the reproducible matrix](../../docs/universe-flight-verification.md) for nine GPU routes, production orbital/contact/session contracts and separate X11 input coverage.
+
+
+Canonical offline motion #432: [source, schema-30 and verification contract](../../docs/universe-offline-propagation.md). Runtime stores the model epoch/frame, composes the same ship step online/offline, disables engines on closing/launch and refuses unverified motion publication.

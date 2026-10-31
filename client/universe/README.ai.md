@@ -162,3 +162,6 @@ source identity, acquisition/verification commands and explicit scientific limit
 The private pack preserves all original measurements and sidecars; source terms
 remain unreviewed for public release. Runtime/save schemas and player discovery
 are unchanged.
+
+
+Canonical motion #432: [motion publication, game-clock policy and schema-30 frame](../../docs/universe-offline-propagation.md). `src/starting_motion.rs` owns the separate authored circular model; geographic identity remains unchanged.

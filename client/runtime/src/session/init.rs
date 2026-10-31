@@ -13,6 +13,8 @@ impl Default for GameplaySession {
             field_marks: Default::default(),
             navigation_cache: Default::default(),
             offline: Default::default(),
+            motion: None,
+            motion_error: None,
             offline_power: false,
             audio_epoch: 0,
             mount_audio: (0, [0.; 3]),

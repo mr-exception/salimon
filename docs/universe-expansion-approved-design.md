@@ -200,3 +200,8 @@ See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen input
 star/parent mapping, acquisition and independent verification scripts, exact
 commands and scientific/release boundaries. Full Gaia acceptance remains #524;
 this private observed pack does not grant player knowledge or publish a release.
+
+
+## Canonical offline motion (#432, owner-approved model 2026-10-31)
+
+The [separate motion publication and schema-30 migration](universe-offline-propagation.md) implement the approved fixed fictional phase/orientation/reference epoch and zero axial spin while preserving geography/resources/body-relative saves. Ordinary canonical flight and closed coasting now share gravity and terrain contact. Scanner timed catch-up, asynchronous verified Resume, final audit and integrated evidence remain #433/#434/#441/#435 in the current batch. No stellar-interior physics, observed-source extrapolation, Jump Drive or hardware qualification is implied.

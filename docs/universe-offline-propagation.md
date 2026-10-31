@@ -1,6 +1,6 @@
-# Closed-game propagation work in progress (#432–#435)
+# Closed-game motion and canonical frame (#432)
 
-Status: **local, incomplete implementation; no delivery or resume claim**.
+Status: canonical motion, schema-30 migration and gravity-only launch integration are implemented on the batch branch. Scanner catch-up (#433), asynchronous menu publication (#434), the final audit (#441) and integrated evidence (#435) follow in the same PR.
 
 ## Independent propagation core
 
@@ -25,39 +25,35 @@ poll. Consumer clones must own their mutable sources; callbacks must not perform
 IO or mutate shared state. The native host still owns crash-safe checkpoint
 publication, engine shutdown, clock validation and admission to Resume.
 
-## Pending canonical motion decision
+## Approved canonical motion publication
 
-Current Vesper gameplay stores body-local positions and velocities. Its frozen
-publication provides mass, radius, semi-major axis and orbital period, but no
-orbital phase, orbital axes, epoch or spin. The ordinary flight controller does
-not apply celestial gravity. A portable integrator passing its fixtures does not
-establish ordinary online/offline consistency.
+The owner explicitly selected “Use that motion model and continue the five-task PR” on 2026-10-31. `client/universe/src/starting_motion.rs` publishes version 1 separately from the immutable terrain/resource definition. Its SHA256 binds all model fields and the unchanged geographic SHA256.
 
-The proposed additional motion publication would explicitly freeze:
+The publication retains Vesper's existing orbit size, circular eccentricity and period. It fixes zero phase at 2026-01-01 UTC, whose explicit reference is 2026-01-01 00:01:09.184 TT, and right-handed orbital axes (+X, +Z, -Y). Axial spin is zero. The star is at the system origin; Vesper follows the authored analytic circle. These are fictional model inputs, not inferred scientific observations.
 
-- Vesper's existing fictional orbit size, zero eccentricity and period;
-- a reference epoch, zero reference phase and fixed right-handed orbital axes;
-- zero axial spin, preserving the current nonrotating body-local frame;
-- the exact motion-publication identity in saves, with an explicit migration
-  preserving existing terrain, resources, object identities and body-local poses;
-- reconstruction of inertial position and velocity from the body frame at that
-  saved epoch, with no conversion of missing observed quantities to zero.
+The trusted local POSIX clock admits uniform elapsed SI seconds from that reference. This is an explicitly defined game-clock mapping, **not a general UTC-to-TT conversion or a claim about future leap-second announcements**. Epoch calendar bounds are checked before advancing; unavailable stellar-interior physics and invalid frame/definition sources reject resume. Imported ephemerides keep their own validity/fallback policies; they are not extrapolated by this model.
 
-**This proposal is pending the owner's answer; it is not implemented or approved.**
-It must not silently alter the frozen physical-world definition. The existing
-[canonical-world migration requirement](universe-expansion-approved-design.md)
-and [save contract](save-contract.md) apply. Scientific-source model validity,
-UTC/TT conversion, authoritative terrain coverage and continuation of committed
-assists also require explicit implementation and verification in the host.
+Runtime and ship compose in nonrotating, translating Vesper axes. Saved velocity is relative to that frame. Inertial position/velocity reconstruct from the motion epoch plus the body's analytic position/velocity and the split galactic system anchor, without flattening the galaxy into f64 metres. Grounded support retains body-relative poses while its inertial position follows the orbit.
+
+`ShipController::advance_celestial` stages Core, motion and clock together. Active flight and closed coasting share symmetric gravity kicks around the existing paid-impulse and continuous terrain contact path. Relative acceleration subtracts the analytic frame acceleration. The current Vesper publication is explicit vacuum; no atmosphere is guessed. The generic trajectory/atmosphere/contact APIs remain available for other declared environments.
+
+Far coasting uses steps at most one second on the exact epoch grid. Within a potentially intersected terrain shell it uses at most 16 ms; the published <=12 m/s² surface field gives <0.4 mm chord sag, below the existing 1 mm sweep tolerance. Canonical terrain now uses the actual folded-wave/smoothstep height-gradient bound, rather than the empty generic-noise layers. Work-limit exhaustion rejects the candidate instead of accepting a fabricated collision. Existing normal-clearance, rebound, commissioned-assist and crash policies are retained. The one-hour coarse/fine fixture requires <25 m position and <0.05 m/s velocity difference; this is a measured numerical regime, not a certified universal error bound.
+
+Closing snapshots explicitly disable engines/throttle/held steering while retaining velocity, orientation, Core and committed paid assists. An abrupt process loss is also safe: launch disables engines before admitting closed time. Invalid motion prevents saving or resuming the candidate, preserving the last verified checkpoint.
+
+## Schema 30 and migration
+
+Canonical sessions require a `state.motion` source with exact version, definition SHA256 and TT game epoch. Schema 24–29 canonical saves without it migrate once from their recorded checkpoint time, preserving the entire physical/geographic/resource source and body-relative velocity. Current missing/unknown/mismatched motion fails atomically. Engineering worlds retain their existing independent frames and cannot carry canonical motion. Reconstruction alone advances no time or grants supplies.
+
+See the [save contract](save-contract.md) and [source/report evidence](../reports/issue-432/README.md). This changes no observed source quantity, terrain definition, resource ID, Core conversion coefficient, Jump Drive rule or backend authority.
 
 ## Remaining batch work
 
-#432 still needs ordinary saved-journey integration, close-time engine shutdown,
-canonical motion binding and full event/source validity acceptance. #433 needs
+#432 supplies ordinary saved-journey motion and close-time shutdown. #433 needs
 chronological timed-system/scanner integration. #434 needs native asynchronous
 progress, verified Resume and checkpoint failure/restart routes. #441 follows the
 implemented U01–U33 audit; #435 follows that audit and integrated source/physics/
-performance evidence. None of these five issues is complete from this core alone.
+performance evidence. The combined batch is not ready until its remaining implementations and acceptance checks complete.
 
 ## Checks
 

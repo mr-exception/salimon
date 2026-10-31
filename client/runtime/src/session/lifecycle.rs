@@ -115,6 +115,9 @@ impl GameplaySession {
             ..Default::default()
         };
         candidate.restore_bytes(bytes)?;
+        if candidate.motion.is_some() {
+            candidate.ship.shut_down_for_close();
+        }
         let header: Header =
             serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
         if header.schema_version >= 22 {

@@ -945,6 +945,6 @@ commands and scientific/release boundaries. Full Gaia acceptance remains #524;
 this private observed pack does not grant player knowledge or publish a release.
 
 
-## Offline propagation candidate (#432)
+## Canonical offline propagation (#432)
 
-[Local propagation work](universe-offline-propagation.md) is owned by ship `offline.rs` over the existing trajectory/contact operators. It does not yet change ordinary runtime/save/UI behavior; the canonical motion decision and host integration remain pending.
+[Canonical motion/propagation](universe-offline-propagation.md) is owned by ship `offline.rs` over the existing trajectory/contact operators. `controller/celestial.rs` and runtime compose the same active/closed gravity operator, with schema-30 migration; #434 owns asynchronous native progress.

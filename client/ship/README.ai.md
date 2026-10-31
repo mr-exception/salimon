@@ -188,4 +188,4 @@ adapters, runtime residency and matching renderer evidence. Quality never change
 physical populations. Explicit obstruction safety overrides ordinary assist continuation.
 
 
-Local offline propagation work (#432): [candidate contract and pending host integration](../../docs/universe-offline-propagation.md). This core alone does not deliver ordinary offline journeys.
+Canonical offline motion (#432): [motion/frame and host contract](../../docs/universe-offline-propagation.md). `controller/celestial.rs` supplies the live body-frame gravity path; schema-30 integration preserves geographical identity.

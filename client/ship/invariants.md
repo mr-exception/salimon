@@ -414,6 +414,6 @@ exclude engineering markers/bodies, and ship telemetry/preview selection does
 not apply the compressed 3 Mm cutoff. Explicit fixtures retain their contracts.
 
 
-## Offline propagation candidate (#432)
+## Canonical offline propagation (#432)
 
-Incomplete jobs cannot expose a verified resume. Each poll stages trajectory and its privately cloned timed consumer together; late errors roll back both. Providers supply complete epoch-valid source/air/collision/support data. No provider absence becomes a physical default. See the [candidate contract and pending host integration](../../docs/universe-offline-propagation.md).
+Incomplete jobs cannot expose a verified resume. Each poll stages trajectory and its privately cloned timed consumer together; late errors roll back both. Providers supply complete epoch-valid source/air/collision/support data. No provider absence becomes a physical default. See the [motion/frame and host contract](../../docs/universe-offline-propagation.md).

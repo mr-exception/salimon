@@ -627,3 +627,8 @@ Canonical sessions persist `state.motion`: version 1, exact motion-definition SH
 
 
 Schema-30 canonical launch settles final motion/work/scanner sub-ticks before publication (#433). Legacy construction-only remainder debt is settled before introducing the migrated motion epoch, preserving saved body-relative geography. Fatigue-only recovery, frozen survival sources, containment and paid-work receipts retain their existing owners. [Chronology and analytic scanner applicability](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+## Asynchronous launch publication (#434)
+
+The native menu owns admission while one worker reads/reconstructs/propagates/verifies and atomically checkpoints through SaveManager. Verified source bytes reconstruct thread-local domain caches on the main thread; no private partial source is playable. Continue also waits for the restored camera region to be ready. A rollback/invalid clock or pre-publication cancellation leaves recoverable generations intact. Retry starts a new verified attempt, without a public staging save slot. Menu wall time does not erase previously admitted saved backlog. [Full source/IO/region contract](universe-offline-propagation.md#native-progress-and-verified-resume-434).

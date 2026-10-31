@@ -11,6 +11,29 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
     };
     let id = command["id"].clone();
     let result = match command.get("op").and_then(Value::as_str) {
+        Some("offline_launch") => match command.get("seconds").and_then(Value::as_u64) {
+            Some(seconds) => app
+                .fixture_launch(
+                    seconds,
+                    command
+                        .get("hold")
+                        .and_then(Value::as_bool)
+                        .unwrap_or(false),
+                    command
+                        .get("backward_clock")
+                        .and_then(Value::as_bool)
+                        .unwrap_or(false),
+                )
+                .map(|()| json!({"started":true,"controlled_clock":true,"seconds":seconds}))
+                .map_err(|_| {
+                    (
+                        "invalid_argument",
+                        "requires a canonical isolated E2E source and 0..86400 seconds",
+                    )
+                }),
+            None => Err(("invalid_argument", "seconds is required")),
+        },
+        Some("launch_release") => Ok(json!({"released":app.release_launch_fixture()})),
         Some("scout_reference") => match command.get("view").and_then(Value::as_str) {
             Some("clear") => {
                 app.scout_reference = None;
@@ -64,6 +87,7 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
         }
         Some("inspect") => {
             let mut result = inspect_session(&app.session);
+            result["launch"] = app.launch_observation();
             result["universe_stream"] = app.universe_stream.as_ref().map_or(Value::Null, |stream| json!({
                 "ready": stream.ready(), "active_cells": stream.active().len(),
                 "wanted_cells": stream.wanted().len(), "resident_encoded_bytes": stream.resident_encoded_bytes,
@@ -110,6 +134,8 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
                         | "environment_volume"
                         | "environment_cues"
                         | "resume"
+                        | "launch_retry"
+                        | "launch_quit"
                         | "diagnostics"
                         | "status"
                         | "status_previous"
@@ -125,6 +151,8 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
                     Some("environment_volume") => KeyCode::KeyF,
                     Some("environment_cues") => KeyCode::KeyT,
                     Some("resume") => KeyCode::Enter,
+                    Some("launch_retry") => KeyCode::KeyR,
+                    Some("launch_quit") => KeyCode::KeyX,
                     Some("status") => KeyCode::KeyH,
                     Some("status_previous") => KeyCode::BracketLeft,
                     Some("status_next") => KeyCode::BracketRight,

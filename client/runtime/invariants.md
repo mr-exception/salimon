@@ -912,3 +912,6 @@ Current canonical saves require the exact authored motion identity and epoch. Mi
 
 
 Offline #433 retains hunger/health/status/active time, grants fatigue-only recovery and never enables engines. Only fully funded pulse windows refresh contacts; future blackout cannot erase earlier returns. Long curved orbital paths are not treated as certified affine tracks. The analytic fast lane requires no runnable work/conversion and a stationary body-frame observer with other sources certified out of range. [Chronology contract](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+Native launch #434 never publishes a partial candidate or resumes from a percentage alone. Reading/catch-up/validation/atomic IO happen off the UI thread; verified bytes reconstruct thread-local caches on the main thread. Continue additionally requires current-region CPU/GPU/stream readiness. Cancellation before publication retains old generations; clocks that precede the save or exceed model validity reject without rewind. Menu/lifecycle handling preserves saved admitted backlog. [Contract](../../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434).

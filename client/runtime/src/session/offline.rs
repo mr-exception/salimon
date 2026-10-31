@@ -96,6 +96,14 @@ impl GameplaySession {
         interval: Duration,
         events: &[TimedEvent],
     ) -> Result<(), SaveError> {
+        self.reconcile_closed_reported(interval, events, &mut |_| Ok(()))
+    }
+    pub(in crate::session) fn reconcile_closed_reported(
+        &mut self,
+        interval: Duration,
+        events: &[TimedEvent],
+        progress: &mut impl FnMut(Duration) -> Result<(), SaveError>,
+    ) -> Result<(), SaveError> {
         if interval
             .checked_add(Duration::from_nanos(self.offline.pending_nanos))
             .is_none()
@@ -118,7 +126,9 @@ impl GameplaySession {
         // never invokes this on an in-game pause frame.
         previous = Duration::ZERO;
         for e in events {
-            next.advance_closed_interval(e.after - previous);
+            next.advance_closed_interval(e.after - previous, &mut |done| {
+                progress(previous + done)
+            })?;
             // A verified event is an exact boundary, including a partial tick.
             next.finish_offline_remainder();
             match &e.event {
@@ -140,7 +150,7 @@ impl GameplaySession {
             }
             previous = e.after;
         }
-        next.advance_closed_interval(interval - previous);
+        next.advance_closed_interval(interval - previous, &mut |done| progress(previous + done))?;
         if let Some(error) = &next.motion_error {
             return Err(invalid(format!("offline motion: {error}")));
         }
@@ -154,9 +164,17 @@ impl GameplaySession {
         *self = next;
         Ok(())
     }
-    fn advance_closed_interval(&mut self, interval: Duration) {
+    fn advance_closed_interval(
+        &mut self,
+        interval: Duration,
+        progress: &mut impl FnMut(Duration) -> Result<(), SaveError>,
+    ) -> Result<(), SaveError> {
         let mut nanos = interval.as_nanos() + u128::from(self.offline.pending_nanos);
+        let initial = nanos;
+        let debt = u128::from(self.offline.pending_nanos);
+        let mut iterations = 0_u64;
         self.offline.pending_nanos = 0;
+        progress(Duration::ZERO)?;
         while nanos >= u128::from(TICK_NANOS) {
             let core = self.ship.snapshot().core_status;
             let possible = self.construction_offline_pending() || self.recovery_work_pending();
@@ -190,9 +208,12 @@ impl GameplaySession {
                     Duration::new((step / 1_000_000_000) as u64, (step % 1_000_000_000) as u32);
                 if let Err(error) = self.advance_closed_stationary(delta) {
                     self.motion_error = Some(error.to_string());
-                    return;
+                    return Ok(());
                 }
                 nanos -= step;
+                progress(interval.min(duration_nanos(
+                    initial.saturating_sub(nanos).saturating_sub(debt),
+                )))?;
                 continue;
             }
             let step = if (possible && funded)
@@ -206,11 +227,21 @@ impl GameplaySession {
             let delta = Duration::new((step / 1_000_000_000) as u64, (step % 1_000_000_000) as u32);
             self.closed_work_tick(delta);
             if self.motion_error.is_some() {
-                return;
+                return Ok(());
             }
             nanos -= step;
+            iterations += 1;
+            if iterations.is_multiple_of(64) {
+                progress(interval.min(duration_nanos(
+                    initial.saturating_sub(nanos).saturating_sub(debt),
+                )))?;
+            }
         }
         self.offline.pending_nanos = nanos as u64;
+        progress(interval.min(duration_nanos(
+            initial.saturating_sub(nanos).saturating_sub(debt),
+        )))?;
+        Ok(())
     }
     fn closed_work_tick(&mut self, delta: Duration) {
         self.advance_closed_sources(delta);
@@ -246,6 +277,12 @@ impl GameplaySession {
             self.closed_work_tick(Duration::from_nanos(nanos));
         }
     }
+}
+fn duration_nanos(nanos: u128) -> Duration {
+    Duration::new(
+        (nanos / 1_000_000_000) as u64,
+        (nanos % 1_000_000_000) as u32,
+    )
 }
 #[cfg(test)]
 mod tests;

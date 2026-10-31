@@ -36,6 +36,9 @@ impl Validate for PhysicalState {
         let canonical = self.terrain == salimon_world::terrain::TerrainMode::Canonical;
         if self.canonical_definition != canonical.then(super::super::canonical::definition_binding)
         {
+            if canonical && self.canonical_definition.is_some() {
+                return Err(SaveError::IncompatibleCatalog("Unrecognized canonical world definition. Use a compatible game version; the saved journey was not replaced.".into()));
+            }
             return Err(invalid(
                 "canonical world definition identity/version/digest mismatch",
             ));

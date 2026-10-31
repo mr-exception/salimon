@@ -1846,3 +1846,8 @@ fixed local light; it changes only the evidence view, never session time/physics
 ## Offline timed consumers and scanner (#433)
 
 `session/offline.rs` composes real motion, ordinary power/Fabricator, Recovery, construction and scanner in chronological order. `session/scanner/offline.rs` analytically settles idle grounded pulse windows; `scanner/offline_tests.rs` checks funded-prefix/TTL/partition/starvation/failure behavior. [Contract and applicability guards](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+## Native asynchronous launch (#434)
+
+`launch.rs` owns one candidate/IO worker and transfers verified source bytes; `launch_progress.rs` owns observable stages and calculable elapsed ratios. `checkpoints.rs::open_reported_at` retains the protected two-slot transaction. `app.rs`/`app/presentation.rs` gate Continue on the receipt, reconstruction and actual current-region readiness; `update_clock.rs::reset_wall_anchor` preserves saved admitted work while excluding menu wall time. [Source, cancellation and E2E contract](../../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434).

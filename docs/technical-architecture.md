@@ -951,3 +951,6 @@ this private observed pack does not grant player knowledge or publish a release.
 
 
 Offline timed/scanner host #433: [source-order and certified idle-window routing](universe-offline-propagation.md#offline-timed-systems-and-scanner-433). Runtime owns cross-domain chronology; ship owns actual Core debit and physical flight; universe owns pulse/contact history.
+
+
+Native asynchronous launch #434: [worker/byte-transfer and menu/region authority](universe-offline-propagation.md#native-progress-and-verified-resume-434). Runtime owns progress/admission and protected publication; renderer readiness is observation, never save authority.

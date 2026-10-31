@@ -861,3 +861,6 @@ this private observed pack does not grant player knowledge or publish a release.
 
 
 Offline timed/scanner #433: runtime `session/offline.rs`, `session/scanner.rs`, `session/scanner/offline.rs` and `scanner/offline_tests.rs`; [canonical chronology, fast-path guards and failure contracts](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+Native launch #434: runtime `launch.rs`, `launch_progress.rs`, `checkpoints.rs`, `app.rs`, `app/presentation.rs` and `update_clock.rs`; [worker/receipt/region contracts](universe-offline-propagation.md#native-progress-and-verified-resume-434). Native routes are `offline-resume-progress.json` and `offline-clock-recovery.json` under `scenarios/evidence/`.

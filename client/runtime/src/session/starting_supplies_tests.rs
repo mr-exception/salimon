@@ -160,6 +160,9 @@ fn verified_native_launch_restart_and_reload_publish_supplies_once() {
         .unwrap();
     restored.advance_automation(Duration::from_millis(16));
     checkpoints.restart(&mut restored).unwrap();
+    // Restart writes a real current-clock canonical journey; its fixture must
+    // not reopen it in 1970 and bypass the verified-clock admission gate.
+    let restarted_at = crate::checkpoints::now().unwrap();
     assert_eq!(restored.run.serial, 2);
     let expected = GameplaySession::new_run();
     assert_eq!(restored.consumables, expected.consumables);
@@ -177,7 +180,7 @@ fn verified_native_launch_restart_and_reload_publish_supplies_once() {
         .unwrap();
         let mut recovered = GameplaySession::default();
         let checkpoint =
-            crate::checkpoints::Checkpoints::open_at(single, &mut recovered, 100).unwrap();
+            crate::checkpoints::Checkpoints::open_at(single, &mut recovered, restarted_at).unwrap();
         assert_eq!(recovered.run.serial, 2);
         assert_eq!(recovered.consumables, expected.consumables);
         assert_eq!(recovered.fabricator, expected.fabricator);
@@ -185,7 +188,8 @@ fn verified_native_launch_restart_and_reload_publish_supplies_once() {
     }
     let mut reloaded = GameplaySession::default();
     let checkpoints =
-        crate::checkpoints::Checkpoints::open_at(directory.clone(), &mut reloaded, 100).unwrap();
+        crate::checkpoints::Checkpoints::open_at(directory.clone(), &mut reloaded, restarted_at)
+            .unwrap();
     assert_eq!(reloaded.consumables, expected.consumables);
     assert_eq!(reloaded.fabricator, expected.fabricator);
     drop(checkpoints);

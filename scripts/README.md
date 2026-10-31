@@ -936,3 +936,10 @@ full PS default-row selection/count and 18 reviewed JPL targets to new files.
 checks an offline production-adapter pack against those original scientific bytes.
 See [the canonical coverage contract](../docs/observed-source-coverage.md) for exact
 build/test commands, physical formats, selection, budgets and scientific limits.
+
+
+## Offline launch menu evidence (#434)
+
+Run `python scripts/salimon-test run scenarios/evidence/offline-resume-progress.json --binary target/debug/salimon-client --artifacts artifacts/offline-resume --screenshot-command '["native"]' --summary`, then the equivalent `offline-clock-recovery.json` route. Use the established Xvfb/Mesa environment. The progress route performs actual takeoff, starts the real launch/checkpoint worker on an isolated saved source, rejects early Resume, captures held measured progress and continues only after publication/current-region readiness. The clock route rejects a controlled backward date and proves Retry/Continue recovery.
+
+New E2E-only native operations are `offline_launch` (`seconds`: integer 0..86400; optional `hold` and `backward_clock` booleans) and `launch_release`. A hold pauses a private worker at actual nonzero progress for at most 30 seconds; it creates no ordinary-game gate. `inspect.launch` exposes source/current-region readiness, exact elapsed progress, errors and the isolated fixture path. Continue/Retry/Quit use native menu key operations `resume`, `launch_retry`, `launch_quit`. `SALIMON_E2E_LAUNCH_DIR=/absolute/isolated/store` with `--e2e --scenario canonical-journey` reopens that store on the real local clock for process-restart probes; never point a probe at personal saves. Native GPU frames prove the actual software-Vulkan path, not physical input/Metal/hardware FPS. [Source/clock/receipt contract](../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434).

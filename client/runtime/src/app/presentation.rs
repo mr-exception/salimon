@@ -238,6 +238,13 @@ impl ClientApplication {
             self.fail(event_loop, error);
             return;
         }
+        if self
+            .launch
+            .as_ref()
+            .is_some_and(crate::launch::Launch::is_ready)
+        {
+            self.launch_region_requested = true;
+        }
         for sphere in &mut spheres {
             let body = crate::terrain::body_at(sphere.center_meters, sphere.radius_meters);
             sphere.radius_meters =

@@ -794,3 +794,6 @@ Canonical offline propagation #432: `cargo test -p salimon-ship --locked offline
 
 
 Offline timed/scanner #433: `cargo test -p salimon-client --locked session::scanner` and `cargo test -p salimon-client --locked session::offline` cover funded-prefix/TTL/partition/long-idle, curved motion, starvation, frozen survival, paused play, legacy debt and atomic failure. [Contract and source owners](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+Verified native resume #434: `cargo test -p salimon-client --locked launch`, affected runner contracts and the production native routes `scenarios/evidence/offline-resume-progress.json` / `offline-clock-recovery.json` with `--screenshot-command '["native"]'`. Keep controlled-clock fixtures distinct from the real-clock launch test/probe, and retain exact backend/media provenance. [Admission, cancel/restart and publication contract](universe-offline-propagation.md#native-progress-and-verified-resume-434).

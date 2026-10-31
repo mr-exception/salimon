@@ -18,6 +18,8 @@ mod fragment_costs;
 mod fragment_physics;
 mod frame_clock;
 mod journey_ended;
+mod launch;
+mod launch_progress;
 mod mining;
 #[cfg(test)]
 mod mining_emission;

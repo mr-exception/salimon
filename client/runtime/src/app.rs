@@ -90,13 +90,13 @@ fn run_config(
         application.condition_feedback = crate::condition_feedback::Presenter::open();
     }
     if config.is_none() && benchmark.is_none() {
-        application.checkpoints = Some(
-            crate::checkpoints::Checkpoints::open(
+        application.session.wait_for_verified_launch();
+        application.launch = Some(
+            crate::launch::Launch::start(
                 crate::checkpoints::default_directory()
                     .map_err(|e| RunError::new("save directory", e))?,
-                &mut application.session,
             )
-            .map_err(|e| RunError::new("restore active run", e))?,
+            .map_err(|e| RunError::new("start journey recovery", e))?,
         );
     }
     application.preserve_startup_backlog = application.checkpoints.is_some();
@@ -114,6 +114,19 @@ fn run_config(
         e2e::initialize(&mut application.session, config)
             .map(|()| application.e2e_config = Some(config))
             .map_err(|error| RunError::new("E2E setup failed", error))?;
+        if let Some(directory) = std::env::var_os("SALIMON_E2E_LAUNCH_DIR") {
+            if config.scenario != e2e::Scenario::CanonicalJourney {
+                return Err(RunError::new(
+                    "offline launch probe",
+                    "requires canonical-journey fixture",
+                ));
+            }
+            application.session.wait_for_verified_launch();
+            application.launch = Some(
+                crate::launch::Launch::start(directory.into())
+                    .map_err(|e| RunError::new("offline launch probe", e))?,
+            );
+        }
     }
     if let Some(config) = benchmark {
         crate::benchmark::initialize(&mut application.session, config)
@@ -162,6 +175,9 @@ pub(crate) struct ClientApplication {
     pub(crate) session: crate::session::GameplaySession,
     pub(crate) benchmark: Option<crate::benchmark::Recorder>,
     checkpoints: Option<crate::checkpoints::Checkpoints>,
+    launch: Option<crate::launch::Launch>,
+    launch_region_requested: bool,
+    launch_exit_requested: bool,
     preserve_startup_backlog: bool,
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
@@ -197,6 +213,9 @@ impl Default for ClientApplication {
             session: crate::session::GameplaySession::default(),
             benchmark: None,
             checkpoints: None,
+            launch: None,
+            launch_region_requested: false,
+            launch_exit_requested: false,
             preserve_startup_backlog: false,
             window: None,
             renderer: None,
@@ -229,6 +248,104 @@ impl Default for ClientApplication {
 }
 
 impl ClientApplication {
+    pub(crate) fn fixture_launch(
+        &mut self,
+        seconds: u64,
+        hold: bool,
+        backward_clock: bool,
+    ) -> Result<(), String> {
+        use salimon_persistence::storage::{NativeStore, SaveManager};
+        if self.e2e_config.is_none()
+            || self.session.motion.is_none()
+            || self.launch.is_some()
+            || seconds > 86400
+        {
+            return Err(
+                "requires a canonical E2E session, no pending launch, and 0..86400 seconds".into(),
+            );
+        }
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+        let serial = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let directory = std::env::temp_dir().join(format!(
+            "salimon-e2e-launch-{}-{serial}",
+            std::process::id()
+        ));
+        std::fs::create_dir(&directory).map_err(|e| e.to_string())?;
+        let saved = crate::checkpoints::now()
+            .map_err(|e| e.to_string())?
+            .max(self.session.offline.watermark);
+        let bytes = self.session.save_bytes(saved).map_err(|e| e.to_string())?;
+        let mut store =
+            SaveManager::new(NativeStore::open(directory.clone()).map_err(|e| e.to_string())?);
+        store
+            .checkpoint(&bytes, |b| {
+                crate::session::GameplaySession::default().restore_bytes(b)
+            })
+            .map_err(|e| e.to_string())?;
+        drop(store);
+        let utc = if backward_clock {
+            saved.saturating_sub(1)
+        } else {
+            saved.checked_add(seconds).ok_or("fixture clock overflow")?
+        };
+        let job =
+            crate::launch::Launch::start_at(directory, utc, hold).map_err(|e| e.to_string())?;
+        self.checkpoints.take();
+        self.session.wait_for_verified_launch();
+        self.scout_audio.stop();
+        self.launch = Some(job);
+        self.launch_region_requested = false;
+        if let Some(window) = &self.window {
+            release_cursor(window);
+        }
+        self.cursor_captured = false;
+        Ok(())
+    }
+    pub(crate) fn release_launch_fixture(&self) -> bool {
+        self.launch
+            .as_ref()
+            .is_some_and(crate::launch::Launch::release_fixture)
+    }
+    fn poll_launch(&mut self) {
+        if let Some((checkpoints, mut session)) =
+            self.launch.as_mut().and_then(crate::launch::Launch::poll)
+        {
+            session.policy = self.session.policy;
+            session.wait_for_verified_launch();
+            self.session = session;
+            self.checkpoints = Some(checkpoints);
+            self.terrain_stream = Default::default();
+            self.launch_region_requested = false;
+            self.preserve_startup_backlog = true;
+            self.frame_clock.reset_interval();
+        }
+    }
+    fn launch_ready(&self) -> bool {
+        self.launch
+            .as_ref()
+            .is_some_and(crate::launch::Launch::is_ready)
+            && self.launch_region_requested
+            && self.terrain_presentation_ready()
+            && self.universe_stream.as_ref().is_none_or(|s| s.ready())
+    }
+    pub(crate) fn launch_observation(&self) -> serde_json::Value {
+        self.launch.as_ref().map_or(serde_json::Value::Null, |job| {
+            let mut v = job.observation();
+            if self.e2e_config.is_some() {
+                v["fixture_directory"] = job.directory().to_string_lossy().to_string().into();
+            }
+            v["source_ready"] = job.is_ready().into();
+            v["ready"] = self.launch_ready().into();
+            if job.is_ready() && !self.launch_ready() {
+                v["progress"] = serde_json::to_value(crate::launch_progress::Progress::at(
+                    crate::launch_progress::Stage::Region,
+                ))
+                .expect("bounded progress");
+                v["percentage"] = serde_json::Value::Null;
+            }
+            v
+        })
+    }
     pub(crate) fn audio_telemetry(&self) -> serde_json::Value {
         let mut v = self.scout_audio.telemetry();
         v["settings"] =
@@ -524,6 +641,42 @@ impl ClientApplication {
         if self.e2e_input_isolated && matches!(source, InputSource::Native) {
             return;
         }
+        if self.launch.is_some() {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                if matches!(
+                    key,
+                    PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
+                ) && self.launch_ready()
+                {
+                    self.launch.take();
+                    self.session.resume_verified_launch();
+                    self.frame_clock.reset_interval();
+                    if let Some(window) = &self.window {
+                        self.cursor_captured = capture_cursor(window);
+                    }
+                } else if key == PhysicalKey::Code(KeyCode::KeyR)
+                    && self
+                        .launch
+                        .as_ref()
+                        .is_some_and(crate::launch::Launch::failed)
+                {
+                    let directory = self.launch.as_ref().expect("launch present").directory();
+                    match crate::launch::Launch::start(directory) {
+                        Ok(job) => self.launch = Some(job),
+                        Err(error) => {
+                            self.session.feedback = Some(if error.to_string().is_empty() {
+                                "Journey recovery could not start"
+                            } else {
+                                "Journey recovery could not start - check storage and clock"
+                            })
+                        }
+                    }
+                } else if key == PhysicalKey::Code(KeyCode::KeyX) {
+                    self.launch_exit_requested = true;
+                }
+            }
+            return;
+        }
         if self.session.survival.snapshot().terminal {
             if self.input_policy().admits_press(source, true)
                 && input::terminal_restart_pressed(
@@ -742,6 +895,11 @@ impl ClientApplication {
     }
 
     fn reset_update_clock(&mut self) {
+        if self.launch.is_some() {
+            self.session.clear_held_controls();
+            self.session.reset_presentation();
+            return;
+        }
         // Fixed-step protocol time/holds must not depend on desktop focus or resize.
         if self.e2e_input_isolated {
             return;
@@ -756,6 +914,9 @@ impl ClientApplication {
     }
 
     fn advance_native(&mut self, elapsed: Duration) -> (Duration, usize) {
+        if self.launch.is_some() {
+            return (Duration::ZERO, 0);
+        }
         let started = Instant::now();
         if self.session.is_paused() || self.session.survival.snapshot().terminal {
             self.session.update_clock.reset();
@@ -831,6 +992,14 @@ impl ClientApplication {
 
     /// Observe host IO without stepping the paused session.
     fn pause_menu_text(&self) -> Option<String> {
+        if let Some(job) = &self.launch {
+            return Some(if job.is_ready() && !self.launch_ready() {
+                crate::launch_progress::Progress::at(crate::launch_progress::Stage::Region)
+                    .menu(None)
+            } else {
+                job.menu()
+            });
+        }
         if !self.session.is_paused() {
             return None;
         }
@@ -929,7 +1098,12 @@ impl ApplicationHandler for ClientApplication {
 
         if let Some(window) = self.window.as_ref() {
             self.native_focused = window.has_focus();
-            self.cursor_captured = capture_cursor(window);
+            self.cursor_captured = if self.launch.is_some() || self.session.is_paused() {
+                release_cursor(window);
+                false
+            } else {
+                capture_cursor(window)
+            };
             window.request_redraw();
         }
         log::info!("application resumed");
@@ -1224,7 +1398,14 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
-        if let Some(checkpoints) = &mut self.checkpoints {
+        self.poll_launch();
+        if self.launch_exit_requested {
+            event_loop.exit();
+            return;
+        }
+        if self.launch.is_none()
+            && let Some(checkpoints) = &mut self.checkpoints
+        {
             checkpoints.poll(&self.session);
             if checkpoints.status().2 {
                 event_loop.exit();
@@ -1254,6 +1435,15 @@ impl ApplicationHandler for ClientApplication {
             }
             event_loop.set_control_flow(ControlFlow::WaitUntil(
                 Instant::now() + Duration::from_millis(10),
+            ));
+            return;
+        }
+        if self.launch.is_some() {
+            if let Some(window) = &self.window {
+                window.request_redraw();
+            }
+            event_loop.set_control_flow(ControlFlow::WaitUntil(
+                Instant::now() + Duration::from_millis(16),
             ));
             return;
         }
@@ -1525,5 +1715,101 @@ mod toolbar_tests {
             );
             assert_eq!(app.session.equipment.selected(), Some(ToolbarSlot::Four));
         }
+    }
+}
+
+#[cfg(test)]
+mod launch_admission_tests {
+    use super::*;
+    #[test]
+    fn pending_launch_rejects_resume_and_preserves_saved_work_during_ui_frames() {
+        let mut app = ClientApplication::default();
+        let config = e2e::Config {
+            scenario: e2e::Scenario::CanonicalJourney,
+            seed: 0,
+            step: Duration::from_millis(16),
+            fragment_load: None,
+        };
+        e2e::initialize(&mut app.session, config).unwrap();
+        app.e2e_config = Some(config);
+        app.session
+            .update_clock
+            .accumulate(Duration::from_millis(50));
+        app.fixture_launch(60, true, false).unwrap();
+        let directory = app.launch.as_ref().unwrap().directory();
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while app.launch.as_ref().unwrap().progress().completed.is_zero() {
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(2));
+        }
+        let before = app.session.save_bytes(1).unwrap();
+        app.dispatch_key(
+            PhysicalKey::Code(KeyCode::Enter),
+            true,
+            false,
+            false,
+            InputSource::Automation,
+        );
+        assert!(!app.launch_ready());
+        assert!(app.session.is_paused());
+        assert_eq!(
+            app.advance_native(Duration::from_secs(60)),
+            (Duration::ZERO, 0)
+        );
+        app.reset_update_clock();
+        assert_eq!(
+            app.session.update_clock.backlog(),
+            Duration::from_millis(50)
+        );
+        assert_eq!(app.session.save_bytes(1).unwrap(), before);
+        assert!(
+            app.pause_menu_text()
+                .unwrap()
+                .contains("Resume unavailable")
+        );
+        drop(app);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod launch_region_admission_tests {
+    use super::*;
+    #[test]
+    fn durable_source_alone_cannot_bypass_current_region_readiness() {
+        let mut app = ClientApplication::default();
+        let config = e2e::Config {
+            scenario: e2e::Scenario::CanonicalJourney,
+            seed: 0,
+            step: Duration::from_millis(16),
+            fragment_load: None,
+        };
+        e2e::initialize(&mut app.session, config).unwrap();
+        app.e2e_config = Some(config);
+        app.fixture_launch(0, false, false).unwrap();
+        let directory = app.launch.as_ref().unwrap().directory();
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while !app.launch.as_ref().unwrap().is_ready() {
+            app.poll_launch();
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(2));
+        }
+        assert!(app.launch_observation()["source_ready"].as_bool().unwrap());
+        assert!(!app.launch_ready());
+        assert!(
+            app.pause_menu_text()
+                .unwrap()
+                .contains("Preparing the current region")
+        );
+        app.dispatch_key(
+            PhysicalKey::Code(KeyCode::Enter),
+            true,
+            false,
+            false,
+            InputSource::Automation,
+        );
+        assert!(app.session.is_paused());
+        drop(app);
+        std::fs::remove_dir_all(directory).unwrap();
     }
 }

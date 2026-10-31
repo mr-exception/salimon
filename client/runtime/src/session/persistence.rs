@@ -65,6 +65,11 @@ impl Validate for SessionState {
                     "motion source belongs only to the canonical body frame",
                 ));
             }
+            if motion.version != salimon_universe::starting_motion::VERSION
+                || motion.definition_sha256 != *salimon_universe::starting_motion::SHA256
+            {
+                return Err(SaveError::IncompatibleCatalog("Unrecognized canonical motion model. Use a compatible game version; the saved journey was not replaced.".into()));
+            }
             motion.validate().map_err(|e| invalid(e.to_string()))?;
         }
         if let Some(b) = &self.biology {

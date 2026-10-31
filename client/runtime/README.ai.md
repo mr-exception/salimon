@@ -624,3 +624,6 @@ Canonical offline motion #432: [source, schema-30 and verification contract](../
 
 
 Offline timed/scanner integration #433: [chronology and analytic idle pulses](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433). `session/scanner/offline.rs` owns the stationary certified fast path; active motion/work retains the actual scheduler.
+
+
+Native verified resume #434: [asynchronous worker, real progress and current-region admission](../../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434). `launch.rs` transfers verified bytes; UI/thread-local query caches remain on the main thread.

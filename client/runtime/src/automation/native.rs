@@ -11,6 +11,33 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
     };
     let id = command["id"].clone();
     let result = match command.get("op").and_then(Value::as_str) {
+        Some("hall_view" | "hall_walk") => {
+            let action = app
+                .hall_prototype
+                .as_mut()
+                .ok_or("internal Hall fixture required")
+                .and_then(|hall| {
+                    if command["op"] == "hall_view" {
+                        command
+                            .get("view")
+                            .and_then(Value::as_str)
+                            .ok_or("view is required")
+                            .and_then(|v| hall.view(v))
+                    } else {
+                        let delta = command
+                            .get("delta")
+                            .and_then(Value::as_array)
+                            .filter(|v| v.len() == 2)
+                            .and_then(|v| Some([v[0].as_f64()?, v[1].as_f64()?]))
+                            .ok_or("two finite metre offsets required")?;
+                        hall.walk(delta)
+                    }
+                });
+            action
+                .map(|()| json!({"applied":true}))
+                .map_err(|e| ("invalid_hall_action", e))
+        }
+
         Some("offline_launch") => match command.get("seconds").and_then(Value::as_u64) {
             Some(seconds) => app
                 .fixture_launch(
@@ -88,6 +115,10 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
         Some("inspect") => {
             let mut result = inspect_session(&app.session);
             result["launch"] = app.launch_observation();
+            result["hall_prototype"] = app
+                .hall_prototype
+                .as_ref()
+                .map_or(Value::Null, |h| h.observe());
             result["universe_stream"] = app.universe_stream.as_ref().map_or(Value::Null, |stream| json!({
                 "ready": stream.ready(), "active_cells": stream.active().len(),
                 "wanted_cells": stream.wanted().len(), "resident_encoded_bytes": stream.resident_encoded_bytes,

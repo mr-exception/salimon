@@ -1,4 +1,5 @@
 """Probe killed native resume workers and real-clock restart without clock replay."""
+from contextlib import contextmanager
 import argparse
 import hashlib
 import json
@@ -9,6 +10,7 @@ import subprocess
 import time
 
 from salimon_test import Game
+from e2e_artifacts import Artifacts
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,6 +42,18 @@ def wait(game, predicate):
         game.request({'op': 'step', 'frames': 1})
 
 
+
+@contextmanager
+def recorded_game(binary, setup, deadline, output, label):
+    artifacts = Artifacts({'phase': label, 'setup': setup}, output / label, ['native'])
+    artifacts.open_logs()
+    try:
+        with Game([str(binary)], setup, deadline, artifacts, native_input=False) as game:
+            yield game
+    finally:
+        artifacts.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
@@ -56,7 +70,7 @@ def main():
     original_env = os.environ.pop('SALIMON_E2E_LAUNCH_DIR', None)
     setup = {'scenario': 'canonical-journey', 'seed': 0, 'step_ms': 16}
     try:
-        with Game([str(binary)], {**setup, 'scenario': 'canonical-flight'}, time.monotonic() + 180) as game:
+        with recorded_game(binary, {**setup, 'scenario': 'canonical-flight'}, time.monotonic() + 180, output, 'interruption') as game:
             wait(game, lambda s: s['terrain']['presentation_ready'])
             game.request({'op': 'landing'})
             game.request({'op': 'step', 'frames': 375})
@@ -79,7 +93,7 @@ def main():
         os.environ['SALIMON_E2E_LAUNCH_DIR'] = str(directory)
         for attempt in range(2):
             started = time.monotonic()
-            with Game([str(binary)], setup, time.monotonic() + 180) as game:
+            with recorded_game(binary, setup, time.monotonic() + 180, output, f'restart-{attempt+1}') as game:
                 state = wait(game, lambda s: s.get('launch') and s['launch']['ready'])
                 assert state['paused'] and state['launch']['source_ready']
                 next_generation, recovered = newest(directory)

@@ -920,3 +920,8 @@ Current U01–U33 truth and explicit fixture boundaries are mapped in the
 [U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
 streaming observer/velocity, physical environment and preview share the saved
 motion source; suit field-mark timestamps remain personal active-time metadata.
+
+- The Hall prototype exists only in the explicit `hall-prototype` E2E fixture.
+  Normal startup has no prototype, menu action, unlock or account state. Its
+  geometry/camera does not replace or serialize survival source. See
+  [the internal contract](../../docs/hall-prototype.md).

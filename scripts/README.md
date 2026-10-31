@@ -968,3 +968,17 @@ pacing. The result distinguishes successful measurement from passing the
 The existing FrameClock caps long observed intervals at 250 ms; raw logs and the
 instrumentation/profile limitations are retained. Run it alone after CPU/GPU
 campaigns finish.
+
+## Internal Hall prototype (#472)
+
+With Linux X11/software Vulkan configured, run
+`python3 scripts/verify_hall_prototype.py --binary target/debug/salimon-client --output artifacts/hall-prototype`.
+It exercises the explicit E2E billion-sign fixture, bounded LOD/collision and
+frozen revisit pixels, retaining real wgpu originals/context/raw measurements.
+[Controls, owners and limitations](../docs/hall-prototype.md). The fixture is
+absent from ordinary menus and confers no completion/account access.
+
+`verify_offline_resume.py` retains interruption/restart process and protocol logs
+in per-phase directories and isolates native input for deterministic automated
+requests. Its real-clock restart checks remain distinct from controlled-time
+fixtures and physical OS suspend/wake qualification.

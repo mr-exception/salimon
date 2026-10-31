@@ -82,7 +82,7 @@ impl ClientApplication {
             scene_instances.extend(scene::room_lamps(&self.session, presentation.ship));
             scene_instances.extend(scene::cargo_door(&self.session, presentation.ship));
         }
-        let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
+        let mut ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
                 position_meters: presentation.character.eye_position_meters,
                 target_meters: presentation.character.look_target_meters,
@@ -335,7 +335,8 @@ impl ClientApplication {
         };
         // Modal text and the Q wheel own interaction; world prompts/reticle must
         // not obscure their rows or suggest a competing world action.
-        let world_interaction_visible = self.session.view_mode == ViewMode::Gameplay
+        let world_interaction_visible = self.hall_prototype.is_none()
+            && self.session.view_mode == ViewMode::Gameplay
             && !terminal
             && !self.session.is_paused()
             && crafting_text.is_none()
@@ -365,6 +366,11 @@ impl ClientApplication {
         } else {
             Vec::new()
         };
+        if let Some(hall) = &self.hall_prototype {
+            (camera, scene_instances, spheres, light) = hall.scene();
+            ship_mesh = None;
+            resource_meshes.clear();
+        }
         let outcome = match self
             .renderer
             .as_mut()
@@ -378,7 +384,11 @@ impl ClientApplication {
                     camera,
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,
-                    fixtures: &fixture_instances,
+                    fixtures: if self.hall_prototype.is_some() {
+                        &[]
+                    } else {
+                        &fixture_instances
+                    },
                     spheres: &spheres,
                     terrain: &self.terrain_stream.active,
                     terrain_mask: self.terrain_stream.mask,
@@ -386,8 +396,16 @@ impl ClientApplication {
                     ship: ship_mesh,
                     held_item,
                 },
-                self.condition_feedback.image(),
-                overlay_image,
+                if self.hall_prototype.is_some() {
+                    None
+                } else {
+                    self.condition_feedback.image()
+                },
+                if self.hall_prototype.is_some() {
+                    None
+                } else {
+                    overlay_image
+                },
                 action_bar_image,
                 crate::reticle::image(world_interaction_visible, &self.session.equipment).or(
                     if self.session.wheel.open {
@@ -396,7 +414,8 @@ impl ClientApplication {
                         None
                     },
                 ),
-                (self.session.view_mode == ViewMode::Gameplay
+                (self.hall_prototype.is_none()
+                    && self.session.view_mode == ViewMode::Gameplay
                     && !terminal
                     && !self.session.is_paused())
                 .then(|| self.session.equipment_presentation()),

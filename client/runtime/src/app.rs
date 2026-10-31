@@ -111,6 +111,9 @@ fn run_config(
         if config.scenario == e2e::Scenario::CanonicalTerrain {
             application.scout_reference = crate::scout_reference::find("universe-orbit");
         }
+        if config.scenario == e2e::Scenario::HallPrototype {
+            application.hall_prototype = Some(Default::default());
+        }
         e2e::initialize(&mut application.session, config)
             .map(|()| application.e2e_config = Some(config))
             .map_err(|error| RunError::new("E2E setup failed", error))?;
@@ -191,6 +194,7 @@ pub(crate) struct ClientApplication {
     pub(crate) observations: crate::terrain_observations::Observations,
     pub(crate) capture_status: String,
     pub(crate) scout_reference: Option<crate::scout_reference::View>,
+    pub(crate) hall_prototype: Option<crate::hall_prototype::Prototype>,
     capture_path: Option<std::path::PathBuf>,
     cursor_captured: bool,
     wheel_raster: salimon_renderer::ConsumableWheelRaster,
@@ -229,6 +233,7 @@ impl Default for ClientApplication {
             observations: crate::terrain_observations::Observations::default(),
             capture_status: "idle".into(),
             scout_reference: None,
+            hall_prototype: None,
             capture_path: None,
             cursor_captured: false,
             wheel_raster: Default::default(),
@@ -845,6 +850,21 @@ impl ClientApplication {
                 _ => {}
             }
         }
+        if let Some(hall) = self.hall_prototype.as_mut() {
+            if pressed && !repeat && !synthetic {
+                let delta = match key {
+                    PhysicalKey::Code(KeyCode::KeyW) => Some([0., -0.5]),
+                    PhysicalKey::Code(KeyCode::KeyS) => Some([0., 0.5]),
+                    PhysicalKey::Code(KeyCode::KeyA) => Some([-0.5, 0.]),
+                    PhysicalKey::Code(KeyCode::KeyD) => Some([0.5, 0.]),
+                    _ => None,
+                };
+                if let Some(delta) = delta {
+                    let _ = hall.walk(delta);
+                }
+            }
+            return;
+        }
         let wheel_was_open = self.session.wheel.open;
         input::dispatch_session_key(&mut self.session, key, pressed);
         self.sync_wheel_cursor(wheel_was_open);
@@ -966,7 +986,9 @@ impl ClientApplication {
                 && self.benchmark.is_none(),
         );
         let condition_cue = self.condition_feedback.take_audio_cue();
-        if self.e2e_config.is_some() {
+        if self.hall_prototype.is_some() {
+            self.scout_audio.stop();
+        } else if self.e2e_config.is_some() {
             self.scout_audio.preview(
                 crate::scout_audio::Observation::capture(&self.session, true),
                 self.condition_feedback.settings,

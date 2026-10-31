@@ -632,3 +632,8 @@ Current U01–U33 truth and explicit fixture boundaries are mapped in the
 [U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
 streaming observer/velocity, physical environment and preview share the saved
 motion source; suit field-mark timestamps remain personal active-time metadata.
+
+The internal `hall_prototype.rs` adapter is admitted only by its explicit E2E
+scenario and never serialized. World owns layout/collision; runtime maps existing
+renderer DTOs. See [the prototype contract](../../docs/hall-prototype.md) before
+changing its gate, camera, controls or capture path.

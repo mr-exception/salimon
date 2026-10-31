@@ -863,3 +863,18 @@ Offline timed/scanner #433: runtime `session/offline.rs`, `session/scanner.rs`, 
 
 
 Native launch #434: runtime `launch.rs`, `launch_progress.rs`, `checkpoints.rs`, `app.rs`, `app/presentation.rs` and `update_clock.rs`; [worker/receipt/region contracts](universe-offline-propagation.md#native-progress-and-verified-resume-434). Native routes are `offline-resume-progress.json` and `offline-clock-recovery.json` under `scenarios/evidence/`.
+
+## Internal Hall prototype (#472)
+
+World `hall.rs` owns exact synthetic ring/slot identity, bounded arc selection and
+capsule sweeps; runtime `hall_prototype.rs` owns the explicit E2E camera and DTO
+adapter. See [the contract](hall-prototype.md) for controls, checks and backend
+boundaries. Ordinary menus and survival saves expose no Hall access.
+
+## Canonical new-game restoration acceptance (#439)
+
+Runtime `session/persistence_scenarios.rs` composes mined iron/silicate, physical
+intake, partial Recovery Module crafting, NativeStore/Checkpoints reload and
+exact-once offline credit. Existing canonical launch/scanner/motion failure tests
+retain their owners. Use the focused integration test and maintained native
+resume/mining routes; [evidence](../reports/issue-439/README.md).

@@ -590,3 +590,147 @@ fn native_cargo_checkpoint_477() {
         "fixture":true,"target_id":id.0,"scope":"normal-launch pickup/drop presentation; not physical mining/travel or performance acceptance"
     })).unwrap()).unwrap();
 }
+
+/// A single canonical journey crosses mining, intake, paid crafting, real disk
+/// recovery and closed-clock publication. Positions below are explicit fixtures;
+/// material, job, energy and reload authority all remain production-owned.
+#[test]
+fn canonical_mine_fabricate_disk_reload_preserves_ownership_and_credits_time_once() {
+    use salimon_world::resources::ResourceId;
+    let dir = Directory::new();
+    let mut s = GameplaySession::new_canonical_run().unwrap();
+    s.bind_scanner_clock(100).unwrap();
+    let initial_supplies = s.consumables.clone();
+    for resource in [ResourceId::IronOre, ResourceId::SilicateRock] {
+        let start = &salimon_world::canonical::START;
+        let site = start
+            .manifest()
+            .resources
+            .outcrops
+            .iter()
+            .find(|site| {
+                matches!(
+                    (site.material, resource),
+                    (
+                        salimon_universe::starting_system::Material::IronOre,
+                        ResourceId::IronOre
+                    ) | (
+                        salimon_universe::starting_system::Material::SilicateRock,
+                        ResourceId::SilicateRock
+                    )
+                )
+            })
+            .unwrap();
+        let point = start.surface_point(site.tangent_xz_meters).unwrap();
+        let deposit = s
+            .mining
+            .nearby(point, s.seed)
+            .unwrap()
+            .iter()
+            .copied()
+            .find(|e| e.deposit.material().resource() == resource)
+            .unwrap();
+        let mut feet = point;
+        feet[0] -= deposit.bounds_radius_meters + 2.;
+        let surface = s.terrain_frame(s.ship.snapshot());
+        s.character = salimon_character::CharacterController::on_surface(surface, feet).unwrap();
+        let ship_frame = frames::character_ship_frame(s.ship.snapshot().pose);
+        let snap = s.character.snapshot(ship_frame, surface);
+        let v = salimon_math::sub(
+            deposit.deposit.position().meters(),
+            snap.eye_position_meters,
+        );
+        let d = salimon_math::scale(v, 1. / salimon_math::length(v));
+        let yaw = salimon_math::dot(d, ship_frame.axes[2])
+            .atan2(salimon_math::dot(d, ship_frame.axes[0]));
+        let pitch = salimon_math::dot(d, snap.up.map(f64::from))
+            .clamp(-1., 1.)
+            .asin();
+        s.character.apply_mouse_delta(yaw / 0.0022, -pitch / 0.0022);
+        s.equipment
+            .select(crate::equipment::ToolbarSlot::One, false);
+        s.mining.set_mouse_held(true);
+        for _ in 0..if resource == ResourceId::SilicateRock {
+            20
+        } else {
+            125
+        } {
+            let snap = s.snapshot();
+            s.mining.advance(
+                &s.equipment,
+                Duration::from_millis(16),
+                snap.character,
+                ship_frame,
+                false,
+                s.seed,
+            );
+        }
+        s.mining.set_mouse_held(false);
+        let snap = s.snapshot();
+        s.mining.advance(
+            &s.equipment,
+            Duration::ZERO,
+            snap.character,
+            ship_frame,
+            false,
+            s.seed,
+        );
+        let fragment = s
+            .mining
+            .session
+            .fragments()
+            .iter()
+            .find(|f| f.material().resource() == resource)
+            .copied()
+            .unwrap();
+        s.character = Default::default(); // Explicit machine intake position fixture.
+        assert!(s.mining.session.pick_up(fragment.id()));
+        s.sync_carried();
+        s.insert_fabricator_fragment();
+        assert!(
+            s.mining.session.fragment(fragment.id()).is_none(),
+            "{:?}, {resource:?}",
+            s.feedback
+        );
+    }
+    enqueue(&mut s, "data-recovery-module", 1);
+    s.advance_game(Duration::from_secs(10));
+    let before = s.fabricator.snapshot(true);
+    assert_eq!(before.jobs.len(), 1);
+    assert!(before.jobs[0].progress > Duration::ZERO);
+    assert!(before.tray.is_none());
+    let physical = s.mining.session.save_state();
+    let active = s.elapsed;
+    let source = s.save_bytes(100).unwrap();
+    checkpoint(&dir, &s, 100);
+    let mut expected = GameplaySession::default();
+    expected.restore_for_launch(&source, 160).unwrap();
+    let mut loaded = reload(&dir, 160);
+    assert_eq!(
+        loaded.save_bytes(160).unwrap(),
+        expected.save_bytes(160).unwrap()
+    );
+    assert_eq!(loaded.consumables, initial_supplies);
+    assert_eq!(loaded.elapsed, active);
+    assert_eq!(
+        serde_json::to_value(loaded.mining.session.save_state()).unwrap(),
+        serde_json::to_value(physical).unwrap()
+    );
+    let tray = loaded.fabricator.snapshot(true).tray.clone().unwrap();
+    assert_eq!(tray.recipe.key(), "data-recovery-module");
+    assert_eq!(tray.mass.milligrams(), 750_000);
+    assert_eq!(loaded.fabricator.snapshot(true).jobs.len(), 0);
+    let credited = loaded.save_bytes(160).unwrap();
+    checkpoint(&dir, &loaded, 160);
+    loaded = reload(&dir, 160);
+    assert_eq!(loaded.save_bytes(160).unwrap(), credited);
+    loaded.install_recovery_module(tray.clone());
+    assert!(loaded.fabricator.snapshot(true).tray.is_none());
+    let installed = loaded.recovery_observation();
+    assert_eq!(
+        installed["module"]["job"],
+        serde_json::to_value(tray.job).unwrap()
+    );
+    checkpoint(&dir, &loaded, 160);
+    assert_eq!(reload(&dir, 160).recovery_observation(), installed);
+}

@@ -1,6 +1,6 @@
 # Absenat, cosmological threshold and Hall of Passage
 
-Status: **approved endgame narrative and future backend-supported design; not currently implemented**. Documentation issues #460–461. Some implementation details (distance discontinuities, moderation specifics, final message length) remain future contracts rather than invented canon. See [lost journey](narrative-and-lost-journey.md), [experience](experience-direction.md) and [roadmap](experience-implementation-map.md).
+Status: **approved endgame narrative; an internal backend-independent spatial prototype is implemented in #472. Completion, accounts, inscriptions and returning access remain future work**. See [prototype scope and verification](hall-prototype.md). Documentation issues #460–461. Some implementation details (distance discontinuities, moderation specifics, final message length) remain future contracts rather than invented canon. See [lost journey](narrative-and-lost-journey.md), [experience](experience-direction.md) and [roadmap](experience-implementation-map.md).
 
 ## Absenat and chained universes
 

@@ -803,3 +803,18 @@ U36 consistency audit: [matrix and current-model limits](../reports/issue-441/RE
 Canonical source, preview, shared sky/light and physical-environment clock
 regressions are included in workspace tests. U34 runs the integrated gates after
 U36 repairs, without creating a dependency from U36 to U34.
+
+## Canonical restoration and internal Hall (#439/#472)
+
+Run `cargo test -p salimon-client --locked canonical_mine_fabricate_disk_reload`
+for the real disk/material/job transaction; the workspace gate includes it and
+the existing launch/scanner/motion fault regressions. Production native routes
+`universe-mining.json`, `offline-resume-progress.json` and
+`offline-clock-recovery.json` plus `scripts/verify_offline_resume.py` cover
+loading/reconciliation and actual-clock interrupted restart. Keep controlled
+time separate from naturally elapsed restart evidence.
+
+[The internal Hall contract](hall-prototype.md) maps world layout/collision and
+runtime adapter tests to the production capture driver. It requires no backend
+and grants no completion. Both tasks require normal workspace/Clippy/fmt/script/
+documentation gates; physical platform/M1/human criteria stay separately unverified.

@@ -77,6 +77,7 @@ pub(crate) enum Scenario {
     ResourceApproach,
     OrbitMoon,
     OpenSpace,
+    HallPrototype,
     CoastingSpace,
     CoastingOrbit,
     EvaApproach,
@@ -152,6 +153,7 @@ impl Scenario {
             "resource-approach" => Ok(Self::ResourceApproach),
             "orbit-moon" => Ok(Self::OrbitMoon),
             "open-space" => Ok(Self::OpenSpace),
+            "hall-prototype" => Ok(Self::HallPrototype),
             "coasting-space" => Ok(Self::CoastingSpace),
             "coasting-orbit" => Ok(Self::CoastingOrbit),
             "eva-approach" => Ok(Self::EvaApproach),
@@ -230,6 +232,7 @@ impl Scenario {
             Self::ResourceApproach => "resource-approach",
             Self::OrbitMoon => "orbit-moon",
             Self::OpenSpace => "open-space",
+            Self::HallPrototype => "hall-prototype",
             Self::CoastingSpace => "coasting-space",
             Self::CoastingOrbit => "coasting-orbit",
             Self::EvaApproach => "eva-approach",
@@ -604,6 +607,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
         | Scenario::OrbitMoon
         | Scenario::CoastingOrbit
         | Scenario::CoastingSpace
+        | Scenario::HallPrototype
         | Scenario::OpenSpace
         | Scenario::EvaApproach => {
             let id = if config.scenario != Scenario::OrbitMoon {
@@ -623,7 +627,10 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
                     salimon_ship::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 200_000.0
                 } else if matches!(
                     config.scenario,
-                    Scenario::OpenSpace | Scenario::CoastingOrbit | Scenario::CoastingSpace
+                    Scenario::HallPrototype
+                        | Scenario::OpenSpace
+                        | Scenario::CoastingOrbit
+                        | Scenario::CoastingSpace
                 ) {
                     salimon_ship::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 10_000.0
                 } else {
@@ -691,6 +698,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
             | Scenario::OrbitMoon
             | Scenario::CoastingOrbit
             | Scenario::CoastingSpace
+            | Scenario::HallPrototype
             | Scenario::OpenSpace
             | Scenario::EvaApproach
     ) != (snapshot.flight_state == FlightState::Flying)

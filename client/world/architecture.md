@@ -280,3 +280,10 @@ Current U01–U33 truth and explicit fixture boundaries are mapped in the
 [U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
 streaming observer/velocity, physical environment and preview share the saved
 motion source; suit field-mark timestamps remain personal active-time metadata.
+
+## Internal Hall geometry (#472)
+
+`src/hall.rs` owns synthetic concentric slot arithmetic, bounded arc queries and
+planar capsule sweeps, independently of any backend, account or renderer. See
+[the prototype contract](../../docs/hall-prototype.md). Runtime alone gates the
+internal fixture and maps its geometry; normal celestial gameplay is separate.

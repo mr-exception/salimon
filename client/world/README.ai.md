@@ -189,3 +189,7 @@ Current U01–U33 truth and explicit fixture boundaries are mapped in the
 [U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
 streaming observer/velocity, physical environment and preview share the saved
 motion source; suit field-mark timestamps remain personal active-time metadata.
+
+Internal Hall geometry uses `src/hall.rs`: synthetic slot identity, bounded arcs
+and planar capsule sweeps only. It grants no account/journey authority; runtime
+gates the explicit developer fixture. See [the contract](../../docs/hall-prototype.md).

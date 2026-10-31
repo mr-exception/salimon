@@ -217,3 +217,8 @@ Current U01–U33 truth and explicit fixture boundaries are mapped in the
 [U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
 streaming observer/velocity, physical environment and preview share the saved
 motion source; suit field-mark timestamps remain personal active-time metadata.
+
+- Internal Hall queries enumerate bounded nearby arcs, never the entire synthetic
+  population. Exact integer slot identity is independent of LOD/camera; planar
+  movement sweeps conservative shared plinth bounds. No account or completion
+  authority is implied; see [the prototype](../../docs/hall-prototype.md).

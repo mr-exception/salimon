@@ -17,6 +17,7 @@ mod flight_regression;
 mod fragment_costs;
 mod fragment_physics;
 mod frame_clock;
+mod hall_prototype;
 mod journey_ended;
 mod launch;
 mod launch_progress;

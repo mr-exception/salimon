@@ -1856,3 +1856,10 @@ Current U01–U33 truth and explicit fixture boundaries are mapped in the
 [U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
 streaming observer/velocity, physical environment and preview share the saved
 motion source; suit field-mark timestamps remain personal active-time metadata.
+
+## Internal Hall fixture (#472)
+
+`hall_prototype.rs` is ephemeral developer presentation/controller state, admitted
+only by the explicit E2E scenario. It maps world-owned bounded layout and capsule
+sweeps into existing production renderer DTOs and is never serialized or used by
+ordinary menus. [Contract and checks](../../docs/hall-prototype.md).

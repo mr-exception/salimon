@@ -1,0 +1,222 @@
+{
+  "setup": {
+    "scenario": "hall-prototype",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "assert": {
+        "path": "hall_prototype.fixture",
+        "equals": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.population",
+        "equals": 1000000000
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.signs",
+        "lte": 1024
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.unlock",
+        "equals": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "hall-arrival",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_view",
+        "view": "overview"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.silhouettes",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "hall-overview",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_view",
+        "view": "sign"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "hall-monolith",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_walk",
+        "delta": [
+          0,
+          0.5
+        ]
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.blocked",
+        "equals": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.eye.2",
+        "lte": 31.1
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "hall-collision",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_view",
+        "view": "outer"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.signs",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.signs",
+        "lte": 1024
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "hall_prototype.detailed",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "hall-billion-outer",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "hall_view",
+        "view": "arrival"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "hall-revisit",
+      "timeout_ms": 60000
+    }
+  ]
+}

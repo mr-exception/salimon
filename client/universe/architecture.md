@@ -182,7 +182,7 @@ Earth states compare against independent U03 goldens. `examples/observed_import.
 builds the frozen source fixture deterministically, also checked twice in CI.
 Read the [canonical units, identities and validity contract](../../docs/universe-observed-ingestion.md).
 U01/U04 wire is unchanged: astrometry/ephemerides/orbits remain separate typed
-observations requiring U12 packaging. Full reviewed coverage remains #526/#513;
+observations requiring U12 packaging. Selected real coverage follows #526 below;
 U14 owns arbitrary-date model evaluation and lower-accuracy fallback, not U08.
 
 ## Missing-data inference — U09 (#410)
@@ -319,3 +319,13 @@ validated reload cannot reveal catalog POIs or invent a target range.
 
 Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
 Personal edits/targets never mutate canonical sites, suit observations or scanner history.
+
+
+## Selected observed-source coverage (#526)
+
+Follow the [real-source coverage contract](../../docs/observed-source-coverage.md) for
+frozen full PS rows, selected JPL targets/parents and physical formats, expected
+source identity, acquisition/verification commands and explicit scientific limits.
+The private pack preserves all original measurements and sidecars; source terms
+remain unreviewed for public release. Runtime/save schemas and player discovery
+are unchanged.

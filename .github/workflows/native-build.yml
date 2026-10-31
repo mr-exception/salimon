@@ -110,6 +110,11 @@ jobs:
           cargo run -p salimon-universe --example observed_import --locked > artifacts/observed-v1.json
           cargo run -p salimon-universe --example observed_import --locked > artifacts/observed-v1-repeat.json
           cmp artifacts/observed-v1.json artifacts/observed-v1-repeat.json
+      - name: Full selected observed-source coverage (offline)
+        run: |
+          python -m unittest discover -s scripts -p test_observed_sources.py -v
+          cargo run -p salimon-universe --example pack_build --locked -- catalogs/sources/observed-526-v1/build.json artifacts/observed-526-pack > artifacts/observed-526-manifest.json
+          python scripts/verify_observed_sources.py --snapshot catalogs/sources/observed-526-v1 --pack artifacts/observed-526-pack --output artifacts/observed-526-coverage.json
       - name: Fixed-seed inference scientific sanity and reproducibility
         run: |
           cargo run -p salimon-universe --example inference_sanity --locked > artifacts/inference-v1.json

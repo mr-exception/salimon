@@ -1,6 +1,6 @@
 //! Standalone, local-input build orchestration. Downloads remain acquisition
 //! tooling; every selected byte is frozen before this offline transaction.
-pub use super::observed::{ArtifactInput, HorizonsInput, Input as ObservedInput};
+pub use super::observed::{ArtifactInput, HorizonsInput, HorizonsKind, Input as ObservedInput};
 use super::*;
 use serde::Deserialize;
 use serde::de::{MapAccess, Visitor};

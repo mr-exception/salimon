@@ -34,8 +34,8 @@ catalog per cell and 256 MiB per blob. Split large inputs into dependency-closed
 cells before building; unsupported larger layouts fail rather than silently
 omit data. The cloud workload measures complete installed bytes, manifest hash
 and build throughput for original/expanded Earth/Proxima samples. Full selected
-Gaia/JPL/PS scientific coverage and real Milky Way size acceptance retain their
-existing #524/#526 ownership; measured fixture density is not extrapolated into
+Gaia scientific coverage and real Milky Way size acceptance remain #524;
+selected JPL/PS coverage is documented in [#526](observed-source-coverage.md); measured fixture density is not extrapolated into
 a claim of meeting 2–5 GB or the 10 GB full-release target. Exceeding that target
 requires the already specified measurement/escalation workflow there.
 
@@ -66,3 +66,6 @@ silently truncated. Gaia measurements/selection evidence, Archive observations
 and Horizons states/raw responses are packaged as typed producer sidecars.
 Exactly one of `input` and `observed` is required per cell; explicit additional
 sidecars can provide full canonical world manifests alongside either route.
+
+Selected real JPL/PS builds, expected target IDs, star classification, source-inventory
+cell limits and independent verification follow [the observed coverage contract](observed-source-coverage.md).

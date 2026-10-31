@@ -184,18 +184,18 @@ impl Ephemeris {
                 velocity_mps: vector(rows[2], ["VX", "VY", "VZ"])?,
             });
         }
-        let mean_radius_meters = physical(header, "Vol. Mean Radius (km)", 1000.0, &provenance)?;
-        let mass_kg = if let Some((_, tail)) = header.split_once("Mass x10^") {
-            let (exponent, tail) = tail
-                .split_once(" (kg)")
-                .ok_or_else(|| invalid("unsupported Horizons mass units"))?;
-            let exponent: i32 = exponent
-                .parse()
-                .map_err(|_| invalid("Horizons mass exponent"))?;
-            Some(parse_physical(tail, 10_f64.powi(exponent), &provenance)?)
-        } else {
-            None
-        };
+        let mean_radius_meters = physical_fields(
+            header,
+            &[
+                "vol.meanradius(km)",
+                "vol.meanradius,km",
+                "meanradius(km)",
+                "radius(km,iau2015)",
+            ],
+            1000.0,
+            &provenance,
+        )?;
+        let mass_kg = mass_field(header, &provenance)?;
         Ok(Self {
             target,
             provenance,
@@ -304,28 +304,103 @@ fn parse_calendar(text: &str) -> Result<Epoch, Error> {
         TimeScale::Tdb,
     )
 }
-fn physical(
+// Match only explicitly supported unit labels. Map the normalized label back
+// to the original tail so source spacing, approximation and errors survive.
+fn field_tails<'a>(header: &'a str, labels: &[&str]) -> Vec<&'a str> {
+    let mut normalized = String::new();
+    let mut offsets = Vec::new();
+    for (offset, c) in header.char_indices() {
+        if !c.is_ascii_whitespace() {
+            normalized.push(c.to_ascii_lowercase());
+            offsets.extend(std::iter::repeat_n(offset, c.len_utf8()));
+        }
+    }
+    let mut equals = std::collections::BTreeSet::new();
+    for label in labels {
+        let pattern = format!("{label}=");
+        for (start, _) in normalized.match_indices(&pattern) {
+            equals.insert(offsets[start + pattern.len() - 1]);
+        }
+    }
+    equals.into_iter().map(|offset| &header[offset..]).collect()
+}
+fn physical_fields(
     header: &str,
-    label: &str,
+    labels: &[&str],
     factor: f64,
     provenance: &Provenance,
 ) -> Result<Option<Quantity>, Error> {
-    header
-        .split_once(label)
-        .map(|(_, tail)| parse_physical(tail, factor, provenance))
+    let tails = field_tails(header, labels);
+    if tails.len() > 1 {
+        return Err(invalid("duplicate Horizons physical field"));
+    }
+    tails
+        .first()
+        .map(|tail| parse_physical(tail, factor, provenance))
         .transpose()
 }
+fn mass_field(header: &str, provenance: &Provenance) -> Result<Option<Quantity>, Error> {
+    let mut found = None;
+    let mut seen = false;
+    // This deliberately does not derive mass from GM or assume a G constant.
+    for exponent in 0..=40 {
+        let labels = [
+            format!("massx10^{exponent}(kg)"),
+            format!("mass,x10^{exponent}kg"),
+            format!("mass,10^{exponent}kg"),
+            format!("mass(10^{exponent}kg)"),
+        ];
+        let labels: Vec<_> = labels.iter().map(String::as_str).collect();
+        let tails = field_tails(header, &labels);
+        for tail in tails {
+            if seen {
+                return Err(invalid("duplicate Horizons mass field"));
+            }
+            seen = true;
+            // A recognized but blank source field is missing, never zero.
+            if tail[1..]
+                .trim_start()
+                .starts_with(|c: char| c.is_ascii_digit() || c == '~')
+            {
+                found = Some(parse_physical(tail, 10_f64.powi(exponent), provenance)?);
+            } else {
+                let same_line = tail[1..].lines().next().unwrap_or("").trim();
+                if !same_line.is_empty() && !same_line.starts_with("Hill Sphere radius, km=") {
+                    return Err(invalid("unsupported Horizons mass value"));
+                }
+            }
+        }
+    }
+    Ok(found)
+}
 fn parse_physical(tail: &str, factor: f64, provenance: &Provenance) -> Result<Quantity, Error> {
-    let token = tail
+    let tail = tail
         .trim_start()
         .strip_prefix('=')
         .ok_or_else(|| invalid("Horizons physical equals"))?
-        .split_whitespace()
-        .next()
-        .ok_or_else(|| invalid("Horizons physical number"))?;
-    let (value, error) = token
+        .trim_start();
+    let approximate = tail.starts_with('~');
+    let tail = tail.strip_prefix('~').unwrap_or(tail).trim_start();
+    let end = tail
+        .find(|c: char| c.is_ascii_whitespace())
+        .unwrap_or(tail.len());
+    let token = &tail[..end];
+    let (value, mut error) = token
         .split_once("+-")
         .map_or((token, None), |(v, e)| (v, Some(e)));
+    if error.is_none() {
+        let rest = tail[end..].trim_start();
+        if let Some(rest) = rest.strip_prefix("+-") {
+            error = Some(
+                rest.split_whitespace()
+                    .next()
+                    .ok_or_else(|| invalid("Horizons physical error missing"))?,
+            );
+        }
+    }
+    if approximate && error.is_some() {
+        return Err(invalid("unsupported approximate Horizons error bounds"));
+    }
     let value = finite(value)? * factor;
     if !factor.is_finite() || factor <= 0.0 || !value.is_finite() || value <= 0.0 {
         return Err(invalid("Horizons physical SI range"));

@@ -1,0 +1,527 @@
+{
+  "format": "salimon.universe.sources",
+  "schema_version": 1,
+  "reviewed_on": "2026-10-31",
+  "sources": [
+    {
+      "id": "nasa:exoplanet-ps",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
+      "query": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name%2Chostname%2Cdefault_flag%2Cgaia_dr3_id%2Cpl_refname%2Csy_snum%2Csy_pnum%2Cpl_bmassprov%2Csy_dist%2Csy_disterr1%2Csy_disterr2%2Cst_mass%2Cst_masserr1%2Cst_masserr2%2Cst_masslim%2Cst_rad%2Cst_raderr1%2Cst_raderr2%2Cst_radlim%2Cpl_massj%2Cpl_massjerr1%2Cpl_massjerr2%2Cpl_massjlim%2Cpl_msinij%2Cpl_msinijerr1%2Cpl_msinijerr2%2Cpl_msinijlim%2Cpl_radj%2Cpl_radjerr1%2Cpl_radjerr2%2Cpl_radjlim%2Cpl_orbper%2Cpl_orbpererr1%2Cpl_orbpererr2%2Cpl_orbperlim%2Cpl_orbsmax%2Cpl_orbsmaxerr1%2Cpl_orbsmaxerr2%2Cpl_orbsmaxlim%2Cpl_orbeccen%2Cpl_orbeccenerr1%2Cpl_orbeccenerr2%2Cpl_orbeccenlim%2Cpl_orbincl%2Cpl_orbinclerr1%2Cpl_orbinclerr2%2Cpl_orbincllim%2Cpl_orblper%2Cpl_orblpererr1%2Cpl_orblpererr2%2Cpl_orblperlim%2Cpl_orbtper%2Cpl_orbtpererr1%2Cpl_orbtpererr2%2Cpl_orbtperlim+from+ps+where+default_flag%3D1+order+by+hostname%2Cpl_name&format=csv",
+      "documentation": [
+        "https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html",
+        "https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html",
+        "attribution": "NASA Exoplanet Archive, Caltech, NASA Exoplanet Exploration Program; Christiansen et al. (2025); all original pl_refname references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "All PS default_flag=1 rows at retrieval; selected science/error/limit/identity/reference columns; not PSCompPars or complete phase-space orbits.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "ps.csv",
+          "bytes": 2884261,
+          "sha256": "5b12b9d4d5a1771a85754cf448b15e296439246d6f9955780c287f23701826ec",
+          "origin": "observed_snapshot",
+          "encoding": "csv"
+        },
+        {
+          "path": "ps-count.csv",
+          "bytes": 7,
+          "sha256": "5b7a8e82a34b935424f4cd11fdb8e55089fa391318450908b97b2d81a4f4aa59",
+          "origin": "observed_snapshot",
+          "encoding": "csv"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-10-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%2710%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Sun center 10; explicit parent system:solar; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-10.json",
+          "bytes": 6586,
+          "sha256": "274418229ee85c7b1eadfe7d2e022949b65427ce3f89eb3d653cdbb38dd97759",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-199-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27199%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Mercury center 199; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-199.json",
+          "bytes": 6579,
+          "sha256": "07c88a0cd08634c03292bcf0a5d1fe1a1303f3208ec81b54fe0caad3ff670b55",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-299-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27299%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Venus center 299; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-299.json",
+          "bytes": 6568,
+          "sha256": "9a1859dc7493833e5bfd2a67bda4ec6d1847cf66da3e0510e2d682b1d28e5eaf",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-399-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27399%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Earth center 399; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-399.json",
+          "bytes": 7140,
+          "sha256": "b52ea89d8794ecc0ce067080e99d035009893b78c9dd9838a9b0b36a42e5ed14",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-301-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27301%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Moon center 301; explicit parent jpl:399; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-301.json",
+          "bytes": 6703,
+          "sha256": "119acb480643e68ca0318d207bf3c788ede77a1752c6a437442ce362a2dfe9fd",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-499-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27499%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Mars center 499; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-499.json",
+          "bytes": 6678,
+          "sha256": "0b0d46aad372773f10ae7f9c5d64db3f1eab3a9dcd3c3862a2289ee925f93d03",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-599-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27599%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Jupiter center 599; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-599.json",
+          "bytes": 6633,
+          "sha256": "b19d1d734929e06529d69078fc9979fea1a9f46e574fe310ec03319409dc374a",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-501-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27501%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Io center 501; explicit parent jpl:599; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-501.json",
+          "bytes": 5820,
+          "sha256": "eecda67c3ea080fc042b6dc62dea1dcf57fd7e4ae5273f4b4cf3dca18dd82629",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-502-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27502%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Europa center 502; explicit parent jpl:599; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-502.json",
+          "bytes": 5822,
+          "sha256": "cf983a3c5c745a75f5981cef23cc1e4d64003781f9cdea13daaa3206034fa72b",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-503-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27503%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Ganymede center 503; explicit parent jpl:599; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-503.json",
+          "bytes": 5822,
+          "sha256": "b246506a1fcac315fdc49a1a68b8fea52536c9910df27ae0737489e9c072043f",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-504-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27504%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Callisto center 504; explicit parent jpl:599; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-504.json",
+          "bytes": 5825,
+          "sha256": "929f81de9d8195d47dd714a36e4542986aeda166a1aab815b0e0cd1d0520e239",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-699-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27699%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Saturn center 699; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-699.json",
+          "bytes": 6605,
+          "sha256": "5fc7df09896c20ac88f00e7dcf66b0f7b496cd040018b46712b04230c379b31e",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-606-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27606%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Titan center 606; explicit parent jpl:699; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-606.json",
+          "bytes": 5895,
+          "sha256": "13fe6b7dc0badc4b5620df2eef49ff12389f31c3bb20c70bc220d09ba868eee1",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-799-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27799%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Uranus center 799; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-799.json",
+          "bytes": 6597,
+          "sha256": "2ae7078ffacf4e329ee76a8f04d6c3c3a20312ab593c0d0cec744057fca5e447",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-899-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27899%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Neptune center 899; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-899.json",
+          "bytes": 6595,
+          "sha256": "320f8d1dded19b0c3240c066be84fe88206b5784649757367af55bf937e6002e",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-801-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27801%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Triton center 801; explicit parent jpl:899; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-801.json",
+          "bytes": 5892,
+          "sha256": "e896365fc3a91eafe63c1b89a28db2d5f1518eac73d633e4e9c17293c5485941",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-999-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27999%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Pluto center 999; explicit parent jpl:10; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-999.json",
+          "bytes": 6440,
+          "sha256": "079221a5dfa8d2ca346c1721f6d271aa0663c20739f0e0b5c0a3727b06d13d3d",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    },
+    {
+      "id": "jpl:horizons-901-j2000",
+      "release": "Private observed selection retrieved 2026-10-31T07:54:29.877764+00:00",
+      "endpoint": "https://ssd.jpl.nasa.gov/api/horizons.api",
+      "query": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27901%27&CENTER=%27500%400%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%272000-01-01%27&STOP_TIME=%272000-01-02%27&STEP_SIZE=%2712h%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27FRAME%27&VEC_TABLE=%272%27",
+      "documentation": [
+        "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+        "attribution": "NASA/JPL Solar System Dynamics / Horizons; exact source model and references retained.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Charon center 901; explicit parent jpl:999; 3 geometric ICRF/SSB KM-S TDB samples, 2000-01-01 to 2000-01-02 every 12h. Selected inventory, not all Solar System small bodies or complete model validity.",
+      "uncertainty": "Original fields, source errors, missing values and references retained; no complete-state covariance or unmeasured quantity invented.",
+      "artifacts": [
+        {
+          "path": "jpl-901.json",
+          "bytes": 6135,
+          "sha256": "3cb74890ff1c46f97ae3e021f4518c0359a817235e8ae9c2ab6e5a1e5f5fc1e7",
+          "origin": "observed_snapshot",
+          "encoding": "json"
+        }
+      ]
+    }
+  ]
+}

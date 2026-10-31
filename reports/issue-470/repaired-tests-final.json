@@ -1,0 +1,122 @@
+[
+  {
+    "test": "session::archive::tests::missing_duplicate_unknown_and_future_record_state_reject_transactionally_and_legacy_initializes",
+    "passed": true,
+    "elapsed_seconds": 0.1133791330000804
+  },
+  {
+    "test": "session::cabin::tests::corrupted_posture_restore_is_atomic_and_previous_schema_has_no_new_fixtures",
+    "passed": true,
+    "elapsed_seconds": 0.09836672700021154
+  },
+  {
+    "test": "session::cargo::tests::schema_nine_requires_door_and_schema_eight_migrates_open",
+    "passed": true,
+    "elapsed_seconds": 0.09300148600004832
+  },
+  {
+    "test": "session::chart::tests::chart_discovery_ui_route_expiry_resume_and_legacy_upgrade",
+    "passed": true,
+    "elapsed_seconds": 0.3322650049999538
+  },
+  {
+    "test": "session::chart::tests::chart_range_change_rediscovery_preserves_routes_and_recovered_lead_uncertainty",
+    "passed": true,
+    "elapsed_seconds": 0.3724509460000718
+  },
+  {
+    "test": "session::construction::room_tests::legacy_two_cell_reservation_retains_original_footprint_and_cancellable_receipts",
+    "passed": true,
+    "elapsed_seconds": 0.09441555600005813
+  },
+  {
+    "test": "session::construction::tests::schema_eight_requires_source_and_legacy_seven_migrates_empty_atomically",
+    "passed": true,
+    "elapsed_seconds": 0.10546055300005719
+  },
+  {
+    "test": "session::field_marks::tests::field_restore_missing_current_source_bad_definition_and_future_epoch_are_atomic",
+    "passed": true,
+    "elapsed_seconds": 0.4341093149998869
+  },
+  {
+    "test": "session::habitation::migration_tests::schema_ten_requires_habitation_and_legacy_nine_stows_without_ticking",
+    "passed": true,
+    "elapsed_seconds": 0.10162531699984356
+  },
+  {
+    "test": "session::journey::tests::v2_migration_preserves_counter_and_v3_requires_sampling_source_transactionally",
+    "passed": true,
+    "elapsed_seconds": 0.10201807099997495
+  },
+  {
+    "test": "session::lifecycle::tests::schema_one_migrates_only_missing_survival_and_schema_two_requires_complete_state",
+    "passed": true,
+    "elapsed_seconds": 0.16485589500007336
+  },
+  {
+    "test": "session::mounts::tests::corrupt_attachment_restore_is_atomic_and_legacy_save_adds_no_colliders",
+    "passed": true,
+    "elapsed_seconds": 0.1098218199999792
+  },
+  {
+    "test": "session::offline::motion_tests::schema_29_migration_preserves_geography_resources_and_body_relative_motion",
+    "passed": true,
+    "elapsed_seconds": 0.3163239900000008
+  },
+  {
+    "test": "session::offline::tests::clock_migration_malformed_clock_and_rollback_cannot_grant_time_twice",
+    "passed": true,
+    "elapsed_seconds": 0.208296707000045
+  },
+  {
+    "test": "session::persistence::contracts::schema23_source_restores_to_version24_without_fixture_state_loss",
+    "passed": true,
+    "elapsed_seconds": 0.11288060900005803
+  },
+  {
+    "test": "session::propulsion_tests::engine_switch_survives_whole_save_and_legacy_forces_migrate_without_velocity_or_energy_changes",
+    "passed": true,
+    "elapsed_seconds": 0.11985754800002724
+  },
+  {
+    "test": "session::recovery::tests::save_restore_offline_freeze_legacy_and_bad_sources_are_transactional",
+    "passed": true,
+    "elapsed_seconds": 0.13208695100001933
+  },
+  {
+    "test": "session::recovery::tests::schema_six_initializes_recovery_without_changing_existing_job_resources_or_core",
+    "passed": true,
+    "elapsed_seconds": 0.09981402700009312
+  },
+  {
+    "test": "session::scanner::save::tests::scanner_persistence_invalid_state_catalog_and_schema_are_atomic",
+    "passed": true,
+    "elapsed_seconds": 0.534439515000031
+  },
+  {
+    "test": "session::starting_supplies_tests::old_empty_saves_and_launch_recovery_never_receive_new_run_grants",
+    "passed": true,
+    "elapsed_seconds": 0.1782944569999927
+  },
+  {
+    "test": "session::surface_age::tests::surface_age_current_omission_unknown_identity_and_legacy_smuggling_are_atomic",
+    "passed": true,
+    "elapsed_seconds": 0.11365259300009711
+  },
+  {
+    "test": "session::surface_chart::tests::surface_chart_power_modal_edit_validation_and_current_omission_reject_safely",
+    "passed": true,
+    "elapsed_seconds": 0.4272091170000749
+  },
+  {
+    "test": "session::tick::tests::ordered_stages_and_partitioned_admission_match_parent_construction_save",
+    "passed": true,
+    "elapsed_seconds": 0.319508365000047
+  },
+  {
+    "test": "session::tutorial::tests::legacy_migration_invalid_state_and_missing_source_are_transactional",
+    "passed": true,
+    "elapsed_seconds": 0.11425443400003132
+  }
+]

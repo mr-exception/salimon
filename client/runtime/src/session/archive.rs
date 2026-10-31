@@ -143,6 +143,7 @@ impl GameplaySession {
         }
     }
     fn mark_archive_read(&mut self) {
+        self.publish_narrative_leads();
         if !self.archive.read.contains(&self.archive.selected) {
             self.archive.read.push(self.archive.selected.clone());
         }
@@ -202,6 +203,11 @@ impl GameplaySession {
             .recovery
             .record_text(r.id)
             .unwrap_or_else(|| format!("{}\n{}", r.status, r.body));
+        let panel = self.recovery.panel(
+            self.recovery_reserve(),
+            self.ship.snapshot().energy_core.stored_joules,
+            self.utility_recovery_multiplier(),
+        ) + &self.narrative_archive_clue(r.id);
         Some(format!(
             "SCOUT ARCHIVE  {}/{}\n{}\nSOURCE: {}\nTIME: UNKNOWN / RETAINED ORDER\n{}\n{}\nREAD {}/{} | NO NAVIGATION FIX\nUP/DOWN records  E close  ESC pause",
             i + 1,
@@ -209,11 +215,7 @@ impl GameplaySession {
             r.title,
             r.source,
             record,
-            self.recovery.panel(
-                self.recovery_reserve(),
-                self.ship.snapshot().energy_core.stored_joules,
-                self.utility_recovery_multiplier()
-            ),
+            panel,
             self.archive.read.len(),
             RECORDS.len()
         ))

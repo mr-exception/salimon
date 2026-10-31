@@ -640,3 +640,8 @@ slots and shows a compatible-version recovery message. Malformed/absent required
 source retains the existing validation/fallback policy. Tests: runtime
 `launch::incompatible_tests` exercises both publication pointers with valid-length
 unknown digests and byte-exact slot preservation.
+
+
+## Narrative inspections — schema 31 (#470)
+
+Current saves require `state.narrative` version 1, two optional first-inspection UTC-millisecond values bounded by the scanner clock, and no transient reader state. Schemas 1–30 without this source migrate to no inspections. Recovered `salimon-site` chart entries must match the exact versioned packet source/position/uncertainty and completed paid work; invalid combinations fail before publication. See [source/interaction ownership](opening-and-investigations.md).

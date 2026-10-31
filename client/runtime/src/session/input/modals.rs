@@ -14,6 +14,12 @@ pub(super) fn handle(session: &mut GameplaySession, key: Key, pressed: bool) -> 
         }
         return true;
     }
+    if session.narrative.reader.is_some() {
+        if pressed && key == Key::Interact {
+            session.narrative.reader = None;
+        }
+        return true;
+    }
     if archive::handle(session, key, pressed) {
         return true;
     }

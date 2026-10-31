@@ -144,3 +144,48 @@ fn chart_source_replays_are_idempotent_and_old_observation_history_cannot_revert
     assert!(chart.observe(&old).is_err());
     assert_eq!(chart, before);
 }
+
+#[test]
+fn transmitted_site_route_preserves_claim_and_rejects_changed_coordinates_and_frames() {
+    let c = crate::starting_system::candidate_publication()
+        .unwrap()
+        .catalog()
+        .clone();
+    let mut chart = Chart::new(c.revision()).unwrap();
+    let id = CatalogId::from_source("salimon-site", "physical-v1").unwrap();
+    let position = Position::BodyLocal {
+        body: CatalogId::try_from(crate::starting_system::PLANET_ID.to_owned()).unwrap(),
+        meters: [65., 2985359., 0.],
+    };
+    let lead = Lead {
+        position: position.clone(),
+        source: "received-packet-v1".into(),
+        received_utc_millis: 100,
+        inferred: false,
+        uncertainty: CoordinateUncertainty::Unknown,
+    };
+    chart.record_lead(&c, id.clone(), lead).unwrap();
+    assert!(chart.route_to(&id, position.clone(), 100).is_err());
+    assert!(
+        chart
+            .route_to_lead(&id, "received-packet-v1", position.clone(), 99)
+            .is_err()
+    );
+    chart
+        .route_to_lead(&id, "received-packet-v1", position, 100)
+        .unwrap();
+    assert!(chart.get(&id).unwrap().observed().is_none());
+    let checkpoint = chart.checkpoint();
+    assert_eq!(
+        Chart::from_checkpoint(&c, checkpoint.clone()).unwrap(),
+        chart
+    );
+    let mut bad = checkpoint.clone();
+    if let Position::BodyLocal { meters, .. } = &mut bad.routes[0].to {
+        meters[0] += 1.;
+    }
+    assert!(Chart::from_checkpoint(&c, bad).is_err());
+    let mut bad = checkpoint;
+    bad.routes[0].lead_source = None;
+    assert!(Chart::from_checkpoint(&c, bad).is_err());
+}

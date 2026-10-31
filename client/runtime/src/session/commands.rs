@@ -21,6 +21,12 @@ impl GameplaySession {
         if self.paused {
             return;
         }
+        if self.narrative.reader.is_some() {
+            if matches!(command, Interact) {
+                self.narrative.reader = None;
+            }
+            return;
+        }
         if self.surface_chart.open
             && !matches!(
                 command,

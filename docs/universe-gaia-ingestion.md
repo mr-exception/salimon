@@ -3,7 +3,7 @@
 `client/universe/src/ingestion/gaia.rs` accepts local Gaia DR3 CSV through a
 `BufRead` boundary. Source bytes must first pass the [U06 manifest/hash and reuse
 gates](universe-sources.md). The adapter does no downloads and confers no production
-reuse approval. #513 still owns approved full snapshots and source permissions.
+reuse approval. Private acquisition/use is owner-authorized by #524 (2026-10-27); #659 owns future public/commercial source review.
 The two pinned Gaia rows are **synthetic**, not measured Gaia science evidence.
 
 ## Selection and measurement contract
@@ -84,3 +84,29 @@ full reviewed data, release-specific quality selection and actual U12 codec
 measurements remain necessary under [#524](https://github.com/mr-exception/salimon/issues/524). [Report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-408/README.md) records
 measured results and follow-up ownership. Native integration remains U34 and the
 reference hardware gates; this offline ingestion does not establish native signoff.
+
+
+## Real DR3 verification tooling (#524)
+
+`python scripts/acquire_gaia_sources.py --output NEW_DIRECTORY` freezes an exact
+8,192-row `random_index` sample and Proxima/Barnard golden IDs from AIP's DR3 TAP
+mirror. Original VOTable, units/metadata, queries, hashes and a string-preserving
+CSV transcription remain together. TAP errors/OVERFLOW, incomplete counts,
+duplicate/changed IDs and unexpected fields reject. The scope is explicitly a
+measurement sample, not a full-release selection. Public redistribution status
+remains unreviewed; private authorization does not change provider terms.
+
+`python scripts/verify_gaia_sources.py --sources catalogs/sources/gaia-524-v1 --ps catalogs/sources/observed-526-v1/ps.csv` independently checks hashes, original
+TABLEDATA/CSV equality, the complete random-index interval and exact DR3 host
+associations against the frozen NASA PS snapshot. Published epoch/parallax/error
+goldens are checked without nearest-neighbor or name-only matching. Ambiguous
+caller associations still fail U07 validation.
+
+`cargo run -p salimon-universe --example gaia_verify --locked -- catalogs/sources/gaia-524-v1 artifacts/gaia-measurement` runs the actual offline U07/U12
+adapters and measures the installed catalog partitions, source/astrometry
+sidecars, literal-ID manifest index, five original decode samples and source-field
+error/coverage distributions. Every selected original column survives the sidecar.
+The current full-release population/size acceptance remains unresolved: a real
+random sample, synthetic density or extrapolation does not meet #524's full-data
+gate. No large-pack exception, arbitrary population truncation or approved
+scientific association is implied by this tooling.

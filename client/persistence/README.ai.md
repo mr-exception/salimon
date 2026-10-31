@@ -178,3 +178,8 @@ remains sterile; positive sources are explicit fictional geometry fixtures.
 
 
 Schema 30 adds canonical motion identity/epoch at the runtime-owned source boundary; see [migration and publication](../../docs/universe-offline-propagation.md). Storage slots/transactions are unchanged.
+
+
+## Physical narrative receipts (schema 31; #470)
+
+The shared envelope admits schema 31. Runtime owns validated version-1 physical inspection receipts, exact recovered-lead binding and explicit schemas 1–30 migration; the modal reader is transient. Discrete checkpoint detection includes inspection source changes. Storage remains opaque and atomic. See the [opening/save contract](../../docs/opening-and-investigations.md).

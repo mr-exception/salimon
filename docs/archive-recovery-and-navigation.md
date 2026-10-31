@@ -3,7 +3,7 @@
 > **Future planetary field observations (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) adds proposed lightweight suit location/bearing marks with assisted, uncertain positioning, and review/editing through a physical Scout planetary chart. These extend **player-known observation** rather than canonical catalog, star-chart discovery or the existing automatic five-second scanner. No perfect planet GPS, automatic landmark POI reveal, new scan mode or autopilot is approved.
 
 
-Status: **Archive reader #467 and local Recovery Module #468 implemented; destination leads/charting remain future #469–470**. Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
+Status: **Archive #467, Recovery #468, chart #469 and the #470 location-bearing investigations are implemented.** Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
 
 ## Physical Ship Archive
 
@@ -45,8 +45,7 @@ The quantum-themed transition is **loading**, not proof of travel through the un
 The separate Scout wall terminal now exposes five intact ordinary voyage/routine
 records and two damaged packets with unknown contents. Source and unknown time
 are explicit; a name or historical departure never grants a destination. Durable
-versioned identities/read selection round-trip through schema 6. Recovery states and Core-funded work are delivered by #468. Destination leads
-and player charting remain #469–470. Native appearance/input signoff remains separate. See the
+versioned identities/read selection round-trip through schema 6. Recovery states and Core-funded work are delivered by #468. Destination leads and player charting follow the [implemented investigation contract](opening-and-investigations.md). Native appearance/input signoff remains separate. See the
 [implementation boundary](../client/runtime/architecture.md#scout-archive-467).
 
 ## Local Recovery implementation (#468)
@@ -54,7 +53,7 @@ and player charting remain #469–470. Native appearance/input signoff remains s
 [Canonical module contract](data-recovery-module.md) records configurable recipe/
 energy defaults, one-component installation into the Archive, emergency reserve,
 low-priority funded work, R controls and schema-7 migration. Recovered local
-fragments stay unverified; full location-bearing story payloads remain #470.
+fragments and completed location-bearing payloads stay unverified; the [#470 investigation contract](opening-and-investigations.md) owns their physical destinations.
 Native physical/visual/budget and provisional tuning review remains #515.
 
 ## Implemented chart boundary (#469)
@@ -65,6 +64,8 @@ voluntary same-frame route annotations. P/M/Enter operate the cockpit projector;
 normal checkpoints persist the chart. The canonical catalog does not seed it,
 and Earth stays hidden until actual observation. `record_lead` is the admission
 boundary for real recovered/inferred coordinates, not a source of invented hints.
-Transmission production/recovery remains #470; it must supply actual source data
-through that boundary. Jump Drive operation and unresolved wormhole use are not
+Transmission production/recovery now supplies the two versioned #470 source payloads through that boundary; only explicit voluntary routes may retain unverified coordinates. Jump Drive operation and unresolved wormhole use are not
 implied by chart routing.
+
+
+The [opening/investigation contract](opening-and-investigations.md) owns packet text, physical site clues, uncertainty-preserving routes and schema-31 inspections.

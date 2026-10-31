@@ -17,6 +17,7 @@ pub(crate) mod frames;
 mod habitation;
 mod init;
 pub(crate) mod input;
+pub(crate) mod narrative;
 mod organisms;
 pub(crate) mod policy;
 mod tick;
@@ -86,6 +87,7 @@ pub(crate) struct GameplaySession {
     pub(crate) tutorial: tutorial::Tutorial,
     pub(crate) building: construction::Building,
     pub(crate) archive: archive::Archive,
+    pub(crate) narrative: narrative::State,
     recovery: recovery::Recovery,
     pub(crate) archive_reader: archive::Reader,
     pub(crate) run: lifecycle::RunState,

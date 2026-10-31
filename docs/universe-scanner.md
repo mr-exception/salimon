@@ -136,21 +136,19 @@ explicit frame and either unknown uncertainty or a finite nonnegative radius in
 meters. Unknown uncertainty is never zero. Leads cannot verify themselves or
 create a verified route. `record_lead` consumes coordinates actually supplied by
 the trusted inference/recovered-message owner; it never fills missing coordinates
-from the catalog. Future #470 owns transmission production/recovery gameplay;
-its absence does not invent leads or mark that narrative implemented.
+from the catalog. The [#470 investigation owner](opening-and-investigations.md) supplies the two completed packet leads without inventing missing information.
 
 The chart bounds observed identities to scanner capacity plus 256 independent
 leads, and retains up to 4,096 explicit route annotations. Observe/lead/route
 validation happens before mutation. Older observation history cannot overwrite
 newer knowledge; rediscovery refreshes observations while retaining lead evidence
-and immutable route snapshots. A route requires previously observed coordinates
+and immutable route snapshots. A verified route requires previously observed coordinates
 in the current ship's known frame, records origin/destination/time, and never
 commands thrust, landing, autopilot or teleportation. Unmapped frames are retained
 as evidence; no absent body-to-galaxy transform is guessed.
 
 In the canonical cockpit, **P** switches the projector between fresh scanner
-contacts and the durable chart, **M** selects a known entry, and **Enter** records
-a verified route. The hint names observed/historical/inferred/transmitted status,
+contacts and the durable chart, **M** selects a known entry, and **Enter** records an observed route or an explicitly unverified transmitted-site plan. The hint names observed/historical/inferred/transmitted status,
 uncertainty, route result and controls. Unselected fresh/historical/lead markers
 use cyan/green/purple; selected entries remain amber, with textual provenance so
 color is not the sole cue. Historical plotted distance is sampled, not a current
@@ -227,3 +225,8 @@ actual hardware/M1/Metal budgets #563 remain separate unverified qualifications.
 ## Closed-game runtime integration (#433)
 
 [Chronological funding, stationary analytic pulses and curved-path boundaries](universe-offline-propagation.md#offline-timed-systems-and-scanner-433) are implemented in runtime `session/offline.rs`, `scanner.rs` and `scanner/offline.rs`. Actual Nacre/Vesper sources share the canonical model epoch; contacts/chart validate before exact fractional Core debit. The idle fast lane retains early funded returns, checked pulse counts and three-hour expiry without per-pulse replay. Active paths retain actual physical samples. Final sub-ticks settle before canonical launch publication; reconstruction alone invents no detections.
+
+
+### Voluntary transmitted-site routes (#470)
+
+`Chart::route_to_lead` retains a chosen immutable lead source and exact coordinates in an explicitly unverified same-frame route. `salimon-site` IDs require body-local coordinates with a validated celestial body. This does not create scanner observations or promote claims to truth. Checkpoint restore rejects missing/duplicate provenance, altered route coordinates and predating timestamps. The [investigation contract](opening-and-investigations.md) owns packet admission, sites and physical inspection; ordinary `route_to` still requires observed discovery.

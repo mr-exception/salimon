@@ -86,8 +86,14 @@ impl GameplaySession {
             && !self.survival.snapshot().terminal
             && !self.wheel.open
             && !self.crafting_ui.open
-            && !self.archive_reader.open)
-            .then(|| self.tutorial.text())
+            && !self.archive_reader.open
+            && self.narrative.reader.is_none())
+            .then(|| {
+                let text = self.tutorial.text()?;
+                if self.mining.terrain == salimon_world::terrain::TerrainMode::Canonical && self.elapsed < std::time::Duration::from_secs(45) {
+                    Some(format!("Earth is home. The Scout is familiar.\nThe voyage and landing are missing.\nShelter aboard; inspect Archive, gather or explore.\n{text}"))
+                } else { Some(text) }
+            })
             .flatten()
     }
 }

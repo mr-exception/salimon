@@ -1,0 +1,36 @@
+{
+  "channels": 2,
+  "control_step_ms": 16,
+  "sample_rate": 48000,
+  "samples": [
+    {
+      "location": "Surface",
+      "metrics": {
+        "cpu_ns": 451985952,
+        "frames": 96000,
+        "mailbox_bytes": 672,
+        "mixer_bytes": 3240,
+        "peak": 0.0,
+        "sample_rate": 48000,
+        "voices": 32
+      },
+      "name": "vesper-outside",
+      "sha256": "e3a90286b3b5420103c5d188beff5aeb90737b9ee66c505ee43582c8af92a32b"
+    },
+    {
+      "location": "InsideShip",
+      "metrics": {
+        "cpu_ns": 273843719,
+        "frames": 96000,
+        "mailbox_bytes": 672,
+        "mixer_bytes": 3240,
+        "peak": 0.005574023816734552,
+        "sample_rate": 48000,
+        "voices": 32
+      },
+      "name": "scout-inside",
+      "sha256": "61ae5cdcef159a9c95b381a0dc5057ae85efc78a31e1ff4cb9ec22c615d316e0"
+    }
+  ],
+  "scope": "actual fresh canonical session observations, declared inside placement, production controls and native callback PCM; not OS device playback"
+}

@@ -115,7 +115,13 @@ impl ClientApplication {
             text: text.to_owned(),
             placement: OverlayPlacement::BottomCenter,
         });
-        let contextual_action = if let Some(text) = self.session.surface_hint() {
+        let contextual_action = if let Some(text) = self.session.narrative_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if let Some(text) = self.session.surface_hint() {
             Some(crate::resource_context::Prompt {
                 fragment: None,
                 text,

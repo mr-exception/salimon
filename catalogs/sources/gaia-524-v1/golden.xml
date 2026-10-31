@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<VOTABLE version="1.3"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
+    xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
+    <RESOURCE type="results">
+        <LINK title="gaiadr3.gaia_source" content-role="doc" href="https://doi.org/10.17876/gaia/dr.3/1"/>
+        <INFO name="QUERY_STATUS" value="OK" />
+        <INFO name="QUERY" value="select source_id,random_index,ref_epoch,ra,ra_error,dec,dec_error,parallax,parallax_error,pmra,pmra_error,pmdec,pmdec_error,radial_velocity,radial_velocity_error,ruwe,duplicated_source,astrometric_params_solved,ra_dec_corr,ra_parallax_corr,ra_pmra_corr,ra_pmdec_corr,dec_parallax_corr,dec_pmra_corr,dec_pmdec_corr,parallax_pmra_corr,parallax_pmdec_corr,pmra_pmdec_corr,phot_g_mean_mag from gaiadr3.gaia_source where source_id in (4472832130942575872,5853498713190525696) order by source_id" />
+        <INFO name="QUERY_LANGUAGE" value="adql-2.1" />
+        <INFO name="SOURCE" value="gaiadr3.gaia_source" />
+        <TABLE name="gaia_user_anonymous.2026-10-31-20-25-03-286668">
+                <FIELD name="source_id" ucd="meta.id;meta.main;meta.ref" ID="datalinkID" datatype="long"> <DESCRIPTION>Unique source identifier (unique within a particular Data Release)</DESCRIPTION> </FIELD>
+                <FIELD name="random_index" ucd="meta.code" datatype="long"> <DESCRIPTION>Random index for use when selecting subsets</DESCRIPTION> </FIELD>
+                <FIELD name="ref_epoch" unit="yr" ucd="meta.ref;time.epoch" datatype="double"> <DESCRIPTION>Reference epoch</DESCRIPTION> </FIELD>
+                <FIELD name="ra" unit="deg" ucd="pos.eq.ra;meta.main" datatype="double"> <DESCRIPTION>Right ascension</DESCRIPTION> </FIELD>
+                <FIELD name="ra_error" unit="mas" ucd="stat.error;pos.eq.ra" datatype="float"> <DESCRIPTION>Standard error of right ascension</DESCRIPTION> </FIELD>
+                <FIELD name="dec" unit="deg" ucd="pos.eq.dec;meta.main" datatype="double"> <DESCRIPTION>Declination</DESCRIPTION> </FIELD>
+                <FIELD name="dec_error" unit="mas" ucd="stat.error;pos.eq.dec" datatype="float"> <DESCRIPTION>Standard error of declination</DESCRIPTION> </FIELD>
+                <FIELD name="parallax" unit="mas" ucd="pos.parallax.trig" datatype="double"> <DESCRIPTION>Parallax</DESCRIPTION> </FIELD>
+                <FIELD name="parallax_error" unit="mas" ucd="stat.error;pos.parallax.trig" datatype="float"> <DESCRIPTION>Standard error of parallax</DESCRIPTION> </FIELD>
+                <FIELD name="pmra" unit="mas.yr**-1" ucd="pos.pm;pos.eq.ra" datatype="double"> <DESCRIPTION>Proper motion in right ascension direction</DESCRIPTION> </FIELD>
+                <FIELD name="pmra_error" unit="mas.yr**-1" ucd="stat.error;pos.pm;pos.eq.ra" datatype="float"> <DESCRIPTION>Standard error of proper motion in right ascension direction</DESCRIPTION> </FIELD>
+                <FIELD name="pmdec" unit="mas.yr**-1" ucd="pos.pm;pos.eq.dec" datatype="double"> <DESCRIPTION>Proper motion in declination direction</DESCRIPTION> </FIELD>
+                <FIELD name="pmdec_error" unit="mas.yr**-1" ucd="stat.error;pos.pm;pos.eq.dec" datatype="float"> <DESCRIPTION>Standard error of proper motion in declination direction</DESCRIPTION> </FIELD>
+                <FIELD name="radial_velocity" unit="km.s**-1" ucd="spect.dopplerVeloc.opt;em.opt.I" datatype="float"> <DESCRIPTION>Radial velocity</DESCRIPTION> </FIELD>
+                <FIELD name="radial_velocity_error" unit="km.s**-1" ucd="stat.error;spect.dopplerVeloc.opt;em.opt.I" datatype="float"> <DESCRIPTION>Radial velocity error</DESCRIPTION> </FIELD>
+                <FIELD name="ruwe" ucd="stat.error" datatype="float"> <DESCRIPTION>Renormalised unit weight error</DESCRIPTION> </FIELD>
+                <FIELD name="duplicated_source" ucd="meta.code.status" datatype="boolean"> <DESCRIPTION>Source with multiple source identifiers</DESCRIPTION> </FIELD>
+                <FIELD name="astrometric_params_solved" ucd="meta.number" datatype="short"> <DESCRIPTION>Which parameters have been solved for?</DESCRIPTION> </FIELD>
+                <FIELD name="ra_dec_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between right ascension and declination</DESCRIPTION> </FIELD>
+                <FIELD name="ra_parallax_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between right ascension and parallax</DESCRIPTION> </FIELD>
+                <FIELD name="ra_pmra_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between right ascension and proper motion in right ascension</DESCRIPTION> </FIELD>
+                <FIELD name="ra_pmdec_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between right ascension and proper motion in declination</DESCRIPTION> </FIELD>
+                <FIELD name="dec_parallax_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between declination and parallax</DESCRIPTION> </FIELD>
+                <FIELD name="dec_pmra_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between declination and proper motion in right ascension</DESCRIPTION> </FIELD>
+                <FIELD name="dec_pmdec_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between declination and proper motion in declination</DESCRIPTION> </FIELD>
+                <FIELD name="parallax_pmra_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between parallax and proper motion in right ascension</DESCRIPTION> </FIELD>
+                <FIELD name="parallax_pmdec_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between parallax and proper motion in declination</DESCRIPTION> </FIELD>
+                <FIELD name="pmra_pmdec_corr" ucd="stat.correlation" datatype="float"> <DESCRIPTION>Correlation between proper motion in right ascension and proper motion in declination</DESCRIPTION> </FIELD>
+                <FIELD name="phot_g_mean_mag" unit="mag" ucd="phot.mag;em.opt" datatype="float"> <DESCRIPTION>G-band mean magnitude</DESCRIPTION> </FIELD>
+            <DATA>
+                <TABLEDATA><TR><TD>4472832130942575872</TD><TD>1329945144</TD><TD>2016.0</TD><TD>269.44850252543836</TD><TD>0.026238997</TD><TD>4.739420051112412</TD><TD>0.029043527</TD><TD>546.975939730948</TD><TD>0.040116355</TD><TD>-801.5509783684709</TD><TD>0.031820867</TD><TD>10362.394206546573</TD><TD>0.036070455</TD><TD>-110.46822</TD><TD>0.13125522</TD><TD>1.0848505</TD><TD>False</TD><TD>31</TD><TD>-0.052255288</TD><TD>0.04826723</TD><TD>-0.21109906</TD><TD>-0.03466423</TD><TD>-0.54353875</TD><TD>-0.05581326</TD><TD>-0.63121563</TD><TD>-0.05781335</TD><TD>0.5593565</TD><TD>0.03058501</TD><TD>8.1939745</TD></TR><TR><TD>5853498713190525696</TD><TD>1320081859</TD><TD>2016.0</TD><TD>217.39232147200883</TD><TD>0.023999203</TD><TD>-62.67607511676666</TD><TD>0.03443618</TD><TD>768.0665391873573</TD><TD>0.049872905</TD><TD>-3781.741008265163</TD><TD>0.031386077</TD><TD>769.4650146478623</TD><TD>0.050524533</TD><TD>-21.942726</TD><TD>0.21612652</TD><TD>0.97145325</TD><TD>False</TD><TD>95</TD><TD>0.37388447</TD><TD>0.056153428</TD><TD>-0.30604824</TD><TD>-0.07928604</TD><TD>0.15966518</TD><TD>-0.07302318</TD><TD>-0.20184441</TD><TD>-0.11339641</TD><TD>-0.095663965</TD><TD>0.6296853</TD><TD>8.984749</TD></TR>
+                </TABLEDATA>
+            </DATA>
+        </TABLE>
+    </RESOURCE>
+    <RESOURCE type="meta" utype="adhoc:service">
+        <PARAM name="standardID" datatype="char" arraysize="*" value="ivo://ivoa.net/std/DataLink#links-1.0" />
+        <PARAM name="accessURL" datatype="char" arraysize="*" value="https://gaia.aip.de/datalink/links" />
+        <GROUP name="inputParams">
+            <PARAM name="ID" datatype="char" arraysize="*" value="" ref="datalinkID"/>
+        </GROUP>
+    </RESOURCE>
+</VOTABLE>

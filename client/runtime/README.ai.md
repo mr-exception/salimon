@@ -637,3 +637,8 @@ The internal `hall_prototype.rs` adapter is admitted only by its explicit E2E
 scenario and never serialized. World owns layout/collision; runtime maps existing
 renderer DTOs. See [the prototype contract](../../docs/hall-prototype.md) before
 changing its gate, camera, controls or capture path.
+
+
+## Recovered investigations and opening (#470 / #471)
+
+`session/narrative.rs` owns fixed physical Vesper clues, complete-packet lead admission, aimed E inspections and schema-31 receipts. Read the [opening/investigation contract](../../docs/opening-and-investigations.md) before changing it. Never turn transmitted routes, inscriptions or a remembered home into verified history or celestial knowledge. Tests live in `session/narrative/tests.rs`; `scripts/verify_narrative.py` retains production GPU captures from declared fixtures. Existing Core funding, survival and scanner authority remain with their owners.

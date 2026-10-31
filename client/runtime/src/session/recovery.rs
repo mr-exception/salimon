@@ -79,7 +79,7 @@ impl Recovery {
             std::array::from_fn(|i| self.complete(i)),
         )
     }
-    fn complete(&self, i: usize) -> bool {
+    pub(super) fn complete(&self, i: usize) -> bool {
         self.spent_joules[i] >= self.config.record_cost_joules[i]
     }
     pub(super) fn record_text(&self, id: &str) -> Option<String> {
@@ -99,7 +99,9 @@ impl Recovery {
         } else {
             "DAMAGED / CONTENT UNKNOWN"
         };
-        let content = if self.spent_joules[i] == 0.0 {
+        let content = if self.complete(i) {
+            super::narrative::PAYLOADS[i]
+        } else if self.spent_joules[i] == 0.0 {
             "No message claim has been recovered."
         } else if i == 0 {
             "Received distress fragment: [signal incomplete].\nSender/time/location remain unverified.\nMissing data cannot be invented."
@@ -179,6 +181,7 @@ impl GameplaySession {
         self.recovery.spent_joules[i] += funded;
         if self.recovery.complete(i) {
             self.recovery.active = None;
+            self.publish_narrative_leads();
         }
     }
     pub(super) fn install_recovery_module(&mut self, item: OutputItem) {

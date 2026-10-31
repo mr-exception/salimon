@@ -16,6 +16,10 @@ pub(crate) enum Scenario {
     CanonicalMining,
     CanonicalFlight,
     CanonicalJourney,
+    NarrativeDistress,
+    NarrativeWarning,
+    NarrativeRecovered,
+    NarrativeChart,
     PlanetaryChart,
     BiologicalHarvest,
     BiologicalMining,
@@ -94,6 +98,10 @@ impl Scenario {
             "biological-mining" => Ok(Self::BiologicalMining),
             "planetary-chart" => Ok(Self::PlanetaryChart),
             "canonical-journey" => Ok(Self::CanonicalJourney),
+            "narrative-distress" => Ok(Self::NarrativeDistress),
+            "narrative-warning" => Ok(Self::NarrativeWarning),
+            "narrative-recovered" => Ok(Self::NarrativeRecovered),
+            "narrative-chart" => Ok(Self::NarrativeChart),
             "navigation-approach" => Ok(Self::NavigationApproach),
             "surface-age-offline" => Ok(Self::SurfaceAgeOffline),
             "surface-age-replacement" => Ok(Self::SurfaceAgeReplacement),
@@ -226,6 +234,10 @@ impl Scenario {
             Self::BiologicalMining => "biological-mining",
             Self::PlanetaryChart => "planetary-chart",
             Self::CanonicalJourney => "canonical-journey",
+            Self::NarrativeDistress => "narrative-distress",
+            Self::NarrativeWarning => "narrative-warning",
+            Self::NarrativeRecovered => "narrative-recovered",
+            Self::NarrativeChart => "narrative-chart",
             Self::NavigationApproach => "navigation-approach",
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
@@ -496,6 +508,25 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
             // Explicit review initial condition, not a claimed walking/boarding route.
             app.character = Default::default();
             app.character.enter_cockpit();
+        }
+        Scenario::NarrativeDistress
+        | Scenario::NarrativeWarning
+        | Scenario::NarrativeRecovered
+        | Scenario::NarrativeChart => {
+            crate::session::narrative::initialize_fixture(
+                app,
+                match config.scenario {
+                    Scenario::NarrativeDistress => Some(0),
+                    Scenario::NarrativeWarning => Some(1),
+                    _ => None,
+                },
+            )?;
+            if config.scenario == Scenario::NarrativeChart {
+                app.feedback = None; // Fixture starts after the installation notification.
+                app.character = Default::default();
+                app.character.enter_cockpit();
+                app.ship.set_cockpit_control(true);
+            }
         }
         Scenario::CanonicalJourney => {
             *app = GameplaySession::new_canonical_run()?;

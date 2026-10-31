@@ -176,3 +176,8 @@ remains sterile; positive sources are explicit fictional geometry fixtures.
 
 
 Schema-30 canonical motion is runtime validated before publication; missing/current unknown motion never silently substitutes a new model. Earlier canonical sources migrate explicitly; engineering sources remain independent. Storage does not infer world frames or advance a motion clock. See the [runtime motion contract](../../docs/universe-offline-propagation.md).
+
+
+## Physical narrative receipts (schema 31; #470)
+
+The shared envelope admits schema 31. Runtime owns validated version-1 physical inspection receipts, exact recovered-lead binding and explicit schemas 1–30 migration; the modal reader is transient. Discrete checkpoint detection includes inspection source changes. Storage remains opaque and atomic. See the [opening/save contract](../../docs/opening-and-investigations.md).

@@ -58,9 +58,7 @@ requested MW, protected GJ, per-record percentage and remaining nominal work.
 Intact, unknown damaged, partially reconstructed, unverified recovered fragments
 and permanently missing second-record segments stay distinct. Record identities,
 sender/source and unknown timestamps persist; recovered text is an unverified
-fragment, never proof of unseen history. Full distress/warning location leads
-and their authored destination integration remain [#470](https://github.com/mr-exception/salimon/issues/470)
-after charting/world prerequisites. Recovery cannot invent coordinates, expose
+fragment, never proof of unseen history. Complete distress/warning location leads and physical investigation destinations follow the [#470 contract](opening-and-investigations.md). Partial work supplies no coordinates. Recovery cannot invent missing coordinates, expose
 Earth/Hall destinations or reconstruct missing bytes into certainty.
 
 ## Persistence and verification

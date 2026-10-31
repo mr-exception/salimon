@@ -1,0 +1,188 @@
+{
+  "arch": "x86_64",
+  "input_scope": "Frozen real DR3 random-index sample and explicit golden IDs. No complete-release or hardware budget acceptance.",
+  "os": "linux",
+  "results": [
+    {
+      "astrometry_and_selection_sidecars_bytes": 10557591,
+      "build_seconds": 15.074284067,
+      "catalog_partition_bytes": 794293,
+      "catalog_records": 15652,
+      "decode_seconds_original_five_samples": [
+        1.42613116,
+        1.49518338,
+        2.575520613,
+        1.315353392,
+        2.862243336
+      ],
+      "full_release_complete": false,
+      "installed_bytes": 11894669,
+      "installed_bytes_per_selected_star": 1519.891259902888,
+      "manifest_bytes": 539829,
+      "manifest_sha256": "53cc1aa9235b67920cea4d710a1c1ec2bc321ca3c60349144c6923dae0d86a26",
+      "selected_stars": 7826,
+      "selection": "sample",
+      "source_field_distributions": {
+        "dec_error": {
+          "max": 72.60268,
+          "median": 0.3390732,
+          "min": 0.007555395,
+          "missing": 0,
+          "p95": 6.361772,
+          "present": 7826
+        },
+        "parallax": {
+          "max": 12.599344304105063,
+          "median": 0.32086212127823727,
+          "min": -7.240410178663836,
+          "missing": 1517,
+          "p95": 1.767211345007592,
+          "present": 6309
+        },
+        "parallax_error": {
+          "max": 4.3555007,
+          "median": 0.33556867,
+          "min": 0.010006905,
+          "missing": 1517,
+          "p95": 1.2733824,
+          "present": 6309
+        },
+        "phot_g_mean_mag": {
+          "max": 21.991173,
+          "median": 19.737677,
+          "min": 9.902622,
+          "missing": 20,
+          "p95": 20.962805,
+          "present": 7806
+        },
+        "ra_error": {
+          "max": 82.0564,
+          "median": 0.36841002,
+          "min": 0.006344677,
+          "missing": 0,
+          "p95": 7.397533,
+          "present": 7826
+        },
+        "ruwe": {
+          "max": 1.39813,
+          "median": 1.0188698,
+          "min": 0.77300024,
+          "missing": 1517,
+          "p95": 1.1654496,
+          "present": 6309
+        }
+      },
+      "summary": {
+        "policy": {
+          "max_ruwe": 1.4,
+          "reject_duplicated_source": true
+        },
+        "summary": {
+          "canonical_stars": 7826,
+          "duplicate_rows": 0,
+          "incomplete_velocity": 7681,
+          "input_rows": 8192,
+          "missing_or_nonpositive_parallax": 2993,
+          "missing_ruwe": 1517,
+          "rejected_astrometry": 0,
+          "rejected_quality": 366,
+          "selected_rows": 7826
+        }
+      }
+    },
+    {
+      "astrometry_and_selection_sidecars_bytes": 3240,
+      "build_seconds": 0.624439575,
+      "catalog_partition_bytes": 919,
+      "catalog_records": 4,
+      "decode_seconds_original_five_samples": [
+        0.000761661,
+        0.000423336,
+        0.000440872,
+        0.000400939,
+        0.000438086
+      ],
+      "full_release_complete": false,
+      "installed_bytes": 7863,
+      "installed_bytes_per_selected_star": 3931.5,
+      "manifest_bytes": 748,
+      "manifest_sha256": "4b3c0f9eaaa081f42ba7c629fae1fa668dfbc288233fcc23e2b9f84a63768234",
+      "selected_stars": 2,
+      "selection": "golden",
+      "source_field_distributions": {
+        "dec_error": {
+          "max": 0.03443618,
+          "median": 0.029043527,
+          "min": 0.029043527,
+          "missing": 0,
+          "p95": 0.029043527,
+          "present": 2
+        },
+        "parallax": {
+          "max": 768.0665391873573,
+          "median": 546.975939730948,
+          "min": 546.975939730948,
+          "missing": 0,
+          "p95": 546.975939730948,
+          "present": 2
+        },
+        "parallax_error": {
+          "max": 0.049872905,
+          "median": 0.040116355,
+          "min": 0.040116355,
+          "missing": 0,
+          "p95": 0.040116355,
+          "present": 2
+        },
+        "phot_g_mean_mag": {
+          "max": 8.984749,
+          "median": 8.1939745,
+          "min": 8.1939745,
+          "missing": 0,
+          "p95": 8.1939745,
+          "present": 2
+        },
+        "ra_error": {
+          "max": 0.026238997,
+          "median": 0.023999203,
+          "min": 0.023999203,
+          "missing": 0,
+          "p95": 0.023999203,
+          "present": 2
+        },
+        "ruwe": {
+          "max": 1.0848505,
+          "median": 0.97145325,
+          "min": 0.97145325,
+          "missing": 0,
+          "p95": 0.97145325,
+          "present": 2
+        }
+      },
+      "summary": {
+        "policy": {
+          "max_ruwe": 1.4,
+          "reject_duplicated_source": true
+        },
+        "summary": {
+          "canonical_stars": 2,
+          "duplicate_rows": 0,
+          "incomplete_velocity": 0,
+          "input_rows": 2,
+          "missing_or_nonpositive_parallax": 0,
+          "missing_ruwe": 0,
+          "rejected_astrometry": 0,
+          "rejected_quality": 0,
+          "selected_rows": 2
+        }
+      }
+    }
+  ],
+  "version": 1,
+  "process_measurement": {
+    "elapsed_seconds": 28.918762430000015,
+    "peak_rss_kib_linux": 151576,
+    "build_profile": "dev",
+    "command": "target/debug/examples/gaia_verify catalogs/sources/gaia-524-v1 artifacts/gaia-524-measurement-rss"
+  }
+}

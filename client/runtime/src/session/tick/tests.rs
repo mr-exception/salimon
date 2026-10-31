@@ -23,7 +23,8 @@ fn construction() -> GameplaySession {
 #[test]
 fn ordered_stages_and_partitioned_admission_match_parent_construction_save() {
     // Schema 29 adds only the explicit empty biological publication; all older
-    // source bytes remain frozen beside the envelope version change.
+    // source bytes remain frozen beside the envelope version change. Schema 31
+    // adds only empty physical-inspection receipts.
     let expected = std::str::from_utf8(PARENT_TICK)
         .unwrap()
         .replacen(
@@ -32,6 +33,7 @@ fn ordered_stages_and_partitioned_admission_match_parent_construction_save() {
             1,
         )
         .replacen("\"offline\":", &format!("\"biology\":{{\"fixture\":false,\"journal\":{{\"identity\":\"{}\",\"deltas\":[]}}}},\"offline\":",crate::session::biology::catalog(false).identity()),1)
+        .replacen("\"recovery\":", "\"narrative\":{\"version\":1,\"inspected_utc_millis\":[null,null]},\"recovery\":",1)
         .into_bytes();
     let mut whole = construction();
     whole.advance_automation(Duration::from_secs(12));

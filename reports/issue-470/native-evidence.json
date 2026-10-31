@@ -1,0 +1,2736 @@
+[
+  {
+    "scenario": "canonical-journey",
+    "name": "awakening-outside-scout",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 300,
+      "cache_patches": 300,
+      "cpu_cache_bytes": 8867180,
+      "generated_last_frame": 0,
+      "generated_peak": 2,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 20063,
+      "generation_total_micros": 906819,
+      "gpu_cache_bytes": 6904548,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 2094368,
+      "pending_patches": 0,
+      "preparation_last_frame_micros": 563,
+      "preparation_overruns": 499,
+      "preparation_peak_micros": 20645,
+      "presentation_ready": true,
+      "selection_last_frame_micros": 0,
+      "total_generated": 300,
+      "triangles": 162622,
+      "uploaded_last_frame_bytes": 76800
+    },
+    "player": {
+      "eye_position_meters": [
+        14.000008206564244,
+        2985360.749967173,
+        0.0
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        13.004680168648086,
+        2985360.8465181803,
+        -3.816844395261542e-17
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 1.75
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        3.1086262911737537e-15,
+        -0.3580596926622093,
+        14.000008206564244
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        4.689553406933555e-06,
+        1.0,
+        0.0
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": null,
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          null
+        ],
+        "version": 1
+      },
+      "text": null
+    },
+    "chart": {
+      "entry_count": 0,
+      "mode": false,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": null,
+      "spent_joules": [
+        0.0,
+        0.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": false,
+      "source": {
+        "read": [],
+        "selected": "voyage.earth-departure",
+        "version": 1
+      },
+      "text": null
+    },
+    "tutorial": {
+      "prompt": "Earth is home. The Scout is familiar.\nThe voyage and landing are missing.\nShelter aboard; inspect Archive, gather or explore.\nSURVIVAL 1/7: H: inspect survival meters\nT: skip tutorial",
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": null,
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.08749999850988388,
+        0.20999999344348907,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "canonical-journey-awakening-outside-scout.png",
+    "sha256": "7447ecbe3be538cca9587319534999104af029c3c3b4edd7ad1c3daf4b06bf03"
+  },
+  {
+    "scenario": "narrative-distress",
+    "name": "physical-relay",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 300,
+      "cache_patches": 300,
+      "cpu_cache_bytes": 8867180,
+      "generated_last_frame": 0,
+      "generated_peak": 2,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 7832,
+      "generation_total_micros": 637302,
+      "gpu_cache_bytes": 6904548,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 2094368,
+      "pending_patches": 0,
+      "preparation_last_frame_micros": 869,
+      "preparation_overruns": 490,
+      "preparation_peak_micros": 8442,
+      "presentation_ready": true,
+      "selection_last_frame_micros": 0,
+      "total_generated": 300,
+      "triangles": 162622,
+      "uploaded_last_frame_bytes": 76800
+    },
+    "player": {
+      "eye_position_meters": [
+        66.80003890029641,
+        2985360.7492526453,
+        0.0
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        66.00002559100753,
+        2985360.1492703916,
+        -3.067806360035034e-17
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 1.7499999995343387
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        1.483258824659304e-14,
+        -0.3587742205709219,
+        66.80003890029641
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        2.2375868866220117e-05,
+        1.0,
+        0.0
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": "E: inspect fractured relay",
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          null
+        ],
+        "version": 1
+      },
+      "text": null
+    },
+    "chart": {
+      "entry_count": 0,
+      "mode": false,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": null,
+      "spent_joules": [
+        0.0,
+        0.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": false,
+      "source": {
+        "read": [],
+        "selected": "voyage.earth-departure",
+        "version": 1
+      },
+      "text": null
+    },
+    "tutorial": {
+      "prompt": "Earth is home. The Scout is familiar.\nThe voyage and landing are missing.\nShelter aboard; inspect Archive, gather or explore.\nSURVIVAL 1/7: H: inspect survival meters\nT: skip tutorial",
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": null,
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.08749999850988388,
+        0.20999999344348907,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-distress-physical-relay.png",
+    "sha256": "9b47d4c2df16a3d103804ff38ad8940f610b21ea2a683f89acdafcbab474777a"
+  },
+  {
+    "scenario": "narrative-distress",
+    "name": "inspected-clue",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 300,
+      "cache_patches": 300,
+      "cpu_cache_bytes": 8867180,
+      "generated_last_frame": 0,
+      "generated_peak": 2,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 7832,
+      "generation_total_micros": 637302,
+      "gpu_cache_bytes": 6904548,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 2094368,
+      "pending_patches": 0,
+      "preparation_last_frame_micros": 664,
+      "preparation_overruns": 490,
+      "preparation_peak_micros": 8442,
+      "presentation_ready": true,
+      "selection_last_frame_micros": 0,
+      "total_generated": 300,
+      "triangles": 162622,
+      "uploaded_last_frame_bytes": 76800
+    },
+    "player": {
+      "eye_position_meters": [
+        66.80003890029641,
+        2985360.7492526453,
+        0.0
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        66.00002559100753,
+        2985360.1492703916,
+        -3.067806360035034e-17
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 1.7499999995343387
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        1.483258824659304e-14,
+        -0.3587742205709219,
+        66.80003890029641
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        2.2375868866220117e-05,
+        1.0,
+        0.0
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": "E: inspect fractured relay",
+      "source": {
+        "inspected_utc_millis": [
+          4016,
+          null
+        ],
+        "version": 1
+      },
+      "text": "PHYSICAL EVIDENCE / DISTRESS SITE\nOBSERVED: fractured relay casing; scored ceramic plate.\nLEGIBLE INSCRIPTION / UNVERIFIED CLAIM:\n'Passage may emerge near Absenat.'\nNo endpoint, working passage or transit is established.\nWho wrote this, and whether it is true, remain unknown.\nSaved to Archive. E: close"
+    },
+    "chart": {
+      "entry_count": 0,
+      "mode": false,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": null,
+      "spent_joules": [
+        0.0,
+        0.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": false,
+      "source": {
+        "read": [],
+        "selected": "voyage.earth-departure",
+        "version": 1
+      },
+      "text": null
+    },
+    "tutorial": {
+      "prompt": null,
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": null,
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.08749999850988388,
+        0.20999999344348907,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-distress-inspected-clue.png",
+    "sha256": "c49f946f3827454942a31d8d5617c40c5f9184b7164445e8d59fbfe2dfbe684a"
+  },
+  {
+    "scenario": "narrative-warning",
+    "name": "physical-relay",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 234,
+      "cache_patches": 234,
+      "cpu_cache_bytes": 6917002,
+      "generated_last_frame": 0,
+      "generated_peak": 2,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 14240,
+      "generation_total_micros": 559642,
+      "gpu_cache_bytes": 5374848,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 2095784,
+      "pending_patches": 0,
+      "preparation_last_frame_micros": 426,
+      "preparation_overruns": 279,
+      "preparation_peak_micros": 14580,
+      "presentation_ready": true,
+      "selection_last_frame_micros": 0,
+      "total_generated": 234,
+      "triangles": 126004,
+      "uploaded_last_frame_bytes": 59904
+    },
+    "player": {
+      "eye_position_meters": [
+        12007.943794248695,
+        2986887.4524212005,
+        -8004.095862296494
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        12007.139550855154,
+        2986886.858129648,
+        -8004.092681919947
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 1.7499999999308784
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        8004.095862296496,
+        1526.344394334592,
+        12007.943794248693
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        0.0040201726369559765,
+        0.999988317489624,
+        -0.002679713536053896
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": "E: inspect remote transmitter",
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          null
+        ],
+        "version": 1
+      },
+      "text": null
+    },
+    "chart": {
+      "entry_count": 0,
+      "mode": false,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": null,
+      "spent_joules": [
+        0.0,
+        0.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": false,
+      "source": {
+        "read": [],
+        "selected": "voyage.earth-departure",
+        "version": 1
+      },
+      "text": null
+    },
+    "tutorial": {
+      "prompt": "Earth is home. The Scout is familiar.\nThe voyage and landing are missing.\nShelter aboard; inspect Archive, gather or explore.\nSURVIVAL 1/7: H: inspect survival meters\nT: skip tutorial",
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": null,
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.08749999850988388,
+        0.20999999344348907,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-warning-physical-relay.png",
+    "sha256": "81fa14059a22f485a4531f7f4f4ae9c435914554723f98268f9fe093fc2b0af3"
+  },
+  {
+    "scenario": "narrative-warning",
+    "name": "inspected-clue",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 234,
+      "cache_patches": 234,
+      "cpu_cache_bytes": 6917002,
+      "generated_last_frame": 0,
+      "generated_peak": 2,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 14240,
+      "generation_total_micros": 559642,
+      "gpu_cache_bytes": 5374848,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 2095784,
+      "pending_patches": 0,
+      "preparation_last_frame_micros": 440,
+      "preparation_overruns": 279,
+      "preparation_peak_micros": 14580,
+      "presentation_ready": true,
+      "selection_last_frame_micros": 0,
+      "total_generated": 234,
+      "triangles": 126004,
+      "uploaded_last_frame_bytes": 59904
+    },
+    "player": {
+      "eye_position_meters": [
+        12007.943794248695,
+        2986887.4524212005,
+        -8004.095862296494
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        12007.139550855154,
+        2986886.858129648,
+        -8004.092681919947
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 1.7499999999308784
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        8004.095862296496,
+        1526.344394334592,
+        12007.943794248693
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        0.0040201726369559765,
+        0.999988317489624,
+        -0.002679713536053896
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": "E: inspect remote transmitter",
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          2320
+        ],
+        "version": 1
+      },
+      "text": "PHYSICAL EVIDENCE / REMOTE WARNING ORIGIN\nOBSERVED: detached transmitter housing, dark indicator.\nLEGIBLE LOCAL BUFFER / UNVERIFIED CLAIM:\n'Trap. Do not take the passage.' [remaining bytes lost]\nNo sender identity or motive survives.\nThis does not establish who sent the received warning.\nSaved to Archive. E: close"
+    },
+    "chart": {
+      "entry_count": 0,
+      "mode": false,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": null,
+      "spent_joules": [
+        0.0,
+        0.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": false,
+      "source": {
+        "read": [],
+        "selected": "voyage.earth-departure",
+        "version": 1
+      },
+      "text": null
+    },
+    "tutorial": {
+      "prompt": null,
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": null,
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.08749999850988388,
+        0.20999999344348907,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-warning-inspected-clue.png",
+    "sha256": "0c99bda14db229b33a3fccd10bf41c4959e00ecbf1b65d4ab96965190b03e8c3"
+  },
+  {
+    "scenario": "narrative-recovered",
+    "name": "distress-payload",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 0,
+      "cache_patches": 0,
+      "cpu_cache_bytes": 13176,
+      "generated_last_frame": 0,
+      "generated_peak": 0,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 0,
+      "generation_total_micros": 0,
+      "gpu_cache_bytes": 131072,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 0,
+      "pending_patches": 1,
+      "preparation_last_frame_micros": 2070,
+      "preparation_overruns": 22,
+      "preparation_peak_micros": 3282,
+      "presentation_ready": false,
+      "selection_last_frame_micros": 2064,
+      "total_generated": 0,
+      "triangles": 0,
+      "uploaded_last_frame_bytes": 0
+    },
+    "player": {
+      "eye_position_meters": [
+        -2.3000000000000007,
+        2985363.1053386936,
+        2.9999999999999996
+      ],
+      "local_ship_position_meters": [
+        -3.0,
+        1.9973118279569892,
+        -2.3
+      ],
+      "location": "InsideShip",
+      "look_target_meters": [
+        -3.3000000000000007,
+        2985363.1053386936,
+        2.999999999999999
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 4.105341087095439
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        -3.0,
+        1.9973118277266622,
+        -2.3000000000000003
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": null,
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          null
+        ],
+        "version": 1
+      },
+      "text": null
+    },
+    "chart": {
+      "entry_count": 2,
+      "mode": false,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [
+          {
+            "id": "salimon-site:vesper-distress-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    65.00000869376335,
+                    2985359.3992923796,
+                    0.0
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-01.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          },
+          {
+            "id": "salimon-site:vesper-warning-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    12006.138430990492,
+                    2986886.1183502786,
+                    -8004.092287326993
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-02.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          }
+        ],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": {
+        "category": "Component",
+        "job": 3,
+        "mass": 750000,
+        "recipe": "data-recovery-module",
+        "unit": 1
+      },
+      "spent_joules": [
+        3000000000.0,
+        5000000000.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": true,
+      "source": {
+        "read": [
+          "voyage.earth-departure",
+          "voyage.mars-transit",
+          "routine.maintenance",
+          "routine.personal",
+          "voyage.system-exit",
+          "received.damaged-01"
+        ],
+        "selected": "received.damaged-01",
+        "version": 1
+      },
+      "text": "SCOUT ARCHIVE  6/7\nDamaged received record 01\nSOURCE: Received packet / sender unknown\nTIME: UNKNOWN / RETAINED ORDER\nRECOVERED FRAGMENT / UNVERIFIED\nRECEIVED CLAIM / sender and transmission time unknown.\nDistress: accident at the attached Vesper surface fix.\nPlease investigate the damaged relay. +/-25m.\nPacket frame: Vesper body-local, location-v1.\nA received claim, not proof of the traveler's visit.\nP in cockpit: chart; Enter: voluntary uncertain route.\nRECOVERY INSTALLED\nSTOPPED  5.0 MW / reserve 2.00 GJ\nRecord progress: 100.0% / 100.0%\nWork left at requested power: 0s / 0s\nR: start/stop selected damaged record (no refund)\nREAD 6/7 | NO NAVIGATION FIX\nUP/DOWN records  E close  ESC pause"
+    },
+    "tutorial": {
+      "prompt": null,
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.009999999776482582,
+        0.024000000208616257,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.018546203151345253,
+        0.006220866460353136,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-recovered-distress-payload.png",
+    "sha256": "fc5bcc78829fc359b3ee630b59497a1a62644c9bbbf788808eb482954dd475d6"
+  },
+  {
+    "scenario": "narrative-recovered",
+    "name": "warning-payload",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 0,
+      "cache_patches": 0,
+      "cpu_cache_bytes": 13176,
+      "generated_last_frame": 0,
+      "generated_peak": 0,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 0,
+      "generation_total_micros": 0,
+      "gpu_cache_bytes": 131072,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 0,
+      "pending_patches": 1,
+      "preparation_last_frame_micros": 2202,
+      "preparation_overruns": 32,
+      "preparation_peak_micros": 5556,
+      "presentation_ready": false,
+      "selection_last_frame_micros": 2196,
+      "total_generated": 0,
+      "triangles": 0,
+      "uploaded_last_frame_bytes": 0
+    },
+    "player": {
+      "eye_position_meters": [
+        -2.3000000000000007,
+        2985363.1053386936,
+        2.9999999999999996
+      ],
+      "local_ship_position_meters": [
+        -3.0,
+        1.9973118279569892,
+        -2.3
+      ],
+      "location": "InsideShip",
+      "look_target_meters": [
+        -3.3000000000000007,
+        2985363.1053386936,
+        2.999999999999999
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 4.105341087095439
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        -3.0,
+        1.9973118277266622,
+        -2.3000000000000003
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": null,
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          null
+        ],
+        "version": 1
+      },
+      "text": null
+    },
+    "chart": {
+      "entry_count": 2,
+      "mode": false,
+      "note": null,
+      "route_count": 0,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [
+          {
+            "id": "salimon-site:vesper-distress-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    65.00000869376335,
+                    2985359.3992923796,
+                    0.0
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-01.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          },
+          {
+            "id": "salimon-site:vesper-warning-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    12006.138430990492,
+                    2986886.1183502786,
+                    -8004.092287326993
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-02.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          }
+        ],
+        "routes": [],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": {
+        "category": "Component",
+        "job": 3,
+        "mass": 750000,
+        "recipe": "data-recovery-module",
+        "unit": 1
+      },
+      "spent_joules": [
+        3000000000.0,
+        5000000000.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": true,
+      "source": {
+        "read": [
+          "voyage.earth-departure",
+          "voyage.mars-transit",
+          "routine.maintenance",
+          "routine.personal",
+          "voyage.system-exit",
+          "received.damaged-01",
+          "received.damaged-02"
+        ],
+        "selected": "received.damaged-02",
+        "version": 1
+      },
+      "text": "SCOUT ARCHIVE  7/7\nDamaged received record 02\nSOURCE: Received packet / sender unknown\nTIME: UNKNOWN / RETAINED ORDER\nIRRECOVERABLE SEGMENTS / PARTIAL\nRECEIVED WARNING / sender and time unknown.\nIt is a trap. Do not take the passage.\nSeparate origin: Vesper remote relay, +/-25m.\nPacket frame: Vesper body-local, location-v1.\n[irrecoverable gap: sender, motive, chronology]\nNo proof of passage or of the warning's truth.\nP in cockpit: chart; Enter: voluntary uncertain route.\nRECOVERY INSTALLED\nSTOPPED  5.0 MW / reserve 2.00 GJ\nRecord progress: 100.0% / 100.0%\nWork left at requested power: 0s / 0s\nR: start/stop selected damaged record (no refund)\nREAD 7/7 | NO NAVIGATION FIX\nUP/DOWN records  E close  ESC pause"
+    },
+    "tutorial": {
+      "prompt": null,
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": "habitation/engineering",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.009999999776482582,
+        0.024000000208616257,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.018546203151345253,
+        0.006220866460353136,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-recovered-warning-payload.png",
+    "sha256": "62702e9cbe70262d94e0c1b547029a24f9d3a602ec8c79908de742ccf6e0a097"
+  },
+  {
+    "scenario": "narrative-chart",
+    "name": "uncertain-route-1",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 0,
+      "cache_patches": 0,
+      "cpu_cache_bytes": 12120,
+      "generated_last_frame": 0,
+      "generated_peak": 0,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 0,
+      "generation_total_micros": 0,
+      "gpu_cache_bytes": 131072,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 0,
+      "pending_patches": 1,
+      "preparation_last_frame_micros": 2148,
+      "preparation_overruns": 14,
+      "preparation_peak_micros": 4741,
+      "presentation_ready": false,
+      "selection_last_frame_micros": 2142,
+      "total_generated": 0,
+      "triangles": 0,
+      "uploaded_last_frame_bytes": 0
+    },
+    "player": {
+      "eye_position_meters": [
+        6.128431095930864e-16,
+        2985362.9070591237,
+        -2.76
+      ],
+      "local_ship_position_meters": [
+        2.76,
+        1.799032258064516,
+        0.0
+      ],
+      "location": "Cockpit",
+      "look_target_meters": [
+        8.337784163710061e-16,
+        2985362.807225707,
+        -3.7550041652780255
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 3.9070603996515274
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        2.76,
+        1.7990322578698397,
+        0.0
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": null,
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          null
+        ],
+        "version": 1
+      },
+      "text": null
+    },
+    "chart": {
+      "entry_count": 2,
+      "mode": true,
+      "note": "UNVERIFIED ROUTE SAVED - NO AUTOPILOT",
+      "route_count": 1,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [
+          {
+            "id": "salimon-site:vesper-distress-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    65.00000869376335,
+                    2985359.3992923796,
+                    0.0
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-01.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          },
+          {
+            "id": "salimon-site:vesper-warning-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    12006.138430990492,
+                    2986886.1183502786,
+                    -8004.092287326993
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-02.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          }
+        ],
+        "routes": [
+          {
+            "created_utc_millis": 0,
+            "destination": "salimon-site:vesper-distress-v1",
+            "from": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                2985361.108026866,
+                0.0
+              ]
+            },
+            "lead_source": "scout.received.damaged-01.location-v1",
+            "to": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                65.00000869376335,
+                2985359.3992923796,
+                0.0
+              ]
+            }
+          }
+        ],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": {
+        "category": "Component",
+        "job": 3,
+        "mass": 750000,
+        "recipe": "data-recovery-module",
+        "unit": 1
+      },
+      "spent_joules": [
+        3000000000.0,
+        5000000000.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": false,
+      "source": {
+        "read": [],
+        "selected": "voyage.earth-departure",
+        "version": 1
+      },
+      "text": null
+    },
+    "tutorial": {
+      "prompt": "Earth is home. The Scout is familiar.\nThe voyage and landing are missing.\nShelter aboard; inspect Archive, gather or explore.\nSURVIVAL 1/7: H: inspect survival meters\nT: skip tutorial",
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": "cockpit",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.009999999776482582,
+        0.024000000208616257,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.014938433654606342,
+        0.015305417589843273,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-chart-uncertain-route-1.png",
+    "sha256": "77d7884648ec2b6031b979956b48ae445ee27cb80d09071f2311d86b8de2a617"
+  },
+  {
+    "scenario": "narrative-chart",
+    "name": "uncertain-route-2",
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "terrain": {
+      "active_patches": 0,
+      "cache_patches": 0,
+      "cpu_cache_bytes": 13176,
+      "generated_last_frame": 0,
+      "generated_peak": 0,
+      "generation_last_frame_micros": 0,
+      "generation_peak_micros": 0,
+      "generation_total_micros": 0,
+      "gpu_cache_bytes": 131072,
+      "gpu_ready": true,
+      "mode": "Canonical",
+      "peak_upload_bytes": 0,
+      "pending_patches": 1,
+      "preparation_last_frame_micros": 2682,
+      "preparation_overruns": 26,
+      "preparation_peak_micros": 6501,
+      "presentation_ready": false,
+      "selection_last_frame_micros": 2674,
+      "total_generated": 0,
+      "triangles": 0,
+      "uploaded_last_frame_bytes": 0
+    },
+    "player": {
+      "eye_position_meters": [
+        6.128431095930864e-16,
+        2985362.9070591237,
+        -2.76
+      ],
+      "local_ship_position_meters": [
+        2.76,
+        1.799032258064516,
+        0.0
+      ],
+      "location": "Cockpit",
+      "look_target_meters": [
+        8.337784163710061e-16,
+        2985362.807225707,
+        -3.7550041652780255
+      ],
+      "nearby_body": {
+        "name": "Vesper",
+        "surface_distance_meters": 3.9070603996515274
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        2.76,
+        1.7990322578698397,
+        0.0
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "narrative": {
+      "hint": null,
+      "source": {
+        "inspected_utc_millis": [
+          null,
+          null
+        ],
+        "version": 1
+      },
+      "text": null
+    },
+    "chart": {
+      "entry_count": 2,
+      "mode": true,
+      "note": "UNVERIFIED ROUTE SAVED - NO AUTOPILOT",
+      "route_count": 2,
+      "source": {
+        "catalog_revision": "awakening-candidates-v1",
+        "entries": [
+          {
+            "id": "salimon-site:vesper-distress-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    65.00000869376335,
+                    2985359.3992923796,
+                    0.0
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-01.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          },
+          {
+            "id": "salimon-site:vesper-warning-v1",
+            "leads": [
+              {
+                "inferred": false,
+                "position": {
+                  "body": "salimon-fiction:awakening.s000000.p00",
+                  "frame": "body_local",
+                  "meters": [
+                    12006.138430990492,
+                    2986886.1183502786,
+                    -8004.092287326993
+                  ]
+                },
+                "received_utc_millis": 0,
+                "source": "scout.received.damaged-02.location-v1",
+                "uncertainty": {
+                  "kind": "radius_meters",
+                  "meters": 25.0
+                }
+              }
+            ],
+            "observed": null
+          }
+        ],
+        "routes": [
+          {
+            "created_utc_millis": 0,
+            "destination": "salimon-site:vesper-distress-v1",
+            "from": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                2985361.108026866,
+                0.0
+              ]
+            },
+            "lead_source": "scout.received.damaged-01.location-v1",
+            "to": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                65.00000869376335,
+                2985359.3992923796,
+                0.0
+              ]
+            }
+          },
+          {
+            "created_utc_millis": 48,
+            "destination": "salimon-site:vesper-warning-v1",
+            "from": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                0.0,
+                2985361.108026866,
+                0.0
+              ]
+            },
+            "lead_source": "scout.received.damaged-02.location-v1",
+            "to": {
+              "body": "salimon-fiction:awakening.s000000.p00",
+              "frame": "body_local",
+              "meters": [
+                12006.138430990492,
+                2986886.1183502786,
+                -8004.092287326993
+              ]
+            }
+          }
+        ],
+        "version": 1
+      }
+    },
+    "recovery": {
+      "active": null,
+      "config": {
+        "mobility_reserve_joules": 2000000000.0,
+        "record_cost_joules": [
+          3000000000.0,
+          5000000000.0
+        ],
+        "watts": 5000000.0
+      },
+      "module": {
+        "category": "Component",
+        "job": 3,
+        "mass": 750000,
+        "recipe": "data-recovery-module",
+        "unit": 1
+      },
+      "spent_joules": [
+        3000000000.0,
+        5000000000.0
+      ],
+      "version": 1
+    },
+    "archive": {
+      "open": false,
+      "source": {
+        "read": [],
+        "selected": "voyage.earth-departure",
+        "version": 1
+      },
+      "text": null
+    },
+    "tutorial": {
+      "prompt": "Earth is home. The Scout is familiar.\nThe voyage and landing are missing.\nShelter aboard; inspect Archive, gather or explore.\nSURVIVAL 1/7: H: inspect survival meters\nT: skip tutorial",
+      "state": {
+        "completed": 0,
+        "skipped": false
+      }
+    },
+    "audio_output": {
+      "area": "cockpit",
+      "available": false,
+      "backend": "cpal-0.18.2",
+      "callback_cpu_overruns": 0,
+      "callbacks": 0,
+      "channels": 0,
+      "device_id": null,
+      "environment_warning": null,
+      "frames": 0,
+      "mailbox_bytes": 672,
+      "max_callback_frames": 0,
+      "max_callback_ns": 0,
+      "mixer_bytes": 3240,
+      "preview_only": true,
+      "sample_format": null,
+      "sample_rate": 0,
+      "scene_events": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "scene_filters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.009999999776482582,
+        0.024000000208616257,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scene_gains": [
+        0.014938433654606342,
+        0.015305417589843273,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "settings": {
+        "camera_motion": true,
+        "condition_audio": true,
+        "environment_audio": true,
+        "environment_cues": true,
+        "environment_volume_percent": 60,
+        "master_mute": false,
+        "scene_audio": true,
+        "scene_volume_percent": 60,
+        "version": 1,
+        "vignette": true
+      },
+      "voices": 32
+    },
+    "png": "narrative-chart-uncertain-route-2.png",
+    "sha256": "0e9394b97461ca406cd3416df2676f66424041abba4dfd52dc6a53e553d43ea3"
+  }
+]

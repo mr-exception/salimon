@@ -81,6 +81,10 @@ pub(crate) enum Key {
 }
 
 pub(crate) fn dispatch(session: &mut GameplaySession, key: Key, pressed: bool) {
+    if session.narrative.reader.is_some() {
+        modals::handle(session, key, pressed);
+        return;
+    }
     if session.surface_key(key, pressed) {
         return;
     }
@@ -147,6 +151,7 @@ impl GameplaySession {
         self.biology.pending = None;
         self.crafting_ui.open = false;
         self.archive_reader.open = false;
+        self.narrative.reader = None;
         self.wheel = Default::default();
         self.input.clear();
         self.ship.clear_steering_input();

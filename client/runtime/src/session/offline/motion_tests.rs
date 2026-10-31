@@ -38,7 +38,10 @@ fn schema_29_migration_preserves_geography_resources_and_body_relative_motion() 
     );
     let current: Value = serde_json::from_slice(&loaded.save_bytes(100).unwrap()).unwrap();
     assert_eq!(current["state"]["physical"], old["state"]["physical"]);
-    assert_eq!(current["schema_version"], 30);
+    assert_eq!(
+        current["schema_version"],
+        salimon_persistence::SCHEMA_VERSION
+    );
     let bytes = loaded.save_bytes(100).unwrap();
     for path in ["/state/motion/version", "/state/motion/definition_sha256"] {
         let mut bad = current.clone();

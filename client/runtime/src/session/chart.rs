@@ -82,7 +82,6 @@ pub(crate) fn restore(
 impl GameplaySession {
     /// Trusted recovered-message/inference admission, consumed by #470. No
     /// coordinates are obtained from catalog lookup or inferred by this seam.
-    #[allow(dead_code)] // Production source owner is downstream; exercised here.
     pub(crate) fn chart_receive_lead(
         &mut self,
         id: salimon_universe::CatalogId,
@@ -132,6 +131,29 @@ impl GameplaySession {
             body: salimon_world::canonical::START.manifest().planet.id.clone(),
             meters: self.ship.snapshot().pose.position_meters,
         };
+        let lead_source = self
+            .chart
+            .get(&id)
+            .and_then(|e| e.leads().last())
+            .map(|l| l.source.clone());
+        let unverified = self.chart.get(&id).is_some_and(|e| e.observed().is_none());
+        if unverified
+            && super::narrative::site_name(&id).is_some()
+            && let Some(source) = lead_source
+        {
+            self.scanner.chart_note = Some(
+                if self
+                    .chart
+                    .route_to_lead(&id, &source, from, self.scanner.utc_millis)
+                    .is_ok()
+                {
+                    "UNVERIFIED ROUTE SAVED - NO AUTOPILOT"
+                } else {
+                    "ROUTE FRAME UNAVAILABLE"
+                },
+            );
+            return;
+        }
         self.scanner.chart_note = Some(
             if self
                 .chart
@@ -164,7 +186,7 @@ impl GameplaySession {
                 .and_then(|r| r.header().display_name.as_deref())
                 .unwrap_or("OBSERVED OBJECT")
         } else {
-            "UNVERIFIED LEAD"
+            super::narrative::site_name(&entry.id).unwrap_or("UNVERIFIED LEAD")
         };
         let provenance = match entry.observed() {
             Some(e) if e.fresh(self.scanner.utc_millis) => "OBSERVED",

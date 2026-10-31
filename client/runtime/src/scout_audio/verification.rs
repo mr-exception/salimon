@@ -312,3 +312,45 @@ fn continuous_production_audio_582() {
         .unwrap();
     }
 }
+
+#[test]
+#[ignore = "writes opening production callback PCM; set a new SALIMON_AUDIO_EVIDENCE directory"]
+fn opening_production_audio_471() {
+    let root = PathBuf::from(std::env::var_os("SALIMON_AUDIO_EVIDENCE").unwrap());
+    std::fs::create_dir(&root).unwrap();
+    let mut rows = Vec::new();
+    for (name, inside) in [("vesper-outside", false), ("scout-inside", true)] {
+        let mut s = GameplaySession::new_canonical_run().unwrap();
+        if inside {
+            s.character = Default::default();
+        }
+        let mut m = Mixer::default();
+        let mut sequence = Vec::new();
+        for _ in 0..125 {
+            s.advance_game(Duration::from_millis(16));
+            let observation = Observation::capture(&s, true);
+            m.observe(observation, Settings::default());
+            let mut control = controls(
+                m.voices(Settings::default()),
+                0,
+                true,
+                None,
+                Settings::default(),
+            );
+            crate::environment_audio::apply(
+                observation.environment,
+                &mut control,
+                Settings::default(),
+            );
+            assert!(
+                observation.environment.bands.iter().all(|b| b.gain == 0.),
+                "Vesper is airless"
+            );
+            sequence.push(control);
+        }
+        let (wav, metrics) = crate::native_audio::sequence_wav(&sequence);
+        std::fs::write(root.join(format!("{name}.wav")), &wav).unwrap();
+        rows.push(json!({"name":name,"location":format!("{:?}",s.character.location()),"metrics":metrics,"sha256":salimon_universe::pack::digest(&wav)}));
+    }
+    std::fs::write(root.join("manifest.json"),serde_json::to_vec_pretty(&json!({"scope":"actual fresh canonical session observations, declared inside placement, production controls and native callback PCM; not OS device playback","sample_rate":48000,"channels":2,"control_step_ms":16,"samples":rows})).unwrap()).unwrap();
+}

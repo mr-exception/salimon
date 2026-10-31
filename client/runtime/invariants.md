@@ -900,3 +900,7 @@ See the [cloud render acceptance contract](../../docs/universe-terrain.md#cloud-
 seam tests and bounded raw frame/draw observations. Measurements remain
 observational; missing GPU counters stay null and software timings do not
 establish hardware FPS.
+
+The `universe-night` evidence camera clears canonical terrain by 40 m on the
+negative-Y hemisphere, opposite the current fixed positive-Y local light. It
+never supplies an atmosphere, biosphere or gameplay location/time change.

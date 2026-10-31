@@ -876,3 +876,43 @@ See the [cloud render acceptance contract](../docs/universe-terrain.md#cloud-int
 seam tests and bounded raw frame/draw observations. Measurements remain
 observational; missing GPU counters stay null and software timings do not
 establish hardware FPS.
+
+## Planetary environment matrix (#628)
+
+Build the production client, configure Linux Xvfb/Mesa as in the validation guide,
+then run (Pillow is required from `scripts/visual-requirements.txt`):
+
+```sh
+python3 scripts/planetary_environment.py --binary target/debug/salimon-client --output artifacts/environment-new
+```
+
+The output directory must be new. Nine mandatory native capture routes cover
+canonical geology orbit/surface/edge/revisit, Vesper vacuum day/night, sterile
+sources, biological detachment/mining/save/reopen, suit field marks, personal
+chart history/manual bearings and suit/Scout audio/settings. Native input uses
+the production protocol; this does not certify physical input devices.
+
+World/runtime weather, organism, natural-site and geological-landmark exports
+repeat in independent processes and require exact byte equality. These exact
+DTOs feed production wgpu pipelines; callback PCM exports exercise suit, open/
+closed Scout and vacuum transmission. Positive atmospheric/biosphere sources
+are explicit fictional fixtures on representative geometry; they do not publish
+life or atmosphere on Vesper or the observed Moon. Component probes isolate
+optics/materials; they are not one fully populated canonical planet or a claim
+of seamless navigation between their separate fixtures.
+
+`matrix.json` retains commands, source/binary hashes, each native context and
+raw-derived median/p95/max frame, draw and available GPU measurements. Original
+results retain memory/cache metrics and simulation coordinates/time. Missing GPU
+samples remain null; software-GPU timings do not establish M1/Metal FPS. Missing
+routes, failed steps/captures, wrong scenario contracts and differing source
+exports fail. Original PNG/WAV/JSON/log hashes bind the artifact directory.
+The run stops on failure and writes a failed report; it does not overwrite a
+prior packet. #561 owns actual perceptual/listening review, #557 physical input
+and #563 hardware qualification. See the [current report](../reports/issue-628/README.md).
+
+After an interrupted session, `--native-summary /path/to/summary.json` may reuse
+completed results from the same binary. Preserve the source/binary provenance;
+the runner rechecks the complete ordered scenario contracts, steps, GPU originals
+and raw metrics. Incomplete or failed rows cannot satisfy the matrix. A successful
+summary must contain all nine routes before component verification proceeds.

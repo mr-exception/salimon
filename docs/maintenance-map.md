@@ -837,3 +837,8 @@ See the [cloud render acceptance contract](universe-terrain.md#cloud-integration
 seam tests and bounded raw frame/draw observations. Measurements remain
 observational; missing GPU counters stay null and software timings do not
 establish hardware FPS.
+
+Planetary environment combined verification: `scripts/planetary_environment.py`,
+`scenario_suites.py` and `scenarios/evidence/planetary-night.json`; runtime
+`scout_reference.rs` owns physical night-camera placement. The [matrix guide](../scripts/README.md#planetary-environment-matrix-628)
+links production path coverage and hardware/perception limits.

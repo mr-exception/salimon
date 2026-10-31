@@ -1,0 +1,2346 @@
+[
+  {
+    "scenario": "universe-terrain.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/result.json",
+    "sha256": "0e1e4be72640c68304f1d4f35b91b5f53c652fa2947604e890922d6fd90e9360",
+    "steps": 52,
+    "captures": [
+      {
+        "label": "universe-orbit",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-012-universe-orbit.png",
+        "sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 6,
+          "cache_patches": 6,
+          "cpu_cache_bytes": 176678,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 3429,
+          "generation_total_micros": 7879,
+          "gpu_cache_bytes": 258104,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 128568,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 11,
+          "preparation_overruns": 3,
+          "preparation_peak_micros": 3453,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 6,
+          "triangles": 3072,
+          "uploaded_last_frame_bytes": 1536
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 21,
+            "median": 33.532726,
+            "p95": 47.583449,
+            "max": 49.677292
+          },
+          "cpu_update_ms": {
+            "count": 21,
+            "median": 0.612807,
+            "p95": 3.506252,
+            "max": 4.030417
+          },
+          "cpu_render_ms": {
+            "count": 21,
+            "median": 1.186585,
+            "p95": 6.192268,
+            "max": 35.279903000000004
+          },
+          "gpu_ms": {
+            "count": 20,
+            "median": 23.2608495,
+            "p95": 32.019788,
+            "max": 68.39541
+          },
+          "scene_draws": {
+            "count": 21,
+            "median": 11.0,
+            "p95": 11.0,
+            "max": 11.0
+          },
+          "total_draws": {
+            "count": 21,
+            "median": 14.0,
+            "p95": 14.0,
+            "max": 14.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 4478038.5,
+          "name": "universe-orbit"
+        }
+      },
+      {
+        "label": "universe-orbit-repeat",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-013-universe-orbit-repeat.png",
+        "sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 6,
+          "cache_patches": 6,
+          "cpu_cache_bytes": 176678,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 3429,
+          "generation_total_micros": 7879,
+          "gpu_cache_bytes": 258104,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 128568,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 24,
+          "preparation_overruns": 3,
+          "preparation_peak_micros": 3453,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 6,
+          "triangles": 3072,
+          "uploaded_last_frame_bytes": 1536
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 25,
+            "median": 33.532726,
+            "p95": 49.677292,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 25,
+            "median": 0.612807,
+            "p95": 3.506252,
+            "max": 4.030417
+          },
+          "cpu_render_ms": {
+            "count": 25,
+            "median": 1.2791890000000001,
+            "p95": 35.279903000000004,
+            "max": 700.8962640000001
+          },
+          "gpu_ms": {
+            "count": 24,
+            "median": 23.27706,
+            "p95": 32.019788,
+            "max": 68.39541
+          },
+          "scene_draws": {
+            "count": 25,
+            "median": 11.0,
+            "p95": 11.0,
+            "max": 11.0
+          },
+          "total_draws": {
+            "count": 25,
+            "median": 14.0,
+            "p95": 14.0,
+            "max": 14.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 4478038.5,
+          "name": "universe-orbit"
+        }
+      },
+      {
+        "label": "universe-surface",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-025-universe-surface.png",
+        "sha256": "b10d8c9f061852c55fc44854f8f7f50e03b082bfc7609fc7471fb755f777a1a7",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 306,
+          "cpu_cache_bytes": 9041870,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 8619,
+          "generation_total_micros": 411466,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 416,
+          "preparation_overruns": 348,
+          "preparation_peak_micros": 71810,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 306,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 388,
+            "median": 45.666450499999996,
+            "p95": 132.454714,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 388,
+            "median": 2.85565,
+            "p95": 4.213369,
+            "max": 73.785494
+          },
+          "cpu_render_ms": {
+            "count": 388,
+            "median": 1.2516859999999999,
+            "p95": 7.603747,
+            "max": 708.9893390000001
+          },
+          "gpu_ms": {
+            "count": 387,
+            "median": 35.769844,
+            "p95": 87.997511,
+            "max": 293.219254
+          },
+          "scene_draws": {
+            "count": 388,
+            "median": 16.0,
+            "p95": 16.0,
+            "max": 310.0
+          },
+          "total_draws": {
+            "count": 388,
+            "median": 19.0,
+            "p95": 19.0,
+            "max": 313.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 2.803398689507931,
+          "name": "universe-surface"
+        }
+      },
+      {
+        "label": "universe-surface-repeat",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-026-universe-surface-repeat.png",
+        "sha256": "b10d8c9f061852c55fc44854f8f7f50e03b082bfc7609fc7471fb755f777a1a7",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 306,
+          "cpu_cache_bytes": 9041870,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 8619,
+          "generation_total_micros": 411466,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 772,
+          "preparation_overruns": 348,
+          "preparation_peak_micros": 71810,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 306,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 392,
+            "median": 45.738246000000004,
+            "p95": 135.875756,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 392,
+            "median": 2.854362,
+            "p95": 4.213369,
+            "max": 73.785494
+          },
+          "cpu_render_ms": {
+            "count": 392,
+            "median": 1.256512,
+            "p95": 8.192876,
+            "max": 978.9978550000001
+          },
+          "gpu_ms": {
+            "count": 391,
+            "median": 35.880943,
+            "p95": 93.819619,
+            "max": 293.219254
+          },
+          "scene_draws": {
+            "count": 392,
+            "median": 16.0,
+            "p95": 16.0,
+            "max": 310.0
+          },
+          "total_draws": {
+            "count": 392,
+            "median": 19.0,
+            "p95": 19.0,
+            "max": 313.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 2.803398689507931,
+          "name": "universe-surface"
+        }
+      },
+      {
+        "label": "universe-edge",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-038-universe-edge.png",
+        "sha256": "cc77b3e9f5d6b4d29e93490d395c2d25eeda4d66b9edfb5366221131235fccdb",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 138,
+          "cache_patches": 438,
+          "cpu_cache_bytes": 12829774,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 17638,
+          "generation_total_micros": 620789,
+          "gpu_cache_bytes": 3244992,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096228,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 156,
+          "preparation_overruns": 432,
+          "preparation_peak_micros": 71810,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 438,
+          "triangles": 74772,
+          "uploaded_last_frame_bytes": 35328
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 491,
+            "median": 55.689594,
+            "p95": 149.750781,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 491,
+            "median": 2.927406,
+            "p95": 4.266164,
+            "max": 73.785494
+          },
+          "cpu_render_ms": {
+            "count": 491,
+            "median": 1.4190209999999999,
+            "p95": 11.680752,
+            "max": 1170.959597
+          },
+          "gpu_ms": {
+            "count": 490,
+            "median": 40.1900525,
+            "p95": 115.75806299999999,
+            "max": 338.481923
+          },
+          "scene_draws": {
+            "count": 491,
+            "median": 16.0,
+            "p95": 305.0,
+            "max": 310.0
+          },
+          "total_draws": {
+            "count": 491,
+            "median": 19.0,
+            "p95": 308.0,
+            "max": 313.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 500.00000000067257,
+          "name": "universe-edge"
+        }
+      },
+      {
+        "label": "universe-edge-repeat",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-039-universe-edge-repeat.png",
+        "sha256": "cc77b3e9f5d6b4d29e93490d395c2d25eeda4d66b9edfb5366221131235fccdb",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 138,
+          "cache_patches": 438,
+          "cpu_cache_bytes": 12829774,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 17638,
+          "generation_total_micros": 620789,
+          "gpu_cache_bytes": 3244992,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096228,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 194,
+          "preparation_overruns": 432,
+          "preparation_peak_micros": 71810,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 438,
+          "triangles": 74772,
+          "uploaded_last_frame_bytes": 35328
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 495,
+            "median": 55.774552,
+            "p95": 151.29142000000002,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 495,
+            "median": 2.922376,
+            "p95": 4.266164,
+            "max": 73.785494
+          },
+          "cpu_render_ms": {
+            "count": 495,
+            "median": 1.431477,
+            "p95": 12.045905000000001,
+            "max": 1170.959597
+          },
+          "gpu_ms": {
+            "count": 494,
+            "median": 40.27577049999999,
+            "p95": 115.75806299999999,
+            "max": 338.481923
+          },
+          "scene_draws": {
+            "count": 495,
+            "median": 16.0,
+            "p95": 305.0,
+            "max": 310.0
+          },
+          "total_draws": {
+            "count": 495,
+            "median": 19.0,
+            "p95": 308.0,
+            "max": 313.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 500.00000000067257,
+          "name": "universe-edge"
+        }
+      },
+      {
+        "label": "universe-orbit-revisit",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-051-universe-orbit-revisit.png",
+        "sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 6,
+          "cache_patches": 438,
+          "cpu_cache_bytes": 12783158,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 17638,
+          "generation_total_micros": 620789,
+          "gpu_cache_bytes": 258104,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096228,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 19,
+          "preparation_overruns": 432,
+          "preparation_peak_micros": 71810,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 438,
+          "triangles": 3072,
+          "uploaded_last_frame_bytes": 1536
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 511,
+            "median": 55.602101,
+            "p95": 152.657227,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 511,
+            "median": 2.890367,
+            "p95": 4.258811000000001,
+            "max": 73.785494
+          },
+          "cpu_render_ms": {
+            "count": 511,
+            "median": 1.447875,
+            "p95": 12.045905000000001,
+            "max": 1170.959597
+          },
+          "gpu_ms": {
+            "count": 510,
+            "median": 40.1236235,
+            "p95": 120.03519999999999,
+            "max": 338.481923
+          },
+          "scene_draws": {
+            "count": 511,
+            "median": 16.0,
+            "p95": 305.0,
+            "max": 310.0
+          },
+          "total_draws": {
+            "count": 511,
+            "median": 19.0,
+            "p95": 308.0,
+            "max": 313.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 4478038.5,
+          "name": "universe-orbit"
+        }
+      },
+      {
+        "label": "universe-orbit-revisit-repeat",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-052-universe-orbit-revisit-repeat.png",
+        "sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 6,
+          "cache_patches": 438,
+          "cpu_cache_bytes": 12783158,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 17638,
+          "generation_total_micros": 620789,
+          "gpu_cache_bytes": 258104,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096228,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 48,
+          "preparation_overruns": 432,
+          "preparation_peak_micros": 71810,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 438,
+          "triangles": 3072,
+          "uploaded_last_frame_bytes": 1536
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 515,
+            "median": 55.118736,
+            "p95": 153.18436,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 515,
+            "median": 2.882132,
+            "p95": 4.258811000000001,
+            "max": 73.785494
+          },
+          "cpu_render_ms": {
+            "count": 515,
+            "median": 1.447875,
+            "p95": 12.051177,
+            "max": 1170.959597
+          },
+          "gpu_ms": {
+            "count": 514,
+            "median": 39.705057,
+            "p95": 120.03519999999999,
+            "max": 338.481923
+          },
+          "scene_draws": {
+            "count": 515,
+            "median": 16.0,
+            "p95": 305.0,
+            "max": 310.0
+          },
+          "total_draws": {
+            "count": 515,
+            "median": 19.0,
+            "p95": 308.0,
+            "max": 313.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 4478038.5,
+          "name": "universe-orbit"
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "planetary-vacuum.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-final-2/native/run-1evukg3v/result.json",
+    "sha256": "e5b9f4ac71dcb4e7421b2c2a1bdae5b5000102437be29b1ad8a61239c4bff11a",
+    "steps": 6,
+    "captures": [
+      {
+        "label": "airless-zenith",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-1evukg3v/step-005-airless-zenith.png",
+        "sha256": "82cfee8bc62cb8e5c51b04a8315f018cc9500478bd1129137c39140dce31b12d",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 3822,
+          "generation_total_micros": 416023,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 656,
+          "preparation_overruns": 342,
+          "preparation_peak_micros": 4123,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 360,
+            "median": 47.6146535,
+            "p95": 67.587771,
+            "max": 147.66917199999997
+          },
+          "cpu_update_ms": {
+            "count": 360,
+            "median": 3.207504,
+            "p95": 3.937663,
+            "max": 8.100294
+          },
+          "cpu_render_ms": {
+            "count": 360,
+            "median": 1.2890705,
+            "p95": 6.570987000000001,
+            "max": 82.68169999999999
+          },
+          "gpu_ms": {
+            "count": 359,
+            "median": 37.950185,
+            "p95": 56.066943,
+            "max": 117.532283
+          },
+          "scene_draws": {
+            "count": 360,
+            "median": 19.0,
+            "p95": 19.0,
+            "max": 319.0
+          },
+          "total_draws": {
+            "count": 360,
+            "median": 23.0,
+            "p95": 23.0,
+            "max": 323.0
+          }
+        },
+        "reference_camera": null
+      }
+    ]
+  },
+  {
+    "scenario": "planetary-night.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-final-2/native/run-tvjfvbku/result.json",
+    "sha256": "f122aeb6ca553da3b2a49704df2f73e654b73e2d16a2253141bdd84bf3627484",
+    "steps": 6,
+    "captures": [
+      {
+        "label": "airless-night",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-tvjfvbku/step-006-airless-night.png",
+        "sha256": "5ab1885e132e8536b7413b77ba0db91c262a0dc62bcf9782c1d6e1f91320bdd7",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 153,
+          "cache_patches": 155,
+          "cpu_cache_bytes": 4594399,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 4186,
+          "generation_total_micros": 206731,
+          "gpu_cache_bytes": 3576164,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2083224,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 168,
+          "preparation_overruns": 96,
+          "preparation_peak_micros": 4283,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 155,
+          "triangles": 82744,
+          "uploaded_last_frame_bytes": 39168
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 105,
+            "median": 45.727768000000005,
+            "p95": 91.839321,
+            "max": 144.37524299999998
+          },
+          "cpu_update_ms": {
+            "count": 105,
+            "median": 3.031288,
+            "p95": 3.871664,
+            "max": 4.987100000000001
+          },
+          "cpu_render_ms": {
+            "count": 105,
+            "median": 0.953796,
+            "p95": 5.798826,
+            "max": 78.891231
+          },
+          "gpu_ms": {
+            "count": 104,
+            "median": 37.567961499999996,
+            "p95": 79.546415,
+            "max": 91.139794
+          },
+          "scene_draws": {
+            "count": 105,
+            "median": 5.0,
+            "p95": 158.0,
+            "max": 158.0
+          },
+          "total_draws": {
+            "count": 105,
+            "median": 8.0,
+            "p95": 161.0,
+            "max": 161.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": 40.0,
+          "name": "universe-night"
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "natural-sites-canonical.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-final-2/native/run-uaazu713/result.json",
+    "sha256": "30c3df38f66d0affc27cf8b097839685563e0606233bdb64950e8c3004d9e1b9",
+    "steps": 10,
+    "captures": [
+      {
+        "label": "sterile-natural-sites",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-uaazu713/step-005-sterile-natural-sites.png",
+        "sha256": "4eb729c43595423a41982597e99a194b2bf1934bbf79314e539c08775f57d510",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 12646,
+          "generation_total_micros": 414483,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 307,
+          "preparation_overruns": 315,
+          "preparation_peak_micros": 12974,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 329,
+            "median": 60.96127,
+            "p95": 79.751753,
+            "max": 154.97711999999999
+          },
+          "cpu_update_ms": {
+            "count": 329,
+            "median": 3.117309,
+            "p95": 4.186878,
+            "max": 14.185295
+          },
+          "cpu_render_ms": {
+            "count": 329,
+            "median": 1.294697,
+            "p95": 6.186597,
+            "max": 82.446095
+          },
+          "gpu_ms": {
+            "count": 328,
+            "median": 52.5175445,
+            "p95": 60.81227,
+            "max": 140.14368499999998
+          },
+          "scene_draws": {
+            "count": 329,
+            "median": 19.0,
+            "p95": 19.0,
+            "max": 319.0
+          },
+          "total_draws": {
+            "count": 329,
+            "median": 23.0,
+            "p95": 23.0,
+            "max": 323.0
+          }
+        },
+        "reference_camera": null
+      }
+    ]
+  },
+  {
+    "scenario": "biological-harvest.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/result.json",
+    "sha256": "9fc9cb99a4e4a493d2f144846b943d5d9deecf77f210afea2cad14f65c23f8bb",
+    "steps": 44,
+    "captures": [
+      {
+        "label": "attached-biomass-part",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-006-attached-biomass-part.png",
+        "sha256": "2e441f1e6595a20486570142df903cefde705d7c588390afe25009e9b5662366",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        },
+        "terrain": {
+          "active_patches": 435,
+          "cache_patches": 435,
+          "cpu_cache_bytes": 12850805,
+          "generated_last_frame": 0,
+          "generated_peak": 1,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 22157,
+          "generation_total_micros": 4901850,
+          "gpu_cache_bytes": 9608020,
+          "gpu_ready": true,
+          "mode": "Representative",
+          "peak_upload_bytes": 2094860,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 491,
+          "preparation_overruns": 475,
+          "preparation_peak_micros": 22561,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 435,
+          "triangles": 228436,
+          "uploaded_last_frame_bytes": 111360
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 145.82299400000002,
+            "p95": 149.112019,
+            "max": 149.112019
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 14.349751000000001,
+            "p95": 15.593278999999999,
+            "max": 15.593278999999999
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 9.109432,
+            "p95": 9.533501999999999,
+            "max": 9.533501999999999
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 102.581642,
+            "p95": 105.472536,
+            "max": 105.472536
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 447.0,
+            "p95": 447.0,
+            "max": 447.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 451.0,
+            "p95": 451.0,
+            "max": 451.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "gripping-source",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-013-gripping-source.png",
+        "sha256": "1f8f9b8c7dfcc24f42b63166d17969b025ad0bb6db6eb30d6ddb5077a1f7d4c4",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        },
+        "terrain": {
+          "active_patches": 435,
+          "cache_patches": 435,
+          "cpu_cache_bytes": 12850805,
+          "generated_last_frame": 0,
+          "generated_peak": 1,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 22157,
+          "generation_total_micros": 4901850,
+          "gpu_cache_bytes": 9608020,
+          "gpu_ready": true,
+          "mode": "Representative",
+          "peak_upload_bytes": 2094860,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 545,
+          "preparation_overruns": 475,
+          "preparation_peak_micros": 22561,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 435,
+          "triangles": 228436,
+          "uploaded_last_frame_bytes": 111360
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 140.58440099999999,
+            "p95": 141.10013099999998,
+            "max": 141.10013099999998
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 9.618605,
+            "p95": 13.96876,
+            "max": 13.96876
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 9.459353,
+            "p95": 9.719281,
+            "max": 9.719281
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 99.539528,
+            "p95": 100.64319300000001,
+            "max": 100.64319300000001
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 447.0,
+            "p95": 447.0,
+            "max": 447.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 451.0,
+            "p95": 451.0,
+            "max": 451.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "same-natural-part-in-hand",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-029-same-natural-part-in-hand.png",
+        "sha256": "d81c2d9f679c7ef1a79690e96c4c7a7111a628a4e8916f74612b390356709641",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        },
+        "terrain": {
+          "active_patches": 435,
+          "cache_patches": 435,
+          "cpu_cache_bytes": 12850805,
+          "generated_last_frame": 0,
+          "generated_peak": 1,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 22157,
+          "generation_total_micros": 4901850,
+          "gpu_cache_bytes": 9608020,
+          "gpu_ready": true,
+          "mode": "Representative",
+          "peak_upload_bytes": 2094860,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 793,
+          "preparation_overruns": 475,
+          "preparation_peak_micros": 22561,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 435,
+          "triangles": 228436,
+          "uploaded_last_frame_bytes": 111360
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 136.794954,
+            "p95": 147.754183,
+            "max": 147.754183
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 9.918520000000001,
+            "p95": 16.073633,
+            "max": 16.073633
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 12.89258,
+            "p95": 14.009559,
+            "max": 14.009559
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 100.549326,
+            "p95": 109.571896,
+            "max": 109.571896
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 447.0,
+            "p95": 447.0,
+            "max": 447.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 451.0,
+            "p95": 451.0,
+            "max": 451.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "released-natural-part",
+        "path": "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-041-released-natural-part.png",
+        "sha256": "015f948c7ccde4879219f09f3b99cd227d5162f85ba85836b4759b4eeda8fb08",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        },
+        "terrain": {
+          "active_patches": 435,
+          "cache_patches": 435,
+          "cpu_cache_bytes": 12850805,
+          "generated_last_frame": 0,
+          "generated_peak": 1,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 22157,
+          "generation_total_micros": 4901850,
+          "gpu_cache_bytes": 9608020,
+          "gpu_ready": true,
+          "mode": "Representative",
+          "peak_upload_bytes": 2094860,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 547,
+          "preparation_overruns": 475,
+          "preparation_peak_micros": 22561,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 435,
+          "triangles": 228436,
+          "uploaded_last_frame_bytes": 111360
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 144.891271,
+            "p95": 150.15066499999998,
+            "max": 150.15066499999998
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 9.943555,
+            "p95": 10.363917,
+            "max": 10.363917
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 9.582588,
+            "p95": 9.743416,
+            "max": 9.743416
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 105.739396,
+            "p95": 108.997745,
+            "max": 108.997745
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 447.0,
+            "p95": 447.0,
+            "max": 447.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 451.0,
+            "p95": 451.0,
+            "max": 451.0
+          }
+        },
+        "reference_camera": null
+      }
+    ]
+  },
+  {
+    "scenario": "biological-mining.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/result.json",
+    "sha256": "f8e3d27c6f5bc4023c2a74db26e2774d6bd1f9b1191d92185e81deed3a8d60ba",
+    "steps": 30,
+    "captures": [
+      {
+        "label": "attached-medicinal-reserve",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/step-006-attached-medicinal-reserve.png",
+        "sha256": "4bebb5fe1822b471f60be3aa3a0080b7dc0b36713fac203b85be75ad6d17fbce",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        },
+        "terrain": {
+          "active_patches": 435,
+          "cache_patches": 435,
+          "cpu_cache_bytes": 12850805,
+          "generated_last_frame": 0,
+          "generated_peak": 1,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 28414,
+          "generation_total_micros": 5032604,
+          "gpu_cache_bytes": 9608020,
+          "gpu_ready": true,
+          "mode": "Representative",
+          "peak_upload_bytes": 2094860,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 498,
+          "preparation_overruns": 479,
+          "preparation_peak_micros": 28774,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 435,
+          "triangles": 228436,
+          "uploaded_last_frame_bytes": 111360
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 167.772414,
+            "p95": 196.595308,
+            "max": 196.595308
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 9.845088,
+            "p95": 14.921369,
+            "max": 14.921369
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 8.791618,
+            "p95": 9.14766,
+            "max": 9.14766
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 130.429068,
+            "p95": 130.779969,
+            "max": 130.779969
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 446.0,
+            "p95": 446.0,
+            "max": 446.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 450.0,
+            "p95": 450.0,
+            "max": 450.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "partial-depletion",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/step-017-partial-depletion.png",
+        "sha256": "7f5abb333f68cd4812d6c7ef1e2d1ec66ce7c6a29dd1df7e2b5a2c02bb20fa3d",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        },
+        "terrain": {
+          "active_patches": 435,
+          "cache_patches": 435,
+          "cpu_cache_bytes": 12850805,
+          "generated_last_frame": 0,
+          "generated_peak": 1,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 28414,
+          "generation_total_micros": 5032604,
+          "gpu_cache_bytes": 9608020,
+          "gpu_ready": true,
+          "mode": "Representative",
+          "peak_upload_bytes": 2094860,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 539,
+          "preparation_overruns": 479,
+          "preparation_peak_micros": 28774,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 435,
+          "triangles": 228436,
+          "uploaded_last_frame_bytes": 111360
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 173.266848,
+            "p95": 173.72439,
+            "max": 173.72439
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 10.691372,
+            "p95": 11.433695,
+            "max": 11.433695
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 9.323938,
+            "p95": 9.401707,
+            "max": 9.401707
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 134.626283,
+            "p95": 138.891872,
+            "max": 138.891872
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 448.0,
+            "p95": 448.0,
+            "max": 448.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 452.0,
+            "p95": 452.0,
+            "max": 452.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "cap-release-and-partial-source",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/step-026-cap-release-and-partial-source.png",
+        "sha256": "142a74079b1f0f794d2e2a13b0ba55013f40165498908c58a339a2442fc7a096",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        },
+        "terrain": {
+          "active_patches": 435,
+          "cache_patches": 435,
+          "cpu_cache_bytes": 12850805,
+          "generated_last_frame": 0,
+          "generated_peak": 1,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 28414,
+          "generation_total_micros": 5032604,
+          "gpu_cache_bytes": 9608020,
+          "gpu_ready": true,
+          "mode": "Representative",
+          "peak_upload_bytes": 2094860,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 512,
+          "preparation_overruns": 479,
+          "preparation_peak_micros": 28774,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 435,
+          "triangles": 228436,
+          "uploaded_last_frame_bytes": 111360
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 171.388969,
+            "p95": 175.503483,
+            "max": 175.503483
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 10.931237999999999,
+            "p95": 12.651865,
+            "max": 12.651865
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 9.212653,
+            "p95": 9.908304999999999,
+            "max": 9.908304999999999
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 135.172664,
+            "p95": 135.59221,
+            "max": 135.59221
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 448.0,
+            "p95": 448.0,
+            "max": 448.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 452.0,
+            "p95": 452.0,
+            "max": 452.0
+          }
+        },
+        "reference_camera": null
+      }
+    ]
+  },
+  {
+    "scenario": "suit-observations.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/result.json",
+    "sha256": "66027b939a781cf998c31048a14a7160348afb071fbc7627cb360b477ab432c2",
+    "steps": 20,
+    "captures": [
+      {
+        "label": "bounded-fix",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/step-009-bounded-fix.png",
+        "sha256": "f9aef8639c0717f55afe5fed404c2c7114c4b6c9d8c8233aa6aa75db967684e8",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 3832,
+          "generation_total_micros": 389510,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 315,
+          "preparation_overruns": 317,
+          "preparation_peak_micros": 5986,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 340,
+            "median": 46.798058499999996,
+            "p95": 117.673238,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 340,
+            "median": 3.1326195,
+            "p95": 4.059257000000001,
+            "max": 9.192633
+          },
+          "cpu_render_ms": {
+            "count": 340,
+            "median": 1.3205105000000001,
+            "p95": 6.954712,
+            "max": 86.074448
+          },
+          "gpu_ms": {
+            "count": 339,
+            "median": 37.602986,
+            "p95": 75.443332,
+            "max": 146.792949
+          },
+          "scene_draws": {
+            "count": 340,
+            "median": 19.0,
+            "p95": 319.0,
+            "max": 321.0
+          },
+          "total_draws": {
+            "count": 340,
+            "median": 23.0,
+            "p95": 322.0,
+            "max": 325.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "bearing-only",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/step-013-bearing-only.png",
+        "sha256": "6d1d243b619c697d425344f89ad2bec2a4292b6f4380e5ba31d035ec7ae9f289",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 3832,
+          "generation_total_micros": 389510,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 416,
+          "preparation_overruns": 318,
+          "preparation_peak_micros": 5986,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 348,
+            "median": 46.8539605,
+            "p95": 119.600282,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 348,
+            "median": 3.126534,
+            "p95": 4.059257000000001,
+            "max": 9.192633
+          },
+          "cpu_render_ms": {
+            "count": 348,
+            "median": 1.326612,
+            "p95": 7.480772999999999,
+            "max": 860.2570430000001
+          },
+          "gpu_ms": {
+            "count": 347,
+            "median": 37.622617999999996,
+            "p95": 102.47245600000001,
+            "max": 146.792949
+          },
+          "scene_draws": {
+            "count": 348,
+            "median": 19.0,
+            "p95": 319.0,
+            "max": 321.0
+          },
+          "total_draws": {
+            "count": 348,
+            "median": 23.0,
+            "p95": 323.0,
+            "max": 325.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "navigation-unavailable",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/step-017-navigation-unavailable.png",
+        "sha256": "52cbe8714190fa7815221273381d421db49e4ac57cbf1cc860f9e705fe77def7",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 3832,
+          "generation_total_micros": 389510,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 605,
+          "preparation_overruns": 318,
+          "preparation_peak_micros": 5986,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 357,
+            "median": 46.965748000000005,
+            "p95": 123.553654,
+            "max": 250.0
+          },
+          "cpu_update_ms": {
+            "count": 357,
+            "median": 3.118342,
+            "p95": 4.059257000000001,
+            "max": 9.192633
+          },
+          "cpu_render_ms": {
+            "count": 357,
+            "median": 1.3427499999999999,
+            "p95": 7.596561,
+            "max": 871.209249
+          },
+          "gpu_ms": {
+            "count": 356,
+            "median": 37.6366745,
+            "p95": 104.06154400000001,
+            "max": 146.792949
+          },
+          "scene_draws": {
+            "count": 357,
+            "median": 19.0,
+            "p95": 321.0,
+            "max": 321.0
+          },
+          "total_draws": {
+            "count": 357,
+            "median": 23.0,
+            "p95": 325.0,
+            "max": 325.0
+          }
+        },
+        "reference_camera": null
+      }
+    ]
+  },
+  {
+    "scenario": "planetary-chart.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/result.json",
+    "sha256": "90333eb7856a6787f3a39a90e145c24d3992f287621dbcaa93f8f4182cb3a4c8",
+    "steps": 42,
+    "captures": [
+      {
+        "label": "spot-uncertainty",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-007-spot-uncertainty.png",
+        "sha256": "2bbc5daaf451cd0e5f87d1d9f1169e285506eecc2a074c074224a61970705650",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 6424,
+          "generation_total_micros": 436379,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096532,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 457,
+          "preparation_overruns": 350,
+          "preparation_peak_micros": 35593,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 141.12683,
+            "p95": 153.700882,
+            "max": 153.700882
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 1.412932,
+            "p95": 2.31466,
+            "max": 2.31466
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 6.807614,
+            "p95": 13.573052,
+            "max": 13.573052
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 114.276089,
+            "p95": 139.839054,
+            "max": 139.839054
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 307.0,
+            "p95": 307.0,
+            "max": 307.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 311.0,
+            "p95": 311.0,
+            "max": 311.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": null,
+          "name": "scanner"
+        }
+      },
+      {
+        "label": "named-manual-target",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-018-named-manual-target.png",
+        "sha256": "8c6950b63dc8c1caa33db287080ad5512d0332d9cb5ae96339f6de681bdb7d76",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 6424,
+          "generation_total_micros": 436379,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096532,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 339,
+          "preparation_overruns": 350,
+          "preparation_peak_micros": 35593,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 118.888606,
+            "p95": 120.316006,
+            "max": 120.316006
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 1.128964,
+            "p95": 1.220343,
+            "max": 1.220343
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 6.5947059999999995,
+            "p95": 7.422423,
+            "max": 7.422423
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 105.594065,
+            "p95": 108.039574,
+            "max": 108.039574
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 307.0,
+            "p95": 307.0,
+            "max": 307.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 311.0,
+            "p95": 311.0,
+            "max": 311.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": null,
+          "name": "scanner"
+        }
+      },
+      {
+        "label": "bearing-cone",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-031-bearing-cone.png",
+        "sha256": "f95e49cca5fbfa1321ee49b3e8576ca480621e83497ee0e5df184eabcb5f3942",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 6424,
+          "generation_total_micros": 436379,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096532,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 333,
+          "preparation_overruns": 350,
+          "preparation_peak_micros": 35593,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 119.597493,
+            "p95": 121.966526,
+            "max": 121.966526
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 0.9997910000000001,
+            "p95": 1.237297,
+            "max": 1.237297
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 6.4957210000000005,
+            "p95": 8.20894,
+            "max": 8.20894
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 105.846169,
+            "p95": 107.88277000000001,
+            "max": 107.88277000000001
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 307.0,
+            "p95": 307.0,
+            "max": 307.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 311.0,
+            "p95": 311.0,
+            "max": 311.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": null,
+          "name": "scanner"
+        }
+      },
+      {
+        "label": "deleted-personal-marks",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-042-deleted-personal-marks.png",
+        "sha256": "96af0d41356b701abe8a9fe02e8a73b6565c0b56ff47725566b0e19adb7559d6",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 6424,
+          "generation_total_micros": 436379,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2096532,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 304,
+          "preparation_overruns": 350,
+          "preparation_peak_micros": 35593,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 119.868794,
+            "p95": 120.788113,
+            "max": 120.788113
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 0.946987,
+            "p95": 1.0255670000000001,
+            "max": 1.0255670000000001
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 6.846614,
+            "p95": 12.329276,
+            "max": 12.329276
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 104.09955599999999,
+            "p95": 106.05553400000001,
+            "max": 106.05553400000001
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 307.0,
+            "p95": 307.0,
+            "max": 307.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 311.0,
+            "p95": 311.0,
+            "max": 311.0
+          }
+        },
+        "reference_camera": {
+          "canonical_terrain_clearance_meters": null,
+          "name": "scanner"
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "environment-audio.json",
+    "result_file": "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/result.json",
+    "sha256": "44a6a001deafbc929d3e6858e9bfb1b013b7a723d39f279e738b2c644c1016d4",
+    "steps": 67,
+    "captures": [
+      {
+        "label": "vacuum-quiet",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-010-vacuum-quiet.png",
+        "sha256": "4eb729c43595423a41982597e99a194b2bf1934bbf79314e539c08775f57d510",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 4495,
+          "generation_total_micros": 389286,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 334,
+          "preparation_overruns": 316,
+          "preparation_peak_micros": 4757,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 122.45091099999999,
+            "p95": 123.329448,
+            "max": 123.329448
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 1.11907,
+            "p95": 1.1813010000000002,
+            "max": 1.1813010000000002
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 7.072478,
+            "p95": 7.506011,
+            "max": 7.506011
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 109.82366,
+            "p95": 110.505138,
+            "max": 110.505138
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 319.0,
+            "p95": 319.0,
+            "max": 319.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 323.0,
+            "p95": 323.0,
+            "max": 323.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "environment-settings",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-017-environment-settings.png",
+        "sha256": "cdac8150da6bb5cfb2955a619c0523def7bf18797627687682c92248feb0626d",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 4495,
+          "generation_total_micros": 389286,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 314,
+          "preparation_overruns": 316,
+          "preparation_peak_micros": 4757,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 128.12940700000001,
+            "p95": 132.642379,
+            "max": 132.642379
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 0.987423,
+            "p95": 1.1523349999999999,
+            "max": 1.1523349999999999
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 6.633811,
+            "p95": 7.011787,
+            "max": 7.011787
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 109.980898,
+            "p95": 111.595475,
+            "max": 111.595475
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 319.0,
+            "p95": 319.0,
+            "max": 319.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 320.0,
+            "p95": 320.0,
+            "max": 320.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "independent-settings",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-030-independent-settings.png",
+        "sha256": "49ddada1df1c5f618c0bc78f9f27db658356737853e310f143a92bc410b88394",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 4495,
+          "generation_total_micros": 389286,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 323,
+          "preparation_overruns": 316,
+          "preparation_peak_micros": 4757,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 133.234398,
+            "p95": 138.208356,
+            "max": 138.208356
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 0.9541229999999999,
+            "p95": 1.129899,
+            "max": 1.129899
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 7.005787000000001,
+            "p95": 7.224809,
+            "max": 7.224809
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 110.824135,
+            "p95": 118.60806699999999,
+            "max": 118.60806699999999
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 319.0,
+            "p95": 319.0,
+            "max": 319.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 320.0,
+            "p95": 320.0,
+            "max": 320.0
+          }
+        },
+        "reference_camera": null
+      },
+      {
+        "label": "scout-interior-vacuum",
+        "path": "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-067-scout-interior-vacuum.png",
+        "sha256": "4754e97482c23bdb15560e0bc7ad94ec5a9e1ead2645d7e8a01879ba86c8aba8",
+        "context": {
+          "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "backend": "Vulkan",
+          "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+          "scale_factor": 1.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        },
+        "terrain": {
+          "active_patches": 300,
+          "cache_patches": 300,
+          "cpu_cache_bytes": 8867180,
+          "generated_last_frame": 0,
+          "generated_peak": 2,
+          "generation_last_frame_micros": 0,
+          "generation_peak_micros": 4495,
+          "generation_total_micros": 389286,
+          "gpu_cache_bytes": 6904548,
+          "gpu_ready": true,
+          "mode": "Canonical",
+          "peak_upload_bytes": 2094368,
+          "pending_patches": 0,
+          "preparation_last_frame_micros": 312,
+          "preparation_overruns": 316,
+          "preparation_peak_micros": 4757,
+          "presentation_ready": true,
+          "selection_last_frame_micros": 0,
+          "total_generated": 300,
+          "triangles": 162622,
+          "uploaded_last_frame_bytes": 76800
+        },
+        "metrics": {
+          "present_ms": {
+            "count": 5,
+            "median": 144.458247,
+            "p95": 176.70722999999998,
+            "max": 176.70722999999998
+          },
+          "cpu_update_ms": {
+            "count": 5,
+            "median": 1.161013,
+            "p95": 1.798748,
+            "max": 1.798748
+          },
+          "cpu_render_ms": {
+            "count": 5,
+            "median": 6.876405,
+            "p95": 9.332013,
+            "max": 9.332013
+          },
+          "gpu_ms": {
+            "count": 5,
+            "median": 123.766023,
+            "p95": 165.01082,
+            "max": 165.01082
+          },
+          "scene_draws": {
+            "count": 5,
+            "median": 316.0,
+            "p95": 316.0,
+            "max": 316.0
+          },
+          "total_draws": {
+            "count": 5,
+            "median": 320.0,
+            "p95": 320.0,
+            "max": 320.0
+          }
+        },
+        "reference_camera": null
+      }
+    ]
+  }
+]

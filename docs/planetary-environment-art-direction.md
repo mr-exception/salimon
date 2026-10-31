@@ -187,3 +187,12 @@ The [implemented transfer/depletion contract](biological-harvesting.md) uses exp
 source authoring, a brief F separation, one original natural object, existing
 spherical mining and source-bound checkpoints. Vesper remains sterile. Subjective
 art/listening and M1 qualification remain #561/#563.
+
+## Combined cloud verification (#628)
+
+The [maintained environment matrix](../scripts/README.md#planetary-environment-matrix-628)
+combines canonical sterile Vesper day/night and streaming with explicit fictional
+weather/biology positives, harvesting/reload, field marks/chart and sound evidence.
+The [dated report](../reports/issue-628/README.md) records exact fixture/publication
+boundaries and original captures. It does not approve perceptual presentation,
+physical platform behavior or hardware budgets; those remain #561/#557/#563.

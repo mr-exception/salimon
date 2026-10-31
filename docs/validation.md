@@ -763,3 +763,12 @@ See the [cloud render acceptance contract](universe-terrain.md#cloud-integration
 seam tests and bounded raw frame/draw observations. Measurements remain
 observational; missing GPU counters stay null and software timings do not
 establish hardware FPS.
+
+## Combined planetary environment (#628)
+
+Use the [maintained environment matrix](../scripts/README.md#planetary-environment-matrix-628)
+for canonical day/night, orbit-to-ground/revisit, positive biological save/harvest,
+personal chart and sound verification plus repeated source exports and production
+GPU/PCM component captures. `planetary-environment` always selects evidence routes.
+Preserve its exact commands, original media and state/context/metric report;
+software timings and fictional positive fixtures have the limits stated there.

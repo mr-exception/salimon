@@ -612,3 +612,7 @@ World owns explicit source designations, revision/depletion journals and physica
 publication; runtime composes F/tool input, current anatomy and source-bound restore.
 Schema 29 preserves missing/partial parts and natural object identity. Vesper
 remains sterile; positive sources are explicit fictional geometry fixtures.
+
+Combined planetary environment evidence: see the [matrix runner](../../scripts/README.md#planetary-environment-matrix-628).
+`scout_reference.rs` owns the canonical night camera and ground-clearance test;
+positive atmosphere/life evidence remains explicitly fictional component fixtures.

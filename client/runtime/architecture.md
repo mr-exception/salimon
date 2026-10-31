@@ -1830,3 +1830,9 @@ See the [cloud render acceptance contract](../../docs/universe-terrain.md#cloud-
 seam tests and bounded raw frame/draw observations. Measurements remain
 observational; missing GPU counters stay null and software timings do not
 establish hardware FPS.
+
+Planetary integration evidence is orchestrated by `scripts/planetary_environment.py`.
+Its fixed native group composes the production scenario/session paths and existing
+world-to-renderer exports without changing canonical publications. The night
+reference camera samples actual Vesper ground on the hemisphere opposite the
+fixed local light; it changes only the evidence view, never session time/physics.

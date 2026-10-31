@@ -30,12 +30,18 @@ SCOUT_CONSTRUCTION = (
 )
 SCANNER = ("scanner-integration.json", "scanner-hologram.json", "cockpit-nose.json")
 UNIVERSE_RENDER = ("universe-terrain.json", "universe-journey.json", "universe-mining.json")
-GROUPS = {"universe-render": UNIVERSE_RENDER, "scanner": SCANNER, "scout-construction": SCOUT_CONSTRUCTION, "realistic-flight": REALISTIC_FLIGHT, "terrain": TERRAIN, "ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
+PLANETARY_ENVIRONMENT = (
+    "universe-terrain.json", "planetary-vacuum.json", "planetary-night.json",
+    "natural-sites-canonical.json", "biological-harvest.json",
+    "biological-mining.json", "suit-observations.json", "planetary-chart.json",
+    "environment-audio.json",
+)
+GROUPS = {"planetary-environment": PLANETARY_ENVIRONMENT, "universe-render": UNIVERSE_RENDER, "scanner": SCANNER, "scout-construction": SCOUT_CONSTRUCTION, "realistic-flight": REALISTIC_FLIGHT, "terrain": TERRAIN, "ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
 
 
 def select_scenarios(directory, group=None, evidence=False):
     # This integrated acceptance group always uses production capture routes.
-    if evidence or group in {"scout-construction", "scanner", "universe-render"}:
+    if evidence or group in {"scout-construction", "scanner", "universe-render", "planetary-environment"}:
         directory = directory / "evidence"
     if group in GROUPS:
         # Explicit paths ensure a missing prerequisite fails instead of being skipped.

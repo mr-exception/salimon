@@ -56,6 +56,12 @@ pub(crate) fn find(name: &str) -> Option<View> {
     let eye = match name {
         "universe-orbit" => Some([0., radius * 2.5, 0.]),
         "universe-surface" => Some([45., radius + 3., 70.]),
+        "universe-night" => {
+            let height = salimon_world::terrain::TerrainDefinition::canonical_start()
+                .height([0., -1., 0.])
+                .expect("published canonical night terrain");
+            Some([0., -(radius + height + 40.), 0.])
+        }
         "universe-edge" => {
             let direction = [
                 std::f64::consts::FRAC_1_SQRT_2,
@@ -74,7 +80,11 @@ pub(crate) fn find(name: &str) -> Option<View> {
             name: name.into(),
             absolute: true,
             eye,
-            target: [0., radius, 0.],
+            target: if name == "universe-night" {
+                [0., eye[1], 1000.]
+            } else {
+                [0., radius, 0.]
+            },
         });
     }
     let views: Vec<View> =
@@ -100,7 +110,7 @@ impl View {
     pub(crate) fn canonical_ground_clearance(&self) -> Option<f64> {
         if !matches!(
             self.name.as_str(),
-            "universe-orbit" | "universe-surface" | "universe-edge"
+            "universe-orbit" | "universe-surface" | "universe-edge" | "universe-night"
         ) {
             return None;
         }
@@ -123,7 +133,11 @@ impl View {
             return CameraFrame {
                 position_meters: self.eye,
                 target_meters: self.target,
-                up: [0., 0., 1.],
+                up: if self.name == "universe-night" {
+                    [0., -1., 0.]
+                } else {
+                    [0., 0., 1.]
+                },
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
@@ -207,7 +221,12 @@ mod canonical_camera_tests {
             .manifest()
             .physical
             .radius_meters;
-        for name in ["universe-orbit", "universe-surface", "universe-edge"] {
+        for name in [
+            "universe-orbit",
+            "universe-surface",
+            "universe-edge",
+            "universe-night",
+        ] {
             let view = find(name).unwrap();
             let distance = salimon_math::length(view.eye);
             let ground = definition.height(view.eye.map(|v| v / distance)).unwrap();

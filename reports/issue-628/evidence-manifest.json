@@ -1,0 +1,542 @@
+{
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-025-universe-surface.png": {
+    "original_sha256": "b10d8c9f061852c55fc44854f8f7f50e03b082bfc7609fc7471fb755f777a1a7",
+    "report_path": "native/run-y0j6gcru/step-025-universe-surface.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/scenario.json": {
+    "original_sha256": "457c230db1e15abd8b6723fa694a7664bc5998e1ea858e1a8f5e2fa67c21046d",
+    "report_path": "native/run-y0j6gcru/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-051-universe-orbit-revisit.png": {
+    "original_sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+    "report_path": "native/run-y0j6gcru/step-051-universe-orbit-revisit.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-012-universe-orbit.png": {
+    "original_sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+    "report_path": "native/run-y0j6gcru/step-012-universe-orbit.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-038-universe-edge.png": {
+    "original_sha256": "cc77b3e9f5d6b4d29e93490d395c2d25eeda4d66b9edfb5366221131235fccdb",
+    "report_path": "native/run-y0j6gcru/step-038-universe-edge.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-013-universe-orbit-repeat.png": {
+    "original_sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+    "report_path": "native/run-y0j6gcru/step-013-universe-orbit-repeat.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-039-universe-edge-repeat.png": {
+    "original_sha256": "cc77b3e9f5d6b4d29e93490d395c2d25eeda4d66b9edfb5366221131235fccdb",
+    "report_path": "native/run-y0j6gcru/step-039-universe-edge-repeat.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/result.json": {
+    "original_sha256": "0e1e4be72640c68304f1d4f35b91b5f53c652fa2947604e890922d6fd90e9360",
+    "report_path": "native/run-y0j6gcru/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/stderr.log": {
+    "original_sha256": "f6d6a0775ec71f5ed1ae7d74b8d0487a6e8b8e9111a686d0f4f4807b85ea45db",
+    "report_path": "native/run-y0j6gcru/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-052-universe-orbit-revisit-repeat.png": {
+    "original_sha256": "235c5032dc6dcbb073ec37718f39463c09f1d0486accdbbf58b6b3f478cccaf2",
+    "report_path": "native/run-y0j6gcru/step-052-universe-orbit-revisit-repeat.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-y0j6gcru/step-026-universe-surface-repeat.png": {
+    "original_sha256": "b10d8c9f061852c55fc44854f8f7f50e03b082bfc7609fc7471fb755f777a1a7",
+    "report_path": "native/run-y0j6gcru/step-026-universe-surface-repeat.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-1evukg3v/step-005-airless-zenith.png": {
+    "original_sha256": "82cfee8bc62cb8e5c51b04a8315f018cc9500478bd1129137c39140dce31b12d",
+    "report_path": "native/run-1evukg3v/step-005-airless-zenith.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-1evukg3v/scenario.json": {
+    "original_sha256": "c5582d34ef1e20e466548ae96af654ed0905a2ca92a35e132a896257bed9f12b",
+    "report_path": "native/run-1evukg3v/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-1evukg3v/result.json": {
+    "original_sha256": "e5b9f4ac71dcb4e7421b2c2a1bdae5b5000102437be29b1ad8a61239c4bff11a",
+    "report_path": "native/run-1evukg3v/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-1evukg3v/stderr.log": {
+    "original_sha256": "37b4887179dc93e8e12eb08ee4b149fe9614e25e2de1b4fe53b0048e989fa459",
+    "report_path": "native/run-1evukg3v/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-tvjfvbku/scenario.json": {
+    "original_sha256": "29521082ff044e3deb3d5a662eb3e28bfbb56d60458844f63196f126c75a531e",
+    "report_path": "native/run-tvjfvbku/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-tvjfvbku/step-006-airless-night.png": {
+    "original_sha256": "5ab1885e132e8536b7413b77ba0db91c262a0dc62bcf9782c1d6e1f91320bdd7",
+    "report_path": "native/run-tvjfvbku/step-006-airless-night.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-tvjfvbku/result.json": {
+    "original_sha256": "f122aeb6ca553da3b2a49704df2f73e654b73e2d16a2253141bdd84bf3627484",
+    "report_path": "native/run-tvjfvbku/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-tvjfvbku/stderr.log": {
+    "original_sha256": "d156d1a0a86a2c3feeca0aacd039d8202f3945edd589adf945fc959115e1c87c",
+    "report_path": "native/run-tvjfvbku/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-uaazu713/scenario.json": {
+    "original_sha256": "84718032824762768ef29840eb1a9719858a530974c21e07c00db64f3aad207b",
+    "report_path": "native/run-uaazu713/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-uaazu713/step-005-sterile-natural-sites.png": {
+    "original_sha256": "4eb729c43595423a41982597e99a194b2bf1934bbf79314e539c08775f57d510",
+    "report_path": "native/run-uaazu713/step-005-sterile-natural-sites.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-uaazu713/result.json": {
+    "original_sha256": "30c3df38f66d0affc27cf8b097839685563e0606233bdb64950e8c3004d9e1b9",
+    "report_path": "native/run-uaazu713/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-uaazu713/stderr.log": {
+    "original_sha256": "239e33ca5616ad44c3357ef4d4c3612cc48edb1b02b60413c0661d3dbb634344",
+    "report_path": "native/run-uaazu713/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/scenario.json": {
+    "original_sha256": "54bf642632b38f4dc507189cd3b900ec02bedcbd1fad0b695c170c652e7b5c6b",
+    "report_path": "native/run-9p5jiqwx/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-041-released-natural-part.png": {
+    "original_sha256": "015f948c7ccde4879219f09f3b99cd227d5162f85ba85836b4759b4eeda8fb08",
+    "report_path": "native/run-9p5jiqwx/step-041-released-natural-part.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-029-same-natural-part-in-hand.png": {
+    "original_sha256": "d81c2d9f679c7ef1a79690e96c4c7a7111a628a4e8916f74612b390356709641",
+    "report_path": "native/run-9p5jiqwx/step-029-same-natural-part-in-hand.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/result.json": {
+    "original_sha256": "9fc9cb99a4e4a493d2f144846b943d5d9deecf77f210afea2cad14f65c23f8bb",
+    "report_path": "native/run-9p5jiqwx/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-006-attached-biomass-part.png": {
+    "original_sha256": "2e441f1e6595a20486570142df903cefde705d7c588390afe25009e9b5662366",
+    "report_path": "native/run-9p5jiqwx/step-006-attached-biomass-part.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/stderr.log": {
+    "original_sha256": "7fb934154913186caa5a0f5f15cdcc1353d98d714ad64dbcd994563e51885e4b",
+    "report_path": "native/run-9p5jiqwx/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-final-2/native/run-9p5jiqwx/step-013-gripping-source.png": {
+    "original_sha256": "1f8f9b8c7dfcc24f42b63166d17969b025ad0bb6db6eb30d6ddb5077a1f7d4c4",
+    "report_path": "native/run-9p5jiqwx/step-013-gripping-source.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/scenario.json": {
+    "original_sha256": "5510194e4818724761d65dd732a9a798310e5b8ab3aacb9d6ca4cc0d486a4086",
+    "report_path": "native/run-3z41kki0/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/step-026-cap-release-and-partial-source.png": {
+    "original_sha256": "142a74079b1f0f794d2e2a13b0ba55013f40165498908c58a339a2442fc7a096",
+    "report_path": "native/run-3z41kki0/step-026-cap-release-and-partial-source.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/step-006-attached-medicinal-reserve.png": {
+    "original_sha256": "4bebb5fe1822b471f60be3aa3a0080b7dc0b36713fac203b85be75ad6d17fbce",
+    "report_path": "native/run-3z41kki0/step-006-attached-medicinal-reserve.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/result.json": {
+    "original_sha256": "f8e3d27c6f5bc4023c2a74db26e2774d6bd1f9b1191d92185e81deed3a8d60ba",
+    "report_path": "native/run-3z41kki0/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/stderr.log": {
+    "original_sha256": "2cc0932d9242cf3f34c3277e5bc6c3f8630880f5398694cc6bb5384fe5dc7da1",
+    "report_path": "native/run-3z41kki0/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-3z41kki0/step-017-partial-depletion.png": {
+    "original_sha256": "7f5abb333f68cd4812d6c7ef1e2d1ec66ce7c6a29dd1df7e2b5a2c02bb20fa3d",
+    "report_path": "native/run-3z41kki0/step-017-partial-depletion.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/scenario.json": {
+    "original_sha256": "a913647206a9c4c279f481ba4a3ef146a9639068ec58bafa998b3d3b9cb3da2e",
+    "report_path": "native/run-w8fyl26o/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/step-009-bounded-fix.png": {
+    "original_sha256": "f9aef8639c0717f55afe5fed404c2c7114c4b6c9d8c8233aa6aa75db967684e8",
+    "report_path": "native/run-w8fyl26o/step-009-bounded-fix.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/result.json": {
+    "original_sha256": "66027b939a781cf998c31048a14a7160348afb071fbc7627cb360b477ab432c2",
+    "report_path": "native/run-w8fyl26o/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/step-017-navigation-unavailable.png": {
+    "original_sha256": "52cbe8714190fa7815221273381d421db49e4ac57cbf1cc860f9e705fe77def7",
+    "report_path": "native/run-w8fyl26o/step-017-navigation-unavailable.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/stderr.log": {
+    "original_sha256": "23aaffaaafcd9f56e1800e88d3e38207fbc31cae20a4297869dcea2d65046ca1",
+    "report_path": "native/run-w8fyl26o/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-w8fyl26o/step-013-bearing-only.png": {
+    "original_sha256": "6d1d243b619c697d425344f89ad2bec2a4292b6f4380e5ba31d035ec7ae9f289",
+    "report_path": "native/run-w8fyl26o/step-013-bearing-only.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-007-spot-uncertainty.png": {
+    "original_sha256": "2bbc5daaf451cd0e5f87d1d9f1169e285506eecc2a074c074224a61970705650",
+    "report_path": "native/run-_snqm9ah/step-007-spot-uncertainty.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/scenario.json": {
+    "original_sha256": "8dda1ecd29da1fc4d3a6356a579bf88ddc407ce1ba7f308444a05c702a3fded2",
+    "report_path": "native/run-_snqm9ah/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-031-bearing-cone.png": {
+    "original_sha256": "f95e49cca5fbfa1321ee49b3e8576ca480621e83497ee0e5df184eabcb5f3942",
+    "report_path": "native/run-_snqm9ah/step-031-bearing-cone.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-018-named-manual-target.png": {
+    "original_sha256": "8c6950b63dc8c1caa33db287080ad5512d0332d9cb5ae96339f6de681bdb7d76",
+    "report_path": "native/run-_snqm9ah/step-018-named-manual-target.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/step-042-deleted-personal-marks.png": {
+    "original_sha256": "96af0d41356b701abe8a9fe02e8a73b6565c0b56ff47725566b0e19adb7559d6",
+    "report_path": "native/run-_snqm9ah/step-042-deleted-personal-marks.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/result.json": {
+    "original_sha256": "90333eb7856a6787f3a39a90e145c24d3992f287621dbcaa93f8f4182cb3a4c8",
+    "report_path": "native/run-_snqm9ah/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-_snqm9ah/stderr.log": {
+    "original_sha256": "263c1489c3264331092c043aca5921045042ed5781df0da329428d8d3b64dd3d",
+    "report_path": "native/run-_snqm9ah/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/scenario.json": {
+    "original_sha256": "c8d361d72b045b07556b4f347ea07eb38972a31b2d6e76b82af909de21bf671b",
+    "report_path": "native/run-wbbopvrq/scenario.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-030-independent-settings.png": {
+    "original_sha256": "49ddada1df1c5f618c0bc78f9f27db658356737853e310f143a92bc410b88394",
+    "report_path": "native/run-wbbopvrq/step-030-independent-settings.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-017-environment-settings.png": {
+    "original_sha256": "cdac8150da6bb5cfb2955a619c0523def7bf18797627687682c92248feb0626d",
+    "report_path": "native/run-wbbopvrq/step-017-environment-settings.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-010-vacuum-quiet.png": {
+    "original_sha256": "4eb729c43595423a41982597e99a194b2bf1934bbf79314e539c08775f57d510",
+    "report_path": "native/run-wbbopvrq/step-010-vacuum-quiet.png"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/result.json": {
+    "original_sha256": "44a6a001deafbc929d3e6858e9bfb1b013b7a723d39f279e738b2c644c1016d4",
+    "report_path": "native/run-wbbopvrq/result.json.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/stderr.log": {
+    "original_sha256": "ec1c95a8dfd593dc3013ed8022e6c418105963921ff4400beb28fe002b405587",
+    "report_path": "native/run-wbbopvrq/stderr.log.gz"
+  },
+  "/workspace/salimon/artifacts/issue-628-resumed-native/run-wbbopvrq/step-067-scout-interior-vacuum.png": {
+    "original_sha256": "4754e97482c23bdb15560e0bc7ad94ec5a9e1ead2645d7e8a01879ba86c8aba8",
+    "report_path": "native/run-wbbopvrq/step-067-scout-interior-vacuum.png"
+  },
+  "audio/metrics.json": {
+    "original_sha256": "702637b70a714a1f6758eb13c5d6a8a41ae2c149205f4590f4de60fc666dd52a",
+    "report_path": "evidence/audio/metrics.json.gz"
+  },
+  "audio/mineral-contact-harvest.wav": {
+    "original_sha256": "bb373ccf666a1d407aa799f4d61031ec1b858127b359d775828ff32fb4948406",
+    "report_path": "evidence/audio/mineral-contact-harvest.wav"
+  },
+  "audio/organic-contact-harvest.wav": {
+    "original_sha256": "a1b9b5a7bec125afafa3bf792a4b50451e025cc05e14f246c4a5b713a66f6234",
+    "report_path": "evidence/audio/organic-contact-harvest.wav"
+  },
+  "audio/physical-flexible-biology.wav": {
+    "original_sha256": "98daa67d8381f4b781538a8bfee38a0097ec9b8ee3164a027b1230dac7886ad8",
+    "report_path": "evidence/audio/physical-flexible-biology.wav"
+  },
+  "audio/scout-ramp-closed.wav": {
+    "original_sha256": "988d3908d3b0aa5181568b9f56361f5b02a4af62fb77dc7f66f8f71f705eb3a7",
+    "report_path": "evidence/audio/scout-ramp-closed.wav"
+  },
+  "audio/scout-ramp-open.wav": {
+    "original_sha256": "cb400abbd46d6bd5c2731c09e47f63c30c767fd2da28d18d6fe4bf4a9658c5b0",
+    "report_path": "evidence/audio/scout-ramp-open.wav"
+  },
+  "audio/source-context.json": {
+    "original_sha256": "ba62f1a6ed8342f20a828be439f86afb8e7a4f96f1383575fe9a2d65bea65866",
+    "report_path": "evidence/audio/source-context.json.gz"
+  },
+  "audio/suit-local-weather.wav": {
+    "original_sha256": "5a633cbe85a4e8b2fcfabcdad52feb4ebf3c2af537c189b412b6d60447cf24d4",
+    "report_path": "evidence/audio/suit-local-weather.wav"
+  },
+  "audio/vacuum-contact-geology.wav": {
+    "original_sha256": "dacc4b0d984027478e5fc4eadc466c08256e19bac3dbd46ca82bf2a2eb805328",
+    "report_path": "evidence/audio/vacuum-contact-geology.wav"
+  },
+  "audio/vacuum-quiet.wav": {
+    "original_sha256": "e3a90286b3b5420103c5d188beff5aeb90737b9ee66c505ee43582c8af92a32b",
+    "report_path": "evidence/audio/vacuum-quiet.wav"
+  },
+  "audio.log": {
+    "original_sha256": "52965abe0897db8cbb69286166072b760d321e657c6516d1526e2357b5a48567",
+    "report_path": "evidence/audio.log.gz"
+  },
+  "landmark/approach.png": {
+    "original_sha256": "bde5ba89c2225d02ae28f277abda72634ddfa00ae1dddef0cea70aaec9218036",
+    "report_path": "evidence/landmark/approach.png"
+  },
+  "landmark/local.png": {
+    "original_sha256": "08af9cbc078493ed2373931406c3ed11622b04b339c4e8cc0a0327faae1de518",
+    "report_path": "evidence/landmark/local.png"
+  },
+  "landmark/regional.png": {
+    "original_sha256": "af5f3c0a7ca995cf9b0fa8635714f0269ebc7be59c7feff2108c4ddb6c7b03eb",
+    "report_path": "evidence/landmark/regional.png"
+  },
+  "landmark-export.log": {
+    "original_sha256": "bc82c58f0b608de08322db3a9d467e6df08b3a4c73369efc267a476e5b0d4208",
+    "report_path": "evidence/landmark-export.log.gz"
+  },
+  "landmark-render.log": {
+    "original_sha256": "cc934356ca0c8101dc10f280e1dfc8a9bbbfd34a375984c3c3818798553d3945",
+    "report_path": "evidence/landmark-render.log.gz"
+  },
+  "landmark-repeat.json": {
+    "original_sha256": "e87f2a9274720b0d57ec6f0d4570606a9f393088688232c663d312f791f1a549",
+    "report_path": "evidence/landmark-repeat.json.gz"
+  },
+  "landmark-repeat.log": {
+    "original_sha256": "857d93e29ed39d42153dc59743ca19ff71d4babef2d8af75496502f5d795d0f5",
+    "report_path": "evidence/landmark-repeat.log.gz"
+  },
+  "landmark.json": {
+    "original_sha256": "e87f2a9274720b0d57ec6f0d4570606a9f393088688232c663d312f791f1a549",
+    "report_path": "evidence/landmark.json.gz"
+  },
+  "matrix.json": {
+    "original_sha256": "aebeb43a578b841a5566a8046d8d491c60bcea3280c4fe7ad0ff1cce44a099e8",
+    "report_path": "evidence/matrix.json.gz"
+  },
+  "natural/natural-DenseColony.png": {
+    "original_sha256": "a302eef8b57b512d14e601834fa430ed1c85cf269b6731ba1bf5c16234459d56",
+    "report_path": "evidence/natural/natural-DenseColony.png"
+  },
+  "natural/natural-GiantOrganism.png": {
+    "original_sha256": "c82153c6eb1b61856b5e0a48764f4f2dc148beaa7bbf59be150da293e51520ed",
+    "report_path": "evidence/natural/natural-GiantOrganism.png"
+  },
+  "natural-export.log": {
+    "original_sha256": "2763f1cdff43b4ab53af3b7bdc3613208d6bfbfed10575b95476ce52038a8642",
+    "report_path": "evidence/natural-export.log.gz"
+  },
+  "natural-render.log": {
+    "original_sha256": "4af610fd562309a54da8a9047f2bc6ee61a4626900f34fedec440eb0371ffaf5",
+    "report_path": "evidence/natural-render.log.gz"
+  },
+  "natural-repeat.json": {
+    "original_sha256": "f43306af8b45fe3a650dc497b08025bab02aca699079cfa5ac1017ed03caef96",
+    "report_path": "evidence/natural-repeat.json.gz"
+  },
+  "natural-repeat.log": {
+    "original_sha256": "2763f1cdff43b4ab53af3b7bdc3613208d6bfbfed10575b95476ce52038a8642",
+    "report_path": "evidence/natural-repeat.log.gz"
+  },
+  "natural.json": {
+    "original_sha256": "f43306af8b45fe3a650dc497b08025bab02aca699079cfa5ac1017ed03caef96",
+    "report_path": "evidence/natural.json.gz"
+  },
+  "specimens/Colony-0.png": {
+    "original_sha256": "399310e9b9c7282011052fa3f18536ac332f9188aef85ba5d24f9110363abbd3",
+    "report_path": "evidence/specimens/Colony-0.png"
+  },
+  "specimens/Colony-1.png": {
+    "original_sha256": "7f9acfb6c85162a7c7b3744556c3cc3a5250d1bc88bb2f28d3e4c7513fdbcd08",
+    "report_path": "evidence/specimens/Colony-1.png"
+  },
+  "specimens/Column-0.png": {
+    "original_sha256": "177caae27fdceee3338ca89a4f4f323b29c5d46154eed0db06f0d7c6403980e9",
+    "report_path": "evidence/specimens/Column-0.png"
+  },
+  "specimens/Column-1.png": {
+    "original_sha256": "ad1c37b3d3faca69996ed888b6fa5f8b5b1782c86121f6404f1bd3a20cfbec41",
+    "report_path": "evidence/specimens/Column-1.png"
+  },
+  "specimens/Filament-0.png": {
+    "original_sha256": "82073a1088792e883e1cb72818225f60a548d6b20837bdb7741646127338f185",
+    "report_path": "evidence/specimens/Filament-0.png"
+  },
+  "specimens/Filament-1.png": {
+    "original_sha256": "91062d668f613526da413ffe0f89df36daf9dbff0bbc1903d8ca8e9b2158639b",
+    "report_path": "evidence/specimens/Filament-1.png"
+  },
+  "specimens/Frond-0.png": {
+    "original_sha256": "1cd6a436b1bc164f0669ee4c1848b3efa5bf773c1e710ed2563780ea0b47c63d",
+    "report_path": "evidence/specimens/Frond-0.png"
+  },
+  "specimens/Frond-1.png": {
+    "original_sha256": "173393133928a471924e3310786a282c4cc97bb3f1878a177dd9ba78572f09c8",
+    "report_path": "evidence/specimens/Frond-1.png"
+  },
+  "specimens/Giant-0.png": {
+    "original_sha256": "6952be191db5e461bec77aa5c4ea930497180f1f982b1f2adca518c58cd2f8b0",
+    "report_path": "evidence/specimens/Giant-0.png"
+  },
+  "specimens/Giant-1.png": {
+    "original_sha256": "2aa026080f564dba6fb741adc56d0fb06e531c9a3391f91461abaed7ef72cbf2",
+    "report_path": "evidence/specimens/Giant-1.png"
+  },
+  "specimens/Mat-0.png": {
+    "original_sha256": "0597088b8dca4ed71c8a355155756355fe4ac967bca375edb84e14d341cbb3ed",
+    "report_path": "evidence/specimens/Mat-0.png"
+  },
+  "specimens/Mat-1.png": {
+    "original_sha256": "3105dc317680582152b706393664666193f0c8662c8c3c145366142e5a1708fb",
+    "report_path": "evidence/specimens/Mat-1.png"
+  },
+  "specimens/dust.png": {
+    "original_sha256": "e0a1844d24d50ecd1926a8c8d615d348fd31a0488264025fe1d769984c72c78d",
+    "report_path": "evidence/specimens/dust.png"
+  },
+  "specimens/frost.png": {
+    "original_sha256": "c6b128fd0d0f66f61de36c6f05c84d8e52089e57742104d4b64555929826e81e",
+    "report_path": "evidence/specimens/frost.png"
+  },
+  "specimens/material-30-day.png": {
+    "original_sha256": "b66d40d181d535ecae9f2fc9cce4c3e6b7ffbebce1b51b21ab146e53cd67d39a",
+    "report_path": "evidence/specimens/material-30-day.png"
+  },
+  "specimens/material-30-night.png": {
+    "original_sha256": "02d282b44557244e58d76a594ae164d405f904ad9bb139a0a40f804911f01fc2",
+    "report_path": "evidence/specimens/material-30-night.png"
+  },
+  "specimens/material-30-red.png": {
+    "original_sha256": "0bf188c70849cd8435c2cee7bdaf6afdeffba4983ced26a9e371830ac54bcd58",
+    "report_path": "evidence/specimens/material-30-red.png"
+  },
+  "specimens/material-40-day.png": {
+    "original_sha256": "e9ac86f2a4f64a2c5ccfae14781a027e7dac188464fa32ece35209357eecdcb8",
+    "report_path": "evidence/specimens/material-40-day.png"
+  },
+  "specimens/material-40-night.png": {
+    "original_sha256": "e35113e18a20002c97ecd52807a4ec107f411bc01b57f9293bf9642a949accb1",
+    "report_path": "evidence/specimens/material-40-night.png"
+  },
+  "specimens/material-40-red.png": {
+    "original_sha256": "fc10ca4d81cc659ddad6866df22a2db1a6e527e9bfc15948f2c5309a3c96d5bb",
+    "report_path": "evidence/specimens/material-40-red.png"
+  },
+  "specimens/material-60-day.png": {
+    "original_sha256": "04a20d2608444221db6f19cb57f84915e8aa9e609245b61148eff98aa2ad5d99",
+    "report_path": "evidence/specimens/material-60-day.png"
+  },
+  "specimens/material-60-night.png": {
+    "original_sha256": "d1149a028b5a01af5afa84ab7654e7532490d67ec2c2e833086b308de056273f",
+    "report_path": "evidence/specimens/material-60-night.png"
+  },
+  "specimens/material-60-red.png": {
+    "original_sha256": "4b5ff01f6ee58844a86a851baf29560b6bda146f3c386efeae13c5348638778e",
+    "report_path": "evidence/specimens/material-60-red.png"
+  },
+  "specimens/material-70-day.png": {
+    "original_sha256": "33ea370fd582fff2b6e6e759dedc046b2b8b89b822b89ea9026087a2d54061c3",
+    "report_path": "evidence/specimens/material-70-day.png"
+  },
+  "specimens/material-70-night.png": {
+    "original_sha256": "b4292064aeb2a7f9f108f0428e00286cd8da58c5b8ec52da551ef32cd9cce2bc",
+    "report_path": "evidence/specimens/material-70-night.png"
+  },
+  "specimens/material-70-red.png": {
+    "original_sha256": "1bafdee746fd3d44d6839c3470886fd02421272c5114bc1eed98030621695b3c",
+    "report_path": "evidence/specimens/material-70-red.png"
+  },
+  "specimens/material-80-day.png": {
+    "original_sha256": "37c69de3a744ea25ce9140ce2c222de93a15d6e51286510723cbc3faa7eea647",
+    "report_path": "evidence/specimens/material-80-day.png"
+  },
+  "specimens/material-80-night.png": {
+    "original_sha256": "fb6f3ba204c030f704255f6fa0ff6d48503a9bd3f082bb50eb79e9e39f6ecae5",
+    "report_path": "evidence/specimens/material-80-night.png"
+  },
+  "specimens/material-80-red.png": {
+    "original_sha256": "b3940264a2a1ef0feeadb1f7ee10ebde35a8ee5af45cecf9df565e60751d191b",
+    "report_path": "evidence/specimens/material-80-red.png"
+  },
+  "specimens/material-95-day.png": {
+    "original_sha256": "bb7f985fb9a32fc84d502bbf02a47fd6808dd11b00f197c85c8ad8e917aacc9e",
+    "report_path": "evidence/specimens/material-95-day.png"
+  },
+  "specimens/material-95-night.png": {
+    "original_sha256": "010f3b3e0706718e93478d97127096ef81002421483e7abd0a2baf43ecf802a3",
+    "report_path": "evidence/specimens/material-95-night.png"
+  },
+  "specimens/material-95-red.png": {
+    "original_sha256": "a20c4560f0358d5cb7ba86821b522697d007415ee59fe3bb4ca1a10002f9ce7b",
+    "report_path": "evidence/specimens/material-95-red.png"
+  },
+  "specimens/wet.png": {
+    "original_sha256": "17355a3871d8ab42e3a97073b1a8505ddc564b8eae31d8df9b7c553b5743bc3f",
+    "report_path": "evidence/specimens/wet.png"
+  },
+  "specimens-export.log": {
+    "original_sha256": "cd0e4841ddb2252f79700c90c4199731794454f577a3220908fff9f920baf8af",
+    "report_path": "evidence/specimens-export.log.gz"
+  },
+  "specimens-render.log": {
+    "original_sha256": "2c86a1020cbe29881234be3de084fc2fa2026b20258b57e8b1ce2f118f907856",
+    "report_path": "evidence/specimens-render.log.gz"
+  },
+  "specimens-repeat.json": {
+    "original_sha256": "9005106c48a4097d9deff02af4d9cb596f71fe1f4ece63070ffed7663cb2b8a5",
+    "report_path": "evidence/specimens-repeat.json.gz"
+  },
+  "specimens-repeat.log": {
+    "original_sha256": "d5ddc52e92ef18813bac5606a48840116e8f077ecacd3dd511197b2def868433",
+    "report_path": "evidence/specimens-repeat.log.gz"
+  },
+  "specimens.json": {
+    "original_sha256": "9005106c48a4097d9deff02af4d9cb596f71fe1f4ece63070ffed7663cb2b8a5",
+    "report_path": "evidence/specimens.json.gz"
+  },
+  "weather/clear.png": {
+    "original_sha256": "3675bddb08e0c099433e910d6f2447bf33943d7d24a2df1b83a3a82ff7820e81",
+    "report_path": "evidence/weather/clear.png"
+  },
+  "weather/clouds.png": {
+    "original_sha256": "6de78a82dc6d908b99b5129dcfc8d5def41af565604c7c231084ea9b0cf6904a",
+    "report_path": "evidence/weather/clouds.png"
+  },
+  "weather/day-end.png": {
+    "original_sha256": "a0a72e9404ed258d1059aa897f7613f87c716a217decfe6574565b9232e4cb96",
+    "report_path": "evidence/weather/day-end.png"
+  },
+  "weather/day-start.png": {
+    "original_sha256": "6de78a82dc6d908b99b5129dcfc8d5def41af565604c7c231084ea9b0cf6904a",
+    "report_path": "evidence/weather/day-start.png"
+  },
+  "weather/dust.png": {
+    "original_sha256": "0858a199abe8ab70fa394440821e84e160a12c7842b28889ad61e3bfc6a59c8a",
+    "report_path": "evidence/weather/dust.png"
+  },
+  "weather/low-quality.png": {
+    "original_sha256": "91e3338e9ed20dc9c19ad927a0fe8b6fb138675455fa851ec06c47f039aabaf3",
+    "report_path": "evidence/weather/low-quality.png"
+  },
+  "weather/orbit.png": {
+    "original_sha256": "0f50d0dba5d3495fa1e23fed35a68086f351512ec033e070a03bf64f5748d0e8",
+    "report_path": "evidence/weather/orbit.png"
+  },
+  "weather/rain.png": {
+    "original_sha256": "cc3447a19bc3d31f3c4bbc7c44f7f8aa69cc796851a58b412fd5377f02fa1162",
+    "report_path": "evidence/weather/rain.png"
+  },
+  "weather/reload.png": {
+    "original_sha256": "6de78a82dc6d908b99b5129dcfc8d5def41af565604c7c231084ea9b0cf6904a",
+    "report_path": "evidence/weather/reload.png"
+  },
+  "weather-export.log": {
+    "original_sha256": "666caf20dc580d83912975343480ce8b0599569b00904a1e91e5fdc5a2c701d7",
+    "report_path": "evidence/weather-export.log.gz"
+  },
+  "weather-render.log": {
+    "original_sha256": "26a613b3e68d8784c7046a24aeca1175aa21180f5b5866f18d9c60d45437d9a1",
+    "report_path": "evidence/weather-render.log.gz"
+  },
+  "weather-repeat.json": {
+    "original_sha256": "85e4de179d1b5ea2ce69c91336374fbda7bf6aa0f345789630617c0631d919cc",
+    "report_path": "evidence/weather-repeat.json.gz"
+  },
+  "weather-repeat.log": {
+    "original_sha256": "71c2b111cdc3b7a53f9153c27bce6de8eb54a4878084e9a1d064a178676bdf4d",
+    "report_path": "evidence/weather-repeat.log.gz"
+  },
+  "weather.json": {
+    "original_sha256": "85e4de179d1b5ea2ce69c91336374fbda7bf6aa0f345789630617c0631d919cc",
+    "report_path": "evidence/weather.json.gz"
+  }
+}

@@ -37,7 +37,7 @@ class ScenarioSuiteTests(unittest.TestCase):
                 for evidence in (False, True):
                     paths = select_scenarios(root, group, evidence)
                     self.assertEqual([path.name for path in paths], list(names))
-                    self.assertEqual(paths[0].parent, root / "evidence" if evidence or group in {"scout-construction", "scanner", "universe-render"} else root)
+                    self.assertEqual(paths[0].parent, root / "evidence" if evidence or group in {"scout-construction", "scanner", "universe-render", "planetary-environment"} else root)
                     with self.assertRaises(ScenarioError):
                         parse_scenario(paths[0])
 

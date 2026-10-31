@@ -616,3 +616,5 @@ remains sterile; positive sources are explicit fictional geometry fixtures.
 Combined planetary environment evidence: see the [matrix runner](../../scripts/README.md#planetary-environment-matrix-628).
 `scout_reference.rs` owns the canonical night camera and ground-clearance test;
 positive atmosphere/life evidence remains explicitly fictional component fixtures.
+
+Flight acceptance #437: see [the reproducible matrix](../../docs/universe-flight-verification.md) for nine GPU routes, production orbital/contact/session contracts and separate X11 input coverage.

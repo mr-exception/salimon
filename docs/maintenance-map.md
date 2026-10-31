@@ -842,3 +842,5 @@ Planetary environment combined verification: `scripts/planetary_environment.py`,
 `scenario_suites.py` and `scenarios/evidence/planetary-night.json`; runtime
 `scout_reference.rs` owns physical night-camera placement. The [matrix guide](../scripts/README.md#planetary-environment-matrix-628)
 links production path coverage and hardware/perception limits.
+
+Flight acceptance #437: see [the reproducible matrix](universe-flight-verification.md) for nine GPU routes, production orbital/contact/session contracts and separate X11 input coverage.

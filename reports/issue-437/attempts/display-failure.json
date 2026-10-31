@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/universe-flight.json",
+  "status": "failed",
+  "steps_completed": 0,
+  "steps": [],
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/workspace/salimon/artifacts/issue-437/canonical-flight/run-3e5jy6gz",
+  "setup": {
+    "scenario": "canonical-flight",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "error": "game exited before ready signal (exit 1): [2026-10-31T07:01:21Z ERROR salimon_client] Salimon client stopped: failed to create native event loop: os error at /workspace/.salimon-tools/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/winit-0.30.13/src/platform_impl/linux/mod.rs:788: Failed to open connection to X server",
+  "failure_screenshot": {
+    "status": "unavailable",
+    "reason": "game did not become ready"
+  },
+  "duration_ms": 21,
+  "game_exit_code": 1,
+  "result_file": "/workspace/salimon/artifacts/issue-437/canonical-flight/run-3e5jy6gz/result.json"
+}

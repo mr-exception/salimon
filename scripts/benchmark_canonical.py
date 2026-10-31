@@ -28,6 +28,8 @@ def memory_sample(pid, system=None):
     if system.startswith('linux'):
         fields = dict(line.split(':', 1) for line in Path(f'/proc/{pid}/status').read_text().splitlines()
                       if ':' in line)
+        if not {'VmRSS', 'VmHWM'} <= fields.keys():
+            raise ValueError('Linux process RSS/high water unavailable')
         return {'rss_kib': int(fields['VmRSS'].split()[0]),
                 'process_high_water_kib': int(fields['VmHWM'].split()[0])}
     raise RuntimeError(f'unsupported benchmark platform: {system}')

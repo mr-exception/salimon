@@ -1,0 +1,403 @@
+[
+  {
+    "status": "failed",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "binary_sha256": "3f0e6e0f4638ebd9523e79ac1ef4a5657f8b6bb723ca54e5e75e4d07cd042560",
+    "command": [
+      "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client"
+    ],
+    "profile": "release",
+    "workload": "normal canonical new journey; no E2E; no optional pack",
+    "instrumentation": "game per-frame debug diagnostics enabled; intervals capped at 250 ms by FrameClock",
+    "hardware_fps_validated": false,
+    "seconds_to_verified_continue": 1.9569065410032636,
+    "error": "Helper exited 1: 109:117: execution error: System Events got an error: Can\u2019t get window 1 of application process \"salimon-client\". Invalid index. (-1719)\n",
+    "original_result_sha256": "06ded5a19551441eaadda5180938096dd68f96f09c383f6cfd1c33f310452211",
+    "retained_raw_file": "canonical-1/result.json.gz"
+  },
+  {
+    "status": "failed",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "binary_sha256": "3f0e6e0f4638ebd9523e79ac1ef4a5657f8b6bb723ca54e5e75e4d07cd042560",
+    "command": [
+      "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client"
+    ],
+    "profile": "release",
+    "workload": "normal canonical new journey; no E2E; no optional pack",
+    "instrumentation": "game per-frame debug diagnostics enabled; intervals capped at 250 ms by FrameClock",
+    "hardware_fps_validated": false,
+    "seconds_to_verified_continue": 1.7929724160057958,
+    "window_context": {
+      "capture": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/canonical-2/gameplay.png",
+      "capture_source": "macOS window compositor; not optical scanout",
+      "displays": [
+        {
+          "name": "Built-in Retina Display",
+          "pixels": [
+            2240,
+            1260
+          ],
+          "refresh_hz": 60,
+          "scale_factor": 2
+        },
+        {
+          "name": "LF27T450F",
+          "pixels": [
+            1920,
+            1080
+          ],
+          "refresh_hz": 75,
+          "scale_factor": 1
+        }
+      ],
+      "drawable_source": "native window/resize logs, not OS logical bounds",
+      "os_bounds_unit": "logical points; includes decorations",
+      "os_window_bounds": {
+        "Height": 572,
+        "Width": 960,
+        "X": 640,
+        "Y": 169
+      },
+      "pid": 44108,
+      "window_id": 1510
+    },
+    "sample_seconds": 30.01988983398769,
+    "error": "need 100 visible foreground frames, got 1801",
+    "original_result_sha256": "7c8f43f4cab40d8b323076d0dccd9550fe003943fe8e22bc9154dc68ca2b6f1e",
+    "retained_raw_file": "canonical-2/result.json.gz",
+    "sampled_rss_max_kib": 133728
+  },
+  {
+    "status": "passed",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "binary_sha256": "3f0e6e0f4638ebd9523e79ac1ef4a5657f8b6bb723ca54e5e75e4d07cd042560",
+    "command": [
+      "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client"
+    ],
+    "profile": "release",
+    "workload": "normal canonical new journey; no E2E; no optional pack",
+    "instrumentation": "game per-frame debug diagnostics enabled; intervals capped at 250 ms by FrameClock",
+    "hardware_fps_validated": false,
+    "seconds_to_verified_continue": 1.7274294170056237,
+    "window_context": {
+      "capture": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/canonical-3/gameplay.png",
+      "capture_source": "macOS window compositor; not optical scanout",
+      "displays": [
+        {
+          "mode_pixels": [
+            4480,
+            2520
+          ],
+          "mode_points": [
+            2240,
+            1260
+          ],
+          "name": "Built-in Retina Display",
+          "refresh_hz": 60,
+          "scale_factor": 2
+        },
+        {
+          "mode_pixels": [
+            1920,
+            1080
+          ],
+          "mode_points": [
+            1920,
+            1080
+          ],
+          "name": "LF27T450F",
+          "refresh_hz": 75,
+          "scale_factor": 1
+        }
+      ],
+      "drawable_source": "native window/resize logs, not OS logical bounds",
+      "os_bounds_unit": "logical points; includes decorations",
+      "os_window_bounds": {
+        "Height": 572,
+        "Width": 960,
+        "X": 640,
+        "Y": 169
+      },
+      "pid": 45007,
+      "window_id": 1525
+    },
+    "sample_seconds": 30.065427207999164,
+    "metrics": {
+      "interval_ms": {
+        "count": 1804,
+        "median": 16.661,
+        "p95": 18.609,
+        "max": 22.155
+      },
+      "wall_ms": {
+        "count": 1804,
+        "median": 16.533,
+        "p95": 18.535,
+        "max": 22.015
+      },
+      "cpu_update_ms": {
+        "count": 1804,
+        "median": 0.4005,
+        "p95": 0.627,
+        "max": 1.025
+      },
+      "cpu_render_ms": {
+        "count": 1804,
+        "median": 2.7135,
+        "p95": 3.457,
+        "max": 4.768
+      },
+      "backlog_ms": {
+        "count": 1804,
+        "median": 7.9185,
+        "p95": 15.109,
+        "max": 15.991
+      },
+      "gpu_ms": {
+        "count": 1804,
+        "median": 3.3053125000000003,
+        "p95": 6.998917,
+        "max": 8.610292
+      }
+    },
+    "submitted_frames_per_second": 60.002473522811954,
+    "submitted_interval_60fps_comparison": {
+      "p95_limit_ms": 16.666666666666668,
+      "passed": false,
+      "owner_budget_approval": false,
+      "physical_scanout_verified": false
+    },
+    "renderer": "[2026-10-31T16:36:29Z INFO  salimon_client::app] renderer ready: adapter=\"Apple M1\" backend=Metal device_type=IntegratedGpu gpu_timestamps=true",
+    "native_window_events": [
+      "[2026-10-31T16:36:29Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00",
+      "[2026-10-31T16:36:29Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }",
+      "[2026-10-31T16:36:29Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }",
+      "[2026-10-31T16:36:29Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }"
+    ],
+    "original_result_sha256": "015b3531f78fa3c82ae9e607a362fe8d0af65a74dd298bfd50c3fd787c4a6aec",
+    "retained_raw_file": "canonical-3/result.json.gz",
+    "sampled_rss_max_kib": 134736
+  },
+  {
+    "status": "passed",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "binary_sha256": "3f0e6e0f4638ebd9523e79ac1ef4a5657f8b6bb723ca54e5e75e4d07cd042560",
+    "command": [
+      "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client"
+    ],
+    "profile": "release",
+    "workload": "normal canonical new journey; no E2E; no optional pack",
+    "instrumentation": "game per-frame debug diagnostics enabled; intervals capped at 250 ms by FrameClock",
+    "hardware_fps_validated": false,
+    "seconds_to_verified_continue": 1.7224797079979908,
+    "window_context": {
+      "capture": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/canonical-4/gameplay.png",
+      "capture_source": "macOS window compositor; not optical scanout",
+      "displays": [
+        {
+          "mode_pixels": [
+            4480,
+            2520
+          ],
+          "mode_points": [
+            2240,
+            1260
+          ],
+          "name": "Built-in Retina Display",
+          "refresh_hz": 60,
+          "scale_factor": 2
+        },
+        {
+          "mode_pixels": [
+            1920,
+            1080
+          ],
+          "mode_points": [
+            1920,
+            1080
+          ],
+          "name": "LF27T450F",
+          "refresh_hz": 75,
+          "scale_factor": 1
+        }
+      ],
+      "drawable_source": "native window/resize logs, not OS logical bounds",
+      "os_bounds_unit": "logical points; includes decorations",
+      "os_window_bounds": {
+        "Height": 572,
+        "Width": 960,
+        "X": 640,
+        "Y": 169
+      },
+      "pid": 45536,
+      "window_id": 1539
+    },
+    "sample_seconds": 30.04607629099337,
+    "metrics": {
+      "interval_ms": {
+        "count": 1803,
+        "median": 16.673,
+        "p95": 18.587,
+        "max": 20.44
+      },
+      "wall_ms": {
+        "count": 1803,
+        "median": 16.538,
+        "p95": 18.496,
+        "max": 20.36
+      },
+      "cpu_update_ms": {
+        "count": 1803,
+        "median": 0.299,
+        "p95": 0.632,
+        "max": 0.917
+      },
+      "cpu_render_ms": {
+        "count": 1803,
+        "median": 2.652,
+        "p95": 3.444,
+        "max": 4.481
+      },
+      "backlog_ms": {
+        "count": 1803,
+        "median": 7.961,
+        "p95": 15.241,
+        "max": 15.992
+      },
+      "gpu_ms": {
+        "count": 1803,
+        "median": 3.062709,
+        "p95": 7.182875,
+        "max": 8.370834
+      }
+    },
+    "submitted_frames_per_second": 60.007835383832415,
+    "submitted_interval_60fps_comparison": {
+      "p95_limit_ms": 16.666666666666668,
+      "passed": false,
+      "owner_budget_approval": false,
+      "physical_scanout_verified": false
+    },
+    "renderer": "[2026-10-31T16:37:07Z INFO  salimon_client::app] renderer ready: adapter=\"Apple M1\" backend=Metal device_type=IntegratedGpu gpu_timestamps=true",
+    "native_window_events": [
+      "[2026-10-31T16:37:07Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00",
+      "[2026-10-31T16:37:07Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }",
+      "[2026-10-31T16:37:07Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }",
+      "[2026-10-31T16:37:07Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }"
+    ],
+    "original_result_sha256": "b93cdd06020440e5800e864fdc5c8d119109ce11259e5f1571c18ed30ceb4bb2",
+    "retained_raw_file": "canonical-4/result.json.gz",
+    "sampled_rss_max_kib": 134992
+  },
+  {
+    "status": "passed",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "binary_sha256": "3f0e6e0f4638ebd9523e79ac1ef4a5657f8b6bb723ca54e5e75e4d07cd042560",
+    "command": [
+      "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client"
+    ],
+    "profile": "release",
+    "workload": "normal canonical new journey; no E2E; no optional pack",
+    "instrumentation": "game per-frame debug diagnostics enabled; intervals capped at 250 ms by FrameClock",
+    "hardware_fps_validated": false,
+    "seconds_to_verified_continue": 1.7446706670016283,
+    "window_context": {
+      "capture": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/canonical-5/gameplay.png",
+      "capture_source": "macOS window compositor; not optical scanout",
+      "displays": [
+        {
+          "mode_pixels": [
+            4480,
+            2520
+          ],
+          "mode_points": [
+            2240,
+            1260
+          ],
+          "name": "Built-in Retina Display",
+          "refresh_hz": 60,
+          "scale_factor": 2
+        },
+        {
+          "mode_pixels": [
+            1920,
+            1080
+          ],
+          "mode_points": [
+            1920,
+            1080
+          ],
+          "name": "LF27T450F",
+          "refresh_hz": 75,
+          "scale_factor": 1
+        }
+      ],
+      "drawable_source": "native window/resize logs, not OS logical bounds",
+      "os_bounds_unit": "logical points; includes decorations",
+      "os_window_bounds": {
+        "Height": 572,
+        "Width": 960,
+        "X": 640,
+        "Y": 169
+      },
+      "pid": 46180,
+      "window_id": 1553
+    },
+    "sample_seconds": 30.014771791000385,
+    "metrics": {
+      "interval_ms": {
+        "count": 1801,
+        "median": 16.658,
+        "p95": 18.586,
+        "max": 19.905
+      },
+      "wall_ms": {
+        "count": 1801,
+        "median": 16.532,
+        "p95": 18.5,
+        "max": 19.823
+      },
+      "cpu_update_ms": {
+        "count": 1801,
+        "median": 0.346,
+        "p95": 0.637,
+        "max": 1.252
+      },
+      "cpu_render_ms": {
+        "count": 1801,
+        "median": 2.645,
+        "p95": 3.406,
+        "max": 4.91
+      },
+      "backlog_ms": {
+        "count": 1801,
+        "median": 7.954,
+        "p95": 15.19,
+        "max": 15.987
+      },
+      "gpu_ms": {
+        "count": 1801,
+        "median": 3.618625,
+        "p95": 7.390458,
+        "max": 8.406167
+      }
+    },
+    "submitted_frames_per_second": 60.00378788620379,
+    "submitted_interval_60fps_comparison": {
+      "p95_limit_ms": 16.666666666666668,
+      "passed": false,
+      "owner_budget_approval": false,
+      "physical_scanout_verified": false
+    },
+    "renderer": "[2026-10-31T16:37:45Z INFO  salimon_client::app] renderer ready: adapter=\"Apple M1\" backend=Metal device_type=IntegratedGpu gpu_timestamps=true",
+    "native_window_events": [
+      "[2026-10-31T16:37:45Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00",
+      "[2026-10-31T16:37:45Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }",
+      "[2026-10-31T16:37:45Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }",
+      "[2026-10-31T16:37:45Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }"
+    ],
+    "original_result_sha256": "6c6217550c57e4878fd6c1087bfc8868ab9e7a85011b7bb567c76c02e7cf49fb",
+    "retained_raw_file": "canonical-5/result.json.gz",
+    "sampled_rss_max_kib": 134512
+  }
+]

@@ -818,3 +818,15 @@ time separate from naturally elapsed restart evidence.
 runtime adapter tests to the production capture driver. It requires no backend
 and grants no completion. Both tasks require normal workspace/Clippy/fmt/script/
 documentation gates; physical platform/M1/human criteria stay separately unverified.
+
+
+## Local Mac release qualification
+
+The [Mac procedure](macos-qualification.md) separates native Metal/OS-injected
+checks and hardware profiling from deferred physical trials and owner decisions.
+Use `scripts/benchmark_canonical.py --profile release` with a matching optimized
+binary; `scripts/verify_recovery.py` maintains the seeded paid module/Archive
+route previously retained only in the #515 report. Script contracts: `python3 -m
+unittest discover -s scripts -p test_benchmark_canonical.py`, existing packaged
+smoke/fragment/visual/route-review tests, and `python3 scripts/check_docs.py`.
+No new runtime/domain behavior or cloud acceptance gate is introduced.

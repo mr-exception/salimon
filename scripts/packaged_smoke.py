@@ -140,17 +140,17 @@ def main(argv=None):
     parser.add_argument("--binary", required=True, type=Path)
     parser.add_argument("--artifacts", type=Path, default=ROOT / "artifacts" / "packaged-smoke")
     parser.add_argument("--timeout", type=float, default=60)
-    parser.add_argument("--screenshot-command", type=json.loads,
+    parser.add_argument("--screenshot-command", type=json.loads, default=argparse.SUPPRESS,
                         help='trusted local JSON argv; supports {pid} and {path}; [] disables capture')
     args = parser.parse_args(argv)
     if not 0 < args.timeout <= 600:
         parser.error("--timeout must be greater than zero and at most 600 seconds")
-    if args.screenshot_command is not None and (
+    if hasattr(args, 'screenshot_command') and (
             not isinstance(args.screenshot_command, list)
             or not all(isinstance(part, str) for part in args.screenshot_command)
             or (args.screenshot_command and not any('{path}' in part for part in args.screenshot_command))):
         parser.error('--screenshot-command must be a JSON string array containing {path}, or []')
-    report = run(args.binary, args.artifacts, args.timeout, args.screenshot_command)
+    report = run(args.binary, args.artifacts, args.timeout, getattr(args, 'screenshot_command', None))
     print(json.dumps(report))
     return 0 if report["success"] else 1
 

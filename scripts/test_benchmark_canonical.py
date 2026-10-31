@@ -16,6 +16,8 @@ class CanonicalBenchmark(unittest.TestCase):
         with patch.object(benchmark.Path, 'read_text', return_value='Name:\tgame\nVmRSS:\t42 kB\nVmHWM:\t84 kB\n'):
             self.assertEqual(benchmark.memory_sample(42, 'linux'),
                              {'rss_kib': 42, 'process_high_water_kib': 84})
+        with patch.object(benchmark.Path, 'read_text', return_value='Name:\tgame\n'), self.assertRaises(ValueError):
+            benchmark.memory_sample(42, 'linux')
 
     def test_gpu_units_unavailable_counters_and_foreground_admission(self):
         rows = []

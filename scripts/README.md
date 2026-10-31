@@ -732,10 +732,12 @@ resolutions. Scales 1/1.5/2 are simulated via X11, not physical DPI evidence.
 `scout-recovery` explicitly starts with a held 2 kg iron identity and a 0.5 kg
 silicate bin, no module/job/progress. `key: recovery` maps to physical R through
 normal Archive dispatch; `inspect.recovery` is immutable source evidence. Use
-`reports/issue-515/verify.py --binary target/debug/salimon-client --output
+`scripts/verify_recovery.py --binary target/release/salimon-client --output
 artifacts/new-515` under Xvfb/Vulkan. It drives intake, menu, funded craft, tray
 collection/installation, real cabin walking, R start/stop and both paid records.
 This fixture does not measure mining/acquisition, balance or physical OS input.
+The maintained script restores the historical #515 route with its self-contained
+read-only aiming helper; it also runs on a native Mac with `WGPU_BACKEND=metal`.
 
 The #566 collector adds the explicit `--profile cloud-llvmpipe-1280` admission
 profile for Xvfb 1280×800, scale1, Vulkan llvmpipe. The default M1/Metal profile

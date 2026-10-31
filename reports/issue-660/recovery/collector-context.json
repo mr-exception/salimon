@@ -1,0 +1,14 @@
+{
+  "revision": "125944f175c526645600c19e8deba6a7902f9b7d",
+  "binary_sha256": "3f0e6e0f4638ebd9523e79ac1ef4a5657f8b6bb723ca54e5e75e4d07cd042560",
+  "input": "production protocol, desktop input isolated; 96 ms requests / 16 ms simulation ticks",
+  "collector_sha256": "0ad6cb5ff78a24a1c576f0bba483696646f43916f87d375b9a1bac1f57a1c989",
+  "command": [
+    "python3",
+    "scripts/verify_recovery.py",
+    "--binary",
+    "target/release/salimon-client",
+    "--output",
+    "artifacts/m1-qualification/recovery"
+  ]
+}

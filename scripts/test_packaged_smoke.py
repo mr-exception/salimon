@@ -80,7 +80,7 @@ while True:
 
 class PortableContracts(unittest.TestCase):
     def test_invalid_capture_argv_rejected_before_launch(self):
-        for value in ('"shell command"', '[1]', '["capture-without-output"]'):
+        for value in ('null', 'true', '{}', '"shell command"', '[1]', '["capture-without-output"]'):
             with self.subTest(value=value):
                 result = subprocess.run([sys.executable, str(Path(smoke.__file__)), '--binary',
                                          'missing', '--screenshot-command', value],

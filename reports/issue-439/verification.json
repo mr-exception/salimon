@@ -534,6 +534,18 @@
       "result": "1 passed; also passed in full workspace suite",
       "log": "check-9.log.gz",
       "uncompressed_sha256": "e74afc11a1a94d1fd37d72772e14037219ff2fcea654c48db192e6ecee244de6"
+    },
+    {
+      "command": "python3 scripts/check_docs.py --base 5113d628865e8fe863ec40c7dbe3092b8fbe347b",
+      "result": "0 failures, final source-impact check",
+      "log": "docs-base.log.gz",
+      "uncompressed_sha256": "c51a45877eafba57b03b15b9f47be25ee4fd7e4fa2c12023fa09753283db6c0e"
+    },
+    {
+      "command": "python3 scripts/architecture_review.py --base 5113d628865e8fe863ec40c7dbe3092b8fbe347b --output artifacts/issue-472/architecture.json",
+      "result": "warning-only review passed; 77 candidates, active PR inventory unavailable locally; CI collects actual inventory",
+      "log": "architecture.log.gz",
+      "uncompressed_sha256": "ec342f4cf3031d6a7afb6e9b3558ccda322ede089a1bfc546552c8d6f48975f3"
     }
   ],
   "hardware_fps_validated": false,

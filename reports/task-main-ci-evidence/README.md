@@ -23,7 +23,7 @@ a removed `reports/issue-196/baseline.json`.
 
 ## Validation
 
-Cloud Debian 13 x86_64, Python 3.12.12, Rust/Cargo 1.99.1; locked dependencies.
+Cloud Debian 13 x86_64, Python 3.12.14, Rust/Cargo 1.99.1; locked dependencies.
 
 - `python3 scripts/check_docs.py`: PASS, zero failures, no added baseline exemptions.
 - `python3 -m unittest discover -s scripts -p 'test_*.py'`: PASS, 142 tests.

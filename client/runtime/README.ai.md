@@ -464,15 +464,14 @@ before editing lifecycle/input in `app.rs`.
 See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
-loaded catalog truth does not grant player discovery or replace gameplay yet.
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
 
 
 ## Canonical terrain streaming (#424)
 
 See the [canonical terrain contract](../../docs/universe-terrain.md) for the exact U11
 evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
-CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
-and normal alien-world startup belong to #425/#426.
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Ordinary canonical gameplay and alien-world startup are implemented by #425/#426.
 
 
 ## Canonical surface gameplay and schema 24 (#425)
@@ -627,3 +626,9 @@ Offline timed/scanner integration #433: [chronology and analytic idle pulses](..
 
 
 Native verified resume #434: [asynchronous worker, real progress and current-region admission](../../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434). `launch.rs` transfers verified bytes; UI/thread-local query caches remain on the main thread.
+
+
+Current U01–U33 truth and explicit fixture boundaries are mapped in the
+[U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
+streaming observer/velocity, physical environment and preview share the saved
+motion source; suit field-mark timestamps remain personal active-time metadata.

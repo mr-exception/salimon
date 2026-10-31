@@ -92,7 +92,9 @@ impl ClientApplication {
             };
             self.condition_feedback.camera(&mut camera);
             if let Some(view) = &self.scout_reference {
-                camera = view.camera(presentation.ship.pose);
+                camera = view
+                    .at_epoch(self.session.environment_epoch().ok())
+                    .camera(presentation.ship.pose);
             }
             let mesh = scene::gameplay_ship(&self.session, presentation.ship);
             Some(mesh)
@@ -134,21 +136,36 @@ impl ClientApplication {
         {
             resource_meshes.push(preview);
         }
+        let environment_epoch = match self.session.environment_epoch() {
+            Ok(epoch) => epoch,
+            Err(error) => {
+                self.fail(event_loop, error);
+                return;
+            }
+        };
+        if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
+            match super::sky::host_position(environment_epoch) {
+                Ok(position) => light.position_meters = position,
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        }
         if let Some(stream) = &mut self.universe_stream {
             let result = if self.session.mining.terrain
                 == salimon_world::terrain::TerrainMode::Canonical
             {
-                salimon_world::canonical::START
-                    .manifest()
-                    .distance
-                    .system_position
-                    .translated(camera.position_meters)
+                salimon_universe::starting_motion::inertial(
+                    environment_epoch,
+                    camera.position_meters,
+                    presentation.ship.velocity_meters_per_second,
+                )
             } else {
                 salimon_universe::coordinates::GalacticPosition::new([0; 3], camera.position_meters)
+                    .map(|p| (p, presentation.ship.velocity_meters_per_second))
             }
-            .and_then(|position| {
-                stream.update(position, presentation.ship.velocity_meters_per_second)
-            });
+            .and_then(|(position, velocity)| stream.update(position, velocity));
             let error = result
                 .err()
                 .map(|e| e.to_string())
@@ -161,7 +178,7 @@ impl ClientApplication {
         let sky = if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
             match super::sky::scene(
                 camera.position_meters,
-                self.session.elapsed,
+                environment_epoch,
                 self.universe_stream.as_ref(),
             ) {
                 Ok(sky) => Some(sky),
@@ -185,22 +202,6 @@ impl ClientApplication {
             } else {
                 None
             };
-        let origin = salimon_universe::Epoch::calendar(
-            [2000, 1, 1],
-            [12, 0, 0, 0],
-            salimon_universe::TimeScale::Tt,
-        )
-        .expect("fixed TT epoch");
-        let environment_epoch = match i64::try_from(self.session.elapsed.as_nanos())
-            .ok()
-            .and_then(|ns| origin.advance_nanos(ns).ok())
-        {
-            Some(epoch) => epoch,
-            None => {
-                self.fail(event_loop, "environment clock exceeds supported TT epoch");
-                return;
-            }
-        };
         let weather_frame =
             if self.session.mining.terrain == salimon_world::terrain::TerrainMode::Canonical {
                 match super::weather::canonical(environment_epoch) {

@@ -8,7 +8,19 @@ Verification ownership was revised by the owner on 2026-10-23:
 blanket M1-only issue completion. Feature/science contracts and hardware-specific
 performance targets are unchanged. Keep actual platform results distinct.
 
-Status: **approved design; portable catalog/trajectory foundations and U17–U19 physics APIs delivered with the limits below; canonical playable-world adoption and remaining expansion are incomplete**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Expansion follows the completed earlier gameplay implementation queue; remaining issues retain their explicit functional blockers. Keep separate native verification, no implementation PRs as part of planning.
+Status: **U01–U33 interfaces and canonical playable adoption are implemented;
+U34 integrated cloud evidence is delivered in the current five-task PR.**
+The [U36 audit matrix](../reports/issue-441/README.md) maps current behavior,
+source/tests and remaining scope. Ordinary play uses Vesper and the approved
+fictional two-body motion publication; compressed worlds are engineering fixtures.
+Full Gaia acceptance (#524), physical platform (#557), human presentation (#561),
+hardware budgets (#563) and release/source/balance qualification (#659–#661)
+remain separate. No observed-body arbitrary-date playable system is implied.
+
+Implementation-status sections below U01 record their original delivery boundaries;
+they are historical per-stage notes, superseded for current integration by the
+linked audit matrix, source coverage and motion contracts at the end. They must
+not be read as new blockers for already delivered downstream stages.
 
 ## Narrative alignment (2026-10-21)
 
@@ -156,7 +168,7 @@ presentation/platform/budget criteria routed to #561/#557/#563.
 
 See the [surface-flight contract](universe-surface-flight.md) for rotating/orbiting support,
 Core-funded physically bounded landing/takeoff, production source/tests and
-remaining playable-world adoption. Current compressed gameplay is unchanged.
+canonical adoption through the [motion contract](universe-offline-propagation.md). Compressed engineering fixtures remain explicitly isolated.
 
 
 ## Real-scale atmospheric drag (#419)
@@ -179,10 +191,9 @@ U27 #428 implements the portable contact/history authority; see [scanner contrac
 
 The scanner contact/pulse/checkpoint/projector and player-known chart boundaries
 (#428/#429/#431/#430/#469) are implemented in the [scanner contract](universe-scanner.md).
-Canonical surface observations retain their explicit body frame; no missing
-orbital phase or source motion is invented. Full global-frame playable adoption
-and closed-game trajectory/event production remain #427/#432/#433. Transmission
-production is #470. Chart knowledge survives contact expiry without revealing
+Canonical surface observations retain their explicit body frame, while published
+Nacre/Vesper motion is evaluated at the source epoch. Closed event production is
+implemented by #432/#433. Transmission production retains #470. Chart knowledge survives contact expiry without revealing
 unknown catalog objects or granting autopilot/jump authority.
 
 
@@ -204,4 +215,4 @@ this private observed pack does not grant player knowledge or publish a release.
 
 ## Canonical offline motion (#432, owner-approved model 2026-10-31)
 
-The [separate motion publication and schema-30 migration](universe-offline-propagation.md) implement the approved fixed fictional phase/orientation/reference epoch and zero axial spin while preserving geography/resources/body-relative saves. Ordinary canonical flight and closed coasting now share gravity and terrain contact. Scanner timed catch-up, asynchronous verified Resume, final audit and integrated evidence remain #433/#434/#441/#435 in the current batch. No stellar-interior physics, observed-source extrapolation, Jump Drive or hardware qualification is implied.
+The [separate motion publication and schema-30 migration](universe-offline-propagation.md) implement the approved fixed fictional phase/orientation/reference epoch and zero axial spin while preserving geography/resources/body-relative saves. Ordinary canonical flight and closed coasting now share gravity and terrain contact. Scanner timed catch-up and asynchronous verified Resume are implemented by #433/#434; #441 maps current source truth and #435 records integrated evidence. No stellar-interior physics, observed-source extrapolation, Jump Drive or hardware qualification is implied.

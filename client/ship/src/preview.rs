@@ -19,6 +19,19 @@ impl ShipController {
     /// not anticipate runtime auxiliary demand, new cargo, refueling or commands.
     /// Half-step discrepancy is an indicator, not a certified uncertainty bound.
     pub fn navigation_preview(&self) -> Option<Preview> {
+        self.navigation_preview_at(None)
+    }
+    /// Canonical forecasts require the authoritative source clock. The clock and
+    /// ship are cloned together; failed source evaluation yields no prediction.
+    pub fn navigation_preview_at(
+        &self,
+        clock: Option<&salimon_universe::starting_motion::Clock>,
+    ) -> Option<Preview> {
+        if self.terrain == salimon_world::terrain::TerrainMode::Canonical && clock.is_none() {
+            return None;
+        }
+        let mut coarse_clock = clock.cloned();
+        let mut fine_clock = clock.cloned();
         let start = self.snapshot();
         if start.flight_state != FlightState::Flying {
             return None;
@@ -48,9 +61,20 @@ impl ShipController {
             endpoint_meters: start.pose.position_meters,
         };
         for i in 1..=128 {
-            coarse.advance(Duration::from_millis(64));
+            if let Some(clock) = &mut coarse_clock {
+                coarse
+                    .advance_celestial(clock, Duration::from_millis(64), false)
+                    .ok()?;
+            } else {
+                coarse.advance(Duration::from_millis(64));
+            }
             for _ in 0..2 {
-                fine.advance(Duration::from_millis(32));
+                if let Some(clock) = &mut fine_clock {
+                    fine.advance_celestial(clock, Duration::from_millis(32), false)
+                        .ok()?;
+                } else {
+                    fine.advance(Duration::from_millis(32));
+                }
             }
             let t = f64::from(i) * 0.064;
             let h = altitude(&fine);
@@ -83,6 +107,37 @@ impl ShipController {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn canonical_preview_follows_motion_source_without_mutating_ship_or_epoch() {
+        let radius = salimon_universe::starting_motion::DEFINITION.planet_radius_meters;
+        let mut ship = ShipController::flying_with_velocity(
+            crate::ShipPose {
+                position_meters: [radius + 500_000., 0., 0.],
+                orientation: [0., 0., 0., 1.],
+            },
+            0,
+            [0., 0., 1000.],
+        )
+        .unwrap();
+        ship.terrain = salimon_world::terrain::TerrainMode::Canonical;
+        let clock = salimon_universe::starting_motion::Clock::at(0).unwrap();
+        let before = serde_json::to_vec(&ship).unwrap();
+        assert!(ship.navigation_preview().is_none());
+        let preview = ship.navigation_preview_at(Some(&clock)).unwrap();
+        let mut actual = ship.clone();
+        let mut epoch = clock.clone();
+        for _ in 0..256 {
+            actual
+                .advance_celestial(&mut epoch, Duration::from_millis(32), false)
+                .unwrap();
+        }
+        assert_eq!(
+            preview.endpoint_meters,
+            actual.snapshot().pose.position_meters
+        );
+        assert_eq!(serde_json::to_vec(&ship).unwrap(), before);
+        assert_ne!(epoch, clock);
+    }
     fn falling(height: f64, speed: f64, throttle: i8) -> ShipController {
         let b = salimon_world::CELESTIAL_BODIES
             .iter()

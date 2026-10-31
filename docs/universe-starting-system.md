@@ -26,7 +26,7 @@ uses U10 builder v1, seed 412, a single 2 pc cuboid local-disk region, residual
 density 1 system/pc³, ages 3–8 Gyr and [Fe/H] -0.2–0.3. It publishes eight
 fictional systems and 26 planets from an explicitly empty retained baseline
 `awakening-empty-v1`. This is a small **authored candidate cohort**, not a measured
-residual-density estimate or a production Gaia catalog. U12 must retain this
+residual-density estimate or a production Gaia catalog. U12 packaging retains this
 cohort and reconcile/merge production observations without regenerating its IDs.
 
 The audit screens individual planets in stable catalog-ID order for distance
@@ -95,7 +95,7 @@ exact permanent manifest, including floating signed-zero representation.
 
 This world digest is **distinct from U10's source-body-recipe digest**. U01 catalog
 body definitions still reference those unchanged U10 recipes. U11 supplies the
-expanded selected-world sidecar and subsystem digests; U12 must package and bind
+expanded selected-world sidecar and subsystem digests; U12 packages and binds
 both. Other fictional bodies still have generation recipes, not full surface
 definitions. No schema-1 reinterpretation or terrain-v1 codec change occurs.
 
@@ -140,7 +140,7 @@ checks every walk segment analytically against the ship disk, cap and <=55 m
 total path. Tests independently sample the paths and common surface. All five
 existing mining/Core/fabricator material keys are represented, without changing
 their recipes, yields, resource codec or mutable depletion journals. These are
-fixed **baseline** resource definitions; U24 #425 must adapt them to real-scale
+fixed **baseline** resource definitions; U24 #425 adapts them to real-scale
 mining, ship hull/airlock geometry, carrying and persistence before play.
 
 ## Commands, checks and remaining boundaries
@@ -157,8 +157,10 @@ CI compares repeated Ubuntu output to the committed golden and runs the same
 U11 tests on macOS/Windows in debug/release. Retain workspace build/tests,
 all-target Clippy/fmt and documentation gates. See [measured report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-412/README.md).
 
-U12 #413 owns production merging/packaging; U14 #415 evolving states; U23 #424
-real-scale terrain LOD; U24 #425 playable arrival/resources integration.
+Implemented consumers: U12 #413 merging/packaging; U14 #415 state evaluation;
+U23 #424 real-scale terrain LOD; U24 #425 playable arrival/resources.
+#432 supplies a separate owner-approved motion publication without changing
+this frozen geography, resource identity or original world digest.
 Cloud integration gates #436–#439 remain separate; human review/platform/budget
 criteria are #561/#557/#563 under the [verification workflow](verification-workflow.md).
 The portable definition alone does not validate renderer/native appearance or hull contact. Runtime surface/save adoption is now delivered by #425 and normal startup/restart by #426; see [canonical gameplay](universe-gameplay.md) and its production evidence. Scanner/chart, Earth-route retirement (#427), backend and asset work remain separate. Explicit all-player-consistent fictional revision

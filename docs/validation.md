@@ -797,3 +797,9 @@ Offline timed/scanner #433: `cargo test -p salimon-client --locked session::scan
 
 
 Verified native resume #434: `cargo test -p salimon-client --locked launch`, affected runner contracts and the production native routes `scenarios/evidence/offline-resume-progress.json` / `offline-clock-recovery.json` with `--screenshot-command '["native"]'`. Keep controlled-clock fixtures distinct from the real-clock launch test/probe, and retain exact backend/media provenance. [Admission, cancel/restart and publication contract](universe-offline-propagation.md#native-progress-and-verified-resume-434).
+
+
+U36 consistency audit: [matrix and current-model limits](../reports/issue-441/README.md).
+Canonical source, preview, shared sky/light and physical-environment clock
+regressions are included in workspace tests. U34 runs the integrated gates after
+U36 repairs, without creating a dependency from U36 to U34.

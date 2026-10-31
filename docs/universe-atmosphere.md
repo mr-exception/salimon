@@ -68,10 +68,10 @@ outside the declared conditions.
 - Run `cargo test -p salimon-ship --locked atmosphere::`, workspace build/tests,
   all-target Clippy, fmt and documentation/base-impact checks.
 
-This extends the production portable #417/#418 real-scale API. Existing
-compressed gameplay, save schema, shaders and UI remain unchanged until the
-already scoped canonical-world adoption (#424–#427). Real-scale contact is #420;
-scientific full-pack acceptance is #524/#526. Physical platform, human presentation
+This extends the production portable #417/#418 real-scale API. Canonical adoption is implemented by #424–#427 and #432–#434. Vesper
+is published vacuum: the live motion adapter applies no invented atmosphere.
+Generic drag remains the explicit reusable API; moving contact is #420.
+Selected JPL/PS coverage is #526; full Gaia acceptance remains #524. Physical platform, human presentation
 and hardware qualification remain separately unverified under #557/#561/#563;
 no new renderer output requires graphical captures for this domain-only PR.
 

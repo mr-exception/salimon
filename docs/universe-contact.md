@@ -113,11 +113,11 @@ errors under the gravity guard; they are not silently projected out of a planet.
   crossing times, curved motion, terrain face/edge/corner, production terrain
   samples, orbital-frame invariance, tangent/miss, broad-phase work, response and
   failure rollback. Terrain samples remain declared representative-world fixtures,
-  not evidence that future canonical tile streaming already exists.
+  separate from the implemented canonical tile stream and Vesper adapter.
 
 Run `cargo test -p salimon-ship --locked contact::`, workspace tests/build,
-all-target Clippy, fmt and docs/base-impact checks. No rendered output or current
-save/UI/input behavior changes. Offline event orchestration and fatal/grounded
-save publication remain #432–#434; canonical tile production remains #424/#425.
+all-target Clippy, fmt and docs/base-impact checks. Generic contact APIs remain separate from the runtime adapter. Canonical terrain
+streaming/gameplay is implemented by #424/#425; #432–#434 now provide verified
+closed propagation and publication with the existing crash/grounding policy.
 Physical input/OS #557, human presentation #561 and actual hardware/Metal #563 are
 separate, explicitly unverified release qualification, not routine cloud gates.

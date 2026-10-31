@@ -90,7 +90,7 @@ Follow the [canonical assembly, traversal, identity, mass and schema-18 contract
 Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
-Historical fixtures remain explicit; new-run startup is #426.
+Historical fixtures remain explicit; ordinary new-run startup uses the canonical constructor (#426).
 
 
 ## Physical organisms and static clearance (#620)

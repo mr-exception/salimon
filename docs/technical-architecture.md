@@ -19,7 +19,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | --- | --- |
 | `client/runtime/` | Native shell/lifecycle/evidence IO plus portable GameplaySession commands, snapshots, stepping, resource/cargo adapters and presentation mapping |
 | `client/fabrication/` | Portable validated recipes, integer raw storage/reservation, FIFO jobs, single tray and typed consumable slots; runtime adapters remain separate |
-| `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
+| `client/world/` | Canonical Vesper terrain/resources and explicit six-body engineering fixtures, local `f64` frames/camera tour, conserved resource/session deltas, fragments and carrying |
 | `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks, live telemetry and independent portable structural topology |
 | `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |
 | `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
@@ -954,3 +954,10 @@ Offline timed/scanner host #433: [source-order and certified idle-window routing
 
 
 Native asynchronous launch #434: [worker/byte-transfer and menu/region authority](universe-offline-propagation.md#native-progress-and-verified-resume-434). Runtime owns progress/admission and protected publication; renderer readiness is observation, never save authority.
+
+
+Current universe integration: [U01–U33 source/test audit](../reports/issue-441/README.md).
+The canonical motion source drives live/closed ship gravity, scanner positions,
+Nacre light/disk, split streaming observer and physical environmental time.
+The generic split-inertial APIs and observed ephemerides retain their explicit
+validity/time-scale contracts; they do not imply observed-body playable adoption.

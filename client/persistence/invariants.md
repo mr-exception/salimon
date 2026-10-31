@@ -125,7 +125,7 @@ Follow the [canonical damage, physical salvage and schema-21 contract](../../doc
 
 ## Offline construction (#550)
 
-Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Canonical motion and scanner event production are now implemented by #432/#433; see the offline propagation contract. Body-local loose objects retain saved containment/anchors; ship motion advances.
 
 
 ## Cosmetic surface age (#581)
@@ -138,7 +138,7 @@ Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs
 Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
-Historical fixtures remain explicit; new-run startup is #426.
+Historical fixtures remain explicit; ordinary new-run startup uses the canonical constructor (#426).
 
 
 ## Scanner delivery (#431)

@@ -1,6 +1,6 @@
 # Gravity-aware ship trajectory (#417)
 
-The portable ship `trajectory` module composes the existing funded-joule Propulsion contract and ledger-derived mass with U15 gravity using symmetric velocity-Verlet steps. Position remains a split GalacticPosition and epochs remain explicit TT/TDB. The caller chooses a fixed step <=60 seconds and supplies epoch-aware complete source candidates at both endpoints. State and gravity selection commit atomically only after both source queries and all numerical checks succeed. Mass changes use a fresh Propulsion value per step. The base step never debits Core or grants engine/autopilot authority; support, drag and contact compose through the explicit #418–#420 companion APIs. No velocity cap is added. Canonical playable runtime adoption remains later work; existing compressed controller behavior is unchanged. Numerical orbit tests establish a documented fixture error budget, not complete scientific/model or hardware qualification.
+The portable ship `trajectory` module composes the existing funded-joule Propulsion contract and ledger-derived mass with U15 gravity using symmetric velocity-Verlet steps. Position remains a split GalacticPosition and epochs remain explicit TT/TDB. The caller chooses a fixed step <=60 seconds and supplies epoch-aware complete source candidates at both endpoints. State and gravity selection commit atomically only after both source queries and all numerical checks succeed. Mass changes use a fresh Propulsion value per step. The base step never debits Core or grants engine/autopilot authority; support, drag and contact compose through the explicit #418–#420 companion APIs. No velocity cap is added. Canonical runtime uses the separate translating-frame operator in `controller/celestial.rs`; generic Trajectory remains the explicit split-inertial API. Both use the published gravity service; compressed engineering controllers remain isolated. Numerical orbit tests establish a documented fixture error budget, not complete scientific/model or hardware qualification.
 
 This is portable private-development implementation, separate from playable runtime adoption. Private real-data development is authorized; future distribution review remains #659 and full-release scientific data acceptance remains #524/#526. No hardware, scientific model accuracy or production completeness is inferred from fixture tests.
 
@@ -31,7 +31,7 @@ human gameplay, M1 qualification or future source-release review gates this PR.
 
 See the [surface-flight contract](universe-surface-flight.md) for rotating/orbiting support,
 Core-funded physically bounded landing/takeoff, production source/tests and
-remaining playable-world adoption. Current compressed gameplay is unchanged.
+canonical adoption through the [motion contract](universe-offline-propagation.md). Compressed engineering fixtures remain explicitly isolated.
 
 
 ## Real-scale atmospheric drag (#419)

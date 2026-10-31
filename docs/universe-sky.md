@@ -2,8 +2,9 @@
 
 The canonical gameplay view now draws an analytically authored Milky Way band
 and the published host star. `renderer/src/sky.rs` and `sky.wgsl` own presentation;
-`runtime/src/app/sky.rs` maps the fixed starting body's existing illumination
-axes, published star radius and camera-relative f64 distances into angular disks.
+`runtime/src/app/sky.rs` maps the canonical motion epoch, analytic Nacre position, published star radius
+and camera-relative f64 distances into angular disks. Point lighting uses that
+same Nacre position; it cannot retain an independent fixed sun.
 The band is authored art, not an observed star census or navigation layer. The
 historical compressed engineering fixtures retain their existing background.
 
@@ -18,13 +19,18 @@ values, over 128 sources or over 256 KiB reject. The streaming IO worker verifie
 and decodes the sidecar before publishing the cell; the frame thread never reads
 a file. Existing packs without this optional sidecar remain compatible.
 
-The canonical streaming observer is the published system anchor plus current
-body-local camera position. This follows the current fixed-axis playable adapter;
-full rotating/orbiting frame adoption remains #427. Star motion uses elapsed
-simulation time from each supplied reference epoch, not a fabricated UTC-to-TT
-conversion or a claim of current-epoch astrometric precision. The existing host
-illumination has no certified orbital phase. These are explicit visual model
-limits; scientific flight/ephemeris APIs remain unchanged.
+The canonical streaming observer reconstructs the published split system anchor
+plus Vesper's analytic orbital position and the body-local camera position.
+Prefetch velocity includes the orbital velocity. Host disk, light, weather,
+organism activity and environmental audio use the saved motion epoch, including
+closed elapsed time; personal field-mark metadata retains its frozen active-time
+clock. See [the model/time-scale contract](universe-offline-propagation.md).
+Moving optional pack stars must share this explicit TT scale; incompatible scales
+reject projection rather than silently treating TDB as TT. Missing motion holds
+the reference position without inventing a date conversion. This is a bounded
+visual model, not current-epoch scientific astrometry. The `universe-night`
+evidence camera follows the actual anti-stellar direction at 40 m terrain
+clearance; it changes presentation only.
 
 `sky::StarSource::project` subtracts split positions before normalization and
 f32 narrowing, uses radius/distance angular size, and applies an approximate

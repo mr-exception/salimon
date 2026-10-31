@@ -177,8 +177,7 @@ Follow the [canonical damage, physical salvage and schema-21 contract](../../doc
 
 See the [canonical terrain contract](../../docs/universe-terrain.md) for the exact U11
 evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
-CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
-and normal alien-world startup belong to #425/#426.
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Ordinary canonical gameplay and alien-world startup are implemented by #425/#426.
 
 
 ## Canonical surface gameplay and schema 24 (#425)
@@ -186,7 +185,7 @@ and normal alien-world startup belong to #425/#426.
 Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
-Historical fixtures remain explicit; new-run startup is #426.
+Historical fixtures remain explicit; ordinary new-run startup uses the canonical constructor (#426).
 
 
 ## Canonical geology (#612)
@@ -275,3 +274,9 @@ World owns explicit source designations, revision/depletion journals and physica
 publication; runtime composes F/tool input, current anatomy and source-bound restore.
 Schema 29 preserves missing/partial parts and natural object identity. Vesper
 remains sterile; positive sources are explicit fictional geometry fixtures.
+
+
+Current U01–U33 truth and explicit fixture boundaries are mapped in the
+[U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
+streaming observer/velocity, physical environment and preview share the saved
+motion source; suit field-mark timestamps remain personal active-time metadata.

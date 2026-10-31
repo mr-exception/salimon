@@ -85,3 +85,18 @@ Normal startup runs `launch.rs` on one worker while the native window presents i
 Cancellation checks happen before publication and between bounded source batches. A failed/canceled job keeps its private changes out of the visible session. Atomic IO that has already started owns its verified receipt and remains recoverable through the existing two generations. A stopped worker, bad/missing source, backward local clock, unsupported calendar, lock/storage error or failed publication cannot enable Resume. The menu offers Retry/Quit with bounded readable error text. Its wall time is excluded; saved admitted tick backlog survives until Continue through `reset_wall_anchor`.
 
 Only explicit E2E mode enables `offline_launch` (controlled elapsed seconds in 0..86400, optional backward-clock fixture and bounded progress hold) and `launch_release`. They seed a new isolated temporary store and use the real worker/checkpoint path. `SALIMON_E2E_LAUNCH_DIR` additionally lets a canonical-journey E2E process reopen a designated isolated store with the actual local clock, including restart after process death. Ordinary launches do not enable protocol input or fixture gates. [Report and native routes](../reports/issue-434/README.md).
+
+
+## Shared physical and presentation epoch (audit #441)
+
+Runtime sky host disk and point lighting use the same analytic Nacre position
+relative to Vesper. Streaming reconstructs the split galactic observer and adds
+orbital velocity for prefetch. Canonical physical weather/organism/audio queries
+use the motion epoch even while personal active time freezes offline. Optional
+moving pack stars must explicitly share TT; unsupported scale projection rejects
+rather than inventing TT/TDB conversion. Unknown stellar velocity holds its
+published reference position. Suit field marks retain the pre-existing personal
+active-time metadata clock; this is not the physical environment time source.
+Navigation previews clone both ship and clock and call the actual canonical
+operator. Missing/invalid motion produces no prediction. Half-step differences
+remain indicators, not universal uncertainty bounds.

@@ -1,5 +1,12 @@
 # Coordinate Strategy
 
+> **Engineering fixture scope:** the compressed six-body catalog and precision
+> tour below are explicit test/F2 fixtures. Ordinary play uses the frozen
+> canonical Vesper terrain and a separate versioned motion clock; see
+> [canonical frames and offline propagation](../../docs/universe-offline-propagation.md).
+> Galaxy-scale sources use split positions, not the fixture's absolute f64 anchor.
+
+
 ## Strategy
 
 World positions are Cartesian `f64` meters. The camera's Earth-surface anchor is

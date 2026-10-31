@@ -24,7 +24,7 @@ impl GameplaySession {
             *cache = Some(Cached {
                 at: self.elapsed,
                 source,
-                preview: self.ship.navigation_preview(),
+                preview: self.ship.navigation_preview_at(self.motion.as_ref()),
             });
         }
         let cached = cache.as_ref()?;

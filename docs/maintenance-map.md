@@ -531,7 +531,7 @@ See the [canonical damage and schema-21 contract](construction-damage.md) for ru
 
 ## Offline construction (#550)
 
-See [the maintained chronology and schema-22 contract](construction-offline.md): runtime `session/offline.rs`, ship `controller/offline.rs`, launch/checkpoint staging and existing work owners. Run offline/checkpoint/Recovery and ship tests, workspace build/tests/Clippy/fmt, the two documented wgpu routes and docs/base-impact validation. Future #433 supplies verified universe events; no scanner or orbit implementation is duplicated here.
+See [the maintained chronology and schema-22 contract](construction-offline.md): runtime `session/offline.rs`, ship `controller/offline.rs`, launch/checkpoint staging and existing work owners. Run offline/checkpoint/Recovery and ship tests, workspace build/tests/Clippy/fmt, the two documented wgpu routes and docs/base-impact validation. Verified canonical motion and scanner events are composed by #432/#433; see the offline propagation contract.
 
 
 Cosmetic aging #581: [source/identity, successful use, schema 23, rendering budgets and exact verification](surface-age.md). Damage remains condition-driven; clean repairs restore normal geometry and preserve age.
@@ -631,15 +631,14 @@ consequences, funded-work receipts, cloud tests and adoption/precision limits.
 See the [streaming contract](universe-streaming.md) for worker ownership,
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
-loaded catalog truth does not grant player discovery or replace gameplay yet.
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
 
 
 ## Canonical terrain streaming (#424)
 
 See the [canonical terrain contract](universe-terrain.md) for the exact U11
 evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
-CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
-and normal alien-world startup belong to #425/#426.
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Ordinary canonical gameplay and alien-world startup are implemented by #425/#426.
 
 
 ## Canonical surface integration (#425)
@@ -857,7 +856,7 @@ this private observed pack does not grant player knowledge or publish a release.
 
 ## Canonical offline propagation (#432)
 
-[Source and frame contract](universe-offline-propagation.md): ship `src/offline.rs`, regressions `src/offline/tests.rs`. Ordinary canonical motion publication and saved-journey integration are implemented; timed/scanner composition and native progress follow in #433/#434.
+[Source and frame contract](universe-offline-propagation.md): ship `src/offline.rs`, regressions `src/offline/tests.rs`. Ordinary canonical motion publication and saved-journey integration are implemented; timed/scanner composition and native progress are implemented by #433/#434.
 
 
 Offline timed/scanner #433: runtime `session/offline.rs`, `session/scanner.rs`, `session/scanner/offline.rs` and `scanner/offline_tests.rs`; [canonical chronology, fast-path guards and failure contracts](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).

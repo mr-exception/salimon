@@ -4,7 +4,8 @@
 reader with split-cell galactic navigation. The native runtime opens the optional
 `SALIMON_UNIVERSE_PACK` directory at startup and polls it during presentation.
 Invalid pack startup fails explicitly. No catalog truth is exposed as discovered
-navigation; gameplay world migration remains #425/#426.
+navigation. Canonical gameplay/startup is implemented by #425/#426; streaming
+uses the #432 inertial observer and orbital velocity without exposing pack truth.
 
 The current and five-second projected positions select a deterministic nearest
 set of at most sixteen cells (configurable 1–64). Integer cell differences precede

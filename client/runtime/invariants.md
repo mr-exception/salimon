@@ -647,7 +647,7 @@ Follow the [canonical damage, physical salvage and schema-21 contract](../../doc
 
 ## Offline construction (#550)
 
-Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Canonical motion and scanner event production are now implemented by #432/#433; see the offline propagation contract. Body-local loose objects retain saved containment/anchors; ship motion advances.
 
 
 ## Cosmetic surface age (#581)
@@ -728,15 +728,14 @@ admission. Native retry/capture/measurement sequencing is retained; see
 See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
 nonblocking runtime polling, explicit residency limits, stale-result rejection
 and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
-loaded catalog truth does not grant player discovery or replace gameplay yet.
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
 
 
 ## Canonical terrain streaming (#424)
 
 See the [canonical terrain contract](../../docs/universe-terrain.md) for the exact U11
 evaluator, separate frozen identity/codec, planet-wide quadtree, stitching and
-CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Gameplay adoption
-and normal alien-world startup belong to #425/#426.
+CPU/GPU bounds. Compressed six-body fixtures remain unchanged. Ordinary canonical gameplay and alien-world startup are implemented by #425/#426.
 
 
 ## Canonical surface gameplay and schema 24 (#425)
@@ -915,3 +914,9 @@ Offline #433 retains hunger/health/status/active time, grants fatigue-only recov
 
 
 Native launch #434 never publishes a partial candidate or resumes from a percentage alone. Reading/catch-up/validation/atomic IO happen off the UI thread; verified bytes reconstruct thread-local caches on the main thread. Continue additionally requires current-region CPU/GPU/stream readiness. Cancellation before publication retains old generations; clocks that precede the save or exceed model validity reject without rewind. Menu/lifecycle handling preserves saved admitted backlog. [Contract](../../docs/universe-offline-propagation.md#native-progress-and-verified-resume-434).
+
+
+Current U01–U33 truth and explicit fixture boundaries are mapped in the
+[U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
+streaming observer/velocity, physical environment and preview share the saved
+motion source; suit field-mark timestamps remain personal active-time metadata.

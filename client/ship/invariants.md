@@ -351,7 +351,7 @@ Follow the [canonical damage, physical salvage and schema-21 contract](../../doc
 
 ## Offline construction (#550)
 
-Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Universe/scanner/trajectory event production remains #433.
+Follow the [canonical schema-22 clock, energy, safety and atomic launch contract](../../docs/construction-offline.md). Runtime owns chronological work and verified-event admission; ship owns closed power without impulse or new engine/assist authority. Saved scene/cargo and survival active sources remain frozen; timed service, Fabricator, Recovery and eligible construction settle before verified publication. Canonical motion and scanner event production are now implemented by #432/#433; see the offline propagation contract. Body-local loose objects retain saved containment/anchors; ship motion advances.
 
 
 ## Cosmetic surface age (#581)
@@ -361,14 +361,14 @@ Follow the [persistent exposure, schema-23 and clean-repair contract](../../docs
 
 ## Real-scale trajectory foundation (#417)
 
-`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. The compressed playable controller and saves remain unchanged; real-scale support, drag and contact compose through the #418–#420 companion APIs below. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
+`trajectory.rs` owns split-position velocity-Verlet integration with the existing paid Propulsion contract and universe gravity. The separate engineering controller retains compressed fixtures; ordinary canonical play uses the schema-30 motion source and `controller/celestial.rs` (#432). Generic real-scale support, drag and contact compose through the #418–#420 companion APIs below. Read the [trajectory contract](../../docs/universe-trajectory.md) for epoch, mass, error and atomic-failure rules. The direct universe dependency is a portable domain dependency, with no GPU/window coupling.
 
 
 ## Real-scale surface flight (#418)
 
 See the [surface-flight contract](../../docs/universe-surface-flight.md) for rotating/orbiting support,
 Core-funded physically bounded landing/takeoff, production source/tests and
-remaining playable-world adoption. Current compressed gameplay is unchanged.
+canonical adoption through the [motion contract](../../docs/universe-offline-propagation.md). Compressed engineering fixtures remain explicitly isolated.
 
 
 ## Real-scale atmospheric drag (#419)
@@ -390,7 +390,7 @@ consequences, funded-work receipts, cloud tests and adoption/precision limits.
 Follow the [canonical surface contract](../../docs/universe-gameplay.md):
 selected body/terrain context, immutable U11 deposits, shared physical ground,
 conserved fragment/cargo/Fabricator ownership and exact U05 definition binding.
-Historical fixtures remain explicit; new-run startup is #426.
+Historical fixtures remain explicit; ordinary new-run startup uses the canonical constructor (#426).
 
 
 ## Bounded navigation prediction (#421)
@@ -420,3 +420,9 @@ Incomplete jobs cannot expose a verified resume. Each poll stages trajectory and
 
 
 Scanner funding cannot use rounded display joules. Authoritative fractional availability and actual post-bus auxiliary debit remain distinct from telemetry; no partially funded pulse earns discovery (#433). [Contract](../../docs/universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+Current U01–U33 truth and explicit fixture boundaries are mapped in the
+[U36 consistency audit](../../reports/issue-441/README.md). Canonical sky/light,
+streaming observer/velocity, physical environment and preview share the saved
+motion source; suit field-mark timestamps remain personal active-time metadata.

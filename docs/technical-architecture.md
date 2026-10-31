@@ -925,3 +925,12 @@ portable regressions, production callback export and native environment-audio sc
 World `environment/harvest.rs` and `biological_session.rs` own source/mass rules;
 runtime `session/biology.rs` composes input, current anatomy and checkpoint restore.
 Run world/runtime harvest tests, full gates and both native biological scenarios.
+
+
+## Canonical render acceptance (#436)
+
+See the [cloud render acceptance contract](universe-terrain.md#cloud-integration-acceptance-436) for the required
+`universe-render` suite, native frozen/revisit pixel checks, canonical stitched
+seam tests and bounded raw frame/draw observations. Measurements remain
+observational; missing GPU counters stay null and software timings do not
+establish hardware FPS.

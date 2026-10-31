@@ -73,6 +73,7 @@ pub(super) fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
             let native = json!({ "native_input_isolated":app.e2e_input_isolated, "terrain_upload_preparation_micros": upload_times,
                 "visual_context": app.visual_context(),
+                "reference_camera": app.scout_reference.as_ref().map(|view| json!({"name":view.name, "canonical_terrain_clearance_meters":view.canonical_ground_clearance()})),
                         "survival_details_open":app.survival_hud.details_open,
                 "window": app.window_state(),
                 "capture_status": app.capture_status,

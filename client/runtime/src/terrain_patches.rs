@@ -849,53 +849,83 @@ mod topology_tests {
     use super::*;
     #[test]
     fn mixed_lod_and_cross_face_segments_have_no_open_edges_inside_the_mask() {
-        let body = *CELESTIAL_BODIES
-            .iter()
-            .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
-            .unwrap();
-        let definition = TerrainMode::Representative.definition(body.id).unwrap();
-        for direction in [unit([1.0, 1.0, 0.0]), unit([1.0, 1.0, 1.0])] {
-            let anchor = scale(direction, body.radius_meters);
-            let leaves = balanced_selection(body.radius_meters, anchor).unwrap();
-            let mut boundary = std::collections::HashMap::<[[i64; 3]; 2], ([f64; 3], u32)>::new();
-            for cell in &leaves {
-                let patch = generate(body, definition, key(*cell, body, definition, &leaves));
-                let mut local = std::collections::HashMap::<[u32; 2], u32>::new();
-                for tri in patch.indices.as_chunks::<3>().0 {
-                    for i in 0..3 {
-                        let mut edge = [tri[i], tri[(i + 1) % 3]];
-                        edge.sort();
-                        *local.entry(edge).or_default() += 1;
+        for mode in [TerrainMode::Representative, TerrainMode::Canonical] {
+            let body = if mode == TerrainMode::Canonical {
+                salimon_world::canonical::BODIES[0]
+            } else {
+                *CELESTIAL_BODIES
+                    .iter()
+                    .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
+                    .unwrap()
+            };
+            let definition = mode.definition(body.id).unwrap();
+            for direction in [unit([1.0, 1.0, 0.0]), unit([1.0, 1.0, 1.0])] {
+                let anchor = scale(direction, body.radius_meters);
+                let leaves = if mode == TerrainMode::Canonical {
+                    let mut work =
+                        SelectionWork::new((body.id as u8, definition.to_bytes(), anchor));
+                    let mut selected = None;
+                    for _ in 0..5000 {
+                        if let Some(keys) = work.advance(body, definition, Instant::now()).unwrap()
+                        {
+                            selected = Some(
+                                keys.into_iter()
+                                    .map(|k| Cell {
+                                        face: k.face,
+                                        level: k.level,
+                                        u: k.u,
+                                        v: k.v,
+                                    })
+                                    .collect(),
+                            );
+                            break;
+                        }
+                    }
+                    selected.expect("bounded canonical selection")
+                } else {
+                    balanced_selection(body.radius_meters, anchor).unwrap()
+                };
+                let mut boundary =
+                    std::collections::HashMap::<[[i64; 3]; 2], ([f64; 3], u32)>::new();
+                for cell in &leaves {
+                    let patch = generate(body, definition, key(*cell, body, definition, &leaves));
+                    let mut local = std::collections::HashMap::<[u32; 2], u32>::new();
+                    for tri in patch.indices.as_chunks::<3>().0 {
+                        for i in 0..3 {
+                            let mut edge = [tri[i], tri[(i + 1) % 3]];
+                            edge.sort();
+                            *local.entry(edge).or_default() += 1;
+                        }
+                    }
+                    for (edge, count) in local {
+                        if count != 1 {
+                            continue;
+                        }
+                        let points = edge.map(|index| {
+                            std::array::from_fn::<_, 3, _>(|i| {
+                                patch.anchor_meters[i]
+                                    + f64::from(patch.vertices[index as usize].offset_meters[i])
+                            })
+                        });
+                        let mid = salimon_math::scale(salimon_math::add(points[0], points[1]), 0.5);
+                        let mut positions = points.map(|p| {
+                            let cube =
+                                scale(p, 1.0 / p.iter().map(|v| v.abs()).fold(0.0_f64, f64::max));
+                            cube.map(|v| (v * f64::from(1_u32 << 24)).round() as i64)
+                        });
+                        positions.sort();
+                        boundary.entry(positions).or_insert((mid, 0)).1 += 1;
                     }
                 }
-                for (edge, count) in local {
-                    if count != 1 {
-                        continue;
+                let mut checked = 0;
+                for (_, (mid, count)) in boundary {
+                    if length(sub(scale(unit(mid), body.radius_meters), anchor)) < MASK_METERS {
+                        assert_eq!(count, 2, "unpaired near terrain edge at {mid:?}");
+                        checked += 1;
                     }
-                    let points = edge.map(|index| {
-                        std::array::from_fn::<_, 3, _>(|i| {
-                            patch.anchor_meters[i]
-                                + f64::from(patch.vertices[index as usize].offset_meters[i])
-                        })
-                    });
-                    let mid = salimon_math::scale(salimon_math::add(points[0], points[1]), 0.5);
-                    let mut positions = points.map(|p| {
-                        let cube =
-                            scale(p, 1.0 / p.iter().map(|v| v.abs()).fold(0.0_f64, f64::max));
-                        cube.map(|v| (v * f64::from(1_u32 << 24)).round() as i64)
-                    });
-                    positions.sort();
-                    boundary.entry(positions).or_insert((mid, 0)).1 += 1;
                 }
+                assert!(checked > 1000);
             }
-            let mut checked = 0;
-            for (_, (mid, count)) in boundary {
-                if length(sub(scale(unit(mid), body.radius_meters), anchor)) < MASK_METERS {
-                    assert_eq!(count, 2, "unpaired near terrain edge at {mid:?}");
-                    checked += 1;
-                }
-            }
-            assert!(checked > 1000);
         }
     }
 }

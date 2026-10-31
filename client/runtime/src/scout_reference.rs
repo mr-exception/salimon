@@ -57,8 +57,15 @@ pub(crate) fn find(name: &str) -> Option<View> {
         "universe-orbit" => Some([0., radius * 2.5, 0.]),
         "universe-surface" => Some([45., radius + 3., 70.]),
         "universe-edge" => {
-            let d = radius / 2.0_f64.sqrt();
-            Some([d + 500., d + 500., 0.])
+            let direction = [
+                std::f64::consts::FRAC_1_SQRT_2,
+                std::f64::consts::FRAC_1_SQRT_2,
+                0.,
+            ];
+            let height = salimon_world::terrain::TerrainDefinition::canonical_start()
+                .height(direction)
+                .expect("published canonical terrain direction");
+            Some(direction.map(|v| v * (radius + height + 500.)))
         }
         _ => None,
     };
@@ -89,6 +96,28 @@ pub(crate) fn find(name: &str) -> Option<View> {
 }
 
 impl View {
+    /// Evidence-only clearance against the physical canonical evaluator.
+    pub(crate) fn canonical_ground_clearance(&self) -> Option<f64> {
+        if !matches!(
+            self.name.as_str(),
+            "universe-orbit" | "universe-surface" | "universe-edge"
+        ) {
+            return None;
+        }
+        let distance = salimon_math::length(self.eye);
+        let height = salimon_world::terrain::TerrainDefinition::canonical_start()
+            .height(self.eye.map(|v| v / distance))
+            .ok()?;
+        Some(
+            distance
+                - salimon_world::canonical::START
+                    .manifest()
+                    .physical
+                    .radius_meters
+                - height,
+        )
+    }
+
     pub(crate) fn camera(&self, pose: ShipPose) -> CameraFrame {
         if self.absolute {
             return CameraFrame {
@@ -165,5 +194,33 @@ mod geology_camera_tests {
         }
         assert!(find("geology-sun-near").is_none());
         assert!(find("geology-moon-invalid").is_none());
+    }
+}
+
+#[cfg(test)]
+mod canonical_camera_tests {
+    use super::*;
+    #[test]
+    fn canonical_reference_cameras_stay_above_actual_terrain() {
+        let definition = salimon_world::terrain::TerrainDefinition::canonical_start();
+        let radius = salimon_world::canonical::START
+            .manifest()
+            .physical
+            .radius_meters;
+        for name in ["universe-orbit", "universe-surface", "universe-edge"] {
+            let view = find(name).unwrap();
+            let distance = salimon_math::length(view.eye);
+            let ground = definition.height(view.eye.map(|v| v / distance)).unwrap();
+            let clearance = distance - radius - ground;
+            assert_eq!(view.canonical_ground_clearance(), Some(clearance));
+            assert!(view.absolute);
+            assert!(
+                clearance > 2.0,
+                "{name}: camera intersects actual terrain ({clearance} m)"
+            );
+            if name == "universe-edge" {
+                assert!((clearance - 500.0).abs() < 1e-6);
+            }
+        }
     }
 }

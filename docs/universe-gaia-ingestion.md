@@ -106,7 +106,7 @@ caller associations still fail U07 validation.
 adapters and measures the installed catalog partitions, source/astrometry
 sidecars, literal-ID manifest index, five original decode samples and source-field
 error/coverage distributions. Every selected original column survives the sidecar.
-The current full-release population/size acceptance remains unresolved: a real
+The owner-selected all-usable-DR3 full-release/storage acceptance remains unresolved: a real
 random sample, synthetic density or extrapolation does not meet #524's full-data
 gate. No large-pack exception, arbitrary population truncation or approved
 scientific association is implied by this tooling.

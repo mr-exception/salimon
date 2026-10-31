@@ -60,9 +60,9 @@ population in the allowed manifest, independently of astrometric compression.
 The measured 7,826-star manifest already occupies 539,829 bytes. Raising the cap
 would not solve the installed-data budget or the need for a scalable index.
 
-The source issue leaves the final science population undefined. The requested
-clarification has not selected a distance/brightness-limited population; this
-report retains the broader usable-DR3 scope. No arbitrary truncation is approved
+The owner confirmed in this task: **all usable DR3 sources; report a budget
+blocker if needed**. This is the retained target, not a distance/brightness-limited
+substitute. No arbitrary population truncation or size exception is approved
 here. Remaining #524 work is a scalable compact index/astrometry representation,
 an explicit complete science selection and release-specific association/ambiguity
 coverage, full-selection acquisition/count/error distributions, and actual full

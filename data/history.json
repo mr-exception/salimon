@@ -2,6 +2,407 @@
   "schema": 1,
   "runs": [
     {
+      "lane": "benchmarks",
+      "revision": "75a1e112be2e5435d9671c41edd345d27d0163cb",
+      "status": "failure",
+      "run_id": "41284985205",
+      "attempt": "1",
+      "created_at": "2026-11-01T07:35:38.020923+00:00",
+      "url": "https://github.com/mr-exception/salimon/actions/runs/41284985205/attempts/1",
+      "checks": [
+        {
+          "name": "tools",
+          "status": "success"
+        },
+        {
+          "name": "build",
+          "status": "success"
+        },
+        {
+          "name": "fragments",
+          "status": "success"
+        },
+        {
+          "name": "flight",
+          "status": "success"
+        },
+        {
+          "name": "spheres",
+          "status": "failure"
+        },
+        {
+          "name": "preparation",
+          "status": "skipped"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "Flight update p95",
+          "value": 0.000261,
+          "unit": "ms",
+          "context": "deck / 0 fragments / mass-idle",
+          "configuration": {
+            "fixture": "deck",
+            "count": 0,
+            "workload": "mass-idle",
+            "samples": 100
+          },
+          "comparison_key": "a1ae2f59f68b72cad8afa86980e12b376ad4dbb33986f484a63cf828d5de49c2"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 3.1e-05,
+          "unit": "ms",
+          "context": "deck / 0 fragments / mass-crossing",
+          "configuration": {
+            "fixture": "deck",
+            "count": 0,
+            "workload": "mass-crossing",
+            "samples": 100
+          },
+          "comparison_key": "efa20c97f72e62773e754de0fde053dd7ed5a336c77b1f4373681ff9eece3a9c"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 0.00532,
+          "unit": "ms",
+          "context": "deck / 0 fragments / moving-powered",
+          "configuration": {
+            "fixture": "deck",
+            "count": 0,
+            "workload": "moving-powered",
+            "samples": 100
+          },
+          "comparison_key": "0e9de171f6aecaea5325e51e6a94ea1eecaae26bcdc7baa6b4e35001b9641d37"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 0.004949,
+          "unit": "ms",
+          "context": "deck / 0 fragments / moving-zero-g",
+          "configuration": {
+            "fixture": "deck",
+            "count": 0,
+            "workload": "moving-zero-g",
+            "samples": 100
+          },
+          "comparison_key": "8aecb1dec0f1a4f1b4de4e40d94dd6a88d08f1c32e40db691b1f496440d4b8c5"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 0.00533,
+          "unit": "ms",
+          "context": "deck / 0 fragments / power-transition",
+          "configuration": {
+            "fixture": "deck",
+            "count": 0,
+            "workload": "power-transition",
+            "samples": 100
+          },
+          "comparison_key": "a73bf8ab53272b715065ecb6f4d37fc49c40c93f6d4a4822979bb0d7a2caabc2"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 0.0052499999999999995,
+          "unit": "ms",
+          "context": "deck / 0 fragments / dense-contacts",
+          "configuration": {
+            "fixture": "deck",
+            "count": 0,
+            "workload": "dense-contacts",
+            "samples": 100
+          },
+          "comparison_key": "2d9dc3fecde931066caa5ee1e8b7a676ef94cd5177cfee9c48b49a6c96d06b0d"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 0.000281,
+          "unit": "ms",
+          "context": "deck / 500 fragments / mass-idle",
+          "configuration": {
+            "fixture": "deck",
+            "count": 500,
+            "workload": "mass-idle",
+            "samples": 100
+          },
+          "comparison_key": "5db50e53adbe7a5b5b0ef9e892cf35ddc97e075844ac242621fa41c7d0343fed"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 0.000861,
+          "unit": "ms",
+          "context": "deck / 500 fragments / mass-crossing",
+          "configuration": {
+            "fixture": "deck",
+            "count": 500,
+            "workload": "mass-crossing",
+            "samples": 100
+          },
+          "comparison_key": "c6bf1e3c19cb99c6c4d2e79867e28caad0e2f39570ce386dabb1f9412929d5db"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 6.290942,
+          "unit": "ms",
+          "context": "deck / 500 fragments / moving-powered",
+          "configuration": {
+            "fixture": "deck",
+            "count": 500,
+            "workload": "moving-powered",
+            "samples": 100
+          },
+          "comparison_key": "0bc7fc5c0c40149b6d8f1dcd374c794c693f82e35eddc46eca6e3073a9237b56"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 2.322998,
+          "unit": "ms",
+          "context": "deck / 500 fragments / moving-zero-g",
+          "configuration": {
+            "fixture": "deck",
+            "count": 500,
+            "workload": "moving-zero-g",
+            "samples": 100
+          },
+          "comparison_key": "4b03cffc4b48ad98f0b62b6452efcf9216d9140d9f2d1c2c36fcccbd2c98fc61"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 5.794841,
+          "unit": "ms",
+          "context": "deck / 500 fragments / power-transition",
+          "configuration": {
+            "fixture": "deck",
+            "count": 500,
+            "workload": "power-transition",
+            "samples": 100
+          },
+          "comparison_key": "cdbe8ee8cc36676aa4ebaa32274533df278aa8bfe340ec90156c972db3e9e3d4"
+        },
+        {
+          "name": "Flight update p95",
+          "value": 4.207262,
+          "unit": "ms",
+          "context": "deck / 500 fragments / dense-contacts",
+          "configuration": {
+            "fixture": "deck",
+            "count": 500,
+            "workload": "dense-contacts",
+            "samples": 100
+          },
+          "comparison_key": "24964551ae1c11848eccd3046dc64b03dd6bb49b1e650fb9d707e3c47ee5e986"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 340.602569,
+          "unit": "ms",
+          "context": "physics / 500 fragments / scattered / settled requested / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 500,
+            "initial_state": "settled_requested",
+            "layout": "scattered",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "ce49aaff589a58960423a48e2aaed5e9af06b2df59ccc66395f743004e094c61"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 94.93102400000001,
+          "unit": "ms",
+          "context": "physics / 500 fragments / scattered / initially active / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 500,
+            "initial_state": "active",
+            "layout": "scattered",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "0f059e944582ed436a07c283e0e46eccf46a26edd1580d936ae3ed4b13b252e1"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 226.319851,
+          "unit": "ms",
+          "context": "physics / 500 fragments / dense / settled requested / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 500,
+            "initial_state": "settled_requested",
+            "layout": "dense",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "1c21d09eab58a8230f40460d582383b8fc57f6080d7d05eae89f2ced01f3bfb6"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 123.258499,
+          "unit": "ms",
+          "context": "physics / 500 fragments / dense / initially active / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 500,
+            "initial_state": "active",
+            "layout": "dense",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "0f4cd6210917a40b2cf98e213ece11736f332ac4f8a5bf19828bdcd81fbac574"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 500.56262699999996,
+          "unit": "ms",
+          "context": "physics / 1000 fragments / scattered / settled requested / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 1000,
+            "initial_state": "settled_requested",
+            "layout": "scattered",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "6ba829cb95e1a27aff4137ce552644e1ecaf543f0227d501ad5a330c6b99b437"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 174.910913,
+          "unit": "ms",
+          "context": "physics / 1000 fragments / scattered / initially active / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 1000,
+            "initial_state": "active",
+            "layout": "scattered",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "907e094205e40948885819b7e4f8caa3c754365f35a44275c9d074f99e34e774"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 689.1501519999999,
+          "unit": "ms",
+          "context": "physics / 1000 fragments / dense / settled requested / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 1000,
+            "initial_state": "settled_requested",
+            "layout": "dense",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "7e45174cd73ca094785e05e5032c20d233910bfc3e0123b427fe3d1ef77a2b4a"
+        },
+        {
+          "name": "Fragment CPU update p95",
+          "value": 481.278124,
+          "unit": "ms",
+          "context": "physics / 1000 fragments / dense / initially active / seed 155",
+          "configuration": {
+            "camera": "facing",
+            "count": 1000,
+            "initial_state": "active",
+            "layout": "dense",
+            "minimum_samples": 100,
+            "sample_seconds": 2,
+            "seed": 155,
+            "settle_steps_limit": 0,
+            "warmup_seconds": 0,
+            "repeat": 1
+          },
+          "comparison_key": "5296480b15e7e459d04b335c907cfa1c1872f2a476586d33b37c93ea988b0ba8"
+        }
+      ],
+      "error": null,
+      "environment": {
+        "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+        "architecture": "x86_64",
+        "cpu": "AMD EPYC 7763 64-Core Processor",
+        "runner_image": "ubuntu24",
+        "runner_image_version": "20261026.354.1"
+      }
+    },
+    {
+      "lane": "windows",
+      "revision": "75a1e112be2e5435d9671c41edd345d27d0163cb",
+      "status": "success",
+      "run_id": "41284985205",
+      "attempt": "1",
+      "created_at": "2026-11-01T07:32:35.779064+00:00",
+      "url": "https://github.com/mr-exception/salimon/actions/runs/41284985205/attempts/1",
+      "checks": [
+        {
+          "name": "build",
+          "status": "success"
+        }
+      ],
+      "metrics": [],
+      "error": null,
+      "environment": {
+        "platform": "Windows-2022Server-10.0.20348-SP0",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 1 Stepping 1, AuthenticAMD",
+        "runner_image": "win22",
+        "runner_image_version": "20261026.347.1"
+      }
+    },
+    {
+      "lane": "macos",
+      "revision": "75a1e112be2e5435d9671c41edd345d27d0163cb",
+      "status": "success",
+      "run_id": "41284985205",
+      "attempt": "1",
+      "created_at": "2026-11-01T07:31:17.482857+00:00",
+      "url": "https://github.com/mr-exception/salimon/actions/runs/41284985205/attempts/1",
+      "checks": [
+        {
+          "name": "build",
+          "status": "success"
+        }
+      ],
+      "metrics": [],
+      "error": null,
+      "environment": {
+        "platform": "macOS-14.8.9-arm64-arm-64bit",
+        "architecture": "arm64",
+        "cpu": "arm",
+        "runner_image": "macos14",
+        "runner_image_version": "20260831.0302.1"
+      }
+    },
+    {
       "lane": "nightly",
       "revision": "75a1e112be2e5435d9671c41edd345d27d0163cb",
       "status": "failure",

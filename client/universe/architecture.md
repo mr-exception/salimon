@@ -245,6 +245,14 @@ definitions and physical screens, not M1 rendering/contact/survival acceptance.
 ## Incremental private offline packs (#413)
 
 See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+`pack.rs` owns version-2 optional lossless zlib sidecars and v1 read compatibility.
+Blob hashes/lengths bind stored bytes; `zlib_raw_bytes` bounds exact inflation.
+`pack/tests.rs` covers stream corruption, size limits, compatibility and immutable
+publication; `gaia_verify` measures real-source encoded/decoded storage and reads.
+The v2 root is bounded to 64 MiB (legacy v1: 16 MiB), and builder identity checks
+are incremental. Gzip CSV sources retain an 8 MiB decoded batch bound. This admits
+[the nearby catalog](../../docs/nearby-celestial-catalog.md); full-Gaia scalability
+remains future work.
 
 
 ## Bounded read-only pack queries (#414)

@@ -77,7 +77,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             distributions.insert(field.into(),serde_json::json!({"present":values.len(),"missing":missing,"min":values.first(),"median":quantile(0.5),"p95":quantile(0.95),"max":values.last()}));
         }
         let sidecar_bytes = cell.sidecars.values().map(|b| b.bytes).sum::<u64>();
-        results.push(serde_json::json!({"selection":name,"summary":summary,"selected_stars":selected,"catalog_records":record_count,"manifest_bytes":manifest_bytes,"manifest_sha256":pack::digest(&manifest.encode()?),"catalog_partition_bytes":cell.catalog.bytes,"astrometry_and_selection_sidecars_bytes":sidecar_bytes,"installed_bytes":installed_bytes,"installed_bytes_per_selected_star":installed_bytes as f64/selected as f64,"build_seconds":build_seconds,"decode_seconds_original_five_samples":decoder_seconds,"source_field_distributions":distributions,"full_release_complete":false}));
+        let mut sidecar_measurements = serde_json::Map::new();
+        for (name, blob) in &cell.sidecars {
+            let mut seconds = Vec::new();
+            let raw = pack::read_blob(&root, blob)?;
+            let raw_digest = pack::digest(&raw);
+            for _ in 0..5 {
+                let started = Instant::now();
+                let decoded = pack::read_blob(&root, blob)?;
+                seconds.push(started.elapsed().as_secs_f64());
+                if decoded != raw {
+                    return Err("sidecar decode changed original producer bytes".into());
+                }
+            }
+            sidecar_measurements.insert(name.clone(), serde_json::json!({"stored_bytes":blob.bytes,"decoded_bytes":raw.len(),"decoded_sha256":raw_digest,"zlib":blob.zlib_raw_bytes.is_some(),"read_verify_decode_seconds_original_five_samples":seconds}));
+        }
+        results.push(serde_json::json!({"selection":name,"summary":summary,"selected_stars":selected,"catalog_records":record_count,"manifest_bytes":manifest_bytes,"manifest_sha256":pack::digest(&manifest.encode()?),"catalog_partition_bytes":cell.catalog.bytes,"astrometry_and_selection_sidecars_bytes":sidecar_bytes,"sidecars":sidecar_measurements,"installed_bytes":installed_bytes,"installed_bytes_per_selected_star":installed_bytes as f64/selected as f64,"build_seconds":build_seconds,"decode_seconds_original_five_samples":decoder_seconds,"source_field_distributions":distributions,"full_release_complete":false}));
     }
     println!(
         "{}",

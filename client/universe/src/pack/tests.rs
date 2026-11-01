@@ -49,6 +49,224 @@ fn repeat_incremental_build_preserves_exact_sidecars_and_manifest() {
     assert!(m.encode().is_err());
     fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn version_two_compresses_exact_sidecar_bytes_and_reader_retains_them() {
+    let root = root();
+    // Unknown columns, whitespace and nulls must survive byte-for-byte, rather
+    // than being parsed/reformatted or dropped to meet a size target.
+    let raw = br#" {"source_id":"5853498713190525696", "future_column":null} "#.repeat(1000);
+    let mut b = builder(&root);
+    b.add_cell(
+        key(),
+        &fixture(),
+        &BTreeMap::from([("astrometry".into(), raw.clone())]),
+    )
+    .unwrap();
+    let first = b.finish(None, BTreeMap::new()).unwrap();
+    assert_eq!(first.version, 2);
+    let blob = &first.cells[0].sidecars["astrometry"];
+    assert_eq!(blob.zlib_raw_bytes, Some(raw.len() as u64));
+    assert!(blob.bytes < raw.len() as u64 / 10);
+    assert_eq!(read_blob(&root, blob).unwrap(), raw);
+    let reader = crate::reader::Reader::open(&root, 4096).unwrap();
+    assert_eq!(reader.sidecar(key(), "astrometry").unwrap(), raw);
+    let mut legacy = first.clone();
+    legacy.version = 1;
+    assert!(legacy.encode().is_err());
+    let mut b = builder(&root);
+    b.add_cell(
+        key(),
+        &fixture(),
+        &BTreeMap::from([("astrometry".into(), raw)]),
+    )
+    .unwrap();
+    let repeat = b.finish(Some(&first), BTreeMap::new()).unwrap();
+    assert_eq!(repeat.encode().unwrap(), first.encode().unwrap());
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn reader_counts_stored_io_when_a_v2_catalog_blob_is_compressed() {
+    let root = root();
+    let mut b = builder(&root);
+    b.add_cell(key(), &fixture(), &BTreeMap::new()).unwrap();
+    let mut manifest = b.finish(None, BTreeMap::new()).unwrap();
+    let original = read_blob(&root, &manifest.cells[0].catalog).unwrap();
+    let compressed = builder(&root).store_sidecar(&original).unwrap();
+    assert!(compressed.zlib_raw_bytes.is_some());
+    assert!(compressed.bytes < original.len() as u64);
+    manifest.cells[0].catalog = compressed.clone();
+    fs::write(root.join("manifest.json"), manifest.encode().unwrap()).unwrap();
+    let mut reader = crate::reader::Reader::open(&root, 1).unwrap();
+    assert_eq!(
+        reader.cell(key()).unwrap().encode().unwrap(),
+        fixture().encode().unwrap()
+    );
+    assert_eq!(reader.stats().catalog_blob_reads, 1);
+    assert_eq!(reader.stats().catalog_blob_bytes, compressed.bytes);
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn compressed_sidecars_reject_incomplete_trailing_bombs_and_false_lengths() {
+    let root = root();
+    let raw = b"source uncertainty and all original columns\n".repeat(100);
+    let mut b = builder(&root);
+    b.add_cell(
+        key(),
+        &fixture(),
+        &BTreeMap::from([("astrometry".into(), raw.clone())]),
+    )
+    .unwrap();
+    let first = b.finish(None, BTreeMap::new()).unwrap();
+    let blob = &first.cells[0].sidecars["astrometry"];
+    for n in [
+        0,
+        raw.len() as u64 - 1,
+        raw.len() as u64 + 1,
+        MAX_BLOB_BYTES as u64 + 1,
+    ] {
+        let mut bad = blob.clone();
+        bad.zlib_raw_bytes = Some(n);
+        assert!(read_blob(&root, &bad).is_err());
+    }
+    let stored = fs::read(blob_path(&root, blob).unwrap()).unwrap();
+    let b = builder(&root);
+    for bad in [
+        stored[..stored.len() - 1].to_vec(),
+        [stored.clone(), vec![0]].concat(),
+        [stored.clone(), stored].concat(),
+    ] {
+        // Bind the altered bytes so this exercises strict stream validation,
+        // beyond the ordinary encoded SHA256 corruption check.
+        let descriptor = b.store_encoded(&bad, Some(raw.len() as u64)).unwrap();
+        assert!(read_blob(&root, &descriptor).is_err());
+    }
+    let before = fs::read(root.join("manifest.json")).unwrap();
+    fs::write(blob_path(&root, blob).unwrap(), b"corrupt").unwrap();
+    assert!(read_blob(&root, blob).is_err());
+    let mut b = builder(&root);
+    assert!(
+        b.add_cell(
+            key(),
+            &fixture(),
+            &BTreeMap::from([("astrometry".into(), raw)])
+        )
+        .is_err()
+    );
+    assert_eq!(before, fs::read(root.join("manifest.json")).unwrap());
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn legacy_raw_packs_still_open_and_unknown_versions_fail() {
+    let root = root();
+    let mut b = builder(&root);
+    b.add_cell(key(), &fixture(), &BTreeMap::new()).unwrap();
+    let mut manifest = b.finish(None, BTreeMap::new()).unwrap();
+    manifest.version = 1;
+    fs::write(root.join("manifest.json"), manifest.encode().unwrap()).unwrap();
+    let mut reader = crate::reader::Reader::open(&root, 4096).unwrap();
+    assert_eq!(
+        reader.cell(key()).unwrap().encode().unwrap(),
+        fixture().encode().unwrap()
+    );
+    manifest.version = 3;
+    assert!(manifest.encode().is_err());
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn nearby_manifest_bound_is_versioned_and_incremental_ids_still_reject_collisions() {
+    let root = root();
+    let mut b = builder(&root);
+    b.add_cell(key(), &fixture(), &BTreeMap::new()).unwrap();
+    assert!(
+        b.add_cell(CellKey { shard: 1, ..key() }, &fixture(), &BTreeMap::new())
+            .is_err()
+    );
+    let mut source = fixture().datasets()[0].clone();
+    source.id = fixture().records()[0].id().clone();
+    let collision = Catalog::new("fixture-v1".into(), vec![source], vec![]).unwrap();
+    assert!(
+        b.add_cell(CellKey { shard: 1, ..key() }, &collision, &BTreeMap::new())
+            .is_err()
+    );
+    let mut m = b.finish(None, BTreeMap::new()).unwrap();
+    m.version = 1;
+    let mut padded = m.encode().unwrap();
+    padded.resize(LEGACY_MANIFEST_BYTES + 1, b' ');
+    assert!(Manifest::decode(&padded).is_err());
+    m.version = 2;
+    let mut padded = m.encode().unwrap();
+    padded.resize(LEGACY_MANIFEST_BYTES + 1, b' ');
+    assert_eq!(Manifest::decode(&padded).unwrap().version, 2);
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn frozen_gzip_csv_uses_production_import_and_rejects_bombs_truncation_and_trailing_members() {
+    use std::io::Write;
+    let root = root();
+    fs::create_dir_all(&root).unwrap();
+    let original = include_bytes!("../../../../catalogs/sources/fixtures/gaia-synthetic.csv");
+    let gzip = |raw: &[u8]| {
+        let mut encoder = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::new(6));
+        encoder.write_all(raw).unwrap();
+        encoder.finish().unwrap()
+    };
+    let good = gzip(original);
+    let mut sources = crate::sources::SourceManifest::decode(
+        include_bytes!("../../../../catalogs/sources/manifest-v1.json"),
+        false,
+    )
+    .unwrap();
+    sources.sources.retain(|s| s.id.as_str() == "gaia:dr3");
+    let file = "gaia.csv.gz";
+    let request = serde_json::json!({"version":1,"revision":"gzip-nearby-v1","source_manifest":"sources.json","cells":[{"key":key(),"observed":{"gaia":{"source":"gaia:dr3","artifact":file}}}]});
+    fs::write(
+        root.join("build.json"),
+        serde_json::to_vec(&request).unwrap(),
+    )
+    .unwrap();
+    let mut publish_source = |bytes: &[u8]| {
+        sources.sources[0].artifacts = vec![crate::sources::Artifact {
+            path: file.into(),
+            sha256: digest(bytes),
+            bytes: bytes.len() as u64,
+            origin: crate::sources::Origin::ObservedSnapshot,
+            encoding: crate::sources::Encoding::CsvGzip,
+        }];
+        fs::write(root.join(file), bytes).unwrap();
+        fs::write(
+            root.join("sources.json"),
+            serde_json::to_vec(&sources).unwrap(),
+        )
+        .unwrap();
+    };
+    publish_source(&good);
+    let output = root.join("pack");
+    let first = pipeline::build(&root.join("build.json"), &output).unwrap();
+    let before = first.encode().unwrap();
+    let mut reader = crate::reader::Reader::open(&output, 4096).unwrap();
+    assert!(
+        reader
+            .record(&CatalogId::from_source("gaia_dr3", "1000000000000000001").unwrap())
+            .unwrap()
+            .is_some()
+    );
+    for bad in [
+        good[..good.len() - 1].to_vec(),
+        [good.clone(), good].concat(),
+        gzip(&vec![b'x'; 8 * 1024 * 1024 + 1]),
+    ] {
+        publish_source(&bad);
+        assert!(pipeline::build(&root.join("build.json"), &output).is_err());
+        assert_eq!(fs::read(output.join("manifest.json")).unwrap(), before);
+    }
+    fs::remove_dir_all(root).unwrap();
+}
 #[test]
 fn corruption_and_failed_update_preserve_publication() {
     let root = root();

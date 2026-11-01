@@ -57,9 +57,12 @@ pub enum Origin {
 #[serde(rename_all = "snake_case")]
 pub enum Encoding {
     Csv,
+    /// Deterministic lossless archival compression; hash/bytes bind the gzip file.
+    CsvGzip,
     Json,
     /// Exact TAP response, including field units and query completion status.
     Votable,
+    VotableGzip,
 }
 impl SourceManifest {
     pub fn decode(bytes: &[u8], production: bool) -> Result<Self, Error> {

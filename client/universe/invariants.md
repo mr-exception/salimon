@@ -105,6 +105,12 @@ See the [starting-system contract](../../docs/universe-starting-system.md).
 ## Incremental private offline packs (#413)
 
 See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+Version-2 compressed blobs decode to the exact original producer bytes, including
+unknown source fields and missing values; no precision/selection change is
+permitted for size savings. Verify the stored SHA256 before inflation, bound the
+declared decoded length and require a single complete checksum-verified stream
+with exact input/output lengths. V1 remains raw-only; unknown versions reject.
+Storage compression alone does not certify full-Gaia coverage or the 10 GB budget.
 
 
 ## Bounded read-only pack queries (#414)
@@ -195,3 +201,17 @@ Motion identity is separate from immutable terrain/resource identity. Unknown mo
 ## Recovered site routes and Gaia evidence (#470 / #524)
 
 Follow [transmitted-site routes](../../docs/opening-and-investigations.md) for `scanner/chart.rs`: body-local site leads retain uncertainty, explicit route provenance never grants scanner knowledge, and changed/missing provenance fails restore. `sources.rs` also retains exact TAP VOTable artifacts as `votable` encoding. [Gaia ingestion](../../docs/universe-gaia-ingestion.md) maps original-byte acquisition/independent transcription checks and actual production pack measurements; a bounded real sample cannot certify full-release coverage or its budget.
+
+
+## Bounded nearby source publication (#524)
+
+[Nearby coverage](../../docs/nearby-celestial-catalog.md) is an explicit observed
+parallax/nominal-PS-distance selection, not complete physical-sphere or whole-
+Milky-Way evidence. Retain original IDs, strings, units/errors/correlations and
+missing values. Gzip source batches verify stored hashes before inflation and
+reject decoded CSV beyond 8 MiB, truncated streams and trailing members. V1
+root manifests retain 16 MiB; v2 is bounded to 64 MiB for the nearby publication.
+Incremental builder collision checks must preserve global record/source
+uniqueness and atomic publication/migration failures. Source snapshot plus one
+installed nearby pack is capped at 1,000,000,000 bytes; never silently truncate
+rows to meet it. Storage shard keys do not claim physical galactic placement.

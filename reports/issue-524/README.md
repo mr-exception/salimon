@@ -1,104 +1,166 @@
-# Issue #524 — real Gaia DR3 preparation and measured pack blocker
+# Issue #524 — nearby celestial catalog within 1 GB
 
-**Incomplete full-release acceptance.** This PR delivers reproducible real-source
-acquisition, independent exact-ID evidence and actual offline U07/U12 measurements.
-It does **not** close #524, approve a smaller scientific population, approve a size
-exception, or claim that the full-release 2–5 GB aim / 10 GB gate passed.
+## Outcome and area
 
-## Frozen scope and results
+Delivered the owner's 2026-11-01 replacement scope: a documented nearby celestial
+snapshot, under **1,000,000,000 bytes**, with a reproducible expansion path.
+The complete frozen sources and production offline pack are retained privately
+in this workspace; the public repository tracks coverage, hashes and tooling.
+The earlier all-usable-DR3 scope is preserved in the
+[historical full-release preparation report](full-release-preparation.md), not
+claimed passed by this bounded delivery. #659 still owns future public/commercial
+source distribution; no source status or release eligibility is promoted.
 
-On 2026-10-31, the AIP Gaia DR3 TAP mirror returned the complete
-`random_index < 8192` interval and two separately queried golden stars. Original
-VOTable responses, field units/metadata, string-preserving CSV, exact queries,
-SHA256s and credits are frozen under
-[`catalogs/sources/gaia-524-v1`](../../catalogs/sources/gaia-524-v1/).
-The owner-authorized private-development use does not rewrite the source license
-status or constitute a public/commercial release decision (#659).
+[Canonical coverage and expansion guide](../../docs/nearby-celestial-catalog.md)
+and [machine-readable coverage record](../../catalogs/nearby-524-v1.json).
 
-| Production adapter / storage result | Measured value |
+| Selection / result | Actual value |
 | --- | ---: |
-| Real sample input rows | 8,192 |
-| Selected / quality-rejected / astrometry-rejected | 7,826 / 366 / 0 |
-| Selected without measured RUWE | 1,517 |
-| Missing or nonpositive parallax | 2,993 |
-| Incomplete velocity | 7,681 |
-| Canonical records (star + system per selected row) | 15,652 |
-| Installed sample pack bytes | 11,894,669 |
-| Catalog partition bytes | 794,293 |
-| Astrometry + selection sidecar bytes | 10,557,591 |
-| Literal-ID root manifest bytes | 539,829 |
-| Installed bytes / selected star | 1,519.8913 |
-| Peak process RSS, Linux dev build | 151,576 KiB |
+| Gaia region | All sky, observed parallax >=10 mas |
+| Nominal boundary | 100 pc / about 326 light-years around the Sun |
+| Complete-query raw Gaia rows / pages | 574,531 / 71 |
+| Accepted Gaia stars | 331,735 |
+| Quality-rejected Gaia rows, retained in sources | 242,796 |
+| Astrometry rejections / duplicate rows | 0 / 0 |
+| Accepted Gaia sources with incomplete velocity | 202,476 |
+| NASA PS planets with nominal host distance 0–100 pc | 1,590 |
+| Existing selected JPL Solar System targets | 18 |
+| Published stars / systems / individual bodies | 331,913 / 331,913 / 1,607 |
+| Frozen source bytes | 184,061,247 |
+| Installed pack bytes | 146,408,616 |
+| **Frozen sources + one installed pack** | **330,469,863** |
+| Portable bundle bytes / files | 330,936,320 / 572 |
+| Root manifest bytes (v2 limit 64 MiB) | 22,925,711 |
+| Pack cells | 72 |
+| Peak child RSS across both release executions | 268,052 KiB |
 
-These are **real bounded-sample measurements**, not an installed full-Gaia forecast
-or hardware performance qualification. All 29 selected original source columns,
-including errors, correlations, quality and missing values, survive in the actual
-pack sidecar. Original five decode timings, build time, error/coverage
-distributions and process context are retained in
-[measurement JSON](gaia-measurement-rss.json).
+This is an observed-parallax/nominal-PS-distance selection, **not a complete or
+error-free physical sphere**. Source errors, missing data, Gaia quality cuts and
+JPL frames/epochs remain explicit. The published star count also includes 177
+PS-backed stars beyond the accepted Gaia observations plus the Sun; it does not
+reclassify rejected Gaia astrometry as passing. Systems retain the existing
+simple star grouping, not a solved multiple-star hierarchy. The 18 JPL targets
+are selected coverage, not every Solar System body. Frozen original PS rows are
+retained for provenance; only the distance-selected rows enter this pack.
 
-The frozen NASA PS snapshot independently associates exact DR3 IDs
-`5853498713190525696` with Proxima Cen and `4472832130942575872` with Barnard's star.
-The checks also verify J2016.0, positive published parallax uncertainty and broad
-independent parallax ranges. No nearest-neighbor/name-only association or
-averaged replacement observation is introduced. The golden pack's explicit
-`stellar-golden` aliases are evaluation identities, not new production star names.
-See [cross-match evidence](gaia-source-check.json).
+## Data location and hashes
 
-Two offline builds produced exactly the same manifests and installed bytes:
+- `artifacts/nearby-524-v1/sources/`: complete original TAP responses and exact CSV
+  transcription, count/tail responses, units/metadata, URLs/queries, hashes,
+  selected PS/JPL inputs, selection record and offline build request.
+- `artifacts/nearby-524-v1/pack/`: production content-addressed pack.
+- `artifacts/nearby-524-v1.tar`: private portable bundle, including local coverage
+  and README. It was created once, its exact member set/sizes and both embedded
+  manifests were checked, and its SHA256 was recorded. Bulk data is ignored by
+  Git because this repository is public; the bundle is delivered via the workspace.
 
-- Sample: `53cc1aa9235b67920cea4d710a1c1ec2bc321ca3c60349144c6923dae0d86a26`.
-- Golden: `4b3c0f9eaaa081f42ba7c629fae1fa668dfbc288233fcc23e2b9f84a63768234`.
+Bundle SHA256:
+`73d27250c77799dac8d1c189f7333aabe3218a8da1c1fc6c13916777791bc0e6`.
+The coverage record binds the exact source, selection and pack manifest hashes.
+The bundle is reproducible offline from its frozen input bytes. A fresh later
+TAP capture can have different server-generated XML metadata/hashes and must be
+recorded as a new capture rather than silently replacing this one.
 
-## Full-release blocker and remaining work
+## Implementation and verification
 
-The current U12 format stores every selected star **and** generated system ID as
-literal strings in one root manifest capped at 16 MiB. Even ignoring almost all
-numeric digits, delimiters and other metadata, these two quoted IDs require at
-least 31 bytes per source. Thus this layout cannot represent a billion-source
-population in the allowed manifest, independently of astrometric compression.
-The measured 7,826-star manifest already occupies 539,829 bytes. Raising the cap
-would not solve the installed-data budget or the need for a scalable index.
+Acquisition uses `(parallax DESC, source_id ASC)` keyset pages and exact source
+parallax text. Initial/final counts and an empty tail pass. IDs are unique and
+strictly advance by that key. TAP ERROR/OVERFLOW, changed columns, units or
+counts, duplicate/nonadvancing keys, source tampering, changed resume parameters
+and budget overruns fail closed. Source-ID-only pagination timed out after
+98,304 rows; the [actual TAP error](nearby/nearby-page-failure.xml) is retained.
+Parallax-indexed paging completed the same full query; no rows were dropped to
+avoid that failure. The final retained Gaia TAP payload totals 332,545,344 bytes.
 
-The owner confirmed in this task: **all usable DR3 sources; report a budget
-blocker if needed**. This is the retained target, not a distance/brightness-limited
-substitute. No arbitrary population truncation or size exception is approved
-here. Remaining #524 work is a scalable compact index/astrometry representation,
-an explicit complete science selection and release-specific association/ambiguity
-coverage, full-selection acquisition/count/error distributions, and actual full
-installed bytes/decoder/RSS evidence against 2–5/10 GB. An owner-approved size
-exception would need its own explicit decision if the measured gate fails.
+Original source XML/CSV use lossless gzip archives. Stored hashes bind the gzip
+files; original-response hashes bind inflated bytes. The production observed
+adapter verifies stored hashes before bounded 8 MiB CSV inflation and rejects
+truncated/trailing members. All selected original columns/uncertainties remain
+intact. PS joins use exact published DR3 IDs, with separate batches for other
+hosts; there is no name/proximity merge. Independent Proxima/Barnard host,
+parallax/error and J2016.0 checks pass.
 
-A full-table TAP `count(*)` request returned HTTP 400; the exact
-[request](full-gaia-count-request.json) is retained. Full-table counts, full-release
-snapshots, scientific association coverage beyond these goldens and full-pack
-budget acceptance are **failed/unrun**, not inferred from the random sample.
-The primary ESA TAP endpoint initially timed out; successful acquisition used the
-recorded AIP mirror. The sample decoder is a dev-profile cloud measurement;
-release-profile throughput and physical hardware budgets remain unverified.
+Pack v2 losslessly compresses sidecars, bounds exact decoded lengths and rejects
+corrupt, truncated or concatenated streams. Raw v1 packs still read and keep
+their original 16 MiB root limit; v2 admits the measured nearby manifest within
+64 MiB. The builder checks global IDs/sources incrementally rather than cloning
+and revalidating every preceding cell on each batch. Finish still validates the
+whole publication and atomically replaces the active manifest. Collision,
+migration, corruption and failed-update regressions preserve those contracts.
 
-## Commands and provenance
+Both fresh release builds exercised every production filesystem cell/sidecar and
+five exact-ID goldens. They produced **identical manifests, installed byte counts,
+record/selection counts and every decoded-sidecar hash**. Original per-cell
+read/decode samples and actual build times are retained in
+[run A](nearby/nearby-pack-a.json) and [run B](nearby/nearby-pack-b.json), with
+[repeat/RSS evidence](nearby/nearby-repeat-rss.json). The first build took 37.648 s;
+its 72 original catalog-read/decode samples sum to 2.227 s. The filesystem is warm
+after writes; these are Linux release CPU/IO observations, not cold-disk,
+Metal/GPU, frame-rate or reference-hardware claims. The 64 KiB catalog cache never
+exceeded its bound; manifest/index, decode scratch and returned catalogs are separate.
 
-Parent/source base: `3bcf3bf977108408e4a3ba9d855aef0051370515` (`main`).
-Environment: Linux x86_64, glibc 2.41, 3 logical CPUs, Rust 1.99.1, locked workspace.
+The independent verifier checks original query/boundary/continuation semantics,
+source units/datatypes and every original CSV string. With `--pack`, it compares
+**every published Gaia and planet source field** with its original row, including
+errors/correlations/missing values, verifies exact selection membership/counts,
+and enforces the combined 1 GB budget. Both the
+[source verification](nearby/nearby-source-verification.json) and
+[complete pack verification](nearby/nearby-final-verification.json) pass.
 
-```sh
-python scripts/acquire_gaia_sources.py --output catalogs/sources/gaia-524-v1
-python scripts/verify_gaia_sources.py --sources catalogs/sources/gaia-524-v1 --ps catalogs/sources/observed-526-v1/ps.csv
-cargo run -p salimon-universe --example gaia_verify --locked -- catalogs/sources/gaia-524-v1 artifacts/gaia-524-measurement
-# Reused executable, second fresh output; Python resource.RUSAGE_CHILDREN recorded RSS:
-target/debug/examples/gaia_verify catalogs/sources/gaia-524-v1 artifacts/gaia-524-measurement-rss
-```
+## Commands and checks
 
-The acquisition, independent verification, two offline builds and exact hashes
-passed. Existing U07 tests retain ambiguous-match, duplicate conflict, missing
-measurement and malformed-source failures. New tooling tests reject TAP
-ERROR/OVERFLOW, duplicate fields and row-width errors without losing large IDs,
-nulls or units. Shared Rust/script/lint/docs outcomes are recorded with the
-[combined validation](../issue-470/README.md).
+Base/source: `75a1e112be2e5435d9671c41edd345d27d0163cb` (merged #725), branch
+`issue-524-scalable-gaia`. Linux x86_64, Rust/Cargo 1.99.1, locked dependencies,
+3 online logical CPUs / 2-CPU cgroup quota, 10,452,459,520 bytes RAM.
+Rust commands used `source /workspace/.salimon-tools/env.sh`.
 
-Documentation impact: [Gaia contract](../../docs/universe-gaia-ingestion.md),
-universe README/architecture/invariants, source encoding and root routing are
-updated in this PR. VOTable is an explicit retained-source encoding, not a new
-runtime network path. Current scientific/full-budget ownership stays on #524;
-#659 and #720–#723 retain separate release decisions/qualification.
+| Command / coverage | Result |
+| --- | --- |
+| `cargo test -p salimon-universe --locked` | 124 passed, no ignored tests; [log](nearby/nearby-universe-tests.log) |
+| `cargo clippy --workspace --all-targets --locked -- -D warnings` | Passed; [log](nearby/nearby-workspace-clippy.log) |
+| `cargo fmt --all -- --check` | Passed |
+| `python -m unittest discover -s scripts -p 'test_*.py'` | 166 passed; [log](nearby/nearby-all-script-tests.log). Printed failure/timeout text belongs to deliberate negative fixtures. |
+| `python scripts/check_docs.py --base origin/main` | Passed, zero findings; final committed-base check recorded with the PR |
+| `python scripts/acquire_nearby_sources.py --output catalogs/sources/nearby-524-v1` | Complete region; moved to the private `artifacts/nearby-524-v1/sources` location afterward |
+| `prepare(Path('artifacts/nearby-524-v1/sources'))` from `acquire_nearby_sources` | Explicit `nearby-524-v1` publication and complete exact-host PS/JPL routing |
+| `python scripts/verify_nearby_sources.py --sources artifacts/nearby-524-v1/sources` | Passed full frozen-source verification |
+| `cargo build -p salimon-universe --example nearby_verify --release --locked` | Passed |
+| `target/release/examples/nearby_verify artifacts/nearby-524-v1/sources artifacts/issue-524-preflight/nearby-pack-a` | Passed all cells/sidecars/ID goldens; repeated with `nearby-pack-b` |
+| `python scripts/verify_nearby_sources.py --sources artifacts/nearby-524-v1/sources --pack artifacts/nearby-524-v1/pack` | Passed every published original field, coverage and combined size gate |
+
+Initial workspace build/check attempts found missing ALSA development files.
+Installed Debian `libasound2-dev`, `libasound2t64` and `libasound2-data` into the
+executor's local sysroot; no repository workaround or dependency relaxation was
+introduced. The final workspace Clippy and focused source tests pass. The existing #526
+full observed-source verifier was also exercised against a new v2 pack: all
+6,451 PS rows and 18 JPL targets retain their original numeric/error/limit
+[checks](nearby/observed-526-v2-coverage.json). Both Python verifiers share the bounded raw/v2 storage decoder, protected
+by two additional malformed-stream/compatibility regressions. Broad
+final-head workspace build/tests are tracked by the PR's required CI; CI uses
+hermetic fixtures, while the complete private regional corpus is checked locally.
+No graphics, gameplay, physical-device or hardware performance claim is made by
+this source-download task, so no GPU captures or human trials were run.
+
+## Documentation impact and future expansion
+
+Updated all three universe owner guides, source/pack/reader/Gaia contracts,
+architecture and maintenance routing, validation and tooling commands. The
+[nearby guide](../../docs/nearby-celestial-catalog.md) defines area, gaps, private
+location, data limits, replay and a versioned expansion procedure. It distinguishes
+the owner's nearby/1 GB goal from Codex's chosen first 100 pc observation boundary.
+
+Mapping: `pack.rs`/`pack/observed.rs`/`sources.rs` → compression, manifest-bound,
+global-identity and gzip-source regressions → pack/source contracts;
+`acquire_nearby_sources.py`/`verify_nearby_sources.py` → eight offline resume,
+transcription, unit/query and false-coverage boundary tests → nearby guide;
+`nearby_verify.rs` → actual full regional source/pack/reader evidence above.
+Local guide paths/links and source-impact coverage are checked before readiness.
+
+Neutral `[0,0,0]` storage shards are not physical galactic locations. Source
+astrometry stays available for an explicit later coordinate/inference adapter;
+this download does not replace the ordinary playable world or grant player
+knowledge. Full Milky Way coverage/scalable indexing and the old full-release
+budget remain future expansion, not passes inferred from this regional result.
+Keep this publication stable, choose an explicit next boundary/revision/budget,
+reacquire and reverify complete coverage, and extend the paged index if current
+bounds are reached rather than silently truncating or rekeying the data.

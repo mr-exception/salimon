@@ -8,4 +8,7 @@ __pycache__/
 
 /artifacts/
 
+# Bulk observed snapshots are private development artifacts; track coverage metadata.
+/catalogs/sources/nearby-*/
+
 node_modules/

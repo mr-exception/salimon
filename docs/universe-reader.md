@@ -1,8 +1,15 @@
 # Bounded read-only pack queries (#414)
 
-The `reader` module owns exact record/system ID and galactic-region queries, SHA256-verified cell/sidecar reads and a least-recently-used cache. Cache budget accounts Vec capacities of encoded catalog bytes; caller-owned decoded catalogs, the bounded manifest/index and a single <=256 MiB blob/decode scratch are explicitly outside that budget. Oversized cells bypass the cache. Background prefetch has eight queued requests, one worker and shared mutex ownership; queue saturation returns false and the latest failure remains observable. The U12 pack service is integrated and measured by the filesystem/IO/RSS workload below. This module does not attach catalog truth to player discovery or runtime.
+The `reader` module owns exact record/system ID and galactic-region queries, SHA256-verified cell/sidecar reads and a least-recently-used cache. Cache budget accounts Vec capacities of encoded catalog bytes; caller-owned decoded catalogs, the bounded manifest/index and blob/decode scratch are explicitly outside that budget. Oversized cells bypass the cache. Background prefetch has eight queued requests, one worker and shared mutex ownership; queue saturation returns false and the latest failure remains observable. The U12 pack service is integrated and measured by the filesystem/IO/RSS workload below. This module does not attach catalog truth to player discovery or runtime.
 
-This is portable private-development implementation, separate from playable runtime adoption. Private real-data development is authorized; future distribution review remains #659 and full-release scientific data acceptance remains #524/#526. No hardware, scientific model accuracy or production completeness is inferred from fixture tests.
+This is portable private-development implementation, separate from playable runtime adoption. Private real-data development is authorized; future distribution review remains #659. The bounded nearby selection is documented in [#524](nearby-celestial-catalog.md), selected observed coverage in #526, and full-Gaia acceptance remains future expansion. No hardware, scientific model accuracy or production completeness is inferred from fixture tests.
+
+Version-2 sidecars use the [pack codec contract](universe-pack.md): verify the
+encoded SHA256, inflate within the declared bound and return the original bytes.
+During an inflated sidecar read, encoded input (at most 256 MiB) and decoded
+output (at most 256 MiB plus one overflow-detection byte) may coexist outside
+the catalog cache budget. Sidecars are not cached. Legacy raw v1 packs remain
+readable; installing v2 does not make old binaries forward-compatible.
 
 Run `cargo test -p salimon-universe --locked`, `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`, `cargo fmt --all -- --check` and `python3 scripts/check_docs.py`.
 

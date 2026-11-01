@@ -1,0 +1,10 @@
+{
+  "profile": "release",
+  "os": "Linux x86_64",
+  "peak_child_rss_kib": 268052,
+  "manifests_counts_installed_bytes_all_decoded_sidecar_hashes_identical": true,
+  "measurements": [
+    "nearby-pack-a.json",
+    "nearby-pack-b.json"
+  ]
+}

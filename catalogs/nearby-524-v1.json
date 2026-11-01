@@ -1,0 +1,91 @@
+{
+  "format": "salimon.nearby-celestial-coverage",
+  "schema_version": 1,
+  "revision": "nearby-524-v1",
+  "captured_at": "2026-11-01T04:24:23.086844+00:00",
+  "budget_bytes": 1000000000,
+  "area": {
+    "gaia": {
+      "table": "gaiadr3.gaia_source",
+      "all_sky": true,
+      "observed_parallax_min_mas": 10,
+      "nominal_max_parsecs": 100,
+      "nominal_max_light_years": "about 326",
+      "boundary": "Observed parallax cut, with original uncertainties; not a complete/error-free geometric sphere."
+    },
+    "exoplanets": {
+      "source": "NASA Exoplanet Archive frozen PS default rows",
+      "nominal_host_distance_min_pc_exclusive": 0,
+      "nominal_host_distance_max_pc_inclusive": 100
+    },
+    "solar_system": {
+      "selected_horizons_targets": 18,
+      "complete_solar_system_inventory": false
+    }
+  },
+  "counts": {
+    "bodies": 1607,
+    "gaia_duplicate_rows": 0,
+    "gaia_incomplete_velocity": 202476,
+    "gaia_input_rows": 574531,
+    "gaia_missing_or_nonpositive_parallax": 0,
+    "gaia_missing_ruwe": 0,
+    "gaia_rejected_astrometry": 0,
+    "gaia_rejected_quality": 242796,
+    "gaia_selected_rows": 331735,
+    "ps_planets": 1590,
+    "solar_system_targets": 18,
+    "stars": 331913,
+    "systems": 331913
+  },
+  "source_query_rows": 574531,
+  "source_query_pages": 71,
+  "bytes": {
+    "retained_gaia_tap_responses": 332545344,
+    "frozen_sources": 184061247,
+    "installed_pack": 146408616,
+    "source_snapshot_plus_installed_pack": 330469863,
+    "pack_manifest": 22925711
+  },
+  "hashes": {
+    "source_manifest_sha256": "37820174cb902bcbe234288b5f91e673c2a69aab9728ca1617f6f367c12d9d34",
+    "selection_sha256": "4caa8b3da961d796962410e5ed8d82a208f77f0ebe14aebf9f2390398b8b3cbb",
+    "pack_manifest_sha256": "6721457542a3886c369cd64a96fb0327eb7cc8699d0693ac7ea64ac8f643606d"
+  },
+  "private_workspace": {
+    "sources": "artifacts/nearby-524-v1/sources",
+    "pack": "artifacts/nearby-524-v1/pack",
+    "bundle": "artifacts/nearby-524-v1.tar"
+  },
+  "verification_report": "reports/issue-524/README.md",
+  "guide": "docs/nearby-celestial-catalog.md",
+  "limits": [
+    "Gaia ICRS source astrometry/J2016.0; missing velocity is not zero.",
+    "Catalog/storage shards are neutral offline batch keys, not physical galactic positions.",
+    "Gaia quality rejects remain in frozen inputs; PS-backed stars can remain independently published.",
+    "Ordinary playable-world adoption, complete physical-sphere/Milky-Way coverage and public data-release eligibility are not established."
+  ],
+  "full_release_complete": false,
+  "public_commercial_source_review_issue": 659,
+  "verification": {
+    "source_query_and_every_published_field": "passed",
+    "repeat_build_manifest_and_sidecar_hashes": "identical",
+    "peak_child_rss_kib": 268052,
+    "release_build_seconds": [
+      37.648057942,
+      37.004608458
+    ],
+    "original_all_cell_decode_seconds": [
+      2.226554988,
+      2.311088794
+    ],
+    "profile": "release; Linux x86_64; warm filesystem after writes; 3 online logical CPUs / 2-CPU cgroup quota"
+  },
+  "delivery": {
+    "bulk_data_visibility": "private workspace artifact; not included in public Git history",
+    "local_bundle": "artifacts/nearby-524-v1.tar",
+    "bundle_bytes": 330936320,
+    "bundle_sha256": "73d27250c77799dac8d1c189f7333aabe3218a8da1c1fc6c13916777791bc0e6",
+    "bundle_files": 572
+  }
+}

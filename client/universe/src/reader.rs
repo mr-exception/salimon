@@ -115,7 +115,7 @@ impl Reader {
         self.stats.catalog_blob_bytes = self
             .stats
             .catalog_blob_bytes
-            .saturating_add(bytes.len() as u64);
+            .saturating_add(entry.catalog.bytes);
         let mut reader = partitions::Reader::open(Cursor::new(bytes))?;
         if reader.cells().len() != 1
             || reader.cells()[0].key != key

@@ -1,5 +1,13 @@
 # Native E2E scenario runner
 
+Nearby celestial source acquisition and offline verification (#524): follow
+[area, data location and expansion](../docs/nearby-celestial-catalog.md).
+`acquire_nearby_sources.py` freezes complete bounded Gaia/PS/JPL selections;
+`verify_nearby_sources.py` checks original strings, query coverage and optionally
+every published pack observation. Bulk outputs remain private ignored artifacts.
+Run `python -m unittest discover -s scripts -p 'test_nearby_sources.py'` for
+resumption, budget, source tampering and false-coverage regressions.
+
 Build standalone executables with the [cross-platform build interface](BUILDING.md).
 Pass its staged executable to `--binary` to test the distribution artifact.
 For normal launch and real OS keyboard input, use the separate

@@ -1,7 +1,9 @@
 import json
+import hashlib
 from pathlib import Path
 import tempfile
 import unittest
+import zlib
 
 from acquire_observed_sources import freeze, queries, TARGETS, count_query
 from verify_observed_sources import catalog_records, read_blob, number_equal
@@ -11,6 +13,31 @@ SNAPSHOT = ROOT / 'catalogs/sources/observed-526-v1'
 
 
 class ObservedSources(unittest.TestCase):
+    def test_raw_and_v2_compressed_blobs_return_identical_original_bytes(self):
+        raw = b'{"missing_error":null,"source_id":"5853498713190525696"}' * 100
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'blobs').mkdir()
+            for stored, extra in [(raw, {}), (zlib.compress(raw), dict(zlib_raw_bytes=len(raw)))]:
+                sha = hashlib.sha256(stored).hexdigest()
+                (root / 'blobs' / sha).write_bytes(stored)
+                self.assertEqual(read_blob(root, dict(sha256=sha, bytes=len(stored), **extra)), raw)
+
+    def test_rehashed_truncated_trailing_or_false_length_zlib_blobs_fail_closed(self):
+        raw = b'original source fields and uncertainties' * 100
+        compressed = zlib.compress(raw)
+        cases = [(compressed[:-1], len(raw)), (compressed + b'x', len(raw)),
+                 (compressed + compressed, len(raw)), (compressed, len(raw) - 1),
+                 (compressed, len(raw) + 1), (compressed, 256 * 1024 * 1024 + 1)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'blobs').mkdir()
+            for stored, size in cases:
+                sha = hashlib.sha256(stored).hexdigest()
+                (root / 'blobs' / sha).write_bytes(stored)
+                with self.assertRaises((ValueError, zlib.error)):
+                    read_blob(root, dict(sha256=sha, bytes=len(stored), zlib_raw_bytes=size))
+
     def test_full_query_and_exact_target_freeze(self):
         ps, jpl = queries()
         self.assertIn('default_flag%3D1+order+by+hostname%2Cpl_name', ps)

@@ -28,7 +28,7 @@ remain in force; the frozen snapshot introduces no renames. Golden real examples
 include Proxima, TRAPPIST-1, Kepler-16 and PSR B1257+12. Multi-star multiplicity
 stays in raw metadata: an Archive host identifier is not a reconstructed binary
 hierarchy. Missing phase, frame, epoch, astrometry and orbital elements remain
-missing. Full Gaia matching/coverage and galaxy storage acceptance stay #524.
+missing. The bounded nearby Gaia delivery follows [#524](nearby-celestial-catalog.md); full Gaia matching/coverage and galaxy storage acceptance remain future expansion.
 
 ## Supported physical headers
 
@@ -89,3 +89,10 @@ paths are never replaced. Failed acquisition retains original partial bytes but
 publishes no completed manifest/request. Live source updates may change counts,
 measurements or identities; review the new bytes and scientific results before
 using a new revision. Tests and normal pack builds never download data.
+
+
+The Python observed-source verifier reads both raw v1 and compressed v2 pack
+blobs through a bounded stored-hash/exact-zlib-extent decoder. The nearby verifier
+shares that storage-only helper; source selection, original-field comparisons
+and numerical checks remain separately defined. Decoder regressions cover
+rehashed truncated/trailing streams and false/oversized decoded lengths.

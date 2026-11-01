@@ -33,7 +33,7 @@ tolerances or claiming solver/native coverage. Preserve failure and source conte
 U07 `ingestion/gaia.rs` adds streaming local CSV decoding and bounded canonical
 matching with typed source measurements; see the [Gaia contract](../../docs/universe-gaia-ingestion.md).
 Private real-data acquisition is authorized by the 2026-10-27 owner decision.
-Scientific full-data acceptance remains #524; future release review is #659.
+The [nearby catalog](../../docs/nearby-celestial-catalog.md) defines #524's current 1 GB scope; full Gaia coverage is future expansion and release review remains #659.
 
 U08 `ingestion/{horizons,exoplanets}.rs` imports source-labeled Solar System states,
 physical measurements and PS default-row planets; see the [observed ingestion
@@ -78,6 +78,12 @@ permission, full-snapshot coverage or approval of a production staging operation
 ## Incremental private offline packs (#413)
 
 See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+`pack.rs` writes v2 losslessly compressed sidecars and reads raw v1 packs;
+`read_blob` validates stored hashes, bounded exact inflation and single-stream
+completion. Run pack/reader tests and the release `gaia_verify` measurement for
+storage changes. The nearby scope uses a 64 MiB v2 root (v1 remains 16 MiB),
+incremental identity checks and bounded gzip CSV batches. Full-Gaia scale is future
+expansion; follow the [nearby catalog](../../docs/nearby-celestial-catalog.md).
 
 
 ## Bounded read-only pack queries (#414)

@@ -583,6 +583,12 @@ See [physics](../client/physics/architecture.md#contact-response-owner-644),
 ## Incremental private offline packs (#413)
 
 See the [implemented contract](universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+`client/universe/src/pack.rs` and `pack/tests.rs` own v2 lossless sidecars and
+v1 compatibility. `examples/gaia_verify.rs` measures production encoded/decoded
+storage; `scripts/gaia_archive_inventory.py` freezes the full official bulk-file
+listing with offline failure tests in `test_gaia_archive_inventory.py`. Full-Gaia
+catalog/index scale remains future expansion; #524 now delivers the bounded
+[nearby catalog](nearby-celestial-catalog.md).
 
 
 ## Bounded read-only pack queries (#414)
@@ -850,7 +856,7 @@ Flight acceptance #437: see [the reproducible matrix](universe-flight-verificati
 See the [coverage contract](observed-source-coverage.md) for JPL/PS frozen inputs,
 `ingestion/horizons.rs` physical formats, `pack/observed.rs` expected targets and
 star/parent mapping, acquisition and independent verification scripts, exact
-commands and scientific/release boundaries. Full Gaia acceptance remains #524;
+commands and scientific/release boundaries. Nearby Gaia delivery is #524; full-Gaia acceptance is future expansion (see [coverage](nearby-celestial-catalog.md));
 this private observed pack does not grant player knowledge or publish a release.
 
 
@@ -882,4 +888,4 @@ resume/mining routes; [evidence](../reports/issue-439/README.md).
 
 ## Opening and recovered investigations (#470 / #471)
 
-[Opening/investigation contract](opening-and-investigations.md): runtime `session/narrative.rs` owns complete-packet lead admission, fixed ground-bound physical clues, modal inspections and schema-31 receipts; universe `scanner/chart.rs` owns explicit unverified same-frame route snapshots. Runtime tests, `scripts/verify_narrative.py`, existing canonical mine/carry/Fabricator persistence and production audio exports form the acceptance matrix. Scientific full-Gaia acceptance remains #524.
+[Opening/investigation contract](opening-and-investigations.md): runtime `session/narrative.rs` owns complete-packet lead admission, fixed ground-bound physical clues, modal inspections and schema-31 receipts; universe `scanner/chart.rs` owns explicit unverified same-frame route snapshots. Runtime tests, `scripts/verify_narrative.py`, existing canonical mine/carry/Fabricator persistence and production audio exports form the acceptance matrix. Nearby scientific coverage follows [the regional catalog](nearby-celestial-catalog.md); full-Gaia acceptance remains future expansion.

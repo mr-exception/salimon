@@ -71,6 +71,24 @@ fn artifact(
             "selected source changed between verification and import",
         ));
     }
+    let bytes = if matches!(selected.encoding, crate::sources::Encoding::CsvGzip) {
+        use std::io::Read;
+        let mut decoder = flate2::bufread::GzDecoder::new(bytes.as_slice());
+        let mut raw = Vec::new();
+        decoder
+            .by_ref()
+            .take(8 * 1024 * 1024 + 1)
+            .read_to_end(&mut raw)
+            .map_err(io)?;
+        if raw.len() > 8 * 1024 * 1024 || !decoder.get_ref().is_empty() {
+            return Err(invalid(
+                "compressed raw source exceeds batch bound or has trailing streams",
+            ));
+        }
+        raw
+    } else {
+        bytes
+    };
     Ok((
         bytes,
         Dataset {

@@ -1,0 +1,33 @@
+{
+  "status": "passed",
+  "selected_query_complete": true,
+  "full_release_complete": false,
+  "gaia_input_rows": 574531,
+  "pages": 71,
+  "all_sky": true,
+  "parallax_min_mas": 10.0,
+  "nominal_parsecs": 100.0,
+  "selected_ps_planets": 1590,
+  "solar_system_targets": 18,
+  "response_bytes": 332545344,
+  "frozen_source_bytes": 184061247,
+  "exact_golden_associations": [
+    {
+      "source_id": "5853498713190525696",
+      "ps_hosts": [
+        "Proxima Cen"
+      ],
+      "parallax_mas": "768.0665391873573",
+      "parallax_error_mas": "0.049872905"
+    },
+    {
+      "source_id": "4472832130942575872",
+      "ps_hosts": [
+        "Barnard's star"
+      ],
+      "parallax_mas": "546.975939730948",
+      "parallax_error_mas": "0.040116355"
+    }
+  ],
+  "source_manifest_sha256": "37820174cb902bcbe234288b5f91e673c2a69aab9728ca1617f6f367c12d9d34"
+}

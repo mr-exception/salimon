@@ -81,7 +81,8 @@ The conditional 1.8-billion-object projection and 5/10 GB capacities are explici
 arithmetic at that density. They exclude extra quality columns, partition/index
 costs and nonstellar content. Do not use them to approve the 2–5/10 GB pack target;
 full reviewed data, release-specific quality selection and actual U12 codec
-measurements remain necessary under [#524](https://github.com/mr-exception/salimon/issues/524). [Report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-408/README.md) records
+measurements remain necessary for a future full-Gaia claim. The current
+[nearby catalog](nearby-celestial-catalog.md) is #524's explicitly bounded scope. [Report](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-408/README.md) records
 measured results and follow-up ownership. Native integration remains U34 and the
 reference hardware gates; this offline ingestion does not establish native signoff.
 
@@ -106,7 +107,27 @@ caller associations still fail U07 validation.
 adapters and measures the installed catalog partitions, source/astrometry
 sidecars, literal-ID manifest index, five original decode samples and source-field
 error/coverage distributions. Every selected original column survives the sidecar.
-The owner-selected all-usable-DR3 full-release/storage acceptance remains unresolved: a real
-random sample, synthetic density or extrapolation does not meet #524's full-data
-gate. No large-pack exception, arbitrary population truncation or approved
-scientific association is implied by this tooling.
+Pack v2 compresses sidecars losslessly; `gaia_verify` additionally records encoded
+and decoded sizes, decoded SHA256s and five original read/verify/inflate timings.
+The output measures the production storage/reader route, not a new scientific
+selection or changed precision. Exact source strings and missing values remain
+intact. See [pack compatibility and bounds](universe-pack.md).
+The earlier all-usable-DR3 request was replaced on 2026-11-01 by the owner's
+[1 GB nearby selection](nearby-celestial-catalog.md). Neither the old random
+sample nor the new regional publication establishes full-Gaia coverage or the
+historical 2–5/10 GB galaxy budget. No scientific precision is reduced for size.
+
+## Bounded nearby publication (2026-11-01)
+
+[Coverage, local data location and expansion](nearby-celestial-catalog.md) define
+the current #524 scope. `acquire_nearby_sources.py` freezes the complete all-sky
+parallax >=10 mas query in 8192-row `(parallax DESC, source_id ASC)` pages, with
+initial/final counts and an empty tail. Original XML and CSV use deterministic
+`votable_gzip`/`csv_gzip` archives; source hashes bind stored bytes, and original
+response hashes bind inflated bytes. `verify_nearby_sources.py` checks release
+units/datatypes, every original CSV string, query/boundary/continuation semantics,
+exact golden associations and the locally selected PS/JPL companions. With
+`--pack`, it compares every published Gaia/planet source field and checks the
+combined frozen-source/installed-pack 1 GB budget. Rejected Gaia rows remain
+frozen inputs. `nearby_verify` exercises the production offline builder and
+filesystem reader, all cell/sidecar decodes and exact-ID goldens in release mode.

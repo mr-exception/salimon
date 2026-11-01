@@ -157,3 +157,16 @@ The separate [#526 selection](observed-source-coverage.md) freezes the full PS
 default-row table and explicitly selected JPL targets for private development.
 It preserves original provider statuses and does not modify the historical
 fixture manifest above or satisfy future public-release review.
+
+
+## Private bounded nearby snapshots (#524)
+
+The [nearby catalog](nearby-celestial-catalog.md) records the current 1 GB
+regional scope, data location, hashes and expansion procedure. `csv_gzip` and
+`votable_gzip` are lossless source-archive encodings; stored lengths/SHA256s bind
+the compressed files. The observed adapter additionally bounds decoded CSV
+batches to 8 MiB and rejects truncated/trailing gzip streams. Independent
+verification checks original XML response hashes and exact CSV transcription.
+This adds no reuse approval or release eligibility. Bulk snapshots/generated
+packs stay in ignored workspace artifacts; the public repository retains
+coverage/provenance metadata and acquisition/rebuild commands.

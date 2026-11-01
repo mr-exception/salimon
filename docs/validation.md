@@ -317,6 +317,15 @@ matching, duplicates and malformed input. Run `cargo run -p salimon-universe
 --example gaia_bench --release --locked` as one command for synthetic resource
 sensitivity; see the [Gaia contract](universe-gaia-ingestion.md) for projection limits.
 
+Gaia storage changes (#524): run universe pack/reader regressions and
+`cargo run -p salimon-universe --example gaia_verify --release --locked -- catalogs/sources/gaia-524-v1 NEW_OUTPUT_DIR`.
+The production route reports encoded/decoded sidecar bytes and five original
+read/verify/inflate samples; repeat offline builds must preserve manifest and
+decoded hashes. Run `python -m unittest discover -s scripts -p 'test_gaia*.py'`
+for acquisition/inventory/transcription boundaries. The archive inventory command
+in the [Gaia guide](universe-gaia-ingestion.md) measures source bulk-file bytes,
+not installed-pack or full scientific acceptance.
+
 U08: universe/workspace tests compare the production source importer against U03
 Earth goldens, physical headers and Proxima quantities/IDs/errors, plus synthetic
 limits/matching/error cases. `cargo run -p salimon-universe --example observed_import --locked`
@@ -830,3 +839,13 @@ route previously retained only in the #515 report. Script contracts: `python3 -m
 unittest discover -s scripts -p test_benchmark_canonical.py`, existing packaged
 smoke/fragment/visual/route-review tests, and `python3 scripts/check_docs.py`.
 No new runtime/domain behavior or cloud acceptance gate is introduced.
+
+
+Nearby celestial data (#524): run universe pack/reader/source tests, all-target
+Clippy/fmt, `test_nearby_sources.py` plus the source-importer/runner suites and
+docs/base-impact checks. Use `verify_nearby_sources.py` on the complete frozen
+regional inputs, release `nearby_verify` for every production cell/sidecar and
+exact-ID lookup, then `verify_nearby_sources.py --pack` to compare every published
+original field and the combined 1 GB budget. Repeat builds must reproduce exact
+manifest/blob and decoded-sidecar hashes; retain per-cell timings and measured
+RSS. See [area, commands and future expansion](nearby-celestial-catalog.md).

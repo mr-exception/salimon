@@ -1,0 +1,4096 @@
+{
+  "arch": "x86_64",
+  "build_seconds": 37.648057942,
+  "cap_bytes": 1000000000,
+  "cells": 72,
+  "counts": {
+    "bodies": 1607,
+    "gaia_duplicate_rows": 0,
+    "gaia_incomplete_velocity": 202476,
+    "gaia_input_rows": 574531,
+    "gaia_missing_or_nonpositive_parallax": 0,
+    "gaia_missing_ruwe": 0,
+    "gaia_rejected_astrometry": 0,
+    "gaia_rejected_quality": 242796,
+    "gaia_selected_rows": 331735,
+    "ps_planets": 1590,
+    "solar_system_targets": 18,
+    "stars": 331913,
+    "systems": 331913
+  },
+  "decode_seconds_each_original_cell": [
+    0.041353196,
+    0.034807013,
+    0.035814436,
+    0.032698849,
+    0.035330639,
+    0.030400395,
+    0.032429601,
+    0.031357725,
+    0.028865894,
+    0.029174865,
+    0.032517557,
+    0.032741809,
+    0.029457246,
+    0.035152336,
+    0.041214208,
+    0.03270833,
+    0.030314703,
+    0.033717514,
+    0.031361392,
+    0.032725505,
+    0.02881517,
+    0.034100091,
+    0.033667168,
+    0.033590562,
+    0.029116738,
+    0.036684607,
+    0.03497776,
+    0.032424327,
+    0.050948448,
+    0.033277683,
+    0.032003136,
+    0.029301127,
+    0.032064694,
+    0.030862455,
+    0.030125125,
+    0.029497207,
+    0.029287929,
+    0.030975792,
+    0.029451997,
+    0.029502103,
+    0.027955096,
+    0.027468229,
+    0.029903272,
+    0.030371596,
+    0.032425361,
+    0.030133873,
+    0.03199931,
+    0.029510743,
+    0.029330205,
+    0.027703678,
+    0.028580685,
+    0.031562957,
+    0.030068564,
+    0.033594638,
+    0.030951908,
+    0.03140755,
+    0.029273023,
+    0.028809343,
+    0.039833155,
+    0.028180034,
+    0.031223375,
+    0.035175733,
+    0.029344675,
+    0.030145678,
+    0.027521667,
+    0.028875072,
+    0.028631689,
+    0.029699701,
+    0.029324476,
+    0.028228048,
+    0.00386055,
+    0.000643772
+  ],
+  "full_release_complete": false,
+  "golden_lookups": [
+    {
+      "id": "gaia_dr3:5853498713190525696",
+      "seconds": 0.040722649
+    },
+    {
+      "id": "gaia_dr3:4472832130942575872",
+      "seconds": 0.044121233
+    },
+    {
+      "id": "jpl:10",
+      "seconds": 0.00036154
+    },
+    {
+      "id": "jpl:399",
+      "seconds": 0.000290398
+    },
+    {
+      "id": "jpl:301",
+      "seconds": 0.00024642
+    }
+  ],
+  "installed_bytes": 146408616,
+  "manifest_bytes": 22925711,
+  "manifest_sha256": "6721457542a3886c369cd64a96fb0327eb7cc8699d0693ac7ea64ac8f643606d",
+  "os": "linux",
+  "physical_coverage": "Source parallax/PS nominal-distance selections. Storage shards are not physical galactic coordinates; no ordinary-play world adoption or full Milky Way acceptance.",
+  "reader_resident_bytes": 65536,
+  "reader_stats": {
+    "cache_hits": 3,
+    "catalog_blob_bytes": 35324296,
+    "catalog_blob_reads": 74
+  },
+  "selected_query_complete": true,
+  "sidecar_digests": [
+    {
+      "decoded_bytes": 8610982,
+      "decoded_sha256": "b16807d4f83568f5727630536a9c2ca0e1114fb0d6b4e8fd7156b88483e41f18",
+      "encoded_bytes": 1611298,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 0
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "68ba86c4f4cbb9fb9c92821c6837881af8ea1057ecb0995b7caa727ea3aca914",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 0
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 2203284,
+      "decoded_sha256": "5113b17ba7084cfdece79ec42be4b165826f8c93adaaf0f40718b3104fee1dbe",
+      "encoded_bytes": 199932,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 0
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 118,
+      "decoded_sha256": "9a3077b54776818beb8317f97fab5c3ff2e4f07b6e546ca59063871d5590fede",
+      "encoded_bytes": 92,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 0
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 8123723,
+      "decoded_sha256": "6a914ad017266f7db6e8c26ba9c29a52c4b5aa1fe15cb8da44087027f2fea1fb",
+      "encoded_bytes": 1515964,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 1
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "7acfb9b2df4f44cc347e4f216cfd8a4fb1d70092896b3abad06352c0f71d7b0e",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 1
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 640254,
+      "decoded_sha256": "ecde0359cf704778066ccc3eea673458d452275a147caf5d84d0cb5af2138d63",
+      "encoded_bytes": 62696,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 1
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 116,
+      "decoded_sha256": "36f6ca82c0a9e5ec37f1b04fc003535edea6a676b727a393c29185edd994bde7",
+      "encoded_bytes": 91,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 1
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7976008,
+      "decoded_sha256": "34cb65d4996bae2f6d0ed93131c538e35c05d948ae09ed1c2c2bead77cfde80d",
+      "encoded_bytes": 1485403,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 2
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "f52cb09baa65ee84230a365110eed2dbf717f9875321d2136f6e6e34e4b10653",
+      "encoded_bytes": 183,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 2
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 516803,
+      "decoded_sha256": "df0cac098bafb9a1a1bf0a86653123eacba370b34d5016faf9a2383d51e5a8ca",
+      "encoded_bytes": 49618,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 2
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 116,
+      "decoded_sha256": "a444c17c110a4b1f9d045847a892dbed6898deded1ed479e0b5a5b32f840d66a",
+      "encoded_bytes": 91,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 2
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7733660,
+      "decoded_sha256": "3a8c594e0fbb039cc2834670dfa3339e11666c75ef25c1ae2d6406e8b0e075e5",
+      "encoded_bytes": 1439019,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 3
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "43c522eeb76aee4d7fb1eb2a29762b57548781f0cc65b47051c8af6cf2b8a3fa",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 3
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 357853,
+      "decoded_sha256": "dabd6e61f20e9af8f8ad09c0596c908f0bbaeffc962ea4128f439ce968dc6cb9",
+      "encoded_bytes": 33839,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 3
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "0a13741f8059492bc9dfb4fc1be36aab721006503ae3da9bff85b37a57ff4b8b",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 3
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7703681,
+      "decoded_sha256": "94aaac93b6612f2d5e5a4b199c7d90fde518e4b39f2dba6178a2e8191b41ea3e",
+      "encoded_bytes": 1432690,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 4
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "d96387993dede5f65371d465469313a35a11fd4129e704fef91b4d723c6667c6",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 4
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 288586,
+      "decoded_sha256": "f6c973bb3ae96b7d66a2d663f3e44418b5dd0895ca4ba2f0e5eb57fdfb50fde0",
+      "encoded_bytes": 28256,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 4
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "5a6f858f3cca807a5dc46d2091605381a9ac7168e92b14da25e8bfe12b529fe9",
+      "encoded_bytes": 91,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 4
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7493579,
+      "decoded_sha256": "1872a6adab5c3c5d4c31549aaef228d17dadf4ccddc3dc713a0f724e32e1edf7",
+      "encoded_bytes": 1393294,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 5
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "c7e39d3a9df45175490fb14f5aa379da45036cada1f5a4a2bb16e74fca29bf1b",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 5
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 195813,
+      "decoded_sha256": "f8cfda2d5e4df5b897ce7e40729c52a781f4af5741e71d167a698588abbe1583",
+      "encoded_bytes": 19704,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 5
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "6a7900b448d070a16da9296e03503348a4396a82bb7668db103e06ffd911ebe4",
+      "encoded_bytes": 91,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 5
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7397099,
+      "decoded_sha256": "00071c4823104391ca9c0167543bde5792737dc33e68e98a1858bb546c1ee6ef",
+      "encoded_bytes": 1374066,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 6
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "5ba6b5a407714baf12da2642cf3a1af3e4c93fa08f9c781665a468a97c228603",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 6
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 166759,
+      "decoded_sha256": "8d8beac990221a415ddb678030c5d4a0fc8be3ca15ca7750e9c78dbdce9f8719",
+      "encoded_bytes": 17657,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 6
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "90550436559b5b08133e370d294ff94dca6df0ee8863e975de5088880e4257b6",
+      "encoded_bytes": 91,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 6
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7335585,
+      "decoded_sha256": "41e02d20bf8f0a435ed8218cc37b18456c3fe6b9c68551625de81a09901e8324",
+      "encoded_bytes": 1361493,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 7
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "a422a86137478a84240146d87fe92df1a85e123c47fcdfcf1425d9fd2fba912f",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 7
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 139345,
+      "decoded_sha256": "ac9c8c14a7980fc577d69861f03467185afd03ffe7031f049c62416836d39046",
+      "encoded_bytes": 14708,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 7
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "7dd685f392e7f82100fa329d2a9ca702b76e341fddbee0c4ecadfc143280cc7c",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 7
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7217626,
+      "decoded_sha256": "4773a314e1cfd190b5f130269b9534769208ec6653073fb6f4e10cd0660deab1",
+      "encoded_bytes": 1339101,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 8
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "857f24fad369ab7326ff4d3b4a3b2c8f163fe77b26bcd582431c4a0761fe1a35",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 8
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 172156,
+      "decoded_sha256": "9b4f5686e3845d5d24fe588a16663a6e04212d2887c080c09410e1bf517dbab6",
+      "encoded_bytes": 17730,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 8
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "06231e71bfc4b107d083399161aa5ebfc042b855f65c9f76c79614369aecc6eb",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 8
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7086913,
+      "decoded_sha256": "4954fbfdb99446a4414e322d2abadaed48c2fa0466dc7b49a3d1d45f81c89469",
+      "encoded_bytes": 1313849,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 9
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "a03e8e71baed814ab091c4e66cc9d1b38e88be493f147c471f3c0ff604e9c380",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 9
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 133385,
+      "decoded_sha256": "1b484f4f3df58fe5f7b57b323f75ded2123c1acc9a3547507ad837d68f0aa8ae",
+      "encoded_bytes": 13868,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 9
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "7dd685f392e7f82100fa329d2a9ca702b76e341fddbee0c4ecadfc143280cc7c",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 9
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7093718,
+      "decoded_sha256": "944d84777ca8b971a8870cc81ca0e2be960e5ad99869d35c9faacb5dc39af537",
+      "encoded_bytes": 1313945,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 10
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "d3c38d6b2a9a915017922c786e063f8fa16edb152d121d5928ace55fa7f4e271",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 10
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 145865,
+      "decoded_sha256": "c76259b733b5e744014d13ebef53d047ebcacfacc05a1f047058b1034fac1efd",
+      "encoded_bytes": 16103,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 10
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "6446096208795af6dac2a0273497264a95e48234d8788a78cf98771ed6a37f50",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 10
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7095431,
+      "decoded_sha256": "cdc854df8852cf74c4f607fc9b81f14821f637753d18182a08b2e085fdb72a53",
+      "encoded_bytes": 1314487,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 11
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "71acb281aa3c2e2df8b43aab4c70d88355fbc6cea44dfea8c302cd2e7b43cd9b",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 11
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 93621,
+      "decoded_sha256": "b66b7d2190c9674553f58814673769a76bee597b2f99487362b595bce2f8833c",
+      "encoded_bytes": 9438,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 11
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "c603ca1f3522b77d8b09f2210259fec0e58edf3028e036b1115332b531c326f3",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 11
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7053644,
+      "decoded_sha256": "59c89a3f950378a38992d3cf4a8515d5d8beed86fd887dec3aaeadb7c8c371b8",
+      "encoded_bytes": 1305415,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 12
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "88848ae2535ee998414f64e125078cf9ddc2cab53eab94995beb15727fdb3f84",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 12
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 94290,
+      "decoded_sha256": "b3d61d9043cb802baac2655a72a95912b766e063cada188ca39c6af9bc4d61d7",
+      "encoded_bytes": 9822,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 12
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "28d6f874c103cac77fd7930faff18dd2c51ae965287a52fb2df69b420ce36a10",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 12
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 7005969,
+      "decoded_sha256": "09c9691130e1ea8c38e395ba043849760007bd91c8de9ef13423d7ce3c4fa08b",
+      "encoded_bytes": 1296601,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 13
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "e768e3bac306eb60fb92f12d091e0f326ab151f6f5ed9214b4b046e36c12a12f",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 13
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 147603,
+      "decoded_sha256": "d03d7c33d95b9862e0a4c24ae3136585000609f2fe89796205a93d29b5e9e12b",
+      "encoded_bytes": 14949,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 13
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "4aa2397c0caf598ec540f5d630453880f043b0c2410f23d856385506891532bb",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 13
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6905672,
+      "decoded_sha256": "9928af4a2ba5b1e16fb9366a00ce413a238b0b0226c9f9e038de7497373449fc",
+      "encoded_bytes": 1277705,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 14
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "10fcf88a10a68b76f850adf68f252e9afff31528f1fafd9c3a94bd21e7944592",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 14
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 90300,
+      "decoded_sha256": "26a67e2af9c25c561062f5611c5fda1978fcc1bb2df12b60f6fcb57649225dfa",
+      "encoded_bytes": 8877,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 14
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "db926f591bb1ca28a4f125b83754e4441101f98e988e7b2c787c4c438ff7ff77",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 14
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6878730,
+      "decoded_sha256": "9a668ef0535406225086ea7ff1bc159df73f7845e2d85b84cc5373becbbb5ecb",
+      "encoded_bytes": 1272679,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 15
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "6f0a2fe0b15af445decca438b16fa2e40ca14d2847fff7b772352876225fab81",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 15
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 99532,
+      "decoded_sha256": "cef40d6751a009f64a354be544757de8a4b8a5f99eb02edef762c0aef79fd8ae",
+      "encoded_bytes": 10880,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 15
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "84188f96e9a34e521065ec2f6da7d84a42ea7b724f37cac8ea0dddca2e8b8773",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 15
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6900478,
+      "decoded_sha256": "8c49b032f3f30e13fd3f9b001fe761f1e5beea7bd7ba6de9b0c6f4de50e46334",
+      "encoded_bytes": 1275698,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 16
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "ce45c258290a1f26954eceb39e27e99cb100fd7ef11033c5e7b0b8a8c372b6af",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 16
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 68548,
+      "decoded_sha256": "903d2ea48da69ad22933a4eff011f7edf0cfeb4a9994a133ed82680d1199d40c",
+      "encoded_bytes": 7928,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 16
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "89a9ac175b3ff3c9c7c0ec02d772902f50cb7e87de97a8f09a43bf730d00798b",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 16
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6824684,
+      "decoded_sha256": "949e39b03e9ce4b59fd0ff9210c9caaafc3978084b69151b8c1384a644fc4244",
+      "encoded_bytes": 1261122,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 17
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "09fad6c89b98d5f922d495d21f095fb1eb94e61dd1e88c5ea8f0277db226247f",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 17
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 59608,
+      "decoded_sha256": "f5ed68060321412959c75e09b23d3e60bc62be25a2f2964cd63a5351a42731dd",
+      "encoded_bytes": 6433,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 17
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 112,
+      "decoded_sha256": "3ddd528b8ce489e6dc230195d58237d88ff4a78cea01341ba082e128ba2c3c31",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 17
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6775401,
+      "decoded_sha256": "a47a35dc3109719ee938c5db5222b7b0fe6e0f8c7df03e81c698e820ae7b1868",
+      "encoded_bytes": 1252325,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 18
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "45726b904dd4b2fc2b251a667af647b39d622f0f4823b2911af5bec62705c4ce",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 18
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 80255,
+      "decoded_sha256": "98a569681b565b68114926d8b0962f1bad5cd5323b08fca5f67b02851561dd3f",
+      "encoded_bytes": 8625,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 18
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "76cd6eca1910b2f58ecf427cead8091fea82c9f15d63c04a59110f072f6cb903",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 18
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6792045,
+      "decoded_sha256": "79fba1c3c21eae0682367383aa885b943717528a8b49b700581e5fa6b2df19da",
+      "encoded_bytes": 1255445,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 19
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "15de8642b27be99064df338f5a9a3110de4a17d45ebdf4eb25488faeb3824cd6",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 19
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 25791,
+      "decoded_sha256": "db3881405e78c16a767e0a4308d13883494ed8de90f70627457e7c0fcb644e42",
+      "encoded_bytes": 3555,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 19
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c6407aa88e4401e44627d36026cd818a7808908c429173601d8a864649fedd85",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 19
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6735210,
+      "decoded_sha256": "6c4b9f0bd1e3584406e8d93e6811b3c6f1b8d26419f1adc922d04b6a63af2701",
+      "encoded_bytes": 1244755,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 20
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "3bc3da2867445025e6d70fd70ad5339079fdeb0cfcd31abe5dcccde596e0c2b0",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 20
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 48604,
+      "decoded_sha256": "9b3c6b788056e3c005a4e01a6f5c4df3cc54d15720daa658f4c6abef473f740d",
+      "encoded_bytes": 5988,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 20
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 112,
+      "decoded_sha256": "a57dd389c07babc4da7da1257a3e706a1246e72c9ed8743bf7870215597df6b5",
+      "encoded_bytes": 88,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 20
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6663248,
+      "decoded_sha256": "06f589b50ad5ef5d9791989cb5777512d0e2579d3e388e466a60dd07a1e06ffd",
+      "encoded_bytes": 1230629,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 21
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "993ca582562b2986714c24e9faa2b634892c32ac5066784154f949fe72da561f",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 21
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 17925,
+      "decoded_sha256": "adad5c3178b6d13e5449cc7ac0716107ebdf4ccdcce2bc5958329a208c27131c",
+      "encoded_bytes": 2795,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 21
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "4d8e4b0fa273242a9ebf17712ac550c8effeecead873df977be9fcbda251c262",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 21
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6716903,
+      "decoded_sha256": "e4a5658320f6b28abe7c4e1fe55b812e33abc7c920201c8fbcc9c93403d461c6",
+      "encoded_bytes": 1239642,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 22
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "e162d98ff3e57b81b489a82d0434e6a892cbb80e0583c47ac1a89aece7e1a979",
+      "encoded_bytes": 188,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 22
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 12759,
+      "decoded_sha256": "816e310415dd7b5c8b7d0818241355995af41f6f4c0b66fe74044238cd9d3bb8",
+      "encoded_bytes": 2197,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 22
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "b691ef4dc5be30e833eacd744176b2d43a195f49b8681e4a461cd0800b628a62",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 22
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6744302,
+      "decoded_sha256": "ab990878f9245e97c8f4094b5acd160e2acfccab46273bb0653a5eb28495ecee",
+      "encoded_bytes": 1245297,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 23
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "26f3d5a826c106f1d6eba9749d94af833a6f9f86f94efa60ee6361704919bbbd",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 23
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 123008,
+      "decoded_sha256": "68425e28df953d6f2d21abcb0688f7abc46b49c621dbcfd82d1a4c7d7006d43d",
+      "encoded_bytes": 12387,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 23
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "bd6e52a53ac1754f6f0e0679124e0a484209ca609b5645b51f04c9bf8b181ac4",
+      "encoded_bytes": 91,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 23
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6712991,
+      "decoded_sha256": "805591b597767d3c8afa78e2edcb65a00446a2f3df4cb64c6070abc174608186",
+      "encoded_bytes": 1239527,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 24
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "aac15591acd664e02b0c27fbccf4e7684e81e9f41d7c90e3189376c1a11552ba",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 24
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 43110,
+      "decoded_sha256": "ca50c95d82001ff6d2c470fdf6db07d587467d4cd29ec62e3ea6b7cfddd4b74e",
+      "encoded_bytes": 5173,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 24
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "e2ae2d2a2c7b55ea09b4e985a9f06052e47e4e92c025c7d208f262cc88c3f59c",
+      "encoded_bytes": 88,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 24
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6788879,
+      "decoded_sha256": "cd37d111cb058205b4bc7606030d68a59d5e273f1592a060666f4448b16bef6c",
+      "encoded_bytes": 1252289,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 25
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "a6b7e71dca5bc385d34d40e01d613cf508ebe895df0f39771872da6f3d57a578",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 25
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 13336,
+      "decoded_sha256": "15b84accada4d49db5b167bc1046d85cfc8811437c7dce8475d84aa829d00336",
+      "encoded_bytes": 2058,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 25
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "9e99c08144d09fa14de31ad9b1856644ad19ab5c43bfe856554a76211620d822",
+      "encoded_bytes": 88,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 25
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6732453,
+      "decoded_sha256": "c08e9b90da2709653520ce0ae3a996cf6b8abbfb06f96854f340ad63bb851224",
+      "encoded_bytes": 1243459,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 26
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "7867d4c0bd8a2089b8b2df6e4ef513731d24b3152598367f9d8cd1fd55689fd3",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 26
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 63111,
+      "decoded_sha256": "411853cba5a877e702a1514f08d8998a987abe7981ff78f5744b29fd0dba5a46",
+      "encoded_bytes": 7157,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 26
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "7316bf4c9a17d434b88b4655d392e868217d1d40647219048acb420486cd0202",
+      "encoded_bytes": 90,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 26
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6649474,
+      "decoded_sha256": "ceff2f040291a31177a72a2de6e0bd7d77d70c08cfc7e30af24e132c0df195a5",
+      "encoded_bytes": 1227940,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 27
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "fda9b70f1ff0cc4a35c9095c851e21660766ce1527a304ad2ccd49fb968dfb2b",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 27
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 45072,
+      "decoded_sha256": "218ff4cf03f284038e4624f3609d6352563be1cee61e60e752be1ac7a597fcc8",
+      "encoded_bytes": 5716,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 27
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 112,
+      "decoded_sha256": "b4d6a6f9b283f587824c7345aea55476f895b079e27c9a90ccd7641e2095180f",
+      "encoded_bytes": 88,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 27
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6660833,
+      "decoded_sha256": "fa5e880cf2a3395f95b7306938b39b8a6f655cb345f56a9927ed52c06c4e9bf2",
+      "encoded_bytes": 1228664,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 28
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "0329e4c9eb6388559a8e77c55d2ab68a96a9894e9ef3355970782335bdf441e4",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 28
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 45930,
+      "decoded_sha256": "dfebe7ed175d1dfade5582fbcd8922b8b40530fcad81eda979fa8f0a803e003c",
+      "encoded_bytes": 5319,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 28
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 112,
+      "decoded_sha256": "e0661646e1eb25e9435f2fe73a179549c8999ebca58d9c851bfd86ca75d999e0",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 28
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6598659,
+      "decoded_sha256": "696b37e2c3a6eee9df3986d195f9bebe46297a5faa962c67d08f16854bb4723b",
+      "encoded_bytes": 1217684,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 29
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "1ac73a88891e15566283636183c844f103efa181dcf142c254ca721cf45ffed1",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 29
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 56258,
+      "decoded_sha256": "2b65f510bd778758dd4f2249136aaab8d867b413fe7f25d525af291371a144a5",
+      "encoded_bytes": 6376,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 29
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 112,
+      "decoded_sha256": "2f874c5bd58d5745a7f66a6107462655335cbf37ca6c48b02afceea133451c1f",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 29
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6593882,
+      "decoded_sha256": "8f83cc70e18b042a3674636396bf5ef4d6c04876795a9be09949051cfecfb55e",
+      "encoded_bytes": 1216760,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 30
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "34de4d041f7c9cf70830acd3e773e8f33147951035d692fafab6c425b2dcaa2b",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 30
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 37581,
+      "decoded_sha256": "4d8a67033f738f8bc17ddc467ac3d2784c60ce3ed63190d54e71f842e1c035b1",
+      "encoded_bytes": 4488,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 30
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "0e18efe083dc3bf5823282be6b1f70f8b668b2e996e109abf0b4d04d6f1a53e1",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 30
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6748122,
+      "decoded_sha256": "99bc905b082fbf0ee9f2f1936cd57e57a9bf4403a3857f3bbec76bb97b4edd16",
+      "encoded_bytes": 1244338,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 31
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "acceb4746eaa8094a70a875a1ee4cdbd7d804e763a04e3e00d766e408d261b52",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 31
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 25350,
+      "decoded_sha256": "65e7001667797cc2affa772a51a38da642d6aedf838e37472bfb775c687a6ace",
+      "encoded_bytes": 3514,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 31
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c6407aa88e4401e44627d36026cd818a7808908c429173601d8a864649fedd85",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 31
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6674529,
+      "decoded_sha256": "7f81c3860f3744c4bac1935e3d9b34eb7946febc158865e903dd24fc01017a18",
+      "encoded_bytes": 1230502,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 32
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "5feb02efc4d7bdf87c81dd484d5bb1d407b70d0b5b337d593338bfef22dfa04b",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 32
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 56161,
+      "decoded_sha256": "bb8232277cfb3dcca4430369a73e8163eae8cf5e0516fe63238919247f598acd",
+      "encoded_bytes": 6916,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 32
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "21c3ec5749e8533abad2061b94cd967249cd79030e7c1342b1cb5b81ca98b2f4",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 32
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6649806,
+      "decoded_sha256": "2d4b4c1c906ab66d790fd1ab6cb7b2a39702b71774d2063fe48f737e1334f003",
+      "encoded_bytes": 1226260,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 33
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "1ba2dc8ec8ad5f5d52eaabb6d98e34859fff0753a5cb19d63903c77fa49caa18",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 33
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 34261,
+      "decoded_sha256": "60c39744269f6ca7438e9594221ef24e3e55786e527a1d10eab8cc57da470592",
+      "encoded_bytes": 4441,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 33
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "56f967eff374e3347af3ecbf07d2b2fbc45fbccc5e6cfc0e6ccf7bfd3bc95b96",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 33
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6660463,
+      "decoded_sha256": "ff0ec1d4eb58f4244c7de1fbb71b6ceeafc7b86a4f4b135dbcd1976798f84705",
+      "encoded_bytes": 1227783,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 34
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "422bedfb272f5e80388c66c094cb83dd4feceebb83aec9f162160d84edc3595a",
+      "encoded_bytes": 188,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 34
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 32845,
+      "decoded_sha256": "ee836b255fe64fe15a69d124a2b410df7a67c5c56808620aac3d4e4105a31e01",
+      "encoded_bytes": 4120,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 34
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c9d14ce9ea28855601b19956624ee1d7fea26f598d5282d492c1877d3527c021",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 34
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6716000,
+      "decoded_sha256": "0d68eb9962d5b50a198a0097c4b41080c4dfe760403dc653247e6aa47aa2d84c",
+      "encoded_bytes": 1236732,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 35
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "8094ce7505b43a3784301820ea1ac42bb4729efb5634b9ce1c3e2e789daa94ac",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 35
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 69991,
+      "decoded_sha256": "2ce1ee7d3d2f3004a1513001a66ba7c96dfce0f678c7fe31c8e63ac06fbb955c",
+      "encoded_bytes": 7157,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 35
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 112,
+      "decoded_sha256": "d77552663ae4256f32da4a213f685d513d1f79d0c5d4850c5cdb8ae3f8f6aa46",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 35
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6643033,
+      "decoded_sha256": "2df75bd2c70f51e2e5787495e9aec878e327bf93b881c731891735d96ed76291",
+      "encoded_bytes": 1225184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 36
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "d7b9ae6f5d7b5cf194a7a202765d024d7c3c6050a38750314d0c8110f460bce9",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 36
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 34203,
+      "decoded_sha256": "d0151365353d804c9e5eb8dacfce7322e24f2f09eb8974f775a26225d853d5d3",
+      "encoded_bytes": 4390,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 36
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "56f967eff374e3347af3ecbf07d2b2fbc45fbccc5e6cfc0e6ccf7bfd3bc95b96",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 36
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6602046,
+      "decoded_sha256": "9590752d76e9d0743ddea0f92d284d023a3963f621c6de6b4f4921809bf4ebed",
+      "encoded_bytes": 1217521,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 37
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "8aee4e2a94b7244b53800532b263f2e3994885e36d24c11a7f8e5cde8efc9671",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 37
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 26906,
+      "decoded_sha256": "40473fe2b5c0f4a3d1be337b6bc9cd714d6c758fa0ee1029a6410a28359dd6a6",
+      "encoded_bytes": 3679,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 37
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c6407aa88e4401e44627d36026cd818a7808908c429173601d8a864649fedd85",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 37
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6615936,
+      "decoded_sha256": "c8a46ad308dc432fc21db324ed216ad51f7df15d2f277fac1aa98b3e543011af",
+      "encoded_bytes": 1219517,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 38
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "13ff45123c25a66600628f39f0596c0a17ec5e9635e7b333becdb89400d8945a",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 38
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 30828,
+      "decoded_sha256": "a6c4a0f166023359fe85a5157b595abf1390dbbd3bc1646454f303c5cc2073f5",
+      "encoded_bytes": 3685,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 38
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c9d14ce9ea28855601b19956624ee1d7fea26f598d5282d492c1877d3527c021",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 38
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6695907,
+      "decoded_sha256": "6b48c88f1e6d55669161d187933663da698bffef27da86bca1f039dc151024a2",
+      "encoded_bytes": 1234427,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 39
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "97a2a98704b0c4e5fabae490ff07fb450b6a3884d196e1b8595c11576b085436",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 39
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 60232,
+      "decoded_sha256": "cdbc8be4c345759f3d54bc58f36f880d9067277925429356441d7c7f4a043539",
+      "encoded_bytes": 5731,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 39
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 112,
+      "decoded_sha256": "97ef51b310783634cae93ad6f1752f0b853638542263b726c40d1a7b26677e88",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 39
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6528509,
+      "decoded_sha256": "528d21f6d4759663cf562200a9bd3b50c20a7336dc5629e6137493e2c2a9c1eb",
+      "encoded_bytes": 1202658,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 40
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "da5b0a0c8c58cd7d4da288a70ae3b4c47690e7fefc9c440317b2dbc7b842ebe0",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 40
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 21846,
+      "decoded_sha256": "e3ca0772ac1bffd0c10e8a7a2646481b795b820cf2a40f6cf9fe04a57a4bc06f",
+      "encoded_bytes": 2851,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 40
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "2f397c2a29dfee339af18fb5afb4b42a1463d463b04352fc3bab637d5cee5937",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 40
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6539966,
+      "decoded_sha256": "044d71399b37a66c8a313f080d8c6a9ced38beb54a87c56a426a83bf6c6cd471",
+      "encoded_bytes": 1202775,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 41
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "6bf471478dfb6d555ed0effdc83cce9a2acbbac346d7984f5b5abc4a29157a4e",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 41
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 22526,
+      "decoded_sha256": "0ef92088859b5dde73bac611a7234a1c55d7f0151ee8a5d338a52fb5f4522832",
+      "encoded_bytes": 3200,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 41
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "2f397c2a29dfee339af18fb5afb4b42a1463d463b04352fc3bab637d5cee5937",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 41
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6595992,
+      "decoded_sha256": "c2337b625821cf1026c9ca2ee8c5a22c0976f1f9fddd2788c3146864617c2ef1",
+      "encoded_bytes": 1214875,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 42
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "5beacfaa8226cb366998c31ec485335e9b0eb1f12c0c581da9107fcd5d410a06",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 42
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 6991,
+      "decoded_sha256": "55a1b5a31206e4aa50cce89bffd9d51c6b2c5e807a10db0d6d4b7f189ed4464f",
+      "encoded_bytes": 1433,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 42
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "e691da290a09e3cb9d035ec698deaa7e8ad296aadc8b22bb360aae4cac819255",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 42
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6502622,
+      "decoded_sha256": "c35f88858d3f6332ac13c718723e5dfc70b9cd0898d2ad55cea6579a65eed13d",
+      "encoded_bytes": 1197942,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 43
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "2b54316d0efad5ba7bb90c7e0898b1335ded28801dd527f83eb1468c12ef0a58",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 43
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 17173,
+      "decoded_sha256": "91fd2b8f7af7a2d07a260176335eb9ecf15a28311a8bad8d396436de9c2a5c87",
+      "encoded_bytes": 2671,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 43
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "4d8e4b0fa273242a9ebf17712ac550c8effeecead873df977be9fcbda251c262",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 43
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6641380,
+      "decoded_sha256": "1d2a16bccf93c8847e8a7a3f9896150d785dbdb6366d722eacb6f199ecd73cb3",
+      "encoded_bytes": 1222156,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 44
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "2e653b1cbe48c1ea4503a21cf50c62b89838daefdfd54ce69da79240b11c3ca6",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 44
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 23943,
+      "decoded_sha256": "4cb77378050f06c6f891333890afc880437dc440d70fd0f3e92ae6fee6475823",
+      "encoded_bytes": 3553,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 44
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "4298507afeb20b252a34fe8da533f7839bb39a63e9daee2bd9031515558e1af4",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 44
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6680795,
+      "decoded_sha256": "2edaa540af36250fe95e96211877074292d722135ec763127271c86b40efef39",
+      "encoded_bytes": 1229568,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 45
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "975224bc8cc3336a27c7897289da6a1a66779dcdc3f31e425ba8daf3fd9486d1",
+      "encoded_bytes": 187,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 45
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 36979,
+      "decoded_sha256": "0ed57e7b1e8b0e2a3c2b65823554a7f9dc3664c4f48563af6ee150f75a049068",
+      "encoded_bytes": 4178,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 45
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "b228fe85c8afcdaa0ab53cbe7760e11bce648dd657998fd2580d1a2f9fbcee80",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 45
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6576675,
+      "decoded_sha256": "36435b0b3b19fe76535c6caeb53acd8218ee7369351391e055922badce836730",
+      "encoded_bytes": 1211543,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 46
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "d86f6efea53031f69f8a45b8ed3403276b30f9a5445c172fcb6c745bcb17e44d",
+      "encoded_bytes": 183,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 46
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 6604987,
+      "decoded_sha256": "40dd3b6c7bcf7ba65747562b477ea73bd5b907e8bbab106e91ab66fbde6916ae",
+      "encoded_bytes": 1214365,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 47
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "3c57ef7994eb420dca2a429726edb1dd12f9dac654fde022241a9535f6cf7923",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 47
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 11905,
+      "decoded_sha256": "732ed174527e0e196ee8700454a0e8b2a7c3835ee02844e3c29d56d0adff1f91",
+      "encoded_bytes": 2034,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 47
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "b691ef4dc5be30e833eacd744176b2d43a195f49b8681e4a461cd0800b628a62",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 47
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6702107,
+      "decoded_sha256": "8e124518319b4f4b77b88ba6737d34a2e888d1c1b35dd08da17110b3b18b37fc",
+      "encoded_bytes": 1232693,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 48
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "b41b15b33008d6321ed18771dde77f0c9bd0e8e35a6c458baa0479c72316dcb7",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 48
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 17898,
+      "decoded_sha256": "1695948d1931d0632d310b6af57a4b43ebc3a37248fa4cd50ea476f6ca774dd0",
+      "encoded_bytes": 2697,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 48
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "5ef66dece592286d3ffc2924bc0e70194b6e4eb6c4c7c88524a4222ab0f4e91c",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 48
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6566818,
+      "decoded_sha256": "2ea5c941fcf374eb4ac9eeffadb39d05b300def655dd7d1c8196cf9f6cced24a",
+      "encoded_bytes": 1208369,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 49
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "e05c029d31b616d6209fddb50e956b43ebd5bfb1e3ce0002abdc1a53c835c845",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 49
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 6989,
+      "decoded_sha256": "33bfb76dbd03bead9c2428c878e4e3b36586a077274a5460245032849fce9474",
+      "encoded_bytes": 1413,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 49
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "e691da290a09e3cb9d035ec698deaa7e8ad296aadc8b22bb360aae4cac819255",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 49
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6675394,
+      "decoded_sha256": "3adbe4a4f8c24da2acc1c5ef91f004fe8414a1d2a07a7abad012916a3144c21a",
+      "encoded_bytes": 1229122,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 50
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "514d59e00cb3da1ea16fb46758ae332719787548dd269336f5c0a844b7c214ca",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 50
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 42249,
+      "decoded_sha256": "21fcda023d92f5e25ddd498af1e597e67f4d08fe9d9fa4bf04215a1028acbffb",
+      "encoded_bytes": 5529,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 50
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "171496a22949ff2273063f68214f87d8b208cda49a4f4791b7a19f24dc7ff494",
+      "encoded_bytes": 88,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 50
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6609313,
+      "decoded_sha256": "51ced41fae80383aa81a6600a0e4433d637efdce052367e8a96a4fa2867141a6",
+      "encoded_bytes": 1215816,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 51
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "7518494e6bc4a1edd03cd4c09c20febf8240e1bf767afdbb799f5fa80072ae07",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 51
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 8769,
+      "decoded_sha256": "956bdeceeb3aea2978467a100565eb703227b8dd8956fb5a7804f6ef13bfe487",
+      "encoded_bytes": 1700,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 51
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "e691da290a09e3cb9d035ec698deaa7e8ad296aadc8b22bb360aae4cac819255",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 51
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6672765,
+      "decoded_sha256": "57896cdb141d54a7cb8ecc64d2f5288ac55f54ecccf1f5aa5c25e0609650ca54",
+      "encoded_bytes": 1226991,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 52
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "38c1064c2318524e903b044dbe9c7178b6012c56fb7f3539f98d32114897c2c4",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 52
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 19240,
+      "decoded_sha256": "9bcb7760cdad2a6c5779c279357c058b0bb38dac57a8987b37cb488859922e0e",
+      "encoded_bytes": 2779,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 52
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "5ef66dece592286d3ffc2924bc0e70194b6e4eb6c4c7c88524a4222ab0f4e91c",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 52
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6689609,
+      "decoded_sha256": "999809441ef426228f13d76bbc1d2b1cd5159affe861634e89891abf2a7d1708",
+      "encoded_bytes": 1232051,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 53
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "454e650801ccfc414fbf71eab03eefba70f8ad06351cf9261549471c8ecbd9cc",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 53
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 26854,
+      "decoded_sha256": "28779e37fe80342e3697f4ecafdf812081b5bed5317118558f687c43ef278a2a",
+      "encoded_bytes": 3800,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 53
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c6407aa88e4401e44627d36026cd818a7808908c429173601d8a864649fedd85",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 53
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6726983,
+      "decoded_sha256": "ef4edbfad927ad6b91fc71677543ed8ad4fcc0fc35b0a5f301547e320e66b12e",
+      "encoded_bytes": 1237483,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 54
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "fa510c80877a0f62ef5f42ecb5827716ca99003f5e6aefcb8bbc6e93fcf81635",
+      "encoded_bytes": 183,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 54
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 23985,
+      "decoded_sha256": "d4197b2b69fb7f43d7d216f6dadaaaeb2be2c6891c8e57a68ac85c410116e86d",
+      "encoded_bytes": 3202,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 54
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c6407aa88e4401e44627d36026cd818a7808908c429173601d8a864649fedd85",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 54
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6530504,
+      "decoded_sha256": "5729925ec41c817a43ca9694b9edde7f6b8b1f045a3dc44a2ec0262d08f2a763",
+      "encoded_bytes": 1202322,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 55
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "6d7de2a994589654bd6a0c4972c40e7cefbded84a71cd70c8f6b385127ba49a9",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 55
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 9468,
+      "decoded_sha256": "9d394b5a4853da841ec3f0050eedffb5da3e0e9108f6fbffabce95b1ce4697d4",
+      "encoded_bytes": 1773,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 55
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "e691da290a09e3cb9d035ec698deaa7e8ad296aadc8b22bb360aae4cac819255",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 55
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6655495,
+      "decoded_sha256": "585295bac5cccc4b16a704b1519a3bf251a840373ed5dd0e3b41b03313d2c3f0",
+      "encoded_bytes": 1224447,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 56
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "310d0c50669ffaf7eaf0a33d4c9d42be8df511a510becd371eaca80e5e2b9da3",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 56
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 8267,
+      "decoded_sha256": "ca22d943b2a1e43a58b17fe24dd91bced9f3a2ab320f6cbfae44b43c39a01639",
+      "encoded_bytes": 1649,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 56
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "e691da290a09e3cb9d035ec698deaa7e8ad296aadc8b22bb360aae4cac819255",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 56
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6602008,
+      "decoded_sha256": "9d5f8ccc44e938b337ef22af93878869f4004e581b86660552a417569cd8bfea",
+      "encoded_bytes": 1213813,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 57
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "e4fa26a7b5b4454f9632f90dc70d449ab07072d7c0ba3a7fa010feef0cec7dda",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 57
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 27204,
+      "decoded_sha256": "e125ad5ad3c3d1b0649cb478bac1f3a2545ca347f345c75acf66272fcd6a1d52",
+      "encoded_bytes": 3761,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 57
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c6407aa88e4401e44627d36026cd818a7808908c429173601d8a864649fedd85",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 57
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6601557,
+      "decoded_sha256": "cfd5f635118fccb4198df4d8688546a1cb1abbd63448141e2e5e9d6555940df5",
+      "encoded_bytes": 1213477,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 58
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "abc4922fd076a1337c59f497abc5267ebb827a46a7dde8462717f48e2cab79db",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 58
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 25906,
+      "decoded_sha256": "874d7a017e4e23db3ca408677a9036e95a882fcca8d1aff90d9dbcec89c9c878",
+      "encoded_bytes": 3368,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 58
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "c6407aa88e4401e44627d36026cd818a7808908c429173601d8a864649fedd85",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 58
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6569619,
+      "decoded_sha256": "a886e3b4c2aded6b73108da2b1bc5c7b393b4fd2ae2c377ed0052aa3c4f2eaf4",
+      "encoded_bytes": 1208619,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 59
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "b454f163c2d895a218e6d83ee2d8ebb77e1b9844ee243bdc2d2239a1ed9b9850",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 59
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 17377,
+      "decoded_sha256": "15b4534f727fe6c2d2ad1539e0aa4c24de25aa3efb85a04167e19a704d76bcde",
+      "encoded_bytes": 2716,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 59
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "4d8e4b0fa273242a9ebf17712ac550c8effeecead873df977be9fcbda251c262",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 59
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6725253,
+      "decoded_sha256": "72a55dd08de504fdb97130bc434a2da2ae700a67a18abfde29e706c567ce8dd1",
+      "encoded_bytes": 1236144,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 60
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "6063a0feaeef5875c05286d2f7f61ef6295a1a96c3e9434e4be782513efc72b6",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 60
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 14466,
+      "decoded_sha256": "cdb335d363919e78712dbda17ee5cc9bebc7b71090b5df096676d000ef29a5b0",
+      "encoded_bytes": 2167,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 60
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "9e99c08144d09fa14de31ad9b1856644ad19ab5c43bfe856554a76211620d822",
+      "encoded_bytes": 88,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 60
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6690262,
+      "decoded_sha256": "a7f9b5b963fb303b8b4efcaa65e069be2db61368ead4dbfc1fd228cd622b9799",
+      "encoded_bytes": 1230522,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 61
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "5b20475d14f32cb66c84008dbda0f85f34645acc4e44e0eca0a7ec996dbe3bfe",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 61
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 30164,
+      "decoded_sha256": "20a269cb615337a2e006cfa5cdecd83ddd5d2a94b13fc371a93a3f06bd0d37f5",
+      "encoded_bytes": 3438,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 61
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "f163a5914c6986fa1e49e2e70b5e53bbf52010459ae92ca772bb8350ba6ec81f",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 61
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6703470,
+      "decoded_sha256": "538bbd661490e078ead51303b66162d3cf1f5f25cc90a6736b50f0995ae36d1b",
+      "encoded_bytes": 1232046,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 62
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "e7faea5db6dfbd8bcc76c799fcfca392c804db11cd864a680209344d80c11226",
+      "encoded_bytes": 182,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 62
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 22307,
+      "decoded_sha256": "b4fa8727ead9ca0c2877ffb95d79f9c103bb693757fe443d281e1504f61f889b",
+      "encoded_bytes": 3205,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 62
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "2f397c2a29dfee339af18fb5afb4b42a1463d463b04352fc3bab637d5cee5937",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 62
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6588449,
+      "decoded_sha256": "4057bdb7f4a85d2012df7c3fbaaa2517526bfd17b453e7dd2571d27333362f52",
+      "encoded_bytes": 1211474,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 63
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "318be754d4f6a47961a03185011b68f42389e8da6432a572b6e16adcff4ad20c",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 63
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 12508,
+      "decoded_sha256": "a569047b3ef324bc1f722f9e0e8e70991e11f08f726a4818cbb09108f741aa62",
+      "encoded_bytes": 2177,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 63
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "b691ef4dc5be30e833eacd744176b2d43a195f49b8681e4a461cd0800b628a62",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 63
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6629622,
+      "decoded_sha256": "5e1bd32077af09092cd4077ec4ba56acc84148b44430ab739720a470a78b8df8",
+      "encoded_bytes": 1218343,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 64
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "11cee712d24f94890747e91ca2816aa5fc4bd772ae56316e5a48a555e41506d7",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 64
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 22140,
+      "decoded_sha256": "f0ef2514abeb77c11a3b856e5c8048f60292f7c99fad5e7577b5f5ba9596ff19",
+      "encoded_bytes": 3047,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 64
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "2f397c2a29dfee339af18fb5afb4b42a1463d463b04352fc3bab637d5cee5937",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 64
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6672250,
+      "decoded_sha256": "c0edda3fd5a0e3ea18f84c9a342658fb433265dfb573424d4be3168313173186",
+      "encoded_bytes": 1225234,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 65
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "92c02f1b59e8a6e73bee3c5e58a393bfbfb78ceadec63a0e0c3f2b9cc341578d",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 65
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 6600819,
+      "decoded_sha256": "ea63c6a4ff4c23d591a71b7665e146c841e337b8251b8f9cddb1d1881be5c874",
+      "encoded_bytes": 1212562,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 66
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "c03aa0bedc8f8089e42234dca5d9dc8b663f4db24283f413bc34c00ea911e13b",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 66
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 4805,
+      "decoded_sha256": "cac7a668f5076caa1b6f2d93adfbcc323411fb4b8421d56c9751d40950453b54",
+      "encoded_bytes": 1160,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 66
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "ed54dc05bc60700551fce910693deeb8249cb4e0fef58a4b93b64811ebf0c316",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 66
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6796034,
+      "decoded_sha256": "1c0860a0f1f61ec0d0c293f3f6b2742ab6d4798cd8c43cb8638729b511385f8d",
+      "encoded_bytes": 1249000,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 67
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "8a216c4987a5126035357e36e3e10054d8bc2033810e4c4488a538596699102c",
+      "encoded_bytes": 186,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 67
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 18027,
+      "decoded_sha256": "95dfed8e0cad37af0765418c54dab4fdf6f58dad21d756d40e6711137206a720",
+      "encoded_bytes": 2812,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 67
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "4d8e4b0fa273242a9ebf17712ac550c8effeecead873df977be9fcbda251c262",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 67
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6697881,
+      "decoded_sha256": "617adb989c9a6214ea5d50d2291605201589a76f6dab1b306d0aeafe380a0dca",
+      "encoded_bytes": 1230890,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 68
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "77796ef4db5a714a401c594f66f8dc575e146018704cbb15e7c64b19bfbfba97",
+      "encoded_bytes": 185,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 68
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 27415,
+      "decoded_sha256": "8a40c4aa255d0b2f7b8b5184088bd4f1e988b71645df678cb3f74de3c6186e1f",
+      "encoded_bytes": 3474,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 68
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "15bbf8da79d211fd65e23d2f0e0813945fe5c071793d433b9700cc01feed9429",
+      "encoded_bytes": 89,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 68
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 6675645,
+      "decoded_sha256": "33897eec808312047e307c270700f7611fd09d608245a394a5c191852c4278d8",
+      "encoded_bytes": 1226101,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 69
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 280,
+      "decoded_sha256": "26e63775b6ca2b54e713b3a87c2141238f4b9fdb682de2eb0057a24b60561855",
+      "encoded_bytes": 184,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 69
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 8480,
+      "decoded_sha256": "d0aaef1920d5b108d59002a53fe81639f5433580830ab098b7bd7c8d3ac30e53",
+      "encoded_bytes": 1695,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 69
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "e691da290a09e3cb9d035ec698deaa7e8ad296aadc8b22bb360aae4cac819255",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 69
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 923532,
+      "decoded_sha256": "27f42937a50bedc6c8b6edd2f1407d2989c3a6c9dcbb3896ebaa9276a83faa6c",
+      "encoded_bytes": 171058,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 70
+      },
+      "name": "gaia_observations"
+    },
+    {
+      "decoded_bytes": 276,
+      "decoded_sha256": "f4d4a3acd3eea729924b80d6359138b899bea0663ccad1465dbbf8017763a388",
+      "encoded_bytes": 180,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 70
+      },
+      "name": "gaia_selection"
+    },
+    {
+      "decoded_bytes": 4884,
+      "decoded_sha256": "4eb81d787c5ee1a988ffce54653ba833ca98094c5be951fc5e1cf31b5a036603",
+      "encoded_bytes": 1151,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 70
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 110,
+      "decoded_sha256": "ed54dc05bc60700551fce910693deeb8249cb4e0fef58a4b93b64811ebf0c316",
+      "encoded_bytes": 87,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 70
+      },
+      "name": "planet_summary"
+    },
+    {
+      "decoded_bytes": 136267,
+      "decoded_sha256": "845fa68f7cbf74d54eea78a1b7c0852ebf469789b947748dda8e92b1643b2131",
+      "encoded_bytes": 16430,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 71
+      },
+      "name": "ephemerides"
+    },
+    {
+      "decoded_bytes": 111754,
+      "decoded_sha256": "59ab906f8d92c7114a41f5b2006b13ef9648bc8c8ed860d1dbcc7c43bf7630b1",
+      "encoded_bytes": 11633,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 71
+      },
+      "name": "planet_observations"
+    },
+    {
+      "decoded_bytes": 114,
+      "decoded_sha256": "359d9d1b2bd6be53b7cd3aecd5d5b1ef17a31df5174259d09e8450b0897f205e",
+      "encoded_bytes": 92,
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 71
+      },
+      "name": "planet_summary"
+    }
+  ],
+  "source_manifest_sha256": "37820174cb902bcbe234288b5f91e673c2a69aab9728ca1617f6f367c12d9d34",
+  "version": 1
+}

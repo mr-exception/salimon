@@ -47,8 +47,17 @@ def number_equal(actual, expected, context):
 
 def read_blob(pack, blob):
     require(re.fullmatch('[0-9a-f]{64}', blob['sha256']) is not None, 'invalid blob path')
-    data = (pack / 'blobs' / blob['sha256']).read_bytes()
+    require(0 < blob['bytes'] <= 256 * 1024 * 1024, 'blob byte bound')
+    with (pack / 'blobs' / blob['sha256']).open('rb') as stream:
+        data = stream.read(blob['bytes'] + 1)
     require(len(data) == blob['bytes'] and digest(data) == blob['sha256'], 'blob size/hash mismatch')
+    if 'zlib_raw_bytes' in blob:
+        size = blob['zlib_raw_bytes']
+        require(0 < size <= 256 * 1024 * 1024, 'blob decoded byte bound')
+        decoder = zlib.decompressobj()
+        data = decoder.decompress(data, size + 1)
+        require(len(data) == size and decoder.eof and not decoder.unused_data and not decoder.unconsumed_tail,
+                'blob zlib extent/decoded size')
     return data
 
 
@@ -75,8 +84,17 @@ def verify(snapshot, pack):
     source_bytes = (snapshot / 'manifest.json').read_bytes()
     sources = json.loads(source_bytes)
     selection = json.loads((snapshot / 'selection.json').read_bytes())
-    manifest_bytes = (pack / 'manifest.json').read_bytes()
+    with (pack / 'manifest.json').open('rb') as stream:
+        manifest_bytes = stream.read(64 * 1024 * 1024 + 1)
+    require(len(manifest_bytes) <= 64 * 1024 * 1024, 'pack manifest byte bound')
     manifest = json.loads(manifest_bytes)
+    require(manifest['format'] == 'salimon.universe.private-pack' and manifest['version'] in (1, 2), 'pack format/version')
+    if manifest['version'] == 1:
+        require(len(manifest_bytes) <= 16 * 1024 * 1024, 'legacy manifest byte bound')
+        all_blobs = [manifest['source_manifest']]
+        for cell in manifest['cells']:
+            all_blobs.extend([cell['catalog'], *cell['sidecars'].values()])
+        require(not any('zlib_raw_bytes' in b for b in all_blobs), 'compressed blob in legacy pack')
     require(manifest['production_eligible'] is False, 'private scope required')
     require(read_blob(pack, manifest['source_manifest']) == source_bytes, 'source manifest binding')
     source_sizes = {}

@@ -53,7 +53,7 @@ def verify(manifest, production=False, production_review=None):
             path = (root / name).resolve()
             if not path.is_relative_to(root):
                 raise ValueError(f'artifact symlink escapes source root: {name}')
-            if artifact['origin'] not in {'synthetic', 'observed_snapshot'} or artifact['encoding'] not in {'csv', 'json'}:
+            if artifact['origin'] not in {'synthetic', 'observed_snapshot'} or artifact['encoding'] not in {'csv', 'csv_gzip', 'json', 'votable', 'votable_gzip'}:
                 raise ValueError('unknown artifact origin/encoding')
             if production and artifact['origin'] == 'synthetic':
                 raise ValueError('synthetic fixture is not production data')

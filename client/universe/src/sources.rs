@@ -58,6 +58,8 @@ pub enum Origin {
 pub enum Encoding {
     Csv,
     Json,
+    /// Exact TAP response, including field units and query completion status.
+    Votable,
 }
 impl SourceManifest {
     pub fn decode(bytes: &[u8], production: bool) -> Result<Self, Error> {

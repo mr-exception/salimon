@@ -10,6 +10,9 @@ impl GameplaySession {
         if self.paused || self.survival.snapshot().terminal {
             return;
         }
+        if self.inspect_narrative_site() {
+            return;
+        }
         self.enforce_survival_restrictions();
         if self.building.active {
             self.contribute_construction();

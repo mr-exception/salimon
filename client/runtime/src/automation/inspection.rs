@@ -3,6 +3,7 @@ use super::*;
 pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let prediction=app.navigation_prediction().map(|p|json!({"horizon_seconds":p.horizon_seconds,"closest_altitude_meters":p.closest_altitude_meters,"closest_seconds":p.closest_seconds,"contact_window_seconds":p.contact_window_seconds,"convergence_meters":p.convergence_meters,"age_seconds":p.age_seconds,"warning":p.warning}));
     let snapshot = app.snapshot();
+    let narrative = serde_json::json!({"source": app.narrative, "text": app.narrative_text(), "hint": app.narrative_hint()});
     let hud = crate::survival_hud::Observation::capture(app);
     let ship = snapshot.ship;
     let frame = character_ship_frame(ship.pose);
@@ -236,10 +237,11 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["lighting"] = app.light_inspect();
     observation["construction"] = app.construction_inspect();
     observation["ship"]["engines_enabled"] = ship.engines_enabled.into();
+    observation["narrative"] = narrative;
     observation["archive"] =
         json!({"source":app.archive, "open":app.archive_reader.open, "text":app.archive_text()});
     observation["recovery"] = app.recovery_observation();
-    observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
+    observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial_text()});
     observation["scanner"] = scanner;
     observation["chart"] = json!({"source":app.chart.checkpoint(),"mode":app.scanner.chart_mode,"note":app.scanner.chart_note,"entry_count":app.chart.entries().count(),"route_count":app.chart.routes().len()});
     observation["surface_chart"] = json!({"source":app.surface_capture().ok().flatten(),"open":app.surface_chart.open,"editing":app.surface_chart.editing,"hint":app.surface_hint()});

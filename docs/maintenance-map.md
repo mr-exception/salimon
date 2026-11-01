@@ -878,3 +878,8 @@ intake, partial Recovery Module crafting, NativeStore/Checkpoints reload and
 exact-once offline credit. Existing canonical launch/scanner/motion failure tests
 retain their owners. Use the focused integration test and maintained native
 resume/mining routes; [evidence](../reports/issue-439/README.md).
+
+
+## Opening and recovered investigations (#470 / #471)
+
+[Opening/investigation contract](opening-and-investigations.md): runtime `session/narrative.rs` owns complete-packet lead admission, fixed ground-bound physical clues, modal inspections and schema-31 receipts; universe `scanner/chart.rs` owns explicit unverified same-frame route snapshots. Runtime tests, `scripts/verify_narrative.py`, existing canonical mine/carry/Fabricator persistence and production audio exports form the acceptance matrix. Scientific full-Gaia acceptance remains #524.

@@ -45,6 +45,7 @@ impl ClientApplication {
         let presentation = self.session.presentation();
         let render_ship_frame = character_ship_frame(presentation.ship.pose);
         if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(self.session.narrative_geometry());
             scene_instances.extend(scene::construction_wireframes(
                 &self.session,
                 render_ship_frame,
@@ -273,6 +274,7 @@ impl ClientApplication {
             Some(self.condition_feedback.menu_text())
         } else {
             self.pause_menu_text()
+                .or_else(|| self.session.narrative_text())
                 .or_else(|| self.session.archive_text())
                 .or_else(|| self.session.crafting_text())
         };

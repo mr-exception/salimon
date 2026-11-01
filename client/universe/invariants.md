@@ -190,3 +190,8 @@ separates decoder error, source uncertainty, sample coverage and release eligibi
 ## Canonical motion publication (#432)
 
 Motion identity is separate from immutable terrain/resource identity. Unknown model versions/hashes, non-TT epochs and unsupported calendar arithmetic reject atomically. Fixed fictional phase/orientation/spin never become inferred observations. Uniform local game-clock admission is explicitly defined relative to its reference instant, not a general UTC/TT conversion. [Canonical contract](../../docs/universe-offline-propagation.md).
+
+
+## Recovered site routes and Gaia evidence (#470 / #524)
+
+Follow [transmitted-site routes](../../docs/opening-and-investigations.md) for `scanner/chart.rs`: body-local site leads retain uncertainty, explicit route provenance never grants scanner knowledge, and changed/missing provenance fails restore. `sources.rs` also retains exact TAP VOTable artifacts as `votable` encoding. [Gaia ingestion](../../docs/universe-gaia-ingestion.md) maps original-byte acquisition/independent transcription checks and actual production pack measurements; a bounded real sample cannot certify full-release coverage or its budget.

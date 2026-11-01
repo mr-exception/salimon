@@ -165,3 +165,8 @@ are unchanged.
 
 
 Canonical motion #432: [motion publication, game-clock policy and schema-30 frame](../../docs/universe-offline-propagation.md). `src/starting_motion.rs` owns the separate authored circular model; geographic identity remains unchanged.
+
+
+## Recovered site routes and Gaia evidence (#470 / #524)
+
+Follow [transmitted-site routes](../../docs/opening-and-investigations.md) for `scanner/chart.rs`: body-local site leads retain uncertainty, explicit route provenance never grants scanner knowledge, and changed/missing provenance fails restore. `sources.rs` also retains exact TAP VOTable artifacts as `votable` encoding. [Gaia ingestion](../../docs/universe-gaia-ingestion.md) maps original-byte acquisition/independent transcription checks and actual production pack measurements; a bounded real sample cannot certify full-release coverage or its budget.

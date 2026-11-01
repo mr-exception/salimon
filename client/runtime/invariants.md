@@ -925,3 +925,8 @@ motion source; suit field-mark timestamps remain personal active-time metadata.
   Normal startup has no prototype, menu action, unlock or account state. Its
   geometry/camera does not replace or serialize survival source. See
   [the internal contract](../../docs/hall-prototype.md).
+
+
+## Recovered investigations and opening (#470 / #471)
+
+`session/narrative.rs` owns fixed physical Vesper clues, complete-packet lead admission, aimed E inspections and schema-31 receipts. Read the [opening/investigation contract](../../docs/opening-and-investigations.md) before changing it. Never turn transmitted routes, inscriptions or a remembered home into verified history or celestial knowledge. Tests live in `session/narrative/tests.rs`; `scripts/verify_narrative.py` retains production GPU captures from declared fixtures. Existing Core funding, survival and scanner authority remain with their owners.

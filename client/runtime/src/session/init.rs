@@ -28,6 +28,7 @@ impl Default for GameplaySession {
             habitation: Default::default(),
             building: Default::default(),
             archive: Default::default(),
+            narrative: Default::default(),
             recovery: Default::default(),
             archive_reader: Default::default(),
             tutorial: tutorial::Tutorial::dismissed(),

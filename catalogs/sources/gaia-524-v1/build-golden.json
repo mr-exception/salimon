@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "revision": "gaia-524-golden-v1",
+  "source_manifest": "manifest.json",
+  "cells": [
+    {
+      "key": {
+        "galactic": [
+          0,
+          0,
+          0
+        ],
+        "shard": 0
+      },
+      "observed": {
+        "gaia": {
+          "source": "gaia:dr3",
+          "artifact": "golden.csv"
+        },
+        "stellar_cross_matches": [
+          [
+            "gaia_dr3:4472832130942575872",
+            "stellar-golden:barnard"
+          ],
+          [
+            "gaia_dr3:5853498713190525696",
+            "stellar-golden:proxima"
+          ]
+        ]
+      }
+    }
+  ]
+}

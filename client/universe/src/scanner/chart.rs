@@ -45,6 +45,9 @@ pub struct Route {
     pub from: Position,
     pub to: Position,
     pub created_utc_millis: u64,
+    /// A voluntary plan toward a transmitted claim, never a verified arrival.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lead_source: Option<String>,
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct Chart {
@@ -178,6 +181,33 @@ impl Chart {
             from,
             to: position.clone(),
             created_utc_millis: now,
+            lead_source: None,
+        });
+        Ok(())
+    }
+    /// Preserve the exact transmitted coordinates and provenance in a voluntary
+    /// same-frame plan. This does not promote the lead to scanner knowledge.
+    pub fn route_to_lead(
+        &mut self,
+        id: &CatalogId,
+        source: &str,
+        from: Position,
+        now: u64,
+    ) -> Result<(), Error> {
+        let lead = self
+            .get(id)
+            .and_then(|e| e.leads.iter().find(|l| l.source == source))
+            .ok_or_else(|| invalid("route lead unknown"))?;
+        if now < lead.received_utc_millis || self.routes.len() >= MAX_ROUTES {
+            return Err(invalid("chart route clock/capacity"));
+        }
+        lead.position.relative_meters(&from)?;
+        self.routes.push(Route {
+            destination: id.clone(),
+            from,
+            to: lead.position.clone(),
+            created_utc_millis: now,
+            lead_source: Some(source.into()),
         });
         Ok(())
     }
@@ -217,7 +247,11 @@ impl Chart {
                     },
                 )?;
             }
+            let mut sources = std::collections::BTreeSet::new();
             for lead in &entry.leads {
+                if !sources.insert(&lead.source) {
+                    return Err(invalid("duplicate chart lead provenance"));
+                }
                 validate_lead(catalog, &entry.id, lead)?;
                 lead_count += 1;
             }
@@ -229,19 +263,27 @@ impl Chart {
             let entry = chart
                 .get(&route.destination)
                 .ok_or_else(|| invalid("route destination unknown"))?;
-            if entry.observed.is_none() {
-                return Err(invalid("unverified route"));
-            }
+            let earliest = if let Some(source) = &route.lead_source {
+                let lead = entry
+                    .leads
+                    .iter()
+                    .find(|l| &l.source == source)
+                    .ok_or_else(|| invalid("route lead source missing"))?;
+                if route.to != lead.position {
+                    return Err(invalid("route changed transmitted coordinates"));
+                }
+                lead.received_utc_millis
+            } else {
+                entry
+                    .observed
+                    .as_ref()
+                    .ok_or_else(|| invalid("unverified route"))?
+                    .first_seen_utc_millis()
+            };
             validate_position(catalog, &route.destination, &route.from)?;
             validate_position(catalog, &route.destination, &route.to)?;
             route.to.relative_meters(&route.from)?;
-            if route.created_utc_millis
-                < entry
-                    .observed
-                    .as_ref()
-                    .expect("checked observed route")
-                    .first_seen_utc_millis()
-            {
+            if route.created_utc_millis < earliest {
                 return Err(invalid("route predates discovery"));
             }
             chart.routes.push(route);
@@ -251,7 +293,9 @@ impl Chart {
 }
 fn validate_position(catalog: &Catalog, id: &CatalogId, position: &Position) -> Result<(), Error> {
     super::validate_position(catalog, position)?;
-    if !matches!(catalog.get(id), Some(Record::Star(_) | Record::Body(_))) {
+    let site =
+        id.as_str().starts_with("salimon-site:") && matches!(position, Position::BodyLocal { .. });
+    if !site && !matches!(catalog.get(id), Some(Record::Star(_) | Record::Body(_))) {
         return Err(invalid("chart requires celestial identity"));
     }
     Ok(())

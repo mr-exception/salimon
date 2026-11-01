@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "input_rows": 8192,
+  "exact_golden_cross_matches": [
+    {
+      "gaia_dr3_id": "4472832130942575872",
+      "ps_hosts": [
+        "Barnard's star"
+      ],
+      "parallax_mas": "546.975939730948",
+      "parallax_error_mas": "0.040116355"
+    },
+    {
+      "gaia_dr3_id": "5853498713190525696",
+      "ps_hosts": [
+        "Proxima Cen"
+      ],
+      "parallax_mas": "768.0665391873573",
+      "parallax_error_mas": "0.049872905"
+    }
+  ],
+  "source_manifest_sha256": "71469e182fdf07beb96a18152585dfc58083a036ce05e5f3acba8d2ce58905b0",
+  "ps_sha256": "5b12b9d4d5a1771a85754cf448b15e296439246d6f9955780c287f23701826ec",
+  "full_release_complete": false
+}

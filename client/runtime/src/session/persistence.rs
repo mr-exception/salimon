@@ -46,6 +46,8 @@ pub(crate) struct SessionState {
     #[serde(default)]
     archive: Option<super::archive::Archive>,
     #[serde(default)]
+    narrative: Option<super::narrative::State>,
+    #[serde(default)]
     recovery: Option<super::recovery::Recovery>,
     #[serde(default)]
     construction: Option<super::construction::ConstructionSave>,
@@ -94,12 +96,18 @@ impl Validate for SessionState {
                 true,
                 0,
             )?;
-            super::chart::restore(
+            let restored = super::chart::restore(
                 Some(chart.clone()),
                 salimon_persistence::SCHEMA_VERSION,
                 true,
                 &scanner,
             )?;
+            if let Some(recovery) = &self.recovery {
+                super::narrative::validate_leads(&restored, recovery)?;
+            }
+            if let Some(narrative) = &self.narrative {
+                narrative.validate_clock(scanner.utc_millis)?;
+            }
         }
         if let Some(clock) = &self.offline {
             clock.validate()?;
@@ -126,6 +134,9 @@ impl Validate for SessionState {
         }
         if let Some(construction) = &self.construction {
             construction.validate()?;
+        }
+        if let Some(narrative) = &self.narrative {
+            narrative.validate()?;
         }
         if let Some(archive) = &self.archive {
             archive.validate()?;
@@ -172,6 +183,7 @@ impl GameplaySession {
             cargo_door: Some(self.cargo_door.clone()),
             habitation: Some(self.habitation.clone()),
             archive: Some(self.archive.clone()),
+            narrative: Some(self.narrative.clone()),
             recovery: Some(self.recovery.clone()),
             construction: Some(self.building.source.clone()),
             fabrication: salimon_fabrication::FabricationSaveState::capture(
@@ -206,6 +218,7 @@ impl GameplaySession {
         let tutorial = super::tutorial::save::restore(save.state.tutorial, save.schema_version)?;
         let archive = super::archive::save::restore(save.state.archive, save.schema_version)?;
         let recovery = super::recovery::save::restore(save.state.recovery, save.schema_version)?;
+        let narrative = super::narrative::restore(save.state.narrative, save.schema_version)?;
         let construction =
             super::construction::save::restore(save.state.construction, save.schema_version)?;
         let cargo_door = super::cargo::save::restore(save.state.cargo_door, save.schema_version)?;
@@ -250,6 +263,8 @@ impl GameplaySession {
             physical.mining.terrain == salimon_world::terrain::TerrainMode::Canonical,
             &scanner,
         )?;
+        super::narrative::validate_leads(&chart, &recovery)?;
+        narrative.validate_clock(scanner.utc_millis)?;
         let field_marks = super::field_marks::restore(
             save.state.field_marks,
             save.schema_version,
@@ -286,6 +301,7 @@ impl GameplaySession {
             cargo_door,
             habitation,
             archive,
+            narrative,
             recovery,
             tutorial,
             view_mode: ViewMode::Gameplay,
@@ -362,7 +378,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            (self.survival.snapshot().terminal, (self.building.source.projects.jobs().map(|p|(p.id,p.work.completed,p.work.damaged,p.work.stopped,p.work.destroyed)).collect::<Vec<_>>(), (&self.building.source.removed_partitions,((&self.building.source.open_doors,&self.building.source.damage),self.module_checkpoint())))), self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, (&self.archive, (&self.finishes, (&self.lighting,&self.core_upgrades))), ((self.mounts.carried.as_ref().map(|c|c.id), self.mounts.mounts.iter().map(|m|(m.id,m.rail,m.secured)).collect::<Vec<_>>()), self.recovery.checkpoint_events()), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0,self.cabin_checkpoint()))))
+            (self.survival.snapshot().terminal, (self.building.source.projects.jobs().map(|p|(p.id,p.work.completed,p.work.damaged,p.work.stopped,p.work.destroyed)).collect::<Vec<_>>(), (&self.building.source.removed_partitions,((&self.building.source.open_doors,&self.building.source.damage),self.module_checkpoint())))), self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, ((&self.archive, &self.narrative), (&self.finishes, (&self.lighting,&self.core_upgrades))), ((self.mounts.carried.as_ref().map(|c|c.id), self.mounts.mounts.iter().map(|m|(m.id,m.rail,m.secured)).collect::<Vec<_>>()), self.recovery.checkpoint_events()), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0,self.cabin_checkpoint()))))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

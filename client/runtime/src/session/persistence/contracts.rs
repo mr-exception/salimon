@@ -8,6 +8,8 @@ fn schema23_source_restores_to_version24_without_fixture_state_loss() {
     let mut expected: serde_json::Value = serde_json::from_slice(PARENT_SAVE).unwrap();
     expected["schema_version"] = salimon_persistence::SCHEMA_VERSION.into();
     expected["state"]["biology"] = serde_json::json!({"fixture":false,"journal":{"identity":crate::session::biology::catalog(false).identity(),"deltas":[]}});
+    expected["state"]["narrative"] =
+        serde_json::json!({"version":1,"inspected_utc_millis":[null,null]});
     let current = GameplaySession::new_run().save_bytes(100).unwrap();
     assert_eq!(
         serde_json::from_slice::<serde_json::Value>(&current).unwrap(),

@@ -178,3 +178,8 @@ remains sterile; positive sources are explicit fictional geometry fixtures.
 ## Canonical motion schema 30 (#432)
 
 The shared envelope admits version 30. Runtime validates `state.motion` against the exact separate motion publication and migrates earlier canonical sources without changing physical/geographic identities. Existing verified two-slot atomic storage and corruption recovery remain the sole durable publication path. [Contract](../../docs/universe-offline-propagation.md).
+
+
+## Physical narrative receipts (schema 31; #470)
+
+The shared envelope admits schema 31. Runtime owns validated version-1 physical inspection receipts, exact recovered-lead binding and explicit schemas 1–30 migration; the modal reader is transient. Discrete checkpoint detection includes inspection source changes. Storage remains opaque and atomic. See the [opening/save contract](../../docs/opening-and-investigations.md).

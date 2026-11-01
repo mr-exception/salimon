@@ -1863,3 +1863,8 @@ motion source; suit field-mark timestamps remain personal active-time metadata.
 only by the explicit E2E scenario. It maps world-owned bounded layout and capsule
 sweeps into existing production renderer DTOs and is never serialized or used by
 ordinary menus. [Contract and checks](../../docs/hall-prototype.md).
+
+
+## Recovered investigations and opening (#470 / #471)
+
+`session/narrative.rs` owns fixed physical Vesper clues, complete-packet lead admission, aimed E inspections and schema-31 receipts. Read the [opening/investigation contract](../../docs/opening-and-investigations.md) before changing it. Never turn transmitted routes, inscriptions or a remembered home into verified history or celestial knowledge. Tests live in `session/narrative/tests.rs`; `scripts/verify_narrative.py` retains production GPU captures from declared fixtures. Existing Core funding, survival and scanner authority remain with their owners.

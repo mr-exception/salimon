@@ -1,0 +1,350 @@
+{
+  "version": 1,
+  "retrieved_at": "2026-10-31T20:24:49.607255+00:00",
+  "acquisitions": [
+    {
+      "name": "sample",
+      "url": "https://gaia.aip.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votable&QUERY=select+source_id%2Crandom_index%2Cref_epoch%2Cra%2Cra_error%2Cdec%2Cdec_error%2Cparallax%2Cparallax_error%2Cpmra%2Cpmra_error%2Cpmdec%2Cpmdec_error%2Cradial_velocity%2Cradial_velocity_error%2Cruwe%2Cduplicated_source%2Castrometric_params_solved%2Cra_dec_corr%2Cra_parallax_corr%2Cra_pmra_corr%2Cra_pmdec_corr%2Cdec_parallax_corr%2Cdec_pmra_corr%2Cdec_pmdec_corr%2Cparallax_pmra_corr%2Cparallax_pmdec_corr%2Cpmra_pmdec_corr%2Cphot_g_mean_mag+from+gaiadr3.gaia_source+where+random_index+%3C+8192+order+by+source_id&MAXREC=8194",
+      "query": "select source_id,random_index,ref_epoch,ra,ra_error,dec,dec_error,parallax,parallax_error,pmra,pmra_error,pmdec,pmdec_error,radial_velocity,radial_velocity_error,ruwe,duplicated_source,astrometric_params_solved,ra_dec_corr,ra_parallax_corr,ra_pmra_corr,ra_pmdec_corr,dec_parallax_corr,dec_pmra_corr,dec_pmdec_corr,parallax_pmra_corr,parallax_pmdec_corr,pmra_pmdec_corr,phot_g_mean_mag from gaiadr3.gaia_source where random_index < 8192 order by source_id",
+      "rows": 8192,
+      "fields": [
+        {
+          "name": "source_id",
+          "ucd": "meta.id;meta.main;meta.ref",
+          "ID": "datalinkID",
+          "datatype": "long"
+        },
+        {
+          "name": "random_index",
+          "ucd": "meta.code",
+          "datatype": "long"
+        },
+        {
+          "name": "ref_epoch",
+          "unit": "yr",
+          "ucd": "meta.ref;time.epoch",
+          "datatype": "double"
+        },
+        {
+          "name": "ra",
+          "unit": "deg",
+          "ucd": "pos.eq.ra;meta.main",
+          "datatype": "double"
+        },
+        {
+          "name": "ra_error",
+          "unit": "mas",
+          "ucd": "stat.error;pos.eq.ra",
+          "datatype": "float"
+        },
+        {
+          "name": "dec",
+          "unit": "deg",
+          "ucd": "pos.eq.dec;meta.main",
+          "datatype": "double"
+        },
+        {
+          "name": "dec_error",
+          "unit": "mas",
+          "ucd": "stat.error;pos.eq.dec",
+          "datatype": "float"
+        },
+        {
+          "name": "parallax",
+          "unit": "mas",
+          "ucd": "pos.parallax.trig",
+          "datatype": "double"
+        },
+        {
+          "name": "parallax_error",
+          "unit": "mas",
+          "ucd": "stat.error;pos.parallax.trig",
+          "datatype": "float"
+        },
+        {
+          "name": "pmra",
+          "unit": "mas.yr**-1",
+          "ucd": "pos.pm;pos.eq.ra",
+          "datatype": "double"
+        },
+        {
+          "name": "pmra_error",
+          "unit": "mas.yr**-1",
+          "ucd": "stat.error;pos.pm;pos.eq.ra",
+          "datatype": "float"
+        },
+        {
+          "name": "pmdec",
+          "unit": "mas.yr**-1",
+          "ucd": "pos.pm;pos.eq.dec",
+          "datatype": "double"
+        },
+        {
+          "name": "pmdec_error",
+          "unit": "mas.yr**-1",
+          "ucd": "stat.error;pos.pm;pos.eq.dec",
+          "datatype": "float"
+        },
+        {
+          "name": "radial_velocity",
+          "unit": "km.s**-1",
+          "ucd": "spect.dopplerVeloc.opt;em.opt.I",
+          "datatype": "float"
+        },
+        {
+          "name": "radial_velocity_error",
+          "unit": "km.s**-1",
+          "ucd": "stat.error;spect.dopplerVeloc.opt;em.opt.I",
+          "datatype": "float"
+        },
+        {
+          "name": "ruwe",
+          "ucd": "stat.error",
+          "datatype": "float"
+        },
+        {
+          "name": "duplicated_source",
+          "ucd": "meta.code.status",
+          "datatype": "boolean"
+        },
+        {
+          "name": "astrometric_params_solved",
+          "ucd": "meta.number",
+          "datatype": "short"
+        },
+        {
+          "name": "ra_dec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "ra_parallax_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "ra_pmra_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "ra_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "dec_parallax_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "dec_pmra_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "dec_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "parallax_pmra_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "parallax_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "pmra_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "phot_g_mean_mag",
+          "unit": "mag",
+          "ucd": "phot.mag;em.opt",
+          "datatype": "float"
+        }
+      ],
+      "csv_transcription": "TABLEDATA strings in source FIELD order; missing TD remains empty; no numeric reformatting"
+    },
+    {
+      "name": "golden",
+      "url": "https://gaia.aip.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votable&QUERY=select+source_id%2Crandom_index%2Cref_epoch%2Cra%2Cra_error%2Cdec%2Cdec_error%2Cparallax%2Cparallax_error%2Cpmra%2Cpmra_error%2Cpmdec%2Cpmdec_error%2Cradial_velocity%2Cradial_velocity_error%2Cruwe%2Cduplicated_source%2Castrometric_params_solved%2Cra_dec_corr%2Cra_parallax_corr%2Cra_pmra_corr%2Cra_pmdec_corr%2Cdec_parallax_corr%2Cdec_pmra_corr%2Cdec_pmdec_corr%2Cparallax_pmra_corr%2Cparallax_pmdec_corr%2Cpmra_pmdec_corr%2Cphot_g_mean_mag+from+gaiadr3.gaia_source+where+source_id+in+%284472832130942575872%2C5853498713190525696%29+order+by+source_id&MAXREC=8194",
+      "query": "select source_id,random_index,ref_epoch,ra,ra_error,dec,dec_error,parallax,parallax_error,pmra,pmra_error,pmdec,pmdec_error,radial_velocity,radial_velocity_error,ruwe,duplicated_source,astrometric_params_solved,ra_dec_corr,ra_parallax_corr,ra_pmra_corr,ra_pmdec_corr,dec_parallax_corr,dec_pmra_corr,dec_pmdec_corr,parallax_pmra_corr,parallax_pmdec_corr,pmra_pmdec_corr,phot_g_mean_mag from gaiadr3.gaia_source where source_id in (4472832130942575872,5853498713190525696) order by source_id",
+      "rows": 2,
+      "fields": [
+        {
+          "name": "source_id",
+          "ucd": "meta.id;meta.main;meta.ref",
+          "ID": "datalinkID",
+          "datatype": "long"
+        },
+        {
+          "name": "random_index",
+          "ucd": "meta.code",
+          "datatype": "long"
+        },
+        {
+          "name": "ref_epoch",
+          "unit": "yr",
+          "ucd": "meta.ref;time.epoch",
+          "datatype": "double"
+        },
+        {
+          "name": "ra",
+          "unit": "deg",
+          "ucd": "pos.eq.ra;meta.main",
+          "datatype": "double"
+        },
+        {
+          "name": "ra_error",
+          "unit": "mas",
+          "ucd": "stat.error;pos.eq.ra",
+          "datatype": "float"
+        },
+        {
+          "name": "dec",
+          "unit": "deg",
+          "ucd": "pos.eq.dec;meta.main",
+          "datatype": "double"
+        },
+        {
+          "name": "dec_error",
+          "unit": "mas",
+          "ucd": "stat.error;pos.eq.dec",
+          "datatype": "float"
+        },
+        {
+          "name": "parallax",
+          "unit": "mas",
+          "ucd": "pos.parallax.trig",
+          "datatype": "double"
+        },
+        {
+          "name": "parallax_error",
+          "unit": "mas",
+          "ucd": "stat.error;pos.parallax.trig",
+          "datatype": "float"
+        },
+        {
+          "name": "pmra",
+          "unit": "mas.yr**-1",
+          "ucd": "pos.pm;pos.eq.ra",
+          "datatype": "double"
+        },
+        {
+          "name": "pmra_error",
+          "unit": "mas.yr**-1",
+          "ucd": "stat.error;pos.pm;pos.eq.ra",
+          "datatype": "float"
+        },
+        {
+          "name": "pmdec",
+          "unit": "mas.yr**-1",
+          "ucd": "pos.pm;pos.eq.dec",
+          "datatype": "double"
+        },
+        {
+          "name": "pmdec_error",
+          "unit": "mas.yr**-1",
+          "ucd": "stat.error;pos.pm;pos.eq.dec",
+          "datatype": "float"
+        },
+        {
+          "name": "radial_velocity",
+          "unit": "km.s**-1",
+          "ucd": "spect.dopplerVeloc.opt;em.opt.I",
+          "datatype": "float"
+        },
+        {
+          "name": "radial_velocity_error",
+          "unit": "km.s**-1",
+          "ucd": "stat.error;spect.dopplerVeloc.opt;em.opt.I",
+          "datatype": "float"
+        },
+        {
+          "name": "ruwe",
+          "ucd": "stat.error",
+          "datatype": "float"
+        },
+        {
+          "name": "duplicated_source",
+          "ucd": "meta.code.status",
+          "datatype": "boolean"
+        },
+        {
+          "name": "astrometric_params_solved",
+          "ucd": "meta.number",
+          "datatype": "short"
+        },
+        {
+          "name": "ra_dec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "ra_parallax_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "ra_pmra_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "ra_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "dec_parallax_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "dec_pmra_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "dec_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "parallax_pmra_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "parallax_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "pmra_pmdec_corr",
+          "ucd": "stat.correlation",
+          "datatype": "float"
+        },
+        {
+          "name": "phot_g_mean_mag",
+          "unit": "mag",
+          "ucd": "phot.mag;em.opt",
+          "datatype": "float"
+        }
+      ],
+      "csv_transcription": "TABLEDATA strings in source FIELD order; missing TD remains empty; no numeric reformatting"
+    }
+  ],
+  "golden_identifications": {
+    "4472832130942575872": "Barnard’s Star",
+    "5853498713190525696": "Proxima Centauri"
+  },
+  "private_authorization": "https://github.com/mr-exception/salimon/issues/524",
+  "full_release_complete": false
+}

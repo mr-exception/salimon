@@ -128,7 +128,7 @@ export function App() {
     const resume=()=>{previous=performance.now()}
     document.addEventListener('visibilitychange',resume)
     const animate=(now:number)=>{
-      const dt=document.hidden?0:(now-previous)/1000;previous=now
+      const dt=document.hidden?0:Math.max(0,now-previous)/1000;previous=now
       clock.current.state=changeThrottle(clock.current.state,throttleRef.current)
       const p=clock.current.advance(dt,controls.current)
       setAligning(p.alignment!==null)

@@ -26,3 +26,8 @@ and validation commands. Relative guide links resolve in this checkout.
 Remaining planned scope: indexed scanner #728, collision #729, browser/input and
 CI hardening #730. Catalog remains illustrative, energy infinite, no gravity,
 Core integration, planetary scene, native/hardware qualification or performance claim.
+
+A subsequent scanner browser probe exposed an initial/visibility rAF timestamp
+that could precede `performance.now()`. The presentation adapter now clamps that
+negative elapsed interval to zero (the domain still rejects negative time).
+The focused real-browser startup/pulse check passed after the correction.

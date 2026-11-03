@@ -9,18 +9,41 @@ on:
     branches: [main]
     paths:
       - 'client/**'
+      - '.github/workflows/navigation-client.yml'
+
+concurrency:
+  group: navigation-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install dependencies
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install locked dependencies
         working-directory: client
-        run: npm install --no-audit --no-fund
-      - name: Build
+        run: npm ci --no-audit --no-fund
+      - name: Domain and integration tests
+        working-directory: client
+        run: npm test
+      - name: Build and typecheck
         working-directory: client
         run: npm run build
+      - name: Install Chromium
+        working-directory: client
+        run: npx playwright install --with-deps chromium
+      - name: Desktop, mobile and production WebGL checks
+        working-directory: client
+        run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: navigation-evidence-${{ github.sha }}
+          path: client/test-results/
+          retention-days: 14

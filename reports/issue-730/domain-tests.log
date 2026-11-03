@@ -1,0 +1,32 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts
+
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (1.88035ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (0.281453ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.396051ms)
+✔ rotation changes impact-relative velocity and destruction decision (0.909735ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (1.369921ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (0.435029ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (0.759524ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (1.358484ms)
+✔ independent key and pointer owners release without clearing another held input (1.748517ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (0.869276ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (7.918143ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (0.399537ms)
+✔ large catalog query matches independent brute force without global precision loss (40.979361ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (16.198858ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (0.382882ms)
+✔ presentation count is bounded by viewport cells, not catalog length (35.362167ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (1.852669ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (2.525167ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (1.045335ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (1.658735ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 539.232073

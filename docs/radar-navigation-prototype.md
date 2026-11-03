@@ -40,7 +40,7 @@ The prototype must not silently masquerade as the original native gameplay. Its 
 
 ## Migration/engineering follow-ups
 
-Keep sample simulation separate from rendering. Split coordinates, ship-relative conversion and impulse/mass motion are implemented for the browser ship. `scanner.ts` now indexes immutable catalog bodies into integer 32-cell buckets. It queries the inclusive 100,000 ls sphere on ticks 300, 600, etc.; first contact publication waits five simulation seconds. Between pulses it only evicts out-of-range contacts, including selection, without recording history. `radar.ts` projects these contacts through the actual orthographic frustum. One symbol/edge button per 44 px bin bounds presentation; grouping retains every ID and exposes paged selection (32 rows). Edge markers use frustum clipping, never radial zoom approximations. The grid translates along a fixed galactic lattice. `navigationRuntime.ts` composes ship/contact/scanner transitions on every fixed step. Remaining work includes epoch-aware body positions, browser/input accessibility tests and eventual native-domain migration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.
+Keep sample simulation separate from rendering. Split coordinates, ship-relative conversion and impulse/mass motion are implemented for the browser ship. `scanner.ts` now indexes immutable catalog bodies into integer 32-cell buckets. It queries the inclusive 100,000 ls sphere on ticks 300, 600, etc.; first contact publication waits five simulation seconds. Between pulses it only evicts out-of-range contacts, including selection, without recording history. `radar.ts` projects these contacts through the actual orthographic frustum. One symbol/edge button per 44 px bin bounds presentation; grouping retains every ID and exposes paged selection (32 rows). Edge markers use frustum clipping, never radial zoom approximations. The grid translates along a fixed galactic lattice. `navigationRuntime.ts` composes ship/contact/scanner transitions on every fixed step. `input.ts` owns held-input sources and hidden/resume frame timing. Automated unit/integration and desktop/mobile/production browser checks are in place, alongside labelled keyboard-accessible controls and paged contact search. Remaining migration work includes epoch-aware body positions and eventual native-domain integration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.
 
 ## Browser physical contact (#729)
 
@@ -68,3 +68,22 @@ warnings appear, prioritized by severity/distance. They neither steer nor modify
 thrust. Collision still applies to physical bodies before scanner discovery.
 The current sample has five collision candidates; the scanner's large-catalog
 index does not imply a galaxy-scale collision performance qualification.
+
+## Browser controls and cloud validation (#730)
+
+Focus the radar for W/A/S/D and Space; form controls keep native typing/slider
+behavior. Hold labelled direction buttons using pointer, Space or Enter.
+Pointer up/cancel/capture loss, key release, blur, visibility changes and resize
+release the relevant held sources. Hidden-page intervals are paused and resume
+without elapsed-time catchup. Multiple pointer/key owners remain independent.
+
+The searchable scanned-contact picker and overlap menu expose at most 32 rows
+per page, preserving every detected ID. Camera zoom/reset buttons work from
+keyboard and touch without changing ship state. Live scan, selected target,
+warning and flight status have explicit text. Throttle exposes a labelled signed
+percentage and coast/forward/reverse description; non-flight controls disable.
+
+Use `npm ci`, `npm test`, `npm run build` and `npm run test:browser` in `client/`.
+The Playwright configuration starts isolated dev and production-preview servers,
+executes serially on actual software WebGL and retains screenshots/raw results.
+CI repeats these checks against the current PR head with lockfile caching.

@@ -5,8 +5,9 @@ import * as THREE from 'three'
 import { SAMPLE_BODIES, length, normal, type Body, type Vec3 } from './sampleUniverse'
 
 import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
-import { alignTo, forward, idleControls, setThrottle as changeThrottle, type Controls, type ShipState } from './simulation.ts'
+import { alignTo, forward, setThrottle as changeThrottle, type ShipState } from './simulation.ts'
 type Pose = ShipState
+import { NavigationInput, FrameTimer, acceptsFlightShortcut, axisForCode, type Axis } from './input.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { distances, navigationWarnings } from './contact.ts'
 import { radarGroups, gridOffsetLs, type ContactGroup } from './radar.ts'
@@ -14,7 +15,8 @@ const VISIBLE_RADIUS = 900
 const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
 const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
-function CameraControls({ onViewRadius }: { onViewRadius: (value: number) => void }) {
+type ViewCommand={action:'reset'|'in'|'out';sequence:number}
+function CameraControls({ onViewRadius, command }: { onViewRadius: (value: number) => void; command:ViewCommand }) {
   const { camera, gl } = useThree()
   const controlsRef = useRef<OrbitControls|null>(null)
   useEffect(() => {
@@ -37,6 +39,13 @@ function CameraControls({ onViewRadius }: { onViewRadius: (value: number) => voi
     sync()
     return () => { controls.removeEventListener('change',sync); controls.dispose();controlsRef.current=null }
   },[camera,gl,onViewRadius])
+  useEffect(()=>{
+    if(!(camera instanceof THREE.OrthographicCamera))return
+    if(command.action==='reset'){camera.position.set(200000,125000,200000);camera.lookAt(0,0,0);camera.zoom=0.5}
+    else camera.zoom=THREE.MathUtils.clamp(camera.zoom*(command.action==='in'?1.5:1/1.5),0.001,30)
+    camera.updateProjectionMatrix();controlsRef.current?.update()
+    onViewRadius((camera.top-camera.bottom)/(2*camera.zoom))
+  },[camera,command,onViewRadius])
   useFrame(() => controlsRef.current?.update())
   return null
 }
@@ -58,7 +67,7 @@ function Contact({ body, position, selected, onSelect }: { body: Body; position:
     </mesh>}
   </group>
 }
-function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void }) {
+function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:ViewCommand }) {
   const { camera, size } = useThree()
   const [groups,updateGroups]=useState<ContactGroup[]>([])
   const elapsed = useRef(0)
@@ -76,7 +85,7 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
   const heading = forward(pose.yaw,pose.pitch)
   return <>
     <color attach="background" args={['#060f19']}/>
-    <CameraControls onViewRadius={setViewRadius} />
+    <CameraControls onViewRadius={setViewRadius} command={viewCommand} />
     <gridHelper args={[spacing*100,100,'#2a6b79','#183645']} position={[gridOffset[0],0,gridOffset[2]]} />
     <axesHelper args={[65]}/>
     <group rotation={[pose.pitch,pose.yaw,0]} rotation-order="YXZ">
@@ -101,7 +110,12 @@ export function App({navigation}:{navigation?:NavigationRuntime}={}) {
   const [viewRadius,setViewRadius]=useState(VISIBLE_RADIUS)
   const [pulse,setPulse]=useState(0)
   const [aligning,setAligning]=useState(false)
-  const controls=useRef<Controls>(idleControls())
+  const input=useRef(new NavigationInput())
+  const [held,setHeld]=useState(input.current.controls)
+  const [paused,setPaused]=useState(document.hidden)
+  const [viewCommand,setViewCommand]=useState<ViewCommand>({action:'reset',sequence:0})
+  const [contactPage,setContactPage]=useState(0)
+  const [contactQuery,setContactQuery]=useState('')
 
   const throttleRef=useRef(throttle)
 
@@ -112,35 +126,39 @@ export function App({navigation}:{navigation?:NavigationRuntime}={}) {
     if(g.bodies.length===1){runtime.current.scanner.select(g.bodies[0].id);setSelected(runtime.current.scanner.selected);setMenu([])}
     else {setMenu(g.bodies.map(b=>b.id));setMenuPage(0)}
   },[])
+  const cancelAlignment=()=>{runtime.current.clock.state={...runtime.current.clock.state,alignment:null};setAligning(false)}
   useEffect(()=>{
+    const clear=()=>{input.current.clear();setHeld(input.current.controls);cancelAlignment()}
     const onKeyDown=(e:KeyboardEvent)=>{
-      const key=e.key.toLowerCase()
-      const axis=({w:'up',s:'down',a:'left',d:'right'} as const)[key as 'w'|'s'|'a'|'d']
-      if(axis && !e.repeat){controls.current[axis]=true;runtime.current.clock.state={...runtime.current.clock.state,alignment:null};setAligning(false);e.preventDefault()}
-      if(e.code==='Space' && !e.repeat){setThrottle(0);e.preventDefault()}
+      if(!acceptsFlightShortcut(e.target)||e.altKey||e.ctrlKey||e.metaKey)return
+      const axis=axisForCode(e.code)
+      if(axis){input.current.press(`key:${e.code}`,axis);cancelAlignment();e.preventDefault()}
+      if(e.code==='Space' && !e.repeat){throttleRef.current=0;setThrottle(0);e.preventDefault()}
     }
-    const onKeyUp=(e:KeyboardEvent)=>{const axis=({w:'up',s:'down',a:'left',d:'right'} as const)[e.key.toLowerCase() as 'w'|'s'|'a'|'d'];if(axis) controls.current[axis]=false}
-    const blur=()=>{controls.current={up:false,down:false,left:false,right:false}}
-    window.addEventListener('keydown',onKeyDown)
-    window.addEventListener('keyup',onKeyUp)
-    window.addEventListener('blur',blur)
-    return ()=>{window.removeEventListener('keydown',onKeyDown);window.removeEventListener('keyup',onKeyUp);window.removeEventListener('blur',blur)}
+    const onKeyUp=(e:KeyboardEvent)=>input.current.release(`key:${e.code}`)
+    const visibility=()=>{clear();setPaused(document.hidden)}
+    const focus=(e:FocusEvent)=>{if(!acceptsFlightShortcut(e.target))input.current.releasePrefix('key:')}
+    window.addEventListener('keydown',onKeyDown);window.addEventListener('keyup',onKeyUp)
+    window.addEventListener('blur',clear);window.addEventListener('resize',clear);window.addEventListener('focusin',focus)
+    document.addEventListener('visibilitychange',visibility)
+    return ()=>{window.removeEventListener('keydown',onKeyDown);window.removeEventListener('keyup',onKeyUp);window.removeEventListener('blur',clear);window.removeEventListener('resize',clear);window.removeEventListener('focusin',focus);document.removeEventListener('visibilitychange',visibility)}
   },[])
   useEffect(()=>{
     let frame=0
-    let previous=performance.now()
+    const timer=new FrameTimer(performance.now())
     let accumulator=0
-    const resume=()=>{previous=performance.now()}
+    const resume=()=>timer.resume(performance.now())
     document.addEventListener('visibilitychange',resume)
     const animate=(now:number)=>{
-      const dt=document.hidden?0:Math.max(0,now-previous)/1000;previous=now
+      const dt=timer.sample(now,document.hidden)
+      if(document.hidden){frame=requestAnimationFrame(animate);return}
       runtime.current.clock.state=changeThrottle(runtime.current.clock.state,throttleRef.current)
-      const p=runtime.current.advance(dt,controls.current)
+      const p=runtime.current.advance(dt,input.current.controls)
       if(p.mode!=='flying'){throttleRef.current=0;setThrottle(0)}
       setAligning(p.alignment!==null)
       accumulator+=dt
       if(accumulator>=0.08){
-        setPose(p);setContacts(runtime.current.scanner.contacts);setSelected(runtime.current.scanner.selected);setPulse(runtime.current.scanner.pulse);accumulator=0
+        setHeld(input.current.controls);setPose(p);setContacts(runtime.current.scanner.contacts);setSelected(runtime.current.scanner.selected);setPulse(runtime.current.scanner.pulse);accumulator=0
       }
       frame=requestAnimationFrame(animate)
     }
@@ -156,27 +174,43 @@ export function App({navigation}:{navigation?:NavigationRuntime}={}) {
     runtime.current.clock.state=alignTo(runtime.current.clock.state,relativeM(target.position,runtime.current.clock.state.position))
     setAligning(true)
   }
-  const hold=(axis:keyof Controls)=>({
-    onPointerDown:(event:import('react').PointerEvent<HTMLButtonElement>)=>{event.currentTarget.setPointerCapture(event.pointerId);controls.current[axis]=true;runtime.current.clock.state={...runtime.current.clock.state,alignment:null};setAligning(false)},
-    onPointerUp:()=>{controls.current[axis]=false},
-    onPointerCancel:()=>{controls.current[axis]=false},
-    onLostPointerCapture:()=>{controls.current[axis]=false}
+  const hold=(axis:Axis)=>({
+    disabled:pose.mode!=='flying',
+    'aria-pressed':held[axis],
+    onPointerDown:(event:import('react').PointerEvent<HTMLButtonElement>)=>{
+      if(event.button!==0)return
+      event.currentTarget.setPointerCapture(event.pointerId);input.current.press(`pointer:${event.pointerId}`,axis);cancelAlignment()
+    },
+    onPointerUp:(event:import('react').PointerEvent<HTMLButtonElement>)=>input.current.release(`pointer:${event.pointerId}`),
+    onPointerCancel:(event:import('react').PointerEvent<HTMLButtonElement>)=>input.current.release(`pointer:${event.pointerId}`),
+    onLostPointerCapture:(event:import('react').PointerEvent<HTMLButtonElement>)=>input.current.release(`pointer:${event.pointerId}`),
+    onKeyDown:(event:import('react').KeyboardEvent<HTMLButtonElement>)=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();input.current.press(`button:${axis}:${event.code}`,axis);cancelAlignment()}},
+    onKeyUp:(event:import('react').KeyboardEvent<HTMLButtonElement>)=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();input.current.release(`button:${axis}:${event.code}`)}},
+    onBlur:()=>input.current.releasePrefix(`button:${axis}:`),
+    onClick:(event:import('react').MouseEvent<HTMLButtonElement>)=>{if(event.detail===0){input.current.press(`activate:${axis}`,axis);cancelAlignment();setTimeout(()=>input.current.release(`activate:${axis}`),150)}}
   })
-  const restart=()=>{runtime.current.reset();throttleRef.current=0;setThrottle(0);controls.current=idleControls();setPose(runtime.current.clock.state);setContacts([]);setSelected(null);setGroups([]);setMenu([]);setAligning(false);setPulse(0)}
+  const restart=()=>{runtime.current.reset();throttleRef.current=0;setThrottle(0);input.current.clear();setHeld(input.current.controls);setPose(runtime.current.clock.state);setContacts([]);setSelected(null);setGroups([]);setMenu([]);setMenuPage(0);setContactQuery('');setContactPage(0);setAligning(false);setPulse(0)}
+  const filteredContacts=contacts.filter(b=>b.name.toLowerCase().includes(contactQuery.toLowerCase()))
+  const contactPages=Math.max(1,Math.ceil(filteredContacts.length/32))
+  const page=Math.min(contactPage,contactPages-1)
+  const pageContacts=filteredContacts.slice(page*32,(page+1)*32)
+  const view=(action:ViewCommand['action'])=>setViewCommand(c=>({action,sequence:c.sequence+1}))
   const warnings=navigationWarnings(pose,contacts)
   const targetDistances=target?distances(pose,target):null
   const distance=target?length(relativeM(target.position,pose.position))/LIGHT_SECOND_M:null
-  return <div className="app">
-    <div className="radar">
-      <Canvas orthographic camera={RADAR_CAMERA}>
-        <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable}/>
+  return <div className="app" data-mode={pose.mode}>
+    <div className="radar" role="region" aria-label="Navigation radar" aria-describedby="navigation-help" tabIndex={0} onPointerDown={e=>{if(e.target instanceof HTMLCanvasElement)e.currentTarget.focus({preventScroll:true})}}>
+      <Canvas orthographic camera={RADAR_CAMERA} onCreated={({gl})=>{gl.domElement.setAttribute('aria-label','Ship-centered three-dimensional radar');gl.domElement.setAttribute('role','img')}} fallback={<p role="alert">WebGL is unavailable. A WebGL 2 browser is required.</p>}>
+        <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
-      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" style={{left:g.x+'%',top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
+      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
       <div className="legend">▲ HEADING <span>◆ VELOCITY</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
     </div>
     <aside>
       <h1>NAVIGATION</h1><p className="muted">Navigation-only prototype · unlimited energy</p>
+      <p className="scan-status" role="status" aria-live="polite">{paused?'Navigation paused while hidden':pulse===0?'Scanner: awaiting first five-second pulse':`Scanner pulse ${pulse}: ${contacts.length} temporary contacts`}</p>
+      <div className="stat"><span>Total ship mass</span><strong>{fmt(pose.massKg)} kg</strong></div>
       <div className="stat"><span>Relative position</span><strong>{pose.position.offsetM.map(fmt).join(' / ')} m (cell local)</strong></div>
       <div className="stat"><span>Speed (sample inertial frame)</span><strong>{fmt(length(pose.velocityMps))} m/s</strong></div>
       <div className="stat"><span>Yaw / pitch</span><strong>{radians(pose.yaw)}° / {radians(pose.pitch)}°</strong></div>
@@ -186,9 +220,18 @@ export function App({navigation}:{navigation?:NavigationRuntime}={}) {
         {pose.mode==='destroyed'?'Journey ended — ship destroyed':pose.contact.outcome==='safe-contact'?'Safe surface contact':'Crash recovery'} · impact {fmt(pose.contact.impactSpeedMps)} m/s
         {(pose.mode==='destroyed'||pose.mode==='grounded') && <button onClick={restart}>Restart navigation</button>}
       </div>}
-      <div className="warnings" role="status">{warnings.map(w=><p key={w.id}>{w.message}</p>)}</div>
+      <div className="warnings" role="status" aria-label="Navigation warnings">{warnings.length===0?<p>No navigation warnings</p>:warnings.map(w=><p key={w.id}>{w.message}</p>)}</div>
       <hr/>
       <h2>Contact</h2>
+      <p role="status" aria-live="polite" className="target-status">{target?`Selected target: ${target.name}`:'No selected target'}</p>
+      <label htmlFor="contact-search">Find scanned contacts</label>
+      <input id="contact-search" type="search" value={contactQuery} onChange={e=>{setContactQuery(e.target.value);setContactPage(0)}}/>
+      <label htmlFor="contact-select">Scanned contacts ({contacts.length})</label>
+      <select id="contact-select" value={pageContacts.some(b=>b.id===selected)?selected??'':''} onChange={e=>{if(e.target.value)select(e.target.value)}}>
+        <option value="">Choose a contact</option>
+        {pageContacts.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+      </select>
+      {contactPages>1 && <div className="contact-pages"><button disabled={page===0} onClick={()=>setContactPage(page-1)}>Previous scanned contacts</button><span>{page+1}/{contactPages}</span><button disabled={page+1===contactPages} onClick={()=>setContactPage(page+1)}>Next scanned contacts</button></div>}
       {menuBodies.length>0 && <div className="contact-menu" aria-label="Grouped contacts">
         <p>{menuBodies.length} contacts · page {menuPage+1}</p>
         {menuBodies.slice(menuPage*32,(menuPage+1)*32).map(b=><button key={b.id} onClick={()=>select(b.id)}>{b.name}</button>)}
@@ -198,13 +241,14 @@ export function App({navigation}:{navigation?:NavigationRuntime}={}) {
       {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><p className="muted">Surface clearance {fmt(targetDistances?.surfaceDistanceM??0)} m</p><button className="action" disabled={pose.mode!=='flying'} onClick={setDirection}>Set direction</button></>:<p className="muted">Select a holographic contact or edge marker.</p>}
       <hr/>
       <h2>Manual orientation</h2>
-      <div className="pad"><button {...hold('up')}>↑</button><div><button {...hold('left')}>←</button><button {...hold('down')}>↓</button><button {...hold('right')}>→</button></div></div>
-      <p className="muted">Hold W/A/S/D or buttons. Camera drag is independent.</p>
+      <div className="pad"><button aria-label="Pitch up" {...hold('up')}>↑</button><div><button aria-label="Yaw left" {...hold('left')}>←</button><button aria-label="Pitch down" {...hold('down')}>↓</button><button aria-label="Yaw right" {...hold('right')}>→</button></div></div>
+      <p className="muted" id="navigation-help">Focus the radar for W/A/S/D and Space. Hold buttons with pointer, Space or Enter. Camera drag is independent.</p>
+      <div className="camera-actions"><button onClick={()=>view('in')}>Zoom in</button><button onClick={()=>view('out')}>Zoom out</button><button onClick={()=>view('reset')}>Reset camera</button></div>
       <hr/>
-      <h2>Throttle <strong>{throttle>0?'+':''}{throttle}%</strong></h2>
-      <input type="range" min="-100" max="100" step="1" value={throttle} disabled={pose.mode!=='flying'} onChange={e=>setThrottle(Number(e.target.value))}/>
-      <button onClick={()=>setThrottle(0)}>Zero throttle (Space)</button>
-      <p className="muted foot">SI fixed-step motion · split galactic coordinates · illustrative catalog. Physical sphere contacts use 20/100 m/s thresholds. Gravity, assisted landing, jump drive, Core limits and 2D gameplay are deferred.</p>
+      <h2><label htmlFor="throttle">Throttle</label> <strong>{throttle>0?'+':''}{throttle}%</strong></h2>
+      <input id="throttle" aria-valuetext={`${throttle}% ${throttle>0?'forward':throttle<0?'reverse':'coast'}`} type="range" min="-100" max="100" step="1" value={throttle} disabled={pose.mode!=='flying'} onChange={e=>{const value=Number(e.target.value);throttleRef.current=value;setThrottle(value)}}/>
+      <button disabled={pose.mode!=='flying'} onClick={()=>{throttleRef.current=0;setThrottle(0)}}>Zero throttle (Space)</button>
+      <p className="muted foot">Illustrative universe · unlimited energy. Impacts at 100 m/s or faster end the run. Lower-speed contact settles the ship.</p>
     </aside>
   </div>
 }

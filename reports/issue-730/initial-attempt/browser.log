@@ -1,0 +1,66 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:4227) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4259) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 12 tests using 1 worker
+
+(node:4271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (15.2s)
+  ✓   2 [desktop] › tests/desktop.spec.ts:24:1 › focused forms preserve keyboard behavior; button keyboard hold and blur release (7.0s)
+  ✓   3 [desktop] › tests/desktop.spec.ts:33:1 › pointer capture releases outside the button, on cancellation and capture loss (7.3s)
+  ✓   4 [desktop] › tests/desktop.spec.ts:42:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (4.0s)
+  ✓   5 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: warning (1.9s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: destroyed (2.2s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: safe (3.1s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: asteroid (2.8s)
+  ✘   9 [desktop] › tests/desktop.spec.ts:57:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (31.7s)
+(node:4720) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [mobile] › tests/mobile.spec.ts:2:1 › mobile layout, accessible selection, zoom controls and rotation resize (9.1s)
+  ✓  11 [mobile] › tests/mobile.spec.ts:15:1 › touch release outside, touch cancel and viewport resize clear held controls (5.7s)
+(node:4903) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (7.6s)
+
+
+  1) [desktop] › tests/desktop.spec.ts:57:1 › dense groups and accessible contact picker keep all IDs with bounded DOM 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Dense contact 0032', exact: true })
+
+
+      59 |  await expect(page.locator('#contact-select option')).toHaveCount(33)
+      60 |  await page.getByRole('button',{name:'◉ 2000 contacts',exact:true}).click();await expect(page.locator('.contact-menu button')).toHaveCount(34)
+    > 61 |  await page.getByRole('button',{name:'Next contacts',exact:true}).click();await page.getByRole('button',{name:'Dense contact 0032',exact:true}).click();await expect(page.locator('.target-status')).toContainText('Dense contact 0032')
+         |                                                                                                                                                 ^
+      62 |  await page.getByLabel('Find scanned contacts').fill('1999');await page.getByLabel('Scanned contacts (2000)',{exact:true}).selectOption('dense-1999');await expect(page.locator('.target-status')).toContainText('Dense contact 1999')
+      63 | })
+      64 |
+        at /workspace/salimon/client/tests/desktop.spec.ts:61:145
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/desktop-dense-groups-and-a-7caf6-ep-all-IDs-with-bounded-DOM-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/desktop-dense-groups-and-a-7caf6-ep-all-IDs-with-bounded-DOM-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop-dense-groups-and-a-7caf6-ep-all-IDs-with-bounded-DOM-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop-dense-groups-and-a-7caf6-ep-all-IDs-with-bounded-DOM-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/desktop.spec.ts:57:1 › dense groups and accessible contact picker keep all IDs with bounded DOM 
+  11 passed (1.7m)

@@ -1,5 +1,24 @@
 # Salimon
 
+The current `main` entry point is the navigation-only React/Three.js browser
+client. Start with [the client guide](client/README.md) and
+[the browser navigation contract](docs/radar-navigation-prototype.md).
+With Node >=22.18:
+
+```sh
+cd client
+npm ci
+npm test
+npm run build
+npm run dev
+```
+
+Browser ship motion, scanner and simplified contacts are implemented; the sample
+catalog is illustrative and energy is unlimited. The text below preserves the
+historical native architecture and does not describe migrated browser gameplay.
+
+## Historical native reference
+
 Salimon is a space exploration game built around a custom Rust runtime. The
 current implementation extends the **Phase 0 — Technical Feasibility Showcase**
 with mining, physical fragments, carrying and EVA: a native-first, client-only

@@ -26,3 +26,34 @@ For usability, visible sample distances are compressed *as input test fixtures*,
 The first scanner pulse arrives after five simulation seconds. `scanner.ts` owns the immutable catalog index and disposable contact/selection state. `radar.ts` owns frustum edges and dense groups; click a group to select any member from its paged list. Zoom never reveals unscanned catalog bodies. The grid is anchored to galactic axes/lattice, with the ship at its center.
 
 `navigationRuntime.ts` composes motion, physical contact and scanning. `contact.ts` uses a conservative 5 m ship sphere and physical body radii, including rotating surface velocity. Impacts >=100 m/s end the run. Lower-speed contacts rebound/settle with zero thrust; <=20 m/s on a planet/moon is safe contact, separate from assisted landing. Nonplanetary contacts always recover as crashes. Restart navigation clears the run. Warnings observe scanned contacts without steering.
+
+## Verification and accessibility
+
+```sh
+npm ci
+npm test
+npm run build
+npx playwright install --with-deps chromium
+npm run test:browser
+```
+
+For an installed system Chromium use `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser`.
+Playwright starts isolated dev (:5175) and built-preview (:4175) servers. The 12
+browser routes cover desktop controls, actual camera/frustum behavior, contact
+fixtures, dense groups, mobile touch/resize and the production WebGL bundle.
+TypeScript also checks test/configuration files. CI uses Node 22, an npm lockfile
+cache, `npm ci`, domain tests, build, installed Chromium and the same suite.
+`test-results/` contains JSON results, original screenshots and failure traces;
+CI retains these as a revision-named artifact for 14 days. Task reports retain
+selected original evidence permanently.
+
+The contact picker is labelled, searchable and paged at 32 items. Buttons have
+accessible names and visible focus; hold orientation buttons with pointer,
+Space or Enter. Focus the radar for W/A/S/D and Space shortcuts. Focused form
+controls retain native keyboard behavior. Zoom in/out and Reset camera are
+keyboard/touch accessible and never change ship state. Blur, hidden-page events
+and viewport resize clear held inputs; hidden time does not advance simulation.
+Releasing one pointer/key preserves other independently held sources. Scanner,
+selected target, flight and warning status are explicit; throttle has a label
+and a signed forward/reverse/coast value. Browser automation uses synthetic input
+and software WebGL; it does not certify physical input, native platforms or FPS.

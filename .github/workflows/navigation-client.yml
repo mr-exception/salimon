@@ -1,0 +1,28 @@
+name: Navigation client
+
+on:
+  pull_request:
+    paths:
+      - 'client/**'
+      - '.github/workflows/navigation-client.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'client/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install dependencies
+        working-directory: client
+        run: npm install --no-audit --no-fund
+      - name: Build
+        working-directory: client
+        run: npm run build

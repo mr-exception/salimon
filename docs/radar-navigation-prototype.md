@@ -10,7 +10,7 @@ The main branch contains the browser client; older documents mentioning Rust pac
 
 ## Approved navigation interaction
 
-- Space appears as a sparse holographic 3D radar, centered on the ship, not a rendered physical galaxy. Stars, planets, moons and asteroids have simple wireframe/symbol contacts.
+- Space appears as a sparse holographic 3D radar, centered on the ship, not a rendered physical galaxy. Stars, planets, moons and asteroids use shared faceted navigation proxies (#737), with fixed screen sizes and linear world positions. A sparse 3D galactic point lattice replaces the rectangular grid surface.
 - The camera is **orthographic** and independent from ship pose, rotating around its center. The fixed galactic coordinate orientation establishes the grid. Zoom does **not** alter distances; object positions are **linear** at any chosen view scale.
 - Starting scanner detection radius is **100,000 light-seconds** (about 200 AU). All cataloged celestial bodies within range are detected on a **five-second pulse**. No contact history remains after objects leave range; the catalog itself remains unchanged.
 - Contacts outside the *current zoom* but within scanner range use edge indicators. Out-of-scanner-range bodies are never exposed by zoom or indicators. Dense contacts can be clustered in presentation, not in detection.

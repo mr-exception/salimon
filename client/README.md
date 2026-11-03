@@ -57,3 +57,18 @@ Releasing one pointer/key preserves other independently held sources. Scanner,
 selected target, flight and warning status are explicit; throttle has a label
 and a signed forward/reverse/coast value. Browser automation uses synthetic input
 and software WebGL; it does not certify physical input, native platforms or FPS.
+
+## Navigation representations (#737)
+
+Navigation objects use shared, flat-shaded low-poly meshes: a directional swept
+ship, faceted planet/moon spheres, an irregular angular asteroid and a restrained
+emissive star. Sizes are fixed CSS-pixel proxies at every orthographic zoom;
+positions stay linear and physical collision radii remain separate. The sparse
+3D galactic reference lattice replaces the rectangular grid surface. No ground
+plane, textures, bloom or physical ship asset is introduced.
+
+`src/visualGeometry.ts` owns shared deterministic geometry/materials;
+`src/navigationVisuals.tsx` owns screen sizing and scene composition. Run the
+normal unit/build/browser checks. `tests/visuals.spec.ts` measures original WebGL
+pixels, draw/triangle/resource bounds and zoom/selection screenshots using the
+production App with a development-only scene observer.

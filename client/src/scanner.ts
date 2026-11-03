@@ -16,6 +16,7 @@ export class CatalogIndex {
   for(const body of bodies) {
    if(!body.id || ids.has(body.id)) throw new Error('Catalog IDs must be unique and nonempty')
    if(!Number.isFinite(body.radiusKm)||body.radiusKm<=0 || !body.position.offsetM.every(v=>Number.isFinite(v)&&Math.abs(v)<=CELL_SIZE_M/2)) throw new Error('Invalid catalog body')
+   if(body.angularVelocityRadps && !body.angularVelocityRadps.every(Number.isFinite))throw new Error('Invalid body rotation')
    ids.add(body.id)
    const k=key(bucket(body.position));const entries=this.buckets.get(k)??[];entries.push(body);this.buckets.set(k,entries)
   }

@@ -19,6 +19,10 @@ Run commands from the repository root. Use `python3` on macOS/Linux where
 [platform build prerequisites](../scripts/BUILDING.md#platform-prerequisites).
 Use Python 3.12 for tooling checks. Initial installation/builds require network access.
 
+## Browser radar checks
+
+For the active browser client use Node >=22.18 and `cd client && npm ci && npm test && npm run build`. The Navigation client workflow builds React/Three.js; historical native commands below apply to legacy revisions. Browser captures must exercise the real WebGL canvas and identify the adapter. Software WebGL results do not establish hardware performance.
+
 ## Automatic CI
 
 [Source build](../.github/workflows/native-build.yml) runs one Ubuntu 24.04 job

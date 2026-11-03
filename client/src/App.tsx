@@ -2,27 +2,15 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as THREE from 'three'
-import { SAMPLE_BODIES, SCANNER_RADIUS_LS, SCAN_INTERVAL_SECONDS, add, length, normal, scale, sub, type Body, type Vec3 } from './sampleUniverse'
+import { SAMPLE_BODIES, SCANNER_RADIUS_LS, SCAN_INTERVAL_SECONDS, length, normal, type Body, type Vec3 } from './sampleUniverse'
 
-type Controls = { up: boolean; down: boolean; left: boolean; right: boolean }
-type Pose = { pos: Vec3; velocity: Vec3; yaw: number; pitch: number }
+import { LIGHT_SECOND_M, radarPosition, relativeM } from './coordinates.ts'
+import { NavigationClock, alignTo, forward, idleControls, setThrottle as changeThrottle, type Controls, type ShipState } from './simulation.ts'
+type Pose = ShipState
 type Edge = { id: string; name: string; x: number; y: number; distance: number }
-const initialPose: Pose = { pos: [0,0,0], velocity: [0,0,0], yaw: 0, pitch: 0 }
-const ANGULAR_SPEED = Math.PI / 6
-const THRUST_LS_PER_SECOND2 = 0.075 // demo motion ONLY: not production force or mass physics
-const VISIBLE_RADIUS = 900 // illustrative initial display volume, in light-seconds
-const V_FORWARD = new THREE.Vector3(0,0,-1)
+const VISIBLE_RADIUS = 900
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
 const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
-const forward = (yaw: number, pitch: number): Vec3 => {
-  const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'))
-  const d = V_FORWARD.clone().applyQuaternion(q)
-  return [d.x,d.y,d.z]
-}
-function moveAngle(current: number, target: number, step: number) {
-  const delta = Math.atan2(Math.sin(target-current),Math.cos(target-current))
-  return current + THREE.MathUtils.clamp(delta,-step,step)
-}
 function CameraControls({ onViewRadius }: { onViewRadius: (value: number) => void }) {
   const { camera, gl } = useThree()
   const controlsRef = useRef<OrbitControls|null>(null)
@@ -76,7 +64,7 @@ function RadarScene({ pose, contacts, selected, select, viewRadius, setViewRadiu
     elapsed.current = 0
     const next: Edge[] = []
     for (const body of contacts) {
-      const relative = sub(body.positionLs, pose.pos)
+      const relative = radarPosition(body.position, pose.position)
       const projected = new THREE.Vector3(...relative).project(camera)
       const outside = Math.abs(projected.x)>0.9 || Math.abs(projected.y)>0.88 || projected.z>1 || projected.z< -1 || length(relative)>viewRadius
       if (!outside) continue
@@ -97,12 +85,13 @@ function RadarScene({ pose, contacts, selected, select, viewRadius, setViewRadiu
       <mesh position={[0,0,7]}><boxGeometry args={[20,3,10]}/><meshBasicMaterial color="#84a9bd" wireframe /></mesh>
     </group>
     <arrowHelper args={[new THREE.Vector3(...heading),new THREE.Vector3(),65,'#69f4c2',8,5]}/>
-    {length(pose.velocity)>0.000001 && <arrowHelper args={[new THREE.Vector3(...normal(pose.velocity)),new THREE.Vector3(),85,'#f0b763',10,6]}/>}
-    {contacts.map(body=><Contact key={body.id} body={body} position={sub(body.positionLs,pose.pos)} selected={selected===body.id} onSelect={select}/>)}
+    {length(pose.velocityMps)>0.000001 && <arrowHelper args={[new THREE.Vector3(...normal(pose.velocityMps)),new THREE.Vector3(),85,'#f0b763',10,6]}/>}
+    {contacts.map(body=><Contact key={body.id} body={body} position={radarPosition(body.position,pose.position)} selected={selected===body.id} onSelect={select}/>)}
   </>
 }
 export function App() {
-  const [pose,setPose]=useState<Pose>(initialPose)
+  const clock=useRef(new NavigationClock())
+  const [pose,setPose]=useState<Pose>(clock.current.state)
   const [throttle,setThrottle]=useState(0)
   const [contacts,setContacts]=useState<readonly Body[]>([])
   const [selected,setSelected]=useState<string|null>(null)
@@ -110,10 +99,10 @@ export function App() {
   const [viewRadius,setViewRadius]=useState(VISIBLE_RADIUS)
   const [pulse,setPulse]=useState(0)
   const [aligning,setAligning]=useState(false)
-  const controls=useRef<Controls>({up:false,down:false,left:false,right:false})
-  const poseRef=useRef(initialPose)
+  const controls=useRef<Controls>(idleControls())
+
   const throttleRef=useRef(throttle)
-  const alignment=useRef<{yaw:number;pitch:number}|null>(null)
+
   const scannerTimer=useRef(0)
   const setEdgesStable=useCallback((e:Edge[])=>setEdges(e),[])
   useEffect(()=>{throttleRef.current=throttle},[throttle])
@@ -122,7 +111,7 @@ export function App() {
     const onKeyDown=(e:KeyboardEvent)=>{
       const key=e.key.toLowerCase()
       const axis=({w:'up',s:'down',a:'left',d:'right'} as const)[key as 'w'|'s'|'a'|'d']
-      if(axis && !e.repeat){controls.current[axis]=true;alignment.current=null;setAligning(false);e.preventDefault()}
+      if(axis && !e.repeat){controls.current[axis]=true;clock.current.state={...clock.current.state,alignment:null};setAligning(false);e.preventDefault()}
       if(e.code==='Space' && !e.repeat){setThrottle(0);e.preventDefault()}
     }
     const onKeyUp=(e:KeyboardEvent)=>{const axis=({w:'up',s:'down',a:'left',d:'right'} as const)[e.key.toLowerCase() as 'w'|'s'|'a'|'d'];if(axis) controls.current[axis]=false}
@@ -136,51 +125,37 @@ export function App() {
     let frame=0
     let previous=performance.now()
     let accumulator=0
+    const resume=()=>{previous=performance.now()}
+    document.addEventListener('visibilitychange',resume)
     const animate=(now:number)=>{
-      const dt=Math.min((now-previous)/1000,0.05);previous=now
-      const p=poseRef.current
-      let {yaw,pitch}=p
-      const turn=controls.current
-      const lr=Number(turn.left)-Number(turn.right)
-      const ud=Number(turn.up)-Number(turn.down)
-      if(lr||ud){
-        alignment.current=null
-        yaw+=lr*ANGULAR_SPEED*dt
-        pitch=THREE.MathUtils.clamp(pitch+ud*ANGULAR_SPEED*dt,-Math.PI/2+0.001,Math.PI/2-0.001)
-      } else if (alignment.current) {
-        yaw=moveAngle(yaw,alignment.current.yaw,ANGULAR_SPEED*dt)
-        pitch=moveAngle(pitch,alignment.current.pitch,ANGULAR_SPEED*dt)
-        if(Math.abs(Math.atan2(Math.sin(alignment.current.yaw-yaw),Math.cos(alignment.current.yaw-yaw)))<0.002 && Math.abs(alignment.current.pitch-pitch)<0.002){alignment.current=null;setAligning(false)}
-      }
-      const acceleration=scale(forward(yaw,pitch),throttleRef.current/100*THRUST_LS_PER_SECOND2)
-      const velocity=add(p.velocity,scale(acceleration,dt))
-      const pos=add(p.pos,scale(velocity,dt))
-      poseRef.current={pos,velocity,yaw,pitch}
+      const dt=document.hidden?0:Math.max(0,now-previous)/1000;previous=now
+      clock.current.state=changeThrottle(clock.current.state,throttleRef.current)
+      const p=clock.current.advance(dt,controls.current)
+      setAligning(p.alignment!==null)
       scannerTimer.current+=dt
-      if(scannerTimer.current>=SCAN_INTERVAL_SECONDS){scannerTimer.current %= SCAN_INTERVAL_SECONDS;setPulse(v=>v+1);setContacts(SAMPLE_BODIES.filter(body=>length(sub(body.positionLs,pos))<=SCANNER_RADIUS_LS))}
+      if(scannerTimer.current>=SCAN_INTERVAL_SECONDS){scannerTimer.current %= SCAN_INTERVAL_SECONDS;setPulse(v=>v+1);setContacts(SAMPLE_BODIES.filter(body=>length(relativeM(body.position,p.position))/LIGHT_SECOND_M<=SCANNER_RADIUS_LS))}
       accumulator+=dt
-      if(accumulator>=0.08){setPose(poseRef.current);accumulator=0}
+      if(accumulator>=0.08){setPose(clock.current.state);accumulator=0}
       frame=requestAnimationFrame(animate)
     }
-    setContacts(SAMPLE_BODIES.filter(body=>length(sub(body.positionLs,initialPose.pos))<=SCANNER_RADIUS_LS))
+    setContacts(SAMPLE_BODIES.filter(body=>length(relativeM(body.position,clock.current.state.position))/LIGHT_SECOND_M<=SCANNER_RADIUS_LS))
     frame=requestAnimationFrame(animate)
-    return ()=>cancelAnimationFrame(frame)
+    return ()=>{cancelAnimationFrame(frame);document.removeEventListener('visibilitychange',resume)}
   },[])
   useEffect(()=>{if(selected && !contacts.some(body=>body.id===selected))setSelected(null)},[contacts,selected])
   const target=useMemo(()=>contacts.find(body=>body.id===selected)??null,[contacts,selected])
   const setDirection=()=>{
     if(!target)return
-    const dir=normal(sub(target.positionLs,poseRef.current.pos))
-    alignment.current={yaw:Math.atan2(-dir[0],-dir[2]),pitch:Math.asin(THREE.MathUtils.clamp(dir[1],-1,1))}
+    clock.current.state=alignTo(clock.current.state,relativeM(target.position,clock.current.state.position))
     setAligning(true)
   }
   const hold=(axis:keyof Controls)=>({
-    onPointerDown:(event:import('react').PointerEvent<HTMLButtonElement>)=>{event.currentTarget.setPointerCapture(event.pointerId);controls.current[axis]=true;alignment.current=null;setAligning(false)},
+    onPointerDown:(event:import('react').PointerEvent<HTMLButtonElement>)=>{event.currentTarget.setPointerCapture(event.pointerId);controls.current[axis]=true;clock.current.state={...clock.current.state,alignment:null};setAligning(false)},
     onPointerUp:()=>{controls.current[axis]=false},
     onPointerCancel:()=>{controls.current[axis]=false},
     onLostPointerCapture:()=>{controls.current[axis]=false}
   })
-  const distance=target?length(sub(target.positionLs,pose.pos)):null
+  const distance=target?length(relativeM(target.position,pose.position))/LIGHT_SECOND_M:null
   return <div className="app">
     <div className="radar">
       <Canvas orthographic camera={{position:[800,500,800],zoom:0.5,near:0.1,far:300000}}>
@@ -192,8 +167,8 @@ export function App() {
     </div>
     <aside>
       <h1>NAVIGATION</h1><p className="muted">Navigation-only prototype · unlimited energy</p>
-      <div className="stat"><span>Relative position</span><strong>{pose.pos.map(fmt).join(' / ')} ls</strong></div>
-      <div className="stat"><span>Speed (sample inertial frame)</span><strong>{fmt(length(pose.velocity))} ls/s</strong></div>
+      <div className="stat"><span>Relative position</span><strong>{pose.position.offsetM.map(fmt).join(' / ')} m (cell local)</strong></div>
+      <div className="stat"><span>Speed (sample inertial frame)</span><strong>{fmt(length(pose.velocityMps))} m/s</strong></div>
       <div className="stat"><span>Yaw / pitch</span><strong>{radians(pose.yaw)}° / {radians(pose.pitch)}°</strong></div>
       <div className="stat"><span>Alignment</span><strong>{aligning?'Turning':'Manual'}</strong></div>
       <hr/>
@@ -207,7 +182,7 @@ export function App() {
       <h2>Throttle <strong>{throttle>0?'+':''}{throttle}%</strong></h2>
       <input type="range" min="-100" max="100" step="1" value={throttle} onChange={e=>setThrottle(Number(e.target.value))}/>
       <button onClick={()=>setThrottle(0)}>Zero throttle (Space)</button>
-      <p className="muted foot">This fixture uses simplified local motion. Gravity, landing, collisions, jump drive, Core limits and 2D gameplay are deferred.</p>
+      <p className="muted foot">SI fixed-step motion · split galactic coordinates · illustrative catalog. Gravity, landing, collisions, jump drive, Core limits and 2D gameplay are deferred.</p>
     </aside>
   </div>
 }

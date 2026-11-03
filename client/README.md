@@ -6,7 +6,8 @@ A self-contained React + TypeScript + Vite + Three.js + React Three Fiber radar.
 
 ```bash
 cd client
-npm install
+npm ci
+npm test
 npm run dev
 ```
 
@@ -20,4 +21,4 @@ Open the URL Vite prints. `npm run build` produces `dist/`.
 - Throttle slider: forward or reverse thrust, 0% to coast. **Energy is infinite**.
 - Reset camera only changes the viewer's orientation.
 
-For usability, visible sample distances are compressed *as input test fixtures*, not via a nonlinear rendering transform. All rendered positions use a linear conversion from simulated coordinates, and scanner range is exactly 100,000 light-seconds. The sample model is not astrophysically authoritative.
+For usability, visible sample distances are compressed *as input test fixtures*, not via a nonlinear rendering transform. All rendered positions use a linear conversion from simulated coordinates, and scanner range is exactly 100,000 light-seconds. The catalog is not astrophysically authoritative. Ship motion uses the approved SI impulse/mass model on a renderer-independent 60 Hz clock. `coordinates.ts` owns integer galactic cells/local offsets, `simulation.ts` owns motion and one-time alignment, and `App.tsx` owns input and presentation. Energy remains infinite. Tests run on Node 22.18 or newer without a separate test runner.

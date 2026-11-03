@@ -2,14 +2,14 @@ build	Desktop, mobile and production WebGL checks	﻿2026-11-03T21:14:42.9430855
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:42.9431228Z [36;1mnpm run test:browser[0m
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:42.9461646Z shell: /usr/bin/bash -e {0}
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:42.9461922Z ##[endgroup]
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:43.0532623Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:43.0532623Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:43.0533272Z > salimon-navigation-client@0.1.0 test:browser
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:43.0533678Z > playwright test
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:43.0533828Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:43.0533828Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:46.6973285Z GitCommitInfo: timeout of 3000ms exceeded while running "git fetch origin c37120def5c041588c9860c81c358d166fd66f8b --no-auto-maintenance --no-auto-gc --no-tags --no-recurse-submodules --depth=1"
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:48.1224042Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:48.1224042Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:48.1224724Z Running 13 tests using 1 worker
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:48.1225086Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:14:48.1225086Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:15:13.5834323Z   ✘   1 [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (23.9s)
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:15:20.7994998Z   ✓   2 [desktop] › tests/desktop.spec.ts:24:1 › focused forms preserve keyboard behavior; button keyboard hold and blur release (6.6s)
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:15:26.7772758Z   ✓   3 [desktop] › tests/desktop.spec.ts:33:1 › pointer capture releases outside the button, on cancellation and capture loss (6.0s)
@@ -23,24 +23,24 @@ build	Desktop, mobile and production WebGL checks	2026-11-03T21:15:51.0499083Z  
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:15:59.2272373Z   ✓  11 [mobile] › tests/mobile.spec.ts:2:1 › mobile layout, accessible selection, zoom controls and rotation resize (7.0s)
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:03.6368698Z   ✓  12 [mobile] › tests/mobile.spec.ts:15:1 › touch release outside, touch cancel and viewport resize clear held controls (4.4s)
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:11.6966192Z   ✓  13 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (7.2s)
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3640091Z 
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3645322Z 
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3656822Z   1) [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption 
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3658071Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3640091Z
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3645322Z
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3656822Z   1) [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3658071Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3658466Z     Error: expect(locator).toHaveText(expected) failed
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3658927Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3658927Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3659221Z     Locator:  locator('.target-status')
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3659842Z     Expected: "Selected target: Caligo"
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3660483Z     Received: "No selected target"
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3661271Z     Timeout:  10000ms
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3661545Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3661545Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3661705Z     Call log:
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3662373Z       - Expect "toHaveText" locator('.target-status') with timeout 10000ms
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3663217Z       - waiting for locator('.target-status')
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3664584Z         23 × locator resolved to <p role="status" aria-live="polite" class="target-status">No selected target</p>
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3665692Z            - unexpected value "No selected target"
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3666108Z 
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3666123Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3666108Z
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3666123Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3666699Z       16 |  for(let i=0;i<4;i++)await page.getByRole('button',{name:'Zoom in',exact:true}).click()
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3668742Z       17 |  const edge=page.getByRole('button',{name:'◇ Caligo',exact:true});await expect(edge).toBeVisible();await edge.click()
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3671702Z     > 18 |  await expect(page.locator('.target-status')).toHaveText('Selected target: Caligo')
@@ -49,22 +49,22 @@ build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3673955Z  
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3676059Z       20 |  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('a');await page.waitForTimeout(200);await page.keyboard.up('a')
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3677803Z       21 |  await expect(stat(page,'Alignment')).toHaveText('Manual');await stopped(page)
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3678952Z         at /home/runner/work/salimon/salimon/client/tests/desktop.spec.ts:18:47
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3679535Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3679535Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3680337Z     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3682314Z     test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/test-failed-1.png
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3683891Z     ────────────────────────────────────────────────────────────────────────────────────────────────
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3684469Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3684469Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3685400Z     Error Context: test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/error-context.md
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3686358Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3686358Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3687106Z     attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3688424Z     test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/trace.zip
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3689366Z     Usage:
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3689567Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3689567Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3690495Z         npx playwright show-trace test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/trace.zip
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3691791Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3691791Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3692539Z     ────────────────────────────────────────────────────────────────────────────────────────────────
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3693110Z 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3693110Z
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3693261Z   1 failed
-build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3694480Z     [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption 
+build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3694480Z     [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3695517Z   12 passed (1.5m)
 build	Desktop, mobile and production WebGL checks	2026-11-03T21:16:12.3907040Z ##[error]Process completed with exit code 1.

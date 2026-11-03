@@ -48,4 +48,3 @@ wingGeometry.setAttribute('position',new THREE.Float32BufferAttribute([
 ],3))
 wingGeometry.computeVertexNormals()
 wingMaterial.side=THREE.DoubleSide
-

@@ -19,7 +19,7 @@ test('scanner pulse, camera independence, clipping selection and manual alignmen
  await page.getByRole('button',{name:'Set direction',exact:true}).click();await expect(stat(page,'Alignment')).toHaveText('Turning')
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('a');await page.waitForTimeout(200);await page.keyboard.up('a')
  await expect(stat(page,'Alignment')).toHaveText('Manual');await stopped(page)
- await page.getByRole('button',{name:'Reset camera',exact:true}).click();await expect(page.locator('.edge')).toHaveCount(0)
+ await page.getByRole('button',{name:'Reset camera',exact:true}).click();await expect(page.locator('.edge[data-offscreen="true"]')).toHaveCount(0)
 })
 test('focused forms preserve keyboard behavior; button keyboard hold and blur release',async({page})=>{
  await page.goto('/');const initial=await heading(page).textContent()

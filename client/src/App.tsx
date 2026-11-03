@@ -42,7 +42,15 @@ function CameraControls({ onViewRadius, command }: { onViewRadius: (value: numbe
   },[camera,gl,onViewRadius])
   useEffect(()=>{
     if(!(camera instanceof THREE.OrthographicCamera))return
-    if(command.action==='reset'){camera.position.set(200000,125000,200000);camera.lookAt(0,0,0);camera.zoom=0.5}
+    if(command.action==='reset'){
+      const controls=controlsRef.current
+      if(controls){
+        // Drain residual orbit/pan damping before assigning the reset pose.
+        const damping=controls.enableDamping;controls.enableDamping=false
+        controls.update();controls.enableDamping=damping;controls.target.set(0,0,0)
+      }
+      camera.position.set(200000,125000,200000);camera.lookAt(0,0,0);camera.zoom=0.5
+    }
     else camera.zoom=THREE.MathUtils.clamp(camera.zoom*(command.action==='in'?1.5:1/1.5),0.001,30)
     camera.updateProjectionMatrix();controlsRef.current?.update()
     onViewRadius((camera.top-camera.bottom)/(2*camera.zoom))
@@ -190,7 +198,7 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
         <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
-      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
+      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" data-offscreen={g.edge} style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
       <div className="legend">▲ HEADING <span>◆ VELOCITY</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
     </div>
     <aside>

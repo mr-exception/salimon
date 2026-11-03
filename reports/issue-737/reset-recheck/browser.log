@@ -1,0 +1,63 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep scanner pulse|faceted navigation
+
+[WebServer] (node:9534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:9565) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:9577) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (22.2s)
+(node:9712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (6.9s)
+
+
+  1) [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.edge')
+    Expected: 0
+    Received: 1
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveCount" locator('.edge') with timeout 10000ms
+      - waiting for locator('.edge')
+        3 × locator resolved to 3 elements
+          - unexpected value "3"
+        20 × locator resolved to 1 element
+           - unexpected value "1"
+
+
+      20 |  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('a');await page.waitForTimeout(200);await page.keyboard.up('a')
+      21 |  await expect(stat(page,'Alignment')).toHaveText('Manual');await stopped(page)
+    > 22 |  await page.getByRole('button',{name:'Reset camera',exact:true}).click();await expect(page.locator('.edge')).toHaveCount(0)
+         |                                                                                                              ^
+      23 | })
+      24 | test('focused forms preserve keyboard behavior; button keyboard hold and blur release',async({page})=>{
+      25 |  await page.goto('/');const initial=await heading(page).textContent()
+        at /workspace/salimon/client/tests/desktop.spec.ts:22:110
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption 
+  1 passed (31.1s)

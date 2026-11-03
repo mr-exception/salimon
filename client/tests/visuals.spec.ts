@@ -5,6 +5,8 @@ test('faceted navigation proxies render at readable sizes without a rectangular 
  await page.goto('/tests/fixture.html?scenario=visuals')
  await expect(page.locator('.scan-status')).toContainText('4 temporary contacts')
  await page.waitForFunction(()=>!!window.radarTest)
+ await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).length)).toBe(4)
+ const defaultView=await page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).map(o=>({name:o.name,pixel:o.pixel.map(v=>Math.round(v*1e6)/1e6)})))
  await page.evaluate(()=>window.radarTest.camera([0,125000,200000],[0,0,0],0.5))
  await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).length)).toBe(4)
  const samples=[]
@@ -27,5 +29,12 @@ test('faceted navigation proxies render at readable sizes without a rectangular 
  const selected=await page.evaluate(()=>window.radarTest.snapshot());samples.push(selected)
  await testInfo.attach('selected.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
  await testInfo.attach('geometry-backend.json',{body:JSON.stringify({samples,errors},null,2),contentType:'application/json'})
+ // Reset must cancel residual damping, not drift into new groups during clicks.
+ await page.mouse.move(300,300);await page.mouse.down();await page.mouse.move(590,420,{steps:3});await page.mouse.up()
+ await page.getByRole('button',{name:'Reset camera',exact:true}).click()
+ await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).map(o=>({name:o.name,pixel:o.pixel.map(v=>Math.round(v*1e6)/1e6)})))).toEqual(defaultView)
+ await page.waitForTimeout(300)
+ expect(await page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).map(o=>({name:o.name,pixel:o.pixel.map(v=>Math.round(v*1e6)/1e6)})))).toEqual(defaultView)
+ await testInfo.attach('camera-reset.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
  expect(errors).toEqual([])
 })

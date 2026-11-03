@@ -1,0 +1,17 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep scanner pulse|faceted navigation
+
+[WebServer] (node:9936) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:9967) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:9979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (11.3s)
+  ✓  2 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (6.5s)
+
+  2 passed (19.2s)

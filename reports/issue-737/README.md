@@ -30,7 +30,7 @@ viewport 1280×800; existing mobile regression 390×844 and resized landscape.
 - `npm run build --prefix client`: pass, [raw output](build.log).
   Existing Vite >500 kB bundle advisory remains; no threshold was changed.
 - `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser --prefix client`:
-  13/13 pass, including all prior desktop/mobile/production routes and the new
+  13/13 pass locally at the hull-corrected source (`7fb7e70`), including all prior desktop/mobile/production routes and the new
   production-App visual fixture. [Raw output](browser.log), [results](browser-results.json).
   Pixels are read directly from the rendered WebGL framebuffer. All four classes
   have visible shaded pixels; the ship remains readable at zoom 0.1/0.5/1.
@@ -40,6 +40,26 @@ viewport 1280×800; existing mobile regression 390×844 and resized landscape.
 - Original captures: [normal](zoom-0.5.png), [far zoom](zoom-0.1.png),
   [near zoom](zoom-1.png), [selected moon](selected.png).
 - `git diff --check`: pass. All final local checks pass. Final geometry review found inward hull triangle winding in the initial delivery; it is corrected on this owning branch, with an outward-face regression and refreshed original captures. The initial evidence remains in the first PR commit (`10c59c6`).
+
+CI run [41719915839](https://github.com/mr-exception/salimon/actions/runs/41719915839)
+at `7fb7e70` passed install/unit/build and 12/13 browser routes but failed edge
+selection. Its [raw log](ci-selection-failure/browser.log),
+[original capture](ci-selection-failure/selection-failed.png) and
+[replay trace](ci-selection-failure/trace.zip) are retained. The trace shows
+residual orbit damping changing a single-contact marker into a group during a
+click. Reset now drains pending orbit/pan damping before restoring pose/target.
+The visual fixture asserts restoration of original body projections and absence
+of later drift. The first recheck exposed a separate test assertion counting
+visible overlap menus as off-screen indicators: [log](reset-recheck/browser.log),
+[original](reset-recheck/visible-group.png). A `data-offscreen` attribute now lets
+the test check actual off-screen indicators while preserving visible group access.
+
+Final reset correction: `npm run build --prefix client` passes, then
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser --prefix client -- --project=desktop --grep 'scanner pulse|faceted navigation'`
+passes 2/2 affected browser routes: [log](reset-browser.log),
+[results](reset-browser-results.json), [reset original](camera-reset.png).
+The 22 portable/asset tests and other previously passing routes have unchanged
+inputs and are reused; final CI repeats the full 13-route gate on the new head.
 
 CI repeats the full locked build/unit/browser checks on the published head;
 its run link and outcome are recorded on the PR and issue. Screenshots, raw JSON

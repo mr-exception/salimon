@@ -11,7 +11,6 @@ const initialPose: Pose = { pos: [0,0,0], velocity: [0,0,0], yaw: 0, pitch: 0 }
 const ANGULAR_SPEED = Math.PI / 6
 const THRUST_LS_PER_SECOND2 = 0.075 // demo motion ONLY: not production force or mass physics
 const VISIBLE_RADIUS = 900 // illustrative initial display volume, in light-seconds
-const AXIS_Y = new THREE.Vector3(0,1,0)
 const V_FORWARD = new THREE.Vector3(0,0,-1)
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
 const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
@@ -26,6 +25,7 @@ function moveAngle(current: number, target: number, step: number) {
 }
 function CameraControls({ onViewRadius }: { onViewRadius: (value: number) => void }) {
   const { camera, gl } = useThree()
+  const controlsRef = useRef<OrbitControls|null>(null)
   useEffect(() => {
     camera.position.set(800, 500, 800)
     camera.lookAt(0,0,0)
@@ -33,6 +33,7 @@ function CameraControls({ onViewRadius }: { onViewRadius: (value: number) => voi
     const controls = new OrbitControls(camera, gl.domElement)
     controls.enablePan = false
     controls.enableDamping = true
+    controlsRef.current = controls
     controls.minZoom = 0.001
     controls.maxZoom = 30
     controls.target.set(0,0,0)
@@ -43,13 +44,9 @@ function CameraControls({ onViewRadius }: { onViewRadius: (value: number) => voi
     }
     controls.addEventListener('change',sync)
     sync()
-    return () => { controls.removeEventListener('change',sync); controls.dispose() }
+    return () => { controls.removeEventListener('change',sync); controls.dispose();controlsRef.current=null }
   },[camera,gl,onViewRadius])
-  useFrame(() => { /* OrbitControls damping requires a frame update */ })
-  return <DampedOrbit />
-}
-function DampedOrbit() {
-  // OrbitControls are updated with their own change events when damping is disabled.
+  useFrame(() => controlsRef.current?.update())
   return null
 }
 function Contact({ body, position, selected, onSelect }: { body: Body; position: Vec3; selected: boolean; onSelect: (id: string) => void }) {
@@ -70,8 +67,8 @@ function Contact({ body, position, selected, onSelect }: { body: Body; position:
     </mesh>}
   </group>
 }
-function RadarScene({ pose, contacts, selected, select, viewRadius, setEdges }: { pose: Pose; contacts: readonly Body[]; selected: string|null; select:(id:string)=>void; viewRadius:number; setEdges:(edges:Edge[])=>void }) {
-  const { camera, size } = useThree()
+function RadarScene({ pose, contacts, selected, select, viewRadius, setViewRadius, setEdges }: { pose: Pose; contacts: readonly Body[]; selected: string|null; select:(id:string)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setEdges:(edges:Edge[])=>void }) {
+  const { camera } = useThree()
   const elapsed = useRef(0)
   useFrame((_state,dt) => {
     elapsed.current += dt
@@ -92,11 +89,11 @@ function RadarScene({ pose, contacts, selected, select, viewRadius, setEdges }: 
   const heading = forward(pose.yaw,pose.pitch)
   return <>
     <color attach="background" args={['#060f19']}/>
-    <CameraControls onViewRadius={()=>{}} />
+    <CameraControls onViewRadius={setViewRadius} />
     <gridHelper args={[1800,18,'#2a6b79','#183645']} rotation={[0,0,0]} />
     <axesHelper args={[65]}/>
     <group rotation={[pose.pitch,pose.yaw,0]} rotation-order="YXZ">
-      <mesh><coneGeometry args={[12,36,5]} /><meshBasicMaterial color="#65efc6" wireframe /></mesh>
+      <mesh rotation={[-Math.PI/2,0,0]}><coneGeometry args={[12,36,5]} /><meshBasicMaterial color="#65efc6" wireframe /></mesh>
       <mesh position={[0,0,7]}><boxGeometry args={[20,3,10]}/><meshBasicMaterial color="#84a9bd" wireframe /></mesh>
     </group>
     <arrowHelper args={[new THREE.Vector3(...heading),new THREE.Vector3(),65,'#69f4c2',8,5]}/>
@@ -187,10 +184,10 @@ export function App() {
   return <div className="app">
     <div className="radar">
       <Canvas orthographic camera={{position:[800,500,800],zoom:0.5,near:0.1,far:300000}}>
-        <RadarScene pose={pose} contacts={contacts} selected={selected} select={select} viewRadius={viewRadius} setEdges={setEdgesStable}/>
+        <RadarScene pose={pose} contacts={contacts} selected={selected} select={select} viewRadius={viewRadius} setViewRadius={setViewRadius} setEdges={setEdgesStable}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
-      <div className="edge-layer">{edges.filter(e=>!target || e.id!==target.id).map(e=><button key={e.id} className="edge" style={{left:e.x+'%',top:e.y+'%'}} onClick={()=>select(e.id)} title={e.name+' · '+fmt(e.distance)+' light-seconds'}>◇ {e.name}</button>)}</div>
+      <div className="edge-layer">{edges.map(e=><button key={e.id} className="edge" style={{left:e.x+'%',top:e.y+'%'}} onClick={()=>select(e.id)} title={e.name+' · '+fmt(e.distance)+' light-seconds'}>◇ {e.name}</button>)}</div>
       <div className="legend">▲ HEADING <span>◆ VELOCITY</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
     </div>
     <aside>

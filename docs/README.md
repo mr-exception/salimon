@@ -14,6 +14,11 @@ GitHub issues are the task source of truth. Read each issue's **Blocked by** sec
 
 These newer approved narrative contracts supersede historical Earth-start assumptions **for future implementations**; they do not imply that the current prototype already implements the alien-world opening, online Hall or endgame.
 
+## Active browser navigation prototype
+
+- [Navigation-only holographic radar contract and migration boundary](radar-navigation-prototype.md)
+- [React prototype setup](../client/README.md)
+
 ## Product and gameplay
 
 - [Project Vision](project-vision.md)

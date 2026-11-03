@@ -24,7 +24,7 @@ The main branch contains the browser client; older documents mentioning Rust pac
 
 ## Prototype sample and limitations
 
-The sample in `client/src/sampleUniverse.ts` contains an invented miniature test system with the ship, a star, planets, moon and asteroid. It intentionally uses short *illustrative* distances for visible camera interaction; the actual scanner cap remains 100,000 light-seconds. The catalog is illustrative; its coordinates are converted once to split SI positions. `simulation.ts` owns authoritative browser ship motion: 60 Hz fixed steps, integer galactic cells with local meter offsets, 100,000 kg dry mass, 100/50 MW forward/reverse and 1 N·s/J with unlimited energy. Throttle clamps to signed integer percent. Position integrates constant step acceleration; orientation uses 5°/s yaw/pitch with galactic-up stabilized roll. Manual input cancels the captured one-time alignment, including opposing held controls. Existing velocity stays inertial. React and the radar only publish snapshots; a bounded per-frame work budget retains elapsed-time debt. Hidden-page time is paused. This does not implement gravity, ephemerides, collision, light delay, jump drive or the historical native runtime.
+The sample in `client/src/sampleUniverse.ts` contains an invented miniature test system with the ship, a star, planets, moon and asteroid. It intentionally uses short *illustrative* distances for visible camera interaction; the actual scanner cap remains 100,000 light-seconds. The catalog is illustrative; its coordinates are converted once to split SI positions. `simulation.ts` owns authoritative browser ship motion: 60 Hz fixed steps, integer galactic cells with local meter offsets, 100,000 kg dry mass, 100/50 MW forward/reverse and 1 N·s/J with unlimited energy. Throttle clamps to signed integer percent. Position integrates constant step acceleration; orientation uses 5°/s yaw/pitch with galactic-up stabilized roll. Manual input cancels the captured one-time alignment, including opposing held controls. Existing velocity stays inertial. React and the radar only publish snapshots; a bounded per-frame work budget retains elapsed-time debt. Hidden-page time is paused. This does not implement gravity, ephemerides, light delay, jump drive or the historical native runtime.
 
 The prototype must not silently masquerade as the original native gameplay. Its purpose is to validate controls, symbols, selection, scanning cadence, frame-independent heading and camera, range filtering and the client build.
 
@@ -40,4 +40,31 @@ The prototype must not silently masquerade as the original native gameplay. Its 
 
 ## Migration/engineering follow-ups
 
-Keep sample simulation separate from rendering. Split coordinates, ship-relative conversion and impulse/mass motion are implemented for the browser ship. `scanner.ts` now indexes immutable catalog bodies into integer 32-cell buckets. It queries the inclusive 100,000 ls sphere on ticks 300, 600, etc.; first contact publication waits five simulation seconds. Between pulses it only evicts out-of-range contacts, including selection, without recording history. `radar.ts` projects these contacts through the actual orthographic frustum. One symbol/edge button per 44 px bin bounds presentation; grouping retains every ID and exposes paged selection (32 rows). Edge markers use frustum clipping, never radial zoom approximations. The grid translates along a fixed galactic lattice. Remaining work includes epoch-aware body positions, contact handling, browser/input accessibility tests and eventual native-domain migration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.
+Keep sample simulation separate from rendering. Split coordinates, ship-relative conversion and impulse/mass motion are implemented for the browser ship. `scanner.ts` now indexes immutable catalog bodies into integer 32-cell buckets. It queries the inclusive 100,000 ls sphere on ticks 300, 600, etc.; first contact publication waits five simulation seconds. Between pulses it only evicts out-of-range contacts, including selection, without recording history. `radar.ts` projects these contacts through the actual orthographic frustum. One symbol/edge button per 44 px bin bounds presentation; grouping retains every ID and exposes paged selection (32 rows). Edge markers use frustum clipping, never radial zoom approximations. The grid translates along a fixed galactic lattice. `navigationRuntime.ts` composes ship/contact/scanner transitions on every fixed step. Remaining work includes epoch-aware body positions, browser/input accessibility tests and eventual native-domain migration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.
+
+## Browser physical contact (#729)
+
+`contact.ts` owns conservative sphere sweeps: physical body radius plus a 5 m
+ship sphere. Radar glyph radii never enter collision or warning calculations.
+Each fixed-step chord catches full crossings and chooses the earliest contact
+with ID tie-breaking. Total impact velocity is measured against the rotating
+surface (`omega × surface radius`), not just the normal component.
+
+At >=100 m/s the ship is destroyed and the journey ends. Below 100 m/s contact
+zeros throttle/alignment and performs three progressively damped radial rebounds
+bounded by 2 m over one second, then rests in `grounded`. Planet/moon contact at
+<=20 m/s is classified `safe-contact`; >20 m/s is a crash. Asteroids and stars
+always use crash recovery below 100 m/s, never safe planetary landing. Grounded
+ships follow surface rotation. This simplified settling response is separate
+from proper assisted landing/recovery, which remains unimplemented; it adds no
+free-flight gravity. Restart navigation begins a fresh sample run and clears
+clock debt, scanner, selection and controls.
+
+Warnings consume current scanned contacts only. Clearance is center distance
+minus physical body and ship radii. Surface proximity starts within 1 km;
+dangerous approach requires inward closure, >=100 m/s relative speed and <=30 s
+to the nominal sphere at current closure. At most three deduplicated text
+warnings appear, prioritized by severity/distance. They neither steer nor modify
+thrust. Collision still applies to physical bodies before scanner discovery.
+The current sample has five collision candidates; the scanner's large-catalog
+index does not imply a galaxy-scale collision performance qualification.

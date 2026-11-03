@@ -1,0 +1,65 @@
+{
+  "fixture": "client/tests/fixture.html (production App/runtime, deterministic injected catalog/state)",
+  "viewport": [
+    1280,
+    800
+  ],
+  "results": [
+    {
+      "scenario": "warning",
+      "stats": [
+        "Relative position1,000,002,798 / 0.0 / 0.0 m (cell local)",
+        "Speed (sample inertial frame)150.0 m/s",
+        "Yaw / pitch0.0° / 0.0°",
+        "AlignmentManual",
+        "Flight statusflying"
+      ],
+      "status": [
+        "Contact fixture: dangerous approach"
+      ]
+    },
+    {
+      "scenario": "destroyed",
+      "stats": [
+        "Relative position1,000,001,005 / 0.0 / 0.0 m (cell local)",
+        "Speed (sample inertial frame)0.0 m/s",
+        "Yaw / pitch0.0° / 0.0°",
+        "AlignmentManual",
+        "Flight statusdestroyed"
+      ],
+      "status": [
+        "Journey ended — ship destroyed · impact 100.0 m/sRestart navigation",
+        ""
+      ]
+    },
+    {
+      "scenario": "safe",
+      "stats": [
+        "Relative position1,000,001,005 / 0.0 / 0.0 m (cell local)",
+        "Speed (sample inertial frame)0.0 m/s",
+        "Yaw / pitch0.0° / 0.0°",
+        "AlignmentManual",
+        "Flight statusgrounded"
+      ],
+      "status": [
+        "Safe surface contact · impact 20.0 m/sRestart navigation",
+        ""
+      ]
+    },
+    {
+      "scenario": "asteroid",
+      "stats": [
+        "Relative position1,000,001,005 / 0.0 / 0.0 m (cell local)",
+        "Speed (sample inertial frame)0.0 m/s",
+        "Yaw / pitch0.0° / 0.0°",
+        "AlignmentManual",
+        "Flight statusgrounded"
+      ],
+      "status": [
+        "Crash recovery · impact 20.0 m/sRestart navigation",
+        ""
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -5,9 +5,10 @@ import * as THREE from 'three'
 import { SAMPLE_BODIES, length, normal, type Body, type Vec3 } from './sampleUniverse'
 
 import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
-import { NavigationClock, alignTo, forward, idleControls, setThrottle as changeThrottle, type Controls, type ShipState } from './simulation.ts'
+import { alignTo, forward, idleControls, setThrottle as changeThrottle, type Controls, type ShipState } from './simulation.ts'
 type Pose = ShipState
-import { CatalogIndex, Scanner } from './scanner.ts'
+import { NavigationRuntime } from './navigationRuntime.ts'
+import { distances, navigationWarnings } from './contact.ts'
 import { radarGroups, gridOffsetLs, type ContactGroup } from './radar.ts'
 const VISIBLE_RADIUS = 900
 const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
@@ -87,16 +88,16 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
     {groups.filter(g=>!g.edge).map(g=><Contact key={g.id} body={g.bodies[0]} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
   </>
 }
-export function App() {
-  const clock=useRef(new NavigationClock())
-  const [pose,setPose]=useState<Pose>(clock.current.state)
+export function App({navigation}:{navigation?:NavigationRuntime}={}) {
+  const [runtimeInstance]=useState(()=>navigation??new NavigationRuntime(SAMPLE_BODIES))
+  const runtime=useRef(runtimeInstance)
+  const [pose,setPose]=useState<Pose>(runtime.current.clock.state)
   const [throttle,setThrottle]=useState(0)
   const [contacts,setContacts]=useState<readonly Body[]>([])
   const [selected,setSelected]=useState<string|null>(null)
   const [groups,setGroups]=useState<ContactGroup[]>([])
   const [menu,setMenu]=useState<readonly string[]>([])
   const [menuPage,setMenuPage]=useState(0)
-  const scanner=useRef(new Scanner(new CatalogIndex(SAMPLE_BODIES)))
   const [viewRadius,setViewRadius]=useState(VISIBLE_RADIUS)
   const [pulse,setPulse]=useState(0)
   const [aligning,setAligning]=useState(false)
@@ -106,16 +107,16 @@ export function App() {
 
   const setGroupsStable=useCallback((g:ContactGroup[])=>setGroups(g),[])
   useEffect(()=>{throttleRef.current=throttle},[throttle])
-  const select=useCallback((id:string)=>{scanner.current.select(id);setSelected(scanner.current.selected);setMenu([])},[])
+  const select=useCallback((id:string)=>{runtime.current.scanner.select(id);setSelected(runtime.current.scanner.selected);setMenu([])},[])
   const selectGroup=useCallback((g:ContactGroup)=>{
-    if(g.bodies.length===1){scanner.current.select(g.bodies[0].id);setSelected(scanner.current.selected);setMenu([])}
+    if(g.bodies.length===1){runtime.current.scanner.select(g.bodies[0].id);setSelected(runtime.current.scanner.selected);setMenu([])}
     else {setMenu(g.bodies.map(b=>b.id));setMenuPage(0)}
   },[])
   useEffect(()=>{
     const onKeyDown=(e:KeyboardEvent)=>{
       const key=e.key.toLowerCase()
       const axis=({w:'up',s:'down',a:'left',d:'right'} as const)[key as 'w'|'s'|'a'|'d']
-      if(axis && !e.repeat){controls.current[axis]=true;clock.current.state={...clock.current.state,alignment:null};setAligning(false);e.preventDefault()}
+      if(axis && !e.repeat){controls.current[axis]=true;runtime.current.clock.state={...runtime.current.clock.state,alignment:null};setAligning(false);e.preventDefault()}
       if(e.code==='Space' && !e.repeat){setThrottle(0);e.preventDefault()}
     }
     const onKeyUp=(e:KeyboardEvent)=>{const axis=({w:'up',s:'down',a:'left',d:'right'} as const)[e.key.toLowerCase() as 'w'|'s'|'a'|'d'];if(axis) controls.current[axis]=false}
@@ -133,12 +134,13 @@ export function App() {
     document.addEventListener('visibilitychange',resume)
     const animate=(now:number)=>{
       const dt=document.hidden?0:Math.max(0,now-previous)/1000;previous=now
-      clock.current.state=changeThrottle(clock.current.state,throttleRef.current)
-      const p=clock.current.advance(dt,controls.current,(_before,after)=>{scanner.current.update(after.tick,after.position);return after})
+      runtime.current.clock.state=changeThrottle(runtime.current.clock.state,throttleRef.current)
+      const p=runtime.current.advance(dt,controls.current)
+      if(p.mode!=='flying'){throttleRef.current=0;setThrottle(0)}
       setAligning(p.alignment!==null)
       accumulator+=dt
       if(accumulator>=0.08){
-        setPose(p);setContacts(scanner.current.contacts);setSelected(scanner.current.selected);setPulse(scanner.current.pulse);accumulator=0
+        setPose(p);setContacts(runtime.current.scanner.contacts);setSelected(runtime.current.scanner.selected);setPulse(runtime.current.scanner.pulse);accumulator=0
       }
       frame=requestAnimationFrame(animate)
     }
@@ -151,15 +153,18 @@ export function App() {
   const target=useMemo(()=>contacts.find(body=>body.id===selected)??null,[contacts,selected])
   const setDirection=()=>{
     if(!target)return
-    clock.current.state=alignTo(clock.current.state,relativeM(target.position,clock.current.state.position))
+    runtime.current.clock.state=alignTo(runtime.current.clock.state,relativeM(target.position,runtime.current.clock.state.position))
     setAligning(true)
   }
   const hold=(axis:keyof Controls)=>({
-    onPointerDown:(event:import('react').PointerEvent<HTMLButtonElement>)=>{event.currentTarget.setPointerCapture(event.pointerId);controls.current[axis]=true;clock.current.state={...clock.current.state,alignment:null};setAligning(false)},
+    onPointerDown:(event:import('react').PointerEvent<HTMLButtonElement>)=>{event.currentTarget.setPointerCapture(event.pointerId);controls.current[axis]=true;runtime.current.clock.state={...runtime.current.clock.state,alignment:null};setAligning(false)},
     onPointerUp:()=>{controls.current[axis]=false},
     onPointerCancel:()=>{controls.current[axis]=false},
     onLostPointerCapture:()=>{controls.current[axis]=false}
   })
+  const restart=()=>{runtime.current.reset();throttleRef.current=0;setThrottle(0);controls.current=idleControls();setPose(runtime.current.clock.state);setContacts([]);setSelected(null);setGroups([]);setMenu([]);setAligning(false);setPulse(0)}
+  const warnings=navigationWarnings(pose,contacts)
+  const targetDistances=target?distances(pose,target):null
   const distance=target?length(relativeM(target.position,pose.position))/LIGHT_SECOND_M:null
   return <div className="app">
     <div className="radar">
@@ -176,6 +181,12 @@ export function App() {
       <div className="stat"><span>Speed (sample inertial frame)</span><strong>{fmt(length(pose.velocityMps))} m/s</strong></div>
       <div className="stat"><span>Yaw / pitch</span><strong>{radians(pose.yaw)}° / {radians(pose.pitch)}°</strong></div>
       <div className="stat"><span>Alignment</span><strong>{aligning?'Turning':'Manual'}</strong></div>
+      <div className="stat"><span>Flight status</span><strong>{pose.mode}</strong></div>
+      {pose.contact && <div role="status" className="contact-status">
+        {pose.mode==='destroyed'?'Journey ended — ship destroyed':pose.contact.outcome==='safe-contact'?'Safe surface contact':'Crash recovery'} · impact {fmt(pose.contact.impactSpeedMps)} m/s
+        {(pose.mode==='destroyed'||pose.mode==='grounded') && <button onClick={restart}>Restart navigation</button>}
+      </div>}
+      <div className="warnings" role="status">{warnings.map(w=><p key={w.id}>{w.message}</p>)}</div>
       <hr/>
       <h2>Contact</h2>
       {menuBodies.length>0 && <div className="contact-menu" aria-label="Grouped contacts">
@@ -184,16 +195,16 @@ export function App() {
         <button disabled={menuPage===0} onClick={()=>setMenuPage(p=>p-1)}>Previous contacts</button>
         <button disabled={(menuPage+1)*32>=menuBodies.length} onClick={()=>setMenuPage(p=>p+1)}>Next contacts</button>
       </div>}
-      {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><button className="action" onClick={setDirection}>Set direction</button></>:<p className="muted">Select a holographic contact or edge marker.</p>}
+      {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><p className="muted">Surface clearance {fmt(targetDistances?.surfaceDistanceM??0)} m</p><button className="action" disabled={pose.mode!=='flying'} onClick={setDirection}>Set direction</button></>:<p className="muted">Select a holographic contact or edge marker.</p>}
       <hr/>
       <h2>Manual orientation</h2>
       <div className="pad"><button {...hold('up')}>↑</button><div><button {...hold('left')}>←</button><button {...hold('down')}>↓</button><button {...hold('right')}>→</button></div></div>
       <p className="muted">Hold W/A/S/D or buttons. Camera drag is independent.</p>
       <hr/>
       <h2>Throttle <strong>{throttle>0?'+':''}{throttle}%</strong></h2>
-      <input type="range" min="-100" max="100" step="1" value={throttle} onChange={e=>setThrottle(Number(e.target.value))}/>
+      <input type="range" min="-100" max="100" step="1" value={throttle} disabled={pose.mode!=='flying'} onChange={e=>setThrottle(Number(e.target.value))}/>
       <button onClick={()=>setThrottle(0)}>Zero throttle (Space)</button>
-      <p className="muted foot">SI fixed-step motion · split galactic coordinates · illustrative catalog. Gravity, landing, collisions, jump drive, Core limits and 2D gameplay are deferred.</p>
+      <p className="muted foot">SI fixed-step motion · split galactic coordinates · illustrative catalog. Physical sphere contacts use 20/100 m/s thresholds. Gravity, assisted landing, jump drive, Core limits and 2D gameplay are deferred.</p>
     </aside>
   </div>
 }

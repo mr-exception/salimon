@@ -8,6 +8,7 @@ export interface Body {
   readonly kind: BodyKind
   readonly position: Position
   readonly radiusKm: number
+  readonly angularVelocityRadps?: Vec3
 }
 export const SCANNER_RADIUS_LS = 100_000
 export const SCAN_INTERVAL_SECONDS = 5

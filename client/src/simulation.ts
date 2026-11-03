@@ -1,3 +1,4 @@
+import { type ContactState } from './contact.ts'
 import { ORIGIN, translate, type Position } from './coordinates.ts'
 import { add, length, normal, scale, type Vec3 } from './math.ts'
 export type Controls = { up: boolean; down: boolean; left: boolean; right: boolean }
@@ -11,12 +12,14 @@ export interface ShipState {
   readonly massKg: number
   readonly throttle: number
   readonly alignment: Alignment | null
+  readonly mode: 'flying'|'recovering'|'grounded'|'destroyed'
+  readonly contact: ContactState|null
   readonly tick: number
 }
 export const STEP_SECONDS = 1/60
 export const ANGULAR_SPEED = 5 * Math.PI/180
 export const DRY_MASS_KG = 100_000
-export const initialShip = (): ShipState => ({position:ORIGIN,velocityMps:[0,0,0],yaw:0,pitch:0,massKg:DRY_MASS_KG,throttle:0,alignment:null,tick:0})
+export const initialShip = (): ShipState => ({position:ORIGIN,velocityMps:[0,0,0],yaw:0,pitch:0,massKg:DRY_MASS_KG,throttle:0,alignment:null,mode:'flying',contact:null,tick:0})
 export const forward = (yaw: number, pitch: number): Vec3 => [-Math.sin(yaw)*Math.cos(pitch), Math.sin(pitch), -Math.cos(yaw)*Math.cos(pitch)]
 export const angleDifference = (target: number, current: number) => Math.atan2(Math.sin(target-current),Math.cos(target-current))
 function moveAngle(current: number, target: number) {
@@ -25,6 +28,7 @@ function moveAngle(current: number, target: number) {
 }
 export function setThrottle(state: ShipState, percent: number): ShipState {
   if (!Number.isFinite(percent)) throw new RangeError('Throttle must be finite')
+  if(state.mode!=='flying')return {...state,throttle:0}
   return {...state,throttle:Math.max(-100,Math.min(100,Math.round(percent)))}
 }
 export function setMass(state: ShipState, massKg: number): ShipState {
@@ -32,11 +36,13 @@ export function setMass(state: ShipState, massKg: number): ShipState {
   return {...state,massKg}
 }
 export function alignTo(state: ShipState, direction: Vec3): ShipState {
+  if(state.mode!=='flying')return state
   if (!direction.every(Number.isFinite) || length(direction)===0) return {...state,alignment:null}
   const dir=normal(direction)
   return {...state,alignment:{yaw:Math.atan2(-dir[0],-dir[2]),pitch:Math.asin(Math.max(-1,Math.min(1,dir[1])))}}
 }
 export function stepShip(state: ShipState, controls: Controls): ShipState {
+  if(state.mode!=='flying')return {...state,tick:state.tick+1,throttle:0,alignment:null}
   let {yaw,pitch,alignment}=state
   if (Object.values(controls).some(Boolean)) {
     alignment=null
@@ -58,6 +64,7 @@ export class NavigationClock {
   state: ShipState
   private debt=0
   constructor(state=initialShip()) {this.state=state}
+  reset(state=initialShip()) {this.state=state;this.debt=0}
   advance(elapsedSeconds: number, controls: Controls, afterStep?: (before: ShipState, after: ShipState)=>ShipState) {
     if(!Number.isFinite(elapsedSeconds)||elapsedSeconds<0) throw new RangeError('Invalid elapsed time')
     this.debt+=elapsedSeconds

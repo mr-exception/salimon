@@ -70,3 +70,5 @@ This qualifies browser/cloud presentation, not hardware FPS, physical input,
 native gameplay migration or art-direction signoff. The static sample catalog,
 unlimited energy and existing prototype simulation limits remain. Off-screen
 line presentation is the separate child delivery #738.
+
+Final evidence formatting removes trailing whitespace from text logs and an extra source EOF line; numerical readings and executable behavior are unchanged. Prior check coverage is reused for this formatting-only commit; current-head CI still runs the complete gate.

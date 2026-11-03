@@ -35,7 +35,7 @@ Running 16 tests using 1 worker
   ✓  16 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.3s)
 
 
-  1) [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible 
+  1) [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible
 
     Error: expect(locator).toHaveCount(expected) failed
 
@@ -75,5 +75,5 @@ Running 16 tests using 1 worker
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   1 failed
-    [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible 
+    [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible
   15 passed (1.4m)

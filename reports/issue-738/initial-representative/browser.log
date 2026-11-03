@@ -35,7 +35,7 @@ Running 16 tests using 1 worker
   ✓  16 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.3s)
 
 
-  1) [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines 
+  1) [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines
 
     Error: expect(received).toBe(expected) // Object.is equality
 
@@ -66,5 +66,5 @@ Running 16 tests using 1 worker
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   1 failed
-    [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines 
+    [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines
   15 passed (1.3m)

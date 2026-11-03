@@ -18,9 +18,9 @@ existing keyboard-compatible paged contact menu/search. Visible grouping now als
 renders the selected representative at that body's own position.
 
 Parent: PR #739, branch `issue-737-faceted-navigation`, at
-`8ec79be75237b5ee37b2c0d18a10061c4d0ce145`. This child targets that branch.
+`bc6ccdc44adae64688243b065bf49e17202bfb51`. This child targets that branch.
 Revalidated unchanged parent/default refs before publication; prototype #731 and
-scanner/input prerequisites #728/#730 are merged. Parent hull and camera-reset corrections are included in this ancestry. Parent current-head CI passed: [run 41721378488](https://github.com/mr-exception/salimon/actions/runs/41721378488). Child current-head CI links and outcomes are recorded on its PR and source issue.
+scanner/input prerequisites #728/#730 are merged. Parent hull and camera-reset corrections are included in this ancestry. Parent functional-source CI passed (before final whitespace normalization): [run 41721378488](https://github.com/mr-exception/salimon/actions/runs/41721378488). Child current-head CI links and outcomes are recorded on its PR and source issue.
 [Source and fixture hashes](source.sha256). Merge #739 before this child.
 
 ## Prepublication corrections
@@ -85,3 +85,5 @@ retain full screenshots/results/traces for 14 days; useful originals above are
 permanent. Cloud software rendering does not establish hardware FPS or physical
 input/device qualification. This changes navigation presentation only; sample
 catalog and existing simulation/migration limitations remain.
+
+Final evidence formatting removes trailing whitespace from retained text logs. Parent formatting-only corrections were merged without rewriting either branch. Executable inputs are unchanged; local verification above is reused and CI repeats the complete gate on both final published heads.

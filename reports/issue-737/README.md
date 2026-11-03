@@ -24,8 +24,8 @@ viewport 1280×800; existing mobile regression 390×844 and resized landscape.
 
 - `cd client && npm ci --no-audit --no-fund`: pass (95 locked packages).
 - Baseline `npm run build && CHROMIUM_PATH=/usr/bin/chromium npx playwright test --project=production`: pass, live WebGL/adapter preflight before implementation; [original baseline](before.png).
-- `npm test --prefix client`: 21/21 pass, including asset bounds/finite vertices,
-  directional nose/wing silhouette and nonspherical rock, plus unchanged
+- `npm test --prefix client`: 22/22 pass, including asset bounds/finite vertices,
+  directional nose/wing silhouette, outward hull winding and nonspherical rock, plus unchanged
   scanner/precision/physics/input tests. [Raw output](domain-tests.log).
 - `npm run build --prefix client`: pass, [raw output](build.log).
   Existing Vite >500 kB bundle advisory remains; no threshold was changed.
@@ -39,7 +39,7 @@ viewport 1280×800; existing mobile regression 390×844 and resized landscape.
   in [raw measurements](geometry-backend.json).
 - Original captures: [normal](zoom-0.5.png), [far zoom](zoom-0.1.png),
   [near zoom](zoom-1.png), [selected moon](selected.png).
-- `git diff --check`: pass. No required local check failed.
+- `git diff --check`: pass. All final local checks pass. Final geometry review found inward hull triangle winding in the initial delivery; it is corrected on this owning branch, with an outward-face regression and refreshed original captures. The initial evidence remains in the first PR commit (`10c59c6`).
 
 CI repeats the full locked build/unit/browser checks on the published head;
 its run link and outcome are recorded on the PR and issue. Screenshots, raw JSON

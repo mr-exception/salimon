@@ -11,7 +11,7 @@
             399.9999999999927
           ],
           "pixels": 461,
-          "colors": 174
+          "colors": 158
         },
         {
           "name": "nav-ship-heading",
@@ -22,7 +22,7 @@
             399.9999999999927
           ],
           "pixels": 461,
-          "colors": 174
+          "colors": 158
         },
         {
           "name": "nav-ship-hull",
@@ -33,7 +33,7 @@
             399.9999999999927
           ],
           "pixels": 461,
-          "colors": 174
+          "colors": 158
         },
         {
           "name": "nav-ship-wings",
@@ -44,7 +44,7 @@
             399.9999999999927
           ],
           "pixels": 461,
-          "colors": 174
+          "colors": 158
         },
         {
           "name": "nav-ship-canopy",
@@ -55,7 +55,7 @@
             394.1042917913974
           ],
           "pixels": 461,
-          "colors": 174
+          "colors": 158
         },
         {
           "name": "nav-ship-engine",
@@ -66,7 +66,7 @@
             407.63198473603853
           ],
           "pixels": 445,
-          "colors": 162
+          "colors": 146
         },
         {
           "name": "nav-ship-engine",
@@ -77,7 +77,7 @@
             407.63198473603853
           ],
           "pixels": 455,
-          "colors": 167
+          "colors": 151
         },
         {
           "name": "nav-body:asteroid:asteroid",
@@ -141,8 +141,8 @@
             485,
             399.9999999999985
           ],
-          "pixels": 870,
-          "colors": 245
+          "pixels": 868,
+          "colors": 227
         },
         {
           "name": "nav-ship-heading",
@@ -152,8 +152,8 @@
             485,
             399.9999999999985
           ],
-          "pixels": 870,
-          "colors": 245
+          "pixels": 868,
+          "colors": 227
         },
         {
           "name": "nav-ship-hull",
@@ -163,8 +163,8 @@
             485,
             399.9999999999985
           ],
-          "pixels": 870,
-          "colors": 245
+          "pixels": 868,
+          "colors": 227
         },
         {
           "name": "nav-ship-wings",
@@ -174,8 +174,8 @@
             485,
             399.9999999999985
           ],
-          "pixels": 870,
-          "colors": 245
+          "pixels": 868,
+          "colors": 227
         },
         {
           "name": "nav-ship-canopy",
@@ -185,8 +185,8 @@
             485,
             394.10429179140317
           ],
-          "pixels": 870,
-          "colors": 245
+          "pixels": 868,
+          "colors": 227
         },
         {
           "name": "nav-ship-engine",
@@ -196,8 +196,8 @@
             480.5,
             407.6319847360444
           ],
-          "pixels": 826,
-          "colors": 224
+          "pixels": 824,
+          "colors": 206
         },
         {
           "name": "nav-ship-engine",
@@ -207,8 +207,8 @@
             489.5,
             407.6319847360444
           ],
-          "pixels": 879,
-          "colors": 246
+          "pixels": 877,
+          "colors": 228
         },
         {
           "name": "nav-body:asteroid:asteroid",
@@ -219,7 +219,7 @@
             386.2200275599159
           ],
           "pixels": 216,
-          "colors": 73
+          "colors": 71
         },
         {
           "name": "nav-body:planet:planet",
@@ -229,8 +229,8 @@
             473.5,
             386.2200275599159
           ],
-          "pixels": 859,
-          "colors": 236
+          "pixels": 857,
+          "colors": 218
         }
       ],
       "surfaces": 0,
@@ -251,7 +251,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-heading",
@@ -262,7 +262,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-hull",
@@ -273,7 +273,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-wings",
@@ -284,7 +284,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-canopy",
@@ -295,7 +295,7 @@
             394.1042917913901
           ],
           "pixels": 498,
-          "colors": 193
+          "colors": 174
         },
         {
           "name": "nav-ship-engine",
@@ -306,7 +306,7 @@
             407.63198473603126
           ],
           "pixels": 480,
-          "colors": 181
+          "colors": 162
         },
         {
           "name": "nav-ship-engine",
@@ -317,7 +317,7 @@
             407.63198473603126
           ],
           "pixels": 498,
-          "colors": 190
+          "colors": 171
         },
         {
           "name": "nav-body:asteroid:asteroid",
@@ -382,7 +382,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-heading",
@@ -393,7 +393,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-hull",
@@ -404,7 +404,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-wings",
@@ -415,7 +415,7 @@
             399.99999999998545
           ],
           "pixels": 498,
-          "colors": 192
+          "colors": 173
         },
         {
           "name": "nav-ship-canopy",
@@ -426,7 +426,7 @@
             394.1042917913901
           ],
           "pixels": 498,
-          "colors": 193
+          "colors": 174
         },
         {
           "name": "nav-ship-engine",
@@ -437,7 +437,7 @@
             407.63198473603126
           ],
           "pixels": 480,
-          "colors": 181
+          "colors": 162
         },
         {
           "name": "nav-ship-engine",
@@ -448,7 +448,7 @@
             407.63198473603126
           ],
           "pixels": 498,
-          "colors": 190
+          "colors": 171
         },
         {
           "name": "nav-body:asteroid:asteroid",

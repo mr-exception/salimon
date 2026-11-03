@@ -16,3 +16,12 @@ test('navigation assets have finite bounded flat facets and a directional ship s
  assert.ok(rock.getSize(new Vector3()).x>rock.getSize(new Vector3()).y*1.3)
  assert.notDeepEqual(Array.from(bodyGeometries.asteroid.getAttribute('position').array),Array.from(new IcosahedronGeometry(1,0).getAttribute('position').array))
 })
+
+test('closed ship hull triangles face outward so back-face culling preserves the upper hull',()=>{
+ const positions=shipGeometry.getAttribute('position'),indices=shipGeometry.index!
+ for(let i=0;i<indices.count;i+=3) {
+  const a=new Vector3().fromBufferAttribute(positions,indices.getX(i)),b=new Vector3().fromBufferAttribute(positions,indices.getX(i+1)),c=new Vector3().fromBufferAttribute(positions,indices.getX(i+2))
+  const outward=b.clone().sub(a).cross(c.clone().sub(a))
+  assert.ok(outward.dot(a.clone().add(b).add(c).divideScalar(3))>0,'convex hull face points away from its interior')
+ }
+})

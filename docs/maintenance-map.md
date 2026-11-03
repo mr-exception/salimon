@@ -883,3 +883,7 @@ resume/mining routes; [evidence](../reports/issue-439/README.md).
 ## Opening and recovered investigations (#470 / #471)
 
 [Opening/investigation contract](opening-and-investigations.md): runtime `session/narrative.rs` owns complete-packet lead admission, fixed ground-bound physical clues, modal inspections and schema-31 receipts; universe `scanner/chart.rs` owns explicit unverified same-frame route snapshots. Runtime tests, `scripts/verify_narrative.py`, existing canonical mine/carry/Fabricator persistence and production audio exports form the acceptance matrix. Scientific full-Gaia acceptance remains #524.
+
+## Browser radar (#727)
+
+The active browser entry point is `client/src/App.tsx`. `coordinates.ts` owns split SI positions and camera-relative differences; `simulation.ts` owns fixed-step ship state, impulse/mass motion and alignment; `sampleUniverse.ts` owns illustrative catalog inputs. Domain tests use `npm test`; type/build validation uses `npm run build` in `client/`. Historical Rust paths below require the legacy revision and are not current browser owners.

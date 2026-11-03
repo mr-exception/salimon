@@ -6,7 +6,7 @@ Status: approved navigation design and prototype scope. This is **not** a claim 
 
 Implement a browser-based 3D holographic navigation *view*, built with React, TypeScript, Three.js and React Three Fiber under `client/`. Ship energy is **infinite in this prototype only**. No Energy Core UI, depletion, resources, 2D planetary surfaces, interior, survival, crafting, or detailed ship meshes. The deterministic **sample universe** is illustrative test data, not the production Gaia catalog.
 
-The main branch currently contains documentation only; older documents mentioning Rust packages and `client/` refer to a previous architecture. This prototype establishes a fresh browser entry point but does not delete or rewrite historical contracts. Production migration is separate future work.
+The main branch contains the browser client; older documents mentioning Rust packages refer to a previous architecture. This prototype establishes a fresh browser entry point but does not delete or rewrite historical contracts. Production migration is separate future work.
 
 ## Approved navigation interaction
 
@@ -24,13 +24,13 @@ The main branch currently contains documentation only; older documents mentionin
 
 ## Prototype sample and limitations
 
-The sample in `client/src/sampleUniverse.ts` contains an invented miniature test system with the ship, a star, planets, moon and asteroid. It intentionally uses short *illustrative* distances for visible camera interaction; the actual scanner cap remains 100,000 light-seconds. The sample uses a fixed-point local frame, scale conversion and simple motion for demonstrability, **not production-grade gravity, Kepler ephemerides, collision, precision split-cells, light-speed information delay, long-distance jump drive or authoritative ship impulse**.
+The sample in `client/src/sampleUniverse.ts` contains an invented miniature test system with the ship, a star, planets, moon and asteroid. It intentionally uses short *illustrative* distances for visible camera interaction; the actual scanner cap remains 100,000 light-seconds. The catalog is illustrative; its coordinates are converted once to split SI positions. `simulation.ts` owns authoritative browser ship motion: 60 Hz fixed steps, integer galactic cells with local meter offsets, 100,000 kg dry mass, 100/50 MW forward/reverse and 1 N·s/J with unlimited energy. Throttle clamps to signed integer percent. Position integrates constant step acceleration; orientation uses 5°/s yaw/pitch with galactic-up stabilized roll. Manual input cancels the captured one-time alignment, including opposing held controls. Existing velocity stays inertial. React and the radar only publish snapshots; a bounded per-frame work budget retains elapsed-time debt. Hidden-page time is paused. This does not implement gravity, ephemerides, collision, light delay, jump drive or the historical native runtime.
 
 The prototype must not silently masquerade as the original native gameplay. Its purpose is to validate controls, symbols, selection, scanning cadence, frame-independent heading and camera, range filtering and the client build.
 
 ## Acceptance checks
 
-1. `cd client && npm install && npm run build` succeeds in a supported Node environment.
+1. `cd client && npm ci && npm test && npm run build` succeeds in a supported Node environment.
 2. Browser displays a ship-centered radar and multiple distinct holographic celestial contacts from a typed sample catalog.
 3. Camera orbit/zoom do not change ship orientation or motion.
 4. A selected contact opens only Set direction; alignment is one-time; manually turning cancels.
@@ -40,4 +40,4 @@ The prototype must not silently masquerade as the original native gameplay. Its 
 
 ## Migration/engineering follow-ups
 
-Keep sample simulation separate from rendering. Production work needs real galactic split coordinates, epoch-aware body positions, floating-origin renderer, spatial indexed scanner (100,000 light-seconds), the correct pre-existing thrust/mass model, 100 m/s contact handling, input and scene unit tests, accessible keyboard controls, and eventual navigation integration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.
+Keep sample simulation separate from rendering. Split coordinates, ship-relative conversion and impulse/mass motion are implemented for the browser ship. Remaining work includes epoch-aware body positions, indexed scanning, contact handling, browser/input accessibility tests and eventual native-domain migration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.

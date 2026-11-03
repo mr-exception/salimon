@@ -1,5 +1,17 @@
 # Technical architecture and AI maintenance
 
+## Active browser navigation
+
+Current `main` ships the [navigation-only browser client](radar-navigation-prototype.md).
+`coordinates.ts` owns split positions; `simulation.ts` owns deterministic SI ship
+transitions; `contact.ts` owns conservative sphere contact and observations;
+`scanner.ts` owns the spatial catalog index and temporary detection;
+`navigationRuntime.ts` composes them per fixed step. React/App owns lifecycle and
+input mapping through `input.ts`, and Three/R3F owns camera and radar presentation.
+No React or GPU type enters the simulation. Test and build instructions are in
+[the client guide](../client/README.md). The native sections below are historical
+contracts, not a claim that their gameplay has been migrated.
+
 [Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
 
 ## Implemented architecture

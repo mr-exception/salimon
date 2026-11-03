@@ -1,0 +1,35 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:10333) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:10364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 16 tests using 1 worker
+
+(node:10376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (11.6s)
+  ✓   2 [desktop] › tests/desktop.spec.ts:24:1 › focused forms preserve keyboard behavior; button keyboard hold and blur release (5.2s)
+  ✓   3 [desktop] › tests/desktop.spec.ts:33:1 › pointer capture releases outside the button, on cancellation and capture loss (4.9s)
+  ✓   4 [desktop] › tests/desktop.spec.ts:42:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (2.6s)
+  ✓   5 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: warning (1.1s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: destroyed (1.5s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: safe (2.3s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: asteroid (2.3s)
+  ✓   9 [desktop] › tests/desktop.spec.ts:57:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (2.1s)
+  ✓  10 [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines (7.3s)
+  ✓  11 [desktop] › tests/edges.spec.ts:68:1 › edge discovery waits for pulse; out-of-range targets stay hidden and selected contacts expire (6.5s)
+  ✓  12 [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible (2.7s)
+  ✓  13 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (6.4s)
+(node:10960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  14 [mobile] › tests/mobile.spec.ts:2:1 › mobile layout, accessible selection, zoom controls and rotation resize (6.5s)
+  ✓  15 [mobile] › tests/mobile.spec.ts:15:1 › touch release outside, touch cancel and viewport resize clear held controls (4.2s)
+(node:11141) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.4s)
+
+  16 passed (1.3m)

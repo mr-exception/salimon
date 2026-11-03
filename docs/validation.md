@@ -21,7 +21,7 @@ Use Python 3.12 for tooling checks. Initial installation/builds require network 
 
 ## Browser radar checks
 
-For the active browser client use Node >=22.18 and `cd client && npm ci && npm test && npm run build`. Run `npx playwright install --with-deps chromium && npm run test:browser` for the 12 desktop/mobile/production WebGL routes (system Chromium: set `CHROMIUM_PATH`). The Navigation client workflow uses npm lockfile caching, clean install, domain tests, build/typecheck and the same browser suite; revision-named raw results/screenshots/traces are retained for 14 days. Historical native commands below apply to legacy revisions. Browser captures must exercise the real WebGL canvas and identify the adapter. Software WebGL results do not establish hardware performance.
+For the active browser client use Node >=22.18 and `cd client && npm ci && npm test && npm run build`. Run `npx playwright install --with-deps chromium && npm run test:browser` for the desktop/mobile/production WebGL routes, including proxy-pixel and viewport-edge scenarios (system Chromium: set `CHROMIUM_PATH`). The Navigation client workflow uses npm lockfile caching, clean install, domain tests, build/typecheck and the same browser suite; revision-named raw results/screenshots/traces are retained for 14 days. Historical native commands below apply to legacy revisions. Browser captures must exercise the real WebGL canvas and identify the adapter. Software WebGL results do not establish hardware performance.
 
 ## Automatic CI
 

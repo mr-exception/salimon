@@ -1,0 +1,573 @@
+{
+  "initial": [
+    {
+      "id": "bottom",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        50,
+        100
+      ]
+    },
+    {
+      "id": "bottom-left",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        0,
+        100
+      ]
+    },
+    {
+      "id": "top-left",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "bottom-right",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        100,
+        100
+      ]
+    },
+    {
+      "id": "top-right",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        100,
+        0
+      ]
+    },
+    {
+      "id": "left",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        0,
+        50
+      ]
+    },
+    {
+      "id": "right",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        100,
+        50
+      ]
+    },
+    {
+      "id": "top",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        50,
+        0
+      ]
+    }
+  ],
+  "panned": [
+    {
+      "id": "bottom-left",
+      "selected": false,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        23.78175969218621,
+        100
+      ]
+    },
+    {
+      "id": "bottom",
+      "selected": false,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        66.93656476594863,
+        100
+      ]
+    },
+    {
+      "id": "left",
+      "selected": false,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        0,
+        56.845194926237575
+      ]
+    },
+    {
+      "id": "bottom-right",
+      "selected": false,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        100,
+        89.90863016028894
+      ]
+    },
+    {
+      "id": "top-right",
+      "selected": false,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        100,
+        23.78175969218621
+      ]
+    },
+    {
+      "id": "top-left",
+      "selected": false,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        10.091369839711051,
+        0
+      ]
+    },
+    {
+      "id": "top",
+      "selected": false,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        66.93656476594863,
+        0
+      ]
+    },
+    {
+      "id": "right",
+      "selected": true,
+      "start": [
+        66.93656476594863,
+        56.845194926237575
+      ],
+      "end": [
+        100,
+        56.845194926237575
+      ]
+    }
+  ],
+  "zoomed": [
+    {
+      "id": "bottom-left",
+      "selected": false,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        46.27528140170878,
+        100
+      ]
+    },
+    {
+      "id": "bottom",
+      "selected": false,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        82.9556900190211,
+        100
+      ]
+    },
+    {
+      "id": "left",
+      "selected": false,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        0,
+        63.319591382687705
+      ]
+    },
+    {
+      "id": "bottom-right",
+      "selected": false,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        100,
+        80.3639013636666
+      ]
+    },
+    {
+      "id": "top-right",
+      "selected": false,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        100,
+        46.27528140170879
+      ]
+    },
+    {
+      "id": "top-left",
+      "selected": false,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        19.636098636333394,
+        0
+      ]
+    },
+    {
+      "id": "top",
+      "selected": false,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        82.9556900190211,
+        0
+      ]
+    },
+    {
+      "id": "right",
+      "selected": true,
+      "start": [
+        82.9556900190211,
+        63.319591382687705
+      ],
+      "end": [
+        100,
+        63.319591382687705
+      ]
+    }
+  ],
+  "rotated": [],
+  "shipOutside": [
+    {
+      "id": "bottom-right",
+      "selected": false,
+      "start": [
+        0,
+        61.855670103092784
+      ],
+      "end": [
+        38.144329896907216,
+        100
+      ]
+    },
+    {
+      "id": "top-right",
+      "selected": false,
+      "start": [
+        0,
+        38.144329896907216
+      ],
+      "end": [
+        38.144329896907216,
+        0
+      ]
+    }
+  ],
+  "moved": [
+    {
+      "id": "bottom",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        44.84536082474227,
+        100
+      ]
+    },
+    {
+      "id": "bottom-right",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        94.84536082474226,
+        100
+      ]
+    },
+    {
+      "id": "top-right",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        94.84536082474226,
+        0
+      ]
+    },
+    {
+      "id": "top-left",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        0,
+        4.672897196261683
+      ]
+    },
+    {
+      "id": "bottom-left",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        0,
+        95.32710280373831
+      ]
+    },
+    {
+      "id": "left",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        0,
+        50
+      ]
+    },
+    {
+      "id": "top",
+      "selected": false,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        44.84536082474227,
+        0
+      ]
+    },
+    {
+      "id": "right",
+      "selected": true,
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        100,
+        50
+      ]
+    }
+  ],
+  "projections": {
+    "ship": [
+      50,
+      50
+    ],
+    "contacts": [
+      {
+        "id": "bottom",
+        "point": [
+          39.69072164948454,
+          150
+        ]
+      },
+      {
+        "id": "bottom-left",
+        "point": [
+          -60.30927835051547,
+          150
+        ]
+      },
+      {
+        "id": "bottom-right",
+        "point": [
+          139.69072164948452,
+          150
+        ]
+      },
+      {
+        "id": "left",
+        "point": [
+          -60.30927835051547,
+          50
+        ]
+      },
+      {
+        "id": "right",
+        "point": [
+          139.69072164948452,
+          50
+        ]
+      },
+      {
+        "id": "top",
+        "point": [
+          39.69072164948454,
+          -50
+        ]
+      },
+      {
+        "id": "top-left",
+        "point": [
+          -60.30927835051547,
+          -50
+        ]
+      },
+      {
+        "id": "top-right",
+        "point": [
+          139.69072164948452,
+          -50
+        ]
+      }
+    ]
+  },
+  "gpu": {
+    "objects": [
+      {
+        "name": "nav-galactic-lattice",
+        "type": "Points",
+        "triangles": 0,
+        "pixel": [
+          485,
+          400
+        ],
+        "pixels": 194,
+        "colors": 101
+      },
+      {
+        "name": "nav-ship-heading",
+        "type": "Group",
+        "triangles": 0,
+        "pixel": [
+          485,
+          400
+        ],
+        "pixels": 194,
+        "colors": 101
+      },
+      {
+        "name": "nav-ship-hull",
+        "type": "Mesh",
+        "triangles": 12,
+        "pixel": [
+          485,
+          400
+        ],
+        "pixels": 194,
+        "colors": 101
+      },
+      {
+        "name": "nav-ship-wings",
+        "type": "Mesh",
+        "triangles": 4,
+        "pixel": [
+          485,
+          400
+        ],
+        "pixels": 194,
+        "colors": 101
+      },
+      {
+        "name": "nav-ship-canopy",
+        "type": "Mesh",
+        "triangles": 8,
+        "pixel": [
+          485,
+          394.96
+        ],
+        "pixels": 196,
+        "colors": 102
+      },
+      {
+        "name": "nav-ship-engine",
+        "type": "Mesh",
+        "triangles": 12,
+        "pixel": [
+          480.5,
+          399.1
+        ],
+        "pixels": 188,
+        "colors": 98
+      },
+      {
+        "name": "nav-ship-engine",
+        "type": "Mesh",
+        "triangles": 12,
+        "pixel": [
+          489.5,
+          399.1
+        ],
+        "pixels": 198,
+        "colors": 103
+      }
+    ],
+    "surfaces": 0,
+    "calls": 9,
+    "triangles": 58,
+    "geometries": 10,
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "zoom": 0.5
+  },
+  "errors": []
+}

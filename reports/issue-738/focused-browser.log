@@ -1,0 +1,18 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep all edges|edge discovery|collinear contacts
+
+[WebServer] (node:8152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:8183) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:8195) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines (8.4s)
+  ✓  2 [desktop] › tests/edges.spec.ts:68:1 › edge discovery waits for pulse; out-of-range targets stay hidden and selected contacts expire (6.9s)
+  ✓  3 [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible (2.9s)
+
+  3 passed (19.6s)

@@ -72,3 +72,20 @@ plane, textures, bloom or physical ship asset is introduced.
 normal unit/build/browser checks. `tests/visuals.spec.ts` measures original WebGL
 pixels, draw/triangle/resource bounds and zoom/selection screenshots using the
 production App with a development-only scene observer.
+
+## Off-screen contacts (#738)
+
+Scanned, in-range contacts outside the actual orthographic viewport use subtle
+ship-to-boundary lines. Lines clip to the real viewport, including entry/exit
+when the ship is off-screen; a path missing the viewport draws no false segment.
+Selected lines and labels are brighter. Stable perimeter groups retain every
+contact ID, expose the existing paged picker, and prioritize the selected ray.
+Labels are inset for access; line endpoints remain on the viewport boundary.
+Contacts outside camera depth alone get a labelled contact entry without an
+invented 2D direction. No scanner or detection history policy changes.
+
+Left-drag orbits, right-drag pans and the mouse wheel zooms the independent
+camera. Reset camera restores its target, pose and zoom without moving the ship.
+`src/radar.ts` owns segment clipping and grouping; `tests/edges.spec.ts` covers
+all edges/corners, pan/orbit/zoom, off-screen ship, pulse/expiry and dense
+selection against the production App and actual WebGL canvas.

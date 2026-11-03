@@ -1,11 +1,16 @@
 // Development fixture only; Vite's production entry imports none of this module.
 import * as THREE from 'three'
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { RootState } from '@react-three/fiber'
-export function observeScene({gl,scene,camera,invalidate}:RootState) {
+export function observeScene({gl,scene,camera,invalidate,get}:RootState) {
   if(!(camera instanceof THREE.OrthographicCamera))throw Error('Expected orthographic radar')
   window.radarTest={
     camera(position:[number,number,number],target:[number,number,number],zoom:number) {
-      camera.position.set(...position);camera.up.set(0,1,0);camera.lookAt(...target);camera.zoom=zoom;camera.updateProjectionMatrix();camera.updateMatrixWorld();invalidate()
+      const controls=get().controls as OrbitControls|null;const damping=controls?.enableDamping;if(controls){controls.enableDamping=false;controls.update();controls.target.set(...target)}camera.position.set(...position);camera.up.set(0,1,0);camera.lookAt(...target);camera.zoom=zoom;camera.updateProjectionMatrix();camera.updateMatrixWorld();controls?.update();if(controls&&damping!==undefined)controls.enableDamping=damping;invalidate()
+    },
+    projectLs(point:[number,number,number]) {
+      const v=new THREE.Vector3(...point).project(camera)
+      return [(v.x+1)*50,(1-v.y)*50]
     },
     snapshot() {
       gl.render(scene,camera)
@@ -30,4 +35,4 @@ export function observeScene({gl,scene,camera,invalidate}:RootState) {
     }
   }
 }
-declare global {interface Window {radarTest:{camera:(position:[number,number,number],target:[number,number,number],zoom:number)=>void;snapshot:()=>{objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[];surfaces:number;calls:number;triangles:number;geometries:number;renderer:string;zoom:number}}}}
+declare global {interface Window {radarTest:{projectLs:(point:[number,number,number])=>number[];camera:(position:[number,number,number],target:[number,number,number],zoom:number)=>void;snapshot:()=>{objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[];surfaces:number;calls:number;triangles:number;geometries:number;renderer:string;zoom:number}}}}

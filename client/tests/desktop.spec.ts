@@ -14,7 +14,7 @@ test('scanner pulse, camera independence, clipping selection and manual alignmen
  expect((await page.locator('canvas').screenshot()).equals(before)).toBe(false)
  await page.getByRole('button',{name:'Reset camera',exact:true}).click()
  for(let i=0;i<4;i++)await page.getByRole('button',{name:'Zoom in',exact:true}).click()
- const edge=page.getByRole('button',{name:'◇ Caligo',exact:true});await expect(edge).toBeVisible();await edge.click()
+ const edge=page.getByRole('button',{name:'Off-screen Caligo',exact:true});await expect(edge).toBeVisible();await edge.click()
  await expect(page.locator('.target-status')).toHaveText('Selected target: Caligo')
  await page.getByRole('button',{name:'Set direction',exact:true}).click();await expect(stat(page,'Alignment')).toHaveText('Turning')
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('a');await page.waitForTimeout(200);await page.keyboard.up('a')

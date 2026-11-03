@@ -1,0 +1,79 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:4672) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4703) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 16 tests using 1 worker
+
+(node:4715) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/desktop.spec.ts:6:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (11.5s)
+  ✓   2 [desktop] › tests/desktop.spec.ts:24:1 › focused forms preserve keyboard behavior; button keyboard hold and blur release (5.9s)
+  ✓   3 [desktop] › tests/desktop.spec.ts:33:1 › pointer capture releases outside the button, on cancellation and capture loss (4.8s)
+  ✓   4 [desktop] › tests/desktop.spec.ts:42:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (2.6s)
+  ✓   5 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: warning (1.2s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: destroyed (1.3s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: safe (2.4s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:50:65 › production App contact fixture: asteroid (2.2s)
+  ✓   9 [desktop] › tests/desktop.spec.ts:57:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (2.2s)
+  ✓  10 [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines (7.8s)
+  ✓  11 [desktop] › tests/edges.spec.ts:68:1 › edge discovery waits for pulse; out-of-range targets stay hidden and selected contacts expire (6.6s)
+  ✘  12 [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible (11.7s)
+(node:5262) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (4.9s)
+(node:5403) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  14 [mobile] › tests/mobile.spec.ts:2:1 › mobile layout, accessible selection, zoom controls and rotation resize (7.1s)
+  ✓  15 [mobile] › tests/mobile.spec.ts:15:1 › touch release outside, touch cancel and viewport resize clear held controls (4.2s)
+(node:5599) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.3s)
+
+
+  1) [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.direction-lines line')
+    Expected: 1
+    Received: 2
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveCount" locator('.direction-lines line') with timeout 10000ms
+      - waiting for locator('.direction-lines line')
+        23 × locator resolved to 2 elements
+           - unexpected value "2"
+
+
+      79 | test('collinear contacts share one subdued ray while all IDs and selected representative stay accessible',async({page},testInfo)=>{
+      80 |  await page.goto('/tests/fixture.html?scenario=edges-dense');await front(page)
+    > 81 |  await expect(page.locator('.scan-status')).toContainText('2000 temporary contacts');await expect(page.locator('.direction-lines line')).toHaveCount(1)
+         |                                                                                                                                          ^
+      82 |  await expect(page.locator('.edge')).toHaveCount(1)
+      83 |  const grouped=page.getByRole('button',{name:'Off-screen 2000 contacts',exact:true});await grouped.focus();await page.keyboard.press('Enter')
+      84 |  await expect(page.locator('.contact-menu button')).toHaveCount(34)
+        at /workspace/salimon/client/tests/edges.spec.ts:81:138
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/edges-collinear-contacts-s-ac181-resentative-stay-accessible-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/edges-collinear-contacts-s-ac181-resentative-stay-accessible-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/edges-collinear-contacts-s-ac181-resentative-stay-accessible-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/edges-collinear-contacts-s-ac181-resentative-stay-accessible-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible 
+  15 passed (1.4m)

@@ -22,3 +22,5 @@ Open the URL Vite prints. `npm run build` produces `dist/`.
 - Reset camera only changes the viewer's orientation.
 
 For usability, visible sample distances are compressed *as input test fixtures*, not via a nonlinear rendering transform. All rendered positions use a linear conversion from simulated coordinates, and scanner range is exactly 100,000 light-seconds. The catalog is not astrophysically authoritative. Ship motion uses the approved SI impulse/mass model on a renderer-independent 60 Hz clock. `coordinates.ts` owns integer galactic cells/local offsets, `simulation.ts` owns motion and one-time alignment, and `App.tsx` owns input and presentation. Energy remains infinite. Tests run on Node 22.18 or newer without a separate test runner.
+
+The first scanner pulse arrives after five simulation seconds. `scanner.ts` owns the immutable catalog index and disposable contact/selection state. `radar.ts` owns frustum edges and dense groups; click a group to select any member from its paged list. Zoom never reveals unscanned catalog bodies. The grid is anchored to galactic axes/lattice, with the ship at its center.

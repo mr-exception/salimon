@@ -887,3 +887,5 @@ resume/mining routes; [evidence](../reports/issue-439/README.md).
 ## Browser radar (#727)
 
 The active browser entry point is `client/src/App.tsx`. `coordinates.ts` owns split SI positions and camera-relative differences; `simulation.ts` owns fixed-step ship state, impulse/mass motion and alignment; `sampleUniverse.ts` owns illustrative catalog inputs. Domain tests use `npm test`; type/build validation uses `npm run build` in `client/`. Historical Rust paths below require the legacy revision and are not current browser owners.
+
+Browser scanner #728: `client/src/scanner.ts` owns range, five-second tick cadence, catalog indexing and temporary selection; `radar.ts` owns bounded frustum groups and galactic grid offsets. `scanner.test.ts` covers range/precision, cadence/eviction, large catalogs and grouping without loss.

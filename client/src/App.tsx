@@ -2,20 +2,22 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as THREE from 'three'
-import { SAMPLE_BODIES, SCANNER_RADIUS_LS, SCAN_INTERVAL_SECONDS, length, normal, type Body, type Vec3 } from './sampleUniverse'
+import { SAMPLE_BODIES, length, normal, type Body, type Vec3 } from './sampleUniverse'
 
-import { LIGHT_SECOND_M, radarPosition, relativeM } from './coordinates.ts'
+import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
 import { NavigationClock, alignTo, forward, idleControls, setThrottle as changeThrottle, type Controls, type ShipState } from './simulation.ts'
 type Pose = ShipState
-type Edge = { id: string; name: string; x: number; y: number; distance: number }
+import { CatalogIndex, Scanner } from './scanner.ts'
+import { radarGroups, gridOffsetLs, type ContactGroup } from './radar.ts'
 const VISIBLE_RADIUS = 900
+const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
 const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
 function CameraControls({ onViewRadius }: { onViewRadius: (value: number) => void }) {
   const { camera, gl } = useThree()
   const controlsRef = useRef<OrbitControls|null>(null)
   useEffect(() => {
-    camera.position.set(800, 500, 800)
+    camera.position.set(200000, 125000, 200000)
     camera.lookAt(0,0,0)
     camera.updateProjectionMatrix()
     const controls = new OrbitControls(camera, gl.domElement)
@@ -55,30 +57,26 @@ function Contact({ body, position, selected, onSelect }: { body: Body; position:
     </mesh>}
   </group>
 }
-function RadarScene({ pose, contacts, selected, select, viewRadius, setViewRadius, setEdges }: { pose: Pose; contacts: readonly Body[]; selected: string|null; select:(id:string)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setEdges:(edges:Edge[])=>void }) {
-  const { camera } = useThree()
+function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void }) {
+  const { camera, size } = useThree()
+  const [groups,updateGroups]=useState<ContactGroup[]>([])
   const elapsed = useRef(0)
   useFrame((_state,dt) => {
     elapsed.current += dt
-    if (elapsed.current < 0.2) return
+    if (elapsed.current < 0.1) return
     elapsed.current = 0
-    const next: Edge[] = []
-    for (const body of contacts) {
-      const relative = radarPosition(body.position, pose.position)
-      const projected = new THREE.Vector3(...relative).project(camera)
-      const outside = Math.abs(projected.x)>0.9 || Math.abs(projected.y)>0.88 || projected.z>1 || projected.z< -1 || length(relative)>viewRadius
-      if (!outside) continue
-      const x = THREE.MathUtils.clamp(projected.x,-0.9,0.9)
-      const y = THREE.MathUtils.clamp(projected.y,-0.83,0.83)
-      next.push({id:body.id,name:body.name,x:(x+1)*50,y:(1-y)*50,distance:length(relative)})
-    }
-    setEdges(next)
+    const next=radarGroups(contacts,pose.position,p=>{
+      const v=new THREE.Vector3(...p).project(camera);return [v.x,v.y,v.z]
+    },size.width,size.height)
+    updateGroups(next);setGroups(next)
   })
+  const spacing=10**Math.floor(Math.log10(Math.max(1,viewRadius/5)))
+  const gridOffset=gridOffsetLs(pose.position,spacing)
   const heading = forward(pose.yaw,pose.pitch)
   return <>
     <color attach="background" args={['#060f19']}/>
     <CameraControls onViewRadius={setViewRadius} />
-    <gridHelper args={[1800,18,'#2a6b79','#183645']} rotation={[0,0,0]} />
+    <gridHelper args={[spacing*100,100,'#2a6b79','#183645']} position={[gridOffset[0],0,gridOffset[2]]} />
     <axesHelper args={[65]}/>
     <group rotation={[pose.pitch,pose.yaw,0]} rotation-order="YXZ">
       <mesh rotation={[-Math.PI/2,0,0]}><coneGeometry args={[12,36,5]} /><meshBasicMaterial color="#65efc6" wireframe /></mesh>
@@ -86,7 +84,7 @@ function RadarScene({ pose, contacts, selected, select, viewRadius, setViewRadiu
     </group>
     <arrowHelper args={[new THREE.Vector3(...heading),new THREE.Vector3(),65,'#69f4c2',8,5]}/>
     {length(pose.velocityMps)>0.000001 && <arrowHelper args={[new THREE.Vector3(...normal(pose.velocityMps)),new THREE.Vector3(),85,'#f0b763',10,6]}/>}
-    {contacts.map(body=><Contact key={body.id} body={body} position={radarPosition(body.position,pose.position)} selected={selected===body.id} onSelect={select}/>)}
+    {groups.filter(g=>!g.edge).map(g=><Contact key={g.id} body={g.bodies[0]} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
   </>
 }
 export function App() {
@@ -95,7 +93,10 @@ export function App() {
   const [throttle,setThrottle]=useState(0)
   const [contacts,setContacts]=useState<readonly Body[]>([])
   const [selected,setSelected]=useState<string|null>(null)
-  const [edges,setEdges]=useState<Edge[]>([])
+  const [groups,setGroups]=useState<ContactGroup[]>([])
+  const [menu,setMenu]=useState<readonly string[]>([])
+  const [menuPage,setMenuPage]=useState(0)
+  const scanner=useRef(new Scanner(new CatalogIndex(SAMPLE_BODIES)))
   const [viewRadius,setViewRadius]=useState(VISIBLE_RADIUS)
   const [pulse,setPulse]=useState(0)
   const [aligning,setAligning]=useState(false)
@@ -103,10 +104,13 @@ export function App() {
 
   const throttleRef=useRef(throttle)
 
-  const scannerTimer=useRef(0)
-  const setEdgesStable=useCallback((e:Edge[])=>setEdges(e),[])
+  const setGroupsStable=useCallback((g:ContactGroup[])=>setGroups(g),[])
   useEffect(()=>{throttleRef.current=throttle},[throttle])
-  const select=useCallback((id:string)=>setSelected(id),[])
+  const select=useCallback((id:string)=>{scanner.current.select(id);setSelected(scanner.current.selected);setMenu([])},[])
+  const selectGroup=useCallback((g:ContactGroup)=>{
+    if(g.bodies.length===1){scanner.current.select(g.bodies[0].id);setSelected(scanner.current.selected);setMenu([])}
+    else {setMenu(g.bodies.map(b=>b.id));setMenuPage(0)}
+  },[])
   useEffect(()=>{
     const onKeyDown=(e:KeyboardEvent)=>{
       const key=e.key.toLowerCase()
@@ -130,19 +134,20 @@ export function App() {
     const animate=(now:number)=>{
       const dt=document.hidden?0:Math.max(0,now-previous)/1000;previous=now
       clock.current.state=changeThrottle(clock.current.state,throttleRef.current)
-      const p=clock.current.advance(dt,controls.current)
+      const p=clock.current.advance(dt,controls.current,(_before,after)=>{scanner.current.update(after.tick,after.position);return after})
       setAligning(p.alignment!==null)
-      scannerTimer.current+=dt
-      if(scannerTimer.current>=SCAN_INTERVAL_SECONDS){scannerTimer.current %= SCAN_INTERVAL_SECONDS;setPulse(v=>v+1);setContacts(SAMPLE_BODIES.filter(body=>length(relativeM(body.position,p.position))/LIGHT_SECOND_M<=SCANNER_RADIUS_LS))}
       accumulator+=dt
-      if(accumulator>=0.08){setPose(clock.current.state);accumulator=0}
+      if(accumulator>=0.08){
+        setPose(p);setContacts(scanner.current.contacts);setSelected(scanner.current.selected);setPulse(scanner.current.pulse);accumulator=0
+      }
       frame=requestAnimationFrame(animate)
     }
-    setContacts(SAMPLE_BODIES.filter(body=>length(relativeM(body.position,clock.current.state.position))/LIGHT_SECOND_M<=SCANNER_RADIUS_LS))
     frame=requestAnimationFrame(animate)
     return ()=>{cancelAnimationFrame(frame);document.removeEventListener('visibilitychange',resume)}
   },[])
   useEffect(()=>{if(selected && !contacts.some(body=>body.id===selected))setSelected(null)},[contacts,selected])
+  const menuIds=new Set(menu)
+  const menuBodies=contacts.filter(b=>menuIds.has(b.id))
   const target=useMemo(()=>contacts.find(body=>body.id===selected)??null,[contacts,selected])
   const setDirection=()=>{
     if(!target)return
@@ -158,11 +163,11 @@ export function App() {
   const distance=target?length(relativeM(target.position,pose.position))/LIGHT_SECOND_M:null
   return <div className="app">
     <div className="radar">
-      <Canvas orthographic camera={{position:[800,500,800],zoom:0.5,near:0.1,far:300000}}>
-        <RadarScene pose={pose} contacts={contacts} selected={selected} select={select} viewRadius={viewRadius} setViewRadius={setViewRadius} setEdges={setEdgesStable}/>
+      <Canvas orthographic camera={RADAR_CAMERA}>
+        <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
-      <div className="edge-layer">{edges.map(e=><button key={e.id} className="edge" style={{left:e.x+'%',top:e.y+'%'}} onClick={()=>select(e.id)} title={e.name+' · '+fmt(e.distance)+' light-seconds'}>◇ {e.name}</button>)}</div>
+      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" style={{left:g.x+'%',top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
       <div className="legend">▲ HEADING <span>◆ VELOCITY</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
     </div>
     <aside>
@@ -173,6 +178,12 @@ export function App() {
       <div className="stat"><span>Alignment</span><strong>{aligning?'Turning':'Manual'}</strong></div>
       <hr/>
       <h2>Contact</h2>
+      {menuBodies.length>0 && <div className="contact-menu" aria-label="Grouped contacts">
+        <p>{menuBodies.length} contacts · page {menuPage+1}</p>
+        {menuBodies.slice(menuPage*32,(menuPage+1)*32).map(b=><button key={b.id} onClick={()=>select(b.id)}>{b.name}</button>)}
+        <button disabled={menuPage===0} onClick={()=>setMenuPage(p=>p-1)}>Previous contacts</button>
+        <button disabled={(menuPage+1)*32>=menuBodies.length} onClick={()=>setMenuPage(p=>p+1)}>Next contacts</button>
+      </div>}
       {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><button className="action" onClick={setDirection}>Set direction</button></>:<p className="muted">Select a holographic contact or edge marker.</p>}
       <hr/>
       <h2>Manual orientation</h2>

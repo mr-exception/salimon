@@ -78,8 +78,10 @@ was unavailable; explicit writable `/tmp` caches resolved it without lock change
 ordering; `TopDownView.tsx` / `topDown.css` own illustrated SVG and DOM input.
 Client usage, technical architecture, maintenance routing and approved-design
 implementation notes were updated together. No dependency, lockfile, radar
-simulation, navigation baseline or mandatory CI script changed. Source/guide local
-links were inspected against actual paths and headings.
+simulation, navigation baseline or mandatory CI script changed. New source/guide local
+link paths were checked ([results](evidence/docs-links.json)); broad historical-guide
+scanning also found pre-existing missing native paths after the browser migration,
+outside this issue. New section anchors were inspected against actual headings.
 
 The planetary universe pose is abstract metadata and cancels from local rendering;
 ship origin/rotation changes carry ship-local passengers without changing IDs.

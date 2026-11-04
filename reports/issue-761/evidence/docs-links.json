@@ -1,0 +1,101 @@
+{
+  "scope": "New/changed link paths only. Full historical-guide scan found pre-existing missing native paths after browser migration, outside this issue.",
+  "checked": [
+    {
+      "file": "docs/maintenance-map.md",
+      "link": "../client/README.md#top-down-foundation-761",
+      "exists": true
+    },
+    {
+      "file": "docs/technical-architecture.md",
+      "link": "../client/README.md#top-down-foundation-761",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/source-hashes.json",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/top-down-results.json",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/unit.log",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/unit-no-isolation.log",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/observations.json",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/top-down-baseline-0.png",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/top-down-baseline-1.png",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/test-finished-1.png",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/build.log",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "failed-capture/suspense-boot.log",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "failed-capture/top-down-baseline-0.png",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "failed-capture/top-down-baseline-1.png",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "failed-capture/raw-diff.png",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/initial-browser.log",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/overlap-preview-failure.log",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/radar-visible-contacts.png",
+      "exists": true
+    },
+    {
+      "file": "reports/issue-761/README.md",
+      "link": "evidence/radar-visible-contacts-diff.png",
+      "exists": true
+    }
+  ],
+  "errors": []
+}

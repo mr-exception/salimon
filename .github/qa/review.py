@@ -236,7 +236,7 @@ def records(comments):
         if not body.startswith(MARKER):
             continue
         try:
-            value = json.loads(body.split("```json\n", 1)[1].split("\n```", 1)[0])
+            value = json.loads(body.rsplit("\n```json\n", 1)[1].split("\n```", 1)[0])
             if value.get("schema_version") == SCHEMA:
                 result.append(value)
         except (ValueError, IndexError):
@@ -255,6 +255,7 @@ def run(api, number, requested_run=None):
         "cycle": 1 + sum(bool(r.get("provider_attempted")) for r in history),
         "provider_attempted": False, "verdict": "BLOCKED", "reasons": [], "criteria": [],
         "jobs": {}, "reviewer": None, "evidence": {}, "merge_authority": "human only"}
+    report["runtime_sha256"] = digest([Path(__file__).read_text(), Path(__file__).with_name("policy.py").read_text()])
     try:
         issue_refs = re.findall(r"\b(?:Closes|Fixes|Resolves)\s+#(\d+)\b", pr.get("body") or "", re.I)
         if len(set(issue_refs)) != 1:
@@ -276,7 +277,7 @@ def run(api, number, requested_run=None):
         report["run"] = {"id": ci["id"], "attempt": ci["run_attempt"], "url": ci["html_url"]}
         if ci["head_sha"] != binding["head"] or ci["event"] != "pull_request" or ci["path"] != ".github/workflows/navigation-client.yml" or ci["status"] != "completed":
             raise ValueError("STALE_CI: need completed Navigation client PR run at current head")
-        if not any(p["number"] == number for p in ci.get("pull_requests", [])):
+        if ci.get("pull_requests") and not any(p["number"] == number for p in ci["pull_requests"]):
             raise ValueError("CI_PR_MISMATCH")
         workflow_path = ".github/workflows/navigation-client.yml"
         if api.contents(workflow_path, binding["head"]) != api.contents(workflow_path, "main"):
@@ -303,7 +304,7 @@ def run(api, number, requested_run=None):
         diff = [{k: f.get(k) for k in ("filename", "status", "patch", "sha")} for f in files]
         if len(json.dumps(diff)) > 200_000:
             raise ValueError("DIFF_RESOURCE_BUDGET: split PR")
-        report["fingerprint"] = digest({"binding": binding, "run": report["run"], "jobs": report["jobs"],
+        report["fingerprint"] = digest({"binding": binding, "run": report["run"], "jobs": report["jobs"], "runtime": report["runtime_sha256"],
             "manifest": manifest, "issue": issue["body"], "discussion": [c["body"] for c in discussion], "diff": diff, "reviews": reviews,
             "model": os.environ.get("SALIMON_REVIEW_MODEL") or "gpt-4.1", "configured": bool(os.environ.get("OPENAI_API_KEY"))})
         artifacts = api.pages(f"/actions/runs/{ci['id']}/artifacts", "artifacts")
@@ -339,6 +340,7 @@ def run(api, number, requested_run=None):
         packet = {"binding": binding, "issue": {"number": issue_refs[0], "body": issue["body"],
             "discussion": [c["body"] for c in discussion]}, "criteria": criteria, "diff": diff,
             "jobs": report["jobs"], "evidence": report["evidence"], "states": states, "e2e": e2e,
+            "baseline_manifest": manifest, "baseline_approval": report["baseline_approval"],
             "reviews": reviews, "citations": sorted(citations)}
         if len(json.dumps(packet)) > 350_000:
             raise ValueError("REVIEW_PACKET_RESOURCE_BUDGET")
@@ -349,6 +351,12 @@ def run(api, number, requested_run=None):
     except (ValueError, KeyError, TypeError, AttributeError, IndexError, OSError, zipfile.BadZipFile) as exc:
         # No raw provider body/headers or credentials are logged.
         report["error"] = str(exc)[:500]
+        if not report.get("evidence_ok"):
+            report["fingerprint"] = digest({"binding": binding, "issue": report.get("issue"), "run": report.get("run"),
+                "error": report["error"], "runtime": report["runtime_sha256"], "configured": bool(os.environ.get("OPENAI_API_KEY"))})
+        prior = next((r for r in history if r.get("fingerprint") == report["fingerprint"]), None)
+        if prior:
+            return publish(api, number, prior, comment=False)
     current = identity(api.request(f"/pulls/{number}"))
     report["verdict"], report["reasons"] = decide(binding, current, report["jobs"],
         report.get("evidence_ok", False), report.get("review"), report.get("error"))
@@ -405,7 +413,12 @@ def main():
         ci = event["workflow_run"]
         if ci["event"] != "pull_request" or ci["repository"]["full_name"] != REPO:
             return
-        for pr in ci.get("pull_requests", []):
+        prs = ci.get("pull_requests", [])
+        if not prs:
+            # GitHub may omit associations on fork workflow_run payloads. Exact
+            # current head and artifact merge SHA still bind all evidence.
+            prs = [pr for pr in api.pages("/pulls?state=open") if pr["head"]["sha"] == ci["head_sha"]]
+        for pr in prs:
             run(api, pr["number"], ci["id"])
 
 

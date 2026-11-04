@@ -50,7 +50,7 @@ two seconds. Each call has a 90-second timeout and 4,000 output-token cap; there
 are no model tools. Maximum six requests/24,000 provider output tokens across three
 cycles (retries may consume provider tokens too). Authentication errors do not
 retry. A fingerprint binds head/base/merge, issue/discussion, review state, diff,
-model/configuration presence, CI attempt/results and artifact hashes. Identical
+model/configuration presence, trusted runtime bytes, CI attempt/results and artifact hashes. Identical
 requests revalidate live evidence and restore the status without another model
 call or duplicate comment. A transient failure remains BLOCKED on replay;
 fix configuration or rerun CI to create a new evidenced cycle. At the limit,

@@ -248,6 +248,9 @@ class RuntimeTests(unittest.TestCase):
         self.api.artifacts[0]["expired"] = True
         report, calls = self.execute()
         self.assertEqual((report["verdict"], calls), ("BLOCKED", 0))
+        count = len(self.api.comments)
+        self.execute()
+        self.assertEqual(len(self.api.comments), count)
 
     def test_blocking_human_review(self):
         self.api.reviews = [{"id": 1, "state": "CHANGES_REQUESTED", "user": {"login": "owner"}}]
@@ -294,6 +297,18 @@ class RuntimeTests(unittest.TestCase):
         self.api.contents = lambda path, sha: b"different trusted manifest" if path.endswith("manifest.json") and sha == "main" else original(path, sha)
         with self.assertRaisesRegex(ValueError, "BASELINE_APPROVAL_REQUIRED"):
             review.baseline_approval(self.api, self.api.pr, original("manifest", HEAD), [])
+
+    def test_missing_fork_association_still_requires_exact_head_and_merge(self):
+        self.api.ci["pull_requests"] = []
+        self.assertEqual(self.execute()[0]["verdict"], "ACCEPT")
+        self.api.pr["merge_commit_sha"] = "f" * 40
+        self.assertEqual(self.execute()[0]["verdict"], "BLOCKED")
+
+    def test_finding_code_fence_cannot_hide_durable_cycle_record(self):
+        result = response()
+        result["criteria"][0]["finding"] = 'Example:\n```json\n{"pretend":"record"}\n```'
+        self.execute(result)
+        self.assertEqual(len(review.records(self.api.comments)), 1)
 
 
 class ProviderTransportTests(unittest.TestCase):

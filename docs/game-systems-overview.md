@@ -14,7 +14,7 @@ This list describes long-term product direction rather than current implementati
 
 1. **Exploration & navigation** — realistic-distance travel through a universe-scale world, seamless space-to-surface movement, long-term travel toward Absenat.
 2. **Player character** — strict top-down 2D walking, future EVA, planetary exploration, physical interaction, health and survival state.
-3. **Spaceship flight** — owner-controlled navigation, propulsion upgrades, physically located ship systems, large speed progression.
+3. **Spaceship flight** — owner-controlled navigation accessed from the physical cockpit desk, with a locally displayed 3D radar and pilot seated in the shared 2D world; propulsion upgrades and physically located ship systems remain.
 4. **Ship construction** — modular rooms/hull expansion while landed/docked plus interior module placement during flight.
 5. **Ship simulation** — power/Core, propulsion, oxygen, pressure, thermal state, hull, sensors, weapons, damage, maintenance and environmental protection.
 6. **Survival** — oxygen, food, water, temperature, sleep, health, radiation, pressure and stamina; permadeath resets the player's run.
@@ -26,7 +26,7 @@ This list describes long-term product direction rather than current implementati
 12. **Persistence** — persistent world changes including character location, ship, inventory, NPC state, economy, mined resources and partially modified objects.
 13. **NPC simulation** — autonomous AI-backed NPCs with shared global memory, relationships, travel, factions, quests and free-form dialogue.
 14. **Economy & factions** — local supply/demand, local pricing, trade, resource regeneration and faction control/influence.
-15. **Multiplayer** — persistent shared world, natural encounters, ship boarding, cooperative operation and persistent physical player location.
+15. **Multiplayer** — persistent shared world, natural encounters and ship boarding; on disconnect remove the avatar/cancel interactions and preserve an exact planet-fixed or ship-local reconnect point. If the ship containing an offline player is wholly destroyed, that player dies and restarts. See [cockpit/reconnect](cockpit-navigation-and-reconnect.md).
 16. **Combat** — ship combat and on-foot PvE/PvP with backend-authoritative outcomes.
 17. **Networking & authority** — local state broadcasting, server validation, protected canonical world state and anti-cheat-sensitive actions.
 18. **Performance & streaming** — native `wgpu` presentation and bounded local resource streaming today; larger spatial hierarchies, LOD/asset streaming, scheduling and platform storage remain future work. Web/WASM reuse and browser caching can be evaluated for a future web client.

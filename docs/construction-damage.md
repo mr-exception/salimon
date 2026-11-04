@@ -1,5 +1,7 @@
 # Construction damage and physical salvage (#549)
 
+> **New 2D gameplay scope (2026-11-04):** The localized cell/project damage, detachment and salvage mechanics described here are **historical native implementation** and **future deferred design**, not current approved ship-damage granularity. In the future 2D/multiplayer slice, ship damage/destruction is **whole-vessel only**: offline players anchored inside a wholly destroyed ship die, with a reconnect notice and new run. See [cockpit and reconnect contract](cockpit-navigation-and-reconnect.md). Do not delete this historical evidence or infer that the 2D client already implements either damage system.
+
 `session/construction/damage.rs` composes typed physical impacts, safe deliberate
 removal and surviving-site recovery. Ship owns topology/receipts and exact paid
 work; world owns fresh sealed debris IDs; the existing physical-fragment solver

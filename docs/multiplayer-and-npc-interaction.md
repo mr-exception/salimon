@@ -1,21 +1,27 @@
 # Multiplayer & NPC Interaction
 
+> **Updated player presence (2026-11-04):** The approved [cockpit, disconnect and reconnect contract](cockpit-navigation-and-reconnect.md) supersedes any implication below that an **offline avatar stays visible** or a disconnected player retains an occupied ship chair. Individual room/module damage is deferred; ship-wide damage/destruction governs the new 2D gameplay scope. No multiplayer backend is implemented in the current navigation-only client.
+
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 ## Multiplayer direction
 Salimon uses a **persistent shared world**. Multiplayer is not a separate session mode; players physically inhabit the same evolving universe and encounter one another by traveling to the same places.
 ## Player presence
 - Players meet naturally in the world rather than through lobby matchmaking.
-- A player can physically enter another player's ship.
-- Multiple players can travel together aboard one ship.
-- A player remains at their actual world position across reconnects. Leaving one's own ship does not create a teleport-back shortcut.
-- The player's own spaceship should always remain visible as a home marker on the compass/navigation UI when appropriate.
+- A player can physically enter another player's ship; multiple players can travel together aboard one ship.
+- **On disconnect the avatar is removed entirely** from the world, and active interactions (including cockpit seating) are aborted and released. The user does not leave behind a simulated offline body.
+- **On reconnect, restore the same logical location:** an exact planet-fixed surface point on the same planet, or an exact ship-local point on the same moving ship. If the player disconnected during any interaction, restore them **standing beside that object/module**, with the interaction cancelled and not automatically resumed.
+- A disconnected player who was aboard a ship **dies if the entire ship is destroyed while offline**. On reconnect, show **"You died while disconnected"** and begin a fresh run; do not spawn at the wreck. Destruction of a distant ship does not kill a player logged off on a planet.
+- Leaving one's own ship does not create a teleport-back shortcut. The player's own spaceship should remain visible as a home marker where appropriate.
+- Detailed rules: [cockpit and reconnect contract](cockpit-navigation-and-reconnect.md).
+
 ## Shared ship rules
 - Ship ownership is permanent and each player owns one ship.
-- Only the owner may operate the navigation/cockpit navigation controls.
-- Visiting players may walk inside and interact with other modules, including weapons, repair, cargo, and machinery unless a later system-specific rule restricts an interaction.
+- Only the owner may operate navigation/cockpit controls. The powered cockpit desk opens the 3D radar from default 2D play; the owner's avatar stays **seated** in the cockpit and visible to other connected players.
+- One active pilot-chair occupant at a time; normal exit returns to standing 2D, power loss returns to seated 2D, and power restoration does not reopen radar.
+- Visiting players may walk inside and interact with other modules, including weapons, repair, cargo and machinery unless a later system-specific rule restricts an interaction.
 - There is no general invitation/role system required for basic access; physical access to the ship is the main gate.
-- If the owner disconnects, passengers stay where they are inside the ship and cannot navigate it until the owner returns.
+- When the owner disconnects, remove their avatar and release cockpit authority. Passengers who remain connected stay aboard and cannot pilot the owner's ship. Ship motion and independent machinery continue under their existing simulation/offline rules.
 ## PvP and conflict
 PvP is a natural part of the world.
 - Players may damage one another.
@@ -73,7 +79,7 @@ Threats may include pirates, hostile factions, creatures, environmental hazards,
 ## PvP, crime and combat consequences
 - The **Solar System is the primary restricted/safe-law region**. Outside it, PvP is generally unrestricted.
 - Murder, piracy, theft, and attacks on neutral actors can produce reputation loss, bounties, faction hostility, NPC security/police response, and player-driven bounty consequences.
-- Ship combat damage is physically localized to hull sections and modules, enabling decompression, disabled systems, and internal damage.
+- **Current new 2D scope:** ship damage/destruction applies to the **ship as a whole**; individual room/module damage and detachment are postponed. Historical detailed localized-damage concepts remain a future design topic, not an active rule. See [cockpit/reconnect scope](cockpit-navigation-and-reconnect.md).
 ## Global population model
 - Salimon targets one global MMORPG-style universe rather than separate gameplay shards.
 - Players sharing the same location should, in principle, be able to see one another. Scalability solutions should preserve shared canonical presence instead of creating independent copies of the world.

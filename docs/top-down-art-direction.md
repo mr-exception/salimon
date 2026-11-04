@@ -18,7 +18,8 @@
 
 ## 3D navigation consistency
 
-- The navigation mode stays a **simple orthographic 3D holographic radar** with faceted contact proxies and a sparse galactic lattice; it is not a realistic 3D spaceship scene.
+- **Strict 2D is the default world view.** The navigation mode remains a **simple orthographic 3D holographic radar** opened by interacting with the **cockpit desk**, not a global view toggle. Other connected players see the active pilot seated at the desk in 2D. See [cockpit states and multiplayer reconnect](cockpit-navigation-and-reconnect.md).
+- The radar retains faceted contact proxies and a sparse galactic lattice; it is not a realistic 3D spaceship scene.
 - Share instrument typography, functional accent colors, visual warning language, restrained animation and material sensibility between navigation and 2D exploration. The navigation heading/velocity rays and scanner rules remain unchanged.
 
 The former 3D low-poly art bible and first-person interior/environment camera contracts are legacy implementation references. Their mood, narrative and world-identity decisions remain useful, but incompatible camera, mesh and fragment-specific presentation rules are superseded.

@@ -1,5 +1,7 @@
 # Scout art direction and modular ship construction — approved design (2026-10-22)
 
+> **Scope supersession (2026-11-04):** For the new strict-top-down 2D gameplay, **only ship-wide damage/destruction** is approved for now. The older cell-level structural damage, module detachment and local salvage plans below are **deferred**, not part of the first 2D multiplayer behavior. Offline players saved aboard a ship destroyed in full die on reconnect. See [cockpit and reconnect](cockpit-navigation-and-reconnect.md). Modularity/building discussion is otherwise preserved for future design.
+
 Verification uses the [cloud/human workflow](verification-workflow.md)
 (owner decision 2026-10-23). Routine implementation and integration acceptance
 run in cloud; human spatial/art review and actual platform qualification are

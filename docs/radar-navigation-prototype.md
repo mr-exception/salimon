@@ -1,5 +1,7 @@
 # Navigation-only React radar prototype (2026-11-03)
 
+> **Cockpit access design (2026-11-04):** In future integrated gameplay, this 3D radar is opened **only through the powered cockpit desk** from the default 2D world. Other players see the pilot **seated in the 2D cockpit**. Voluntary exit stands the pilot up; blackout closes 3D but leaves them seated. See [cockpit and reconnect contract](cockpit-navigation-and-reconnect.md). The navigation-only sample presently has no interior/pilot/avatar/multiplayer integration.
+
 > **Separate future 2D direction (2026-11-04):** The current radar stays 3D; Scout and planetary exploration will be [strict top-down illustrated 2D](top-down-art-direction.md). [Resource inventory](resource-inventory-and-gathering.md) is a separate domain and not wired to navigation.
 
 Status: approved navigation design and prototype scope. This is **not** a claim that the previous Rust/native gameplay, planetary exploration, interiors, Energy Core, or save systems were migrated.

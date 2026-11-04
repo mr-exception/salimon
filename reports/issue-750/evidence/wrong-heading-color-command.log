@@ -1,0 +1,47 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [deterministic] › tests/deterministic.spec.ts:77:1 › NAV-3 heading and velocity retain approved colors and viewport edges (4.8s)
+
+
+  1) [deterministic] › tests/deterministic.spec.ts:77:1 › NAV-3 heading and velocity retain approved colors and viewport edges
+
+    Error: NAV-3 heading is yellow
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "rgb(255, 227, 106)"
+    Received: "rgb(255, 0, 0)"
+
+      79 |  const lines=await vectors(page)
+      80 |  expect(lines.map(l=>l.kind)).toEqual(['heading','velocity'])
+    > 81 |  expect(lines[0].stroke,'NAV-3 heading is yellow').toBe('rgb(255, 227, 106)')
+         |                                                    ^
+      82 |  expect(lines[1].stroke,'NAV-3 velocity is light-green').toBe('rgb(182, 245, 162)')
+      83 |  expect(lines[1].dash).not.toBe('none')
+      84 |  expect(lines[0].end[0]).toBe(100);expect(lines[1].end[1]).toBe(0)
+        at /tmp/salimon-negative-0Dz87q/tests/deterministic.spec.ts:81:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/final-negative/wrong-heading-color/deterministic-NAV-3-headin-229c4-d-colors-and-viewport-edges-deterministic/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../workspace/salimon/client/test-results/final-negative/wrong-heading-color/deterministic-NAV-3-headin-229c4-d-colors-and-viewport-edges-deterministic/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/final-negative/wrong-heading-color/deterministic-NAV-3-headin-229c4-d-colors-and-viewport-edges-deterministic/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../workspace/salimon/client/test-results/final-negative/wrong-heading-color/deterministic-NAV-3-headin-229c4-d-colors-and-viewport-edges-deterministic/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [deterministic] › tests/deterministic.spec.ts:77:1 › NAV-3 heading and velocity retain approved colors and viewport edges
+
+[WebServer] (node:4423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4456) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:4468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

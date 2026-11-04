@@ -1,0 +1,97 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=deterministic
+
+[WebServer] (node:1663) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1689) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:1720) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (33.0s)
+(node:1874) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (31.7s)
+(node:2038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [deterministic] › tests/deterministic.spec.ts:69:1 › NAV-3 heading and velocity retain approved colors and viewport edges (7.0s)
+  ✓  4 [deterministic] › tests/deterministic.spec.ts:86:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (4.4s)
+
+
+  1) [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.evaluate: Target page, context or browser has been closed
+
+       at deterministic.ts:19
+
+      17 |  await expect(page.locator('canvas')).toBeVisible()
+      18 | }
+    > 19 | export const snapshot=(page:Page)=>page.evaluate(()=>({navigation:window.navigationTest.snapshot(),scene:window.radarTest.snapshot(),origin:window.radarTest.projectLs([0,0,0])}))
+         |                                         ^
+      20 | export async function vectors(page:Page) {
+      21 |  return page.locator('.ship-vectors line').evaluateAll(nodes=>nodes.filter(n=>(n as SVGElement).style.display!=='none').map(n=>({kind:n.getAttribute('data-vector'),start:[Number(n.getAttribute('x1')),Number(n.getAttribute('y1'))],end:[Number(n.getAttribute('x2')),Number(n.getAttribute('y2'))],stroke:getComputedStyle(n).stroke,dash:getComputedStyle(n).strokeDasharray})))
+      22 | }
+        at snapshot (/workspace/salimon/client/tests/deterministic.ts:19:41)
+        at /workspace/salimon/client/tests/deterministic.spec.ts:25:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 30000ms exceeded.
+
+      49 |  const recordings=[]
+      50 |  for(const input of ['keyboard','mouse']) {
+    > 51 |   const recording=page.evaluate(()=>window.radarTest.recordFrames(20))
+         |                        ^
+      52 |   if(input==='keyboard')await page.keyboard.down('d')
+      53 |   else {await page.mouse.move(500,350);await page.mouse.down({button:'right'});await page.mouse.move(540,360,{steps:4})}
+      54 |   await page.clock.runFor(320)
+        at /workspace/salimon/client/tests/deterministic.spec.ts:51:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom
+    [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan
+  2 passed (1.4m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

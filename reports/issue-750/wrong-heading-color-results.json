@@ -1,0 +1,28 @@
+{
+  "stats": {
+    "startTime": "2026-11-04T07:39:11.484Z",
+    "duration": 10598.967999999999,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "NAV-3 heading and velocity retain approved colors and viewport edges",
+      "project": "deterministic",
+      "status": "failed",
+      "duration_ms": 4792,
+      "errors": [
+        {
+          "location": {
+            "file": "/tmp/salimon-negative-0Dz87q/tests/deterministic.spec.ts",
+            "column": 52,
+            "line": 81
+          },
+          "message": "Error: NAV-3 heading is yellow\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"rgb(255, \u001b[7m227, 106\u001b[27m)\"\u001b[39m\nReceived: \u001b[31m\"rgb(255, \u001b[7m0, 0\u001b[27m)\"\u001b[39m\n\n  79 |  const lines=await vectors(page)\n  80 |  expect(lines.map(l=>l.kind)).toEqual(['heading','velocity'])\n> 81 |  expect(lines[0].stroke,'NAV-3 heading is yellow').toBe('rgb(255, 227, 106)')\n     |                                                    ^\n  82 |  expect(lines[1].stroke,'NAV-3 velocity is light-green').toBe('rgb(182, 245, 162)')\n  83 |  expect(lines[1].dash).not.toBe('none')\n  84 |  expect(lines[0].end[0]).toBe(100);expect(lines[1].end[1]).toBe(0)\n    at /tmp/salimon-negative-0Dz87q/tests/deterministic.spec.ts:81:52"
+        }
+      ]
+    }
+  ]
+}

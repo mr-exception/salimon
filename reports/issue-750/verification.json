@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "issue": 750,
+  "phase": "QA_PENDING",
+  "tested_source_sha": "5b5f1a7fe709be3452e174cc03bb36ee7f499da5",
+  "full_suite_source_sha": "52bb6c3485750bb1828b163a1a7486e752e6a0c1",
+  "base_sha": "e2ccba2c4d5800ade890aa8b394429d62835f6d2",
+  "source_change_after_full_run": "Only the first edge test timeout changed from 30 to 90 seconds; its affected route was rerun. Other source/test inputs are unchanged.",
+  "unit": {
+    "command": "npm test",
+    "result": "PASS",
+    "passed": 28,
+    "failed": 0
+  },
+  "build": {
+    "command": "npm run build",
+    "result": "PASS",
+    "warning": "Existing large production chunk"
+  },
+  "browser": {
+    "full": {
+      "stats": {
+        "startTime": "2026-11-04T07:32:04.319Z",
+        "duration": 321243.083,
+        "expected": 22,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+          "project": "deterministic",
+          "status": "passed",
+          "duration_ms": 21248,
+          "errors": []
+        },
+        {
+          "title": "NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan",
+          "project": "deterministic",
+          "status": "passed",
+          "duration_ms": 37637,
+          "errors": []
+        },
+        {
+          "title": "NAV-3 heading and velocity retain approved colors and viewport edges",
+          "project": "deterministic",
+          "status": "passed",
+          "duration_ms": 9258,
+          "errors": []
+        },
+        {
+          "title": "NAV-4 read-only fixture observers return detached state; production has no hooks",
+          "project": "deterministic",
+          "status": "passed",
+          "duration_ms": 4280,
+          "errors": []
+        },
+        {
+          "title": "scanner pulse, camera independence, clipping selection and manual alignment interruption",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 17020,
+          "errors": []
+        },
+        {
+          "title": "WASD pans without changing ship state and key release stops movement",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 16243,
+          "errors": []
+        },
+        {
+          "title": "camera keys release on focus, blur, visibility and resize",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 17012,
+          "errors": []
+        },
+        {
+          "title": "wheel zoom bounds and removed desktop controls survive view changes",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 8610,
+          "errors": []
+        },
+        {
+          "title": "Help has keyboard focus containment, accurate bindings and Escape/close return focus",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 6721,
+          "errors": []
+        },
+        {
+          "title": "right-drag pointer release outside canvas ends pan and ship controls release on blur",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 11097,
+          "errors": []
+        },
+        {
+          "title": "zero throttle coasts while ship rotates; focused slider keeps native keyboard input",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 7900,
+          "errors": []
+        },
+        {
+          "title": "production App contact fixture: warning",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 3207,
+          "errors": []
+        },
+        {
+          "title": "production App contact fixture: destroyed",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 4120,
+          "errors": []
+        },
+        {
+          "title": "production App contact fixture: safe",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 3782,
+          "errors": []
+        },
+        {
+          "title": "production App contact fixture: asteroid",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 3900,
+          "errors": []
+        },
+        {
+          "title": "dense groups and accessible contact picker keep all IDs with bounded DOM",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 13145,
+          "errors": []
+        },
+        {
+          "title": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+          "project": "desktop",
+          "status": "timedOut",
+          "duration_ms": 32216,
+          "errors": [
+            {
+              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+            },
+            {
+              "location": {
+                "file": "/workspace/salimon/client/tests/edges.spec.ts",
+                "column": 79,
+                "line": 36
+              },
+              "message": "Error: locator.screenshot: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - taking element screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n\u001b[2m  - attempting scroll into view action\u001b[22m\n\u001b[2m    - waiting for element to be stable\u001b[22m\n\n\n  34 |  await front(page,'edges','different');await page.waitForTimeout(150)\n  35 |  const differing=await lines(page);expect(differing[0].end[0]).toBe(100);expect(differing[1].end[1]).toBe(0)\n> 36 |  await info.attach('differing-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})\n     |                                                                               ^\n  37 |  await front(page,'edges','right');await page.waitForTimeout(150)\n  38 |  await info.attach('overlapping-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})\n  39 |  await front(page,'edges','near');await page.waitForTimeout(150)\n    at /workspace/salimon/client/tests/edges.spec.ts:36:79"
+            }
+          ]
+        },
+        {
+          "title": "ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 22199,
+          "errors": []
+        },
+        {
+          "title": "off-screen contacts stay in picker after pulse and selection still expires with scanner range",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 12857,
+          "errors": []
+        },
+        {
+          "title": "continuous keyboard pan renders scanned bodies at their current projection on every frame",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 11504,
+          "errors": []
+        },
+        {
+          "title": "continuous mouse pan renders scanned bodies at their current projection on every frame",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 11302,
+          "errors": []
+        },
+        {
+          "title": "faceted navigation proxies render at readable sizes without a rectangular surface",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 26677,
+          "errors": []
+        },
+        {
+          "title": "built production bundle renders WebGL, scanner and labelled controls",
+          "project": "production",
+          "status": "passed",
+          "duration_ms": 7865,
+          "errors": []
+        }
+      ]
+    },
+    "edge-rerun": {
+      "stats": {
+        "startTime": "2026-11-04T07:38:08.275Z",
+        "duration": 50807.844,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+          "project": "desktop",
+          "status": "passed",
+          "duration_ms": 45813,
+          "errors": []
+        }
+      ]
+    },
+    "reversed-wasd": {
+      "stats": {
+        "startTime": "2026-11-04T07:39:01.049Z",
+        "duration": 9525.887999999999,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+          "project": "deterministic",
+          "status": "failed",
+          "duration_ms": 5787,
+          "errors": [
+            {
+              "location": {
+                "file": "/tmp/salimon-negative-AGHF0N/tests/deterministic.spec.ts",
+                "column": 108,
+                "line": 14
+              },
+              "message": "Error: NAV-1 a moves the correct screen direction\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m-8.577319587628864\u001b[39m\n\n  12 |    await page.keyboard.down(key);await page.clock.runFor(160);await page.keyboard.up(key)\n  13 |    const after=await snapshot(page)\n> 14 |    expect((after.origin[axis]-before.origin[axis])*sign,`NAV-1 ${key} moves the correct screen direction`).toBeGreaterThan(1)\n     |                                                                                                            ^\n  15 |    expect(after.navigation.ship.yaw).toBe(start.navigation.ship.yaw)\n  16 |    expect(after.navigation.ship.pitch).toBe(start.navigation.ship.pitch)\n  17 |    expect(after.navigation.ship.velocityMps).toEqual(start.navigation.ship.velocityMps)\n    at /tmp/salimon-negative-AGHF0N/tests/deterministic.spec.ts:14:108"
+            }
+          ]
+        }
+      ]
+    },
+    "wrong-heading-color": {
+      "stats": {
+        "startTime": "2026-11-04T07:39:11.484Z",
+        "duration": 10598.967999999999,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "NAV-3 heading and velocity retain approved colors and viewport edges",
+          "project": "deterministic",
+          "status": "failed",
+          "duration_ms": 4792,
+          "errors": [
+            {
+              "location": {
+                "file": "/tmp/salimon-negative-0Dz87q/tests/deterministic.spec.ts",
+                "column": 52,
+                "line": 81
+              },
+              "message": "Error: NAV-3 heading is yellow\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"rgb(255, \u001b[7m227, 106\u001b[27m)\"\u001b[39m\nReceived: \u001b[31m\"rgb(255, \u001b[7m0, 0\u001b[27m)\"\u001b[39m\n\n  79 |  const lines=await vectors(page)\n  80 |  expect(lines.map(l=>l.kind)).toEqual(['heading','velocity'])\n> 81 |  expect(lines[0].stroke,'NAV-3 heading is yellow').toBe('rgb(255, 227, 106)')\n     |                                                    ^\n  82 |  expect(lines[1].stroke,'NAV-3 velocity is light-green').toBe('rgb(182, 245, 162)')\n  83 |  expect(lines[1].dash).not.toBe('none')\n  84 |  expect(lines[0].end[0]).toBe(100);expect(lines[1].end[1]).toBe(0)\n    at /tmp/salimon-negative-0Dz87q/tests/deterministic.spec.ts:81:52"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "negative": {
+    "schema_version": 1,
+    "status": "PASS",
+    "mutations": [
+      {
+        "id": "reversed-wasd",
+        "file": "src/CameraControls.tsx",
+        "original_sha256": "5699d3761d8a95d931c8da21deb45591553a6b22a45b76cd45ca5968d9a448d2",
+        "mutated_sha256": "68de2cf000af02d566367f68dc4280d395f09329d80a2300a8bcb9221045a354",
+        "exit": 1,
+        "assertion": "NAV-1 a moves the correct screen direction",
+        "result": "EXPECTED_FAILURE",
+        "report": "reversed-wasd-results.json"
+      },
+      {
+        "id": "wrong-heading-color",
+        "file": "src/styles.css",
+        "original_sha256": "c5a4feaf0ab6bfdd05c156acc8d327f37a0635eaedf969d32a06b45c502c3cdf",
+        "mutated_sha256": "1fba009def8db310f733480972d04adc356800490a38d77f24bab196702734c4",
+        "exit": 1,
+        "assertion": "NAV-3 heading is yellow",
+        "result": "EXPECTED_FAILURE",
+        "report": "wrong-heading-color-results.json"
+      }
+    ]
+  },
+  "unrun": [
+    "Physical input/hardware GPU/native/mobile qualification: N/A",
+    "Current published-head CI and independent review: pending PR binding"
+  ],
+  "evidence_index": "evidence-index.json"
+}

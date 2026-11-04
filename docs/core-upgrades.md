@@ -1,5 +1,7 @@
 # Instant physical-material Core upgrades (#548)
 
+> **Future 2D conversion upgrade boundary (2026-11-04):** This document specifies historical **energy-storage capacity** tiers for the native Core. The new [2D resource lifecycle](resource-inventory-and-gathering.md) approves a separate **upgradeable maximum energy-generation rate (watts)** for continuous whole-litre conversion. **Its base rate, progression, upgrade resources/costs and prerequisites must be discussed and defined later.** No new generation-rate tiers are approved here, and the historical physical-fragment intake does not govern the future 2D UI.
+
 ## Balance decision and catalog
 
 On 2026-10-24 the owner explicitly asked Codex to choose balanced tiers/costs,

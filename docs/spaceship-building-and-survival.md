@@ -1,5 +1,7 @@
 # Spaceship, Building & Survival
 
+> **New 2D design (2026-11-04):** [Strict top-down illustrated art](top-down-art-direction.md) and [10 kg / 10 L direct resource inventory](resource-inventory-and-gathering.md) supersede old first-person fragment-carry/mining descriptions below. The old native code and acceptance notes are historical, not currently running in the navigation-only browser client.
+
 > **Approved future Scout/construction contract (2026-10-22):** [Scout art direction and modular construction](scout-and-modular-construction.md). Older entries below describe the **currently implemented** authored Scout where noted; they do not override the new target. This page is not evidence that modular building or the new cargo bay has shipped.
 
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
@@ -64,13 +66,10 @@ Player survival needs include:
 The ship itself must provide or support the resources and equipment needed to manage these needs.
 ## Death
 Death is intentionally severe. If the player dies or suffers unrecoverable total loss, the run ends and the player starts the game fresh. This makes preparation, maintenance, navigation, and cooperation meaningful.
-## Physical inventory and cargo
-Inventory should avoid abstract chest/list behavior wherever possible.
-- Resources exist as physical objects/fragments.
-- Players can drop resources directly on the ship floor and create visible piles.
-- **Current implementation:** The authored Scout can carry loose fragments on its cabin deck and has no dedicated cargo room. **Approved future starter:** a separated aft cargo bay with real physical bins and correct cargo mass, without abstract storage; see [approved future design](scout-and-modular-construction.md).
-- Physical containers organize objects spatially; the player can see and retrieve the actual contents.
-- Cargo mass and placement may affect the ship where simulation depth permits.
+## Resource inventory and cargo (new 2D direction)
+
+Raw resources are stored in the player's **10 kg / 10 L dual-capacity inventory**, counted in integer resource units with integer weight and volume. No physical fragment piles or one-fragment-at-a-time carrying for raw materials. Ship cargo and non-resource physical belongings remain distinct pending future 2D integration. See [inventory contract](resource-inventory-and-gathering.md).
+
 ## Space EVA and airlock
 - When the ship is in open space and is **not landed**, the player may open the airlock and leave the ship for EVA/free-flight.
 - On exit, the player starts from the airlock's world-space position and **inherits the ship's current linear velocity**. EVA movement then adds player-relative motion on top of that inherited velocity instead of resetting the player to a stationary world frame.
@@ -78,13 +77,10 @@ Inventory should avoid abstract chest/list behavior wherever possible.
 - This open-space EVA condition remains active until the player comes within **3,000,000 m** of a planet or other solid celestial body. Inside that distance, movement must transition to the nearby-body interaction/gravity regime rather than continuing indefinitely as deep-space free-flight.
 - The 3,000,000 m threshold is the same nearby-body distance used elsewhere in the game and should be treated as one shared gameplay constant rather than duplicated values.
 - Opening the airlock in space is intentionally allowed. Future pressure, oxygen, suit-safety, decompression, and death consequences may add risk, but they must not invalidate the core ability to perform EVA.
-## Resource gathering
-### Asteroids
-A mining laser/tool detaches fragments from asteroids or breaks sufficiently small asteroids into multiple pieces. Fragments are physically collected into the ship, then processed by ship modules.
-### Planetary resources
-A handheld or equipment-based mining laser breaks resource objects into carriable physical fragments. For example, harvesting a tree can produce wood fragments and fruit objects.
-### Processing
-Raw materials can require processing before construction or crafting. Example: iron-bearing fragments can be refined/processed into steel for ship upgrades.
+## Resource gathering (new 2D direction)
+
+Asteroid mining, planetary extraction and biological harvesting credit whole raw-resource units **directly** to the player's inventory, while debiting the same quantity from the persistent source. Gather only units that fit both remaining weight and volume; leave any excess at the source. No mined spherical fragments, raw fragment carry or fragment gravity/contact behavior. Future Core/Fabricator/construction adapters should consume exact inventory quantities instead of held resource fragments. See [resource inventory and gathering](resource-inventory-and-gathering.md).
+
 ## Resource uses
 Resources may be used for:
 - food and survival supplies;
@@ -109,16 +105,15 @@ Research and technology unlocks should enable:
 - If the owner dies, the ship becomes orphaned and remains in the world as salvage/loot.
 - If the ship is destroyed while the owner survives, the owner can still return and rebuild/repair from the **Core**, which is the irreducible recovery point of the ship.
 - There are no lockable protected containers or general anti-loot protections planned; physical access means items can be taken.
-## Confirmed personal inventory rules
-The game should avoid conventional abstract inventory.
-- **Core carrying rule:** the player can physically carry exactly **one carriable world object at a time**. This is a permanent rule for all current and future carriable world objects, including mined resource fragments; it is not a temporary limit that increases with progression.
-- The player has no general backpack or pocket inventory for resources or other ordinary world objects.
-- Equipped gear and dedicated equipment slots are separate from the one-object carrying mechanic and do not consume that carrying capacity.
-- A player can equip one primary gun/tool and carry one extra in a toolbelt; these equipped/toolbelt items are separate from the one-object carrying mechanic.
-- The accepted Fabricator wave specifies **3 food-ration slots** and **2 medkit slots**, one item each, separate from physical world-object carrying. See the accepted Fabricator contracts below.
-- Future transport aids such as electrical carts may help move multiple physical items, without increasing the player's personal one-object carrying capacity.
-- Every physical item has mass and volume and these properties affect carrying, storage, and ship mass.
-- Loose objects inside the spaceship do not need to react to ship acceleration because the ship provides internal gravity; acceleration effects are intentionally abstracted away for interior object stability.
+## Confirmed personal resource inventory (2026-11-04)
+
+- Start with 10 kg **and** 10 L, both independently enforced; future upgrades can expand either capacity.
+- Resource definitions store positive integer kilograms and litres per unit, with integer stack quantities only (minimum precision 1 kg / 1 L).
+- Collect raw materials directly into stacks rather than physically carrying resource fragments.
+- Existing tool slots, food/medkit slots and non-resource possessions are separate interaction systems.
+- Inventory mass contributes only once to relevant physics. No source consumption without matching inventory credit.
+- See the [authoritative resource contract](resource-inventory-and-gathering.md).
+
 ## Confirmed construction and damage model
 - **Approved future construction:** a **ship-local 3 m × 3 m × 3 m structural grid on all three axes**, with face-based connection to the persistent Core, multi-deck expansion, optional finer data-driven attachment snapping, and one blueprint spanning many structural cells. The older Z-only snap plan is superseded by [this approved contract](scout-and-modular-construction.md).
 - Rooms and modules can be individually detached or destroyed during combat and can physically separate from the ship.
@@ -137,7 +132,7 @@ existing eye-height surface walking takes over. Exiting influence disables radia
 gravity and preserves accumulated drift. Ship interior gravity overrides this
 mode after re-entry. This does not add orbital physics to ship flight.
 
-### Physical planet/ship transfer (#47)
+### Historical physical planet/ship fragment transfer (#47; superseded for raw resources)
 
 E picks up an aimed fragment on the surface or while walking inside; E releases
 the carried fragment from hand height. Gravity and contact let fragments settle
@@ -327,7 +322,9 @@ implemented by this wave. Existing configuration seams alone do not constitute p
 instant Core capacity system is implemented by #548 under its [separate paid-material contract](core-upgrades.md). Owner-only multiplayer navigation is a future rule;
 current client-only authority means the powered occupied cockpit.
 
-## Accepted spherical mining (2026-10-15)
+## Historical native spherical mining (2026-10-15; superseded for raw 2D resources)
+
+> This historical implementation is not the future 2D collecting contract. See [direct gathering](resource-inventory-and-gathering.md).
 
 Holding left mouse aimed at a valid deposit grows one sphere at the mining tool's
 front-left, with a configurable per-tool **10 kg** initial cap. Release the sphere

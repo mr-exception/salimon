@@ -1,5 +1,7 @@
 # Navigation-only React radar prototype (2026-11-03)
 
+> **Separate future 2D direction (2026-11-04):** The current radar stays 3D; Scout and planetary exploration will be [strict top-down illustrated 2D](top-down-art-direction.md). [Resource inventory](resource-inventory-and-gathering.md) is a separate domain and not wired to navigation.
+
 Status: approved navigation design and prototype scope. This is **not** a claim that the previous Rust/native gameplay, planetary exploration, interiors, Energy Core, or save systems were migrated.
 
 ## Scope boundary

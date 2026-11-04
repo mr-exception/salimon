@@ -22,7 +22,7 @@ Identify the actual PR stack parent when implementation starts.
 
 ## Verification matrix
 
-Follow [the policy](../../docs/acceptance-policy.md). Fill every category; use N/A
+Follow [the policy](https://github.com/mr-exception/salimon/blob/main/docs/acceptance-policy.md). Fill every category; use N/A
 with a reason. Mark mandatory checks before implementation; never mark an unrun check PASS.
 
 | Category | Criterion IDs / production path | Exact command/procedure and expected assertion | Mandatory? / N/A reason | Evidence and actual result |

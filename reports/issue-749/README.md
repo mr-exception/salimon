@@ -37,8 +37,13 @@ head/base and independent verdict are bound in the delivering PR conversation.
 Commands (repository root):
 
 - `python3 reports/issue-749/check_links.py 6dc4a117613b0e0f12d210297ffb9a88a85ba497`
-  checks only links introduced by this change, not historical native documentation debt.
-- `git diff --check`: whitespace validation.
+  PASS (20 local links/anchors after making template URLs absolute); checks only
+  links introduced by this change, not historical native documentation debt.
+- `git diff 6dc4a117613b0e0f12d210297ffb9a88a85ba497 --check`: PASS.
+- `sha256sum -c reports/issue-749/source.sha256`: all 10 inputs PASS.
+- Markdown issue-template front matter parsed with PyYAML: PASS, string
+  name/about/title/labels. Policy URLs are absolute GitHub repository links
+  so they also work when instantiated in issue/PR bodies.
 - `python3 reports/issue-742/verify_frames.py reports/issue-742/before`:
   expected exit 1 at the missing-body/pixel assertion; frozen known defect rejected.
 - `python3 reports/issue-742/verify_frames.py reports/issue-742/camera-idle-recheck`:
@@ -62,11 +67,25 @@ the local added-link check and semantic review cover its affected scope.
 
 ## Independent review and delivery
 
-Status: QA pending. Cycle 1 will use a distinct reviewer subagent under the
-Salimon QA workflow, which independently inspects criteria, final diff, template
-walkthrough, archived failure/pass evidence and remote checks. Its exact reviewed
-head/base, verdict and limitations are recorded in the PR conversation; this
-developer report does not self-accept. The source issue remains open until merge.
+Delivering [PR #753](https://github.com/mr-exception/salimon/pull/753) targets
+`main`. Distinct reviewer subagent `/root/review_issue_749`, cycle 1, independently
+inspected source `cad15823a18ec852a691895a948653ca1d8e8183` against base
+`6dc4a117613b0e0f12d210297ffb9a88a85ba497`: **REQUEST_CHANGES**. AC-1 needed
+absolute policy URLs in the templates because relative URLs break in copied
+issue/PR bodies; AC-2/3 passed. Both URLs are now absolute, and the relevant
+link/template/hash/whitespace checks pass after correction. The recorded archived
+frame checks are reused: their inputs and driver are unchanged.
+
+The reviewer verified actual issue criteria, the complete 12-file diff, template
+walkthrough and remote revision/check policy independently of the developer.
+The remote head had zero check-runs/statuses (combined status reports `pending`
+for an empty list); no runtime workflow or green CI is claimed. Final-head
+checks and the independent cycle 2 criterion verdict/status are recorded in the
+[PR review conversation](https://github.com/mr-exception/salimon/pull/753),
+which binds the exact final head/base without a self-referential report commit.
+This report records the real cycle 1 verdict, never a speculative acceptance.
+The issue remains open until owner merge; the current-head reviewer comment
+is the authoritative QA status.
 
 No deployment, merge, issue closure, branch-protection mutation, baseline promotion
 or qualification claim is part of this delivery. No remaining implementation

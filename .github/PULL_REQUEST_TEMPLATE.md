@@ -13,7 +13,7 @@ Describe the observable change and any negative/boundary cases.
 
 ## Acceptance and verification
 
-Use [the acceptance policy](../docs/acceptance-policy.md). Map every issue criterion
+Use [the acceptance policy](https://github.com/mr-exception/salimon/blob/main/docs/acceptance-policy.md). Map every issue criterion
 and all five categories; N/A needs a reason. PASS requires actual execution.
 
 | Criterion IDs / category | Mandatory? / N/A reason | Exact command/procedure | PASS / FAIL / BLOCKED / NOT RUN | Evidence / tested SHA |

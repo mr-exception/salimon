@@ -26,7 +26,7 @@ Use Python 3.12 for tooling checks. Initial installation/builds require network 
 
 ## Browser radar checks
 
-For the active browser client use Node >=22.18 and `cd client && npm ci && npm test && npm run build`. Run `npx playwright install --with-deps chromium && npm run test:browser` for the desktop/production WebGL routes, including proxy-pixel and clipped ship-vector scenarios (system Chromium: set `CHROMIUM_PATH`). The Navigation client workflow uses npm lockfile caching, clean install, domain tests, build/typecheck and the same browser suite; revision-named raw results/screenshots/traces are retained for 14 days. Historical native commands below apply to legacy revisions. Browser captures must exercise the real WebGL canvas and identify the adapter. Software WebGL results do not establish hardware performance.
+For the fresh browser client use Node >=22.18 and `cd client && npm ci && npm test && npm run build`. Run `npx playwright install --with-deps chromium && npm run test:browser`, followed by `npm run test:browser:negative`. The deterministic seeded/fixed-clock navigation routes supplement existing desktop and production WebGL checks. See the [criterion matrix and mutation procedure](../client/README.md#deterministic-navigation-regression-750). System Chromium can be selected with `CHROMIUM_PATH`; CI uses the lockfile-selected Playwright Chromium on Ubuntu 24.04. Revision-named results, originals, failure traces and negative-demonstration reports are retained for 14 days; preserve essential evidence in task reports. Browser captures exercise the real WebGL canvas and identify the adapter. Software WebGL does not establish hardware performance. The native commands below are historical and do not gate the fresh client.
 
 ## Automatic CI
 

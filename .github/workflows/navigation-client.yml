@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -38,9 +38,12 @@ jobs:
       - name: Install Chromium
         working-directory: client
         run: npx playwright install --with-deps chromium
-      - name: Desktop, mobile and production WebGL checks
+      - name: Deterministic navigation, desktop and production WebGL checks
         working-directory: client
         run: npm run test:browser
+      - name: Prove intentional navigation regressions fail
+        working-directory: client
+        run: npm run test:browser:negative
       - uses: actions/upload-artifact@v4
         if: always()
         with:

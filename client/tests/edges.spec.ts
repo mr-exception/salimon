@@ -1,9 +1,9 @@
 import {test,expect,type Page} from '@playwright/test'
 import type {} from './sceneHarness'
 import type {} from './fixture'
-async function front(page:Page,target:[number,number,number]=[0,0,0],zoom=.5) {
+async function front(page:Page,scenario='edges',vector='zero',view='front') {
+ await page.goto(`/tests/fixture.html?scenario=${scenario}&view=${view}&vector=${vector}`)
  await page.waitForFunction(()=>!!window.radarTest)
- await page.evaluate(({target,zoom})=>window.radarTest.camera([target[0],target[1],200000],target,zoom),{target,zoom})
 }
 async function lines(page:Page) {
  return page.locator('.ship-vectors line').evaluateAll(nodes=>nodes.filter(n=>(n as SVGElement).style.display!=='none').map(n=>({kind:n.getAttribute('data-vector'),start:[Number(n.getAttribute('x1')),Number(n.getAttribute('y1'))],end:[Number(n.getAttribute('x2')),Number(n.getAttribute('y2'))],stroke:getComputedStyle(n).stroke,dash:getComputedStyle(n).strokeDasharray})))
@@ -15,30 +15,30 @@ function clipped(samples:Awaited<ReturnType<typeof lines>>) {
  }
 }
 test('ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors',async({page},info)=>{
- await page.goto('/tests/fixture.html?scenario=edges');await front(page)
+ await front(page)
  await expect(page.locator('.scan-status')).toContainText('8 temporary contacts')
  await expect(page.locator('.direction-lines,[data-offscreen]')).toHaveCount(0);await expect(page.locator('.edge')).toHaveCount(0)
- const samples=[],box=(await page.locator('.radar').boundingBox())!
+ const samples=[]
  for(const [x,y] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]) {
-  const vx=x*box.width,vy=y*box.height
-  await page.evaluate(({vx,vy})=>window.navigationTest.vectors(vx>0?-Math.PI/2:vx<0?Math.PI/2:0,Math.atan2(vy,Math.abs(vx)),[vx,vy,0]),{vx,vy})
+  const vector=y?(y>0?'top':'bottom')+(x?(x>0?'-right':'-left'):''):(x>0?'right':'left')
+  await front(page,'edges',vector)
   await expect.poll(async()=> (await lines(page)).length).toBe(2)
   await expect.poll(async()=>{const line=(await lines(page))[0];return line?[...(x?[Math.round(line.end[0])]:[]),...(y?[Math.round(line.end[1])]:[])]:[]}).toEqual([...(x?[x>0?100:0]:[]),...(y?[y>0?0:100]:[])])
   const sample=await lines(page);clipped(sample);samples.push(sample)
   const heading=sample[0];if(x)expect(heading.end[0]).toBeCloseTo(x>0?100:0);if(y)expect(heading.end[1]).toBeCloseTo(y>0?0:100)
   expect(heading.stroke).toBe('rgb(255, 227, 106)');expect(sample[1].stroke).toBe('rgb(182, 245, 162)');expect(sample[1].dash).not.toBe('none')
  }
- await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[-1,0,0]));await page.waitForTimeout(150)
+ await front(page,'edges','opposite');await page.waitForTimeout(150)
  const opposite=await lines(page);expect(opposite[0].end[0]).toBe(100);expect(opposite[1].end[0]).toBe(0)
  await info.attach('opposite-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[0,1,0]));await page.waitForTimeout(150)
+ await front(page,'edges','different');await page.waitForTimeout(150)
  const differing=await lines(page);expect(differing[0].end[0]).toBe(100);expect(differing[1].end[1]).toBe(0)
  await info.attach('differing-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[1,0,0]));await page.waitForTimeout(150)
+ await front(page,'edges','right');await page.waitForTimeout(150)
  await info.attach('overlapping-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[1,.001,0]));await page.waitForTimeout(150)
+ await front(page,'edges','near');await page.waitForTimeout(150)
  await info.attach('nearly-overlapping-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[0,0,0]));await expect.poll(async()=> (await lines(page)).length).toBe(1)
+ await front(page,'edges','zero');await expect.poll(async()=> (await lines(page)).length).toBe(1)
  await expect(page.locator('.legend')).toContainText('STATIONARY')
  await page.getByLabel('Scanned contacts (8)',{exact:true}).selectOption('right');await expect(page.locator('.target-status')).toContainText('right')
  expect(await page.evaluate(()=>window.radarTest.snapshot().arrows)).toBe(0)
@@ -46,8 +46,7 @@ test('ship rays reach every edge/corner; no object guides or arrowheads; zero, d
  await info.attach('vector-state.json',{body:JSON.stringify({samples,opposite,differing,gpu:await page.evaluate(()=>window.radarTest.snapshot())},null,2),contentType:'application/json'})
 })
 test('ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping',async({page},info)=>{
- await page.goto('/tests/fixture.html?scenario=visuals');await front(page)
- await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[0,1,0]));await page.waitForTimeout(150)
+ await front(page,'visuals','different');await page.waitForTimeout(150)
  const initial=await lines(page);clipped(initial)
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus()
  await page.keyboard.down('d');await page.waitForTimeout(200);await page.keyboard.up('d')
@@ -57,18 +56,18 @@ test('ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen o
  await page.mouse.wheel(0,-500);await page.waitForTimeout(150);const zoomed=await lines(page);clipped(zoomed);expect(zoomed).not.toEqual(pointer)
  await page.keyboard.down('ArrowUp');await page.waitForTimeout(300);await page.keyboard.up('ArrowUp')
  const turned=await lines(page);clipped(turned);expect(turned[0]).not.toEqual(zoomed[0]);expect(turned[1].end).toEqual(zoomed[1].end)
- await front(page,[1200,0,0]);await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[1,0,0]));await page.waitForTimeout(150)
+ await front(page,'edges','right','outside');await page.waitForTimeout(150)
  const outside=await lines(page);clipped(outside);expect(outside).toHaveLength(2)
  for(const line of outside){expect(line.start[0]).toBe(0);expect(line.end[0]).toBe(100)}
  await info.attach('ship-off-screen.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await page.evaluate(()=>window.navigationTest.vectors(Math.PI/2,0,[-1,0,0]));await expect.poll(async()=> (await lines(page)).length).toBe(0)
+ await front(page,'edges','away','outside');await expect.poll(async()=> (await lines(page)).length).toBe(0)
  await info.attach('camera-vector-state.json',{body:JSON.stringify({initial,keyboard,pointer,zoomed,turned,outside,gpu:await page.evaluate(()=>window.radarTest.snapshot())},null,2),contentType:'application/json'})
 })
 test('off-screen contacts stay in picker after pulse and selection still expires with scanner range',async({page})=>{
- await page.goto('/tests/fixture.html?scenario=edges-unscanned');await front(page)
+ await front(page,'edges-unscanned')
  await expect(page.locator('.scan-status')).toContainText('awaiting first');await expect(page.locator('#contact-select option')).toHaveCount(1)
  await expect(page.locator('.scan-status')).toContainText('8 temporary contacts',{timeout:15000})
  await expect(page.locator('#contact-select option')).toHaveCount(9);await expect(page.locator('.edge,[data-offscreen],.direction-lines')).toHaveCount(0)
  await page.getByLabel('Scanned contacts (8)',{exact:true}).selectOption('right')
- await page.evaluate(()=>window.navigationTest.moveShipLs([300000,0,0]));await expect(page.locator('.target-status')).toHaveText('No selected target');await expect(page.locator('#contact-select option')).toHaveCount(1)
+ await front(page,'expiry','');await expect(page.locator('.scan-status')).toContainText('8 temporary contacts');await page.getByLabel('Scanned contacts (8)',{exact:true}).selectOption('right');await expect(page.locator('.target-status')).toHaveText('No selected target');await expect(page.locator('#contact-select option')).toHaveCount(1)
 })

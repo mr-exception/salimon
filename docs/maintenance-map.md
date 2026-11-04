@@ -2,7 +2,14 @@
 
 [Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
 
-Start with the affected row, then read that crate's `README.ai.md`,
+The active fresh browser prototype is under `client/src/`, with production input
+in `CameraControls.tsx`/`input.ts`, per-frame contact rendering in
+`ContinuousContacts.tsx`, vector projection in `ShipVectorGuides.tsx`/`vectorGuides.ts`,
+and Playwright scenarios/observers in `client/tests/`. See the
+[browser verification contract](../client/README.md#deterministic-navigation-regression-750).
+The crate map below describes the removed native architecture at historical revisions.
+
+For historical native work, start with the affected row, then read that crate's `README.ai.md`,
 `architecture.md` and `invariants.md`. Paths below are repository-root-relative;
 Rust tests are generally inline `#[cfg(test)]` modules. Run focused checks while
 iterating and the [applicable validation gates](validation.md) before completion.

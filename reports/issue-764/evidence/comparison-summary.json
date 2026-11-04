@@ -8,7 +8,7 @@
     },
     "changedPixels": 0,
     "rawChangedPixels": 0,
-    "totalPixels": 651918
+    "totalPixels": 1024000
   },
   "planet-near-rock-comparison.json": {
     "policy": {
@@ -18,8 +18,8 @@
       "masks": []
     },
     "changedPixels": 0,
-    "rawChangedPixels": 1622,
-    "totalPixels": 651918
+    "rawChangedPixels": 0,
+    "totalPixels": 1024000
   },
   "planet-near-colony-comparison.json": {
     "policy": {
@@ -29,8 +29,8 @@
       "masks": []
     },
     "changedPixels": 0,
-    "rawChangedPixels": 4796,
-    "totalPixels": 651918
+    "rawChangedPixels": 800,
+    "totalPixels": 1024000
   },
   "planet-near-scout-comparison.json": {
     "policy": {
@@ -40,8 +40,8 @@
       "masks": []
     },
     "changedPixels": 0,
-    "rawChangedPixels": 4907,
-    "totalPixels": 651918
+    "rawChangedPixels": 6576,
+    "totalPixels": 1024000
   },
   "wrong-checkpoint-negative.json": {
     "policy": {
@@ -51,7 +51,7 @@
       "masks": []
     },
     "pass": false,
-    "changedPixels": 82966,
-    "rawChangedPixels": 182829
+    "changedPixels": 87793,
+    "rawChangedPixels": 193700
   }
 }

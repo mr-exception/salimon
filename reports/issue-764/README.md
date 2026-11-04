@@ -9,7 +9,7 @@ extracts, depletes, transfers, carries or spawns resources.
 
 Parent: PR [#772](https://github.com/mr-exception/salimon/pull/772), branch
 `issue-763-scout-cutaway` at `8a3e27367c608e3e2ad30436a09c403e909e494f`.
-Child: `issue-764-planetary-site`; tested source `9b89116b5f908d9aafcf180af0e82cf72222c80f`.
+Child: `issue-764-planetary-site`; tested source `095a5d4b642f1e3ffd7ca55138bd94405c9fb2ac`.
 #761/#762 are completed in this ancestry; #772's current-head CI and same-session
 review passed. The child targets the parent's head branch; merge #772 first.
 The unique child diff excludes the delivered Scout implementation/report.
@@ -21,7 +21,7 @@ preserve [recorded client input hashes](evidence/source-hashes.json).
 | AC-1 outdoor landing area, movement and collision | Unit tests assert a clear default outdoor spawn, physical rock/source blocking and unchanged fixed entities under movement. PLANET-1 walks from outdoor spawn to mineral, biological colony and near Scout via actual keyboard input, verifies collision stops and retains the same world DOM node. [Spawn](evidence/planet-spawn-0.png), [near mineral](evidence/planet-near-rock-0.png), [near colony](evidence/planet-near-colony-0.png), [near Scout](evidence/planet-near-scout-0.png). |
 | AC-2 repeatable fixed region and anchors | Two fresh browser contexts repeat the journey with exact observed fixed-tick input durations; IDs, source kinds/site IDs/frames/positions remain identical before/after the route. Domain tests prove placement does not depend on ship/camera pose. [Source observations and comparisons](evidence/browser-results.json). |
 | AC-3 stable resource interaction hooks, no extraction | `planetarySite.ts` owns `site:illustrated-landing:v1`, invariant planet-relative spawn/Scout pose and source kind/archetype metadata. Both source types are reachable via existing selection/range/inspection. Repeated and distant requests are tested; source entities remain unchanged and no inventory/depletion/loot implementation is introduced. |
-| AC-4 E2E and visual comparisons | **6 local browser cases PASS**, zero skipped. [Comparison summary](evidence/comparison-summary.json). Spawn, near-mineral, near-colony and near-Scout originals/replays use existing `compareImages` and unchanged `POLICY` (0.1 perceptual threshold, zero pixels over threshold, antialiasing included, no masks). Raw changed pixels and difference images retained. A deliberately wrong checkpoint must be rejected. The existing static TD-1/4 byte-equality assertion remains. |
+| AC-4 E2E and visual comparisons | **6 local browser cases PASS**, zero skipped, followed by **2 additional PLANET-1 repetitions PASS** ([repeat log](evidence/repeat.log), [raw repeat results](evidence/repeat-results.json), [originals 0](evidence/repeat-0/), [originals 1](evidence/repeat-1/)). [Comparison summary](evidence/comparison-summary.json). Spawn, near-mineral, near-colony and near-Scout originals/replays use existing `compareImages` and unchanged `POLICY` (0.1 perceptual threshold, zero pixels over threshold, antialiasing included, no masks). Raw changed pixels and difference images retained. A deliberately wrong checkpoint must be rejected. The existing static TD-1/4 byte-equality assertion remains. |
 | Unit / integration / build | `npm test`: 52 PASS, zero skipped; `npm run build`: PASS, existing large-chunk warning. [Unit](evidence/unit.log), [build](evidence/build.log). Existing Scout/control browser routes remain part of the focused suite; [browser log](evidence/browser.log). Broad Navigation/WebGL, negative/repeat and baseline-approval checks run in current-child CI. |
 | Manual/hardware | Same-session implementing Codex `/root` reviews source, unique diff, actual results and original captures; no independent execution claimed. Physical input, native/mobile/hardware FPS and final subjective art qualification NOT RUN, outside this cloud issue's scope. |
 
@@ -33,7 +33,8 @@ npm ci --cache /tmp/salimon-npm-cache --no-audit --no-fund
 PLAYWRIGHT_BROWSERS_PATH=/tmp/salimon-browsers npx playwright install chromium
 npm test
 npm run build
-PLAYWRIGHT_BROWSERS_PATH=/tmp/salimon-browsers SALIMON_EVIDENCE_DIR=test-results/764-final-policy npm run test:browser -- --project=top-down
+PLAYWRIGHT_BROWSERS_PATH=/tmp/salimon-browsers SALIMON_EVIDENCE_DIR=test-results/764-repaired-full npm run test:browser -- --project=top-down
+PLAYWRIGHT_BROWSERS_PATH=/tmp/salimon-browsers SALIMON_EVIDENCE_DIR=test-results/764-repaired-repeat npm run test:browser -- --project=top-down -g PLANET-1 --repeat-each=2
 ```
 
 Debian 13 x64, Node 24.19.0/npm 11.9.0, locked Playwright 1.64.1 /
@@ -54,6 +55,14 @@ identical player and camera transforms while SVG edge antialiasing still differe
 recovery, isolated contexts and partial-raster disabling did not establish byte
 identity. Manual tracing setup also conflicted with Playwright's existing automatic
 tracing; the duplicate setup was removed.
+
+The first published CI head failed its near-colony comparison by 3 pixels above
+policy, while all 29 other browser cases passed. [CI originals/metrics](failures/ci-41897035054/)
+retain matching player/camera observations and the actual policy diff. The repair
+requests geometric precision from SVG and captures the full 1280×800 viewport
+on the viewer pixel grid. Full affected browser coverage and two additional
+replay repetitions pass locally. No sole cause is claimed from the combined
+precision/readback repair; new-head CI remains required.
 
 The final visual check reuses the repository's established comparator without
 changing its policy, masks, thresholds, approved references or negative checks.

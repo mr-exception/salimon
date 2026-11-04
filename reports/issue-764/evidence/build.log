@@ -15,4 +15,4 @@ dist/assets/index-BTbN-RvA.js   1,156.07 kB │ gzip: 322.74 kB
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 2.93s
+✓ built in 2.81s

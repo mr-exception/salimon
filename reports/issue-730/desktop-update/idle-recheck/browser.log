@@ -1,0 +1,18 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep WASD pans|pointer release|faceted navigation
+
+[WebServer] (node:7558) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7590) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:7602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (20.4s)
+  ✓  2 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (7.0s)
+  ✓  3 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (14.0s)
+
+  3 passed (45.3s)

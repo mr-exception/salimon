@@ -1,6 +1,7 @@
 import { idleControls, type Controls } from './simulation.ts'
 export type Axis=keyof Controls
-export const axisForCode=(code:string):Axis|undefined=>({KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'} as Record<string,Axis>)[code]
+export const axisForCode=(code:string):Axis|undefined=>({ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'} as Record<string,Axis>)[code]
+export const panAxisForCode=(code:string):Axis|undefined=>({KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'} as Record<string,Axis>)[code]
 // Track independent physical inputs, so releasing one pointer/key cannot release
 // another input holding the same axis. All owners are discarded on focus loss.
 export class NavigationInput {
@@ -12,7 +13,7 @@ export class NavigationInput {
  get controls():Controls {const controls=idleControls();for(const axis of this.held.values())controls[axis]=true;return controls}
 }
 export function acceptsFlightShortcut(target:EventTarget|null):boolean {
- return !(target instanceof Element && target.closest('input,textarea,select,button,a,[contenteditable]:not([contenteditable="false"])'))
+ return !(target instanceof Element && target.closest('input,textarea,select,button,a,dialog,[contenteditable]:not([contenteditable="false"])'))
 }
 export class FrameTimer {
  private previous:number

@@ -1,0 +1,518 @@
+{
+  "samples": [
+    {
+      "objects": [
+        {
+          "name": "nav-galactic-lattice",
+          "type": "Points",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.99999999998545
+          ],
+          "pixels": 461,
+          "colors": 158
+        },
+        {
+          "name": "nav-ship-heading",
+          "type": "Group",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.99999999998545
+          ],
+          "pixels": 461,
+          "colors": 158
+        },
+        {
+          "name": "nav-ship-hull",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            485,
+            399.99999999998545
+          ],
+          "pixels": 461,
+          "colors": 158
+        },
+        {
+          "name": "nav-ship-wings",
+          "type": "Mesh",
+          "triangles": 4,
+          "pixel": [
+            485,
+            399.99999999998545
+          ],
+          "pixels": 461,
+          "colors": 158
+        },
+        {
+          "name": "nav-ship-canopy",
+          "type": "Mesh",
+          "triangles": 8,
+          "pixel": [
+            485,
+            394.1042917913901
+          ],
+          "pixels": 461,
+          "colors": 158
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            480.5,
+            407.63198473603126
+          ],
+          "pixels": 445,
+          "colors": 146
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            489.5,
+            407.63198473603126
+          ],
+          "pixels": 455,
+          "colors": 151
+        },
+        {
+          "name": "nav-body:moon:moon",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            542.5,
+            331.100137799572
+          ],
+          "pixels": 191,
+          "colors": 40
+        },
+        {
+          "name": "nav-body:asteroid:asteroid",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            657.5,
+            331.100137799572
+          ],
+          "pixels": 82,
+          "colors": 28
+        },
+        {
+          "name": "nav-body:star:star",
+          "type": "Mesh",
+          "triangles": 36,
+          "pixel": [
+            312.49999999999994,
+            331.100137799572
+          ],
+          "pixels": 913,
+          "colors": 52
+        },
+        {
+          "name": "nav-body:planet:planet",
+          "type": "Mesh",
+          "triangles": 80,
+          "pixel": [
+            427.5,
+            331.100137799572
+          ],
+          "pixels": 494,
+          "colors": 100
+        }
+      ],
+      "surfaces": 0,
+      "calls": 13,
+      "triangles": 214,
+      "geometries": 12,
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "zoom": 0.5
+    },
+    {
+      "objects": [
+        {
+          "name": "nav-galactic-lattice",
+          "type": "Points",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.99999999999704
+          ],
+          "pixels": 1046,
+          "colors": 257
+        },
+        {
+          "name": "nav-ship-heading",
+          "type": "Group",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.99999999999704
+          ],
+          "pixels": 1046,
+          "colors": 257
+        },
+        {
+          "name": "nav-ship-hull",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            485,
+            399.99999999999704
+          ],
+          "pixels": 1046,
+          "colors": 257
+        },
+        {
+          "name": "nav-ship-wings",
+          "type": "Mesh",
+          "triangles": 4,
+          "pixel": [
+            485,
+            399.99999999999704
+          ],
+          "pixels": 1046,
+          "colors": 257
+        },
+        {
+          "name": "nav-ship-canopy",
+          "type": "Mesh",
+          "triangles": 8,
+          "pixel": [
+            485,
+            394.1042917914017
+          ],
+          "pixels": 1046,
+          "colors": 257
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            480.5,
+            407.63198473604285
+          ],
+          "pixels": 1013,
+          "colors": 245
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            489.5,
+            407.63198473604285
+          ],
+          "pixels": 1013,
+          "colors": 245
+        },
+        {
+          "name": "nav-body:planet:planet",
+          "type": "Mesh",
+          "triangles": 80,
+          "pixel": [
+            473.5,
+            386.2200275599144
+          ],
+          "pixels": 1046,
+          "colors": 257
+        },
+        {
+          "name": "nav-body:moon:moon",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            496.49999999999994,
+            386.2200275599144
+          ],
+          "pixels": 1016,
+          "colors": 254
+        }
+      ],
+      "surfaces": 0,
+      "calls": 11,
+      "triangles": 158,
+      "geometries": 12,
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "zoom": 0.1
+    },
+    {
+      "objects": [
+        {
+          "name": "nav-galactic-lattice",
+          "type": "Points",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-heading",
+          "type": "Group",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-hull",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-wings",
+          "type": "Mesh",
+          "triangles": 4,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-canopy",
+          "type": "Mesh",
+          "triangles": 8,
+          "pixel": [
+            485,
+            394.10429179137554
+          ],
+          "pixels": 498,
+          "colors": 174
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            480.5,
+            407.63198473601665
+          ],
+          "pixels": 480,
+          "colors": 162
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            489.5,
+            407.63198473601665
+          ],
+          "pixels": 498,
+          "colors": 171
+        },
+        {
+          "name": "nav-body:moon:moon",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            600,
+            262.20027559914405
+          ],
+          "pixels": 191,
+          "colors": 40
+        },
+        {
+          "name": "nav-body:asteroid:asteroid",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            830.0000000000001,
+            262.20027559914405
+          ],
+          "pixels": 82,
+          "colors": 31
+        },
+        {
+          "name": "nav-body:star:star",
+          "type": "Mesh",
+          "triangles": 36,
+          "pixel": [
+            140,
+            262.20027559914405
+          ],
+          "pixels": 916,
+          "colors": 54
+        },
+        {
+          "name": "nav-body:planet:planet",
+          "type": "Mesh",
+          "triangles": 80,
+          "pixel": [
+            370,
+            262.20027559914405
+          ],
+          "pixels": 488,
+          "colors": 94
+        }
+      ],
+      "surfaces": 0,
+      "calls": 13,
+      "triangles": 214,
+      "geometries": 12,
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "zoom": 1
+    },
+    {
+      "objects": [
+        {
+          "name": "nav-galactic-lattice",
+          "type": "Points",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-heading",
+          "type": "Group",
+          "triangles": 0,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-hull",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-wings",
+          "type": "Mesh",
+          "triangles": 4,
+          "pixel": [
+            485,
+            399.9999999999709
+          ],
+          "pixels": 498,
+          "colors": 173
+        },
+        {
+          "name": "nav-ship-canopy",
+          "type": "Mesh",
+          "triangles": 8,
+          "pixel": [
+            485,
+            394.10429179137554
+          ],
+          "pixels": 498,
+          "colors": 174
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            480.5,
+            407.63198473601665
+          ],
+          "pixels": 480,
+          "colors": 162
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            489.5,
+            407.63198473601665
+          ],
+          "pixels": 498,
+          "colors": 171
+        },
+        {
+          "name": "nav-body:moon:moon",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            600,
+            262.20027559914405
+          ],
+          "pixels": 280,
+          "colors": 54
+        },
+        {
+          "name": "nav-selection",
+          "type": "Mesh",
+          "triangles": 192,
+          "pixel": [
+            600,
+            262.20027559914405
+          ],
+          "pixels": 280,
+          "colors": 54
+        },
+        {
+          "name": "nav-body:asteroid:asteroid",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            830.0000000000001,
+            262.20027559914405
+          ],
+          "pixels": 82,
+          "colors": 31
+        },
+        {
+          "name": "nav-body:star:star",
+          "type": "Mesh",
+          "triangles": 36,
+          "pixel": [
+            140,
+            262.20027559914405
+          ],
+          "pixels": 916,
+          "colors": 54
+        },
+        {
+          "name": "nav-body:planet:planet",
+          "type": "Mesh",
+          "triangles": 80,
+          "pixel": [
+            370,
+            262.20027559914405
+          ],
+          "pixels": 488,
+          "colors": 94
+        }
+      ],
+      "surfaces": 0,
+      "calls": 14,
+      "triangles": 406,
+      "geometries": 13,
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "zoom": 1
+    }
+  ],
+  "errors": []
+}

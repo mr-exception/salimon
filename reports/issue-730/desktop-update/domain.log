@@ -1,0 +1,41 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts
+
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (2.848952ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (0.476692ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.475278ms)
+✔ rotation changes impact-relative velocity and destruction decision (1.658245ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (1.950451ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (0.975614ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (1.119671ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (1.447957ms)
+✔ independent key and pointer owners release without clearing another held input (1.452411ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (1.291206ms)
+✔ navigation assets have finite bounded flat facets and a directional ship silhouette (3.062044ms)
+✔ closed ship hull triangles face outward so back-face culling preserves the upper hull (0.31096ms)
+✔ directional segments reach all viewport edges and corners without a false interior endpoint (2.384448ms)
+✔ panned ship clips entering and exiting rays; misses, parallel, coincident and nonfinite projections are safe (0.325352ms)
+✔ clipping preserves direction and collinearity under arbitrary camera projections (2.236657ms)
+✔ only actual viewport exits have lines; projection pan/rotation and ship-relative origin affect their direction (1.099459ms)
+✔ deterministic overlap grouping preserves every ID and prioritizes the selected ray (36.055373ms)
+✔ near-collinear cardinal rays share a midpoint slot instead of splitting at its boundary (0.45764ms)
+✔ an unselected group prefers a crossing ray over a nearer path missing the panned viewport (0.217312ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (16.143219ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (1.699071ms)
+✔ large catalog query matches independent brute force without global precision loss (123.357631ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (31.961512ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (0.731141ms)
+✔ presentation count is bounded by viewport cells, not catalog length (113.872742ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (2.459725ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (5.792049ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (1.497263ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (3.832931ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1418.59306

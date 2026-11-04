@@ -1,0 +1,18 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep WASD pans|camera keys release|wheel zoom bounds
+
+[WebServer] (node:3923) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:3966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (6.6s)
+  ✓  2 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (9.4s)
+  ✓  3 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (8.6s)
+
+  3 passed (28.2s)

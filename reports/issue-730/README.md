@@ -1,5 +1,7 @@
 # #730 — browser input, accessibility and reproducible verification
 
+Reopened desktop requirements: see the [desktop cleanup supplement](desktop-update/README.md). The original delivery evidence below is preserved at its recorded revision.
+
 Parent: `issue-729-physical-contact` at `f9f002f` (PR #734). Stack order:
 #732 → #733 → #734 → this PR. The common prototype prerequisite #731 is merged.
 

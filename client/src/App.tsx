@@ -1,13 +1,14 @@
 import { Canvas, useFrame, useThree, type RootState } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { CameraControls } from './CameraControls'
+import { HelpDialog } from './HelpDialog'
 import * as THREE from 'three'
 import { SAMPLE_BODIES, length, normal, type Body, type Vec3 } from './sampleUniverse'
 
 import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
 import { alignTo, setThrottle as changeThrottle, type ShipState } from './simulation.ts'
 type Pose = ShipState
-import { NavigationInput, FrameTimer, acceptsFlightShortcut, axisForCode, type Axis } from './input.ts'
+import { NavigationInput, FrameTimer, acceptsFlightShortcut, axisForCode, panAxisForCode } from './input.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { distances, navigationWarnings } from './contact.ts'
 import { radarGroups, gridOffsetLs, type ContactGroup } from './radar.ts'
@@ -16,57 +17,13 @@ const VISIBLE_RADIUS = 900
 const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
 const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
-type ViewCommand={action:'reset'|'in'|'out';sequence:number}
-function CameraControls({ onViewRadius, command }: { onViewRadius: (value: number) => void; command:ViewCommand }) {
-  const { camera, gl, set } = useThree()
-  const controlsRef = useRef<OrbitControls|null>(null)
-  useEffect(() => {
-    camera.position.set(200000, 125000, 200000)
-    camera.lookAt(0,0,0)
-    camera.updateProjectionMatrix()
-    const controls = new OrbitControls(camera, gl.domElement)
-    controls.enablePan = true
-    controls.screenSpacePanning = true
-    set({controls})
-    controls.enableDamping = true
-    controlsRef.current = controls
-    controls.minZoom = 0.001
-    controls.maxZoom = 30
-    controls.target.set(0,0,0)
-    const sync = () => {
-      if (camera instanceof THREE.OrthographicCamera) {
-        onViewRadius((camera.top - camera.bottom) / (2 * camera.zoom))
-      }
-    }
-    controls.addEventListener('change',sync)
-    sync()
-    return () => { controls.removeEventListener('change',sync); controls.dispose();controlsRef.current=null;set({controls:null}) }
-  },[camera,gl,onViewRadius,set])
-  useEffect(()=>{
-    if(!(camera instanceof THREE.OrthographicCamera))return
-    if(command.action==='reset'){
-      const controls=controlsRef.current
-      if(controls){
-        // Drain residual orbit/pan damping before assigning the reset pose.
-        const damping=controls.enableDamping;controls.enableDamping=false
-        controls.update();controls.enableDamping=damping;controls.target.set(0,0,0)
-      }
-      camera.position.set(200000,125000,200000);camera.lookAt(0,0,0);camera.zoom=0.5
-    }
-    else camera.zoom=THREE.MathUtils.clamp(camera.zoom*(command.action==='in'?1.5:1/1.5),0.001,30)
-    camera.updateProjectionMatrix();controlsRef.current?.update()
-    onViewRadius((camera.top-camera.bottom)/(2*camera.zoom))
-  },[camera,command,onViewRadius])
-  useFrame(() => controlsRef.current?.update())
-  return null
-}
 function Contact({ body, position, selected, onSelect }: { body: Body; position: Vec3; selected: boolean; onSelect: (id: string) => void }) {
   return <group position={position as [number,number,number]} onClick={(event) => {event.stopPropagation();onSelect(body.id)}}>
     <BodyVisual kind={body.kind} id={body.id} selected={selected}/>
   </group>
 }
 
-function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:ViewCommand }) {
+function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand, panInput }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:number; panInput:NavigationInput }) {
   const { camera, size } = useThree()
   const [groups,updateGroups]=useState<ContactGroup[]>([])
   const elapsed = useRef(0)
@@ -83,7 +40,7 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
   const gridOffset=gridOffsetLs(pose.position,spacing)
   return <>
     <color attach="background" args={['#060f19']}/>
-    <CameraControls onViewRadius={setViewRadius} command={viewCommand} />
+    <CameraControls onViewRadius={setViewRadius} resetSequence={viewCommand} input={panInput} />
     <ambientLight intensity={0.65}/>
     <directionalLight position={[100,180,-80]} intensity={2}/>
     <GalacticLattice spacing={spacing} offset={gridOffset}/>
@@ -107,9 +64,10 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
   const [pulse,setPulse]=useState(0)
   const [aligning,setAligning]=useState(false)
   const input=useRef(new NavigationInput())
-  const [held,setHeld]=useState(input.current.controls)
+  const panInput=useRef(new NavigationInput())
+  const [helpOpen,setHelpOpen]=useState(false)
   const [paused,setPaused]=useState(document.hidden)
-  const [viewCommand,setViewCommand]=useState<ViewCommand>({action:'reset',sequence:0})
+  const [viewCommand,setViewCommand]=useState(0)
   const [contactPage,setContactPage]=useState(0)
   const [contactQuery,setContactQuery]=useState('')
 
@@ -124,16 +82,18 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
   },[])
   const cancelAlignment=()=>{runtime.current.clock.state={...runtime.current.clock.state,alignment:null};setAligning(false)}
   useEffect(()=>{
-    const clear=()=>{input.current.clear();setHeld(input.current.controls);cancelAlignment()}
+    const clear=()=>{input.current.clear();panInput.current.clear()}
     const onKeyDown=(e:KeyboardEvent)=>{
       if(!acceptsFlightShortcut(e.target)||e.altKey||e.ctrlKey||e.metaKey)return
+      const pan=panAxisForCode(e.code)
+      if(pan){panInput.current.press(`key:${e.code}`,pan);e.preventDefault()}
       const axis=axisForCode(e.code)
       if(axis){input.current.press(`key:${e.code}`,axis);cancelAlignment();e.preventDefault()}
       if(e.code==='Space' && !e.repeat){throttleRef.current=0;setThrottle(0);e.preventDefault()}
     }
-    const onKeyUp=(e:KeyboardEvent)=>input.current.release(`key:${e.code}`)
+    const onKeyUp=(e:KeyboardEvent)=>{input.current.release(`key:${e.code}`);panInput.current.release(`key:${e.code}`)}
     const visibility=()=>{clear();setPaused(document.hidden)}
-    const focus=(e:FocusEvent)=>{if(!acceptsFlightShortcut(e.target))input.current.releasePrefix('key:')}
+    const focus=(e:FocusEvent)=>{if(!acceptsFlightShortcut(e.target)){input.current.releasePrefix('key:');panInput.current.clear()}}
     window.addEventListener('keydown',onKeyDown);window.addEventListener('keyup',onKeyUp)
     window.addEventListener('blur',clear);window.addEventListener('resize',clear);window.addEventListener('focusin',focus)
     document.addEventListener('visibilitychange',visibility)
@@ -154,7 +114,7 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
       setAligning(p.alignment!==null)
       accumulator+=dt
       if(accumulator>=0.08){
-        setHeld(input.current.controls);setPose(p);setContacts(runtime.current.scanner.contacts);setSelected(runtime.current.scanner.selected);setPulse(runtime.current.scanner.pulse);accumulator=0
+        setPose(p);setContacts(runtime.current.scanner.contacts);setSelected(runtime.current.scanner.selected);setPulse(runtime.current.scanner.pulse);accumulator=0
       }
       frame=requestAnimationFrame(animate)
     }
@@ -170,34 +130,19 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
     runtime.current.clock.state=alignTo(runtime.current.clock.state,relativeM(target.position,runtime.current.clock.state.position))
     setAligning(true)
   }
-  const hold=(axis:Axis)=>({
-    disabled:pose.mode!=='flying',
-    'aria-pressed':held[axis],
-    onPointerDown:(event:import('react').PointerEvent<HTMLButtonElement>)=>{
-      if(event.button!==0)return
-      event.currentTarget.setPointerCapture(event.pointerId);input.current.press(`pointer:${event.pointerId}`,axis);cancelAlignment()
-    },
-    onPointerUp:(event:import('react').PointerEvent<HTMLButtonElement>)=>input.current.release(`pointer:${event.pointerId}`),
-    onPointerCancel:(event:import('react').PointerEvent<HTMLButtonElement>)=>input.current.release(`pointer:${event.pointerId}`),
-    onLostPointerCapture:(event:import('react').PointerEvent<HTMLButtonElement>)=>input.current.release(`pointer:${event.pointerId}`),
-    onKeyDown:(event:import('react').KeyboardEvent<HTMLButtonElement>)=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();input.current.press(`button:${axis}:${event.code}`,axis);cancelAlignment()}},
-    onKeyUp:(event:import('react').KeyboardEvent<HTMLButtonElement>)=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();input.current.release(`button:${axis}:${event.code}`)}},
-    onBlur:()=>input.current.releasePrefix(`button:${axis}:`),
-    onClick:(event:import('react').MouseEvent<HTMLButtonElement>)=>{if(event.detail===0){input.current.press(`activate:${axis}`,axis);cancelAlignment();setTimeout(()=>input.current.release(`activate:${axis}`),150)}}
-  })
-  const restart=()=>{runtime.current.reset();throttleRef.current=0;setThrottle(0);input.current.clear();setHeld(input.current.controls);setPose(runtime.current.clock.state);setContacts([]);setSelected(null);setGroups([]);setMenu([]);setMenuPage(0);setContactQuery('');setContactPage(0);setAligning(false);setPulse(0)}
+  const restart=()=>{runtime.current.reset();throttleRef.current=0;setThrottle(0);input.current.clear();panInput.current.clear();setPose(runtime.current.clock.state);setContacts([]);setSelected(null);setGroups([]);setMenu([]);setMenuPage(0);setContactQuery('');setContactPage(0);setAligning(false);setPulse(0)}
   const filteredContacts=contacts.filter(b=>b.name.toLowerCase().includes(contactQuery.toLowerCase()))
   const contactPages=Math.max(1,Math.ceil(filteredContacts.length/32))
   const page=Math.min(contactPage,contactPages-1)
   const pageContacts=filteredContacts.slice(page*32,(page+1)*32)
-  const view=(action:ViewCommand['action'])=>setViewCommand(c=>({action,sequence:c.sequence+1}))
+  const resetView=()=>{panInput.current.clear();setViewCommand(c=>c+1)}
   const warnings=navigationWarnings(pose,contacts)
   const targetDistances=target?distances(pose,target):null
   const distance=target?length(relativeM(target.position,pose.position))/LIGHT_SECOND_M:null
   return <div className="app" data-mode={pose.mode}>
     <div className="radar" role="region" aria-label="Navigation radar" aria-describedby="navigation-help" tabIndex={0} onPointerDown={e=>{if(e.target instanceof HTMLCanvasElement)e.currentTarget.focus({preventScroll:true})}}>
       <Canvas orthographic camera={RADAR_CAMERA} onCreated={(state)=>{onSceneReady?.(state);const {gl}=state;gl.domElement.setAttribute('aria-label','Ship-centered three-dimensional radar');gl.domElement.setAttribute('role','img')}} fallback={<p role="alert">WebGL is unavailable. A WebGL 2 browser is required.</p>}>
-        <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand}/>
+        <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand} panInput={panInput.current}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
       <svg className="direction-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -244,15 +189,15 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
       </div>}
       {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><p className="muted">Surface clearance {fmt(targetDistances?.surfaceDistanceM??0)} m</p><button className="action" disabled={pose.mode!=='flying'} onClick={setDirection}>Set direction</button></>:<p className="muted">Select a holographic contact or edge marker.</p>}
       <hr/>
-      <h2>Manual orientation</h2>
-      <div className="pad"><button aria-label="Pitch up" {...hold('up')}>↑</button><div><button aria-label="Yaw left" {...hold('left')}>←</button><button aria-label="Pitch down" {...hold('down')}>↓</button><button aria-label="Yaw right" {...hold('right')}>→</button></div></div>
-      <p className="muted" id="navigation-help">Focus the radar for W/A/S/D and Space. Hold buttons with pointer, Space or Enter. Drag to orbit, right-drag to pan and wheel to zoom. Camera movement is independent.</p>
-      <div className="camera-actions"><button onClick={()=>view('in')}>Zoom in</button><button onClick={()=>view('out')}>Zoom out</button><button onClick={()=>view('reset')}>Reset camera</button></div>
+      <h2>Camera and orientation</h2>
+      <p className="muted" id="navigation-help">WASD pans the view · wheel zooms · arrow keys turn the ship.</p>
+      <div className="camera-actions"><button onClick={()=>setHelpOpen(true)}>Help</button><button onClick={resetView}>Reset camera</button></div>
       <hr/>
       <h2><label htmlFor="throttle">Throttle</label> <strong>{throttle>0?'+':''}{throttle}%</strong></h2>
       <input id="throttle" aria-valuetext={`${throttle}% ${throttle>0?'forward':throttle<0?'reverse':'coast'}`} type="range" min="-100" max="100" step="1" value={throttle} disabled={pose.mode!=='flying'} onChange={e=>{const value=Number(e.target.value);throttleRef.current=value;setThrottle(value)}}/>
       <button disabled={pose.mode!=='flying'} onClick={()=>{throttleRef.current=0;setThrottle(0)}}>Zero throttle (Space)</button>
       <p className="muted foot">Illustrative universe · unlimited energy. Impacts at 100 m/s or faster end the run. Lower-speed contact settles the ship.</p>
     </aside>
+    {helpOpen && <HelpDialog onClose={()=>setHelpOpen(false)}/>}
   </div>
 }

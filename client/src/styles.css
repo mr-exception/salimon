@@ -12,3 +12,5 @@ label{display:block;font-size:12px;color:#9bc5cf;margin:10px 0 5px}h2 label{marg
 .direction-lines line.selected{stroke:#e5ffc2;stroke-width:2;stroke-opacity:.9}
 .edge.selected{border-color:#e5ffc2!important;color:#f1ffdc!important;background:#253c35f5!important}
 .top-label,.legend{z-index:1}
+
+dialog{max-width:520px;max-height:85vh;overflow:auto;background:#0d1d2b;color:#d9ebf1;border:1px solid #376174;border-radius:8px;padding:24px}dialog::backdrop{background:#020911aa}dialog h2{font-size:16px}dialog dt{font-size:13px;color:#9cf3dd;margin-top:14px}dialog dd{font-size:13px;line-height:1.5;margin:4px 0 0}dialog form{margin-top:20px}

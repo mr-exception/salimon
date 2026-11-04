@@ -1,0 +1,83 @@
+{
+  "source": "dc06ccf2d770d70a88abcdbf43672526ec871267",
+  "launchArgs": [
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--disable-lcd-text"
+  ],
+  "candidate": false,
+  "results": [
+    {
+      "id": "empty-scanner",
+      "pass": false,
+      "changedPixels": 467,
+      "rawChangedPixels": 586,
+      "totalPixels": 1024000,
+      "expected": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+      "actual": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439"
+    },
+    {
+      "id": "visible-contacts",
+      "pass": false,
+      "changedPixels": 467,
+      "rawChangedPixels": 586,
+      "totalPixels": 1024000,
+      "expected": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+      "actual": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d"
+    },
+    {
+      "id": "panned-contacts",
+      "pass": false,
+      "changedPixels": 467,
+      "rawChangedPixels": 586,
+      "totalPixels": 1024000,
+      "expected": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+      "actual": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9"
+    },
+    {
+      "id": "selected-body",
+      "pass": false,
+      "changedPixels": 129,
+      "rawChangedPixels": 169,
+      "totalPixels": 1024000,
+      "expected": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+      "actual": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795"
+    },
+    {
+      "id": "zoom-out",
+      "pass": false,
+      "changedPixels": 467,
+      "rawChangedPixels": 586,
+      "totalPixels": 1024000,
+      "expected": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+      "actual": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e"
+    },
+    {
+      "id": "zoom-in",
+      "pass": false,
+      "changedPixels": 467,
+      "rawChangedPixels": 586,
+      "totalPixels": 1024000,
+      "expected": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+      "actual": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3"
+    },
+    {
+      "id": "heading-velocity",
+      "pass": false,
+      "changedPixels": 467,
+      "rawChangedPixels": 586,
+      "totalPixels": 1024000,
+      "expected": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+      "actual": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252"
+    },
+    {
+      "id": "opposite-vectors",
+      "pass": false,
+      "changedPixels": 467,
+      "rawChangedPixels": 586,
+      "totalPixels": 1024000,
+      "expected": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+      "actual": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+    }
+  ]
+}

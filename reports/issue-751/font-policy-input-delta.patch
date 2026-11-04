@@ -1,0 +1,169 @@
+diff --git a/client/README.md b/client/README.md
+index 86ed064..63607b9 100644
+--- a/client/README.md
++++ b/client/README.md
+@@ -102,7 +102,7 @@ physical input, native platforms or hardware FPS.
+ ## Navigation screenshot regression (#751)
+
+ The [visual reference guide](tests/navigation-baselines/README.md) owns the eight
+-frozen browser screens, fixed fonts/browser/backend, pixel comparison policy,
++frozen browser screens, fixed fonts/Fontconfig/browser/backend, pixel comparison policy,
+ intentional visual defect demonstration and explicit independent baseline approval.
+ `npm run test:visual` compares all screens; run it twice for determinism and run
+ `npm run test:visual:negative` to prove the comparator rejects a real CSS defect.
+diff --git a/client/playwright.config.ts b/client/playwright.config.ts
+index e271066..87da78e 100644
+--- a/client/playwright.config.ts
++++ b/client/playwright.config.ts
+@@ -1,12 +1,15 @@
+ import { defineConfig } from '@playwright/test'
++import {fileURLToPath} from 'node:url'
++const launchOptions={executablePath:process.env.CHROMIUM_PATH,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-lcd-text']}
++const referenceLaunchOptions={...launchOptions,env:{...process.env,FONTCONFIG_FILE:fileURLToPath(new URL('./tests/assets/fonts.conf',import.meta.url))}}
+ const evidenceDir=process.env.SALIMON_EVIDENCE_DIR??'test-results'
+ export default defineConfig({
+  outputDir:evidenceDir,
+  testDir:'./tests',timeout:30000,expect:{timeout:10000},workers:1,fullyParallel:false,retries:0,
+  reporter:[['list'],['json',{outputFile:`${evidenceDir}/results.json`}]],
+  use:{baseURL:'http://127.0.0.1:5175',viewport:{width:1280,height:800},deviceScaleFactor:1,locale:'en-US',timezoneId:'UTC',colorScheme:'dark',reducedMotion:'reduce',screenshot:'on',trace:'retain-on-failure',
+-  launchOptions:{executablePath:process.env.CHROMIUM_PATH,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-lcd-text']}},
+- projects:[{name:'navigation-captures',timeout:180000,testMatch:/navigation-captures\.spec\.ts/,use:{trace:'on'}},{name:'deterministic',timeout:120000,testMatch:/deterministic\.spec\.ts/},{name:'desktop',testMatch:/(desktop|visuals|edges|panning)\.spec\.ts/},{name:'production',testMatch:/production\.spec\.ts/}],
++  launchOptions},
++ projects:[{name:'navigation-captures',timeout:180000,testMatch:/navigation-captures\.spec\.ts/,use:{trace:'on',launchOptions:referenceLaunchOptions}},{name:'deterministic',timeout:120000,testMatch:/deterministic\.spec\.ts/},{name:'desktop',testMatch:/(desktop|visuals|edges|panning)\.spec\.ts/},{name:'production',testMatch:/production\.spec\.ts/}],
+  webServer:[
+   {command:'npm run dev -- --host 127.0.0.1 --port 5175 --strictPort',url:'http://127.0.0.1:5175',reuseExistingServer:!process.env.CI},
+   {command:'npm run preview -- --host 127.0.0.1 --port 4175 --strictPort',url:'http://127.0.0.1:4175',reuseExistingServer:!process.env.CI}
+diff --git a/client/tests/assets/fonts.conf b/client/tests/assets/fonts.conf
+new file mode 100644
+index 0000000..dfd089d
+--- /dev/null
++++ b/client/tests/assets/fonts.conf
+@@ -0,0 +1,16 @@
++<?xml version="1.0"?>
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
++<fontconfig>
++  <!-- Only vendored font files. Do not load the host's aliases/raster defaults. -->
++  <dir prefix="relative">.</dir>
++  <cachedir>/tmp/salimon-navigation-font-cache</cachedir>
++  <match target="pattern">
++    <edit name="antialias" mode="assign"><bool>true</bool></edit>
++    <edit name="hinting" mode="assign"><bool>true</bool></edit>
++    <edit name="hintstyle" mode="assign"><const>hintslight</const></edit>
++    <edit name="autohint" mode="assign"><bool>false</bool></edit>
++    <edit name="rgba" mode="assign"><const>none</const></edit>
++    <edit name="lcdfilter" mode="assign"><const>lcddefault</const></edit>
++    <edit name="dpi" mode="assign"><double>75</double></edit>
++  </match>
++</fontconfig>
+diff --git a/client/tests/navigation-baselines/README.md b/client/tests/navigation-baselines/README.md
+index cceea39..69602eb 100644
+--- a/client/tests/navigation-baselines/README.md
++++ b/client/tests/navigation-baselines/README.md
+@@ -1,6 +1,11 @@
+ # Navigation visual references (#751)
+
+-These eight initial images are **candidates pending explicit human approval**.
++These eight images are **corrected candidates pending explicit human approval**.
++The initial proposal exposed a hidden native-select host-font dependency. The
++current proposal pins Fontconfig to the licensed vendored DejaVu files; the only
++image changes are the selected-value glyphs. See the [upgrade measurements](../../../reports/issue-751/candidate-upgrade.json)
++and [original candidates](../../../reports/issue-751/initial-candidates/manifest.json).
++Previous manifest approval does not approve this new digest.
+ Pixel equality is separate from accepting a reference as correct. The CI approval
+ gate must pass before QA acceptance. No implementation agent may post approval.
+
+@@ -36,7 +41,10 @@ Use the lockfile Chromium on Linux x64; do not set `CHROMIUM_PATH` for reference
+ qualification. Environment drift (browser/Playwright/platform/architecture/font
+ hashes/renderer) fails explicitly. Chromium explicitly disables LCD text
+ (`--disable-lcd-text`) so opaque sidebar glyphs use the same grayscale
+-rasterization on Debian and Ubuntu. Actual launch flags are recorded per capture. Host distro/version is recorded in the issue
++rasterization on Debian and Ubuntu. Actual launch flags are recorded per capture. A minimal, hashed
++`tests/assets/fonts.conf` also pins native-control fallback, hinting, antialiasing,
++DPI and subpixel policy. It loads only vendored fonts and is scoped to the
++screenshot project; ordinary production/browser routes retain host font coverage. Host distro/version is recorded in the issue
+ report/CI runner rather than asserting Debian and Ubuntu are the same OS.
+ Seed 750, fixture front camera, fixed zooms, DPR 1, en-US/UTC, dark scheme and
+ paused RAF/performance clock are recorded in `manifest.json` and observations.
+diff --git a/client/tests/navigation-baselines/empty-scanner.png b/client/tests/navigation-baselines/empty-scanner.png
+index 7636f36..f8fd355 100644
+Binary files a/client/tests/navigation-baselines/empty-scanner.png and b/client/tests/navigation-baselines/empty-scanner.png differ
+diff --git a/client/tests/navigation-baselines/heading-velocity.png b/client/tests/navigation-baselines/heading-velocity.png
+index c94578d..5da2fbe 100644
+Binary files a/client/tests/navigation-baselines/heading-velocity.png and b/client/tests/navigation-baselines/heading-velocity.png differ
+diff --git a/client/tests/navigation-baselines/manifest.json b/client/tests/navigation-baselines/manifest.json
+index 8057b4f..122ca69 100644
+--- a/client/tests/navigation-baselines/manifest.json
++++ b/client/tests/navigation-baselines/manifest.json
+@@ -16,10 +16,12 @@
+     "fontHashes": {
+       "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+       "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+-      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872"
++      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
++      "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab"
+     },
+     "seed": 750,
+     "epoch": "2026-11-04T00:00:00.000Z",
++    "nativeFallback": "vendored DejaVu Sans only",
+     "policy": {
+       "threshold": 0.1,
+       "maxDiffPixels": 0,
+@@ -29,13 +31,13 @@
+   },
+   "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+   "images": {
+-    "empty-scanner.png": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+-    "visible-contacts.png": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+-    "panned-contacts.png": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+-    "selected-body.png": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+-    "zoom-out.png": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+-    "zoom-in.png": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+-    "heading-velocity.png": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+-    "opposite-vectors.png": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf"
++    "empty-scanner.png": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
++    "visible-contacts.png": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
++    "panned-contacts.png": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
++    "selected-body.png": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
++    "zoom-out.png": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
++    "zoom-in.png": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
++    "heading-velocity.png": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
++    "opposite-vectors.png": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+   }
+ }
+diff --git a/client/tests/navigation-baselines/opposite-vectors.png b/client/tests/navigation-baselines/opposite-vectors.png
+index 93c9b62..0e86bc9 100644
+Binary files a/client/tests/navigation-baselines/opposite-vectors.png and b/client/tests/navigation-baselines/opposite-vectors.png differ
+diff --git a/client/tests/navigation-baselines/panned-contacts.png b/client/tests/navigation-baselines/panned-contacts.png
+index 1d787ca..03cc330 100644
+Binary files a/client/tests/navigation-baselines/panned-contacts.png and b/client/tests/navigation-baselines/panned-contacts.png differ
+diff --git a/client/tests/navigation-baselines/selected-body.png b/client/tests/navigation-baselines/selected-body.png
+index fdaa427..e852108 100644
+Binary files a/client/tests/navigation-baselines/selected-body.png and b/client/tests/navigation-baselines/selected-body.png differ
+diff --git a/client/tests/navigation-baselines/visible-contacts.png b/client/tests/navigation-baselines/visible-contacts.png
+index 88e7f31..5ca86cc 100644
+Binary files a/client/tests/navigation-baselines/visible-contacts.png and b/client/tests/navigation-baselines/visible-contacts.png differ
+diff --git a/client/tests/navigation-baselines/zoom-in.png b/client/tests/navigation-baselines/zoom-in.png
+index 8ec946d..5bc27ac 100644
+Binary files a/client/tests/navigation-baselines/zoom-in.png and b/client/tests/navigation-baselines/zoom-in.png differ
+diff --git a/client/tests/navigation-baselines/zoom-out.png b/client/tests/navigation-baselines/zoom-out.png
+index 4c98426..d564070 100644
+Binary files a/client/tests/navigation-baselines/zoom-out.png and b/client/tests/navigation-baselines/zoom-out.png differ
+diff --git a/client/tests/navigation-captures.spec.ts b/client/tests/navigation-captures.spec.ts
+index f52f0d1..df60e37 100644
+--- a/client/tests/navigation-captures.spec.ts
++++ b/client/tests/navigation-captures.spec.ts
+@@ -21,11 +21,12 @@ const cases=[
+ // One ordered session preserves a single manifest and complete comparison summary.
+ test('VIS-1/2 eight navigation screens match reference pixels',async({page,browser},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
+- const fonts=await Promise.all(['DejaVuSans.ttf','DejaVuSans-Bold.ttf','fonts.css'].map(async f=>[f,sha256(await readFile(`tests/assets/${f}`))]))
++ const fonts=await Promise.all(['DejaVuSans.ttf','DejaVuSans-Bold.ttf','fonts.css','fonts.conf'].map(async f=>[f,sha256(await readFile(`tests/assets/${f}`))]))
+  const launchArgs=info.project.use.launchOptions?.args??[]
+  expect(launchArgs,'VISUAL_RASTERIZATION_POLICY').toContain('--disable-lcd-text')
++ expect(info.project.use.launchOptions?.env?.FONTCONFIG_FILE,'VISUAL_FONTCONFIG_POLICY').toMatch(/tests\/assets\/fonts\.conf$/)
+  const source=(await readFile('.revision-for-negative','utf8').catch(()=>null))??execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()
+- const environment={platform:process.platform,arch:process.arch,browser:browser.version(),playwright:JSON.parse(await readFile('node_modules/@playwright/test/package.json','utf8')).version,viewport:{width:1280,height:800},dpr:1,locale:'en-US',timezone:'UTC',colorScheme:'dark',fontHashes:Object.fromEntries(fonts),seed:750,epoch:EPOCH,policy:POLICY}
++ const environment={platform:process.platform,arch:process.arch,browser:browser.version(),playwright:JSON.parse(await readFile('node_modules/@playwright/test/package.json','utf8')).version,viewport:{width:1280,height:800},dpr:1,locale:'en-US',timezone:'UTC',colorScheme:'dark',fontHashes:Object.fromEntries(fonts),seed:750,epoch:EPOCH,nativeFallback:'vendored DejaVu Sans only',policy:POLICY}
+  const manifest=candidate?null:JSON.parse(await readFile(`${directory}/manifest.json`,'utf8'))
+  const results:Record<string,unknown>[]=[],images:Record<string,string>={}
+  const output=candidate??info.outputPath('comparisons')

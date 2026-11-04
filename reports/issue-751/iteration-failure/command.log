@@ -1,0 +1,42 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (118ms)
+
+
+  1) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels
+
+    Error: ENOENT: no such file or directory, mkdir ''
+
+      28 |  const results:Record<string,unknown>[]=[],images:Record<string,string>={}
+      29 |  const output=candidate??info.outputPath('comparisons')
+    > 30 |  await mkdir(output,{recursive:true})
+         |  ^
+      31 |  // Drift is a failure, never an instruction to regenerate references.
+      32 |  if(manifest)expect(environment,'VISUAL_ENVIRONMENT_DRIFT: propose separately reviewed candidates').toEqual(manifest.environment)
+      33 |  for(const fixture of cases) {
+        at /tmp/salimon-visual-negative-noCdym/tests/navigation-captures.spec.ts:30:2
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels
+
+[WebServer] (node:2570) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:2617) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

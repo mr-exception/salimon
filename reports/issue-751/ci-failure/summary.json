@@ -1,0 +1,78 @@
+{
+  "source": "911afd145fd633e9ce2b6b77dc94d083e6325abf",
+  "candidate": false,
+  "results": [
+    {
+      "id": "empty-scanner",
+      "pass": false,
+      "changedPixels": 6512,
+      "rawChangedPixels": 20005,
+      "totalPixels": 1024000,
+      "expected": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+      "actual": "aae7f7cdd312749a026f20a45e0340a3f2e9aec1d5a245a064dfbc04a6e04036"
+    },
+    {
+      "id": "visible-contacts",
+      "pass": false,
+      "changedPixels": 6449,
+      "rawChangedPixels": 19851,
+      "totalPixels": 1024000,
+      "expected": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+      "actual": "bcee44d11838e9786fc46be73309e8cf64d52d9d22c19551f0fbc03ceb136e6f"
+    },
+    {
+      "id": "panned-contacts",
+      "pass": false,
+      "changedPixels": 6449,
+      "rawChangedPixels": 19851,
+      "totalPixels": 1024000,
+      "expected": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+      "actual": "f3763b8ec67de7b92d30a35837d01fb93bb413aa1b05f9dcdbdfed9e5fe387a0"
+    },
+    {
+      "id": "selected-body",
+      "pass": false,
+      "changedPixels": 6098,
+      "rawChangedPixels": 19652,
+      "totalPixels": 1024000,
+      "expected": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+      "actual": "2f0f2d04ef2e2c8d22da88a6379e8a98a1b1bf7f3f0f3a8f514ae1b59fc216aa"
+    },
+    {
+      "id": "zoom-out",
+      "pass": false,
+      "changedPixels": 6449,
+      "rawChangedPixels": 19851,
+      "totalPixels": 1024000,
+      "expected": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+      "actual": "39ef46a4f13e95143cd8dae2d801e0bb0522ed72a2082e5c498a9ec29e6d5555"
+    },
+    {
+      "id": "zoom-in",
+      "pass": false,
+      "changedPixels": 6449,
+      "rawChangedPixels": 19851,
+      "totalPixels": 1024000,
+      "expected": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+      "actual": "89471e7e14752f4fde5622a6f8f6c46fb3a2498ec0dbeedd46a35b5a0e246750"
+    },
+    {
+      "id": "heading-velocity",
+      "pass": false,
+      "changedPixels": 6425,
+      "rawChangedPixels": 19796,
+      "totalPixels": 1024000,
+      "expected": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+      "actual": "6e5a364bfa226b446a88be82d45f9595f60738a607e72fe3b6c83c0d10cb8572"
+    },
+    {
+      "id": "opposite-vectors",
+      "pass": false,
+      "changedPixels": 6429,
+      "rawChangedPixels": 19804,
+      "totalPixels": 1024000,
+      "expected": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+      "actual": "1d644869143934d17c207ef29112cb6df89640d19d9b3a91ccaf6ce7f236d987"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "browser": "156.0.8078.4",
+    "playwright": "1.64.1",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "dpr": 1,
+    "locale": "en-US",
+    "timezone": "UTC",
+    "colorScheme": "dark",
+    "fontHashes": {
+      "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
+      "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab"
+    },
+    "seed": 750,
+    "epoch": "2026-11-04T00:00:00.000Z",
+    "nativeFallback": "vendored DejaVu Sans only",
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    }
+  },
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "images": {
+    "empty-scanner.png": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "visible-contacts.png": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "panned-contacts.png": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "selected-body.png": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "zoom-out.png": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "zoom-in.png": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "heading-velocity.png": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+    "opposite-vectors.png": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+  }
+}

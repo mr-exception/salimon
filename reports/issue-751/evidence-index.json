@@ -1,0 +1,2599 @@
+[
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/results.json",
+    "sha256": "b0af4ee154cd0589421212bd0d8d00c39ba6098ae220c8db946fbb8368399034",
+    "retained": "reports/issue-751/evidence/full/results.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/.last-run.json",
+    "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "retained": "reports/issue-751/evidence/full/.last-run.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/test-finished-1.png",
+    "sha256": "83aaa0e66ee1aba0d3070d9f92c88151085f490bb8247dc19c3bb29b15f9a3bf",
+    "retained": "reports/issue-751/evidence/full/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-wheel-zoom-bounds--bdd1d-ntrols-survive-view-changes-desktop/test-finished-1.png",
+    "sha256": "9346c5322441c92f1526df1af8865dd13c31d67a6ac8e85afa7377fc99ce9c57",
+    "retained": "reports/issue-751/evidence/full/desktop-wheel-zoom-bounds--bdd1d-ntrols-survive-view-changes-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/panning-continuous-mouse-p-6d454-t-projection-on-every-frame-desktop/test-finished-1.png",
+    "sha256": "137295b64fe30bbfd9d2c8f6fa1987d5235232b0a02c22c1b364e88250dbefb7",
+    "retained": "reports/issue-751/evidence/full/panning-continuous-mouse-p-6d454-t-projection-on-every-frame-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-production-App-contact-fixture-destroyed-desktop/test-finished-1.png",
+    "sha256": "6c9f7c16a61a9a3d06656ecc38e71ee4da967ea11e81429cfb5f4118b6c5fc5e",
+    "retained": "reports/issue-751/evidence/full/desktop-production-App-contact-fixture-destroyed-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-production-App-contact-fixture-safe-desktop/test-finished-1.png",
+    "sha256": "6c9f7c16a61a9a3d06656ecc38e71ee4da967ea11e81429cfb5f4118b6c5fc5e",
+    "retained": "reports/issue-751/evidence/full/desktop-production-App-contact-fixture-safe-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-Help-has-keyboard--039bb-d-Escape-close-return-focus-desktop/test-finished-1.png",
+    "sha256": "bfc8ef98da1095778a8a512dd546986fdc3aa7e983606ad89722fbeb106f4baa",
+    "retained": "reports/issue-751/evidence/full/desktop-Help-has-keyboard--039bb-d-Escape-close-return-focus-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/test-finished-1.png",
+    "sha256": "ea82db9366703938ad5e46f11546158494fe36836ef6c593e7d1dd00fcf61ce1",
+    "retained": "reports/issue-751/evidence/full/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/edges-ship-rays-track-actu-db252--off-screen-origin-clipping-desktop/test-finished-1.png",
+    "sha256": "7d18a165b68d6284c9cb79e7f66185c071380cdc8bc84349f3abe4ac43999e90",
+    "retained": "reports/issue-751/evidence/full/edges-ship-rays-track-actu-db252--off-screen-origin-clipping-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/test-finished-1.png",
+    "sha256": "89c739ddcaded4b62ae30e3392ab973719d3edf44944aa72184dfc184e2cb5fc",
+    "retained": "reports/issue-751/evidence/full/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/production-built-productio-b08b0-anner-and-labelled-controls-production/test-finished-1.png",
+    "sha256": "3398d24e7ea15792f2c175396942d0be1019bbe64364a1683b05afa3b816c1b7",
+    "retained": "reports/issue-751/evidence/full/production-built-productio-b08b0-anner-and-labelled-controls-production/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/test-finished-1.png",
+    "sha256": "178c7393bd432a77b9f1959870cbda0ea998ce6e2483416330b5eb1fcfa015e8",
+    "retained": "reports/issue-751/evidence/full/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "f5fc6ec440a912df6d9c5d650cc17d1c3d88381c4c913269a614556746fd77e8",
+    "retained": null,
+    "reason": "Redundant successful visual trace; retain exact committed-source visual-repeat trace instead."
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-finished-1.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/deterministic-NAV-3-headin-229c4-d-colors-and-viewport-edges-deterministic/test-finished-1.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/edges-off-screen-contacts--3f9ef--expires-with-scanner-range-desktop/test-finished-1.png",
+    "sha256": "be7dfcecaae5f4aa227cf591feed703025a74566c269714ef61f92aeae89994b",
+    "retained": "reports/issue-751/evidence/full/edges-off-screen-contacts--3f9ef--expires-with-scanner-range-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-dense-groups-and-a-7caf6-ep-all-IDs-with-bounded-DOM-desktop/test-finished-1.png",
+    "sha256": "7cc68eb9aaf8b639cf23bd3085b1434ed8f3714013c170cea29c791f3f0f5096",
+    "retained": "reports/issue-751/evidence/full/desktop-dense-groups-and-a-7caf6-ep-all-IDs-with-bounded-DOM-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-camera-keys-releas-a0923--blur-visibility-and-resize-desktop/test-finished-1.png",
+    "sha256": "cf4d04aefe1c4a26a5d9cc4ba815d4f960d2877c4154daf11aacd82c5294fec2",
+    "retained": "reports/issue-751/evidence/full/desktop-camera-keys-releas-a0923--blur-visibility-and-resize-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/visuals-faceted-navigation-ac6c3-thout-a-rectangular-surface-desktop/test-finished-1.png",
+    "sha256": "9346c5322441c92f1526df1af8865dd13c31d67a6ac8e85afa7377fc99ce9c57",
+    "retained": "reports/issue-751/evidence/full/visuals-faceted-navigation-ac6c3-thout-a-rectangular-surface-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/test-finished-1.png",
+    "sha256": "3195bde551a057a95f0606c92082ad814d1ca4f9bfa4a9a6dda65c824a68712f",
+    "retained": "reports/issue-751/evidence/full/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/deterministic-NAV-4-read-o-fe8d1-ate-production-has-no-hooks-deterministic/test-finished-1.png",
+    "sha256": "3baf93ea5f39d8486b1072ee2ffa63ee342143ca86749ee2d7bc9a3419675b05",
+    "retained": "reports/issue-751/evidence/full/deterministic-NAV-4-read-o-fe8d1-ate-production-has-no-hooks-deterministic/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/test-finished-1.png",
+    "sha256": "f5d013657384a67c84cc5abdff2c55272c64cc6480d18f346cb84275310d8383",
+    "retained": "reports/issue-751/evidence/full/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-production-App-contact-fixture-asteroid-desktop/test-finished-1.png",
+    "sha256": "6c9f7c16a61a9a3d06656ecc38e71ee4da967ea11e81429cfb5f4118b6c5fc5e",
+    "retained": "reports/issue-751/evidence/full/desktop-production-App-contact-fixture-asteroid-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/test-finished-1.png",
+    "sha256": "37803ba6b6f2164995f6bb20a4bf58c55fdd7535e0b3c07619085c9ef93af6bc",
+    "retained": "reports/issue-751/evidence/full/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-zero-throttle-coas-db468-keeps-native-keyboard-input-desktop/test-finished-1.png",
+    "sha256": "8d2bd6224e9fa1d26e8ea78ed35908a19168da1a9be2afebdafb699fba4f118e",
+    "retained": "reports/issue-751/evidence/full/desktop-zero-throttle-coas-db468-keeps-native-keyboard-input-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/desktop-production-App-contact-fixture-warning-desktop/test-finished-1.png",
+    "sha256": "5222d6a0fc85f2de8fe6a971997e5b2a47742359da0ce40ae9ab3607f896c7e3",
+    "retained": "reports/issue-751/evidence/full/desktop-production-App-contact-fixture-warning-desktop/test-finished-1.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "4d1c296ef717c01ed8ffeb41ef77c322aeb15330a79eb1fc5b00f8882525b6b3",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "ea3aacabd585d7b59285014c8a49f6078d760285c047a1f1cac1200dea8a87c1",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "b6d7cc41a2fb599b7e2ec148513ad293abe76f3f6aeb21c5fd360f203089ec78",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "11047e18a64540f4a784ee491253524dafb8021fc6e8563a6cf8a30c1b5e27b6",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "e4af3ddf9735b8f172e65dff40a1ec4cec14f665b905572cac440f43a80b04cb",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "aae27d54cd5c01e2c7526791b559dc20f690f1d6e2600b6d70c77af2e10e0c42",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "e3f5ce7d8aec608c50475029cd0022eff8d491ea6d6b47a7628dc9e53916a91c",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "3ffcc121f8f8f393bece157b4e210c1c000e02b079b76207d71814111d625c34",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "656e28a968c792a7dc11262dae684d9066b087499bdad202f8d27c991ae637c9",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "3b4cd024fd3605ea2cedeaa91742aedd5e1199491256b5015b2379850be455fc",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "6a8f398d07b4e911d5050ba445503d317760731abbdb67ef593195474ecfad50",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "b8231ba26f5e17596ffdbab7dc5709eed90e3255fb7418542ccbbb5167ab8d73",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "175bf3d04f9e1d24d0114e18ea5c3dc4b3fe849b45139c841dd772d3c98a919a",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "eeb0e3cb47cce46452c1552e95806218fb443f5a590ff1d75ee4e80256627d8a",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "cd7d03db604ec1f866a5f02a8ebde5de439a2cba4fefbf354a79add301de244f",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "1d0563fb30efcc446d61bf81f0f0061e5a8c1088790ba5f8afd8244446b32efd",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "2900419e74cc8c5626b6ce99f1ea82574177698810d1a6085cf5893d77dee386",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "full",
+    "original_path": "client/test-results/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/results.json",
+    "sha256": "933aa6aed5f8901115af416110fe879bb34eb08b5aa78ddc054536c287f7e4ac",
+    "retained": "reports/issue-751/evidence/visual-repeat/results.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/.last-run.json",
+    "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "retained": "reports/issue-751/evidence/visual-repeat/.last-run.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "60de99f93e0ced195c7e6a4c8be97372c7e7ba748df66fec24495046cc49ac15",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-finished-1.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "9a06aa7510816def385a51d92e939308cd966d4cf5eb3269af2ce4aae1b5fbad",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "ea3aacabd585d7b59285014c8a49f6078d760285c047a1f1cac1200dea8a87c1",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "b6d7cc41a2fb599b7e2ec148513ad293abe76f3f6aeb21c5fd360f203089ec78",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "11047e18a64540f4a784ee491253524dafb8021fc6e8563a6cf8a30c1b5e27b6",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "e4af3ddf9735b8f172e65dff40a1ec4cec14f665b905572cac440f43a80b04cb",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "e58eafa915d3be1a27e504d13af0cd32e21a7da55b8573feecbea6409d9dc176",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "e3f5ce7d8aec608c50475029cd0022eff8d491ea6d6b47a7628dc9e53916a91c",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "3ffcc121f8f8f393bece157b4e210c1c000e02b079b76207d71814111d625c34",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "d9eba77947f9366363be2f82f17872632e902c1cc7dbc46f1cb6e0fa02d1e683",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "3b4cd024fd3605ea2cedeaa91742aedd5e1199491256b5015b2379850be455fc",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "6a8f398d07b4e911d5050ba445503d317760731abbdb67ef593195474ecfad50",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "39998f9a0d82d46e7fa74f5a083dd49e7c688dc8eefe3d8b76221c6c938badcc",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "5be25288a0eacc115e68834621957ab5b81e061260378e8f028efb849a08cd17",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "d513b740919c7e6d1ca0a4c67f182f364ef5693d152fbd9a51c3791ac0d6088c",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "707260d3bbcb92ed7ec9f4cd3dfc7372c665348f0aa76a0175f8c9df22445acf",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "66c542c9e6a66ed01007f29dee69ff73922831b3bd718e839a8828186bd36b98",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "b17fa0c9ab25efb5e521eb6292611a4122111c033c8bc2b84a905774eec9b036",
+    "retained": "reports/issue-751/evidence/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "visual-repeat",
+    "original_path": "client/test-results/visual-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/results.json",
+    "sha256": "67ffc89d9a0030489a204e4898c0e8acb9305495a0fb86631d412f8fa40e8aa4",
+    "retained": "reports/issue-751/evidence/visual-negative/results.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/mutation-summary.json",
+    "sha256": "9f670fc698c268b4c2c219efbb910ff59f88bdb167c515d6eedec51ca365a933",
+    "retained": "reports/issue-751/evidence/visual-negative/mutation-summary.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/command.log",
+    "sha256": "704d039c1ab2ee2d63dbfdfec37ca0426a76a1028b509d332258a235f22b90fd",
+    "retained": "reports/issue-751/evidence/visual-negative/command.log",
+    "retained_sha256": "eb41acefef26dc41428c0a42f81b984ce1872dcb1a686fbaec858b8d2e713207",
+    "normalization": "Trailing whitespace trimmed in text log; images/measurements/traces unchanged."
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/.last-run.json",
+    "sha256": "4466214897fd456600fa565c1c656799cd95ca0887d4962b888c3b9f43096bea",
+    "retained": "reports/issue-751/evidence/visual-negative/.last-run.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "dfa485fdb361e364fd1182b166122ff608e835e9b59cfde18bf3d89031a9ecd4",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png",
+    "sha256": "1d5fabd75f276db4ea2cebadf9c4204217d1a619f45fc1a494243e046d895830",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "62cf89047ea656e398d2bee007a9c8e869b94a678c5d47c8b6b25eee2161d7dd",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "ea3aacabd585d7b59285014c8a49f6078d760285c047a1f1cac1200dea8a87c1",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "b6d7cc41a2fb599b7e2ec148513ad293abe76f3f6aeb21c5fd360f203089ec78",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "11047e18a64540f4a784ee491253524dafb8021fc6e8563a6cf8a30c1b5e27b6",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "e4af3ddf9735b8f172e65dff40a1ec4cec14f665b905572cac440f43a80b04cb",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "7ab43a18e19ab39b96038f595f1883b16ae7ee046373db298a772a5e2ee060f5",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "13a3a814a92a8efacc75db54f14c82e6cf8f6d363770710d9ad62bd7ad86ff94",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "3ffcc121f8f8f393bece157b4e210c1c000e02b079b76207d71814111d625c34",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "5a19e5975e9737c1e14746c380fb50602b4d56f0d961de3e6c1b0a157f435ff4",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "1ca751766e4c3fe9ad88249f93f13536024c15d556ddfe1924fe0f42ab0216d8",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "6a8f398d07b4e911d5050ba445503d317760731abbdb67ef593195474ecfad50",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "796d56fb6a5b076fe279d48e70cc0e840f8bb8190789c68d0b47c246d791a567",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "c092c85923d7b4d19cabdd418114d989f55179c002e8e0318c1e68964ea56a03",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "1d5fabd75f276db4ea2cebadf9c4204217d1a619f45fc1a494243e046d895830",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "31bfa56a92da22ba26d47c63dc2219111f4d11abe4e177884b4cf9d38c905f40",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "24c612c949151fdaf372c04190807652380b5bd2a9716d74ba45c7656c4ba2e3",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "12febb5cf476f9773f76082d7e4a7798af3935a2f4234ad4749fc21050f4308a",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "b8b0ab536eff9b4d1cf322a1c187abd032ba7c7b228de1b2e4091db3f5f1adbf",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "2724d2a00f82dbabd37f260edf36a57bd0f2c31e7256ba7d218adf8df89dbfe5",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "visual-negative",
+    "original_path": "client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "results.json",
+    "sha256": "d806e0de90f35eb71cd71a5fc2abc6824aea6ec43f081c19ba8ce1a164bfc4ad",
+    "retained": "reports/issue-751/evidence/grayscale/results.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": ".last-run.json",
+    "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "retained": "reports/issue-751/evidence/full/.last-run.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "4ec0c35693a8122f7b59928b3d0ea83cb94eb6e12c87bde1cd4fb39d397added",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-finished-1.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "866485b624d382b851852afcbe022554ce3139b1c2dd8d8487d0bd781996688e",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "ea3aacabd585d7b59285014c8a49f6078d760285c047a1f1cac1200dea8a87c1",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "b6d7cc41a2fb599b7e2ec148513ad293abe76f3f6aeb21c5fd360f203089ec78",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "11047e18a64540f4a784ee491253524dafb8021fc6e8563a6cf8a30c1b5e27b6",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "e4af3ddf9735b8f172e65dff40a1ec4cec14f665b905572cac440f43a80b04cb",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "a7c74701cde15cc83c04d2f5e7736d5955818a357a9eaa8850abefbf82d0349f",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "e3f5ce7d8aec608c50475029cd0022eff8d491ea6d6b47a7628dc9e53916a91c",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "3ffcc121f8f8f393bece157b4e210c1c000e02b079b76207d71814111d625c34",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "b9bf41f21573dccd8d41812302142fc7af0eb6ae4a560a8dffee781d34e21e6a",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "3b4cd024fd3605ea2cedeaa91742aedd5e1199491256b5015b2379850be455fc",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "6a8f398d07b4e911d5050ba445503d317760731abbdb67ef593195474ecfad50",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "43de7779e06937f9ea95a87662d6a970bfd384b489fc4d2a7d37d0a45cb6e1f5",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "a453bb11c7c2a796b302e40f9485828b62955d44d6252198c2a85ae7c65df539",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "46ae65cd85dfa7e2a6cba1a0ff662748c8a994fedec767629a411be59ff1e780",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "119b7d30f755cc1325e97c6db518dcd2570ebdd2254baa9f619783036f29a41e",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "66d150c3802b3dbdb837d192c552395b743d87167163dbe53afd58aa9f9700e8",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "6c7ffbc322898d260f5e112d0251f22f80eb46cee71570559e2818f1408c5c83",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "grayscale",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "results.json",
+    "sha256": "1ac6a46e44810807881bee517b96e5fca8cfeeea90f36fc56843beeeadf8078d",
+    "retained": "reports/issue-751/evidence/grayscale-repeat/results.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": ".last-run.json",
+    "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "retained": "reports/issue-751/evidence/full/.last-run.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "0157a5300150ca3391e2233bc2e72b53c46b94c3d7cc2a882ea8995d1aa3cff1",
+    "retained": "reports/issue-751/evidence/grayscale-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-finished-1.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "866485b624d382b851852afcbe022554ce3139b1c2dd8d8487d0bd781996688e",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "ea3aacabd585d7b59285014c8a49f6078d760285c047a1f1cac1200dea8a87c1",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "b6d7cc41a2fb599b7e2ec148513ad293abe76f3f6aeb21c5fd360f203089ec78",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "11047e18a64540f4a784ee491253524dafb8021fc6e8563a6cf8a30c1b5e27b6",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "e4af3ddf9735b8f172e65dff40a1ec4cec14f665b905572cac440f43a80b04cb",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "a7c74701cde15cc83c04d2f5e7736d5955818a357a9eaa8850abefbf82d0349f",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "e3f5ce7d8aec608c50475029cd0022eff8d491ea6d6b47a7628dc9e53916a91c",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "3ffcc121f8f8f393bece157b4e210c1c000e02b079b76207d71814111d625c34",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "b9bf41f21573dccd8d41812302142fc7af0eb6ae4a560a8dffee781d34e21e6a",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "3b4cd024fd3605ea2cedeaa91742aedd5e1199491256b5015b2379850be455fc",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "6a8f398d07b4e911d5050ba445503d317760731abbdb67ef593195474ecfad50",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "43de7779e06937f9ea95a87662d6a970bfd384b489fc4d2a7d37d0a45cb6e1f5",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "a453bb11c7c2a796b302e40f9485828b62955d44d6252198c2a85ae7c65df539",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "46ae65cd85dfa7e2a6cba1a0ff662748c8a994fedec767629a411be59ff1e780",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "119b7d30f755cc1325e97c6db518dcd2570ebdd2254baa9f619783036f29a41e",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "66d150c3802b3dbdb837d192c552395b743d87167163dbe53afd58aa9f9700e8",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "866696d1b74c0a852193caa73352786bb4d4825b1895e3f1bb3ee3de1792cb3d",
+    "retained": "reports/issue-751/evidence/grayscale-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "grayscale-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "results.json",
+    "sha256": "4fe6923a8f60721015bdc62d9ea8a396c19f47ea61a966922573b6d87c51827f",
+    "retained": "reports/issue-751/evidence/grayscale-negative/results.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "mutation-summary.json",
+    "sha256": "8227e964cfc6fde8193dfac0a6c08e2eb7e8e21ff54a1a0363485cef69ea2b7e",
+    "retained": "reports/issue-751/evidence/grayscale-negative/mutation-summary.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": ".last-run.json",
+    "sha256": "4466214897fd456600fa565c1c656799cd95ca0887d4962b888c3b9f43096bea",
+    "retained": "reports/issue-751/evidence/visual-negative/.last-run.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "9c1ea38472f02ec2ee9671551c35f61c16a728b7af2cdd30aea1ba27ff5f2f27",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png",
+    "sha256": "1d5fabd75f276db4ea2cebadf9c4204217d1a619f45fc1a494243e046d895830",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "77410ca9f586ab8e0c85730f935a79d27e39df22e66dcdf139d632a681800e87",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "ea3aacabd585d7b59285014c8a49f6078d760285c047a1f1cac1200dea8a87c1",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "b6d7cc41a2fb599b7e2ec148513ad293abe76f3f6aeb21c5fd360f203089ec78",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "11047e18a64540f4a784ee491253524dafb8021fc6e8563a6cf8a30c1b5e27b6",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "e4af3ddf9735b8f172e65dff40a1ec4cec14f665b905572cac440f43a80b04cb",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "bf24c4b06ee7f9a9e542ea0d29c3617c880474c3ea1b908cbc70b63f8ea63e9b",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "13a3a814a92a8efacc75db54f14c82e6cf8f6d363770710d9ad62bd7ad86ff94",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "3ffcc121f8f8f393bece157b4e210c1c000e02b079b76207d71814111d625c34",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "b9bf41f21573dccd8d41812302142fc7af0eb6ae4a560a8dffee781d34e21e6a",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "1ca751766e4c3fe9ad88249f93f13536024c15d556ddfe1924fe0f42ab0216d8",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "6a8f398d07b4e911d5050ba445503d317760731abbdb67ef593195474ecfad50",
+    "retained": "reports/issue-751/evidence/full/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "da57bfd21e947710f22337e704153fee3dc4da044b5d872571489840e860d495",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "a453bb11c7c2a796b302e40f9485828b62955d44d6252198c2a85ae7c65df539",
+    "retained": "reports/issue-751/evidence/grayscale/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "1d5fabd75f276db4ea2cebadf9c4204217d1a619f45fc1a494243e046d895830",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "1bd16c1535aac1d9f0abfc6b53bd287f3e9b2222a9d45a03d2cbbcbc9b574084",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "ed988ca1eacb4e333de5896192c6c1e0f32e462fd30fbfce20969d4a533d73f2",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "d9d7b771b2fc19ae7dd3ffd599c139aa32ebc4c59bd7c665e01656664a3eb8f5",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "bcb2a6241468c38344e2449b2843e97d910514f040a10b3ad66f12cfb94c1c65",
+    "retained": "reports/issue-751/evidence/grayscale-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "2724d2a00f82dbabd37f260edf36a57bd0f2c31e7256ba7d218adf8df89dbfe5",
+    "retained": "reports/issue-751/evidence/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "grayscale-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "results.json",
+    "sha256": "c7e2643d471ea36bcf71bc9d07015d6304694f0de77ddd2097d463823d39ba61",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/results.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "ecda1f12b1ad2be7244fb2a700b5d0f41c8daee78ea7131d0cb3ca6dbfaef02c",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png",
+    "sha256": "1d644869143934d17c207ef29112cb6df89640d19d9b3a91ccaf6ce7f236d987",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "39ef46a4f13e95143cd8dae2d801e0bb0522ed72a2082e5c498a9ec29e6d5555",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "07d591cfc82903a325f42217f8b3019c92fc7acd21c6b88f5a3e34a6f9569ee8",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "4021e213dc125bb1088200125381a628f3117e7d168b770b1cbd87cef0e6a3a0",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "89471e7e14752f4fde5622a6f8f6c46fb3a2498ec0dbeedd46a35b5a0e246750",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "de4913b45ec79b27c71161005078f3c8318ef08cf790cf7d05baaad36d973496",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "a47f4f90016dc1737e86ed21d90ca95b93e81fb47612a58e3500c8e0ac173a0f",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "bcee44d11838e9786fc46be73309e8cf64d52d9d22c19551f0fbc03ceb136e6f",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "cf950a7935a26a660127790291b23acf497054b1b6ccda05be1b8d6a6f2c893d",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "e792313bfae17be7b48b84b750480be2ff233998809e1ef63a4c707440d7b333",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "ae47c57da2c8eb3c8217d0c2ca2ce0c713793de5b5cfd9073b982ade5cd29987",
+    "retained": "reports/issue-751/ci-failure/summary.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "2f0f2d04ef2e2c8d22da88a6379e8a98a1b1bf7f3f0f3a8f514ae1b59fc216aa",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "b47bfb6dbedcba85868aa37fdc8e7f5f7aa20b7da4b1a0fb16a26c1b0316fda6",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "7a698140f04b0ed7195477d0fd19a83015844d6fb287360fda82edfcd333d087",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "f3763b8ec67de7b92d30a35837d01fb93bb413aa1b05f9dcdbdfed9e5fe387a0",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "db7e53fd2d966169c1e95834af9c4f2b8fd10375f65cfa05e7af4e63435c6322",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "e5850c4c4bae67668818874511a667b8a36c8e613a42e69eea1851b2bfbb921c",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "1d644869143934d17c207ef29112cb6df89640d19d9b3a91ccaf6ce7f236d987",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "7d6aa0a5d310103704c30adf6504182212469c6204cac0971738a0f700880f00",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "1e4135d19f7acbc4ee18bcb6d127002cf52b1a52195b8d6c3c27eff3b8ba6eeb",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "43060bd6814d7e0e9b22316d986d4587eafa10695353af231c9a8995844aff69",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "6e5a364bfa226b446a88be82d45f9595f60738a607e72fe3b6c83c0d10cb8572",
+    "retained": "reports/issue-751/ci-failure/heading-velocity.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "666b73cd227a45ce61b610e666ddcc10c0aeaaaf1917a42299446ec9d93e2fe5",
+    "retained": "reports/issue-751/ci-failure/heading-velocity-diff.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "aae7f7cdd312749a026f20a45e0340a3f2e9aec1d5a245a064dfbc04a6e04036",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "4705d9ac1bff66612adb3e4063d8550977cdf8457e3102df8612c899a9c6bfc6",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "ci-failure-41798103146",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "cb5edab4345257023417246ca70ffd32b93a39d962eb09dd00f3887695698859",
+    "retained": "reports/issue-751/evidence/ci-failure-41798103146/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "results.json",
+    "sha256": "cfdbc1b77b290bc551d3257dd8e6015bf0b370fb17e57b2ac1912a8e04e786b0",
+    "retained": "reports/issue-751/evidence/pinned/results.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": ".last-run.json",
+    "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "retained": "reports/issue-751/evidence/full/.last-run.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "70dc9ab208559d4d8014cd604b7ec93155b1d8e57048c19554fb14c90f5ee94a",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-finished-1.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "6d39828c4a88883fff70e6afd1c9283d002c8d17590f1e97430071536500cc0d",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "e9ff0f664bb8f785d324c73caf589923a012d5ee7705e8d05b3c8dc85d724922",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "retained": "client/tests/navigation-baselines/zoom-in.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "bf0faa0f2ed98e2c3127bcea4de7c273ff44908df8f1e543af7b2f3a1d9f1016",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "1de2087416360ada11d3aec841c3f158bb5b32a9a5c22ccc91b9f9c17fcfae0e",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "72337b844cb63611b289c49ac18cc99e2fe4a20a8c3c0a47cffb72f5f27dfc8e",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "retained": "client/tests/navigation-baselines/selected-body.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "9820dddbc9e3374e4b76e5570585d4b8bc2a9b23990905c4716cf8614086f62f",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "5d97b352b00fc4e15cbeb675a50edcfa2e3cbba86d0f9d1ca4e665a100335fdc",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+    "retained": "client/tests/navigation-baselines/heading-velocity.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "retained": "client/tests/navigation-baselines/selected-body.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "retained": "client/tests/navigation-baselines/empty-scanner.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "retained": "client/tests/navigation-baselines/zoom-out.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "retained": "client/tests/navigation-baselines/visible-contacts.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "retained": "client/tests/navigation-baselines/visible-contacts.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "229800337fffe8a22db2e749fa3635936a44deeb60164041f897b552ea4a8cd8",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "aa18ace934a87a3d38432ec8e504c80e3c3fd99015bceb3d21b1325f6389dc44",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "retained": "client/tests/navigation-baselines/zoom-in.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "retained": "client/tests/navigation-baselines/panned-contacts.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "1e75c4cd6606b6ba3cf1423b0b1ec47cb174d860a5a84bd898d80184ce83ae4c",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "f2523198134a3a85b8713151ce0aa751a9046c02ef805b8f60da73d2179acb48",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+    "retained": "client/tests/navigation-baselines/heading-velocity.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "retained": "client/tests/navigation-baselines/panned-contacts.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "retained": "client/tests/navigation-baselines/zoom-out.png"
+  },
+  {
+    "run": "pinned",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "retained": "client/tests/navigation-baselines/empty-scanner.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "results.json",
+    "sha256": "5a6a958d62a38c1edfd610339718f3a5f0d9c9e5adfbdff107331c54c63eda5f",
+    "retained": "reports/issue-751/evidence/pinned-repeat/results.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": ".last-run.json",
+    "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "retained": "reports/issue-751/evidence/full/.last-run.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "c2a6914e4d3860433b419a2debfb88ca22b8b0f74f61352ec99dc15c8a9398ef",
+    "retained": null,
+    "reason": "Repeated success trace covered by pinned first run, or intermediate diagnostic CI trace available in artifact13318325055; essential originals/state/raw metrics retained."
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-finished-1.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "6d39828c4a88883fff70e6afd1c9283d002c8d17590f1e97430071536500cc0d",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "2b0db1fb035863077d361dc0ebab70417e482e3537c6bc08633261bcffeb9913",
+    "retained": "reports/issue-751/evidence/pinned-repeat/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "retained": "client/tests/navigation-baselines/zoom-in.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "bf0faa0f2ed98e2c3127bcea4de7c273ff44908df8f1e543af7b2f3a1d9f1016",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "1de2087416360ada11d3aec841c3f158bb5b32a9a5c22ccc91b9f9c17fcfae0e",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "72337b844cb63611b289c49ac18cc99e2fe4a20a8c3c0a47cffb72f5f27dfc8e",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "retained": "client/tests/navigation-baselines/selected-body.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "9820dddbc9e3374e4b76e5570585d4b8bc2a9b23990905c4716cf8614086f62f",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "5d97b352b00fc4e15cbeb675a50edcfa2e3cbba86d0f9d1ca4e665a100335fdc",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+    "retained": "client/tests/navigation-baselines/heading-velocity.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "retained": "client/tests/navigation-baselines/selected-body.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "retained": "client/tests/navigation-baselines/empty-scanner.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "retained": "client/tests/navigation-baselines/zoom-out.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "retained": "client/tests/navigation-baselines/visible-contacts.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "retained": "client/tests/navigation-baselines/visible-contacts.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "229800337fffe8a22db2e749fa3635936a44deeb60164041f897b552ea4a8cd8",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "aa18ace934a87a3d38432ec8e504c80e3c3fd99015bceb3d21b1325f6389dc44",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "retained": "client/tests/navigation-baselines/zoom-in.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "retained": "client/tests/navigation-baselines/panned-contacts.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "1e75c4cd6606b6ba3cf1423b0b1ec47cb174d860a5a84bd898d80184ce83ae4c",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "f2523198134a3a85b8713151ce0aa751a9046c02ef805b8f60da73d2179acb48",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+    "retained": "client/tests/navigation-baselines/heading-velocity.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "retained": "client/tests/navigation-baselines/panned-contacts.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "retained": "client/tests/navigation-baselines/zoom-out.png"
+  },
+  {
+    "run": "pinned-repeat",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "retained": "client/tests/navigation-baselines/empty-scanner.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "results.json",
+    "sha256": "bea8a6d45d49b212bf32043c2762af55759695eb705b3c1cedd3a9b7655b4de0",
+    "retained": "reports/issue-751/evidence/pinned-negative/results.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "mutation-summary.json",
+    "sha256": "c1a2ede7076c06d41aa32f0c58dde1ae015969757a38ee43b60f1eee4a8787f4",
+    "retained": "reports/issue-751/evidence/pinned-negative/mutation-summary.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": ".last-run.json",
+    "sha256": "4466214897fd456600fa565c1c656799cd95ca0887d4962b888c3b9f43096bea",
+    "retained": "reports/issue-751/evidence/visual-negative/.last-run.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "f1d7a7ef6408626d9460a62953192f567076b31a57375d2b36ad79ab2c47b281",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png",
+    "sha256": "26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "487f502b3201a5d948935334435574319f80107ab1b4c08ff673cd02880c11ea",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "b5b5cdc318923022cbb36b58b77da589259034435a469da38723202ed1b0f3bc",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "retained": "client/tests/navigation-baselines/zoom-in.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "c836ede408a3105cf91e73869d07862f2a63120371b415a21a589a3a2c21de7e",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "bb9cbb835bbbeaaa7fe9ca7a658dfaeb51966e33e0cf1ec7414be6dbdfefb9f0",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "f97c42b8c24b661f6a1cc360ebae66308390b585536aefa518fafbb8d7c42759",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "retained": "client/tests/navigation-baselines/selected-body.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "84e04b79d3b6a76a70ca4cac2387eeb4afcb7995d53a3531adf5d739c6c74396",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "5d97b352b00fc4e15cbeb675a50edcfa2e3cbba86d0f9d1ca4e665a100335fdc",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+    "retained": "client/tests/navigation-baselines/heading-velocity.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "retained": "client/tests/navigation-baselines/selected-body.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "retained": "client/tests/navigation-baselines/empty-scanner.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "retained": "client/tests/navigation-baselines/zoom-out.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "retained": "client/tests/navigation-baselines/visible-contacts.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "retained": "client/tests/navigation-baselines/visible-contacts.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "b217ea950c936833ce3f470afc039c6427be4b95d0048303a3a9ad09e718afe3",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "26040a4d0ca9a5547639bbce37366cb9accda2f5469fcea14a5fa648694d3d86",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "retained": "client/tests/navigation-baselines/zoom-in.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "retained": "client/tests/navigation-baselines/panned-contacts.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "7e2ac69a4ccc2e77c04fc2d4f93f2b714524818d632070013fe482d19cdbaa90",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "f2523198134a3a85b8713151ce0aa751a9046c02ef805b8f60da73d2179acb48",
+    "retained": "reports/issue-751/evidence/pinned/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b",
+    "retained": "reports/issue-751/evidence/pinned-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "retained": "client/tests/navigation-baselines/panned-contacts.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "retained": "client/tests/navigation-baselines/zoom-out.png"
+  },
+  {
+    "run": "pinned-negative",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "retained": "client/tests/navigation-baselines/empty-scanner.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "results.json",
+    "sha256": "d8e17142ecd5abf46b346716718385a299cc2bf611399b811c0d4360372c2d5c",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/results.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip",
+    "sha256": "ce48c8c80e133f3a2d12aacd9f4e2a9a0d8c65d2cd9a5c0945030aa57d406cae",
+    "retained": null,
+    "reason": "Repeated success trace covered by pinned first run, or intermediate diagnostic CI trace available in artifact13318325055; essential originals/state/raw metrics retained."
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+    "retained": "client/tests/navigation-baselines/zoom-out.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json",
+    "sha256": "83c3591ed85440faa0589d1741a28a9189201ca9e7d62efd3989fb7a6adfdb8a",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+    "retained": "reports/issue-751/initial-candidates/zoom-out.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "0e78f37a04fb15c1594ed8d23a287049e0563d8be84ed5390ae6fc340fd7f2d6",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json",
+    "sha256": "3bb3d8b68f33c985148fbca228f328f3d8d9ec4d8b3df1638e6eae3958fb4c64",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+    "retained": "client/tests/navigation-baselines/zoom-in.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+    "retained": "reports/issue-751/initial-candidates/zoom-in.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "70ff1f219b9a43f14d0cdfca6d4f63513fb7250c28fe0db65b9d1542ff3ce108",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+    "retained": "client/tests/navigation-baselines/visible-contacts.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json",
+    "sha256": "d5a40c13ccb991af8584c79387a05c469fb24833f88477ec12864c764f8e437e",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "5445ca119697e156303d6d02790d1ca4e7988ea12e6fea65dc6a86e1fe434b62",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+    "retained": "reports/issue-751/initial-candidates/visible-contacts.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json",
+    "sha256": "b060b137a333ef6dcb43abf369a22859d1a20141be3df1c11dd201232df9ac92",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/summary.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+    "retained": "client/tests/navigation-baselines/selected-body.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+    "retained": "reports/issue-751/initial-candidates/selected-body.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json",
+    "sha256": "0a660eef73f8285e0ed5a3704350c7517d73cfd64beb63b5bc0842f051a3544e",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "04a408778dd1f9d28cc3436875f930822276a2d05d97f4296504c161ca68c4cd",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+    "retained": "client/tests/navigation-baselines/panned-contacts.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json",
+    "sha256": "0befb38fb62259a4152252bbe14e01d95ea404bcd300995ef75a1533bb2a7c2d",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "89b129ea790dc61e1b732528af8e42cf35910a224ad0493fa629891b8a5e4ecd",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+    "retained": "reports/issue-751/initial-candidates/panned-contacts.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "retained": "client/tests/navigation-baselines/opposite-vectors.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json",
+    "sha256": "afe6f6d58593a24dc6b9a501cf60e4374477528c8bc77f9001bc3d7be3cf3ce6",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+    "retained": "reports/issue-751/initial-candidates/opposite-vectors.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "868cca95720dba13649a2808a945ec071d26a1a466d96bb643b114a5eaf4e528",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+    "retained": "client/tests/navigation-baselines/heading-velocity.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json",
+    "sha256": "6740f90d6d771a8a71544cb9a0019c1a2482fecdca8dd648ed06bd9b29ff7256",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+    "retained": "reports/issue-751/initial-candidates/heading-velocity.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+    "retained": "reports/issue-751/initial-candidates/empty-scanner.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "115bfe688c27caa99ad9b5033b26684350e240ef4207a35a53855f3231260ac5",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+    "retained": "client/tests/navigation-baselines/empty-scanner.png"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json",
+    "sha256": "3ca9f1bde0596d7ecafde779be9e7c06bd809b28d7f2763274bebfaa3264b4ce",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json"
+  },
+  {
+    "run": "ci-failure-41821988777",
+    "original_path": "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "dd67d1d09c32c7d9cecfe178ae77f82a18858a1a74b7f476293c256ee66ca2d2",
+    "retained": "reports/issue-751/evidence/ci-failure-41821988777/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png"
+  }
+]

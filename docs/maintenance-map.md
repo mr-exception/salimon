@@ -921,8 +921,11 @@ comparisons and human baseline approval are separate required gates.
 ## Top-down browser foundation (#761)
 
 `client/src/topDownFrames.ts` owns split point conversions and abstract planet/ship
-poses; `topDownRuntime.ts` owns deterministic entities, 60 Hz updates, corridor
-walking, camera and layer order. `TopDownView.tsx` / `topDown.css` own SVG
+poses; `topDownRuntime.ts` owns deterministic entities, 60 Hz updates, collision-aware
+walking/facing, smoothed camera and layer order. `topDownInteraction.ts` owns
+frame-aware swept footprints and deterministic nearby selection/reach; runtime
+request/cancel functions own standing/walking/interaction state. Keep footprints
+shared with SVG wall/door/crate geometry. `TopDownView.tsx` / `topDown.css` own SVG
 illustrations and DOM input. Keep radar/simulation dependencies out of these
 owners. `topDown.test.ts` covers transform/precision/state/layer contracts;
 `tests/top-down.spec.ts` covers actual SVG pixels, repeat captures, input cleanup

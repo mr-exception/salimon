@@ -18,15 +18,20 @@ Open the URL Vite prints. `npm run build` produces `dist/`.
 ## Top-down foundation (#761)
 
 During `npm run dev`, open `/?scene=top-down` for a strict overhead illustrated
-Scout and planetary site in one continuous scene. **W/A/S/D** walks a bounded
-interior corridor; the camera follows the player. Focus loss, editable controls,
+Scout and planetary site in one continuous scene. **W/A/S/D** walks the fixture cabin and cockpit; visible walls, a closed aft
+door, furniture and a crate block movement. The camera follows with fixed-step
+smoothing, and facing persists when movement stops. Focus loss, editable controls,
 resize and hidden-page events release movement. The normal `/` entry and built
 production bundle remain the 3D radar. This development URL is not a cockpit
 interaction or a global gameplay mode switch.
 
 `topDownFrames.ts` owns planet-fixed/ship-local anchors using the existing split
 `Position`; `topDownRuntime.ts` owns stable IDs, immutable scene state, 60 Hz steps,
-bounded walking, follow-camera state and deterministic draw order. `TopDownView.tsx`
+collision-aware walking, follow-camera state and deterministic draw order.
+`topDownInteraction.ts` owns swept footprint queries and deterministic nearby
+selection. Collision boxes use entity-local metres and ship/planet anchors;
+conservative player clearance is 0.46 m. Wall/door/crate art uses those same
+footprints. Sweeps prevent tunnelling and separate local axes allow sliding. `TopDownView.tsx`
 consumes the draw list as SVG: terrain, hull, cutaway interior, people, props and
 foreground cues. Terrain fill precedes terrain objects; equal-layer objects use
 stable ID ordering. There is no roof cover or roof fade. Astronomical planet
@@ -35,12 +40,32 @@ pose, and ship motion changes its planet-relative pose without rewriting anchors
 Local frame point conversion is explicit; automatic frame transfer is deferred.
 
 The fixture uses authored illustrated placeholders, not scientific terrain or
-full gameplay. Collision, cross-frame traversal, cockpit seating/navigation,
-multiplayer, persistence, resource systems and detailed Scout layout remain later
-work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
+full gameplay. Cross-frame traversal, cockpit seating/navigation, multiplayer, persistence,
+resource systems and detailed Scout layout remain later work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
 Playwright project exercises the production SVG adapter, pixel visibility, held
 input cleanup, production radar isolation and byte-identical fresh-run captures.
 Captures are new baseline candidates, not promoted navigation references.
+
+
+### Player interactions (#762)
+
+Approach the Core or cockpit test console to select its stable ID; a cyan outline
+and nearby prompt show the available **Inspect [E]** action. **E** or the Inspect
+button starts a test inspection, and **Escape**, Cancel, movement, focus loss,
+resize, hidden-page state or loss of the target cancels it. Out-of-range requests
+produce feedback and make no gameplay changes. Inspections are explicit no-ops;
+they do not run Core machinery or open navigation. The state exposes standing,
+walking and interacting modes plus a target ID for downstream consumers.
+
+The closed aft door blocks this fixture; there is no planet/ship crossing yet.
+Walk around the crate on its starboard side, then through the open forward
+partition to reach the cockpit. DOM focus clears held movement and editable
+controls do not leak WASD/E input. Button activation returns keyboard control to
+the world. `npm run test:browser -- --project=top-down` covers collision, the
+keyboard detour, both consoles, cancellation, input cleanup, identical fresh-run
+captures and built radar isolation. Position/facing data attributes are read-only
+render observations, not state setters. Capture candidates are review evidence;
+no approved navigation baseline changes.
 
 ## Controls (desktop mouse and keyboard)
 

@@ -108,9 +108,14 @@ catalog densities, litre quantities and transactions belong to #757 after #767.
 `SourceIdentity` is descriptive metadata, not an authoritative save schema.
 
 `PLANET-1` drives a full outdoor keyboard journey twice and compares original
-spawn, near-mineral, near-colony and near-Scout screenshots byte-for-byte, while
+spawn, near-mineral, near-colony and near-Scout screenshots with the unchanged repository visual policy, while
 checking stable source identity/positions, collision stops and the same scene
-node. Domain tests cover clear outdoor spawn, source reach, repeated inert
+node. Replays use fresh browser contexts, exact observed simulation tick counts
+for real keyboard input, and five simulated seconds for camera settling. The
+existing `compareImages` policy permits zero pixels beyond its fixed 0.1
+perceptual threshold, includes antialiasing and applies no masks; raw changed
+pixels and diff images are retained. A wrong-checkpoint comparison must fail.
+The earlier static TD-1/4 byte-identity check is preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
 inspection, footprint blocking and independence from the camera/ship pose.
 The default production `/` remains radar until #766 integrates cockpit entry.
 There is no automatic frame transfer or saved world yet (#765/#757).

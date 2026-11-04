@@ -1,6 +1,13 @@
 # Cloud and human verification
 
-## Current policy (2026-10-23)
+The current [issue acceptance policy](acceptance-policy.md) adds observable
+criteria, independent QA, revision-bound evidence and merge-time closure. It
+applies to the active browser client as well as historical native development;
+use the affected production runtime and its current validation commands. The
+native-specific paths below describe their native revision, not browser setup.
+Required cloud failures cannot be transferred away to claim acceptance.
+
+## Verification ownership policy (2026-10-23)
 
 The owner selected cloud verification as the normal feature-completion path.
 Use `auto-verification` and `human-verification` to describe who can establish

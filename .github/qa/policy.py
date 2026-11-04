@@ -5,7 +5,6 @@ import json
 SCHEMA = 1
 CONTEXT = "salimon/independent-qa"
 MAX_CYCLES = 3
-MAX_ATTEMPTS = 2
 REQUIRED_JOBS = ("build", "baseline-approval")
 FRAMES = ("empty-scanner", "visible-contacts", "panned-contacts", "selected-body",
           "zoom-out", "zoom-in", "heading-velocity", "opposite-vectors")
@@ -73,15 +72,3 @@ def decide(binding, current, jobs, evidence_ok, review, error=None):
     if review["verdict"] == "REQUEST_CHANGES" or any(r["status"] == "FAIL" for r in review["criteria"]):
         return "REQUEST_CHANGES", [review["summary"]]
     return "ACCEPT", []
-
-
-def review_schema(criteria, citations):
-    def obj(properties):
-        return {"type": "object", "properties": properties, "required": list(properties), "additionalProperties": False}
-    return obj({"verdict": {"type": "string", "enum": ["ACCEPT", "REQUEST_CHANGES", "BLOCKED", "INCONCLUSIVE"]},
-                "summary": {"type": "string"},
-                "criteria": {"type": "array", "items": obj({
-                    "id": {"type": "string", "enum": list(criteria)},
-                    "status": {"type": "string", "enum": ["PASS", "FAIL", "UNVERIFIED"]},
-                    "evidence": {"type": "array", "items": {"type": "string", "enum": sorted(citations)}},
-                    "finding": {"type": "string"}, "action": {"type": "string"}})}})

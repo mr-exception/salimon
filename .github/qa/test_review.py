@@ -9,11 +9,11 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import zipfile
-import urllib.error
 
 import policy
 import review
 from invalidate import invalidate
+from handoff import make_handoff, comment
 
 ROOT = Path(__file__).resolve().parents[2]
 BASELINES = ROOT / "client/tests/navigation-baselines"
@@ -173,9 +173,35 @@ class RuntimeTests(unittest.TestCase):
         os.chdir(self.old); self.temp.cleanup()
 
     def execute(self, result=None):
-        with patch.object(review, "ai_review", return_value=(result or response(), {"provider": "TEST DOUBLE", "attempts": 1})) as provider:
+        archive = review.read_archive(self.api.artifact)
+        path = next(n for n in archive.namelist() if n.endswith('/comparisons/summary.json'))
+        source = json.loads(archive.read(path))["source"]
+        try:
+            summary, _, citations, hashes, states = review.captures(archive, MANIFEST, source)
+        except KeyError:
+            hashes = {}  # An invalid fixture must be blocked before handoff use.
+            summary, citations, states = {}, {"image:heading-velocity:actual"}, {}
+        hashes["results.json"] = hashlib.sha256(archive.read("results.json")).hexdigest()
+        checksum = hashlib.sha256((BASELINES / 'manifest.json').read_bytes()).hexdigest()
+        packet = {"binding": policy.identity(self.api.pr), "criteria": CRITERIA,
+                  "issue": {**self.api.request('/issues/998'), "number": "998", "discussion": []},
+                  "evidence": {"artifact_id": 10, "tested_sha": self.api.pr["merge_commit_sha"],
+                               "url": self.api.ci["html_url"] + '/artifacts/10', "sha256": hashes,
+                               "summary": summary, "manifest_sha256": checksum},
+                  "run": {"id": self.api.ci["id"], "attempt": self.api.ci["run_attempt"], "url": self.api.ci["html_url"]},
+                  "citations": sorted(citations), "states": states, "e2e": review.test_results(archive),
+                  "jobs": {j["name"]: j["conclusion"] for j in self.api.jobs},
+                  "diff": [{k: f.get(k) for k in ('filename','status','patch','sha')} for f in self.api.pages('/pulls/999/files')],
+                  "baseline_manifest": MANIFEST, "baseline_approval": {"digest": checksum, "approval": "inherited from exact base"},
+                  "reviews": self.api.reviews}
+        record = make_handoff(packet, result or response(), "fixture-reviewer", "fixture-developer")
+        body = comment(record)
+        if not any(c["body"] == body and c["user"]["login"] == "fixture-submitter" for c in self.api.comments):
+            self.api.comments.append({"body": body, "user": {"login": "fixture-submitter", "type": "User"},
+                                      "author_association": "OWNER", "html_url": "fixture-handoff"})
+        with patch.object(review, "session_review", wraps=review.session_review) as verifier:
             report = review.run(self.api, 999, 1)
-        return report, provider.call_count
+        return report, verifier.call_count
 
     def test_controlled_wrong_repair_new_sha_and_idempotence(self):
         self.api.jobs = [{"name": "build", "conclusion": "failure"}, {"name": "baseline-approval", "conclusion": "skipped"}]
@@ -205,11 +231,11 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(report["verdict"], "REQUEST_CHANGES")
 
     def test_unavailable_reviewer(self):
-        with patch.dict(os.environ, {"OPENAI_API_KEY": ""}), patch.object(review, "ai_review", side_effect=ValueError("REVIEWER_UNAVAILABLE")):
+        with patch.object(review, "session_review", side_effect=ValueError("REVIEWER_UNAVAILABLE")):
             report = review.run(self.api, 999, 1)
         self.assertEqual(report["verdict"], "BLOCKED")
 
-        self.assertFalse(report["provider_attempted"])
+        self.assertFalse(report["review_consumed"])
 
     def test_missing_capture_and_expired_artifact(self):
         for data in (artifact(omit="heading-velocity.png"), None):
@@ -228,7 +254,7 @@ class RuntimeTests(unittest.TestCase):
 
     def test_cycle_limit_and_spoofed_history(self):
         for _ in range(3):
-            self.api.comments.append({"body": review.MARKER + '\n```json\n' + json.dumps({"schema_version": 1, "provider_attempted": True}) + '\n```',
+            self.api.comments.append({"body": review.MARKER + '\n```json\n' + json.dumps({"schema_version": 1, "review_consumed": True}) + '\n```',
                                       "user": {"login": "github-actions[bot]", "type": "Bot"}})
         report, calls = self.execute()
         self.assertEqual((report["verdict"], calls), ("BLOCKED", 0))
@@ -268,8 +294,8 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual((report["verdict"], calls), ("BLOCKED", 0))
         self.assertIn("CI_DEFINITION_CHANGED", report["error"])
 
-    def test_malformed_provider_response_blocks(self):
-        with patch.object(review, "ai_review", side_effect=AttributeError("malformed provider")):
+    def test_malformed_handoff_response_blocks(self):
+        with patch.object(review, "session_review", side_effect=AttributeError("malformed handoff")):
             report = review.run(self.api, 999, 1)
         self.assertEqual(report["verdict"], "BLOCKED")
 
@@ -310,34 +336,87 @@ class RuntimeTests(unittest.TestCase):
         self.execute(result)
         self.assertEqual(len(review.records(self.api.comments)), 1)
 
+    def test_deleting_handoff_invalidates_accepted_status(self):
+        self.assertEqual(self.execute()[0]["verdict"], "ACCEPT")
+        self.api.comments = [c for c in self.api.comments if not c["body"].startswith(review.HANDOFF_MARKER)]
+        report = review.run(self.api, 999, 1)
+        self.assertEqual(report["verdict"], "BLOCKED")
 
-class ProviderTransportTests(unittest.TestCase):
-    def test_structured_multimodal_request_and_transient_retry(self):
-        payload = {"status": "completed", "id": "fixture-response", "output": [{"content": [
-            {"type": "output_text", "text": json.dumps(response())}]}]}
-        class HTTPResponse(io.BytesIO):
-            def __enter__(self): return self
-            def __exit__(self, *args): self.close()
-        failure = urllib.error.HTTPError("https://api.openai.com/v1/responses", 429, "fixture", {}, None)
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "fixture-only-key", "SALIMON_REVIEW_MODEL": "gpt-4.1"}), \
-             patch.object(review.urllib.request, "urlopen", side_effect=[failure, HTTPResponse(json.dumps(payload).encode())]) as http, \
-             patch.object(review.time, "sleep"):
-            result, provider = review.ai_review({"issue": "fixture"}, [("image:heading-velocity:actual", b"fixture-image")], CRITERIA, {"image:heading-velocity:actual"})
-        self.assertEqual((result["verdict"], provider["attempts"], http.call_count), ("ACCEPT", 2, 2))
-        sent = json.loads(http.call_args.args[0].data)
-        self.assertFalse(sent["store"])
-        self.assertTrue(sent["text"]["format"]["strict"])
-        self.assertEqual(sent["input"][0]["content"][-1]["type"], "input_image")
-        self.assertNotIn("tools", sent)
+    def test_removing_comment_marker_triggers_revalidation(self):
+        self.execute()
+        submission = next(c for c in self.api.comments if c['body'].startswith(review.HANDOFF_MARKER))
+        previous = submission['body'];submission['body'] = 'Review withdrawn'
+        event = {'issue': {'number': 999, 'pull_request': {}}, 'comment': submission,
+                 'action': 'edited', 'changes': {'body': {'from': previous}}}
+        Path('event.json').write_text(json.dumps(event))
+        with patch.dict(os.environ, {'GITHUB_TOKEN': 'fixture', 'GITHUB_REPOSITORY': review.REPO, 'GITHUB_EVENT_PATH': 'event.json'}), patch.object(review,'API',return_value=self.api):
+            review.main()
+        self.assertEqual(self.api.statuses[-1][1]['state'], 'failure')
 
-    def test_permanent_and_retry_exhaustion_are_bounded(self):
-        for code, expected in ((401, 1), (429, 2), (503, 2)):
-            failure = urllib.error.HTTPError("https://api.openai.com/v1/responses", code, "fixture", {}, None)
-            with patch.dict(os.environ, {"OPENAI_API_KEY": "fixture-only-key"}), \
-                 patch.object(review.urllib.request, "urlopen", side_effect=failure) as http, patch.object(review.time, "sleep"):
-                with self.assertRaisesRegex(ValueError, "REVIEWER_UNAVAILABLE"):
-                    review.ai_review({}, [], CRITERIA, {"issue"})
-                self.assertEqual(http.call_count, expected)
+    def test_issue_discussion_change_invalidates_handoff_and_scan(self):
+        self.execute();original = self.api.pages
+        def changed(path, key=None):
+            return [{'body': 'New approved intent; requires re-review'}] if path == '/issues/998/comments' else original(path,key)
+        self.api.pages = changed
+        invalidate(self.api,self.api.pr)
+        self.assertEqual(self.api.statuses[-1][1]['state'],'pending')
+        result = review.run(self.api,999,1)
+        self.assertEqual(result['verdict'],'BLOCKED')
+
+    def test_newer_change_request_wins_at_publication(self):
+        self.execute();original = self.api.pages
+        reads = 0
+        def changed(path, key=None):
+            nonlocal reads
+            if path == '/issues/999/comments':
+                reads += 1
+                if reads == 2:
+                    last = copy.deepcopy(next(c for c in self.api.comments if c['body'].startswith(review.HANDOFF_MARKER)))
+                    record = review.handoffs([last])[0]['record'];record['review'] = response('REQUEST_CHANGES','FAIL')
+                    last['body'] = comment(record);last['html_url'] = 'newer-change-request'
+                    self.api.comments.append(last)
+            return original(path,key)
+        self.api.pages = changed
+        self.assertEqual(review.run(self.api,999,1)['verdict'],'BLOCKED')
+
+
+class SessionHandoffTests(unittest.TestCase):
+    def packet(self):
+        return {"binding": {"head": HEAD}, "run": {"id": 1, "attempt": 1}, "criteria": CRITERIA,
+                "issue": {"body": "fixture issue"}, "evidence": {"sha256": {"frame": "checksum"}},
+                "citations": ["image:heading-velocity:actual"]}
+
+    def test_actual_handoff_contract_and_submitter_attestation(self):
+        packet = self.packet()
+        record = make_handoff(packet, response(), "/root/reviewer", "/root")
+        comments = [{"body": comment(record), "user": {"type": "User"}, "author_association": "OWNER", "html_url": "fixture-comment"}]
+        result, reviewer = review.session_review(packet, CRITERIA, set(packet["citations"]), review.handoffs(comments))
+        self.assertEqual(result["verdict"], "ACCEPT")
+        self.assertIn("attestation", reviewer["independence"])
+        self.assertEqual(reviewer["execution"], "Codex session; CI only verifies the submitted record")
+
+    def test_unauthorized_comments_and_missing_reviewer_block(self):
+        packet = self.packet();record = make_handoff(packet, response(), "reviewer", "developer")
+        for user, association in (({"type": "Bot"}, "OWNER"), ({"type": "User"}, "NONE")):
+            submissions = review.handoffs([{"body": comment(record), "user": user, "author_association": association}])
+            with self.assertRaisesRegex(ValueError, "REVIEWER_UNAVAILABLE"):
+                review.session_review(packet, CRITERIA, set(packet["citations"]), submissions)
+
+    def test_stale_bindings_and_self_review_block(self):
+        for field in ("binding", "run", "criteria_sha256", "issue_sha256", "evidence_sha256", "packet_sha256", "reviewer"):
+            packet = self.packet();record = make_handoff(packet, response(), "reviewer", "developer")
+            record[field] = {"id": "developer", "capability": "distinct Codex subagent"} if field == "reviewer" else "stale"
+            with self.assertRaises(ValueError):
+                review.session_review(packet, CRITERIA, set(packet["citations"]), [{"record": record, "comment_url": "fixture"}])
+        with self.assertRaises(ValueError):
+            make_handoff(self.packet(), response(), "same-agent", "same-agent")
+
+    def test_no_external_ai_client_or_workflow_secret(self):
+        runtime = (ROOT / ".github/qa/review.py").read_text()
+        workflow = (ROOT / ".github/workflows/independent-qa.yml").read_text()
+        self.assertNotIn("api.openai.com", runtime)
+        self.assertNotIn("OPENAI_API_KEY", runtime + workflow)
+        self.assertNotIn("urlopen", runtime)
 
 
 if __name__ == "__main__":

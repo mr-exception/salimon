@@ -1,120 +1,115 @@
-# Independent game QA (#752)
+# Independent review evidence gate (#752)
 
-The [trusted runtime](../.github/qa/review.py) reads one open Salimon PR and calls
-a separate, stateless multimodal OpenAI Responses request. It sends no developer
-chat, tools or write authority to the model. This is implemented infrastructure;
-the interactive Salimon skills alone do not provision a persistent agent.
-The owner retains merge authority. Nothing merges, deploys, approves baselines,
-closes issues, edits code or retries a developer fix automatically.
+Independent AI review runs in the active Codex session, using a distinct reviewer
+subagent when available. The [trusted CI runtime](../.github/qa/review.py) verifies
+that review's submitted record against current tests, source and screenshots.
+CI does not invoke a model, provision an agent or require an external AI API key.
+The user explicitly excluded unattended external AI review from this delivery.
+Human retains merge authority; the runtime never merges, closes issues, edits
+code, deploys, or approves screenshot references.
 
-## Evidence and verdict
+## Session review and deterministic gate
 
-Use exactly one local `Closes #N` reference and an issue with 1–20 bullets under
-`## Acceptance criteria`. The runtime assigns AC-1 onward without rewriting the
-issue. It reads the full issue/discussion, paginated PR file patches, current
-head/base/merge, current completed Navigation client PR run, latest executions of
-`build` and `baseline-approval`, and the primary navigation artifact. A partial
-job rerun can reuse successful jobs from that same exact revision. It never
-confuses the deliberate negative captures or repeat directory with the primary.
+A delivering PR must have exactly one local `Closes #N` reference and 1–20
+acceptance bullets under `## Acceptance criteria`. The runtime assigns AC-1
+onward. It reads full issue/discussion, PR patches, exact head/base/merge, latest
+completed Navigation client PR run and successful `build`/`baseline-approval`
+executions. Partial job reruns can reuse same-revision successful jobs.
 
-Every one of eight frames must include source-bound actual/expected/diff PNGs,
-state/environment, the approved manifest hash and retained trace. The model sees
-all 24 images, per-frame state, comparison measurements and E2E results; a trace
-citation proves availability, not that a model has replayed it. Human baseline
-approval is independently verified from exact base + trusted main inheritance or the existing
-exact human approval comment. AI cannot substitute for it. Changed CI workflow
-or mandatory npm scripts are BLOCKED for human review rather than trusted as
-successful deterministic checks. Ordinary source/test diffs remain reviewable.
+The primary artifact must contain all eight source-bound actual/expected/diff
+PNGs, state/environment, approved manifest and trace. Negative/repeat directories
+cannot substitute for the primary evidence. Human reference approval is verified
+independently from exact base plus trusted-main inheritance or an exact existing
+human approval comment. Changed CI workflows or mandatory npm scripts require
+human review and block automated acceptance. AI cannot override those gates.
 
-The strict response schema requires one PASS/FAIL/UNVERIFIED row per criterion,
-known evidence citations, finding and action. Unknown citations, malformed or
-incomplete output, missing/expired capture, unavailable provider, stale evidence,
-unfinished/skipped required CI or active human change requests produce BLOCKED.
-Failed deterministic CI yields REQUEST_CHANGES even if AI says ACCEPT. Only
-all-pass criteria plus successful required CI can yield ACCEPT. Head/base/merge,
-issue body, blocking reviews and current run/job results are rechecked before
-publishing. An approval is attached only to the exact original head SHA.
+Without a current session verdict, the job records BLOCKED and exports
+`handoff-request.json` alongside `report.json` as a 90-day artifact. The request
+includes criteria, full issue/discussion, reviewed diff, test results, state,
+measurements, manifest, citations, exact revisions and the original artifact link.
+Give those materials and actual images to a distinct Codex reviewer. Require one
+PASS/FAIL/UNVERIFIED row per criterion, known evidence citations and actionable
+findings. Missing capability/evidence must remain BLOCKED; never invent agents or
+screenshots. Trace availability is distinct from interactive trace replay.
 
-The PR comment contains a durable cycle index, actionable findings and complete
-machine-readable JSON, including capture/state/trace hashes, source/base, CI run
-and attempt, model response identity, limitations and artifact link. The same
-JSON is uploaded for 90 days. Original browser artifacts retain the existing
-14-day policy; preserve essential originals beside the issue report. An expired
-artifact blocks replay even if a previous review accepted it.
+Create the local submission after genuine independent review:
 
-## Bounded operation and invalidation
+```sh
+python3 .github/qa/handoff.py --packet /tmp/handoff-request.json \
+  --review /tmp/independent-review.json --reviewer /root/reviewer \
+  --implementer /root --output /tmp/review-comment.md
+```
 
-At most three model cycles per PR, including failed provider calls. There are at
-most two API requests per cycle, retrying only HTTP 429/500/502/503/504 once after
-two seconds. Each call has a 90-second timeout and 4,000 output-token cap; there
-are no model tools. Maximum six requests/24,000 provider output tokens across three
-cycles (retries may consume provider tokens too). Authentication errors do not
-retry. A fingerprint binds head/base/merge, issue/discussion, review state, diff,
-model/configuration presence, trusted runtime bytes, CI attempt/results and artifact hashes. Identical
-requests revalidate live evidence and restore the status without another model
-call or duplicate comment. A transient failure remains BLOCKED on replay;
-fix configuration or rerun CI to create a new evidenced cycle. At the limit,
-human investigation/new delivery is required; changing source does not reset it.
+The helper only writes a local comment file. Publish it to that PR through an
+existing authorized GitHub tool. Its marker is `<!-- salimon-codex-review:v1 -->`.
+Only OWNER/MEMBER/COLLABORATOR comments authored by a User are eligible. The
+submitter attests actual separate-agent execution; identities are **not**
+cryptographic proof of agent execution. Keep independent review evidence and
+human review of trusted CI code. A comment alone cannot provision a reviewer.
 
-Per invocation: at most 100 GitHub calls, 500 entries per list, 200 E2E results,
-200 KB PR patches, 350 KB packet JSON, 8 MiB total images, 128 MiB compressed /
-256 MiB expanded artifact data, 2,000 ZIP entries and 32 MiB per entry. No ZIP
-is extracted or executed. Oversized, unsafe, duplicate or missing data blocks.
-Large PRs must be split. The workflow has an eight-minute wall-clock cap.
+The record binds the entire reviewed packet, issue/criteria, CI run/attempt,
+source head/base/merge and every capture/state/trace hash. Re-run the evidence
+preparation and independent review when context changes. CI validates that record
+and deterministic checks, then publishes actionable comments, machine JSON and
+`salimon/independent-qa` status on the exact original head. Failed CI vetoes AI
+approval; missing/unrun checks, absent/invalid handoff, stale context, expired
+artifacts and active human change requests block acceptance. Only all-pass
+criteria and mandatory CI may produce ACCEPT.
 
-Navigation CI completion and explicit dispatch request a review; unrelated
-pushes never spend model tokens. PR synchronize/base edits, branch pushes and a
-15-minute scan invalidate statuses when the current head/base/merge differs from
-the latest recorded review. Each PR has its own workflow concurrency group.
-Scans are bounded to 80 open PRs. Per-head GitHub statuses cannot atomically bind
-a moving base: use strict up-to-date branch protection or a merge queue as well.
-The scan bounds missed-event recovery, not permission to merge stale evidence.
-After a stacked parent merges/retargets/advances, rerun CI and independent review.
+Immediately before publication, the runtime rechecks head/base/merge, issue
+body/discussion, current CI attempt/results, blocking reviews and the latest
+matching handoff. A newer change request wins over an older acceptance. Edited,
+withdrawn or deleted records trigger revalidation; bot report comments do not
+recursively trigger more reports.
 
-## Installation and required-check rollout
+## Limits and invalidation
 
-1. Owner reviews and merges this infrastructure through the normal independent
-   review process. `workflow_run` and schedules activate only from default main.
-   Pre-merge push invalidation explicitly skips if trusted main has no runtime;
-   this bootstrap is not an independent-qa ACCEPT. No auto-merge is enabled.
-2. Configure repository secret `OPENAI_API_KEY` with vision/model access. Optional
-   repository variable `SALIMON_REVIEW_MODEL` defaults to `gpt-4.1`. Without the
-   secret, actual captures are still checked and the result is BLOCKED.
-3. Run Navigation client on a reviewable PR, then dispatch **Independent game QA**
-   with its number if no completion event has triggered review. Read the exact
-   JSON/comment and confirm both failure and success paths before requiring it.
-4. Only after those jobs/statuses actually exist, an owner may add existing
-   `build`, `baseline-approval` and `salimon/independent-qa` checks to protection,
-   with strict base freshness. This change does not alter repository protection.
-   Keep human review for modifications to trusted QA/CI code; do not allow an
-   AI approval or a bypassed test to replace that decision.
+At most three consumed session-review cycles per PR; source edits do not reset
+that budget. Failed preparation or a missing reviewer does not consume a cycle.
+After the cap, human investigation/new delivery is required. There are no model
+calls, model retries, API credentials or model resource costs in this workflow.
+An exact fingerprint binds input/runtime bytes, submissions, CI and artifacts;
+duplicate events revalidate live evidence and restore status without duplicate
+cycle comments. Expired/deleted originals invalidate replay.
 
-The workflow checks out only trusted `main`, disables persisted Git credentials
-and uses Python standard library. It never checks out PR code into the privileged
-job, runs npm from a PR, executes artifact content or uses model output as code.
-PR artifacts and issue text are untrusted data with explicit prompt boundaries.
-Write token scope is limited to issue comments and commit statuses; model secrets
-are passed only to the review job. Branch protection and provider installation
-remain owner configuration, not silently inferred from a green unit fixture.
+Each invocation permits at most 100 GitHub calls, 500 entries per list, 200 E2E
+results, 200 KB patches, 350 KB packet JSON, 8 MiB aggregate images, 128 MiB ZIP /
+256 MiB expanded entries, 2,000 ZIP entries and 32 MiB per entry. Artifacts are
+read as data, never extracted or executed. Oversized/unsafe data blocks. The job
+has an eight-minute timeout. Source scripts use only Python's standard library.
 
-## Verification and controlled demo
+PR changes, pushes and a 15-minute bounded scan invalidate head/base/merge drift.
+The scan also checks withdrawal of accepted handoffs and issue-context changes;
+it supports up to 20 open PRs within the GitHub call budget. Statuses cannot
+atomically encode a moving base or eliminate all event races. Require strict
+up-to-date branch protection or a merge queue as well. Stacked parent changes
+require new evidence and session review. Preserve essential originals beside the
+issue report because navigation artifacts expire after 14 days.
 
-From repository root:
+## Rollout
+
+1. Owner reviews/merges the infrastructure through normal independent review.
+   Trusted workflows run only default-main code with persisted credentials off;
+   they never execute PR files with write credentials. Bootstrap skips an absent
+   runtime on trusted main; that is not an independent QA acceptance.
+2. Run Navigation client, obtain its evidence packet, conduct independent review
+   in Codex and submit the exact record. PR comment events or workflow dispatch
+   validate it. No extra AI service, key, subscription or unattended worker setup.
+3. Only after jobs/statuses actually exist and failure/success paths have been
+   observed should an owner require existing `build`, `baseline-approval` and
+   `salimon/independent-qa`, with strict base freshness. This PR changes no branch
+   protection. The owner still decides whether to merge.
+
+## Verification
 
 ```sh
 python3 -m unittest discover -s .github/qa -p 'test_*.py' -v
 ```
 
-Fixtures run the production orchestration with a labeled fake GitHub API and
-mock HTTP provider transport. They cover deterministic veto, missing provider /
-capture, stale head/base/merge, mid-review parent changes, expired evidence on
-replay, independent baseline approval, protected CI scripts, bounded retries,
-cycle exhaustion and idempotency. They are not live service passes.
-
-For the stronger image demo, capture the real red-velocity CSS defect in a
-disposable committed worktree, restore it in another commit and run the normal
-suite. A distinct reviewer must inspect originals, references, diffs and states,
-then supply source/hash-bound JSON. Replay with:
+Controlled fixtures use simulated GitHub transport and test session records.
+The stronger demo reuses real wrong/repaired browser captures at distinct actual
+commits and the actual distinct reviewer's source/hash-bound verdicts. Only GitHub
+transport is simulated; the production handoff validator and veto policy run.
 
 ```sh
 python3 .github/qa/demo.py --wrong /tmp/wrong --fixed /tmp/fixed \
@@ -122,8 +117,6 @@ python3 .github/qa/demo.py --wrong /tmp/wrong --fixed /tmp/fixed \
   --output /tmp/qa-demo
 ```
 
-Only GitHub and reviewer transport are substituted; the verdicts are the actual
-independent reviewer's, validated against exact supplied capture hashes. The
-record explicitly distinguishes genuine browser/AI execution from simulated
-PR status transitions. See [issue evidence](../reports/issue-752/README.md).
-Hardware GPU/native/physical-input qualification is outside this infrastructure.
+[Issue report](../reports/issue-752/README.md) retains originals, diffs, states,
+traces, logs and transition JSON. Hardware/native/physical-input qualification
+remains outside this infrastructure.

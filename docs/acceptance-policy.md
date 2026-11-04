@@ -103,7 +103,7 @@ baselines is owned by #750–#752. It does not itself alter branch protection.
 The [independent game QA runtime](independent-game-qa.md) now implements the #752
 review/status workflow against #750/#751 evidence. Its required-check rollout is
 explicit: install/configure and observe actual jobs/statuses before an owner
-requires them. Missing provider configuration produces BLOCKED. This policy and
+requires them. Missing current Codex session review evidence produces BLOCKED; no external AI API or key is required. This policy and
 the runtime never grant merge authority or approve changed screenshot baselines.
 
 Fix mandatory cloud failures or leave the task incomplete. Missing cloud tooling

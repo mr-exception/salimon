@@ -2,9 +2,9 @@
 
 Implemented the trusted [review runtime](../../.github/qa/review.py), strict
 [veto policy](../../.github/qa/policy.py), bounded revision invalidator and
-[workflow](../../.github/workflows/independent-qa.yml). The runtime reads evidence
-and requests an independent multimodal API review; it never executes PR code
-with privileged credentials. It publishes exact-head commit statuses, actionable
+[workflow](../../.github/workflows/independent-qa.yml). Independent AI review runs in the active Codex session; CI verifies its exact
+source/evidence-bound handoff. The runtime never invokes an external AI API or
+requires an AI API key, and never executes PR code with privileged credentials. It publishes exact-head commit statuses, actionable
 PR comments and durable machine-readable cycle records. Human retains merge
 authority. [Operations/rollout/limits](../../docs/independent-game-qa.md).
 
@@ -13,12 +13,21 @@ Delivery branch `issue-752-independent-qa-gate`, base `main` at
 Verified #749/#750/#751 code, approval discussion and merged delivery; formal
 blocked-by list is empty. No unrelated gameplay or reference image is changed.
 
+## User-directed scope
+
+The user explicitly declined external AI/API-key/unattended review and requested
+matching plugin instructions. Salimon Issue Manager0.7.1 is saved and read-back
+verified with session reviewers as the default; external AI infrastructure needs
+an explicit future request. The earlier external-provider proposal in the first
+published PR revision is superseded by the session handoff gate. No automated
+model execution is claimed.
+
 ## Acceptance matrix
 
 | Criterion | Production evidence and verification | Result before final PR review |
 | --- | --- | --- |
 | AC-1 wrong indicator requests changes; repair requires new-SHA tests/evidence | Actual red-velocity CSS commit + genuine distinct image review; production orchestrator replay against controlled PR API; repair at different real commit with 24 E2E passes | PASS, [machine-readable demo](demo.json) |
-| AC-2 missing reviewer/capture blocks; finite loops | 23 Python policy/runtime/HTTP-transport tests, including missing provider/capture, expiry, stale head/base/merge, malformed response, transient retry, cycle cap and duplicate replay | PASS, [test log](qa-tests.log) |
+| AC-2 missing reviewer/capture blocks; finite loops | 29 Python policy/runtime/session-handoff tests, including missing session reviewer/capture, expiry, stale head/base/merge, malformed response, withdrawn records, full-context binding, cycle cap and duplicate replay | PASS, [test log](qa-tests.log) |
 | AC-3 actionable comments, machine report, human merge authority | Demo includes exact comments/status records; runtime writes same JSON to PR and artifact; independent source review; no merge/close/deploy endpoint | PASS locally; final current-head CI/reviewer verdict bound in PR conversation |
 | Mandatory existing client gates | 38 assertions, build/typecheck, all 24 Chromium routes; final-head CI also repeats existing deterministic/visual mutation checks and baseline approval | Local PASS; final remote run recorded in PR |
 | Manual/native/hardware | No graphics/product/input change; hardware-specific visual qualification is separate from cloud acceptance | N/A to infrastructure; hardware/native/physical input NOT VERIFIED |
@@ -26,9 +35,9 @@ blocked-by list is empty. No unrelated gameplay or reference image is changed.
 ## Controlled real-image review demo
 
 The PR/GitHub status transport is **simulated**, using the production `run`,
-`publish`, `decide` and `invalidate` functions. The reviewer transport is an
-explicit replay bridge for actual distinct-agent image verdicts, not a hardcoded
-claim of live OpenAI success. Browser runs, source commits, screenshots,
+`publish`, `decide` and `invalidate` functions. Review records use the
+production handoff contract for actual distinct-agent image verdicts; the gate
+never makes a model call. Browser runs, source commits, screenshots,
 measurements and independent AI image inspections are real.
 
 - Wrong source `08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6`: actual velocity stroke
@@ -60,8 +69,9 @@ implementation ancestors, with only merged `8e2adab` as prerequisite. Verify wit
 checkout using `git fetch .../fixtures.bundle refs/heads/qa-fixture-752`.
 The full client tree of the repaired fixture equals delivery source `0a791e2`.
 Later QA-only fixes do not change that tree; [all client hashes](client-inputs.sha256.json)
-bind the reused browser/build/unit evidence. Runtime tests and demo run against
-delivery source `0a791e2`; final report-only publication is reviewed separately.
+bind the reused browser/build/unit evidence. The revised runtime tests and demo run against the final session-only source
+recorded in the PR review; current-head CI is required after publication. Client
+inputs and the original real image reviews are unchanged and reused by hash.
 
 Retained primary originals, expected frames, diffs, metadata, full E2E result
 JSON and trace:
@@ -85,13 +95,12 @@ uploads the full fresh suite artifact under its own exact tested merge revision.
 Cloud Linux x86_64, Python 3.12.14, Node 24.19.0; locked Playwright 1.64.1 /
 Chromium 156.0.8078.4, headless real WebGL SwiftShader. Fixed 1280×800 / DPR1,
 seed750, epoch2026-11-04T00:00:00Z, en-US/UTC/dark, vendored fonts and grayscale
-text. Browser synthetic input; no physical-device claim. Provider model default
-is `gpt-4.1` in a stateless request; no live API key was configured here.
+text. Browser synthetic input; no physical-device claim. No external AI service or API key is used by the final design.
 
 | Command | Actual result |
 | --- | --- |
 | `npm ci --no-audit --no-fund --cache /tmp/salimon-npm-cache`; `PLAYWRIGHT_BROWSERS_PATH=/tmp/salimon-playwright npx playwright install chromium` | PASS |
-| `python3 -m unittest discover -s .github/qa -p 'test_*.py' -v` from root | PASS, 23 tests; [log](qa-tests.log) |
+| `python3 -m unittest discover -s .github/qa -p 'test_*.py' -v` from root | PASS, 29 tests; [log](qa-tests.log) |
 | `npm test` from repaired fixture client | PASS, 38 assertions; [log](client-tests.log) |
 | `npm run build` from repaired fixture client | PASS; existing bundle-size warning; [log](build.log) |
 | `PLAYWRIGHT_BROWSERS_PATH=/tmp/salimon-playwright CI=true SALIMON_EVIDENCE_DIR=/tmp/issue-752-wrong npm run test:visual` on wrong commit | Expected FAIL, only two visual frames; [log](wrong-browser.log) |
@@ -109,19 +118,21 @@ trust) were corrected and covered by targeted tests before final verification.
 
 ## Independent review and limits
 
-Distinct reviewer `/root/review_752`, implementation cycle1, independently
+Distinct reviewer `/root/review_752`, implementation cycles1–2, independently
 reviewed production code, fixtures, original images and hashes. Initial findings
 were handed back and fixed. Final overall verdict is QA pending until the exact
 published head/base and actual required remote checks are reviewed; the final
 structured verdict/run links are published in the PR and source issue. The
 navigation mini-verdicts above do not substitute for that full review.
 
-Live OpenAI service execution is NOT RUN: transport schema, image request and
-bounded 429/503/auth failure behavior are exercised with labeled HTTP fixtures.
-After owner merge, trusted default-branch workflow activation and repository
-`OPENAI_API_KEY` configuration are required for unattended reviews. Missing key
-is BLOCKED. This pre-merge bootstrap does not claim a live automated status pass.
-No persistent agent is manufactured by the interactive skill or fixture.
+No external AI API client, model request, API-key secret or model retry path is
+present in the final active source/workflow. Independent review executes in the
+Codex session. CI verifies an authorized submitter's exact-packet-bound review
+record; this is an attestation, not cryptographic proof of agent execution. A
+missing or withdrawn handoff is BLOCKED. No persistent agent is manufactured.
+After owner merge, trusted workflow activation is required. No separate AI service
+configuration is needed. Published-head CI from the earlier scope cannot stand
+in for new-head CI; final publication/check status is explicit in the PR.
 
 Repository rulesets were empty; branch-protection read returned403 (integration
 permission), so protection settings are UNVERIFIED. This PR does not edit them.

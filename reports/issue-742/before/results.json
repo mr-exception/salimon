@@ -1,0 +1,297 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=desktop",
+      "--grep",
+      "continuous.*pan renders"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "panning.spec.ts",
+      "file": "panning.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "continuous keyboard pan renders scanned bodies at their current projection on every frame",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 11266,
+                  "error": {
+                    "message": "Error: every in-view body must exist on each movement frame\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 47\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 4,\u001b[39m\n\u001b[31m+     \"id\": \"planet\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.9556701030927836,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       948.5000000000001,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 0,\u001b[39m\n\u001b[31m+     \"id\": \"asteroid\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.9474226804123709,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       944.4999999999999,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 0,\u001b[39m\n\u001b[31m+     \"id\": \"asteroid\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.8938144329896905,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       918.5,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: every in-view body must exist on each movement frame\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 47\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 4,\u001b[39m\n\u001b[31m+     \"id\": \"planet\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.9556701030927836,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       948.5000000000001,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 0,\u001b[39m\n\u001b[31m+     \"id\": \"asteroid\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.9474226804123709,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       944.4999999999999,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 0,\u001b[39m\n\u001b[31m+     \"id\": \"asteroid\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.8938144329896905,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       918.5,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/salimon/client/tests/panning.spec.ts:24:100",
+                    "location": {
+                      "file": "/workspace/salimon/client/tests/panning.spec.ts",
+                      "column": 100,
+                      "line": 24
+                    },
+                    "snippet": "  22 |  expect(observations.length).toBeGreaterThan(20)\n  23 |  expect(new Set(observations.map(b=>b.id)).size).toBe(4)\n> 24 |  expect(observations.filter(b=>!b.present),'every in-view body must exist on each movement frame').toEqual([])\n     |                                                                                                    ^\n  25 |  expect(observations.filter(b=>b.bright<10),'actual framebuffer must contain the body, even before drag/key release').toEqual([])\n  26 |  for(const body of observations){expect(body.actualPixel![0]).toBeCloseTo(body.pixel[0],5);expect(body.actualPixel![1]).toBeCloseTo(body.pixel[1],5)}\n  27 |  expect(data.frames.every(frame=>frame.ship!==null)).toBe(true)"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/workspace/salimon/client/tests/panning.spec.ts",
+                        "column": 100,
+                        "line": 24
+                      },
+                      "message": "Error: every in-view body must exist on each movement frame\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 47\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 4,\u001b[39m\n\u001b[31m+     \"id\": \"planet\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.9556701030927836,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       948.5000000000001,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 0,\u001b[39m\n\u001b[31m+     \"id\": \"asteroid\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.9474226804123709,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       944.4999999999999,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"actualPixel\": null,\u001b[39m\n\u001b[31m+     \"bright\": 0,\u001b[39m\n\u001b[31m+     \"id\": \"asteroid\",\u001b[39m\n\u001b[31m+     \"ndc\": Array [\u001b[39m\n\u001b[31m+       0.8938144329896905,\u001b[39m\n\u001b[31m+       1.990051048614449e-17,\u001b[39m\n\u001b[31m+       -0.5994801599480158,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"pixel\": Array [\u001b[39m\n\u001b[31m+       918.5,\u001b[39m\n\u001b[31m+       400,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"present\": false,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  22 |  expect(observations.length).toBeGreaterThan(20)\n  23 |  expect(new Set(observations.map(b=>b.id)).size).toBe(4)\n> 24 |  expect(observations.filter(b=>!b.present),'every in-view body must exist on each movement frame').toEqual([])\n     |                                                                                                    ^\n  25 |  expect(observations.filter(b=>b.bright<10),'actual framebuffer must contain the body, even before drag/key release').toEqual([])\n  26 |  for(const body of observations){expect(body.actualPixel![0]).toBeCloseTo(body.pixel[0],5);expect(body.actualPixel![1]).toBeCloseTo(body.pixel[1],5)}\n  27 |  expect(data.frames.every(frame=>frame.ship!==null)).toBe(true)\n    at /workspace/salimon/client/tests/panning.spec.ts:24:100"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:11:33.455Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "keyboard-visible.png",
+                      "contentType": "image/png",
+                      "sha256": "24085e623d826842803e2cdde95aa31bebbb46f454c9a7cea261dc55e3136ae9",
+                      "bytes": 19507,
+                      "retained": "keyboard-visible.png"
+                    },
+                    {
+                      "name": "keyboard-missing.png",
+                      "contentType": "image/png",
+                      "sha256": "0eb33f72db45976f155dd2b68a149b28acda4b7cd522ef264733f43b5b168b87",
+                      "bytes": 19588,
+                      "retained": "keyboard-missing.png"
+                    },
+                    {
+                      "name": "keyboard-empty.png",
+                      "contentType": "image/png",
+                      "sha256": "5cc9afff52941eeb483d8c00f2636d1a32ae70ec4a70c489a1fca3e09dfb232d",
+                      "bytes": 18772,
+                      "retained": "keyboard-empty.png"
+                    },
+                    {
+                      "name": "keyboard-frames.json",
+                      "contentType": "application/json",
+                      "sha256": "f47cd65e2303237c22ef8ac231216488e9600927d174e3dd54d24c8265a859f0",
+                      "bytes": 102324,
+                      "retained": "keyboard-frames.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/workspace/salimon/client/test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/workspace/salimon/client/test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/workspace/salimon/client/tests/panning.spec.ts",
+                    "column": 100,
+                    "line": 24
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b6e38096e20df0c49e53-ac471b36f825ecb39d54",
+          "file": "panning.spec.ts",
+          "line": 4,
+          "column": 50
+        },
+        {
+          "title": "continuous mouse pan renders scanned bodies at their current projection on every frame",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12523,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:11:47.082Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "mouse-visible.png",
+                      "contentType": "image/png",
+                      "sha256": "d9e2a501d7719f67ef6d93cbf782e2ce8a757d4ab7438897559e4164fc5a8b75",
+                      "bytes": 19516,
+                      "retained": "mouse-visible.png"
+                    },
+                    {
+                      "name": "mouse-frames.json",
+                      "contentType": "application/json",
+                      "sha256": "2898eb43a97d2fd48a2bd4c9fbf33e0403f4ef00fb0abbaed8125e736c9c9882",
+                      "bytes": 117815,
+                      "retained": "mouse-frames.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/panning-continuous-mouse-p-6d454-t-projection-on-every-frame-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6e38096e20df0c49e53-a0842c67ade24af8b086",
+          "file": "panning.spec.ts",
+          "line": 4,
+          "column": 50
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-04T06:11:30.135Z",
+    "duration": 30514.199,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

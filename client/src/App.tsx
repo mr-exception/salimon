@@ -1,11 +1,10 @@
-import { Canvas, useFrame, useThree, type RootState } from '@react-three/fiber'
+import { Canvas, type RootState } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CameraControls } from './CameraControls'
 import { HelpDialog } from './HelpDialog'
 import { ShipVectorGuides, type VectorElements } from './ShipVectorGuides'
 import { STATIONARY_SPEED_MPS } from './vectorGuides'
-import * as THREE from 'three'
-import { SAMPLE_BODIES, length, type Body, type Vec3 } from './sampleUniverse'
+import { SAMPLE_BODIES, length, type Body } from './sampleUniverse'
 
 import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
 import { alignTo, setThrottle as changeThrottle, type ShipState } from './simulation.ts'
@@ -13,31 +12,14 @@ type Pose = ShipState
 import { NavigationInput, FrameTimer, acceptsFlightShortcut, axisForCode, panAxisForCode } from './input.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { distances, navigationWarnings } from './contact.ts'
-import { radarGroups, gridOffsetLs, type ContactGroup } from './radar.ts'
-import { BodyVisual, ShipVisual, GalacticLattice } from './navigationVisuals.tsx'
+import { gridOffsetLs, type ContactGroup } from './radar.ts'
+import { GalacticLattice } from './navigationVisuals.tsx'
+import { ContinuousContacts } from './ContinuousContacts'
 const VISIBLE_RADIUS = 900
 const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
 const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
-function Contact({ body, position, selected, onSelect }: { body: Body; position: Vec3; selected: boolean; onSelect: (id: string) => void }) {
-  return <group position={position as [number,number,number]} onClick={(event) => {event.stopPropagation();onSelect(body.id)}}>
-    <BodyVisual kind={body.kind} id={body.id} selected={selected}/>
-  </group>
-}
-
 function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand, panInput, navigation, vectorElements }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:number; panInput:NavigationInput;navigation:NavigationRuntime;vectorElements:VectorElements }) {
-  const { camera, size } = useThree()
-  const [groups,updateGroups]=useState<ContactGroup[]>([])
-  const elapsed = useRef(0)
-  useFrame((_state,dt) => {
-    elapsed.current += dt
-    if (elapsed.current < 0.1) return
-    elapsed.current = 0
-    const next=radarGroups(contacts,pose.position,p=>{
-      const v=new THREE.Vector3(...p).project(camera);return [v.x,v.y,v.z]
-    },size.width,size.height,selected)
-    updateGroups(next);setGroups(next)
-  })
   const spacing=10**Math.floor(Math.log10(Math.max(1,viewRadius/5)))
   const gridOffset=gridOffsetLs(pose.position,spacing)
   return <>
@@ -47,8 +29,8 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
     <directionalLight position={[100,180,-80]} intensity={2}/>
     <GalacticLattice spacing={spacing} offset={gridOffset}/>
     <ShipVectorGuides navigation={navigation} elements={vectorElements}/>
-    <ShipVisual pitch={pose.pitch} yaw={pose.yaw}/>
-    {groups.map(g=><Contact key={g.id} body={g.bodies.find(b=>b.id===g.representative)!} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
+    <ContinuousContacts navigation={navigation} contacts={contacts} selected={selected} selectGroup={selectGroup} setGroups={setGroups}/>
+
   </>
 }
 export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onSceneReady?:(state:RootState)=>void}={}) {

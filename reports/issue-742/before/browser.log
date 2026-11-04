@@ -1,0 +1,103 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep continuous.*pan renders
+
+[WebServer] (node:5808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:5852) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (11.3s)
+(node:5997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (12.5s)
+
+
+  1) [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame 
+
+    Error: every in-view body must exist on each movement frame
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 47
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "actualPixel": null,
+    +     "bright": 4,
+    +     "id": "planet",
+    +     "ndc": Array [
+    +       0.9556701030927836,
+    +       1.990051048614449e-17,
+    +       -0.5994801599480158,
+    +     ],
+    +     "pixel": Array [
+    +       948.5000000000001,
+    +       400,
+    +     ],
+    +     "present": false,
+    +   },
+    +   Object {
+    +     "actualPixel": null,
+    +     "bright": 0,
+    +     "id": "asteroid",
+    +     "ndc": Array [
+    +       0.9474226804123709,
+    +       1.990051048614449e-17,
+    +       -0.5994801599480158,
+    +     ],
+    +     "pixel": Array [
+    +       944.4999999999999,
+    +       400,
+    +     ],
+    +     "present": false,
+    +   },
+    +   Object {
+    +     "actualPixel": null,
+    +     "bright": 0,
+    +     "id": "asteroid",
+    +     "ndc": Array [
+    +       0.8938144329896905,
+    +       1.990051048614449e-17,
+    +       -0.5994801599480158,
+    +     ],
+    +     "pixel": Array [
+    +       918.5,
+    +       400,
+    +     ],
+    +     "present": false,
+    +   },
+    + ]
+
+      22 |  expect(observations.length).toBeGreaterThan(20)
+      23 |  expect(new Set(observations.map(b=>b.id)).size).toBe(4)
+    > 24 |  expect(observations.filter(b=>!b.present),'every in-view body must exist on each movement frame').toEqual([])
+         |                                                                                                    ^
+      25 |  expect(observations.filter(b=>b.bright<10),'actual framebuffer must contain the body, even before drag/key release').toEqual([])
+      26 |  for(const body of observations){expect(body.actualPixel![0]).toBeCloseTo(body.pixel[0],5);expect(body.actualPixel![1]).toBeCloseTo(body.pixel[1],5)}
+      27 |  expect(data.frames.every(frame=>frame.ship!==null)).toBe(true)
+        at /workspace/salimon/client/tests/panning.spec.ts:24:100
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/error-context.md
+
+    attachment #7: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame 
+  1 passed (30.5s)

@@ -1,0 +1,18 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep continuous.*pan renders|ship rays track
+
+[WebServer] (node:7953) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7984) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:7996) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/edges.spec.ts:48:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (7.4s)
+  ✓  2 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (10.5s)
+  ✓  3 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (10.2s)
+
+  3 passed (32.2s)

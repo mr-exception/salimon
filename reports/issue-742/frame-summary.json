@@ -1,0 +1,62 @@
+{
+  "before": {
+    "keyboard": {
+      "frames": 65,
+      "moving_frames": 64,
+      "observations": 143,
+      "missing_meshes": 3,
+      "missing_pixels": 3,
+      "body_ids": [
+        "asteroid",
+        "moon",
+        "planet",
+        "star"
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    },
+    "mouse": {
+      "frames": 65,
+      "moving_frames": 59,
+      "observations": 177,
+      "missing_meshes": 0,
+      "missing_pixels": 0,
+      "body_ids": [
+        "asteroid",
+        "moon",
+        "planet",
+        "star"
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  },
+  "after": {
+    "keyboard": {
+      "frames": 65,
+      "moving_frames": 64,
+      "observations": 143,
+      "missing_meshes": 0,
+      "missing_pixels": 0,
+      "body_ids": [
+        "asteroid",
+        "moon",
+        "planet",
+        "star"
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    },
+    "mouse": {
+      "frames": 65,
+      "moving_frames": 60,
+      "observations": 180,
+      "missing_meshes": 0,
+      "missing_pixels": 0,
+      "body_ids": [
+        "asteroid",
+        "moon",
+        "planet",
+        "star"
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  }
+}

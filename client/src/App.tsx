@@ -1,16 +1,17 @@
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree, type RootState } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as THREE from 'three'
 import { SAMPLE_BODIES, length, normal, type Body, type Vec3 } from './sampleUniverse'
 
 import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
-import { alignTo, forward, setThrottle as changeThrottle, type ShipState } from './simulation.ts'
+import { alignTo, setThrottle as changeThrottle, type ShipState } from './simulation.ts'
 type Pose = ShipState
 import { NavigationInput, FrameTimer, acceptsFlightShortcut, axisForCode, type Axis } from './input.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { distances, navigationWarnings } from './contact.ts'
 import { radarGroups, gridOffsetLs, type ContactGroup } from './radar.ts'
+import { BodyVisual, ShipVisual, GalacticLattice } from './navigationVisuals.tsx'
 const VISIBLE_RADIUS = 900
 const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
@@ -41,7 +42,15 @@ function CameraControls({ onViewRadius, command }: { onViewRadius: (value: numbe
   },[camera,gl,onViewRadius])
   useEffect(()=>{
     if(!(camera instanceof THREE.OrthographicCamera))return
-    if(command.action==='reset'){camera.position.set(200000,125000,200000);camera.lookAt(0,0,0);camera.zoom=0.5}
+    if(command.action==='reset'){
+      const controls=controlsRef.current
+      if(controls){
+        // Drain residual orbit/pan damping before assigning the reset pose.
+        const damping=controls.enableDamping;controls.enableDamping=false
+        controls.update();controls.enableDamping=damping;controls.target.set(0,0,0)
+      }
+      camera.position.set(200000,125000,200000);camera.lookAt(0,0,0);camera.zoom=0.5
+    }
     else camera.zoom=THREE.MathUtils.clamp(camera.zoom*(command.action==='in'?1.5:1/1.5),0.001,30)
     camera.updateProjectionMatrix();controlsRef.current?.update()
     onViewRadius((camera.top-camera.bottom)/(2*camera.zoom))
@@ -50,23 +59,11 @@ function CameraControls({ onViewRadius, command }: { onViewRadius: (value: numbe
   return null
 }
 function Contact({ body, position, selected, onSelect }: { body: Body; position: Vec3; selected: boolean; onSelect: (id: string) => void }) {
-  const color = selected ? '#dfffe0' : body.kind === 'star' ? '#f6cb79' : body.kind === 'planet' ? '#6cddd3' : body.kind === 'moon' ? '#adc3de' : '#db8bd5'
-  const radius = body.kind === 'star' ? 18 : body.kind === 'planet' ? 12 : body.kind === 'moon' ? 8 : 6
   return <group position={position as [number,number,number]} onClick={(event) => {event.stopPropagation();onSelect(body.id)}}>
-    <mesh>
-      <sphereGeometry args={[radius, 12, 8]} />
-      <meshBasicMaterial color={color} wireframe transparent opacity={selected ? 1 : 0.75} depthTest={false}/>
-    </mesh>
-    <mesh>
-      <sphereGeometry args={[radius * 1.6, 8, 6]} />
-      <meshBasicMaterial transparent opacity={0} depthWrite={false}/>
-    </mesh>
-    {selected && <mesh rotation={[Math.PI/2,0,0]}>
-      <torusGeometry args={[radius*1.7,0.4,4,32]}/>
-      <meshBasicMaterial color="#efffc3" depthTest={false}/>
-    </mesh>}
+    <BodyVisual kind={body.kind} id={body.id} selected={selected}/>
   </group>
 }
+
 function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:ViewCommand }) {
   const { camera, size } = useThree()
   const [groups,updateGroups]=useState<ContactGroup[]>([])
@@ -82,22 +79,19 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
   })
   const spacing=10**Math.floor(Math.log10(Math.max(1,viewRadius/5)))
   const gridOffset=gridOffsetLs(pose.position,spacing)
-  const heading = forward(pose.yaw,pose.pitch)
   return <>
     <color attach="background" args={['#060f19']}/>
     <CameraControls onViewRadius={setViewRadius} command={viewCommand} />
-    <gridHelper args={[spacing*100,100,'#2a6b79','#183645']} position={[gridOffset[0],0,gridOffset[2]]} />
+    <ambientLight intensity={0.65}/>
+    <directionalLight position={[100,180,-80]} intensity={2}/>
+    <GalacticLattice spacing={spacing} offset={gridOffset}/>
     <axesHelper args={[65]}/>
-    <group rotation={[pose.pitch,pose.yaw,0]} rotation-order="YXZ">
-      <mesh rotation={[-Math.PI/2,0,0]}><coneGeometry args={[12,36,5]} /><meshBasicMaterial color="#65efc6" wireframe /></mesh>
-      <mesh position={[0,0,7]}><boxGeometry args={[20,3,10]}/><meshBasicMaterial color="#84a9bd" wireframe /></mesh>
-    </group>
-    <arrowHelper args={[new THREE.Vector3(...heading),new THREE.Vector3(),65,'#69f4c2',8,5]}/>
+    <ShipVisual pitch={pose.pitch} yaw={pose.yaw}/>
     {length(pose.velocityMps)>0.000001 && <arrowHelper args={[new THREE.Vector3(...normal(pose.velocityMps)),new THREE.Vector3(),85,'#f0b763',10,6]}/>}
-    {groups.filter(g=>!g.edge).map(g=><Contact key={g.id} body={g.bodies[0]} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
+    {groups.filter(g=>!g.edge).map(g=><Contact key={g.id} body={g.bodies.find(b=>b.id===selected)??g.bodies[0]} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
   </>
 }
-export function App({navigation}:{navigation?:NavigationRuntime}={}) {
+export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onSceneReady?:(state:RootState)=>void}={}) {
   const [runtimeInstance]=useState(()=>navigation??new NavigationRuntime(SAMPLE_BODIES))
   const runtime=useRef(runtimeInstance)
   const [pose,setPose]=useState<Pose>(runtime.current.clock.state)
@@ -200,11 +194,11 @@ export function App({navigation}:{navigation?:NavigationRuntime}={}) {
   const distance=target?length(relativeM(target.position,pose.position))/LIGHT_SECOND_M:null
   return <div className="app" data-mode={pose.mode}>
     <div className="radar" role="region" aria-label="Navigation radar" aria-describedby="navigation-help" tabIndex={0} onPointerDown={e=>{if(e.target instanceof HTMLCanvasElement)e.currentTarget.focus({preventScroll:true})}}>
-      <Canvas orthographic camera={RADAR_CAMERA} onCreated={({gl})=>{gl.domElement.setAttribute('aria-label','Ship-centered three-dimensional radar');gl.domElement.setAttribute('role','img')}} fallback={<p role="alert">WebGL is unavailable. A WebGL 2 browser is required.</p>}>
+      <Canvas orthographic camera={RADAR_CAMERA} onCreated={(state)=>{onSceneReady?.(state);const {gl}=state;gl.domElement.setAttribute('aria-label','Ship-centered three-dimensional radar');gl.domElement.setAttribute('role','img')}} fallback={<p role="alert">WebGL is unavailable. A WebGL 2 browser is required.</p>}>
         <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
-      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
+      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" data-offscreen={g.edge} style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
       <div className="legend">▲ HEADING <span>◆ VELOCITY</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
     </div>
     <aside>

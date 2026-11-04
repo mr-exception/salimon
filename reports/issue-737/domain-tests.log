@@ -1,0 +1,34 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts
+
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (1.018633ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (0.186757ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.14786ms)
+✔ rotation changes impact-relative velocity and destruction decision (0.43108ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (0.708332ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (0.270211ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (0.45113ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (0.667781ms)
+✔ independent key and pointer owners release without clearing another held input (1.109807ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (0.620111ms)
+✔ navigation assets have finite bounded flat facets and a directional ship silhouette (1.466357ms)
+✔ closed ship hull triangles face outward so back-face culling preserves the upper hull (0.148371ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (5.684832ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (0.248779ms)
+✔ large catalog query matches independent brute force without global precision loss (20.361656ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (7.917817ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (0.22876ms)
+✔ presentation count is bounded by viewport cells, not catalog length (16.194147ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (0.991432ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (1.442302ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (0.514234ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (1.052283ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 386.412465

@@ -68,7 +68,9 @@ The ship itself must provide or support the resources and equipment needed to ma
 Death is intentionally severe. If the player dies or suffers unrecoverable total loss, the run ends and the player starts the game fresh. This makes preparation, maintenance, navigation, and cooperation meaningful.
 ## Resource inventory and cargo (new 2D direction)
 
-Raw resources are stored in the player's **10 kg / 10 L dual-capacity inventory**, counted in integer resource units with integer weight and volume. No physical fragment piles or one-fragment-at-a-time carrying for raw materials. Ship cargo and non-resource physical belongings remain distinct pending future 2D integration. See [inventory contract](resource-inventory-and-gathering.md).
+Raw resources are stored in the player's **10 kg / 10 L dual-capacity inventory** in **whole litres**, using resource-specific **fractional kg/L** densities (integer grams per litre internally). No physical fragment piles or one-fragment-at-a-time carrying for raw materials. The starter Scout has one **50 kg / 50 L general storage container**, plus a **50 kg / 50 L Fabricator resource buffer** and a separate **50 kg / 50 L Energy Core fuel buffer**; players may deposit and retrieve unconsumed materials. Machine inventories are independent from the player inventory, while physical furnishings remain separate.
+
+The new Core design uses **continuous conversion bounded by fixed maximum generation power (watts)**; **that rate can be upgraded later**, but its initial value, upgrade levels and costs are explicitly **deferred for a future design discussion**. Legacy native physical-fuel behavior below does not supersede the [current inventory and Core contract](resource-inventory-and-gathering.md).
 
 ## Space EVA and airlock
 - When the ship is in open space and is **not landed**, the player may open the airlock and leave the ship for EVA/free-flight.
@@ -108,7 +110,7 @@ Research and technology unlocks should enable:
 ## Confirmed personal resource inventory (2026-11-04)
 
 - Start with 10 kg **and** 10 L, both independently enforced; future upgrades can expand either capacity.
-- Resource definitions store positive integer kilograms and litres per unit, with integer stack quantities only (minimum precision 1 kg / 1 L).
+- Resource quantities are whole litres, with resource-specific fractional kg/L densities stored precisely as integer grams per litre.
 - Collect raw materials directly into stacks rather than physically carrying resource fragments.
 - Existing tool slots, food/medkit slots and non-resource possessions are separate interaction systems.
 - Inventory mass contributes only once to relevant physics. No source consumption without matching inventory credit.
@@ -207,7 +209,13 @@ step boundary with that step's normal idle/propulsion consumers before storage
 clipping. It preserves exact powered-thrust duration. Conversion timing/rate is
 owned by E03; no continuous charging source is assumed by this task.
 
-## Physical Core fueling (#189)
+## Energy Core generation rate — new 2D design (2026-11-04)
+
+The approved future 2D Core consumes raw resources from its own **50 kg / 50 L buffer** and produces energy **continuously**, processing whole-litre batches at a **fixed maximum generation power measured in watts**. It automatically prioritizes highest-yield resources (metric still to define), pauses at full energy reserve, and resumes as room becomes available, with unused materials withdrawable.
+
+**The maximum generation rate is upgradeable in the future.** Its starting power, tiers, upgrade costs, prerequisites and cap remain **undecided and must be explicitly discussed and defined later**; do not reuse the historical 200 MJ/s native default as an approved 2D rate. See [resource lifecycle](resource-inventory-and-gathering.md).
+
+## Historical physical Core fueling (#189; superseded for 2D raw resources)
 
 Carry one fragment to the Core, aim at it within 3 m and press E. Mechanical
 intake works without power, immediately consumes the fragment and removes its

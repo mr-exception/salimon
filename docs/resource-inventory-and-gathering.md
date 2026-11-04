@@ -1,33 +1,59 @@
-# Resource inventory and gathering — strict top-down 2D
+# Resource inventory, gathering and ship processing — strict top-down 2D
 
-**Status: owner-approved design (2026-11-04).** Domain logic and tests are implemented in the browser client, but the navigation-only prototype has no 2D surface gameplay, mining controls, inventory UI or machine integration yet. Previous native fragment-carry work is historical.
+**Status: approved gameplay direction (2026-11-04); implementation pending.** The browser client is currently navigation-only. The TypeScript inventory foundation from PR #756 implements a 10 kg / 10 L starting inventory with **integer kilograms per unit** and is **not yet updated** for the newly approved fractional-kg/whole-litre design, ship storage, or continuous Core processing. Do not treat historical native physical-fragment behavior as current 2D gameplay.
 
-## Resource storage
+## Resource representation and player gathering
 
-- Starting player inventory: **10 kg of weight and 10 L of volume**, enforced as independent caps. An item must fit in BOTH free capacities.
-- Minimum granularity: **1 kg and 1 litre**. Each resource type declares positive integer kilograms-per-unit and litres-per-unit, and quantities are integers. A resource unit can weigh more than 1 kg or occupy more than 1 L. No fractional mass, volume or stored resource units.
-- Stacks are stored by resource ID; total usage is derived from quantities and the catalog, never editable totals. Reject invalid values, unknown resource keys, and arithmetic overflow.
-- Capacity upgrades are possible in the future, potentially increasing mass and volume independently. Starting capacities are fixed; upgrade unlocks, costs and tiers are not yet decided.
-- Raw resource stacks do not occupy tool slots or the existing separately designed food/medkit slots. Physical non-resource props and installed furniture are distinct systems pending further 2D decisions.
+- Raw resources are **stacked in whole litres**, not carried as physical fragments. Resource quantities and mining/source depletion are whole-litre increments; no fractional litre can enter an inventory.
+- Each resource type specifies **mass per litre**; fractional kilograms are allowed (e.g. 0.5 kg/L). Use **integer grams per litre** and integer litre quantities internally to avoid floating-point inventory drift. Display kg and L independently.
+- Starting player inventory: **10 kg maximum weight AND 10 L maximum volume**, enforced simultaneously. Future inventory capacity upgrades are possible; their costs/tier values are not defined.
+- The player leaves the Scout, approaches a rock/plant/other harvestable source, equips the mining tool and mines **1 L per second** while the interaction is valid. Suitable gathering interactions for other resource categories need the same capacity and depletion rules.
+- Credit only the litres fitting BOTH remaining limits and remaining source quantity, debiting the corresponding persistent source in the same authoritative operation. Uncollected material remains at the source; no fragments, growing spheres or physical fragment piles are created.
+- Interaction distance, animation/interrupt rules, partial-second progress, tool upgrades, resource-density catalog and source exhaustion visuals require later design/implementation.
 
-## Direct extraction
+## Initial ship-side resource capacities
 
-- In strict top-down planetary/surface play, the player interacts with a valid mineral deposit, asteroid source, or harvestable biological source using a suitable tool. No mined sphere, fragment carrying, fragment drop physics or loose raw-fragment pile.
-- Each successful extraction atomically credits whole resource units to inventory and debits the same quantity from the persistent source. Collect at most the requested units, source remaining units, and the free weight and volume capacities.
-- If a request only partially fits, collect the amount that fits and leave the rest at the source. If nothing fits, do not change either state and report the limiting capacity to the player.
-- Keep stable source IDs and depletion journals. A future authoritative/multiplayer implementation must use revision checks to prevent stale or repeated extraction from duplicating resources.
-- Mining/harvesting yield adapters must deterministically convert old continuous mass rates to whole units and persist any fractional progress as non-collectible source remainder until a full unit accrues; never mint units through repeated rounding.
+| Destination | Starting weight capacity | Starting volume capacity | Operation |
+| --- | --- | --- | --- |
+| Player inventory | 10 kg | 10 L | Collect and transport |
+| One built-in Scout storage container | 50 kg | 50 L | Store and retrieve raw resources |
+| Fabricator input buffer | 50 kg | 50 L | Supply recipes; withdraw unused inputs |
+| Energy Core raw-material buffer | 50 kg | 50 L | Feed energy conversion; withdraw unconsumed inputs |
 
-## Transfer, machine intake and persistence
+- Capacities are **independent per inventory/buffer**, with both weight and volume checked. Each may hold mixed resource types up to its combined limits.
+- The player can deposit and withdraw **unused** material from the general container, Fabricator and Core. Material committed to a queued Fabricator job or already converted by the Core is not withdrawable.
+- Storage-container construction and upgrades, Fabricator-buffer upgrades and Core-buffer upgrades are **future design discussions**; no recipes, tiers or costs are set here.
+- Transfers must conserve exact whole litres and associated mass without duplication. The transfer UI, whether module-to-module transfers are allowed, partial-transfer UX and how a partly converted active Core batch is treated on withdrawal remain to be finalized.
+- Player and ship resource mass must be counted once in applicable physics. General storage is distinct from physical furnishings and separately equipped tools/consumables.
 
-- Material consumption is an exact whole-unit debit; insufficient balance rejects unchanged. New Core, Fabricator and construction interactions must consume from resource inventory rather than inserting physically carried fragments.
-- Ship storage is a separate, **undecided** capacity/transfer system. Do not assume the player's 10 kg / 10 L inventory also governs the ship. Furnishings and special non-resource world items remain separate.
-- Player resource mass affects relevant physical mass only once. A transfer to ship storage must not double-count the same mass. The current navigation-only runtime does NOT consume this inventory or change ship mass.
-- Future saves will need catalog version, integer quantities, upgraded caps and consistent source-depletion transaction state. Older native physical fragment saves need explicit migration decisions, not silent reinterpretation.
-- Legacy physical construction refunds, physical mounts, Fabricator raw input and Core fragment fueling are NOT integrated into this new domain yet.
+## Fabricator
 
-## Implemented starting point
+- The Fabricator has a 50 kg / 50 L reserved resource-input buffer at game start; unused materials can be retrieved.
+- Preserve the earlier crafting contract: jobs reserve/consume their ingredients on queue, operate one at a time, pause without power, and deliver finished consumables/items to the output tray. Resources already committed to a job cannot be recovered by withdrawing them from the input buffer.
+- Replacing legacy physical-fragment intake with inventory transfers is future implementation work. Fabricator capacity-upgrade behavior is deferred.
 
-- client/src/resourceInventory.ts: pure immutable starting inventory, derived usage, direct capacity-limited source extraction, exact removal and independent-capacity increases.
-- client/src/resourceInventory.test.ts: weight, volume, mixed resources, depletion, conservation, exact consumption, upgrade and invalid-input checks.
-- Integration into the future top-down 2D world, UI, machine adapters, storage, saves, and concurrent authority remains future work.
+## Energy Core — approved processing model
+
+- The Core starts with a **separate 50 kg / 50 L raw-material buffer**, independent of the Core's stored energy capacity (joules). Unconsumed raw resources can be withdrawn.
+- Material is selected **automatically by highest energy yield first**. The precise comparison metric when densities differ (yield per kg vs yield per whole litre) and deterministic tie-breaking still require an explicit design decision; do not silently claim either ranking is approved.
+- The Core processes **whole-litre input batches with continuous energy output over time**, not instantaneous full-batch energy grants. The energy reserve can be charged while a batch is being processed.
+- **The Core has a fixed maximum energy-generation POWER, measured in watts (J/s).** Actual conversion is bounded by this power rate, available convertible energy, and free energy-storage capacity. A more energy-rich litre can take longer to finish at the same maximum power.
+- Conversion **automatically pauses** when the energy reserve is full, preserving remaining unconverted energy/material, and **automatically resumes** as energy capacity becomes available. It must not discard fuel or generated energy simply because the reserve is full.
+- **The maximum generation power is upgradeable in the future.** This is distinct from upgrading the Core's raw-material buffer capacity or energy-storage capacity.
+- **Design deliberately deferred:** The initial maximum generation power (in MW), the upgrade mechanism, upgrade tiers, maximum upgradeable rate, required resources/costs, prerequisites, and exact power/progress behavior must be **discussed and defined in a later design session**. This document does not authorize adopting old native conversion values or any example number as the new starting rate.
+- Also deferred: how a partially converted 1 L batch is reserved/represented, whether it occupies original capacity throughout processing, what can be withdrawn during processing, save/resume and interruption details, and exact priority/tie-breaking semantics. Preserve material-energy conservation regardless.
+
+## Persistence, authority and current implementation gap
+
+- Source depletion and inventory credit must be authoritative and atomic so interruption, repeated input, saving/reloading or future multiplayer cannot create duplicate resources.
+- Quantities are whole litres; densities use integer grams/litre. Current `client/src/resourceInventory.ts` still enforces whole kilograms per resource unit. Updating it, its tests and the future 2D interaction system is **separate future work**, not completed by this document.
+- Save data for inventories, active Core batch progress, energy reserve and world depletion must be versioned and validated. The existing navigation-only client has none of these machine or 2D integrations.
+- Older native Core fueling, physical-fragment construction refunds and storage/harvesting implementation notes remain historical only; they are not proof of 2D migration.
+
+## Open design questions for later discussion
+
+1. Initial fixed generation power (MW) and its **upgradeable rate progression**, separate from energy-storage upgrades.
+2. Core priority yield metric (per litre versus per kilogram), deterministic tie-breaks, and currently processing batch behavior.
+3. Core active-batch reservation, withdrawal, interruption and persistence.
+4. Mining tool reach, interruption and partial-second progress; actual resource densities and types.
+5. Storage/transfer UI, direct module transfer policy, and capacity upgrade tiers for inventory/storage/Fabricator/Core.

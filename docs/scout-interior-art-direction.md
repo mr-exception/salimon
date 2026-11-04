@@ -1,5 +1,7 @@
 # Scout interior art direction and habitation presentation
 
+> **Cockpit viewpoint and multiplayer (2026-11-04):** [Cockpit and reconnect](cockpit-navigation-and-reconnect.md) is authoritative for the new strict-top-down character/cockpit flow: navigation desk opens local 3D radar, others see a seated pilot, normal exit stands the pilot up, blackout returns them to seated 2D, and disconnect clears the chair and interaction. Preserve the Scout's approved aesthetic and furniture intent while adapting seating to illustrated overhead poses.
+
 > **2D migration (2026-11-04):** Preserve established Scout atmosphere, habitation features, furnishings and clean repairs; present them with the new [strict top-down illustrated view](top-down-art-direction.md). Old first-person camera/3D mesh requirements are historical. Raw materials follow [direct limited inventory gathering](resource-inventory-and-gathering.md).
 
 **Status: owner-approved future art/experience target, 2026-10-23.** This is a design and future implementation contract, **not** a claim that these furnishings, customization, lighting, acoustics, aging or damage rendering currently ship. No source geometry, physics, power, survival or verified performance contract changes merely because this document exists.

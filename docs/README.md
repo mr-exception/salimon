@@ -22,6 +22,7 @@ These newer approved narrative contracts supersede historical Earth-start assump
 ## Active browser navigation prototype
 
 - [Navigation-only holographic radar contract and migration boundary](radar-navigation-prototype.md)
+- [Approved cockpit transitions, multiplayer presence and precise reconnect](cockpit-navigation-and-reconnect.md)
 - [React prototype setup](../client/README.md)
 
 ## Product and gameplay
@@ -33,6 +34,7 @@ These newer approved narrative contracts supersede historical Earth-start assump
 - [Spatial Jump Drive, sub-light travel, shared time and Core impulse (approved future design)](jump-drive-and-interstellar-travel.md)
 - [Spaceship, Building & Survival](spaceship-building-and-survival.md)
 - [Multiplayer & NPC Interaction](multiplayer-and-npc-interaction.md)
+- [Cockpit control, disconnect/reconnect and offline-death rules](cockpit-navigation-and-reconnect.md)
 - [Technical Architecture & AI Maintenance](technical-architecture.md)
 
 ## Business specifications

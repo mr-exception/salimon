@@ -1,5 +1,7 @@
 # Spaceship, Building & Survival
 
+> **Cockpit and ship-wide damage update (2026-11-04):** Default gameplay is 2D; owner enters 3D radar only via cockpit desk, appearing seated to others. Exiting normally stands them up; blackout returns them to seated 2D; disconnect removes avatar/releases interactions and preserves a ship-local or planet-fixed reconnect point. **Current 2D damage scope is whole-ship damage/destruction only**; old per-cell/module damage text below is legacy/deferred. See [cockpit and reconnect](cockpit-navigation-and-reconnect.md).
+
 > **New 2D design (2026-11-04):** [Strict top-down illustrated art](top-down-art-direction.md) and [10 kg / 10 L direct resource inventory](resource-inventory-and-gathering.md) supersede old first-person fragment-carry/mining descriptions below. The old native code and acceptance notes are historical, not currently running in the navigation-only browser client.
 
 > **Approved future Scout/construction contract (2026-10-22):** [Scout art direction and modular construction](scout-and-modular-construction.md). Older entries below describe the **currently implemented** authored Scout where noted; they do not override the new target. This page is not evidence that modular building or the new cargo bay has shipped.
@@ -103,10 +105,12 @@ Research and technology unlocks should enable:
 - improved tools and resource processing;
 - the ability to safely travel farther from Earth toward Absenat.
 ## Confirmed ship destruction, salvage and access rules
-- Other players may damage, destroy, salvage, and loot a ship whether or not its owner is alive.
-- If the owner dies, the ship becomes orphaned and remains in the world as salvage/loot.
-- If the ship is destroyed while the owner survives, the owner can still return and rebuild/repair from the **Core**, which is the irreducible recovery point of the ship.
+- **Current 2D scope: damage and destruction are ship-wide**. A vessel may be damaged but remain intact, or may be destroyed **as a whole**. Individual room/module damage, detachable partial hulls and occupant rescue from a surviving compartment are intentionally deferred.
+- Other players may damage, destroy, salvage and loot a ship whether or not its owner is alive, subject to later PvP and recovery rules.
+- **If an offline player's saved location is inside a ship and the entire ship is destroyed, that player dies.** On reconnect notify **"You died while disconnected"** and restart their run; do not respawn at the wreck. A disconnected player saved on a planet is not killed by a separate ship's destruction. Whole-ship damage that does not destroy the vessel permits normal reconnect.
+- If the owner dies, the ship becomes orphaned and remains in the world as salvage/loot. Existing future Core-based recovery applies **only where a character is still alive** and can reach that Core; it does not override offline death or resurrect an offline occupant at wreckage.
 - There are no lockable protected containers or general anti-loot protections planned; physical access means items can be taken.
+- See [cockpit navigation and reconnect](cockpit-navigation-and-reconnect.md) for authoritative character/interaction behavior.
 ## Confirmed personal resource inventory (2026-11-04)
 
 - Start with 10 kg **and** 10 L, both independently enforced; future upgrades can expand either capacity.

@@ -98,3 +98,14 @@ target, flight and warning status are explicit; throttle has a label and signed
 forward/reverse/coast value. Desktop mouse/keyboard is the supported input path.
 Browser automation uses synthetic input and software WebGL; it does not certify
 physical input, native platforms or hardware FPS.
+
+## Navigation screenshot regression (#751)
+
+The [visual reference guide](tests/navigation-baselines/README.md) owns the eight
+frozen browser screens, fixed fonts/browser/backend, pixel comparison policy,
+intentional visual defect demonstration and explicit independent baseline approval.
+`npm run test:visual` compares all screens; run it twice for determinism and run
+`npm run test:visual:negative` to prove the comparator rejects a real CSS defect.
+The ordinary `test:browser` suite includes these captures. Candidate generation
+never approves a baseline; CI blocks changed references until a human collaborator
+approves the exact manifest digest. Software WebGL does not qualify hardware GPUs.

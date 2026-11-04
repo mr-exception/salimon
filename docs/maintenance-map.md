@@ -904,3 +904,11 @@ Browser input/QA #730: `client/src/input.ts` owns independent held-input sources
 Browser navigation visuals #737: `client/src/visualGeometry.ts` owns shared faceted proxy assets; `navigationVisuals.tsx` owns orthographic screen sizing and the sparse 3D coordinate lattice. `navigationVisuals.test.ts` and `tests/visuals.spec.ts` cover finite geometry, heading silhouette, actual WebGL pixels, selection, zoom and bounded rendering cost. Simulation, scanner and physical-body owners remain separate.
 
 Browser edge lines #738: `client/src/radar.ts` owns finite segment clipping, true-viewport classification and deterministic selected-first representative rays in perimeter groups. App renders clipped SVG lines over the WebGL scene and keyboard-accessible labels; OrbitControls owns independent right-drag pan. `radar.test.ts` and `tests/edges.spec.ts` cover edges/corners, off-screen ship/misses, camera/ship motion, scan/expiry and all dense-group IDs.
+
+Browser visual QA #751: `client/tests/navigation-captures.spec.ts` captures the
+production App through the #750 deterministic fixture. `client/scripts/visual-comparison.ts`
+owns pixel policy and independent human approval matching; `baseline-approval.ts`
+validates baseline hashes and checks the PR's approval evidence. The
+[reference guide](../client/tests/navigation-baselines/README.md) owns candidate,
+review, environment upgrade and artifact retention procedures. Reference pixel
+comparisons and human baseline approval are separate required gates.

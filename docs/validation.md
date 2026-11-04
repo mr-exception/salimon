@@ -839,3 +839,16 @@ route previously retained only in the #515 report. Script contracts: `python3 -m
 unittest discover -s scripts -p test_benchmark_canonical.py`, existing packaged
 smoke/fragment/visual/route-review tests, and `python3 scripts/check_docs.py`.
 No new runtime/domain behavior or cloud acceptance gate is introduced.
+
+### Browser screenshot baselines (#751)
+
+Follow the [reference guide](../client/tests/navigation-baselines/README.md).
+`npm run test:browser` includes eight complete viewport comparisons. Repeat with
+`SALIMON_EVIDENCE_DIR=test-results/visual-repeat npm run test:visual`, then run
+`npm run test:visual:negative` (real heading-color CSS mutation). Use lockfile
+Chromium/SwiftShader and vendored fixture fonts. Retain originals, diffs, raw pixel
+counts, state/environment metadata and success/failure traces. Changed browser,
+fonts, renderer or reference hashes fail rather than regenerating baselines.
+CI requires explicit human approval of new manifest bytes; implementation agents
+must never approve their own candidates. Hardware/native qualification remains
+unverified. These are browser layout/radar captures, separate from native GLBs.

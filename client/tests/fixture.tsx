@@ -7,6 +7,7 @@ import { NavigationRuntime } from '../src/navigationRuntime'
 import { physicalRadiusM } from '../src/contact'
 import { type Body } from '../src/sampleUniverse'
 import '../src/styles.css'
+import './assets/fonts.css'
 import { observeScene } from './sceneHarness'
 const params=new URLSearchParams(location.search)
 const scenario=params.get('scenario')

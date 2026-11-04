@@ -15,12 +15,19 @@ concurrency:
   group: navigation-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
 jobs:
   build:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -44,6 +51,22 @@ jobs:
       - name: Prove intentional navigation regressions fail
         working-directory: client
         run: npm run test:browser:negative
+      - name: Repeat visual comparisons for determinism
+        working-directory: client
+        env:
+          SALIMON_EVIDENCE_DIR: test-results/visual-repeat
+        run: npm run test:visual
+      - name: Prove a real visual defect fails comparison
+        working-directory: client
+        run: npm run test:visual:negative
+      - name: Require explicit human approval for changed baselines
+        if: github.event_name == 'pull_request'
+        working-directory: client
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SALIMON_PR_NUMBER: ${{ github.event.pull_request.number }}
+          SALIMON_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: npm run test:visual:approval
       - uses: actions/upload-artifact@v4
         if: always()
         with:

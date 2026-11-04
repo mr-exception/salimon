@@ -1,8 +1,10 @@
 # Project Vision
 
+> **Latest direction (2026-11-04):** [Strict overhead illustrated 2D](top-down-art-direction.md) for planet/ship gameplay, separate simplified [3D radar](radar-navigation-prototype.md), and [10 kg / 10 L resource inventory](resource-inventory-and-gathering.md). Earlier 3D native, first-person and physical-fragment references below are historical.
+
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
-> **Salimon** is a realistic, native-first 3D space exploration and survival game set in a persistent shared universe. The player lives physically inside an evolving spaceship, travels across real and fictional space, gathers and processes resources, survives harsh environments, meets autonomous AI-driven NPCs and other players, and works toward the distant mystery of **Absenat**.
+> **Salimon** is a persistent space exploration and survival game set in a persistent shared universe. The player lives physically inside an evolving spaceship, travels across real and fictional space, gathers and processes resources, survives harsh environments, meets autonomous AI-driven NPCs and other players, and works toward the distant mystery of **Absenat**.
 ## Current delivery status
 
 The shared universe and survival pillars below describe the long-term vision.
@@ -33,9 +35,9 @@ Typical quests may involve transporting items, traveling to remote locations, fi
 - **Real universe direction:** known stars, planets, moons, and large astronomical structures should be represented at believable scale and motion; fictional systems and points of interest may fill gameplay gaps.
 - **Physical survival:** oxygen, food, water, temperature, sleep, health, radiation, pressure, and stamina matter. Death is permanent for that run: the player starts fresh and loses the previous character's possessions and ship.
 - **Spaceship as home:** every player owns one ship. It is the player's primary base, vehicle, progression platform, and cozy personal space.
-- **Physical interaction:** first-person movement, walkable interiors, switches, doors, machinery, tools, and physical cargo. Containers are physical spaces, not abstract item lists.
+- **Physical interaction:** strict top-down 2D movement and worlds, machinery and tools; raw resources occupy a limited weight-and-volume inventory, distinct from non-resource possessions.
 - **Meaningful construction:** the ship grows through modular rooms and functional modules whose mass, location, durability, power needs, heat, structural implications, and performance matter.
-- **Resource economy:** asteroid and planetary materials are physically gathered, transported, refined, crafted, traded, and used for survival, repair, construction, upgrades, ammunition, and research.
+- **Resource economy:** asteroid and planetary materials are collected directly as integer inventory stacks, then processed, crafted, traded and consumed for upgrades, repair and survival.
 - **Living AI world:** NPCs are autonomous actors backed by AI models, with globally shared memory and world state across players. NPC actions, relationships, quests, alliances, hostility, factions, trading, and movement affect one common world.
 - **Persistent shared multiplayer:** players encounter one another naturally in the universe, can walk into each other's ships, cooperate or fight, and remain where they physically are even after disconnect/reconnect.
 - **Mystery and exploration:** Salimon should continually suggest that the universe contains unknown history, unexplained entities, anomalies, rare discoveries, and paths toward Absenat.

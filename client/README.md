@@ -1,5 +1,7 @@
 # Salimon navigation-only browser prototype
 
+**2D resource foundation, not radar UI:** The client contains a pure whole-unit 10 kg / 10 L resource inventory and gathering domain (src/resourceInventory.ts), with node tests (src/resourceInventory.test.ts). It is not yet wired to the navigation-only interface. See [resource design](../docs/resource-inventory-and-gathering.md).
+
 A self-contained React + TypeScript + Vite + Three.js + React Three Fiber radar. This is a new prototype and does not migrate the historical native Rust gameplay. See [design contract](../docs/radar-navigation-prototype.md).
 
 ## Run

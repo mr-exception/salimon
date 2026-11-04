@@ -1,5 +1,7 @@
 # Salimon visual style
 
+> **Updated art direction (2026-11-04):** [Strict top-down illustrated 2D](top-down-art-direction.md) is authoritative for Scout interiors and planetary exploration. Existing low-poly 3D renderer/material/camera prescriptions below are historical; compatible palette and mood remain useful. 3D navigation is a separate [holographic radar](radar-navigation-prototype.md).
+
 > **Planetary exterior art direction (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) is the approved future environment-specific specification for geological regions, atmospheric effects, alien biological materials/structures and their physically meaningful LOD/harvesting. Keep current prototype recipes and asset budgets until deliberately implemented and validated. No automatic water-body, ecology or shader implementation is implied.
 
 

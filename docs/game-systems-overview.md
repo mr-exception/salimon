@@ -1,5 +1,7 @@
 # Game Systems Overview
 
+> **New direction (2026-11-04):** Current browser implementation is a 3D navigation-only radar. Future interior/planet gameplay is [strict top-down illustrated 2D](top-down-art-direction.md) with [10 kg / 10 L direct resource inventory](resource-inventory-and-gathering.md). Previous native first-person and physical fragment implementations are historical.
+
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 ## Purpose
@@ -8,22 +10,16 @@ The approved future starting state is the unknown alien homeworld, not Earth. Pl
 
 ## Long-term system areas
 
-This list describes product direction, not implemented modules. The current
-client-only prototype implements navigation, walking/EVA, ship interaction,
-planetary mining, one-object carrying, fragment motion/contact, inertial flight,
-physical Core conversion/power, safe recovery and cabin zero-G. Resource state
-is retained in memory across local streaming, with no disk/backend save.
-Survival, crafting, orbital simulation, NPCs, economy, multiplayer and backend
-authority remain deferred. See [current scope](project-phases.md).
+This list describes long-term product direction rather than current implementation. The active browser client implements only navigation; former native walking, mining, carrying, fabrication and survival implementations have not migrated to it. See [current radar](radar-navigation-prototype.md).
 
 1. **Exploration & navigation** — realistic-distance travel through a universe-scale world, seamless space-to-surface movement, long-term travel toward Absenat.
-2. **Player character** — first-person walking, EVA, planetary exploration, physical interaction, health and survival state.
+2. **Player character** — strict top-down 2D walking, future EVA, planetary exploration, physical interaction, health and survival state.
 3. **Spaceship flight** — owner-controlled navigation, propulsion upgrades, physically located ship systems, large speed progression.
 4. **Ship construction** — modular rooms/hull expansion while landed/docked plus interior module placement during flight.
 5. **Ship simulation** — power/Core, propulsion, oxygen, pressure, thermal state, hull, sensors, weapons, damage, maintenance and environmental protection.
 6. **Survival** — oxygen, food, water, temperature, sleep, health, radiation, pressure and stamina; permadeath resets the player's run.
-7. **Physical inventory & cargo** — items/resources are physical world objects rather than abstract slots wherever possible.
-8. **Mining & gathering** — asteroid fragmentation, planetary resource destruction/extraction, physical collection and transport.
+7. **Resource inventory & cargo** — raw resources occupy integer weight/volume-limited stacks, starting at 10 kg / 10 L; non-resource objects and ship cargo are separate.
+8. **Mining & gathering** — direct credit of whole raw-resource units to limited inventory, with persistent source depletion rather than carryable fragments.
 9. **Processing & crafting** — refining raw resources, repair kits, survival supplies, construction materials, ammunition, equipment and modules.
 10. **Research & progression** — technologies that improve propulsion, modules, weapons, tools and environmental survivability, allowing farther travel.
 11. **World simulation** — real astronomical data where practical, realistic orbital motion, fictional fill content, sectors/snapshots and deterministic catch-up.
@@ -34,7 +30,7 @@ authority remain deferred. See [current scope](project-phases.md).
 16. **Combat** — ship combat and on-foot PvE/PvP with backend-authoritative outcomes.
 17. **Networking & authority** — local state broadcasting, server validation, protected canonical world state and anti-cheat-sensitive actions.
 18. **Performance & streaming** — native `wgpu` presentation and bounded local resource streaming today; larger spatial hierarchies, LOD/asset streaming, scheduling and platform storage remain future work. Web/WASM reuse and browser caching can be evaluated for a future web client.
-19. **Audio, UI & feedback** — first-person HUD, compass/home-ship marker, ship instrumentation, environmental feedback and physical interaction affordances.
+19. **Audio, UI & feedback** — top-down HUD, compass/home-ship marker, ship instrumentation, environmental feedback and physical interaction affordances.
 ## Design principle
 Game systems should be independently understandable and versioned domains. Their public contracts, invariants, persistence rules and authority boundaries must be explicit so autonomous AI agents can safely change one area without reasoning over the entire codebase.
 ## Technical architecture

@@ -1,5 +1,7 @@
 # Planetary environmental art direction and exploration contract
 
+> **2D migration (2026-11-04):** Keep approved deterministic geology, climate, weather, alien biology and landmark identities, but illustrate environments in [strict top-down 2D](top-down-art-direction.md). Harvested raw resource units enter [the player's inventory directly](resource-inventory-and-gathering.md). Historical physical fragment workflows are superseded.
+
 Status: **owner-approved future art/gameplay direction (2026-10-24); design-only, not a claim of implemented weather, ecology, landmarks or planetary charts**. This consolidates the fifteen-round planetary environment discussion. It is the environmental presentation/interaction source of truth alongside, not a replacement for, [canonical planet generation](canonical-planet-generation.md), [universe expansion](universe-expansion-approved-design.md), [planetary/world physics](world-and-realism.md), [visual style](visual-style.md), [experience direction](experience-direction.md), [Scout design](scout-interior-art-direction.md), [navigation and Archive](archive-recovery-and-navigation.md), and [resource contracts](../client/world/resource-contracts.md). When an approved physical or save contract is more specific, that contract controls; new capabilities require their own implementation and verification.
 
 ## Intent and scope

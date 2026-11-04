@@ -1,5 +1,7 @@
 # Biological harvesting and source deltas (#621)
 
+> **Legacy 3D implementation (2026-11-04):** Historical native detached-anatomy fragments, physical carrying and spherical extraction below are superseded for raw resources by [direct 2D inventory gathering](resource-inventory-and-gathering.md). A new authoritative world adapter is still needed; conservation and depletion requirements remain.
+
 World `environment::harvest` publishes explicit yield designations against the
 exact immutable physical Population. Each designation names one stable organism /
 part key, method (Detach or Embedded) and existing raw-material key. Life, palette,

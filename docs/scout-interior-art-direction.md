@@ -1,5 +1,7 @@
 # Scout interior art direction and habitation presentation
 
+> **2D migration (2026-11-04):** Preserve established Scout atmosphere, habitation features, furnishings and clean repairs; present them with the new [strict top-down illustrated view](top-down-art-direction.md). Old first-person camera/3D mesh requirements are historical. Raw materials follow [direct limited inventory gathering](resource-inventory-and-gathering.md).
+
 **Status: owner-approved future art/experience target, 2026-10-23.** This is a design and future implementation contract, **not** a claim that these furnishings, customization, lighting, acoustics, aging or damage rendering currently ship. No source geometry, physics, power, survival or verified performance contract changes merely because this document exists.
 
 Companion contracts: [approved starter Scout and modular construction](scout-and-modular-construction.md), [grounded cinematic experience direction](experience-direction.md), [low-poly visual style](visual-style.md), and [present Scout renderer/audio foundation](scout-presentation.md). Where a feature overlaps these, retain their existing authoritative mechanics, geometry and verification rules. This document refines the *art direction, tactile habitation and interior presentation*. Explicit decisions in this document supersede prior brainstorming alternatives (notably clean repairs vs visible repair patches).

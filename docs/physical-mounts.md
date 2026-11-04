@@ -1,5 +1,7 @@
 # Physical placement and mechanical mounts (#576)
 
+> **2D migration (2026-11-04):** Raw resources no longer exist as physical carryable/mounted fragments: they enter [the limited resource inventory](resource-inventory-and-gathering.md). Mechanical fixtures and personal non-resource objects need separate top-down interaction design. The remainder is legacy native evidence.
+
 New journeys have a portable sample shelf, a heavier fixed cargo restraint and
 three compatible fine habitation rail positions. These reuse the authored #575
 Shelf template; they are physical geometry rather than inventory slots. Shelves

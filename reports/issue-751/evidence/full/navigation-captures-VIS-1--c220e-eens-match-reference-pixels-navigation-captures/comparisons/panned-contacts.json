@@ -1,0 +1,268 @@
+{
+  "source": "b0318abf9c9e1e71a349ff1948e074efb04092c7",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "browser": "156.0.8078.4",
+    "playwright": "1.64.1",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "dpr": 1,
+    "locale": "en-US",
+    "timezone": "UTC",
+    "colorScheme": "dark",
+    "fontHashes": {
+      "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872"
+    },
+    "seed": 750,
+    "epoch": "2026-11-04T00:00:00.000Z",
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    }
+  },
+  "fixture": {
+    "id": "panned-contacts",
+    "pan": true
+  },
+  "state": {
+    "navigation": {
+      "seed": 750,
+      "scenario": "seeded",
+      "ship": {
+        "position": {
+          "cell": [
+            "0",
+            "0",
+            "0"
+          ],
+          "offsetM": [
+            0,
+            0,
+            0
+          ]
+        },
+        "velocityMps": [
+          0,
+          0,
+          0
+        ],
+        "yaw": -1.5707963267948966,
+        "pitch": 0,
+        "massKg": 100000,
+        "throttle": 0,
+        "alignment": null,
+        "mode": "flying",
+        "contact": null,
+        "tick": 326
+      },
+      "pulse": 1,
+      "selected": null,
+      "catalog": [
+        {
+          "id": "star",
+          "position": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -103107832414.65852,
+              -4643406693.5036125,
+              -77946039080
+            ]
+          }
+        },
+        {
+          "id": "planet",
+          "position": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -36266037367.24637,
+              -1675448185.813157,
+              -77946039080
+            ]
+          }
+        },
+        {
+          "id": "moon",
+          "position": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              31283591180.632355,
+              -2279434731.3340464,
+              -77946039080
+            ]
+          }
+        },
+        {
+          "id": "asteroid",
+          "position": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              104885391021.42929,
+              6109936919.016003,
+              -77946039080
+            ]
+          }
+        }
+      ]
+    },
+    "scene": {
+      "objects": [
+        {
+          "name": "nav-galactic-lattice",
+          "type": "Points",
+          "triangles": 0,
+          "pixel": [
+            401.8,
+            400
+          ],
+          "pixels": 246,
+          "colors": 48
+        },
+        {
+          "name": "nav-ship-heading",
+          "type": "Group",
+          "triangles": 0,
+          "pixel": [
+            401.8,
+            400
+          ],
+          "pixels": 246,
+          "colors": 48
+        },
+        {
+          "name": "nav-ship-hull",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            401.8,
+            400
+          ],
+          "pixels": 246,
+          "colors": 48
+        },
+        {
+          "name": "nav-ship-wings",
+          "type": "Mesh",
+          "triangles": 4,
+          "pixel": [
+            401.8,
+            400
+          ],
+          "pixels": 246,
+          "colors": 48
+        },
+        {
+          "name": "nav-ship-canopy",
+          "type": "Mesh",
+          "triangles": 8,
+          "pixel": [
+            404.86,
+            394.96
+          ],
+          "pixels": 246,
+          "colors": 48
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            385.96,
+            399.1
+          ],
+          "pixels": 230,
+          "colors": 48
+        },
+        {
+          "name": "nav-ship-engine",
+          "type": "Mesh",
+          "triangles": 12,
+          "pixel": [
+            385.96,
+            399.1
+          ],
+          "pixels": 230,
+          "colors": 48
+        },
+        {
+          "name": "nav-body:asteroid:asteroid",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            576.7300027778372,
+            389.8097220994532
+          ],
+          "pixels": 95,
+          "colors": 17
+        },
+        {
+          "name": "nav-body:moon:moon",
+          "type": "Mesh",
+          "triangles": 20,
+          "pixel": [
+            453.9754139335826,
+            403.8016879186034
+          ],
+          "pixels": 187,
+          "colors": 27
+        },
+        {
+          "name": "nav-body:planet:planet",
+          "type": "Mesh",
+          "triangles": 80,
+          "pixel": [
+            341.31476029586054,
+            402.79434679076076
+          ],
+          "pixels": 492,
+          "colors": 69
+        },
+        {
+          "name": "nav-body:star:star",
+          "type": "Mesh",
+          "triangles": 36,
+          "pixel": [
+            229.8346458638087,
+            407.7443687617778
+          ],
+          "pixels": 881,
+          "colors": 29
+        }
+      ],
+      "surfaces": 0,
+      "arrows": 0,
+      "calls": 10,
+      "triangles": 204,
+      "geometries": 9,
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "zoom": 0.5
+    },
+    "origin": [
+      41.422680412371136,
+      50
+    ]
+  },
+  "errors": []
+}

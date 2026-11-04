@@ -1,0 +1,13 @@
+{
+  "status": "INVALID_DEMONSTRATION",
+  "source": "ef4f49e7db9447f851e1c90cc08e1b046c3de480",
+  "file": "src/styles.css",
+  "original_sha256": "c5a4feaf0ab6bfdd05c156acc8d327f37a0635eaedf969d32a06b45c502c3cdf",
+  "mutated_sha256": "67a6a651025fe4eaec58ca0638e5c59c6210b6d383b71400a8ce2c3943bef343",
+  "mutation": {
+    "before": "[data-vector=velocity]{stroke:#b6f5a2;",
+    "after": "[data-vector=velocity]{stroke:#ff0000;"
+  },
+  "exit": 1,
+  "comparison": null
+}

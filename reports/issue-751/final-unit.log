@@ -1,0 +1,38 @@
+✔ VIS-1 comparison passes identical images and detects a changed frame with a retained diff (20.607271ms)
+✔ VIS-3 approval is exact, digest-bound and requires a human collaborator (0.146259ms)
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (0.784502ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (0.169654ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.119209ms)
+✔ rotation changes impact-relative velocity and destruction decision (0.524204ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (0.725955ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (0.276233ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (0.552135ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (0.685614ms)
+✔ independent key and pointer owners release without clearing another held input (0.258456ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (0.300919ms)
+✔ navigation assets have finite bounded flat facets and a directional ship silhouette (0.801839ms)
+✔ closed ship hull triangles face outward so back-face culling preserves the upper hull (0.135983ms)
+✔ out-of-view contacts have no presentation group, including depth and malformed projections (0.369562ms)
+✔ visible dense groups retain every ID, deterministic selected representative and bounded presentation (10.902255ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (0.289503ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (0.191767ms)
+✔ large catalog query matches independent brute force without global precision loss (22.644325ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (10.104374ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (0.148492ms)
+✔ presentation count is bounded by viewport cells, not catalog length (15.248211ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (0.202112ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (0.590433ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (0.405186ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (0.912594ms)
+✔ infinite rays reach all edges/corners independently of vector magnitude (0.458425ms)
+✔ off-screen origins clip only forward visible portions; malformed, tangent and degenerate rays vanish (0.137796ms)
+✔ arbitrary rays preserve collinearity, direction and viewport clipping (0.935418ms)
+✔ orthographic projection handles independent vectors, pan, zoom, stationary and view-axis directions (0.695699ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 169.303482

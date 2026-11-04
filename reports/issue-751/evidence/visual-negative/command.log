@@ -1,0 +1,61 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (9.0s)
+
+
+  1) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels
+
+    Error: VISUAL_PIXEL_MISMATCH heading-velocity: 520 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      70 |  await info.attach('comparison-summary.json',{body:json({source,candidate:!!candidate,results}),contentType:'application/json'})
+      71 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 72 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      73 | })
+      74 |
+        at /tmp/salimon-visual-negative-JjDuKs/tests/navigation-captures.spec.ts:72:126
+
+    Error: VISUAL_PIXEL_MISMATCH opposite-vectors: 630 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      70 |  await info.attach('comparison-summary.json',{body:json({source,candidate:!!candidate,results}),contentType:'application/json'})
+      71 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 72 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      73 | })
+      74 |
+        at /tmp/salimon-visual-negative-JjDuKs/tests/navigation-captures.spec.ts:72:126
+
+    attachment #18: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/error-context.md
+
+    attachment #20: trace (application/zip) ────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../workspace/salimon/client/test-results/visual-negative/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels
+
+[WebServer] (node:2972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3003) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:3015) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

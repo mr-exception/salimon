@@ -1,0 +1,5 @@
+
+> salimon-navigation-client@0.1.0 test:visual:approval
+> node --experimental-strip-types scripts/baseline-approval.ts
+
+Baseline approval PASS (inherited from base): 946d93ddef08b91e81eb29cf790389251058f4326148a85245f36e89069bdd60

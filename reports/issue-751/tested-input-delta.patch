@@ -1,0 +1,74 @@
+diff --git a/.github/workflows/navigation-client.yml b/.github/workflows/navigation-client.yml
+index e5ae996..1aa19de 100644
+--- a/.github/workflows/navigation-client.yml
++++ b/.github/workflows/navigation-client.yml
+@@ -27,7 +27,7 @@ jobs:
+     steps:
+       - uses: actions/checkout@v4
+         with:
+-          fetch-depth: 0
++          fetch-depth: 2
+       - uses: actions/setup-node@v4
+         with:
+           node-version: '22'
+diff --git a/client/scripts/negative-visual.mjs b/client/scripts/negative-visual.mjs
+index 484c035..bc5c768 100644
+--- a/client/scripts/negative-visual.mjs
++++ b/client/scripts/negative-visual.mjs
+@@ -15,7 +15,7 @@ try {
+  const source=git??spawnSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).stdout.trim()
+  await writeFile(join(scratch,'.revision-for-negative'),source)
+  const target=join(scratch,'src/styles.css'),original=await readFile(target,'utf8')
+- const before='[data-vector=heading]{stroke:#ffe36a;',after='[data-vector=heading]{stroke:#ff0000;'
++ const before='[data-vector=velocity]{stroke:#b6f5a2;',after='[data-vector=velocity]{stroke:#ff0000;'
+  if(original.split(before).length!==2)throw Error('Visual mutation must match exactly once')
+  const changed=original.replace(before,after);await writeFile(target,changed)
+  const child=spawnSync(process.execPath,[join(root,'node_modules/@playwright/test/cli.js'),'test','--project=navigation-captures'],{cwd:scratch,env:{...process.env,CI:'true',SALIMON_CAPTURE_CANDIDATES:'',SALIMON_EVIDENCE_DIR:output},encoding:'utf8',timeout:240000,maxBuffer:2e6})
+@@ -30,5 +30,5 @@ try {
+  const detected=child.status===1&&!child.error&&report.stats.unexpected===1&&results.length===1&&results[0].status==='failed'&&summary?.results.length===8&&summary.results.filter(r=>!r.pass).length===2&&summary.results.filter(r=>!r.pass).every(r=>['heading-velocity','opposite-vectors'].includes(r.id)&&r.changedPixels>100)&&errors.includes('VISUAL_PIXEL_MISMATCH heading-velocity')&&errors.includes('VISUAL_PIXEL_MISMATCH opposite-vectors')
+  await writeFile(join(output,'mutation-summary.json'),JSON.stringify({status:detected?'PASS':'INVALID_DEMONSTRATION',source,file:'src/styles.css',original_sha256:hash(original),mutated_sha256:hash(changed),mutation:{before,after},exit:child.status,comparison:summary},null,2)+'\n')
+  if(!detected)throw Error(`Visual defect did not fail only the intended comparisons: ${output}`)
+- console.log('VIS-1 PASS: red heading fails two real browser screenshots; six unchanged screens pass; originals/diffs/trace retained')
++ console.log('VIS-1 PASS: red velocity fails two real browser screenshots; six unchanged screens pass; originals/diffs/trace retained')
+ } finally {await rm(scratch,{recursive:true,force:true})}
+diff --git a/client/tests/navigation-baselines/README.md b/client/tests/navigation-baselines/README.md
+index 3da0442..bf4f721 100644
+--- a/client/tests/navigation-baselines/README.md
++++ b/client/tests/navigation-baselines/README.md
+@@ -49,8 +49,8 @@ scenes. CI uploads SHA-named originals/diffs/metadata/traces for 14 days; essent
+ issue evidence is retained beside the delivery report. A page error, environment
+ change, absent contacts, wrong selection or corrupted/missing reference fails.
+
+-The negative driver changes the actual heading CSS to red in a disposable copy.
+-Only the two heading-visible frames must fail, with >100 changed pixels each;
++The negative driver changes the actual velocity CSS to red in a disposable copy.
++Only the two velocity-visible frames must fail, with >100 changed pixels each;
+ the other six must pass. Timeout, startup error or unrelated visual failures do
+ not count as detecting the defect. It never edits checkout references.
+
+diff --git a/client/tests/navigation-captures.spec.ts b/client/tests/navigation-captures.spec.ts
+index 066b5fc..081c4a8 100644
+--- a/client/tests/navigation-captures.spec.ts
++++ b/client/tests/navigation-captures.spec.ts
+@@ -6,7 +6,7 @@ import {boot,snapshot,json,EPOCH} from './deterministic'
+ import {POLICY,sha256,compareImages} from '../scripts/visual-comparison.ts'
+
+ const directory='tests/navigation-baselines'
+-const candidate=process.env.SALIMON_CAPTURE_CANDIDATES
++const candidate=process.env.SALIMON_CAPTURE_CANDIDATES||undefined
+ if(candidate&&process.env.CI)throw Error('Candidate generation is forbidden in CI')
+ const cases=[
+  {id:'empty-scanner',scenario:'seeded-empty',vector:'zero'},
+diff --git a/client/tsconfig.json b/client/tsconfig.json
+index 2b028fd..a3951a1 100644
+--- a/client/tsconfig.json
++++ b/client/tsconfig.json
+@@ -23,6 +23,7 @@
+   "include": [
+     "src",
+     "tests",
+-    "playwright.config.ts"
++    "playwright.config.ts",
++    "scripts"
+   ]
+ }

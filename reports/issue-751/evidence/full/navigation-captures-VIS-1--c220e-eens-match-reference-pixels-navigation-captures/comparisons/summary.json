@@ -1,0 +1,78 @@
+{
+  "source": "b0318abf9c9e1e71a349ff1948e074efb04092c7",
+  "candidate": false,
+  "results": [
+    {
+      "id": "empty-scanner",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60",
+      "actual": "c00472e3d83f649d68ef6a76ad5bec608679d50c0fb8350b703972d922471a60"
+    },
+    {
+      "id": "visible-contacts",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25",
+      "actual": "1fa64ad25a2f327c56e57b816ae8a6f39a2f5986eb97241162cf3bd47f1cdb25"
+    },
+    {
+      "id": "panned-contacts",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0",
+      "actual": "0891c0966d468bf1fa649210da88956c90d01fa386e5a1dc3790c57e2c94daa0"
+    },
+    {
+      "id": "selected-body",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80",
+      "actual": "d59b06ce3bf48ee60aa2c43d6d4ec1132455315c8386c2770c88523642e27a80"
+    },
+    {
+      "id": "zoom-out",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af",
+      "actual": "7718ecebff69a5434113917076b6d058fc206565872046e81425c730904509af"
+    },
+    {
+      "id": "zoom-in",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44",
+      "actual": "2a9dd77520022d1f4b5c176585cd118a0a8119af7a45f07578b9a92ed2c32e44"
+    },
+    {
+      "id": "heading-velocity",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911",
+      "actual": "9b4ccbc791df93f3e5a83544bbb6634dd284da8ca5722dcc7dc51bda9eca2911"
+    },
+    {
+      "id": "opposite-vectors",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf",
+      "actual": "62c5672bd2f08f642168f7d652d334950ee5de383584a70f196ea899656f2bdf"
+    }
+  ]
+}

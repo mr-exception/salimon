@@ -1,4 +1,4 @@
-# Salimon navigation-only browser prototype
+# Salimon browser prototypes
 
 **2D resource foundation, not radar UI:** The client contains a pure whole-unit 10 kg / 10 L resource inventory and gathering domain (src/resourceInventory.ts), with node tests (src/resourceInventory.test.ts). It is not yet wired to the navigation-only interface. See [resource design](../docs/resource-inventory-and-gathering.md).
 
@@ -14,6 +14,33 @@ npm run dev
 ```
 
 Open the URL Vite prints. `npm run build` produces `dist/`.
+
+## Top-down foundation (#761)
+
+During `npm run dev`, open `/?scene=top-down` for a strict overhead illustrated
+Scout and planetary site in one continuous scene. **W/A/S/D** walks a bounded
+interior corridor; the camera follows the player. Focus loss, editable controls,
+resize and hidden-page events release movement. The normal `/` entry and built
+production bundle remain the 3D radar. This development URL is not a cockpit
+interaction or a global gameplay mode switch.
+
+`topDownFrames.ts` owns planet-fixed/ship-local anchors using the existing split
+`Position`; `topDownRuntime.ts` owns stable IDs, immutable scene state, 60 Hz steps,
+bounded walking, follow-camera state and deterministic draw order. `TopDownView.tsx`
+consumes the draw list as SVG: terrain, hull, cutaway interior, people, props and
+foreground cues. Terrain fill precedes terrain objects; equal-layer objects use
+stable ID ordering. There is no roof cover or roof fade. Astronomical planet
+origins never enter camera-relative drawing; planet motion changes its universe
+pose, and ship motion changes its planet-relative pose without rewriting anchors.
+Local frame point conversion is explicit; automatic frame transfer is deferred.
+
+The fixture uses authored illustrated placeholders, not scientific terrain or
+full gameplay. Collision, cross-frame traversal, cockpit seating/navigation,
+multiplayer, persistence, resource systems and detailed Scout layout remain later
+work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
+Playwright project exercises the production SVG adapter, pixel visibility, held
+input cleanup, production radar isolation and byte-identical fresh-run captures.
+Captures are new baseline candidates, not promoted navigation references.
 
 ## Controls (desktop mouse and keyboard)
 

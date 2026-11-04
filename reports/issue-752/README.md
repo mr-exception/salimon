@@ -69,8 +69,9 @@ implementation ancestors, with only merged `8e2adab` as prerequisite. Verify wit
 checkout using `git fetch .../fixtures.bundle refs/heads/qa-fixture-752`.
 The full client tree of the repaired fixture equals delivery source `0a791e2`.
 Later QA-only fixes do not change that tree; [all client hashes](client-inputs.sha256.json)
-bind the reused browser/build/unit evidence. The revised runtime tests and demo run against the final session-only source
-recorded in the PR review; current-head CI is required after publication. Client
+bind the reused browser/build/unit evidence. The revised 29 runtime tests and demo
+run against session-only source `b18600a31a2e934d582c3e00c3ba3c6a5ce47ad5`;
+current-head CI is required after publication. Client
 inputs and the original real image reviews are unchanged and reused by hash.
 
 Retained primary originals, expected frames, diffs, metadata, full E2E result

@@ -34,6 +34,179 @@
     }
   ],
   "reports": {
+    "awaiting_wrong_review": {
+      "schema_version": 1,
+      "pr": 999,
+      "binding": {
+        "head": "08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6",
+        "base": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "base_ref": "main",
+        "merge": "08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6"
+      },
+      "cycle": 1,
+      "review_consumed": false,
+      "verdict": "BLOCKED",
+      "reasons": [
+        "REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record",
+        "CI_INCOMPLETE: baseline-approval"
+      ],
+      "criteria": [
+        {
+          "id": "AC-1",
+          "status": "UNVERIFIED",
+          "finding": "Review not completed"
+        }
+      ],
+      "jobs": {
+        "build": "failure",
+        "baseline-approval": "skipped"
+      },
+      "reviewer": null,
+      "evidence": {
+        "artifact_id": 10,
+        "tested_sha": "08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6",
+        "url": "https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10",
+        "sha256": {
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png": "a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json": "f3f8519d84cdef38f6e3909b70754d4fbae3bd3a8dbc5108d585c147668761b8",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png": "64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json": "c09905b2fd924c3548b4d758d51597285265dccc7e9c6a2aed4e14cdac66c30b",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png": "26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json": "9f7b789bea5a483295cc01611d6eef3f1dbe424d1ac537db0ccfe225f6acff68",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png": "43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json": "0962e85e5877add97c2a6742f64c36649cb6553407842877316b897ffce9fcc2",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png": "471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json": "8f257fabd6ee5a0997258d6f95e1b1bf0a9ffa600ab7b89097e6cecc13c97d1a",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png": "dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json": "7319065293cd35c1e373835de10ff37bdab978040cd42c8bcdfd112df61f5dbd",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png": "bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png": "c836ede408a3105cf91e73869d07862f2a63120371b415a21a589a3a2c21de7e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json": "d8e9357f7008b2ea3df0631b9ec5d56bf69aa7bb5e76c06de44a80f6d2edfbc9",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png": "26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png": "f97c42b8c24b661f6a1cc360ebae66308390b585536aefa518fafbb8d7c42759",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json": "3a2eb51693b33547a011bc86d7041c873085c74c241794a634a5961a42e8ae5f",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip": "70d388884beeae738f014f0c25caf803fad63c20471e2779fe515052082b6fd7",
+          "results.json": "ae8fd1951032386a734bb5dd7e5dded50703347d9d3cffa8b108e4e32592e69c"
+        },
+        "summary": {
+          "source": "08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6",
+          "launchArgs": [
+            "--use-angle=swiftshader",
+            "--enable-unsafe-swiftshader",
+            "--disable-lcd-text"
+          ],
+          "candidate": false,
+          "results": [
+            {
+              "id": "empty-scanner",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+              "actual": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439"
+            },
+            {
+              "id": "visible-contacts",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+              "actual": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d"
+            },
+            {
+              "id": "panned-contacts",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+              "actual": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9"
+            },
+            {
+              "id": "selected-body",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+              "actual": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795"
+            },
+            {
+              "id": "zoom-out",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+              "actual": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e"
+            },
+            {
+              "id": "zoom-in",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+              "actual": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3"
+            },
+            {
+              "id": "heading-velocity",
+              "pass": false,
+              "changedPixels": 520,
+              "rawChangedPixels": 520,
+              "totalPixels": 1024000,
+              "expected": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+              "actual": "bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b"
+            },
+            {
+              "id": "opposite-vectors",
+              "pass": false,
+              "changedPixels": 630,
+              "rawChangedPixels": 630,
+              "totalPixels": 1024000,
+              "expected": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+              "actual": "26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd"
+            }
+          ]
+        },
+        "manifest_sha256": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513"
+      },
+      "merge_authority": "human only",
+      "runtime_sha256": "a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a",
+      "issue": {
+        "number": 998,
+        "body_sha256": "d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b"
+      },
+      "issue_context_sha256": "be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b",
+      "run": {
+        "id": 1,
+        "attempt": 1,
+        "url": "https://github.com/mr-exception/salimon/actions/runs/1"
+      },
+      "baseline_approval": {
+        "digest": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513",
+        "approval": "inherited from exact base"
+      },
+      "fingerprint": "ff7d61d3a68089204afa73bad1f0b7b191906a0674ae190d216c3eca2882d70d",
+      "evidence_ok": true,
+      "error": "REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record"
+    },
     "wrong": {
       "schema_version": 1,
       "pr": 999,
@@ -44,7 +217,7 @@
         "merge": "08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6"
       },
       "cycle": 1,
-      "provider_attempted": true,
+      "review_consumed": true,
       "verdict": "REQUEST_CHANGES",
       "reasons": [
         "CI_VETO: fix build; AI cannot override tests"
@@ -72,10 +245,12 @@
         "baseline-approval": "skipped"
       },
       "reviewer": {
-        "provider": "actual distinct session subagent via explicit fixture replay bridge",
         "reviewer": "/root/review_752",
-        "transport": "fixture only; not OpenAI API",
-        "attempts": 1
+        "capability": "distinct Codex subagent",
+        "execution": "Codex session; CI only verifies the submitted record",
+        "independence": "authorized submitter attestation, not cryptographic agent authentication",
+        "comment_url": "fixture-session-handoff-wrong",
+        "record_sha256": "1fb551121153c6d9bdf5a6bd032cd0fd21de314923204c8a5d03231264dfb6f6"
       },
       "evidence": {
         "artifact_id": 10,
@@ -203,11 +378,12 @@
         "manifest_sha256": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513"
       },
       "merge_authority": "human only",
-      "runtime_sha256": "374293ba6c54ff75f84dfcebb79c57c5c621ce5eed423115f533d4ff9817cd7c",
+      "runtime_sha256": "a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a",
       "issue": {
         "number": 998,
         "body_sha256": "d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b"
       },
+      "issue_context_sha256": "be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b",
       "run": {
         "id": 1,
         "attempt": 1,
@@ -217,7 +393,7 @@
         "digest": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513",
         "approval": "inherited from exact base"
       },
-      "fingerprint": "6e1ff30d7a05e66aa2347537b7fe3b0762f95bfc4b653a3534f0ce62c1fc14f8",
+      "fingerprint": "e66dba34b145a527eda120f05f521a43562ba88fd5ebc4e8fe2bf0411cb3d7ee",
       "evidence_ok": true,
       "review": {
         "verdict": "REQUEST_CHANGES",
@@ -252,7 +428,7 @@
         "merge": "edd62718eb6dbfb55ddde51570a8afc892c02bf3"
       },
       "cycle": 2,
-      "provider_attempted": false,
+      "review_consumed": false,
       "verdict": "BLOCKED",
       "reasons": [
         "MISSING_CAPTURE: require originals, approved references, diffs, state and trace",
@@ -270,18 +446,191 @@
       "reviewer": null,
       "evidence": {},
       "merge_authority": "human only",
-      "runtime_sha256": "374293ba6c54ff75f84dfcebb79c57c5c621ce5eed423115f533d4ff9817cd7c",
+      "runtime_sha256": "a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a",
       "issue": {
         "number": 998,
         "body_sha256": "d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b"
       },
+      "issue_context_sha256": "be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b",
       "run": {
         "id": 1,
         "attempt": 1,
         "url": "https://github.com/mr-exception/salimon/actions/runs/1"
       },
       "error": "STALE_CI: need completed Navigation client PR run at current head",
-      "fingerprint": "e5784310d50a9764cd636c2eaa631ad4f9b06a262887fd548b972fe0301d4e66"
+      "fingerprint": "5f7267faf6f12fb7db6265f6dfea55b9f4e6ecbb62828041a015efa8797f7a37"
+    },
+    "awaiting_fixed_review": {
+      "schema_version": 1,
+      "pr": 999,
+      "binding": {
+        "head": "edd62718eb6dbfb55ddde51570a8afc892c02bf3",
+        "base": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "base_ref": "main",
+        "merge": "edd62718eb6dbfb55ddde51570a8afc892c02bf3"
+      },
+      "cycle": 2,
+      "review_consumed": false,
+      "verdict": "BLOCKED",
+      "reasons": [
+        "REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record"
+      ],
+      "criteria": [
+        {
+          "id": "AC-1",
+          "status": "UNVERIFIED",
+          "finding": "Review not completed"
+        }
+      ],
+      "jobs": {
+        "build": "success",
+        "baseline-approval": "success"
+      },
+      "reviewer": null,
+      "evidence": {
+        "artifact_id": 10,
+        "tested_sha": "edd62718eb6dbfb55ddde51570a8afc892c02bf3",
+        "url": "https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10",
+        "sha256": {
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png": "a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json": "f970c07a7773fafd42e05f74ee853c01e66c3c6f277402ee5a98318f59268fc7",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png": "64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json": "981fa6e8da5906c493a9445bdcdd0f9ecccf9c1adf02bd51c0c08a213c6b0da9",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png": "26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json": "1af0865f8ff7b988749b375a4fb541d69b6f2003fd379bf8df6e492e0032682c",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png": "43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json": "5ffc5fc6ad24d6129bb3aef89b6110d486cf51886e4dec3930cc2203355fc99e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png": "471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json": "b1cbf4f0beb7bb6f21f4a0a8edc8f8a30c728b70cbefaa06360824b689354d9b",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png": "dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json": "0719aac5abb3137f2f5881ca60e956102a952d3d4679e47b8600cce6686a63af",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png": "bf0faa0f2ed98e2c3127bcea4de7c273ff44908df8f1e543af7b2f3a1d9f1016",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json": "c82c6d7d8833a4d8905722344912d52443540eabc617b4e461a83a6230492245",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png": "72337b844cb63611b289c49ac18cc99e2fe4a20a8c3c0a47cffb72f5f27dfc8e",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json": "a6e6458a1526b152727c9c55edccd0b3a4199c8f0246e7d3a87c345302b82d51",
+          "navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip": "1a09b0ff9924b6779a06a753fa110fb44d5e36fc033646ffb7a78b46343ddc5f",
+          "results.json": "aab51f428eacbb6f340cdb0dc6779dc256918fab7c8288295b110214571365d5"
+        },
+        "summary": {
+          "source": "edd62718eb6dbfb55ddde51570a8afc892c02bf3",
+          "launchArgs": [
+            "--use-angle=swiftshader",
+            "--enable-unsafe-swiftshader",
+            "--disable-lcd-text"
+          ],
+          "candidate": false,
+          "results": [
+            {
+              "id": "empty-scanner",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+              "actual": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439"
+            },
+            {
+              "id": "visible-contacts",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+              "actual": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d"
+            },
+            {
+              "id": "panned-contacts",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+              "actual": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9"
+            },
+            {
+              "id": "selected-body",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+              "actual": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795"
+            },
+            {
+              "id": "zoom-out",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+              "actual": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e"
+            },
+            {
+              "id": "zoom-in",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+              "actual": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3"
+            },
+            {
+              "id": "heading-velocity",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+              "actual": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252"
+            },
+            {
+              "id": "opposite-vectors",
+              "pass": true,
+              "changedPixels": 0,
+              "rawChangedPixels": 0,
+              "totalPixels": 1024000,
+              "expected": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+              "actual": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+            }
+          ]
+        },
+        "manifest_sha256": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513"
+      },
+      "merge_authority": "human only",
+      "runtime_sha256": "a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a",
+      "issue": {
+        "number": 998,
+        "body_sha256": "d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b"
+      },
+      "issue_context_sha256": "be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b",
+      "run": {
+        "id": 1,
+        "attempt": 2,
+        "url": "https://github.com/mr-exception/salimon/actions/runs/1"
+      },
+      "baseline_approval": {
+        "digest": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513",
+        "approval": "inherited from exact base"
+      },
+      "fingerprint": "0ad48bd8e79c4f0ea8a73aebb20d525fa22947ad36a60dad705a7f076762a34d",
+      "evidence_ok": true,
+      "error": "REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record"
     },
     "fixed": {
       "schema_version": 1,
@@ -293,7 +642,7 @@
         "merge": "edd62718eb6dbfb55ddde51570a8afc892c02bf3"
       },
       "cycle": 2,
-      "provider_attempted": true,
+      "review_consumed": true,
       "verdict": "ACCEPT",
       "reasons": [],
       "criteria": [
@@ -319,10 +668,12 @@
         "baseline-approval": "success"
       },
       "reviewer": {
-        "provider": "actual distinct session subagent via explicit fixture replay bridge",
         "reviewer": "/root/review_752",
-        "transport": "fixture only; not OpenAI API",
-        "attempts": 1
+        "capability": "distinct Codex subagent",
+        "execution": "Codex session; CI only verifies the submitted record",
+        "independence": "authorized submitter attestation, not cryptographic agent authentication",
+        "comment_url": "fixture-session-handoff-fixed",
+        "record_sha256": "1602c8e30f9afa1fee67f3abebfa280c4bbed29fa1c33e01db2942380d4be864"
       },
       "evidence": {
         "artifact_id": 10,
@@ -450,11 +801,12 @@
         "manifest_sha256": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513"
       },
       "merge_authority": "human only",
-      "runtime_sha256": "374293ba6c54ff75f84dfcebb79c57c5c621ce5eed423115f533d4ff9817cd7c",
+      "runtime_sha256": "a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a",
       "issue": {
         "number": 998,
         "body_sha256": "d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b"
       },
+      "issue_context_sha256": "be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b",
       "run": {
         "id": 1,
         "attempt": 2,
@@ -464,7 +816,7 @@
         "digest": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513",
         "approval": "inherited from exact base"
       },
-      "fingerprint": "e835dd87923cf23a2dba816b4ea003e4cd0870dcd0d74c4413fa0eb676ddd503",
+      "fingerprint": "bc27740f8013c27731255bac72e773c26d49b08d750252886a06a1f23eb1c5b4",
       "evidence_ok": true,
       "review": {
         "verdict": "ACCEPT",
@@ -492,21 +844,53 @@
   },
   "comments": [
     {
-      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 1: **REQUEST_CHANGES**\n\nHead `08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 FAIL: In heading-velocity, the dashed vertical velocity line above the ship is red rather than light green. In opposite-vectors, the dashed line from the ship toward the left viewport edge is also red. The six stationary/control captures are byte-identical; these two differ by 520 and 630 pixels respectively. Action: Restore the production velocity stroke to #b6f5a2, preserve the dashed geometry and yellow heading, then commit the repair and rerun tests and all eight captures at the new SHA before requesting acceptance.\n\nCI_VETO: fix build; AI cannot override tests\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\"},\"cycle\":1,\"provider_attempted\":true,\"verdict\":\"REQUEST_CHANGES\",\"reasons\":[\"CI_VETO: fix build; AI cannot override tests\"],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"FAIL\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:heading-velocity:diff\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"image:opposite-vectors:diff\",\"summary\",\"e2e-results\"],\"finding\":\"In heading-velocity, the dashed vertical velocity line above the ship is red rather than light green. In opposite-vectors, the dashed line from the ship toward the left viewport edge is also red. The six stationary/control captures are byte-identical; these two differ by 520 and 630 pixels respectively.\",\"action\":\"Restore the production velocity stroke to #b6f5a2, preserve the dashed geometry and yellow heading, then commit the repair and rerun tests and all eight captures at the new SHA before requesting acceptance.\"}],\"jobs\":{\"build\":\"failure\",\"baseline-approval\":\"skipped\"},\"reviewer\":{\"provider\":\"actual distinct session subagent via explicit fixture replay bridge\",\"reviewer\":\"/root/review_752\",\"transport\":\"fixture only; not OpenAI API\",\"attempts\":1},\"evidence\":{\"artifact_id\":10,\"tested_sha\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10\",\"sha256\":{\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png\":\"a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json\":\"f3f8519d84cdef38f6e3909b70754d4fbae3bd3a8dbc5108d585c147668761b8\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png\":\"64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json\":\"c09905b2fd924c3548b4d758d51597285265dccc7e9c6a2aed4e14cdac66c30b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png\":\"26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json\":\"9f7b789bea5a483295cc01611d6eef3f1dbe424d1ac537db0ccfe225f6acff68\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png\":\"43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json\":\"0962e85e5877add97c2a6742f64c36649cb6553407842877316b897ffce9fcc2\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png\":\"471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json\":\"8f257fabd6ee5a0997258d6f95e1b1bf0a9ffa600ab7b89097e6cecc13c97d1a\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png\":\"dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json\":\"7319065293cd35c1e373835de10ff37bdab978040cd42c8bcdfd112df61f5dbd\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png\":\"bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png\":\"c836ede408a3105cf91e73869d07862f2a63120371b415a21a589a3a2c21de7e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json\":\"d8e9357f7008b2ea3df0631b9ec5d56bf69aa7bb5e76c06de44a80f6d2edfbc9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png\":\"26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png\":\"f97c42b8c24b661f6a1cc360ebae66308390b585536aefa518fafbb8d7c42759\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json\":\"3a2eb51693b33547a011bc86d7041c873085c74c241794a634a5961a42e8ae5f\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip\":\"70d388884beeae738f014f0c25caf803fad63c20471e2779fe515052082b6fd7\",\"results.json\":\"ae8fd1951032386a734bb5dd7e5dded50703347d9d3cffa8b108e4e32592e69c\"},\"summary\":{\"source\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"launchArgs\":[\"--use-angle=swiftshader\",\"--enable-unsafe-swiftshader\",\"--disable-lcd-text\"],\"candidate\":false,\"results\":[{\"id\":\"empty-scanner\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"actual\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\"},{\"id\":\"visible-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"actual\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\"},{\"id\":\"panned-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"actual\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\"},{\"id\":\"selected-body\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"actual\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\"},{\"id\":\"zoom-out\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"actual\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\"},{\"id\":\"zoom-in\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"actual\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\"},{\"id\":\"heading-velocity\",\"pass\":false,\"changedPixels\":520,\"rawChangedPixels\":520,\"totalPixels\":1024000,\"expected\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"actual\":\"bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b\"},{\"id\":\"opposite-vectors\",\"pass\":false,\"changedPixels\":630,\"rawChangedPixels\":630,\"totalPixels\":1024000,\"expected\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"actual\":\"26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd\"}]},\"manifest_sha256\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\"},\"merge_authority\":\"human only\",\"runtime_sha256\":\"374293ba6c54ff75f84dfcebb79c57c5c621ce5eed423115f533d4ff9817cd7c\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"run\":{\"id\":1,\"attempt\":1,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"baseline_approval\":{\"digest\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\",\"approval\":\"inherited from exact base\"},\"fingerprint\":\"6e1ff30d7a05e66aa2347537b7fe3b0762f95bfc4b653a3534f0ce62c1fc14f8\",\"evidence_ok\":true,\"review\":{\"verdict\":\"REQUEST_CHANGES\",\"summary\":\"The actual velocity indicator is red in both moving-ship views; the approved reference requires a light-green dashed line. The deliberate browser comparison failed on those two views.\",\"criteria\":[{\"id\":\"AC-1\",\"status\":\"FAIL\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:heading-velocity:diff\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"image:opposite-vectors:diff\",\"summary\",\"e2e-results\"],\"finding\":\"In heading-velocity, the dashed vertical velocity line above the ship is red rather than light green. In opposite-vectors, the dashed line from the ship toward the left viewport edge is also red. The six stationary/control captures are byte-identical; these two differ by 520 and 630 pixels respectively.\",\"action\":\"Restore the production velocity stroke to #b6f5a2, preserve the dashed geometry and yellow heading, then commit the repair and rerun tests and all eight captures at the new SHA before requesting acceptance.\"}]}}\n```",
+      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 1: **BLOCKED**\n\nHead `08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 UNVERIFIED: Review not completed Action: Resolve blocker and rerun.\n\nREVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record\nCI_INCOMPLETE: baseline-approval\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\"},\"cycle\":1,\"review_consumed\":false,\"verdict\":\"BLOCKED\",\"reasons\":[\"REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record\",\"CI_INCOMPLETE: baseline-approval\"],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"UNVERIFIED\",\"finding\":\"Review not completed\"}],\"jobs\":{\"build\":\"failure\",\"baseline-approval\":\"skipped\"},\"reviewer\":null,\"evidence\":{\"artifact_id\":10,\"tested_sha\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10\",\"sha256\":{\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png\":\"a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json\":\"f3f8519d84cdef38f6e3909b70754d4fbae3bd3a8dbc5108d585c147668761b8\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png\":\"64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json\":\"c09905b2fd924c3548b4d758d51597285265dccc7e9c6a2aed4e14cdac66c30b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png\":\"26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json\":\"9f7b789bea5a483295cc01611d6eef3f1dbe424d1ac537db0ccfe225f6acff68\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png\":\"43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json\":\"0962e85e5877add97c2a6742f64c36649cb6553407842877316b897ffce9fcc2\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png\":\"471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json\":\"8f257fabd6ee5a0997258d6f95e1b1bf0a9ffa600ab7b89097e6cecc13c97d1a\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png\":\"dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json\":\"7319065293cd35c1e373835de10ff37bdab978040cd42c8bcdfd112df61f5dbd\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png\":\"bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png\":\"c836ede408a3105cf91e73869d07862f2a63120371b415a21a589a3a2c21de7e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json\":\"d8e9357f7008b2ea3df0631b9ec5d56bf69aa7bb5e76c06de44a80f6d2edfbc9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png\":\"26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png\":\"f97c42b8c24b661f6a1cc360ebae66308390b585536aefa518fafbb8d7c42759\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json\":\"3a2eb51693b33547a011bc86d7041c873085c74c241794a634a5961a42e8ae5f\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip\":\"70d388884beeae738f014f0c25caf803fad63c20471e2779fe515052082b6fd7\",\"results.json\":\"ae8fd1951032386a734bb5dd7e5dded50703347d9d3cffa8b108e4e32592e69c\"},\"summary\":{\"source\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"launchArgs\":[\"--use-angle=swiftshader\",\"--enable-unsafe-swiftshader\",\"--disable-lcd-text\"],\"candidate\":false,\"results\":[{\"id\":\"empty-scanner\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"actual\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\"},{\"id\":\"visible-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"actual\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\"},{\"id\":\"panned-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"actual\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\"},{\"id\":\"selected-body\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"actual\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\"},{\"id\":\"zoom-out\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"actual\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\"},{\"id\":\"zoom-in\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"actual\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\"},{\"id\":\"heading-velocity\",\"pass\":false,\"changedPixels\":520,\"rawChangedPixels\":520,\"totalPixels\":1024000,\"expected\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"actual\":\"bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b\"},{\"id\":\"opposite-vectors\",\"pass\":false,\"changedPixels\":630,\"rawChangedPixels\":630,\"totalPixels\":1024000,\"expected\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"actual\":\"26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd\"}]},\"manifest_sha256\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\"},\"merge_authority\":\"human only\",\"runtime_sha256\":\"a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"issue_context_sha256\":\"be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b\",\"run\":{\"id\":1,\"attempt\":1,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"baseline_approval\":{\"digest\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\",\"approval\":\"inherited from exact base\"},\"fingerprint\":\"ff7d61d3a68089204afa73bad1f0b7b191906a0674ae190d216c3eca2882d70d\",\"evidence_ok\":true,\"error\":\"REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record\"}\n```",
       "user": {
         "login": "github-actions[bot]",
         "type": "Bot"
       }
     },
     {
-      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 2: **BLOCKED**\n\nHead `edd62718eb6dbfb55ddde51570a8afc892c02bf3`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 UNVERIFIED: Review not completed Action: Resolve blocker and rerun.\n\nMISSING_CAPTURE: require originals, approved references, diffs, state and trace\nSTALE_CI: need completed Navigation client PR run at current head\nCI_INCOMPLETE: build, baseline-approval\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\"},\"cycle\":2,\"provider_attempted\":false,\"verdict\":\"BLOCKED\",\"reasons\":[\"MISSING_CAPTURE: require originals, approved references, diffs, state and trace\",\"STALE_CI: need completed Navigation client PR run at current head\",\"CI_INCOMPLETE: build, baseline-approval\"],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"UNVERIFIED\",\"finding\":\"Review not completed\"}],\"jobs\":{},\"reviewer\":null,\"evidence\":{},\"merge_authority\":\"human only\",\"runtime_sha256\":\"374293ba6c54ff75f84dfcebb79c57c5c621ce5eed423115f533d4ff9817cd7c\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"run\":{\"id\":1,\"attempt\":1,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"error\":\"STALE_CI: need completed Navigation client PR run at current head\",\"fingerprint\":\"e5784310d50a9764cd636c2eaa631ad4f9b06a262887fd548b972fe0301d4e66\"}\n```",
+      "body": "<!-- salimon-codex-review:v1 -->\nCodex session independent review; submitter attests actual separate agent execution.\n\n```json\n{\n  \"schema_version\": 1,\n  \"binding\": {\n    \"head\": \"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\n    \"base\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n    \"base_ref\": \"main\",\n    \"merge\": \"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\"\n  },\n  \"run\": {\n    \"id\": 1,\n    \"attempt\": 1,\n    \"url\": \"https://github.com/mr-exception/salimon/actions/runs/1\"\n  },\n  \"packet_sha256\": \"de413b91a545769a6046a4aa093d4ad03819b3a0a38e642cda75e5baaa1ff76f\",\n  \"criteria_sha256\": \"108e009609f096531820ffe03e377b63c3afedde0e47171db4d2918f22d099fb\",\n  \"issue_sha256\": \"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\",\n  \"evidence_sha256\": \"ad9940db119af8daea3efa20c94be619fb8cd96c97ec6a86087ac7b259bce027\",\n  \"implementer\": \"/root\",\n  \"reviewer\": {\n    \"id\": \"/root/review_752\",\n    \"capability\": \"distinct Codex subagent\"\n  },\n  \"review\": {\n    \"verdict\": \"REQUEST_CHANGES\",\n    \"summary\": \"The actual velocity indicator is red in both moving-ship views; the approved reference requires a light-green dashed line. The deliberate browser comparison failed on those two views.\",\n    \"criteria\": [\n      {\n        \"id\": \"AC-1\",\n        \"status\": \"FAIL\",\n        \"evidence\": [\n          \"image:heading-velocity:actual\",\n          \"image:heading-velocity:expected\",\n          \"image:heading-velocity:diff\",\n          \"image:opposite-vectors:actual\",\n          \"image:opposite-vectors:expected\",\n          \"image:opposite-vectors:diff\",\n          \"summary\",\n          \"e2e-results\"\n        ],\n        \"finding\": \"In heading-velocity, the dashed vertical velocity line above the ship is red rather than light green. In opposite-vectors, the dashed line from the ship toward the left viewport edge is also red. The six stationary/control captures are byte-identical; these two differ by 520 and 630 pixels respectively.\",\n        \"action\": \"Restore the production velocity stroke to #b6f5a2, preserve the dashed geometry and yellow heading, then commit the repair and rerun tests and all eight captures at the new SHA before requesting acceptance.\"\n      }\n    ]\n  }\n}\n```\n",
+      "user": {
+        "type": "User",
+        "login": "fixture-submitter"
+      },
+      "author_association": "OWNER",
+      "html_url": "fixture-session-handoff-wrong"
+    },
+    {
+      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 1: **REQUEST_CHANGES**\n\nHead `08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 FAIL: In heading-velocity, the dashed vertical velocity line above the ship is red rather than light green. In opposite-vectors, the dashed line from the ship toward the left viewport edge is also red. The six stationary/control captures are byte-identical; these two differ by 520 and 630 pixels respectively. Action: Restore the production velocity stroke to #b6f5a2, preserve the dashed geometry and yellow heading, then commit the repair and rerun tests and all eight captures at the new SHA before requesting acceptance.\n\nCI_VETO: fix build; AI cannot override tests\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\"},\"cycle\":1,\"review_consumed\":true,\"verdict\":\"REQUEST_CHANGES\",\"reasons\":[\"CI_VETO: fix build; AI cannot override tests\"],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"FAIL\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:heading-velocity:diff\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"image:opposite-vectors:diff\",\"summary\",\"e2e-results\"],\"finding\":\"In heading-velocity, the dashed vertical velocity line above the ship is red rather than light green. In opposite-vectors, the dashed line from the ship toward the left viewport edge is also red. The six stationary/control captures are byte-identical; these two differ by 520 and 630 pixels respectively.\",\"action\":\"Restore the production velocity stroke to #b6f5a2, preserve the dashed geometry and yellow heading, then commit the repair and rerun tests and all eight captures at the new SHA before requesting acceptance.\"}],\"jobs\":{\"build\":\"failure\",\"baseline-approval\":\"skipped\"},\"reviewer\":{\"reviewer\":\"/root/review_752\",\"capability\":\"distinct Codex subagent\",\"execution\":\"Codex session; CI only verifies the submitted record\",\"independence\":\"authorized submitter attestation, not cryptographic agent authentication\",\"comment_url\":\"fixture-session-handoff-wrong\",\"record_sha256\":\"1fb551121153c6d9bdf5a6bd032cd0fd21de314923204c8a5d03231264dfb6f6\"},\"evidence\":{\"artifact_id\":10,\"tested_sha\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10\",\"sha256\":{\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png\":\"a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json\":\"f3f8519d84cdef38f6e3909b70754d4fbae3bd3a8dbc5108d585c147668761b8\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png\":\"64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json\":\"c09905b2fd924c3548b4d758d51597285265dccc7e9c6a2aed4e14cdac66c30b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png\":\"26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json\":\"9f7b789bea5a483295cc01611d6eef3f1dbe424d1ac537db0ccfe225f6acff68\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png\":\"43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json\":\"0962e85e5877add97c2a6742f64c36649cb6553407842877316b897ffce9fcc2\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png\":\"471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json\":\"8f257fabd6ee5a0997258d6f95e1b1bf0a9ffa600ab7b89097e6cecc13c97d1a\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png\":\"dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json\":\"7319065293cd35c1e373835de10ff37bdab978040cd42c8bcdfd112df61f5dbd\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png\":\"bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png\":\"c836ede408a3105cf91e73869d07862f2a63120371b415a21a589a3a2c21de7e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json\":\"d8e9357f7008b2ea3df0631b9ec5d56bf69aa7bb5e76c06de44a80f6d2edfbc9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png\":\"26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png\":\"f97c42b8c24b661f6a1cc360ebae66308390b585536aefa518fafbb8d7c42759\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json\":\"3a2eb51693b33547a011bc86d7041c873085c74c241794a634a5961a42e8ae5f\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip\":\"70d388884beeae738f014f0c25caf803fad63c20471e2779fe515052082b6fd7\",\"results.json\":\"ae8fd1951032386a734bb5dd7e5dded50703347d9d3cffa8b108e4e32592e69c\"},\"summary\":{\"source\":\"08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6\",\"launchArgs\":[\"--use-angle=swiftshader\",\"--enable-unsafe-swiftshader\",\"--disable-lcd-text\"],\"candidate\":false,\"results\":[{\"id\":\"empty-scanner\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"actual\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\"},{\"id\":\"visible-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"actual\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\"},{\"id\":\"panned-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"actual\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\"},{\"id\":\"selected-body\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"actual\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\"},{\"id\":\"zoom-out\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"actual\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\"},{\"id\":\"zoom-in\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"actual\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\"},{\"id\":\"heading-velocity\",\"pass\":false,\"changedPixels\":520,\"rawChangedPixels\":520,\"totalPixels\":1024000,\"expected\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"actual\":\"bb49c95aaae95653f31ade17719e42767f5e7b1a12a7598f74695483604d489b\"},{\"id\":\"opposite-vectors\",\"pass\":false,\"changedPixels\":630,\"rawChangedPixels\":630,\"totalPixels\":1024000,\"expected\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"actual\":\"26c5389a715615a372a695c891f35dc9be99523629740140a25306a728902abd\"}]},\"manifest_sha256\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\"},\"merge_authority\":\"human only\",\"runtime_sha256\":\"a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"issue_context_sha256\":\"be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b\",\"run\":{\"id\":1,\"attempt\":1,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"baseline_approval\":{\"digest\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\",\"approval\":\"inherited from exact base\"},\"fingerprint\":\"e66dba34b145a527eda120f05f521a43562ba88fd5ebc4e8fe2bf0411cb3d7ee\",\"evidence_ok\":true,\"review\":{\"verdict\":\"REQUEST_CHANGES\",\"summary\":\"The actual velocity indicator is red in both moving-ship views; the approved reference requires a light-green dashed line. The deliberate browser comparison failed on those two views.\",\"criteria\":[{\"id\":\"AC-1\",\"status\":\"FAIL\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:heading-velocity:diff\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"image:opposite-vectors:diff\",\"summary\",\"e2e-results\"],\"finding\":\"In heading-velocity, the dashed vertical velocity line above the ship is red rather than light green. In opposite-vectors, the dashed line from the ship toward the left viewport edge is also red. The six stationary/control captures are byte-identical; these two differ by 520 and 630 pixels respectively.\",\"action\":\"Restore the production velocity stroke to #b6f5a2, preserve the dashed geometry and yellow heading, then commit the repair and rerun tests and all eight captures at the new SHA before requesting acceptance.\"}]}}\n```",
       "user": {
         "login": "github-actions[bot]",
         "type": "Bot"
       }
     },
     {
-      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 2: **ACCEPT**\n\nHead `edd62718eb6dbfb55ddde51570a8afc892c02bf3`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 PASS: The repaired vertical and leftward dashed velocity lines are light green, while heading remains yellow. Every frame is byte-identical to its approved original with zero changed/raw pixels. Exact-source metadata binds the new SHA; all 24 browser routes, 38 unit assertions and build/typecheck passed. Action: Preserve this repaired color and current exact-source evidence; request fresh CI and review after any relevant source, parent or baseline change.\n\n\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\"},\"cycle\":2,\"provider_attempted\":true,\"verdict\":\"ACCEPT\",\"reasons\":[],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"PASS\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"summary\",\"e2e-results\",\"state:heading-velocity\",\"state:opposite-vectors\"],\"finding\":\"The repaired vertical and leftward dashed velocity lines are light green, while heading remains yellow. Every frame is byte-identical to its approved original with zero changed/raw pixels. Exact-source metadata binds the new SHA; all 24 browser routes, 38 unit assertions and build/typecheck passed.\",\"action\":\"Preserve this repaired color and current exact-source evidence; request fresh CI and review after any relevant source, parent or baseline change.\"}],\"jobs\":{\"build\":\"success\",\"baseline-approval\":\"success\"},\"reviewer\":{\"provider\":\"actual distinct session subagent via explicit fixture replay bridge\",\"reviewer\":\"/root/review_752\",\"transport\":\"fixture only; not OpenAI API\",\"attempts\":1},\"evidence\":{\"artifact_id\":10,\"tested_sha\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10\",\"sha256\":{\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png\":\"a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json\":\"f970c07a7773fafd42e05f74ee853c01e66c3c6f277402ee5a98318f59268fc7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png\":\"64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json\":\"981fa6e8da5906c493a9445bdcdd0f9ecccf9c1adf02bd51c0c08a213c6b0da9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png\":\"26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json\":\"1af0865f8ff7b988749b375a4fb541d69b6f2003fd379bf8df6e492e0032682c\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png\":\"43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json\":\"5ffc5fc6ad24d6129bb3aef89b6110d486cf51886e4dec3930cc2203355fc99e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png\":\"471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json\":\"b1cbf4f0beb7bb6f21f4a0a8edc8f8a30c728b70cbefaa06360824b689354d9b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png\":\"dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json\":\"0719aac5abb3137f2f5881ca60e956102a952d3d4679e47b8600cce6686a63af\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png\":\"bf0faa0f2ed98e2c3127bcea4de7c273ff44908df8f1e543af7b2f3a1d9f1016\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json\":\"c82c6d7d8833a4d8905722344912d52443540eabc617b4e461a83a6230492245\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png\":\"72337b844cb63611b289c49ac18cc99e2fe4a20a8c3c0a47cffb72f5f27dfc8e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json\":\"a6e6458a1526b152727c9c55edccd0b3a4199c8f0246e7d3a87c345302b82d51\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip\":\"1a09b0ff9924b6779a06a753fa110fb44d5e36fc033646ffb7a78b46343ddc5f\",\"results.json\":\"aab51f428eacbb6f340cdb0dc6779dc256918fab7c8288295b110214571365d5\"},\"summary\":{\"source\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"launchArgs\":[\"--use-angle=swiftshader\",\"--enable-unsafe-swiftshader\",\"--disable-lcd-text\"],\"candidate\":false,\"results\":[{\"id\":\"empty-scanner\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"actual\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\"},{\"id\":\"visible-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"actual\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\"},{\"id\":\"panned-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"actual\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\"},{\"id\":\"selected-body\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"actual\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\"},{\"id\":\"zoom-out\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"actual\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\"},{\"id\":\"zoom-in\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"actual\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\"},{\"id\":\"heading-velocity\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"actual\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\"},{\"id\":\"opposite-vectors\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"actual\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\"}]},\"manifest_sha256\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\"},\"merge_authority\":\"human only\",\"runtime_sha256\":\"374293ba6c54ff75f84dfcebb79c57c5c621ce5eed423115f533d4ff9817cd7c\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"run\":{\"id\":1,\"attempt\":2,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"baseline_approval\":{\"digest\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\",\"approval\":\"inherited from exact base\"},\"fingerprint\":\"e835dd87923cf23a2dba816b4ea003e4cd0870dcd0d74c4413fa0eb676ddd503\",\"evidence_ok\":true,\"review\":{\"verdict\":\"ACCEPT\",\"summary\":\"At the new committed repair SHA, both moving-ship views show the approved light-green dashed velocity indicator. All eight captures match their approved references and the complete browser suite passes.\",\"criteria\":[{\"id\":\"AC-1\",\"status\":\"PASS\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"summary\",\"e2e-results\",\"state:heading-velocity\",\"state:opposite-vectors\"],\"finding\":\"The repaired vertical and leftward dashed velocity lines are light green, while heading remains yellow. Every frame is byte-identical to its approved original with zero changed/raw pixels. Exact-source metadata binds the new SHA; all 24 browser routes, 38 unit assertions and build/typecheck passed.\",\"action\":\"Preserve this repaired color and current exact-source evidence; request fresh CI and review after any relevant source, parent or baseline change.\"}]}}\n```",
+      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 2: **BLOCKED**\n\nHead `edd62718eb6dbfb55ddde51570a8afc892c02bf3`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 UNVERIFIED: Review not completed Action: Resolve blocker and rerun.\n\nMISSING_CAPTURE: require originals, approved references, diffs, state and trace\nSTALE_CI: need completed Navigation client PR run at current head\nCI_INCOMPLETE: build, baseline-approval\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\"},\"cycle\":2,\"review_consumed\":false,\"verdict\":\"BLOCKED\",\"reasons\":[\"MISSING_CAPTURE: require originals, approved references, diffs, state and trace\",\"STALE_CI: need completed Navigation client PR run at current head\",\"CI_INCOMPLETE: build, baseline-approval\"],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"UNVERIFIED\",\"finding\":\"Review not completed\"}],\"jobs\":{},\"reviewer\":null,\"evidence\":{},\"merge_authority\":\"human only\",\"runtime_sha256\":\"a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"issue_context_sha256\":\"be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b\",\"run\":{\"id\":1,\"attempt\":1,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"error\":\"STALE_CI: need completed Navigation client PR run at current head\",\"fingerprint\":\"5f7267faf6f12fb7db6265f6dfea55b9f4e6ecbb62828041a015efa8797f7a37\"}\n```",
+      "user": {
+        "login": "github-actions[bot]",
+        "type": "Bot"
+      }
+    },
+    {
+      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 2: **BLOCKED**\n\nHead `edd62718eb6dbfb55ddde51570a8afc892c02bf3`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 UNVERIFIED: Review not completed Action: Resolve blocker and rerun.\n\nREVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\"},\"cycle\":2,\"review_consumed\":false,\"verdict\":\"BLOCKED\",\"reasons\":[\"REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record\"],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"UNVERIFIED\",\"finding\":\"Review not completed\"}],\"jobs\":{\"build\":\"success\",\"baseline-approval\":\"success\"},\"reviewer\":null,\"evidence\":{\"artifact_id\":10,\"tested_sha\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10\",\"sha256\":{\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png\":\"a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json\":\"f970c07a7773fafd42e05f74ee853c01e66c3c6f277402ee5a98318f59268fc7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png\":\"64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json\":\"981fa6e8da5906c493a9445bdcdd0f9ecccf9c1adf02bd51c0c08a213c6b0da9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png\":\"26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json\":\"1af0865f8ff7b988749b375a4fb541d69b6f2003fd379bf8df6e492e0032682c\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png\":\"43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json\":\"5ffc5fc6ad24d6129bb3aef89b6110d486cf51886e4dec3930cc2203355fc99e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png\":\"471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json\":\"b1cbf4f0beb7bb6f21f4a0a8edc8f8a30c728b70cbefaa06360824b689354d9b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png\":\"dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json\":\"0719aac5abb3137f2f5881ca60e956102a952d3d4679e47b8600cce6686a63af\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png\":\"bf0faa0f2ed98e2c3127bcea4de7c273ff44908df8f1e543af7b2f3a1d9f1016\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json\":\"c82c6d7d8833a4d8905722344912d52443540eabc617b4e461a83a6230492245\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png\":\"72337b844cb63611b289c49ac18cc99e2fe4a20a8c3c0a47cffb72f5f27dfc8e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json\":\"a6e6458a1526b152727c9c55edccd0b3a4199c8f0246e7d3a87c345302b82d51\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip\":\"1a09b0ff9924b6779a06a753fa110fb44d5e36fc033646ffb7a78b46343ddc5f\",\"results.json\":\"aab51f428eacbb6f340cdb0dc6779dc256918fab7c8288295b110214571365d5\"},\"summary\":{\"source\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"launchArgs\":[\"--use-angle=swiftshader\",\"--enable-unsafe-swiftshader\",\"--disable-lcd-text\"],\"candidate\":false,\"results\":[{\"id\":\"empty-scanner\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"actual\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\"},{\"id\":\"visible-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"actual\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\"},{\"id\":\"panned-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"actual\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\"},{\"id\":\"selected-body\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"actual\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\"},{\"id\":\"zoom-out\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"actual\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\"},{\"id\":\"zoom-in\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"actual\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\"},{\"id\":\"heading-velocity\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"actual\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\"},{\"id\":\"opposite-vectors\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"actual\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\"}]},\"manifest_sha256\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\"},\"merge_authority\":\"human only\",\"runtime_sha256\":\"a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"issue_context_sha256\":\"be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b\",\"run\":{\"id\":1,\"attempt\":2,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"baseline_approval\":{\"digest\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\",\"approval\":\"inherited from exact base\"},\"fingerprint\":\"0ad48bd8e79c4f0ea8a73aebb20d525fa22947ad36a60dad705a7f076762a34d\",\"evidence_ok\":true,\"error\":\"REVIEWER_UNAVAILABLE: request a distinct Codex session review and submit its current-evidence record\"}\n```",
+      "user": {
+        "login": "github-actions[bot]",
+        "type": "Bot"
+      }
+    },
+    {
+      "body": "<!-- salimon-codex-review:v1 -->\nCodex session independent review; submitter attests actual separate agent execution.\n\n```json\n{\n  \"schema_version\": 1,\n  \"binding\": {\n    \"head\": \"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\n    \"base\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n    \"base_ref\": \"main\",\n    \"merge\": \"edd62718eb6dbfb55ddde51570a8afc892c02bf3\"\n  },\n  \"run\": {\n    \"id\": 1,\n    \"attempt\": 2,\n    \"url\": \"https://github.com/mr-exception/salimon/actions/runs/1\"\n  },\n  \"packet_sha256\": \"0e2c5af1cc5495c267164abbccba509b1cf55d3a66894a4be0203dac8d1c6d51\",\n  \"criteria_sha256\": \"108e009609f096531820ffe03e377b63c3afedde0e47171db4d2918f22d099fb\",\n  \"issue_sha256\": \"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\",\n  \"evidence_sha256\": \"95e3c39add731ac920a7d9af07306a212894ef0e5e11f8dccddc734bbab78aa7\",\n  \"implementer\": \"/root\",\n  \"reviewer\": {\n    \"id\": \"/root/review_752\",\n    \"capability\": \"distinct Codex subagent\"\n  },\n  \"review\": {\n    \"verdict\": \"ACCEPT\",\n    \"summary\": \"At the new committed repair SHA, both moving-ship views show the approved light-green dashed velocity indicator. All eight captures match their approved references and the complete browser suite passes.\",\n    \"criteria\": [\n      {\n        \"id\": \"AC-1\",\n        \"status\": \"PASS\",\n        \"evidence\": [\n          \"image:heading-velocity:actual\",\n          \"image:heading-velocity:expected\",\n          \"image:opposite-vectors:actual\",\n          \"image:opposite-vectors:expected\",\n          \"summary\",\n          \"e2e-results\",\n          \"state:heading-velocity\",\n          \"state:opposite-vectors\"\n        ],\n        \"finding\": \"The repaired vertical and leftward dashed velocity lines are light green, while heading remains yellow. Every frame is byte-identical to its approved original with zero changed/raw pixels. Exact-source metadata binds the new SHA; all 24 browser routes, 38 unit assertions and build/typecheck passed.\",\n        \"action\": \"Preserve this repaired color and current exact-source evidence; request fresh CI and review after any relevant source, parent or baseline change.\"\n      }\n    ]\n  }\n}\n```\n",
+      "user": {
+        "type": "User",
+        "login": "fixture-submitter"
+      },
+      "author_association": "OWNER",
+      "html_url": "fixture-session-handoff-fixed"
+    },
+    {
+      "body": "<!-- salimon-independent-qa:v1 -->\nIndependent QA cycle 2: **ACCEPT**\n\nHead `edd62718eb6dbfb55ddde51570a8afc892c02bf3`; base `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`. Human retains merge authority.\n\n- AC-1 PASS: The repaired vertical and leftward dashed velocity lines are light green, while heading remains yellow. Every frame is byte-identical to its approved original with zero changed/raw pixels. Exact-source metadata binds the new SHA; all 24 browser routes, 38 unit assertions and build/typecheck passed. Action: Preserve this repaired color and current exact-source evidence; request fresh CI and review after any relevant source, parent or baseline change.\n\n\n\n```json\n{\"schema_version\":1,\"pr\":999,\"binding\":{\"head\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"base\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"base_ref\":\"main\",\"merge\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\"},\"cycle\":2,\"review_consumed\":true,\"verdict\":\"ACCEPT\",\"reasons\":[],\"criteria\":[{\"id\":\"AC-1\",\"status\":\"PASS\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"summary\",\"e2e-results\",\"state:heading-velocity\",\"state:opposite-vectors\"],\"finding\":\"The repaired vertical and leftward dashed velocity lines are light green, while heading remains yellow. Every frame is byte-identical to its approved original with zero changed/raw pixels. Exact-source metadata binds the new SHA; all 24 browser routes, 38 unit assertions and build/typecheck passed.\",\"action\":\"Preserve this repaired color and current exact-source evidence; request fresh CI and review after any relevant source, parent or baseline change.\"}],\"jobs\":{\"build\":\"success\",\"baseline-approval\":\"success\"},\"reviewer\":{\"reviewer\":\"/root/review_752\",\"capability\":\"distinct Codex subagent\",\"execution\":\"Codex session; CI only verifies the submitted record\",\"independence\":\"authorized submitter attestation, not cryptographic agent authentication\",\"comment_url\":\"fixture-session-handoff-fixed\",\"record_sha256\":\"1602c8e30f9afa1fee67f3abebfa280c4bbed29fa1c33e01db2942380d4be864\"},\"evidence\":{\"artifact_id\":10,\"tested_sha\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1/artifacts/10\",\"sha256\":{\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png\":\"a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.json\":\"f970c07a7773fafd42e05f74ee853c01e66c3c6f277402ee5a98318f59268fc7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png\":\"64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.json\":\"981fa6e8da5906c493a9445bdcdd0f9ecccf9c1adf02bd51c0c08a213c6b0da9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png\":\"26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.json\":\"1af0865f8ff7b988749b375a4fb541d69b6f2003fd379bf8df6e492e0032682c\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png\":\"43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.json\":\"5ffc5fc6ad24d6129bb3aef89b6110d486cf51886e4dec3930cc2203355fc99e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png\":\"471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.json\":\"b1cbf4f0beb7bb6f21f4a0a8edc8f8a30c728b70cbefaa06360824b689354d9b\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png\":\"dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.json\":\"0719aac5abb3137f2f5881ca60e956102a952d3d4679e47b8600cce6686a63af\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png\":\"bf0faa0f2ed98e2c3127bcea4de7c273ff44908df8f1e543af7b2f3a1d9f1016\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.json\":\"c82c6d7d8833a4d8905722344912d52443540eabc617b4e461a83a6230492245\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png\":\"72337b844cb63611b289c49ac18cc99e2fe4a20a8c3c0a47cffb72f5f27dfc8e\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.json\":\"a6e6458a1526b152727c9c55edccd0b3a4199c8f0246e7d3a87c345302b82d51\",\"navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip\":\"1a09b0ff9924b6779a06a753fa110fb44d5e36fc033646ffb7a78b46343ddc5f\",\"results.json\":\"aab51f428eacbb6f340cdb0dc6779dc256918fab7c8288295b110214571365d5\"},\"summary\":{\"source\":\"edd62718eb6dbfb55ddde51570a8afc892c02bf3\",\"launchArgs\":[\"--use-angle=swiftshader\",\"--enable-unsafe-swiftshader\",\"--disable-lcd-text\"],\"candidate\":false,\"results\":[{\"id\":\"empty-scanner\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\",\"actual\":\"a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439\"},{\"id\":\"visible-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\",\"actual\":\"0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d\"},{\"id\":\"panned-contacts\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\",\"actual\":\"299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9\"},{\"id\":\"selected-body\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\",\"actual\":\"f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795\"},{\"id\":\"zoom-out\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\",\"actual\":\"942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e\"},{\"id\":\"zoom-in\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\",\"actual\":\"56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3\"},{\"id\":\"heading-velocity\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\",\"actual\":\"985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252\"},{\"id\":\"opposite-vectors\",\"pass\":true,\"changedPixels\":0,\"rawChangedPixels\":0,\"totalPixels\":1024000,\"expected\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\",\"actual\":\"280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb\"}]},\"manifest_sha256\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\"},\"merge_authority\":\"human only\",\"runtime_sha256\":\"a6a81697f66c8f0da71a6831360ef502b3169dd6eb5f4ab9c8c16977ec4cac7a\",\"issue\":{\"number\":998,\"body_sha256\":\"d5f2c0d72afdaa6bc430e0759b08488fe1398ce7ed1a398997b5bc8f72594c9b\"},\"issue_context_sha256\":\"be3c7103bb100a8cb11108d14401e7eeab2b6e510b972de7781ca32ccf17030b\",\"run\":{\"id\":1,\"attempt\":2,\"url\":\"https://github.com/mr-exception/salimon/actions/runs/1\"},\"baseline_approval\":{\"digest\":\"961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513\",\"approval\":\"inherited from exact base\"},\"fingerprint\":\"bc27740f8013c27731255bac72e773c26d49b08d750252886a06a1f23eb1c5b4\",\"evidence_ok\":true,\"review\":{\"verdict\":\"ACCEPT\",\"summary\":\"At the new committed repair SHA, both moving-ship views show the approved light-green dashed velocity indicator. All eight captures match their approved references and the complete browser suite passes.\",\"criteria\":[{\"id\":\"AC-1\",\"status\":\"PASS\",\"evidence\":[\"image:heading-velocity:actual\",\"image:heading-velocity:expected\",\"image:opposite-vectors:actual\",\"image:opposite-vectors:expected\",\"summary\",\"e2e-results\",\"state:heading-velocity\",\"state:opposite-vectors\"],\"finding\":\"The repaired vertical and leftward dashed velocity lines are light green, while heading remains yellow. Every frame is byte-identical to its approved original with zero changed/raw pixels. Exact-source metadata binds the new SHA; all 24 browser routes, 38 unit assertions and build/typecheck passed.\",\"action\":\"Preserve this repaired color and current exact-source evidence; request fresh CI and review after any relevant source, parent or baseline change.\"}]}}\n```",
       "user": {
         "login": "github-actions[bot]",
         "type": "Bot"
@@ -514,6 +898,15 @@
     }
   ],
   "statuses": [
+    [
+      "08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6",
+      {
+        "state": "failure",
+        "context": "salimon/independent-qa",
+        "description": "BLOCKED \u2014 cycle 1; exact head/base required",
+        "target_url": "https://github.com/mr-exception/salimon/pull/999#issuecomment-1"
+      }
+    ],
     [
       "08faa0d6cf2fc822dd77b16f1b62f8f7b73211a6",
       {
@@ -544,6 +937,15 @@
     [
       "edd62718eb6dbfb55ddde51570a8afc892c02bf3",
       {
+        "state": "failure",
+        "context": "salimon/independent-qa",
+        "description": "BLOCKED \u2014 cycle 2; exact head/base required",
+        "target_url": "https://github.com/mr-exception/salimon/pull/999#issuecomment-1"
+      }
+    ],
+    [
+      "edd62718eb6dbfb55ddde51570a8afc892c02bf3",
+      {
         "state": "success",
         "context": "salimon/independent-qa",
         "description": "ACCEPT \u2014 cycle 2; exact head/base required",
@@ -560,6 +962,6 @@
       }
     ]
   ],
-  "live_openai_api": "NOT RUN",
+  "ai_execution": "actual Codex session reviewer; no external AI API",
   "automatic_merge": false
 }

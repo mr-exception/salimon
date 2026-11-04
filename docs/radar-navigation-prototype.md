@@ -15,7 +15,7 @@ The main branch contains the browser client; older documents mentioning Rust pac
 - Starting scanner detection radius is **100,000 light-seconds** (about 200 AU). All cataloged celestial bodies within range are detected on a **five-second pulse**. No contact history remains after objects leave range; the catalog itself remains unchanged.
 - Contacts outside the *current zoom* but within scanner range use edge indicators. Out-of-scanner-range bodies are never exposed by zoom or indicators. Dense contacts can be clustered in presentation, not in detection.
 - Clicking a celestial contact opens a menu whose only action is **Set direction**. The action captures a one-time vector toward the contact, smoothly rotating the ship at a fixed angular speed. It does not apply thrust, brake, follow the moving target or autopilot. Any manual rotation cancels alignment.
-- Hold up/down/left/right buttons or W/S/A/D to rotate ship pitch and yaw. Roll stays stabilized relative to galactic up. Ship rotation and camera motion are independent.
+- Use arrow keys to rotate ship pitch and yaw; WASD pans the independent camera. Roll stays stabilized relative to galactic up. Ship rotation and camera motion are independent.
 - Throttle ranges -100% to +100%, with the preexisting impulse/thrust design intended for eventual integration. **Thrust continues while turning**; changing heading does not rotate existing velocity. Zero throttle coasts.
 - Show heading and velocity directions, speed with an explicit reference frame, contact distance, and concise basic proximity / dangerous approach warnings. Keep grid and indicators visible without contacts.
 - At zero Core power in eventual production, controls and propulsion stop. **Energy is unlimited in this prototype**, so no power failure occurs.
@@ -71,34 +71,24 @@ index does not imply a galaxy-scale collision performance qualification.
 
 ## Browser controls and cloud validation (#730)
 
-Focus the radar for W/A/S/D and Space; form controls keep native typing/slider
-behavior. Hold labelled direction buttons using pointer, Space or Enter.
-Pointer up/cancel/capture loss, key release, blur, visibility changes and resize
-release the relevant held sources. Hidden-page intervals are paused and resume
-without elapsed-time catchup. Multiple pointer/key owners remain independent.
+Desktop mouse and keyboard are supported. WASD pans the camera in screen space;
+left-drag orbits, right-drag pans and the wheel zooms within bounds. Arrow keys
+turn ship pitch/yaw and cancel one-time alignment. Camera movement never changes
+ship controls or cancels alignment. Space sets zero throttle outside forms.
+No manual-direction arrow buttons or zoom +/- buttons are displayed.
+
+Help opens a compact native modal dialog with the actual bindings, keyboard
+focus containment, Escape/close dismissal and focus return. Forms keep native
+keys. Key release, form focus, blur, visibility changes and resize clear held
+inputs; hidden time is paused. Reset camera remains available.
 
 The searchable scanned-contact picker and overlap menu expose at most 32 rows
-per page, preserving every detected ID. Camera zoom/reset buttons work from
-keyboard and touch without changing ship state. Live scan, selected target,
-warning and flight status have explicit text. Throttle exposes a labelled signed
-percentage and coast/forward/reverse description; non-flight controls disable.
+per page, preserving every detected ID. Scan, selected target, warning and flight
+status remain explicit. Throttle exposes a signed percentage with coast/forward/
+reverse description and disables outside flight.
 
 Use `npm ci`, `npm test`, `npm run build` and `npm run test:browser` in `client/`.
-The Playwright configuration starts isolated dev and production-preview servers,
-executes serially on actual software WebGL and retains screenshots/raw results.
-CI repeats these checks against the current PR head with lockfile caching.
-
-## Viewport-reaching contact lines (#738)
-
-`radar.ts::clipViewportSegment` clips projected ship→contact segments to the
-actual viewport. Lines end at its boundary, without arrows or interior endpoint
-caps. Panned/off-screen ships may yield two boundary crossings or no visible
-segment. Parallel, coincident, tangent and nonfinite inputs never invent geometry.
-Depth-only exclusions have labels but no false 2D directional line. Stable edge
-slots use one subdued representative ray per group; selected contacts supply the
-exact highlighted ray. All IDs remain available in paged selection. Classification
-uses the real viewport rather than the former inset marker rectangle. Label
-insets never shorten the lines. Right-drag pans; left-drag orbits and wheel zooms.
-Reset restores the camera target as well as orientation/zoom. These interactions
-change no simulation/scanner state. Camera projections use ship-relative split
-coordinates. Detection, five-second cadence and expiry keep their existing owners.
+Playwright starts dev and production-preview servers, executes desktop scenarios
+on actual software WebGL, and retains screenshots/raw results. CI repeats these
+checks on each PR head with lockfile caching. Mobile/touch qualification is not
+a delivery requirement for this desktop prototype.

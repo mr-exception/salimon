@@ -1,0 +1,66 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:2769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2803) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 15 tests using 1 worker
+
+(node:2816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (26.0s)
+  ✘   2 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state; focus, key release, blur and visibility release inputs (42.0s)
+(node:3063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   3 [desktop] › tests/desktop.spec.ts:59:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (14.9s)
+  ✓   4 [desktop] › tests/desktop.spec.ts:69:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (7.7s)
+  ✓   5 [desktop] › tests/desktop.spec.ts:78:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (6.4s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:86:65 › production App contact fixture: warning (3.4s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:86:65 › production App contact fixture: destroyed (3.4s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:86:65 › production App contact fixture: safe (4.4s)
+  ✓   9 [desktop] › tests/desktop.spec.ts:86:65 › production App contact fixture: asteroid (4.8s)
+  ✓  10 [desktop] › tests/desktop.spec.ts:93:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (8.4s)
+  ✓  11 [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines (26.7s)
+  ✓  12 [desktop] › tests/edges.spec.ts:68:1 › edge discovery waits for pulse; out-of-range targets stay hidden and selected contacts expire (10.4s)
+  ✓  13 [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible (10.6s)
+  ✓  14 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (19.8s)
+(node:3719) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  15 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (8.7s)
+
+
+  1) [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state; focus, key release, blur and visibility release inputs 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.focus: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Navigation radar', exact: true })
+        - locator resolved to <div tabindex="0" class="radar" role="region" aria-label="Navigation radar" aria-describedby="navigation-help">…</div>
+
+
+      46 |   else await page.getByLabel('Find scanned contacts').focus()
+      47 |   await page.waitForTimeout(150);const stopped=await projection();await page.waitForTimeout(200);expect(await projection()).toEqual(stopped)
+    > 48 |   await page.keyboard.up('d');await page.getByRole('region',{name:'Navigation radar',exact:true}).focus()
+         |                                                                                                   ^
+      49 |  }
+      50 |  await page.getByRole('button',{name:'Reset camera',exact:true}).click();await page.mouse.move(400,400)
+      51 |  const zoom=await page.evaluate(()=>window.radarTest.snapshot().zoom)
+        at /workspace/salimon/client/tests/desktop.spec.ts:48:99
+
+    Error Context: test-results/desktop-WASD-pans-without--0bfcb-d-visibility-release-inputs-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop-WASD-pans-without--0bfcb-d-visibility-release-inputs-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop-WASD-pans-without--0bfcb-d-visibility-release-inputs-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state; focus, key release, blur and visibility release inputs 
+  14 passed (3.6m)

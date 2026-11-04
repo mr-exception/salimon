@@ -13,13 +13,14 @@ npm run dev
 
 Open the URL Vite prints. `npm run build` produces `dist/`.
 
-## Controls
+## Controls (desktop mouse and keyboard)
 
-- Drag on empty space to orbit the independent orthographic camera; mouse wheel zooms the radar.
-- Click a contact (or its edge marker) to open the **Set direction** menu.
-- Hold **W/S** for pitch and **A/D** for yaw; or hold the on-screen buttons. Manual turning cancels Set direction.
-- Throttle slider: forward or reverse thrust, 0% to coast. **Energy is infinite**.
-- Reset camera only changes the viewer's orientation.
+- **W/A/S/D** pans the independent camera up/left/down/right. Left-drag empty space to orbit; right-drag to pan.
+- Mouse wheel zooms smoothly within bounds; **Reset camera** restores the viewer without changing the ship.
+- Arrow keys turn ship pitch/yaw; manual turning cancels one-time **Set direction** alignment. Camera movement preserves alignment.
+- Click a contact (or its edge marker), or use the scanned-contact picker, then **Set direction**.
+- Throttle slider controls forward/reverse thrust; **Space** sets zero throttle while navigating. Zero throttle coasts. Energy is infinite.
+- **Help** opens the keyboard-accessible binding reference; Escape or Close help dismisses it and returns focus. Form controls retain their native keys.
 
 For usability, visible sample distances are compressed *as input test fixtures*, not via a nonlinear rendering transform. All rendered positions use a linear conversion from simulated coordinates, and scanner range is exactly 100,000 light-seconds. The catalog is not astrophysically authoritative. Ship motion uses the approved SI impulse/mass model on a renderer-independent 60 Hz clock. `coordinates.ts` owns integer galactic cells/local offsets, `simulation.ts` owns motion and one-time alignment, and `App.tsx` owns input and presentation. Energy remains infinite. Tests run on Node 22.18 or newer without a separate test runner.
 
@@ -38,54 +39,21 @@ npm run test:browser
 ```
 
 For an installed system Chromium use `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser`.
-Playwright starts isolated dev (:5175) and built-preview (:4175) servers. The 12
-browser routes cover desktop controls, actual camera/frustum behavior, contact
-fixtures, dense groups, mobile touch/resize and the production WebGL bundle.
-TypeScript also checks test/configuration files. CI uses Node 22, an npm lockfile
+Playwright starts isolated dev (:5175) and built-preview (:4175) servers. Desktop
+routes cover camera/ship independence, actual camera/frustum behavior, contact
+fixtures, dense groups, help, focus/release cleanup and production WebGL.
+TypeScript checks test/configuration files. CI uses Node 22, an npm lockfile
 cache, `npm ci`, domain tests, build, installed Chromium and the same suite.
 `test-results/` contains JSON results, original screenshots and failure traces;
 CI retains these as a revision-named artifact for 14 days. Task reports retain
 selected original evidence permanently.
 
 The contact picker is labelled, searchable and paged at 32 items. Buttons have
-accessible names and visible focus; hold orientation buttons with pointer,
-Space or Enter. Focus the radar for W/A/S/D and Space shortcuts. Focused form
-controls retain native keyboard behavior. Zoom in/out and Reset camera are
-keyboard/touch accessible and never change ship state. Blur, hidden-page events
-and viewport resize clear held inputs; hidden time does not advance simulation.
-Releasing one pointer/key preserves other independently held sources. Scanner,
-selected target, flight and warning status are explicit; throttle has a label
-and a signed forward/reverse/coast value. Browser automation uses synthetic input
-and software WebGL; it does not certify physical input, native platforms or FPS.
-
-## Navigation representations (#737)
-
-Navigation objects use shared, flat-shaded low-poly meshes: a directional swept
-ship, faceted planet/moon spheres, an irregular angular asteroid and a restrained
-emissive star. Sizes are fixed CSS-pixel proxies at every orthographic zoom;
-positions stay linear and physical collision radii remain separate. The sparse
-3D galactic reference lattice replaces the rectangular grid surface. No ground
-plane, textures, bloom or physical ship asset is introduced.
-
-`src/visualGeometry.ts` owns shared deterministic geometry/materials;
-`src/navigationVisuals.tsx` owns screen sizing and scene composition. Run the
-normal unit/build/browser checks. `tests/visuals.spec.ts` measures original WebGL
-pixels, draw/triangle/resource bounds and zoom/selection screenshots using the
-production App with a development-only scene observer.
-
-## Off-screen contacts (#738)
-
-Scanned, in-range contacts outside the actual orthographic viewport use subtle
-ship-to-boundary lines. Lines clip to the real viewport, including entry/exit
-when the ship is off-screen; a path missing the viewport draws no false segment.
-Selected lines and labels are brighter. Stable perimeter groups retain every
-contact ID, expose the existing paged picker, and prioritize the selected ray.
-Labels are inset for access; line endpoints remain on the viewport boundary.
-Contacts outside camera depth alone get a labelled contact entry without an
-invented 2D direction. No scanner or detection history policy changes.
-
-Left-drag orbits, right-drag pans and the mouse wheel zooms the independent
-camera. Reset camera restores its target, pose and zoom without moving the ship.
-`src/radar.ts` owns segment clipping and grouping; `tests/edges.spec.ts` covers
-all edges/corners, pan/orbit/zoom, off-screen ship, pulse/expiry and dense
-selection against the production App and actual WebGL canvas.
+accessible names and visible focus. WASD and arrow shortcuts work without a
+prior radar click when no form/button/dialog has focus. Focused form controls
+retain native keyboard behavior. Blur, hidden-page events and viewport resize
+clear held inputs; hidden time does not advance simulation. Scanner, selected
+target, flight and warning status are explicit; throttle has a label and signed
+forward/reverse/coast value. Desktop mouse/keyboard is the supported input path.
+Browser automation uses synthetic input and software WebGL; it does not certify
+physical input, native platforms or hardware FPS.

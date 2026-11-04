@@ -1,0 +1,111 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:1476) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 15 tests using 1 worker
+
+(node:1520) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (25.9s)
+(node:1699) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [desktop] › tests/desktop.spec.ts:25:1 › WASD pans without changing ship state; focus, key release, blur and visibility release inputs (16.0s)
+  ✓   3 [desktop] › tests/desktop.spec.ts:58:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (5.1s)
+  ✘   4 [desktop] › tests/desktop.spec.ts:68:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (5.7s)
+(node:1966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [desktop] › tests/desktop.spec.ts:77:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (6.4s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:85:65 › production App contact fixture: warning (3.3s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:85:65 › production App contact fixture: destroyed (3.4s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:85:65 › production App contact fixture: safe (4.1s)
+  ✓   9 [desktop] › tests/desktop.spec.ts:85:65 › production App contact fixture: asteroid (4.3s)
+  ✓  10 [desktop] › tests/desktop.spec.ts:92:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (5.0s)
+  ✓  11 [desktop] › tests/edges.spec.ts:19:1 › all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines (17.3s)
+  ✓  12 [desktop] › tests/edges.spec.ts:68:1 › edge discovery waits for pulse; out-of-range targets stay hidden and selected contacts expire (9.0s)
+  ✓  13 [desktop] › tests/edges.spec.ts:79:1 › collinear contacts share one subdued ray while all IDs and selected representative stay accessible (6.5s)
+  ✓  14 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (13.3s)
+(node:2519) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  15 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (8.1s)
+
+
+  1) [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Off-screen Caligo', exact: true })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Off-screen Caligo', exact: true }) with timeout 10000ms
+      - waiting for getByRole('button', { name: 'Off-screen Caligo', exact: true })
+
+
+      16 |  await page.getByRole('button',{name:'Reset camera',exact:true}).click()
+      17 |  await page.mouse.move(400,400);await page.mouse.wheel(0,-600);await page.waitForTimeout(500)
+    > 18 |  const edge=page.getByRole('button',{name:'Off-screen Caligo',exact:true});await expect(edge).toBeVisible();await edge.click()
+         |                                                                                               ^
+      19 |  await expect(page.locator('.target-status')).toHaveText('Selected target: Caligo')
+      20 |  await page.getByRole('button',{name:'Set direction',exact:true}).click();await expect(stat(page,'Alignment')).toHaveText('Turning')
+      21 |  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('ArrowLeft');await page.waitForTimeout(200);await page.keyboard.up('ArrowLeft')
+        at /workspace/salimon/client/tests/desktop.spec.ts:18:95
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop] › tests/desktop.spec.ts:68:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur 
+
+    Error: expect(received).toBeCloseTo(expected, precision)
+
+    Expected: 94.51345151985583
+    Received: 101.83855729396566
+
+    Expected precision:    3
+    Expected difference: < 0.0005
+    Received difference:   7.325105774109829
+
+      72 |  await page.mouse.move(400,350);await page.mouse.down({button:'right'});await page.mouse.move(1100,200,{steps:6});await page.mouse.up({button:'right'});await page.waitForTimeout(1000)
+      73 |  const released=await projection();expect(released).not.toEqual(initial);await page.mouse.move(500,300);await page.waitForTimeout(300)
+    > 74 |  const after=await projection();expect(after[0]).toBeCloseTo(released[0],3);expect(after[1]).toBeCloseTo(released[1],3)
+         |                                                  ^
+      75 |  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('ArrowRight');await page.waitForTimeout(200);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await stopped(page);await page.keyboard.up('ArrowRight')
+      76 | })
+      77 | test('zero throttle coasts while ship rotates; focused slider keeps native keyboard input',async({page})=>{
+        at /workspace/salimon/client/tests/desktop.spec.ts:74:50
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption 
+    [desktop] › tests/desktop.spec.ts:68:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur 
+  13 passed (2.4m)

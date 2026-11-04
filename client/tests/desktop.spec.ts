@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import type {} from './sceneHarness'
 const stat=(page:Page,label:string)=>page.locator('.stat').filter({has:page.locator('span',{hasText:label})}).locator('strong')
 const heading=(page:Page)=>stat(page,'Yaw / pitch')
 async function stopped(page:Page) {await page.waitForTimeout(250);const value=await heading(page).textContent();await page.waitForTimeout(350);await expect(heading(page)).toHaveText(value!)}
@@ -13,36 +14,80 @@ test('scanner pulse, camera independence, clipping selection and manual alignmen
  expect(await page.locator('.stat').allTextContents()).toEqual(ship)
  expect((await page.locator('canvas').screenshot()).equals(before)).toBe(false)
  await page.getByRole('button',{name:'Reset camera',exact:true}).click()
- for(let i=0;i<4;i++)await page.getByRole('button',{name:'Zoom in',exact:true}).click()
+ await page.mouse.move(400,400);await page.mouse.wheel(0,-3200);await page.waitForTimeout(500)
  const edge=page.getByRole('button',{name:'Off-screen Caligo',exact:true});await expect(edge).toBeVisible();await edge.click()
  await expect(page.locator('.target-status')).toHaveText('Selected target: Caligo')
  await page.getByRole('button',{name:'Set direction',exact:true}).click();await expect(stat(page,'Alignment')).toHaveText('Turning')
- await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('a');await page.waitForTimeout(200);await page.keyboard.up('a')
+ await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('w');await page.waitForTimeout(200);await page.keyboard.up('w');await expect(stat(page,'Alignment')).toHaveText('Turning')
+ await page.keyboard.down('ArrowLeft');await page.waitForTimeout(200);await page.keyboard.up('ArrowLeft')
  await expect(stat(page,'Alignment')).toHaveText('Manual');await stopped(page)
  await page.getByRole('button',{name:'Reset camera',exact:true}).click();await expect(page.locator('.edge[data-offscreen="true"]')).toHaveCount(0)
 })
-test('focused forms preserve keyboard behavior; button keyboard hold and blur release',async({page})=>{
- await page.goto('/');const initial=await heading(page).textContent()
- await page.getByLabel('Find scanned contacts').fill('wasd ');await page.keyboard.down('a');await page.waitForTimeout(250);await page.keyboard.up('a');await expect(heading(page)).toHaveText(initial!)
- const up=page.getByRole('button',{name:'Pitch up',exact:true});await up.focus();await page.keyboard.down('Space');await page.waitForTimeout(350);await page.keyboard.up('Space')
- await expect(heading(page)).not.toHaveText(initial!);await stopped(page)
- await up.focus();await page.keyboard.down('Enter');await page.waitForTimeout(200);await page.getByLabel('Find scanned contacts').focus();await page.keyboard.up('Enter');await stopped(page)
- await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('d');await page.waitForTimeout(200);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await stopped(page);await page.keyboard.up('d')
- await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('w');await page.waitForTimeout(200);await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await stopped(page);await page.keyboard.up('w')
-})
-test('pointer capture releases outside the button, on cancellation and capture loss',async({page})=>{
- await page.goto('/')
- const left=page.getByRole('button',{name:'Yaw left',exact:true});await left.scrollIntoViewIfNeeded();const box=(await left.boundingBox())!
- await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.waitForTimeout(300);await page.mouse.move(30,30);await page.mouse.up();await stopped(page)
- for(const type of ['pointercancel','lostpointercapture']) {
-  await left.scrollIntoViewIfNeeded();const b=(await left.boundingBox())!;await page.mouse.move(b.x+b.width/2,b.y+b.height/2);await page.mouse.down();await page.waitForTimeout(200)
-  await left.dispatchEvent(type,{pointerId:1,pointerType:'mouse'});await stopped(page);await page.mouse.up()
+test('WASD pans without changing ship state and key release stops movement',async({page})=>{
+ await page.goto('/tests/fixture.html?scenario=visuals');await page.waitForFunction(()=>!!window.radarTest)
+ await expect(page.locator('.scan-status')).toContainText('4 temporary contacts')
+ const projection=()=>page.evaluate(()=>window.radarTest.projectLs([0,0,0]))
+ const ship=await page.locator('.stat').allTextContents()
+ await expect(page.getByRole('button',{name:/^(Pitch up|Pitch down|Yaw left|Yaw right|Zoom in|Zoom out)$/})).toHaveCount(0)
+ for(const [key,axis,direction] of [['w',1,1],['s',1,-1],['a',0,1],['d',0,-1]] as const){
+  // No prior click on the radar is required.
+  const before=await projection();await page.keyboard.down(key);await page.waitForTimeout(200);await page.keyboard.up(key)
+  const after=await projection();expect((after[axis]-before[axis])*direction).toBeGreaterThan(0)
+  await page.waitForTimeout(180);expect(await projection()).toEqual(after)
  }
+ expect(await page.locator('.stat').allTextContents()).toEqual(ship)
+ const beforeForm=await projection();await page.getByLabel('Find scanned contacts').fill('wasd');await page.keyboard.down('w');await page.waitForTimeout(150);await page.keyboard.up('w');expect(await projection()).toEqual(beforeForm)
+})
+test('camera keys release on focus, blur, visibility and resize',async({page})=>{
+ await page.goto('/tests/fixture.html?scenario=visuals');await page.waitForFunction(()=>!!window.radarTest)
+ const projection=()=>page.evaluate(()=>window.radarTest.projectLs([0,0,0]))
+ await page.getByRole('region',{name:'Navigation radar',exact:true}).focus()
+ for(const event of ['blur','visibilitychange','focus','resize']){
+  await page.keyboard.down('d');await page.waitForTimeout(100)
+  if(event==='blur')await page.evaluate(()=>window.dispatchEvent(new Event('blur')))
+  else if(event==='visibilitychange')await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')))
+  else if(event==='resize')await page.setViewportSize({width:1200,height:800})
+  else await page.getByLabel('Find scanned contacts').focus()
+  await page.waitForTimeout(150);const stopped=await projection();await page.waitForTimeout(200);expect(await projection()).toEqual(stopped)
+  await page.keyboard.up('d');await page.getByRole('region',{name:'Navigation radar',exact:true}).focus()
+ }
+})
+test('wheel zoom bounds and removed desktop controls survive view changes',async({page},testInfo)=>{
+ await page.goto('/tests/fixture.html?scenario=visuals');await page.waitForFunction(()=>!!window.radarTest)
+ const ship=await page.locator('.stat').allTextContents()
+ await page.mouse.move(400,400)
+ const zoom=await page.evaluate(()=>window.radarTest.snapshot().zoom)
+ await page.mouse.wheel(0,-400);await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().zoom)).toBeGreaterThan(zoom)
+ await page.mouse.wheel(0,400);await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().zoom)).toBeCloseTo(zoom,5)
+ for(const [delta,limit] of [[-50000,30],[50000,.001]] as const){await page.mouse.wheel(0,delta);await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().zoom)).toBe(limit)}
+ await page.getByRole('button',{name:'Reset camera',exact:true}).click()
+ await expect(page.getByRole('button',{name:/^(Pitch up|Pitch down|Yaw left|Yaw right|Zoom in|Zoom out)$/})).toHaveCount(0)
+ await testInfo.attach('desktop-controls.png',{body:await page.screenshot(),contentType:'image/png'})
+ await testInfo.attach('desktop-state.json',{body:JSON.stringify({ship,gpu:await page.evaluate(()=>window.radarTest.snapshot())},null,2),contentType:'application/json'})
+})
+test('Help has keyboard focus containment, accurate bindings and Escape/close return focus',async({page},testInfo)=>{
+ await page.goto('/');const help=page.getByRole('button',{name:'Help',exact:true});await help.focus();await page.keyboard.press('Enter')
+ const dialog=page.getByRole('dialog',{name:'Navigation help'});await expect(dialog).toBeVisible()
+ const close=dialog.getByRole('button',{name:'Close help'});await expect(close).toBeFocused()
+ await page.keyboard.press('Tab');await page.keyboard.press('Tab');await expect(close).toBeFocused()
+ await expect(dialog).toContainText('Pan the camera');await expect(dialog).toContainText('Arrow keys');await expect(dialog).toContainText('Wheel zooms')
+ await testInfo.attach('help.png',{body:await page.screenshot(),contentType:'image/png'})
+ await page.keyboard.press('Escape');await expect(dialog).toHaveCount(0);await expect(help).toBeFocused()
+ await help.click();await close.click();await expect(dialog).toHaveCount(0);await expect(help).toBeFocused()
+})
+test('right-drag pointer release outside canvas ends pan and ship controls release on blur',async({page})=>{
+ await page.goto('/tests/fixture.html?scenario=visuals');await page.waitForFunction(()=>!!window.radarTest)
+ const projection=()=>page.evaluate(()=>window.radarTest.projectLs([0,0,0]))
+ const initial=await projection()
+ await page.mouse.move(400,350);await page.mouse.down({button:'right'});await page.mouse.move(1100,200,{steps:6});await page.mouse.up({button:'right'});await page.waitForTimeout(1000)
+ const released=await projection();expect(released).not.toEqual(initial);await page.mouse.move(500,300);await page.waitForTimeout(300)
+ const after=await projection();expect(after[0]).toBeCloseTo(released[0],3);expect(after[1]).toBeCloseTo(released[1],3)
+ await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('ArrowRight');await page.waitForTimeout(200);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await stopped(page);await page.keyboard.up('ArrowRight')
 })
 test('zero throttle coasts while ship rotates; focused slider keeps native keyboard input',async({page})=>{
  await page.goto('/');await page.getByLabel('Throttle',{exact:true}).fill('100');await page.waitForTimeout(450)
  await page.getByRole('button',{name:'Zero throttle (Space)',exact:true}).click();await page.waitForTimeout(250);const speed=await stat(page,'Speed').textContent();expect(speed).not.toBe('0.0 m/s')
- await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('d');await page.waitForTimeout(400);await page.keyboard.up('d');await expect(stat(page,'Speed')).toHaveText(speed!)
+ await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('ArrowRight');await page.waitForTimeout(400);await page.keyboard.up('ArrowRight');await expect(stat(page,'Speed')).toHaveText(speed!)
  await page.getByLabel('Throttle',{exact:true}).focus();await page.keyboard.press('ArrowRight');await expect(page.getByLabel('Throttle',{exact:true})).toHaveValue('1')
  await page.keyboard.press('Space');await expect(page.getByLabel('Throttle',{exact:true})).toHaveValue('1')
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.press('Space');await expect(page.getByLabel('Throttle',{exact:true})).toHaveValue('0')
@@ -51,7 +96,7 @@ for(const scenario of ['warning','destroyed','safe','asteroid'])test(`production
  await page.goto(`/tests/fixture.html?scenario=${scenario}`)
  if(scenario==='warning'){await expect(page.getByRole('status',{name:'Navigation warnings'})).toContainText('dangerous approach');return}
  await expect(page.locator('.contact-status')).toContainText(scenario==='destroyed'?'Journey ended':scenario==='safe'?'Safe surface contact':'Crash recovery')
- await expect(page.getByLabel('Throttle',{exact:true})).toBeDisabled();await expect(page.getByRole('button',{name:'Pitch up',exact:true})).toBeDisabled()
+ await expect(page.getByLabel('Throttle',{exact:true})).toBeDisabled()
  await page.getByRole('button',{name:'Restart navigation',exact:true}).click();await expect(page.locator('.app')).toHaveAttribute('data-mode','flying');await expect(page.getByLabel('Throttle',{exact:true})).toBeEnabled()
 })
 test('dense groups and accessible contact picker keep all IDs with bounded DOM',async({page})=>{

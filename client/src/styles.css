@@ -6,3 +6,9 @@ label{display:block;font-size:12px;color:#9bc5cf;margin:10px 0 5px}h2 label{marg
 .edge{--edge-inset:95px}@media(max-width:750px){.edge{--edge-inset:55px}}
 
 .edge{width:max-content}
+
+.direction-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+.direction-lines line{stroke:#78bdbe;stroke-width:1;stroke-opacity:.22;stroke-linecap:butt}
+.direction-lines line.selected{stroke:#e5ffc2;stroke-width:2;stroke-opacity:.9}
+.edge.selected{border-color:#e5ffc2!important;color:#f1ffdc!important;background:#253c35f5!important}
+.top-label,.legend{z-index:1}

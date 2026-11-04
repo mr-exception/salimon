@@ -40,7 +40,7 @@ The prototype must not silently masquerade as the original native gameplay. Its 
 
 ## Migration/engineering follow-ups
 
-Keep sample simulation separate from rendering. Split coordinates, ship-relative conversion and impulse/mass motion are implemented for the browser ship. `scanner.ts` now indexes immutable catalog bodies into integer 32-cell buckets. It queries the inclusive 100,000 ls sphere on ticks 300, 600, etc.; first contact publication waits five simulation seconds. Between pulses it only evicts out-of-range contacts, including selection, without recording history. `radar.ts` projects these contacts through the actual orthographic frustum. One symbol/edge button per 44 px bin bounds presentation; grouping retains every ID and exposes paged selection (32 rows). Edge markers use frustum clipping, never radial zoom approximations. The grid translates along a fixed galactic lattice. `navigationRuntime.ts` composes ship/contact/scanner transitions on every fixed step. `input.ts` owns held-input sources and hidden/resume frame timing. Automated unit/integration and desktop/mobile/production browser checks are in place, alongside labelled keyboard-accessible controls and paged contact search. Remaining migration work includes epoch-aware body positions and eventual native-domain integration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.
+Keep sample simulation separate from rendering. Split coordinates, ship-relative conversion and impulse/mass motion are implemented for the browser ship. `scanner.ts` now indexes immutable catalog bodies into integer 32-cell buckets. It queries the inclusive 100,000 ls sphere on ticks 300, 600, etc.; first contact publication waits five simulation seconds. Between pulses it only evicts out-of-range contacts, including selection, without recording history. `radar.ts` projects these contacts through the actual orthographic frustum. One symbol/edge button per 44 px bin bounds presentation; grouping retains every ID and exposes paged selection (32 rows). Off-screen directional lines use ship-to-target segment clipping against the actual orthographic viewport, never radial zoom approximations. Labels use stable perimeter slots; selected representatives get priority, and grouping preserves every ID. The grid translates along a fixed galactic lattice. `navigationRuntime.ts` composes ship/contact/scanner transitions on every fixed step. `input.ts` owns held-input sources and hidden/resume frame timing. Automated unit/integration and desktop/mobile/production browser checks are in place, alongside labelled keyboard-accessible controls and paged contact search. Remaining migration work includes epoch-aware body positions and eventual native-domain integration. The prototype's apparent local speed/distance scale must be replaced by the real simulation rather than retuned into fake astronomy.
 
 ## Browser physical contact (#729)
 
@@ -87,3 +87,18 @@ Use `npm ci`, `npm test`, `npm run build` and `npm run test:browser` in `client/
 The Playwright configuration starts isolated dev and production-preview servers,
 executes serially on actual software WebGL and retains screenshots/raw results.
 CI repeats these checks against the current PR head with lockfile caching.
+
+## Viewport-reaching contact lines (#738)
+
+`radar.ts::clipViewportSegment` clips projected ship→contact segments to the
+actual viewport. Lines end at its boundary, without arrows or interior endpoint
+caps. Panned/off-screen ships may yield two boundary crossings or no visible
+segment. Parallel, coincident, tangent and nonfinite inputs never invent geometry.
+Depth-only exclusions have labels but no false 2D directional line. Stable edge
+slots use one subdued representative ray per group; selected contacts supply the
+exact highlighted ray. All IDs remain available in paged selection. Classification
+uses the real viewport rather than the former inset marker rectangle. Label
+insets never shorten the lines. Right-drag pans; left-drag orbits and wheel zooms.
+Reset restores the camera target as well as orientation/zoom. These interactions
+change no simulation/scanner state. Camera projections use ship-relative split
+coordinates. Detection, five-second cadence and expiry keep their existing owners.

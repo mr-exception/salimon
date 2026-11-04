@@ -18,14 +18,16 @@ const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
 const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
 type ViewCommand={action:'reset'|'in'|'out';sequence:number}
 function CameraControls({ onViewRadius, command }: { onViewRadius: (value: number) => void; command:ViewCommand }) {
-  const { camera, gl } = useThree()
+  const { camera, gl, set } = useThree()
   const controlsRef = useRef<OrbitControls|null>(null)
   useEffect(() => {
     camera.position.set(200000, 125000, 200000)
     camera.lookAt(0,0,0)
     camera.updateProjectionMatrix()
     const controls = new OrbitControls(camera, gl.domElement)
-    controls.enablePan = false
+    controls.enablePan = true
+    controls.screenSpacePanning = true
+    set({controls})
     controls.enableDamping = true
     controlsRef.current = controls
     controls.minZoom = 0.001
@@ -38,8 +40,8 @@ function CameraControls({ onViewRadius, command }: { onViewRadius: (value: numbe
     }
     controls.addEventListener('change',sync)
     sync()
-    return () => { controls.removeEventListener('change',sync); controls.dispose();controlsRef.current=null }
-  },[camera,gl,onViewRadius])
+    return () => { controls.removeEventListener('change',sync); controls.dispose();controlsRef.current=null;set({controls:null}) }
+  },[camera,gl,onViewRadius,set])
   useEffect(()=>{
     if(!(camera instanceof THREE.OrthographicCamera))return
     if(command.action==='reset'){
@@ -74,7 +76,7 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
     elapsed.current = 0
     const next=radarGroups(contacts,pose.position,p=>{
       const v=new THREE.Vector3(...p).project(camera);return [v.x,v.y,v.z]
-    },size.width,size.height)
+    },size.width,size.height,selected)
     updateGroups(next);setGroups(next)
   })
   const spacing=10**Math.floor(Math.log10(Math.max(1,viewRadius/5)))
@@ -88,7 +90,7 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
     <axesHelper args={[65]}/>
     <ShipVisual pitch={pose.pitch} yaw={pose.yaw}/>
     {length(pose.velocityMps)>0.000001 && <arrowHelper args={[new THREE.Vector3(...normal(pose.velocityMps)),new THREE.Vector3(),85,'#f0b763',10,6]}/>}
-    {groups.filter(g=>!g.edge).map(g=><Contact key={g.id} body={g.bodies.find(b=>b.id===selected)??g.bodies[0]} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
+    {groups.filter(g=>!g.edge).map(g=><Contact key={g.id} body={g.bodies.find(b=>b.id===g.representative)!} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
   </>
 }
 export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onSceneReady?:(state:RootState)=>void}={}) {
@@ -198,7 +200,15 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
         <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
-      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=><button key={g.id} className="edge" data-offscreen={g.edge} style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} onClick={()=>selectGroup(g)} title={g.bodies.map(b=>b.name).slice(0,3).join(', ')}>{g.edge?'◇':'◉'} {g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name}</button>)}</div>
+      <svg className="direction-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        {[...groups].sort((a,b)=>Number(a.representative===selected)-Number(b.representative===selected)).filter(g=>g.edge&&g.line).map(g=><line key={g.id} data-contact-id={g.representative} className={g.representative===selected?'selected':''} x1={g.line!.start[0]} y1={g.line!.start[1]} x2={g.line!.end[0]} y2={g.line!.end[1]} vectorEffect="non-scaling-stroke"/>)}
+      </svg>
+      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=>{
+        const active=g.bodies.some(b=>b.id===selected)
+        const label=g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name
+        const selectedName=g.bodies.find(b=>b.id===selected)?.name
+        return <button key={g.id} className={`edge${active?' selected':''}`} data-offscreen={g.edge} style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} aria-label={g.edge?`Off-screen ${label}${selectedName?`, selected ${selectedName}`:''}`:undefined} aria-pressed={active} onClick={()=>selectGroup(g)} title={`${g.depthOnly?'Outside camera depth: ':''}${g.bodies.map(b=>b.name).slice(0,3).join(', ')}`}>{g.edge?'':'◉ '}{label}{active?' · selected':''}</button>
+      })}</div>
       <div className="legend">▲ HEADING <span>◆ VELOCITY</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
     </div>
     <aside>
@@ -236,7 +246,7 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
       <hr/>
       <h2>Manual orientation</h2>
       <div className="pad"><button aria-label="Pitch up" {...hold('up')}>↑</button><div><button aria-label="Yaw left" {...hold('left')}>←</button><button aria-label="Pitch down" {...hold('down')}>↓</button><button aria-label="Yaw right" {...hold('right')}>→</button></div></div>
-      <p className="muted" id="navigation-help">Focus the radar for W/A/S/D and Space. Hold buttons with pointer, Space or Enter. Camera drag is independent.</p>
+      <p className="muted" id="navigation-help">Focus the radar for W/A/S/D and Space. Hold buttons with pointer, Space or Enter. Drag to orbit, right-drag to pan and wheel to zoom. Camera movement is independent.</p>
       <div className="camera-actions"><button onClick={()=>view('in')}>Zoom in</button><button onClick={()=>view('out')}>Zoom out</button><button onClick={()=>view('reset')}>Reset camera</button></div>
       <hr/>
       <h2><label htmlFor="throttle">Throttle</label> <strong>{throttle>0?'+':''}{throttle}%</strong></h2>

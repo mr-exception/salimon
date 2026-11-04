@@ -1,0 +1,36 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:6288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6319) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 19 tests using 1 worker
+
+(node:6331) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (17.3s)
+  ✓   2 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (5.6s)
+  ✓   3 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (8.9s)
+  ✓   4 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (5.9s)
+  ✓   5 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (6.3s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (6.3s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (4.8s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (2.6s)
+  ✓   9 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (3.7s)
+  ✓  10 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (4.0s)
+  ✓  11 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (4.4s)
+  ✓  12 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (18.5s)
+  ✓  13 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (13.5s)
+  ✓  14 [desktop] › tests/edges.spec.ts:48:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (13.6s)
+  ✓  15 [desktop] › tests/edges.spec.ts:67:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (9.5s)
+  ✓  16 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (17.0s)
+  ✓  17 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (15.2s)
+  ✓  18 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (11.7s)
+(node:7155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  19 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (10.4s)
+
+  19 passed (3.1m)

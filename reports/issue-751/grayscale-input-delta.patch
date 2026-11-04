@@ -1,0 +1,117 @@
+diff --git a/.github/workflows/navigation-client.yml b/.github/workflows/navigation-client.yml
+index 1aa19de..1d9c6ed 100644
+--- a/.github/workflows/navigation-client.yml
++++ b/.github/workflows/navigation-client.yml
+@@ -59,8 +59,31 @@ jobs:
+       - name: Prove a real visual defect fails comparison
+         working-directory: client
+         run: npm run test:visual:negative
++      - uses: actions/upload-artifact@v4
++        if: always()
++        with:
++          name: navigation-evidence-${{ github.sha }}
++          path: client/test-results/
++          retention-days: 14
++
++  baseline-approval:
++    if: github.event_name == 'pull_request'
++    needs: build
++    runs-on: ubuntu-24.04
++    timeout-minutes: 5
++    steps:
++      - uses: actions/checkout@v4
++        with:
++          fetch-depth: 2
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22'
++          cache: npm
++          cache-dependency-path: client/package-lock.json
++      - name: Install locked dependencies
++        working-directory: client
++        run: npm ci --no-audit --no-fund
+       - name: Require explicit human approval for changed baselines
+-        if: github.event_name == 'pull_request'
+         working-directory: client
+         env:
+           GITHUB_TOKEN: ${{ github.token }}
+@@ -70,6 +93,6 @@ jobs:
+       - uses: actions/upload-artifact@v4
+         if: always()
+         with:
+-          name: navigation-evidence-${{ github.sha }}
+-          path: client/test-results/
++          name: navigation-baseline-approval-${{ github.sha }}
++          path: client/test-results/baseline-approval.json
+           retention-days: 14
+diff --git a/client/playwright.config.ts b/client/playwright.config.ts
+index 1b67198..e271066 100644
+--- a/client/playwright.config.ts
++++ b/client/playwright.config.ts
+@@ -5,7 +5,7 @@ export default defineConfig({
+  testDir:'./tests',timeout:30000,expect:{timeout:10000},workers:1,fullyParallel:false,retries:0,
+  reporter:[['list'],['json',{outputFile:`${evidenceDir}/results.json`}]],
+  use:{baseURL:'http://127.0.0.1:5175',viewport:{width:1280,height:800},deviceScaleFactor:1,locale:'en-US',timezoneId:'UTC',colorScheme:'dark',reducedMotion:'reduce',screenshot:'on',trace:'retain-on-failure',
+-  launchOptions:{executablePath:process.env.CHROMIUM_PATH,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']}},
++  launchOptions:{executablePath:process.env.CHROMIUM_PATH,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-lcd-text']}},
+  projects:[{name:'navigation-captures',timeout:180000,testMatch:/navigation-captures\.spec\.ts/,use:{trace:'on'}},{name:'deterministic',timeout:120000,testMatch:/deterministic\.spec\.ts/},{name:'desktop',testMatch:/(desktop|visuals|edges|panning)\.spec\.ts/},{name:'production',testMatch:/production\.spec\.ts/}],
+  webServer:[
+   {command:'npm run dev -- --host 127.0.0.1 --port 5175 --strictPort',url:'http://127.0.0.1:5175',reuseExistingServer:!process.env.CI},
+diff --git a/client/tests/navigation-baselines/README.md b/client/tests/navigation-baselines/README.md
+index bf4f721..cceea39 100644
+--- a/client/tests/navigation-baselines/README.md
++++ b/client/tests/navigation-baselines/README.md
+@@ -34,7 +34,9 @@ npm run test:visual:negative
+
+ Use the lockfile Chromium on Linux x64; do not set `CHROMIUM_PATH` for reference
+ qualification. Environment drift (browser/Playwright/platform/architecture/font
+-hashes/renderer) fails explicitly. Host distro/version is recorded in the issue
++hashes/renderer) fails explicitly. Chromium explicitly disables LCD text
++(`--disable-lcd-text`) so opaque sidebar glyphs use the same grayscale
++rasterization on Debian and Ubuntu. Actual launch flags are recorded per capture. Host distro/version is recorded in the issue
+ report/CI runner rather than asserting Debian and Ubuntu are the same OS.
+ Seed 750, fixture front camera, fixed zooms, DPR 1, en-US/UTC, dark scheme and
+ paused RAF/performance clock are recorded in `manifest.json` and observations.
+@@ -73,7 +75,8 @@ not count as detecting the defect. It never edits checkout references.
+    Agents must never write this comment, impersonate the reviewer or count their
+    own image judgment as approval. The human can use the same GitHub account that
+    hosts an agent-authored PR; independence is from the implementing agent.
+-5. Rerun the failed approval step/job. It validates image hashes and accepts only
++5. Rerun the failed `baseline-approval` job (the successful browser/build job does
++   not need to run again). It validates image hashes and accepts only
+    that exact digest from a human collaborator (Bot/unaffiliated accounts fail).
+    Any changed manifest invalidates the approval. A byte-identical manifest
+    inherited from the PR base needs no repeat approval. Baseline approval does
+diff --git a/client/tests/navigation-captures.spec.ts b/client/tests/navigation-captures.spec.ts
+index 081c4a8..f52f0d1 100644
+--- a/client/tests/navigation-captures.spec.ts
++++ b/client/tests/navigation-captures.spec.ts
+@@ -22,6 +22,8 @@ const cases=[
+ test('VIS-1/2 eight navigation screens match reference pixels',async({page,browser},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
+  const fonts=await Promise.all(['DejaVuSans.ttf','DejaVuSans-Bold.ttf','fonts.css'].map(async f=>[f,sha256(await readFile(`tests/assets/${f}`))]))
++ const launchArgs=info.project.use.launchOptions?.args??[]
++ expect(launchArgs,'VISUAL_RASTERIZATION_POLICY').toContain('--disable-lcd-text')
+  const source=(await readFile('.revision-for-negative','utf8').catch(()=>null))??execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()
+  const environment={platform:process.platform,arch:process.arch,browser:browser.version(),playwright:JSON.parse(await readFile('node_modules/@playwright/test/package.json','utf8')).version,viewport:{width:1280,height:800},dpr:1,locale:'en-US',timezone:'UTC',colorScheme:'dark',fontHashes:Object.fromEntries(fonts),seed:750,epoch:EPOCH,policy:POLICY}
+  const manifest=candidate?null:JSON.parse(await readFile(`${directory}/manifest.json`,'utf8'))
+@@ -49,7 +51,7 @@ test('VIS-1/2 eight navigation screens match reference pixels',async({page,brows
+   const actual=await page.screenshot({caret:'hide'})
+   const name=`${c.id}.png`;images[name]=sha256(actual)
+   await writeFile(join(output,name),actual)
+-  await writeFile(join(output,`${c.id}.json`),json({source,environment,fixture,state,errors}))
++  await writeFile(join(output,`${c.id}.json`),json({source,environment,launchArgs,fixture,state,errors}))
+   await info.attach(name,{body:actual,contentType:'image/png'})
+   if(candidate){results.push({id:c.id,status:'CANDIDATE',sha256:sha256(actual)});continue}
+   const original=await readFile(join(directory,name))
+@@ -66,8 +68,8 @@ test('VIS-1/2 eight navigation screens match reference pixels',async({page,brows
+   const renderer=(await snapshot(page)).scene.renderer
+   await writeFile(join(output,'manifest.json'),json({schema:1,environment,renderer,images})+'\n')
+  }
+- await writeFile(join(output,'summary.json'),json({source,candidate:!!candidate,results})+'\n')
+- await info.attach('comparison-summary.json',{body:json({source,candidate:!!candidate,results}),contentType:'application/json'})
++ await writeFile(join(output,'summary.json'),json({source,launchArgs,candidate:!!candidate,results})+'\n')
++ await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+ })

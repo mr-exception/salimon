@@ -4,12 +4,15 @@ Implemented eight frozen full-viewport screenshot comparisons over the productio
 App and real Chromium/SwiftShader canvas, with pinned fixture fonts, strict pixel
 policy, durable diagnostics and a real CSS-regression demonstration. **QA pending:
 initial image references are candidates until explicit independent human baseline
-approval.** Required current-head CI and final independent review remain pending
+approval.** The first CI screenshot run failed on host text rasterization; corrected-head CI
+and final independent review remain pending
 at report creation. No baseline has been silently approved or regenerated.
 
 Branch `issue-751-navigation-visual-baselines` extends `main` at
 `b0318abf9c9e1e71a349ff1948e074efb04092c7`; no active PR stack existed.
-Current tested source: `46d691231548a6fde59ba056a8f9c125dc693a4e`.
+Current tested source: `538a77b20f63a736a10a133a50123a4d0d05672b`.
+The original local campaign below used `46d6912`; the grayscale revision and
+actual first CI failure are recorded in the addendum below.
 Final publication head/base, remote CI and independent verdict are bound in the
 PR conversation. #750's merged harness is reused. #224/#228 cover the historical
 native renderer and are not duplicated by browser layout captures.
@@ -134,3 +137,54 @@ Approve navigation baselines: 946d93ddef08b91e81eb29cf790389251058f4326148a85245
 Then rerun the failed gate/job and obtain final independent acceptance. The
 implementing agent will not post this approval. Keep #751 open before the
 accepted delivering PR merges. No merge, deployment or release is authorized.
+
+
+## CI rasterization diagnosis and revision (538a77b)
+
+[First CI run41798103146](https://github.com/mr-exception/salimon/actions/runs/41798103146)
+at published e038da8 / merge911afd1 passed units, build and23 existing browser
+routes but failed all8 screenshot comparisons. Counts were6512/6449/6449/6098/
+6449/6449/6425/6429, respectively. Its14-day
+[artifact13306277199](https://github.com/mr-exception/salimon/actions/runs/41798103146/artifacts/13306277199)
+was downloaded and essential originals, diffs, metadata, raw summary/results and
+failure trace are retained via the updated evidence index. This was an actual
+mandatory failure, not a passing run or a reason to regenerate references.
+
+Independent byte/region analysis of heading/velocity found0 changed pixels in
+the entire970-pixel-wide radar (canvas, bodies, vectors and composited overlay
+labels), versus19796 raw changed pixels in the opaque sidebar. The original
+[CI frame](ci-failure/heading-velocity.png) and
+[diff](ci-failure/heading-velocity-diff.png) show glyph-edge color changes there.
+The cloud host explicitly disables subpixel rendering in fontconfig; Ubuntu's
+opaque text path selected LCD rasterization. Font bytes and layout were already
+identical. Chromium now explicitly uses `--disable-lcd-text`, locking grayscale
+rasterization across both hosts; the screenshot test requires that flag and
+records actual launchArgs in each observation and summary.
+
+**No image, manifest byte, threshold or mask changed.** The approval digest is
+still946d93ddef08b91e81eb29cf790389251058f4326148a85245f36e89069bdd60.
+This preserves the original reference proposal and makes the runtime reproduce
+its rasterization, rather than approving or replacing a changed visual design.
+The separate `baseline-approval` CI job requires the successful build/browser job;
+a later human comment can rerun only that gate instead of repeating gameplay.
+
+At exact committed source538a77b:
+
+- `npm run build`: PASS ([log](grayscale-build.log)).
+- `SALIMON_EVIDENCE_DIR=test-results/grayscale npm run test:visual`: PASS,8/8,
+  zero changed and raw changed pixels ([log](grayscale.log)).
+- `SALIMON_EVIDENCE_DIR=test-results/grayscale-repeat npm run test:visual`: PASS,
+  another8/8 exact match ([log](grayscale-repeat.log)).
+- `npm run test:visual:negative`: PASS, red velocity still fails the same two
+  frames (520/630 pixels), six unchanged controls pass ([log](grayscale-negative.log)).
+- Domain source/unit assertions are unchanged; their30-test result is reused.
+  Current-head CI must still run all required gates, including full browser and
+  prior navigation mutations, with the new launch setting. No CI pass is predicted.
+
+The distinct reviewer rechecked the four-file source diff, CI originals, exact
+regional counts, local repeat and negative evidence. No additional blocking code
+finding; actual current-head CI and explicit human baseline approval remain
+mandatory. Source hashes now bind538a77b inputs; the source delta from46d6912 is
+[recorded separately](grayscale-input-delta.patch). Final head/base/CI/verdict are
+bound after publication in the PR conversation. The user intends to review and
+approve on GitHub; intent is not recorded approval and the gate remains required.

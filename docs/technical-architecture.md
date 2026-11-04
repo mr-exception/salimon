@@ -20,7 +20,10 @@ The development entry `/?scene=top-down` adds one strict overhead world beside
 independently reusable navigation. `client/src/topDownFrames.ts` owns split
 planet-fixed/ship-local anchor conversion, common-planet camera differences and
 abstract poses; `topDownRuntime.ts` owns stable entity IDs, immutable state,
-fixed-step walking, follow-camera and layered draw lists. `TopDownView.tsx` maps
+fixed-step walking/facing, smoothed follow-camera and layered draw lists.
+`topDownInteraction.ts` owns frame-aware swept collision and stable-ID nearby
+selection/reach. Entity-local footprints drive visible wall/door/crate geometry;
+request/cancel state exposes test inspections without Core or radar effects. `TopDownView.tsx` maps
 these lists to SVG and desktop input without importing Three or radar state.
 Planet universe poses are independent of local drawing, avoiding astronomical
 Number cancellation. No automatic frame transfer or cockpit transition is

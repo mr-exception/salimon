@@ -1,0 +1,60 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts
+
+✔ VIS-1 comparison passes identical images and detects a changed frame with a retained diff (58.865493ms)
+✔ VIS-3 approval is exact, digest-bound and requires a human collaborator (0.587708ms)
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (8.90496ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (2.186393ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.393671ms)
+✔ rotation changes impact-relative velocity and destruction decision (1.766921ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (1.393774ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (0.597312ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (0.940543ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (1.361572ms)
+✔ independent key and pointer owners release without clearing another held input (12.670076ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (2.841355ms)
+✔ navigation assets have finite bounded flat facets and a directional ship silhouette (5.03981ms)
+✔ closed ship hull triangles face outward so back-face culling preserves the upper hull (0.288062ms)
+✔ out-of-view contacts have no presentation group, including depth and malformed projections (3.613858ms)
+✔ visible dense groups retain every ID, deterministic selected representative and bounded presentation (28.78947ms)
+✔ starter has 10 kg and 10 L independent limits (9.672889ms)
+✔ mass limits mining; only accepted amount leaves the source (0.756205ms)
+✔ volume limits harvesting even when weight is available (0.166604ms)
+✔ mixed materials are limited by both dimensions (1.204974ms)
+✔ zero requests, exhausted sources and insufficient space do not duplicate materials (0.245624ms)
+✔ exact debit and upgrade preserve independently validated capacities (1.918959ms)
+✔ reject invalid, fractional, unknown, zero-weight and overflowing quantities (0.369446ms)
+✔ repeated extraction conserves whole units (0.909324ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (34.326826ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (0.403206ms)
+✔ large catalog query matches independent brute force without global precision loss (157.926012ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (102.152086ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (5.078918ms)
+✔ presentation count is bounded by viewport cells, not catalog length (199.792702ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (5.145405ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (15.052344ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (5.777996ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (8.983931ms)
+✔ ship-local points round trip through rotated and translated planet poses (7.981092ms)
+✔ passengers retain identity and anchors while pose changes; terrain stays planet-fixed (1.682132ms)
+✔ camera-relative transforms cancel astronomical roots and retain sub-mm offsets across cells (2.497294ms)
+✔ fixed stepping is repeatable across render cadence, diagonal normalized and camera follows (24.385657ms)
+✔ visible walls bound the walk fixture and input/time validation prevent invalid transforms (91.363873ms)
+✔ draw order is stable independently of insertion and has no roof cover (1.257984ms)
+✔ sweeps block high-speed motion, slide tangent/away, and resolve in an object frame (0.832016ms)
+✔ crate, furniture, walls and closed door block walking; a detour reaches cockpit (32.124021ms)
+✔ nearby selection is deterministic, rejects missing/disabled/distant targets and supports request/cancel (6.652215ms)
+✔ facing is retained at rest and camera follows without a snap on move/release (2.391967ms)
+✔ infinite rays reach all edges/corners independently of vector magnitude (9.336797ms)
+✔ off-screen origins clip only forward visible portions; malformed, tangent and degenerate rays vanish (2.421382ms)
+✔ arbitrary rays preserve collinearity, direction and viewport clipping (11.952424ms)
+✔ orthographic projection handles independent vectors, pan, zoom, stationary and view-axis directions (7.885453ms)
+ℹ tests 48
+ℹ suites 0
+ℹ pass 48
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3922.093518

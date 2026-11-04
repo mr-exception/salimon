@@ -3,6 +3,8 @@
 The current `main` entry point is the navigation-only React/Three.js browser
 client. Start with [the client guide](client/README.md) and
 [the browser navigation contract](docs/radar-navigation-prototype.md).
+Development issues follow the [acceptance policy](docs/acceptance-policy.md) and
+include an evidence report and independent review before merge.
 With Node >=22.18:
 
 ```sh

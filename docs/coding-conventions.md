@@ -111,7 +111,10 @@ record what was validated at their revision and do not override current guides.
 
 ## Issue completion and follow-up
 
-Use the [two-label verification workflow](verification-workflow.md).
+Follow the current [acceptance policy](acceptance-policy.md) and
+[two-label verification workflow](verification-workflow.md). Independent review
+and passing current-revision mandatory checks precede QA acceptance; keep
+implementation issues open until the accepted delivering PR merges.
 `auto-verification` means AI executes cloud checks and creates/updates a PR and
 issue. `human-verification` means an issue gives ordered review/capture steps;
 the person returns evidence to Codex for assessment and an issue update. Codex
@@ -122,9 +125,10 @@ in the issue. This is the sole exception to the report-file/PR rules below.
 
 Deliver an issue's completed work in the current PR and close the source issue
 on merge, using a closing reference such as `Closes #123` in the PR description.
-If any point remains unresolved, create a separate follow-up issue for that
-remaining work rather than keeping the entire source issue open. Create and
-link the follow-up before the source issue closes so the work stays tracked.
+Required implementation or cloud acceptance failures keep the source issue
+incomplete. Separately scoped release qualifications or explicitly approved
+scope changes may transfer to a linked follow-up before source closure; preserve
+original requirements and never turn transferred/unrun checks into passes.
 
 For each follow-up:
 
@@ -143,10 +147,9 @@ Keep unresolved product/architecture questions in [Project Q&A](project-qa.md)
 linked to the follow-up until a decision is made. Preserve historical reports
 as evidence at their recorded revision; current workflow belongs here.
 
-For example, a performance PR can close its source issue after delivering an
-optimization while a linked follow-up owns a remaining timing regression or
-budget decision. The PR/report must still identify the failed gate or pending
-approval explicitly.
+For example, a cloud-verified optimization may deliver while a linked human
+issue owns reference-hardware qualification. A failed required cloud timing
+gate still blocks acceptance; a follow-up cannot waive it.
 
 ## Task completion reports
 
@@ -154,6 +157,8 @@ Except for the evidence-only human closure above, every completed task must writ
 `reports/task-<id>/README.md` for a task without an issue. Record:
 
 - Outcome and meaningful changes, including the affected ownership/contracts.
+- Tested source SHA, final head/base binding, independent reviewer/cycle/verdict
+  and criterion evidence under the acceptance policy.
 - Exact validation commands and results, relevant environment/tool versions,
   skipped checks and the reason; distinguish not run, failed and passed.
 - Limitations and remaining blockers, with links to the follow-up issues that

@@ -1,5 +1,10 @@
 # Validation matrix
 
+Follow the current [issue acceptance policy](acceptance-policy.md) for criterion
+matrices, independent review and current-revision evidence. For documentation-only
+changes, check changed links/paths and semantic consistency; record runtime gates
+as N/A with reasons when runtime behavior is unchanged.
+
 ## Verification ownership
 
 Follow [cloud and human verification](verification-workflow.md): reproducible

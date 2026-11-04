@@ -51,3 +51,21 @@ A representative production-scene GPU/pixel preflight passed before editing.
 
 No native platform, physical-device, hardware FPS or mobile qualification is
 claimed. No merge is performed; source issue stays open until PR merge.
+
+## Idle camera follow-up discovered in descendant CI
+
+The initial #747 [CI run](https://github.com/mr-exception/salimon/actions/runs/41784573915)
+passed 18/19 browser routes but found ~1e-12 percent idle projection changes after
+key release ([original failed-step log](ci-idle-failure.log)). The existing exact
+stability assertion remains unchanged. OrbitControls was reconstituting spherical
+coordinates every idle frame. CameraControls now updates it only during active
+pointer interaction or keyboard pan; pointer end still consumes residual damping.
+This fixes the production cause on its owning branch and is propagated through
+the stack. Required updated-head CI runs are linked on each PR/source issue.
+
+Updated production code: `npm run build --prefix client` passes, then
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser --prefix client --
+--project=desktop --grep 'WASD pans|pointer release|faceted navigation'`: **3/3 pass**
+([results](idle-recheck/results.json), [log](idle-recheck/browser.log),
+[build](idle-recheck/build.log)). The exact unchanged key-release assertion,
+right-drag release and proxy/reset checks all pass. Domain code is unchanged.

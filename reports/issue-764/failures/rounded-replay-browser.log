@@ -1,0 +1,47 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down -g PLANET-1
+
+
+Running 1 test using 1 worker
+
+(node:4734) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (27.6s)
+
+
+  1) [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 
+
+    Error: planet-near-colony fresh-run bytes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      203 |       await info.attach(`${name}-${replay}.json`, { body: JSON.stringify({ position: await position(page), tick: await scene(page).getAttribute('data-tick'), ground: await transform(page, 'terrain:site'), player: await transform(page, 'person:player') }), contentType: 'application/json' })
+      204 |       if (replay === 0) captures[name] = png
+    > 205 |       else expect(png.equals(captures[name]!), `${name} fresh-run bytes`).toBe(true)
+          |                                                                           ^
+      206 |     }
+      207 |     await capture('planet-spawn')
+      208 |     await page.keyboard.press('e')
+        at capture (/workspace/salimon/client/tests/top-down.spec.ts:205:75)
+        at /workspace/salimon/client/tests/top-down.spec.ts:227:5
+
+    attachment #8: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/764-planet-rounded/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/764-planet-rounded/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/error-context.md
+
+    attachment #10: trace (application/zip) ────────────────────────────────────────────────────────
+    test-results/764-planet-rounded/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/764-planet-rounded/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 

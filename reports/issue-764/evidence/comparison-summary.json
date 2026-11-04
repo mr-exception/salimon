@@ -1,0 +1,57 @@
+{
+  "planet-spawn-comparison.json": {
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "changedPixels": 0,
+    "rawChangedPixels": 0,
+    "totalPixels": 651918
+  },
+  "planet-near-rock-comparison.json": {
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "changedPixels": 0,
+    "rawChangedPixels": 1622,
+    "totalPixels": 651918
+  },
+  "planet-near-colony-comparison.json": {
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "changedPixels": 0,
+    "rawChangedPixels": 4796,
+    "totalPixels": 651918
+  },
+  "planet-near-scout-comparison.json": {
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "changedPixels": 0,
+    "rawChangedPixels": 4907,
+    "totalPixels": 651918
+  },
+  "wrong-checkpoint-negative.json": {
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "pass": false,
+    "changedPixels": 82966,
+    "rawChangedPixels": 182829
+  }
+}

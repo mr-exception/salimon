@@ -1,0 +1,37 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down -g PLANET-1
+
+
+Running 1 test using 1 worker
+
+(node:5307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (37ms)
+
+
+  1) [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 
+
+    Error: tracing.start: Tracing has been already started
+
+      191 |   for (let replay = 0; replay < 2; replay++) {
+      192 |     const context = await browser.newContext({ baseURL: 'http://127.0.0.1:5175', viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce' })
+    > 193 |     await context.tracing.start({ screenshots: true, snapshots: true })
+          |                           ^
+      194 |     const page = await context.newPage()
+      195 |     try {
+      196 |     // Empty view exercises the default development launch, not a test-only spawn.
+        at /workspace/salimon/client/tests/top-down.spec.ts:193:27
+
+    Error Context: test-results/764-planet-isolated/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/764-planet-isolated/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/764-planet-isolated/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 

@@ -35,12 +35,14 @@ measurements and independent AI image inspections are real.
   `#b6f5a2` → `#ff0000`. Browser comparison fails at 520 / 630 pixels in
   heading-velocity / opposite-vectors; six controls unchanged. Reviewer
   `/root/review_752` independently inspected all eight originals, changed
-  references/diffs, metadata and trace; returned REQUEST_CHANGES / AC-1 FAIL.
+  references/diffs and metadata, and verified trace archive integrity/availability;
+  returned REQUEST_CHANGES / AC-1 FAIL.
 - Repaired source `edd62718eb6dbfb55ddde51570a8afc892c02bf3`: actual restoration
   commit. 38 unit assertions/build/typecheck and all 24 browser routes pass;
   all eight frames have zero perceptual and raw differences. The distinct
   reviewer verified all hashes, two repaired originals, eight source/backend
-  observations and trace, then returned ACCEPT for the navigation mini-criterion.
+  observations and trace archive integrity/availability, then returned ACCEPT for
+  the navigation mini-criterion. No interactive trace replay is claimed.
   This does not self-accept the entire #752 implementation.
 - Replay: wrong → failure/REQUEST_CHANGES; new head before CI → pending;
   old CI on repaired head → failure/BLOCKED; new tests/captures → success/ACCEPT;

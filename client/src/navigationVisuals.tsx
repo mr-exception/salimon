@@ -29,7 +29,6 @@ export function ShipVisual({pitch,yaw}:{pitch:number;yaw:number}) {
       <mesh name="nav-ship-wings" geometry={wingGeometry} material={wingMaterial} dispose={null}/>
       <mesh name="nav-ship-canopy" position={[0,0.28,-0.17]} scale={[0.55,0.35,1.3]} geometry={canopyGeometry} material={glassMaterial} dispose={null}/>
       {[-0.25,0.25].map(x=><mesh key={x} name="nav-ship-engine" position={[x,0.05,0.88]} geometry={engineGeometry} material={engineMaterial} dispose={null}/>)}
-      <arrowHelper args={[new THREE.Vector3(0,0,-1),new THREE.Vector3(0,0,-1.7),1.2,'#69f4c2',0.22,0.12]}/>
     </ScreenSize>
   </group>
 }

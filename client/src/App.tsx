@@ -2,8 +2,10 @@ import { Canvas, useFrame, useThree, type RootState } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CameraControls } from './CameraControls'
 import { HelpDialog } from './HelpDialog'
+import { ShipVectorGuides, type VectorElements } from './ShipVectorGuides'
+import { STATIONARY_SPEED_MPS } from './vectorGuides'
 import * as THREE from 'three'
-import { SAMPLE_BODIES, length, normal, type Body, type Vec3 } from './sampleUniverse'
+import { SAMPLE_BODIES, length, type Body, type Vec3 } from './sampleUniverse'
 
 import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
 import { alignTo, setThrottle as changeThrottle, type ShipState } from './simulation.ts'
@@ -23,7 +25,7 @@ function Contact({ body, position, selected, onSelect }: { body: Body; position:
   </group>
 }
 
-function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand, panInput }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:number; panInput:NavigationInput }) {
+function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand, panInput, navigation, vectorElements }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:number; panInput:NavigationInput;navigation:NavigationRuntime;vectorElements:VectorElements }) {
   const { camera, size } = useThree()
   const [groups,updateGroups]=useState<ContactGroup[]>([])
   const elapsed = useRef(0)
@@ -44,10 +46,9 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
     <ambientLight intensity={0.65}/>
     <directionalLight position={[100,180,-80]} intensity={2}/>
     <GalacticLattice spacing={spacing} offset={gridOffset}/>
-    <axesHelper args={[65]}/>
+    <ShipVectorGuides navigation={navigation} elements={vectorElements}/>
     <ShipVisual pitch={pose.pitch} yaw={pose.yaw}/>
-    {length(pose.velocityMps)>0.000001 && <arrowHelper args={[new THREE.Vector3(...normal(pose.velocityMps)),new THREE.Vector3(),85,'#f0b763',10,6]}/>}
-    {groups.filter(g=>!g.edge).map(g=><Contact key={g.id} body={g.bodies.find(b=>b.id===g.representative)!} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
+    {groups.map(g=><Contact key={g.id} body={g.bodies.find(b=>b.id===g.representative)!} position={g.position} selected={g.bodies.some(b=>selected===b.id)} onSelect={()=>selectGroup(g)}/>)}
   </>
 }
 export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onSceneReady?:(state:RootState)=>void}={}) {
@@ -65,6 +66,8 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
   const [aligning,setAligning]=useState(false)
   const input=useRef(new NavigationInput())
   const panInput=useRef(new NavigationInput())
+  const headingLine=useRef<SVGLineElement>(null),velocityLine=useRef<SVGLineElement>(null)
+  const vectorElements:VectorElements=[headingLine,velocityLine]
   const [helpOpen,setHelpOpen]=useState(false)
   const [paused,setPaused]=useState(document.hidden)
   const [viewCommand,setViewCommand]=useState(0)
@@ -142,19 +145,15 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
   return <div className="app" data-mode={pose.mode}>
     <div className="radar" role="region" aria-label="Navigation radar" aria-describedby="navigation-help" tabIndex={0} onPointerDown={e=>{if(e.target instanceof HTMLCanvasElement)e.currentTarget.focus({preventScroll:true})}}>
       <Canvas orthographic camera={RADAR_CAMERA} onCreated={(state)=>{onSceneReady?.(state);const {gl}=state;gl.domElement.setAttribute('aria-label','Ship-centered three-dimensional radar');gl.domElement.setAttribute('role','img')}} fallback={<p role="alert">WebGL is unavailable. A WebGL 2 browser is required.</p>}>
-        <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand} panInput={panInput.current}/>
+        <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand} panInput={panInput.current} navigation={runtime.current} vectorElements={vectorElements}/>
       </Canvas>
       <div className="top-label">SALIMON <span>3D HOLOGRAPHIC RADAR / SAMPLE UNIVERSE</span></div>
-      <svg className="direction-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        {[...groups].sort((a,b)=>Number(a.representative===selected)-Number(b.representative===selected)).filter(g=>g.edge&&g.line).map(g=><line key={g.id} data-contact-id={g.representative} className={g.representative===selected?'selected':''} x1={g.line!.start[0]} y1={g.line!.start[1]} x2={g.line!.end[0]} y2={g.line!.end[1]} vectorEffect="non-scaling-stroke"/>)}
+      <svg className="ship-vectors" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Ship heading and velocity vector lines">
+        <line ref={headingLine} data-vector="heading" vectorEffect="non-scaling-stroke" style={{display:'none'}}/>
+        <line ref={velocityLine} data-vector="velocity" vectorEffect="non-scaling-stroke" style={{display:'none'}}/>
       </svg>
-      <div className="edge-layer">{groups.filter(g=>g.edge||g.bodies.length>1).map(g=>{
-        const active=g.bodies.some(b=>b.id===selected)
-        const label=g.bodies.length>1?`${g.bodies.length} contacts`:g.bodies[0].name
-        const selectedName=g.bodies.find(b=>b.id===selected)?.name
-        return <button key={g.id} className={`edge${active?' selected':''}`} data-offscreen={g.edge} style={{left:`clamp(var(--edge-inset), ${g.x}%, calc(100% - var(--edge-inset)))`,top:g.y+'%'}} aria-label={g.edge?`Off-screen ${label}${selectedName?`, selected ${selectedName}`:''}`:undefined} aria-pressed={active} onClick={()=>selectGroup(g)} title={`${g.depthOnly?'Outside camera depth: ':''}${g.bodies.map(b=>b.name).slice(0,3).join(', ')}`}>{g.edge?'':'◉ '}{label}{active?' · selected':''}</button>
-      })}</div>
-      <div className="legend">▲ HEADING <span>◆ VELOCITY</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
+      <div className="edge-layer">{groups.filter(g=>g.bodies.length>1).map(g=><button key={g.id} className="edge" style={{left:g.x+'%',top:g.y+'%'}} onClick={()=>selectGroup(g)}>◉ {g.bodies.length} contacts</button>)}</div>
+      <div className="legend"><b>HEADING</b> <span>{length(pose.velocityMps)<=STATIONARY_SPEED_MPS?'STATIONARY':'VELOCITY · dashed'}</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
     </div>
     <aside>
       <h1>NAVIGATION</h1><p className="muted">Navigation-only prototype · unlimited energy</p>
@@ -187,7 +186,7 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
         <button disabled={menuPage===0} onClick={()=>setMenuPage(p=>p-1)}>Previous contacts</button>
         <button disabled={(menuPage+1)*32>=menuBodies.length} onClick={()=>setMenuPage(p=>p+1)}>Next contacts</button>
       </div>}
-      {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><p className="muted">Surface clearance {fmt(targetDistances?.surfaceDistanceM??0)} m</p><button className="action" disabled={pose.mode!=='flying'} onClick={setDirection}>Set direction</button></>:<p className="muted">Select a holographic contact or edge marker.</p>}
+      {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><p className="muted">Surface clearance {fmt(targetDistances?.surfaceDistanceM??0)} m</p><button className="action" disabled={pose.mode!=='flying'} onClick={setDirection}>Set direction</button></>:<p className="muted">Select a visible contact or use the scanned-contact list.</p>}
       <hr/>
       <h2>Camera and orientation</h2>
       <p className="muted" id="navigation-help">WASD pans the view · wheel zooms · arrow keys turn the ship.</p>

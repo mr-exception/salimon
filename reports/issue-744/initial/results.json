@@ -1,0 +1,995 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "production"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "desktop.spec.ts",
+      "file": "desktop.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "scanner pulse, camera independence, clipping selection and manual alignment interruption",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14862,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:07:04.168Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-scanner-pulse-came-adaff-nual-alignment-interruption-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-9b5be75bfe1af93b47bc",
+          "file": "desktop.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "WASD pans without changing ship state and key release stops movement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6046,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:07:19.886Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-33a1550406bfb7bb4bac",
+          "file": "desktop.spec.ts",
+          "line": 26,
+          "column": 1
+        },
+        {
+          "title": "camera keys release on focus, blur, visibility and resize",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11051,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:07:26.011Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-camera-keys-releas-a0923--blur-visibility-and-resize-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-808fff5f75892d1c3d9b",
+          "file": "desktop.spec.ts",
+          "line": 41,
+          "column": 1
+        },
+        {
+          "title": "wheel zoom bounds and removed desktop controls survive view changes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7501,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:07:37.157Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "desktop-controls.png",
+                      "contentType": "image/png",
+                      "sha256": "d6c3848bbff3883ed90cb58202bfee229645af51081a5d94002905e483baebb9",
+                      "bytes": 71629,
+                      "retained": "desktop-controls.png"
+                    },
+                    {
+                      "name": "desktop-state.json",
+                      "contentType": "application/json",
+                      "sha256": "a47938d85b0be7fa3f3973854aa4f8369352b416b71ebe1939d1797836b1bb03",
+                      "bytes": 3086,
+                      "retained": "desktop-state.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-wheel-zoom-bounds--bdd1d-ntrols-survive-view-changes-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-3bca10a70a8d32e700d2",
+          "file": "desktop.spec.ts",
+          "line": 55,
+          "column": 1
+        },
+        {
+          "title": "Help has keyboard focus containment, accurate bindings and Escape/close return focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5115,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:07:44.747Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "help.png",
+                      "contentType": "image/png",
+                      "sha256": "ecc152834bf68dfed94325a09a37d4b6268c3bc21ceafa0641f57743562bd632",
+                      "bytes": 116723,
+                      "retained": "help.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-Help-has-keyboard--039bb-d-Escape-close-return-focus-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-c75fe441bf6c4c4822f8",
+          "file": "desktop.spec.ts",
+          "line": 68,
+          "column": 1
+        },
+        {
+          "title": "right-drag pointer release outside canvas ends pan and ship controls release on blur",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6476,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:07:49.972Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-e19cbf9765bc563e53eb",
+          "file": "desktop.spec.ts",
+          "line": 78,
+          "column": 1
+        },
+        {
+          "title": "zero throttle coasts while ship rotates; focused slider keeps native keyboard input",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5102,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:07:56.554Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-zero-throttle-coas-db468-keeps-native-keyboard-input-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-e7f85959647dd86710ad",
+          "file": "desktop.spec.ts",
+          "line": 87,
+          "column": 1
+        },
+        {
+          "title": "production App contact fixture: warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2510,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:01.754Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-production-App-contact-fixture-warning-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-4f1d12785bfbab09d795",
+          "file": "desktop.spec.ts",
+          "line": 95,
+          "column": 65
+        },
+        {
+          "title": "production App contact fixture: destroyed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2930,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:04.372Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-production-App-contact-fixture-destroyed-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-f95fb399d753a0b5979d",
+          "file": "desktop.spec.ts",
+          "line": 95,
+          "column": 65
+        },
+        {
+          "title": "production App contact fixture: safe",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3455,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:07.424Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-production-App-contact-fixture-safe-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-b9a57e85d1d6463a7855",
+          "file": "desktop.spec.ts",
+          "line": 95,
+          "column": 65
+        },
+        {
+          "title": "production App contact fixture: asteroid",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3463,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:10.924Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-production-App-contact-fixture-asteroid-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-fd777ccd2fd6b95481ec",
+          "file": "desktop.spec.ts",
+          "line": 95,
+          "column": 65
+        },
+        {
+          "title": "dense groups and accessible contact picker keep all IDs with bounded DOM",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5764,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:14.445Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-dense-groups-and-a-7caf6-ep-all-IDs-with-bounded-DOM-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-c459626c82c43fc4d5af",
+          "file": "desktop.spec.ts",
+          "line": 102,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "edges.spec.ts",
+      "file": "edges.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3102,
+                  "error": {
+                    "message": "TypeError: Cannot read properties of undefined (reading 'stroke')",
+                    "stack": "TypeError: Cannot read properties of undefined (reading 'stroke')\n    at /workspace/salimon/client/tests/edges.spec.ts:28:70",
+                    "location": {
+                      "file": "/workspace/salimon/client/tests/edges.spec.ts",
+                      "column": 70,
+                      "line": 28
+                    },
+                    "snippet": "  26 |   const sample=await lines(page);clipped(sample);samples.push(sample)\n  27 |   const heading=sample[0];if(x)expect(heading.end[0]).toBeCloseTo(x>0?100:0);if(y)expect(heading.end[1]).toBeCloseTo(y>0?0:100)\n> 28 |   expect(heading.stroke).toBe('rgb(255, 227, 106)');expect(sample[1].stroke).toBe('rgb(182, 245, 162)');expect(sample[1].dash).not.toBe('none')\n     |                                                                      ^\n  29 |  }\n  30 |  await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[-1,0,0]));await page.waitForTimeout(150)\n  31 |  const opposite=await lines(page);expect(opposite[0].end[0]).toBe(100);expect(opposite[1].end[0]).toBe(0)"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/workspace/salimon/client/tests/edges.spec.ts",
+                        "column": 70,
+                        "line": 28
+                      },
+                      "message": "TypeError: Cannot read properties of undefined (reading 'stroke')\n\n  26 |   const sample=await lines(page);clipped(sample);samples.push(sample)\n  27 |   const heading=sample[0];if(x)expect(heading.end[0]).toBeCloseTo(x>0?100:0);if(y)expect(heading.end[1]).toBeCloseTo(y>0?0:100)\n> 28 |   expect(heading.stroke).toBe('rgb(255, 227, 106)');expect(sample[1].stroke).toBe('rgb(182, 245, 162)');expect(sample[1].dash).not.toBe('none')\n     |                                                                      ^\n  29 |  }\n  30 |  await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[-1,0,0]));await page.waitForTimeout(150)\n  31 |  const opposite=await lines(page);expect(opposite[0].end[0]).toBe(100);expect(opposite[1].end[0]).toBe(0)\n    at /workspace/salimon/client/tests/edges.spec.ts:28:70"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:20.336Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/workspace/salimon/client/test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/workspace/salimon/client/test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/workspace/salimon/client/tests/edges.spec.ts",
+                    "column": 70,
+                    "line": 28
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "0651958d5a6751bb81e4-d7f23bf6b9aa4dc0abd4",
+          "file": "edges.spec.ts",
+          "line": 17,
+          "column": 1
+        },
+        {
+          "title": "ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8541,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:24.608Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "ship-off-screen.png",
+                      "contentType": "image/png",
+                      "sha256": "f0844805946c8a0ad6bc9037a4648f79ad75cdb524caaad6d0b0416b7ee1e7b8",
+                      "bytes": 14865,
+                      "retained": "ship-off-screen.png"
+                    },
+                    {
+                      "name": "camera-vector-state.json",
+                      "contentType": "application/json",
+                      "sha256": "d4c73f4e0c7a73f644f3f351dabea60e81c1662d1d225dcf56ab3c3da4e1eb93",
+                      "bytes": 4783,
+                      "retained": "camera-vector-state.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/edges-ship-rays-track-actu-db252--off-screen-origin-clipping-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0651958d5a6751bb81e4-4125cd4224db85035514",
+          "file": "edges.spec.ts",
+          "line": 45,
+          "column": 1
+        },
+        {
+          "title": "off-screen contacts stay in picker after pulse and selection still expires with scanner range",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7751,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:33.771Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/edges-off-screen-contacts--3f9ef--expires-with-scanner-range-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0651958d5a6751bb81e4-8b486f60d9d2bbed4f30",
+          "file": "edges.spec.ts",
+          "line": 64,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "visuals.spec.ts",
+      "file": "visuals.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "faceted navigation proxies render at readable sizes without a rectangular surface",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10342,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:41.570Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "zoom-0.5.png",
+                      "contentType": "image/png",
+                      "sha256": "61353388b96093737e5558c7c395b7e8d7e5afdaad1d2f94878107c2a4d4d3d0",
+                      "bytes": 19020,
+                      "retained": "zoom-0.5.png"
+                    },
+                    {
+                      "name": "zoom-0.1.png",
+                      "contentType": "image/png",
+                      "sha256": "92e1d6778cc49de1648ffcc3e3d51824b2d53ea33a9f9bcec04b3617501a7223",
+                      "bytes": 16921,
+                      "retained": "zoom-0.1.png"
+                    },
+                    {
+                      "name": "zoom-1.png",
+                      "contentType": "image/png",
+                      "sha256": "5e0597dcd56584e04639e41242538ac448a03b492b1dc9ecac60452ed6a45b50",
+                      "bytes": 19134,
+                      "retained": "zoom-1.png"
+                    },
+                    {
+                      "name": "selected.png",
+                      "contentType": "image/png",
+                      "sha256": "70d06e482b108b254af748b10c5886d3686dbd51fe736097471828565d5c71b6",
+                      "bytes": 19739,
+                      "retained": "selected.png"
+                    },
+                    {
+                      "name": "geometry-backend.json",
+                      "contentType": "application/json",
+                      "sha256": "9271dce170f5ea769850d936c882735c82b255ae37d115efd0f6e81d502b172d",
+                      "bytes": 11667,
+                      "retained": "geometry-backend.json"
+                    },
+                    {
+                      "name": "camera-reset.png",
+                      "contentType": "image/png",
+                      "sha256": "d2f378c68b601b01f1ed2badb7d3a50ca12a43d58a2f8292b9f9b26067dee84a",
+                      "bytes": 25936,
+                      "retained": "camera-reset.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/visuals-faceted-navigation-ac6c3-thout-a-rectangular-surface-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "821bf1ebb4ae78f6d65d-4511f7b795770a79ae93",
+          "file": "visuals.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "production.spec.ts",
+      "file": "production.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "built production bundle renders WebGL, scanner and labelled controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "production",
+              "projectName": "production",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7711,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:08:52.786Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "backend.json",
+                      "contentType": "application/json",
+                      "sha256": "0f7ae59d040fe151f7f2cfececcf3ea302799b7846d53e99127b677bc85811d8",
+                      "bytes": 293,
+                      "retained": "backend.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/production-built-productio-b08b0-anner-and-labelled-controls-production/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed69554c53210704c98c-12950389f42ba9846fe5",
+          "file": "production.spec.ts",
+          "line": 2,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-04T06:07:01.833Z",
+    "duration": 119352.753,
+    "expected": 16,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

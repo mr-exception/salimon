@@ -1,0 +1,16 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=desktop --grep ship rays reach every
+
+[WebServer] (node:5503) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:5546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (14.2s)
+
+  1 passed (18.0s)

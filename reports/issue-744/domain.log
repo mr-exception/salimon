@@ -1,0 +1,40 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts
+
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (2.876652ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (0.768459ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.306277ms)
+✔ rotation changes impact-relative velocity and destruction decision (1.512787ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (2.70563ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (1.273225ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (2.463403ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (30.397031ms)
+✔ independent key and pointer owners release without clearing another held input (2.930523ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (1.9956ms)
+✔ navigation assets have finite bounded flat facets and a directional ship silhouette (6.287789ms)
+✔ closed ship hull triangles face outward so back-face culling preserves the upper hull (0.705995ms)
+✔ out-of-view contacts have no presentation group, including depth and malformed projections (3.248668ms)
+✔ visible dense groups retain every ID, deterministic selected representative and bounded presentation (55.271633ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (126.299118ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (4.967501ms)
+✔ large catalog query matches independent brute force without global precision loss (123.840769ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (38.886804ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (1.453695ms)
+✔ presentation count is bounded by viewport cells, not catalog length (159.817456ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (3.801198ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (4.059676ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (2.416827ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (4.869532ms)
+✔ infinite rays reach all edges/corners independently of vector magnitude (8.071145ms)
+✔ off-screen origins clip only forward visible portions; malformed, tangent and degenerate rays vanish (0.960117ms)
+✔ arbitrary rays preserve collinearity, direction and viewport clipping (9.006156ms)
+✔ orthographic projection handles independent vectors, pan, zoom, stationary and view-axis directions (8.444979ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2859.047625

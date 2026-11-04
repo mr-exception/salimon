@@ -1,0 +1,216 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=desktop",
+      "--grep",
+      "ship rays reach every"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "edges.spec.ts",
+      "file": "edges.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14200,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:09:26.002Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "opposite-vectors.png",
+                      "contentType": "image/png",
+                      "sha256": "a4bfeb554093e7c9e1aa3eceb421eb90bf243489aff52b5cc2810f4f8e9773eb",
+                      "bytes": 15097,
+                      "retained": "opposite-vectors.png"
+                    },
+                    {
+                      "name": "differing-vectors.png",
+                      "contentType": "image/png",
+                      "sha256": "375e5454b25e85854da4469b940d7bb06b846a20c56a8ee6ab3aaf3db238a4db",
+                      "bytes": 15590,
+                      "retained": "differing-vectors.png"
+                    },
+                    {
+                      "name": "overlapping-vectors.png",
+                      "contentType": "image/png",
+                      "sha256": "dd02ea071f1e02453a1aa5ae127c5d02c2b3fbbb5562f776aee5fd6c620d6560",
+                      "bytes": 15066,
+                      "retained": "overlapping-vectors.png"
+                    },
+                    {
+                      "name": "nearly-overlapping-vectors.png",
+                      "contentType": "image/png",
+                      "sha256": "da387866daffe0c6b53f7215586b10f84c38a072ea0ecd2ab79e5bf3fa6a803a",
+                      "bytes": 15107,
+                      "retained": "nearly-overlapping-vectors.png"
+                    },
+                    {
+                      "name": "vector-state.json",
+                      "contentType": "application/json",
+                      "sha256": "ca33e54d5ac4e596a99dfa5a22d32686a9971738086b0e3247e8e6ac940ad7dc",
+                      "bytes": 6290,
+                      "retained": "vector-state.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0651958d5a6751bb81e4-d7f23bf6b9aa4dc0abd4",
+          "file": "edges.spec.ts",
+          "line": 17,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-04T06:09:23.117Z",
+    "duration": 17971.893,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

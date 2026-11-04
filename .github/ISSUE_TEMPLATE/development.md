@@ -41,6 +41,6 @@ screenshots/traces/raw logs in `reports/issue-N/README.md`. Retain failures and
 unverified limits. Link separately owned release qualification with exact scope.
 
 Status: implementation in progress / QA pending / changes requested / QA accepted
-/ merged / closed. Record independent reviewer identity/capability, cycle, verdict
+/ merged / closed. Record the active-session reviewer identity/capability, verdict
 and criterion evidence. Keep open until delivering PR merges with mandatory
 acceptance satisfied; use `Closes #N` in that PR from creation.

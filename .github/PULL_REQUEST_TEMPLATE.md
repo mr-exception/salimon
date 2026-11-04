@@ -9,7 +9,7 @@ Describe the observable change and any negative/boundary cases.
 - Head branch/SHA and base branch/SHA:
 - Parent PR (or default branch if no active stack), verified ancestry and unique diff:
 - Tested source SHA; final-head binding/review comment (fill after publication):
-- Status: QA pending (independent acceptance is required before QA accepted).
+- Status: QA pending (review changes/evidence in the active Codex chat before QA accepted).
 
 ## Acceptance and verification
 
@@ -33,11 +33,11 @@ architecture/invariants/contracts, plus the report and link/path checks. If no
 behavior/ownership/usage changes, state the exact no-impact reason; a report alone
 does not document a changed contract. Preserve historical evidence and future scope.
 
-## Independent review (complete after publication)
+## Review in the active chat (complete after publication)
 
-- Reviewer identity/capability (distinct agent or disclosed separate review pass), cycle:
+- Reviewer identity/capability (same-session review; separate agent only if requested):
 - Exact reviewed head/base, criterion PASS/FAIL/UNVERIFIED with evidence, and verdict:
 - Blocking findings and fixes/rechecks; acceptance revalidated after head/parent changes:
 
-Do not self-accept or waive failed/unrun mandatory checks. Keep the source issue
+Record the actual review; do not waive failed/unrun mandatory functional checks. Keep the source issue
 open before merge. The owner retains merge authority; this PR does not authorize deployment.

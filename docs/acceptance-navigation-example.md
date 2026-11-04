@@ -70,13 +70,13 @@ python3 reports/issue-742/verify_frames.py reports/issue-742/camera-idle-recheck
 The first command must FAIL on that known defect; the second must PASS for the
 retained repaired frames. These commands check archived evidence only, not the
 current application. New implementation acceptance requires new compatible
-production evidence and current-head CI, with an independent reviewer.
+production evidence and current-head CI, with review in the active Codex chat.
 
 | Review input | Criterion | Verdict and action |
 | --- | --- | --- |
 | Historical defective keyboard frames, even with passing build/mouse route | PAN-1 FAIL | REQUEST_CHANGES: retain bodies/update projection each movement frame; add keyboard and pointer temporal regression coverage. |
 | Corrected frames but old head CI or missing current originals | PAN-1 UNVERIFIED for current delivery | BLOCKED: collect/rebind current evidence and resolve CI before acceptance. |
-| Current compatible production captures, all mandatory rows PASS, no blockers, independent review complete | All applicable criteria PASS | ACCEPT bound to exact head/base, cycle and reviewer identity; issue stays open until owner merge. |
+| Current compatible production captures, all mandatory rows PASS, no blockers, active-session review complete | All applicable criteria PASS | ACCEPT bound to exact head/base, cycle and reviewer identity; issue stays open until owner merge. |
 
 The last row is a conditional example, not an approval of this or a historical PR.
 The #749 report records the actual template walkthrough and frozen-evidence checks.

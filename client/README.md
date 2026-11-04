@@ -138,7 +138,8 @@ demonstration means the intentionally broken copy failed, not that broken code
 passed. Set `SALIMON_EVIDENCE_DIR` / `SALIMON_NEGATIVE_DIR` to separate output paths.
 
 These captures are evidence, not approved pixel-regression baselines. Baseline
-approval/diffs are #751; automated independent review/status gates are #752.
+approval/diffs are #751. Review changes and originals in the active Codex chat;
+the automated #752 review/status gate is retired.
 The fixed Ubuntu CI runner and lockfile-selected Chromium improve repeatability;
 a browser/OS update needs relevant revalidation. SwiftShader does not qualify
 hardware GPUs, physical input, mobile/touch, native platforms or hardware FPS.

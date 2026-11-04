@@ -1,0 +1,51 @@
+test_all_vetoes (test_review.PolicyTests.test_all_vetoes) ... ok
+test_issue_parser (test_review.PolicyTests.test_issue_parser) ... ok
+test_response_rejects_missing_or_invented_criteria_evidence (test_review.PolicyTests.test_response_rejects_missing_or_invented_criteria_evidence) ... ok
+test_stale_and_missing_captures (test_review.PolicyTests.test_stale_and_missing_captures) ... ok
+test_unsafe_duplicate_and_oversized_archives (test_review.PolicyTests.test_unsafe_duplicate_and_oversized_archives) ... ok
+test_permanent_and_retry_exhaustion_are_bounded (test_review.ProviderTransportTests.test_permanent_and_retry_exhaustion_are_bounded) ... ok
+test_structured_multimodal_request_and_transient_retry (test_review.ProviderTransportTests.test_structured_multimodal_request_and_transient_retry) ... ok
+test_ai_accept_cannot_override_failure (test_review.RuntimeTests.test_ai_accept_cannot_override_failure) ... ok
+test_blocking_human_review (test_review.RuntimeTests.test_blocking_human_review) ... ok
+test_ci_workflow_change_needs_human_review (test_review.RuntimeTests.test_ci_workflow_change_needs_human_review) ... ok
+test_controlled_wrong_repair_new_sha_and_idempotence (test_review.RuntimeTests.test_controlled_wrong_repair_new_sha_and_idempotence) ... ok
+test_current_report_is_machine_readable (test_review.RuntimeTests.test_current_report_is_machine_readable) ... ok
+test_cycle_limit_and_spoofed_history (test_review.RuntimeTests.test_cycle_limit_and_spoofed_history) ... ok
+test_finding_code_fence_cannot_hide_durable_cycle_record (test_review.RuntimeTests.test_finding_code_fence_cannot_hide_durable_cycle_record) ... ok
+test_idempotence_revalidates_expired_capture (test_review.RuntimeTests.test_idempotence_revalidates_expired_capture) ... ok
+test_independent_baseline_approval_cannot_be_bypassed (test_review.RuntimeTests.test_independent_baseline_approval_cannot_be_bypassed) ... ok
+test_malformed_provider_response_blocks (test_review.RuntimeTests.test_malformed_provider_response_blocks) ... ok
+test_mid_review_and_pre_publication_parent_changes (test_review.RuntimeTests.test_mid_review_and_pre_publication_parent_changes) ... ok
+test_missing_capture_and_expired_artifact (test_review.RuntimeTests.test_missing_capture_and_expired_artifact) ... ok
+test_missing_fork_association_still_requires_exact_head_and_merge (test_review.RuntimeTests.test_missing_fork_association_still_requires_exact_head_and_merge) ... ok
+test_noop_mandatory_script_is_blocked (test_review.RuntimeTests.test_noop_mandatory_script_is_blocked) ... ok
+test_stacked_parent_cannot_self_approve_new_manifest (test_review.RuntimeTests.test_stacked_parent_cannot_self_approve_new_manifest) ... ok
+test_unavailable_reviewer (test_review.RuntimeTests.test_unavailable_reviewer) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.068s
+
+OK
+salimon/independent-qa: REQUEST_CHANGES; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: REQUEST_CHANGES; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: ACCEPT; cycle 1
+salimon/independent-qa: ACCEPT; cycle 1
+salimon/independent-qa: ACCEPT; cycle 1
+salimon/independent-qa: BLOCKED; cycle 4
+salimon/independent-qa: ACCEPT; cycle 1
+salimon/independent-qa: ACCEPT; cycle 1
+salimon/independent-qa: ACCEPT; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: ACCEPT; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1
+salimon/independent-qa: BLOCKED; cycle 1

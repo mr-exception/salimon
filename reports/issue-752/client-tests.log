@@ -1,0 +1,55 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts
+
+✔ VIS-1 comparison passes identical images and detects a changed frame with a retained diff (34.726288ms)
+✔ VIS-3 approval is exact, digest-bound and requires a human collaborator (0.152487ms)
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (1.2649ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (0.249012ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.16015ms)
+✔ rotation changes impact-relative velocity and destruction decision (0.510723ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (0.837322ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (0.337996ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (0.826726ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (1.349136ms)
+✔ independent key and pointer owners release without clearing another held input (0.624894ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (0.64261ms)
+✔ navigation assets have finite bounded flat facets and a directional ship silhouette (1.789494ms)
+✔ closed ship hull triangles face outward so back-face culling preserves the upper hull (0.239208ms)
+✔ out-of-view contacts have no presentation group, including depth and malformed projections (1.120995ms)
+✔ visible dense groups retain every ID, deterministic selected representative and bounded presentation (16.391689ms)
+✔ starter has 10 kg and 10 L independent limits (0.922248ms)
+✔ mass limits mining; only accepted amount leaves the source (0.190955ms)
+✔ volume limits harvesting even when weight is available (0.077506ms)
+✔ mixed materials are limited by both dimensions (0.118217ms)
+✔ zero requests, exhausted sources and insufficient space do not duplicate materials (0.092499ms)
+✔ exact debit and upgrade preserve independently validated capacities (0.236714ms)
+✔ reject invalid, fractional, unknown, zero-weight and overflowing quantities (0.230444ms)
+✔ repeated extraction conserves whole units (0.098347ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (6.056743ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (0.977821ms)
+✔ large catalog query matches independent brute force without global precision loss (36.82816ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (15.39551ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (0.206659ms)
+✔ presentation count is bounded by viewport cells, not catalog length (21.995079ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (0.990701ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (1.740351ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (0.613497ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (1.591709ms)
+✔ infinite rays reach all edges/corners independently of vector magnitude (1.115097ms)
+✔ off-screen origins clip only forward visible portions; malformed, tangent and degenerate rays vanish (0.177856ms)
+✔ arbitrary rays preserve collinearity, direction and viewport clipping (1.736826ms)
+✔ orthographic projection handles independent vectors, pan, zoom, stationary and view-axis directions (0.808117ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 790.440286
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

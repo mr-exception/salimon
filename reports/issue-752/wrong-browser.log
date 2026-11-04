@@ -1,0 +1,109 @@
+
+> salimon-navigation-client@0.1.0 test:visual
+> playwright test --project=navigation-captures
+
+2026-11-04T12:26:49.260Z pw:webserver HTTP GET: http://127.0.0.1:5175/
+2026-11-04T12:26:49.264Z pw:webserver Error while checking if http://127.0.0.1:5175/ is available: connect ECONNREFUSED 127.0.0.1:5175
+2026-11-04T12:26:49.264Z pw:webserver Starting WebServer process npm run dev -- --host 127.0.0.1 --port 5175 --strictPort...
+2026-11-04T12:26:49.266Z pw:webserver Process started
+2026-11-04T12:26:49.267Z pw:webserver Waiting for availability...
+2026-11-04T12:26:49.267Z pw:webserver HTTP GET: http://127.0.0.1:5175/
+2026-11-04T12:26:49.268Z pw:webserver Error while checking if http://127.0.0.1:5175/ is available: connect ECONNREFUSED 127.0.0.1:5175
+2026-11-04T12:26:49.268Z pw:webserver Waiting 100ms
+[WebServer] 
+[WebServer] > salimon-navigation-client@0.1.0 dev
+[WebServer] > vite --host 127.0.0.1 --port 5175 --strictPort
+[WebServer] 
+2026-11-04T12:26:49.368Z pw:webserver HTTP GET: http://127.0.0.1:5175/
+2026-11-04T12:26:49.369Z pw:webserver Error while checking if http://127.0.0.1:5175/ is available: connect ECONNREFUSED 127.0.0.1:5175
+2026-11-04T12:26:49.369Z pw:webserver Waiting 250ms
+[WebServer] (node:1522) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer]   VITE v7.3.7  ready in 59 ms
+[WebServer] 
+[WebServer]   ➜  Local:   http://127.0.0.1:5175/
+2026-11-04T12:26:49.619Z pw:webserver HTTP GET: http://127.0.0.1:5175/
+2026-11-04T12:26:49.632Z pw:webserver HTTP Status: 200
+2026-11-04T12:26:49.633Z pw:webserver WebServer available
+2026-11-04T12:26:49.633Z pw:webserver HTTP GET: http://127.0.0.1:4175/
+2026-11-04T12:26:49.634Z pw:webserver Error while checking if http://127.0.0.1:4175/ is available: connect ECONNREFUSED 127.0.0.1:4175
+2026-11-04T12:26:49.634Z pw:webserver Starting WebServer process npm run preview -- --host 127.0.0.1 --port 4175 --strictPort...
+2026-11-04T12:26:49.637Z pw:webserver Process started
+2026-11-04T12:26:49.637Z pw:webserver Waiting for availability...
+2026-11-04T12:26:49.637Z pw:webserver HTTP GET: http://127.0.0.1:4175/
+2026-11-04T12:26:49.638Z pw:webserver Error while checking if http://127.0.0.1:4175/ is available: connect ECONNREFUSED 127.0.0.1:4175
+2026-11-04T12:26:49.638Z pw:webserver Waiting 100ms
+[WebServer] 
+[WebServer] > salimon-navigation-client@0.1.0 preview
+[WebServer] > vite preview --host 127.0.0.1 --port 4175 --strictPort
+[WebServer] 
+2026-11-04T12:26:49.737Z pw:webserver HTTP GET: http://127.0.0.1:4175/
+2026-11-04T12:26:49.738Z pw:webserver Error while checking if http://127.0.0.1:4175/ is available: connect ECONNREFUSED 127.0.0.1:4175
+2026-11-04T12:26:49.738Z pw:webserver Waiting 250ms
+[WebServer] (node:1554) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]   ➜  Local:   http://127.0.0.1:4175/
+2026-11-04T12:26:49.989Z pw:webserver HTTP GET: http://127.0.0.1:4175/
+2026-11-04T12:26:49.995Z pw:webserver HTTP Status: 200
+2026-11-04T12:26:49.995Z pw:webserver WebServer available
+
+Running 1 test using 1 worker
+
+(node:1566) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (8.6s)
+2026-11-04T12:26:59.246Z pw:webserver Terminating the WebServer
+2026-11-04T12:26:59.248Z pw:webserver Terminated the WebServer
+2026-11-04T12:26:59.248Z pw:webserver Terminating the WebServer
+2026-11-04T12:26:59.267Z pw:webserver Terminated the WebServer
+
+
+  1) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 
+
+    Error: VISUAL_PIXEL_MISMATCH heading-velocity: 520 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      73 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      74 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 75 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      76 | })
+      77 |
+        at /tmp/salimon-752-fixture/client/tests/navigation-captures.spec.ts:75:126
+
+    Error: VISUAL_PIXEL_MISMATCH opposite-vectors: 630 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      73 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      74 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 75 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      76 | })
+      77 |
+        at /tmp/salimon-752-fixture/client/tests/navigation-captures.spec.ts:75:126
+
+    attachment #18: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../issue-752-wrong/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../issue-752-wrong/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/error-context.md
+
+    attachment #20: trace (application/zip) ────────────────────────────────────────────────────────
+    ../../issue-752-wrong/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../issue-752-wrong/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 

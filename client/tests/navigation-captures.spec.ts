@@ -22,6 +22,8 @@ const cases=[
 test('VIS-1/2 eight navigation screens match reference pixels',async({page,browser},info)=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
  const fonts=await Promise.all(['DejaVuSans.ttf','DejaVuSans-Bold.ttf','fonts.css'].map(async f=>[f,sha256(await readFile(`tests/assets/${f}`))]))
+ const launchArgs=info.project.use.launchOptions?.args??[]
+ expect(launchArgs,'VISUAL_RASTERIZATION_POLICY').toContain('--disable-lcd-text')
  const source=(await readFile('.revision-for-negative','utf8').catch(()=>null))??execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()
  const environment={platform:process.platform,arch:process.arch,browser:browser.version(),playwright:JSON.parse(await readFile('node_modules/@playwright/test/package.json','utf8')).version,viewport:{width:1280,height:800},dpr:1,locale:'en-US',timezone:'UTC',colorScheme:'dark',fontHashes:Object.fromEntries(fonts),seed:750,epoch:EPOCH,policy:POLICY}
  const manifest=candidate?null:JSON.parse(await readFile(`${directory}/manifest.json`,'utf8'))
@@ -49,7 +51,7 @@ test('VIS-1/2 eight navigation screens match reference pixels',async({page,brows
   const actual=await page.screenshot({caret:'hide'})
   const name=`${c.id}.png`;images[name]=sha256(actual)
   await writeFile(join(output,name),actual)
-  await writeFile(join(output,`${c.id}.json`),json({source,environment,fixture,state,errors}))
+  await writeFile(join(output,`${c.id}.json`),json({source,environment,launchArgs,fixture,state,errors}))
   await info.attach(name,{body:actual,contentType:'image/png'})
   if(candidate){results.push({id:c.id,status:'CANDIDATE',sha256:sha256(actual)});continue}
   const original=await readFile(join(directory,name))
@@ -66,8 +68,8 @@ test('VIS-1/2 eight navigation screens match reference pixels',async({page,brows
   const renderer=(await snapshot(page)).scene.renderer
   await writeFile(join(output,'manifest.json'),json({schema:1,environment,renderer,images})+'\n')
  }
- await writeFile(join(output,'summary.json'),json({source,candidate:!!candidate,results})+'\n')
- await info.attach('comparison-summary.json',{body:json({source,candidate:!!candidate,results}),contentType:'application/json'})
+ await writeFile(join(output,'summary.json'),json({source,launchArgs,candidate:!!candidate,results})+'\n')
+ await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
  // Soft per-frame failures let QA inspect every unexpected screen in one run.
  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
 })

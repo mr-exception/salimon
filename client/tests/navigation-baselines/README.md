@@ -34,7 +34,9 @@ npm run test:visual:negative
 
 Use the lockfile Chromium on Linux x64; do not set `CHROMIUM_PATH` for reference
 qualification. Environment drift (browser/Playwright/platform/architecture/font
-hashes/renderer) fails explicitly. Host distro/version is recorded in the issue
+hashes/renderer) fails explicitly. Chromium explicitly disables LCD text
+(`--disable-lcd-text`) so opaque sidebar glyphs use the same grayscale
+rasterization on Debian and Ubuntu. Actual launch flags are recorded per capture. Host distro/version is recorded in the issue
 report/CI runner rather than asserting Debian and Ubuntu are the same OS.
 Seed 750, fixture front camera, fixed zooms, DPR 1, en-US/UTC, dark scheme and
 paused RAF/performance clock are recorded in `manifest.json` and observations.
@@ -73,7 +75,8 @@ not count as detecting the defect. It never edits checkout references.
    Agents must never write this comment, impersonate the reviewer or count their
    own image judgment as approval. The human can use the same GitHub account that
    hosts an agent-authored PR; independence is from the implementing agent.
-5. Rerun the failed approval step/job. It validates image hashes and accepts only
+5. Rerun the failed `baseline-approval` job (the successful browser/build job does
+   not need to run again). It validates image hashes and accepts only
    that exact digest from a human collaborator (Bot/unaffiliated accounts fail).
    Any changed manifest invalidates the approval. A byte-identical manifest
    inherited from the PR base needs no repeat approval. Baseline approval does

@@ -97,8 +97,14 @@ documentation-only PRs may have no run. Record that as NOT RUN / not applicable
 to runtime validation, and perform the planned documentation checks. Do not claim
 a passing workflow from an empty check list. Branch protection/rulesets may impose
 additional mandatory checks; inspect actual current requirements before acceptance.
-This policy is enforced by review; it does not install jobs, branch protection,
-an automated reviewer or screenshot baselines. Those are separate #750–#752 work.
+This policy defines acceptance; implementation of automated jobs and screenshot
+baselines is owned by #750–#752. It does not itself alter branch protection.
+
+The [independent game QA runtime](independent-game-qa.md) now implements the #752
+review/status workflow against #750/#751 evidence. Its required-check rollout is
+explicit: install/configure and observe actual jobs/statuses before an owner
+requires them. Missing current Codex session review evidence produces BLOCKED; no external AI API or key is required. This policy and
+the runtime never grant merge authority or approve changed screenshot baselines.
 
 Fix mandatory cloud failures or leave the task incomplete. Missing cloud tooling
 requires a repair attempt or a meaningful equivalent reviewed against the same

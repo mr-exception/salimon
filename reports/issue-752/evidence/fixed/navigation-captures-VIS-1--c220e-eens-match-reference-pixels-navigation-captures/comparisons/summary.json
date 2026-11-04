@@ -1,0 +1,83 @@
+{
+  "source": "edd62718eb6dbfb55ddde51570a8afc892c02bf3",
+  "launchArgs": [
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--disable-lcd-text"
+  ],
+  "candidate": false,
+  "results": [
+    {
+      "id": "empty-scanner",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439",
+      "actual": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439"
+    },
+    {
+      "id": "visible-contacts",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d",
+      "actual": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d"
+    },
+    {
+      "id": "panned-contacts",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9",
+      "actual": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9"
+    },
+    {
+      "id": "selected-body",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795",
+      "actual": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795"
+    },
+    {
+      "id": "zoom-out",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
+      "actual": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e"
+    },
+    {
+      "id": "zoom-in",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
+      "actual": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3"
+    },
+    {
+      "id": "heading-velocity",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
+      "actual": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252"
+    },
+    {
+      "id": "opposite-vectors",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+      "actual": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+    }
+  ]
+}

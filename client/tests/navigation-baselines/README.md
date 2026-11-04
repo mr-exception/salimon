@@ -1,6 +1,11 @@
 # Navigation visual references (#751)
 
-These eight initial images are **candidates pending explicit human approval**.
+These eight images are **corrected candidates pending explicit human approval**.
+The initial proposal exposed a hidden native-select host-font dependency. The
+current proposal pins Fontconfig to the licensed vendored DejaVu files; the only
+image changes are the selected-value glyphs. See the [upgrade measurements](../../../reports/issue-751/candidate-upgrade.json)
+and [original candidates](../../../reports/issue-751/initial-candidates/manifest.json).
+Previous manifest approval does not approve this new digest.
 Pixel equality is separate from accepting a reference as correct. The CI approval
 gate must pass before QA acceptance. No implementation agent may post approval.
 
@@ -36,7 +41,10 @@ Use the lockfile Chromium on Linux x64; do not set `CHROMIUM_PATH` for reference
 qualification. Environment drift (browser/Playwright/platform/architecture/font
 hashes/renderer) fails explicitly. Chromium explicitly disables LCD text
 (`--disable-lcd-text`) so opaque sidebar glyphs use the same grayscale
-rasterization on Debian and Ubuntu. Actual launch flags are recorded per capture. Host distro/version is recorded in the issue
+rasterization on Debian and Ubuntu. Actual launch flags are recorded per capture. A minimal, hashed
+`tests/assets/fonts.conf` also pins native-control fallback, hinting, antialiasing,
+DPI and subpixel policy. It loads only vendored fonts and is scoped to the
+screenshot project; ordinary production/browser routes retain host font coverage. Host distro/version is recorded in the issue
 report/CI runner rather than asserting Debian and Ubuntu are the same OS.
 Seed 750, fixture front camera, fixed zooms, DPR 1, en-US/UTC, dark scheme and
 paused RAF/performance clock are recorded in `manifest.json` and observations.

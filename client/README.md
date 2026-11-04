@@ -102,7 +102,7 @@ physical input, native platforms or hardware FPS.
 ## Navigation screenshot regression (#751)
 
 The [visual reference guide](tests/navigation-baselines/README.md) owns the eight
-frozen browser screens, fixed fonts/browser/backend, pixel comparison policy,
+frozen browser screens, fixed fonts/Fontconfig/browser/backend, pixel comparison policy,
 intentional visual defect demonstration and explicit independent baseline approval.
 `npm run test:visual` compares all screens; run it twice for determinism and run
 `npm run test:visual:negative` to prove the comparator rejects a real CSS defect.

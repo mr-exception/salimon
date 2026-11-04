@@ -21,11 +21,12 @@ const cases=[
 // One ordered session preserves a single manifest and complete comparison summary.
 test('VIS-1/2 eight navigation screens match reference pixels',async({page,browser},info)=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
- const fonts=await Promise.all(['DejaVuSans.ttf','DejaVuSans-Bold.ttf','fonts.css'].map(async f=>[f,sha256(await readFile(`tests/assets/${f}`))]))
+ const fonts=await Promise.all(['DejaVuSans.ttf','DejaVuSans-Bold.ttf','fonts.css','fonts.conf'].map(async f=>[f,sha256(await readFile(`tests/assets/${f}`))]))
  const launchArgs=info.project.use.launchOptions?.args??[]
  expect(launchArgs,'VISUAL_RASTERIZATION_POLICY').toContain('--disable-lcd-text')
+ expect(info.project.use.launchOptions?.env?.FONTCONFIG_FILE,'VISUAL_FONTCONFIG_POLICY').toMatch(/tests\/assets\/fonts\.conf$/)
  const source=(await readFile('.revision-for-negative','utf8').catch(()=>null))??execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()
- const environment={platform:process.platform,arch:process.arch,browser:browser.version(),playwright:JSON.parse(await readFile('node_modules/@playwright/test/package.json','utf8')).version,viewport:{width:1280,height:800},dpr:1,locale:'en-US',timezone:'UTC',colorScheme:'dark',fontHashes:Object.fromEntries(fonts),seed:750,epoch:EPOCH,policy:POLICY}
+ const environment={platform:process.platform,arch:process.arch,browser:browser.version(),playwright:JSON.parse(await readFile('node_modules/@playwright/test/package.json','utf8')).version,viewport:{width:1280,height:800},dpr:1,locale:'en-US',timezone:'UTC',colorScheme:'dark',fontHashes:Object.fromEntries(fonts),seed:750,epoch:EPOCH,nativeFallback:'vendored DejaVu Sans only',policy:POLICY}
  const manifest=candidate?null:JSON.parse(await readFile(`${directory}/manifest.json`,'utf8'))
  const results:Record<string,unknown>[]=[],images:Record<string,string>={}
  const output=candidate??info.outputPath('comparisons')

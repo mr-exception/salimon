@@ -3,10 +3,10 @@ import { PNG } from 'pngjs'
 
 const scene = (page: Page) => page.getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
 const transform = (page: Page, id: string) => page.locator(`[data-entity="${id}"]`).getAttribute('transform')
-async function boot(page: Page) {
+async function boot(page: Page, view = 'interior') {
   await page.clock.install({ time: new Date('2026-11-04T00:00:00Z') })
   await page.clock.pauseAt(new Date('2026-11-04T00:00:01Z'))
-  await page.goto('/?scene=top-down')
+  await page.goto(`/?scene=top-down&view=${view}`)
   // Lazy development module can resolve under React's delayed Suspense commit.
   await expect.poll(async () => { await page.clock.runFor(50); return scene(page).count() }).toBe(1)
   await expect(scene(page)).toBeVisible()
@@ -90,15 +90,13 @@ test('TD-3 collisions, keyboard detour, selection and request/cancel use the con
   await boot(page)
   await page.keyboard.press('e')
   await expect(page.getByRole('status')).toContainText('No available object in reach')
-  await walk(page, ['s'], 800)
-  expect((await position(page))[1]).toBeCloseTo(2.12, 6)
   await walkTo(page, [0, .45])
   await walk(page, ['w'], 700)
   expect((await position(page))[1]).toBeCloseTo(.36, 6)
   await scene(page).screenshot({ path: info.outputPath('crate-collision.png') })
   await walkTo(page, [1.35, .36])
   await expect(page.locator('[data-selection="scout:core"]')).toHaveCount(1)
-  await expect(page.locator('[data-prompt]')).toContainText('Core test console')
+  await expect(page.locator('[data-prompt]')).toContainText('Core')
   await page.keyboard.press('e')
   await expect(page.locator('main')).toHaveAttribute('data-player-mode', 'interacting')
   await expect(page.getByRole('status')).toContainText('No systems changed')
@@ -108,21 +106,67 @@ test('TD-3 collisions, keyboard detour, selection and request/cancel use the con
   await page.keyboard.press('e')
   await page.evaluate(() => window.dispatchEvent(new Event('blur')))
   await expect(page.locator('main')).toHaveAttribute('data-player-mode', 'standing')
-  await walkTo(page, [1.35, -2])
-  await walkTo(page, [0, -2])
-  await walkTo(page, [0, -3.25])
-  await expect(page.locator('[data-selection="scout:desk"]')).toHaveCount(1)
-  await page.getByRole('button', { name: 'Inspect console' }).click()
-  await expect(page.locator('main')).toHaveAttribute('data-target', 'scout:desk')
+  await walkTo(page, [1.35, -1.55])
+  await walkTo(page, [0, -1.55])
+  await walkTo(page, [0, -3.1])
+  await expect(page.locator('[data-selection="scout:chair"]')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Inspect fixture' }).click()
+  await expect(page.locator('main')).toHaveAttribute('data-target', 'scout:chair')
   await page.getByRole('button', { name: 'Cancel inspection' }).click()
   await expect(page.locator('main')).toHaveAttribute('data-player-mode', 'standing')
+  await walkTo(page, [1.1, -3.1])
+  await walkTo(page, [1.1, -3.9])
+  await expect(page.locator('[data-selection="scout:desk"]')).toHaveCount(1)
+  await page.keyboard.press('e')
+  await expect(page.locator('main')).toHaveAttribute('data-target', 'scout:desk')
   await page.screenshot({ path: info.outputPath('cockpit-reached.png') })
   expect((await position(page))[1]).toBeLessThan(-3)
   await info.attach('journey.json', { body: JSON.stringify({ final: await position(page), input: 'actual Playwright keyboard/mouse; no state setters', targets: ['scout:core', 'scout:desk'] }), contentType: 'application/json' })
 })
 
-test('TD-5 built entry retains navigation even with development scene query', async ({ page }) => {
+test('TD-5 built entry retains navigation even with development scene query', async ({ page }, info) => {
   await page.goto('http://127.0.0.1:4175/?scene=top-down')
   await expect(page.getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })).toBeVisible()
   await expect(scene(page)).toHaveCount(0)
+  await page.screenshot({ path: info.outputPath('radar-preflight.png') })
+  const backend = await page.locator('canvas').evaluate(canvas => {
+    const gl = (canvas as HTMLCanvasElement).getContext('webgl2')!
+    const ext = gl.getExtension('WEBGL_debug_renderer_info')
+    return { renderer: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER), version: gl.getParameter(gl.VERSION) }
+  })
+  await info.attach('backend.json', { body: JSON.stringify(backend), contentType: 'application/json' })
+})
+
+
+test('SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway', async ({ page }, info) => {
+  test.setTimeout(90000)
+  await boot(page)
+  const originalNode = await page.locator('[data-entity="ship:scout"]').elementHandle()
+  await walkTo(page, [0, 3.9])
+  await expect(page.locator('[data-selection="scout:fabricator"]')).toHaveCount(1)
+  await page.keyboard.press('e')
+  await expect(page.getByRole('status')).toContainText('Fabricator')
+  await page.keyboard.press('Escape')
+  await walkTo(page, [.65, 4.25])
+  await expect(page.locator('[data-selection="scout:storage"]')).toHaveCount(1)
+  await page.keyboard.press('e')
+  await expect(page.getByRole('status')).toContainText('50 kg / 50 L')
+  await page.screenshot({ path: info.outputPath('cargo-modules.png') })
+  await page.keyboard.press('Escape')
+  await walkTo(page, [0, 4.8])
+  await walkTo(page, [0, 5.8])
+  expect(await originalNode!.evaluate(node => node.isConnected)).toBe(true)
+  await scene(page).screenshot({ path: info.outputPath('entry-cargo.png') })
+  // Fresh exterior starting viewpoint, not a teleport or scene switch in play.
+  await boot(page, 'exterior')
+  await expect(page.locator('[data-entity="person:player"]')).toHaveAttribute('data-frame', 'planet:fixture')
+  for (const id of ['scout:floor', 'scout:desk', 'scout:chair', 'scout:core', 'scout:fabricator', 'scout:storage', 'scout:entry']) {
+    await expect(page.locator(`[data-entity="${id}"]`)).toBeVisible()
+  }
+  const outside = await scene(page).screenshot({ path: info.outputPath('exterior-cutaway.png') })
+  const png = PNG.sync.read(outside)
+  let floorPixels = 0
+  for (let i = 0; i < png.data.length; i += 4) if (png.data[i] === 223 && png.data[i + 1] === 217 && png.data[i + 2] === 198) floorPixels++
+  expect(floorPixels).toBeGreaterThan(1000)
+  await info.attach('exterior-cutaway.png', { body: outside, contentType: 'image/png' })
 })

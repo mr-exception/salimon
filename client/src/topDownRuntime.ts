@@ -1,10 +1,11 @@
+import { scoutEntities } from './scoutLayout.ts'
 import { translate } from './coordinates.ts'
 import { allowedMove, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
 import { point2, relativeAnchor, rotate2, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
 export type Layer = typeof LAYERS[number]
-export type Appearance = 'ground' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue'
+export type Appearance = 'ground' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold'
 export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance }
 export interface TopDownState {
   readonly tick: number
@@ -21,39 +22,25 @@ export const PLAYER_ID = 'person:player'
 const entity = (id: string, frame: Anchor['frame'], x: number, y: number, layer: Layer, appearance: Appearance): Entity2D =>
   ({ id, anchor: { frame, point: point2(x, y) }, layer, appearance })
 
-export function createTopDownState(): TopDownState {
+export function createTopDownState(view: 'interior' | 'exterior' = 'interior'): TopDownState {
   const entities = [
     entity('terrain:site', 'planet:fixture', 0, 0, 'terrain', 'ground'),
     entity('rock:west', 'planet:fixture', -10, -3, 'terrain', 'rock'),
     entity('rock:east', 'planet:fixture', 11, 5, 'terrain', 'rock'),
     entity('ship:scout', 'ship:scout', 0, 0, 'hull', 'hull'),
     entity('scout:floor', 'ship:scout', 0, 0, 'interior', 'floor'),
-    entity(PLAYER_ID, 'ship:scout', 0, 2, 'people', 'player'),
-    { ...entity('scout:desk', 'ship:scout', 0, -5, 'props', 'desk'), footprint: { halfWidth: 1.5, halfHeight: 1.25 }, interaction: { label: 'Cockpit test console', action: 'Inspect', reachM: 1.9 } },
-    { ...entity('scout:bed', 'ship:scout', -2.2, .5, 'props', 'bed'), footprint: { halfWidth: .45, halfHeight: 1.2 } },
-    { ...entity('scout:core', 'ship:scout', 1.9, 1.8, 'props', 'core'), footprint: { halfWidth: .4, halfHeight: .7 }, interaction: { label: 'Core test console', action: 'Inspect', reachM: 1.65 } },
-    { ...entity('fixture:crate', 'ship:scout', 0, -.6, 'props', 'crate'), footprint: { halfWidth: .6, halfHeight: .5 } },
-    ...[
-      ['wall:port', -2.65, .5, .15, 5], ['wall:starboard', 2.65, .5, .15, 5],
-      ['wall:nose-port', -1.85, -5.3, .15, .95], ['wall:nose-starboard', 1.85, -5.3, .15, .95],
-      ['wall:shoulder-port', -2.2, -4.5, .45, .15], ['wall:shoulder-starboard', 2.2, -4.5, .45, .15],
-      ['wall:cockpit-left', -1.65, -2.7, .85, .12], ['wall:cockpit-right', 1.65, -2.7, .85, .12], ['wall:nose', 0, -6.1, 1.7, .15], ['wall:aft', 0, 5.5, 2.5, .15],
-      ['wall:partition-left', -1.65, 2.7, .85, .12], ['wall:partition-right', 1.65, 2.7, .85, .12],
-      ['door:closed', 0, 2.7, .8, .12],
-    ].map(([id, x, y, halfWidth, halfHeight]) => ({
-      ...entity(id as string, 'ship:scout', x as number, y as number, 'props', id === 'door:closed' ? 'door' : 'wall'),
-      footprint: { halfWidth: halfWidth as number, halfHeight: halfHeight as number },
-    })),
+    view === 'exterior' ? entity(PLAYER_ID, 'planet:fixture', -6, 3, 'people', 'player') : entity(PLAYER_ID, 'ship:scout', 0, 2, 'people', 'player'),
+    ...scoutEntities(),
   ]
   return {
     tick: 0,
-    player: { facing: 0, mode: 'standing', targetId: null }, selectedId: null, feedback: 'Approach a console to inspect it.',
+    player: { facing: 0, mode: 'standing', targetId: null }, selectedId: null, feedback: 'Approach a fixture to inspect it. Systems are inactive.',
     frames: {
       planet: { id: 'planet:fixture', universeOrigin: { cell: [10n ** 24n, -(10n ** 24n), 0n], offsetM: [0, 0, 0] }, angle: .2 },
       ship: { id: 'ship:scout', parent: 'planet:fixture', origin: point2(2, -1), angle: -.12 },
     },
     entities,
-    camera: { anchor: entities.find(e => e.id === PLAYER_ID)!.anchor, pixelsPerM: 32 },
+    camera: { anchor: entities.find(e => e.id === PLAYER_ID)!.anchor, pixelsPerM: view === 'exterior' ? 26 : 32 },
   }
 }
 // One continuous scene. Collision queries use each object's frame/footprint;
@@ -88,7 +75,8 @@ export function stepTopDown(state: TopDownState, direction: Point2): TopDownStat
   // Fixed-step exponential follow: same result at any render cadence. The camera
   // remains in the player's frame and never flattens astronomical positions.
   const [cx, cy] = relativeAnchor(anchor, state.camera.anchor, state.frames)
-  const deltaCamera = rotate2([cx * .16, cy * .16], -angle)
+  const cameraAngle = state.camera.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0
+  const deltaCamera = rotate2([cx * .16, cy * .16], -cameraAngle)
   const cameraAnchor = { ...state.camera.anchor, point: translate(state.camera.anchor.point, [deltaCamera[0], deltaCamera[1], 0]) }
   return { ...state, tick: state.tick + 1, entities, player: activity, selectedId, feedback,
     camera: { ...state.camera, anchor: cameraAnchor } }

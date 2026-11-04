@@ -15,6 +15,8 @@ function clipped(samples:Awaited<ReturnType<typeof lines>>) {
  }
 }
 test('ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors',async({page},info)=>{
+ // Each immutable preset boots the real App; retain a bounded capture budget.
+ test.setTimeout(90000)
  await front(page)
  await expect(page.locator('.scan-status')).toContainText('8 temporary contacts')
  await expect(page.locator('.direction-lines,[data-offscreen]')).toHaveCount(0);await expect(page.locator('.edge')).toHaveCount(0)

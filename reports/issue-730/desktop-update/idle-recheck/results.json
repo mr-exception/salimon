@@ -1,0 +1,311 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=desktop",
+      "--grep",
+      "WASD pans|pointer release|faceted navigation"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "desktop.spec.ts",
+      "file": "desktop.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "WASD pans without changing ship state and key release stops movement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20394,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:20:56.035Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-33a1550406bfb7bb4bac",
+          "file": "desktop.spec.ts",
+          "line": 26,
+          "column": 1
+        },
+        {
+          "title": "right-drag pointer release outside canvas ends pan and ship controls release on blur",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7029,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:21:17.008Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/desktop-right-drag-pointer-04386-ip-controls-release-on-blur-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-e19cbf9765bc563e53eb",
+          "file": "desktop.spec.ts",
+          "line": 78,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "visuals.spec.ts",
+      "file": "visuals.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "faceted navigation proxies render at readable sizes without a rectangular surface",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14010,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:21:24.130Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "zoom-0.5.png",
+                      "contentType": "image/png",
+                      "sha256": "7df6b9ce9c1894e34c62c3b7baa05be88af13160995e04c9c6f68ca635407202",
+                      "bytes": 19264,
+                      "retained": "zoom-0.5.png"
+                    },
+                    {
+                      "name": "zoom-0.1.png",
+                      "contentType": "image/png",
+                      "sha256": "552984ad39273d3f6919a32de2aca3b29f2ff9ffd992740e347f73f1d68d4f46",
+                      "bytes": 16995,
+                      "retained": "zoom-0.1.png"
+                    },
+                    {
+                      "name": "zoom-1.png",
+                      "contentType": "image/png",
+                      "sha256": "baa22b63e387d421f7f3b02cc181b4ee4c5a4830c59ad7794f4f85bc2007fbb0",
+                      "bytes": 19773,
+                      "retained": "zoom-1.png"
+                    },
+                    {
+                      "name": "selected.png",
+                      "contentType": "image/png",
+                      "sha256": "03ad7ffacc2133c5b55c8b5f1d68c3aad0ea59bd28665fe7ff7634c91e1a6050",
+                      "bytes": 20021,
+                      "retained": "selected.png"
+                    },
+                    {
+                      "name": "geometry-backend.json",
+                      "contentType": "application/json",
+                      "sha256": "cc7d2325f8cb2da8b4870248d04664ba47354174b340ac999608cdfaa8aa9b06",
+                      "bytes": 11624,
+                      "retained": "geometry-backend.json"
+                    },
+                    {
+                      "name": "camera-reset.png",
+                      "contentType": "image/png",
+                      "sha256": "e06542eae7d77d9a4b9547868962da0ecec555bcb9a19d47aed212628389f94d",
+                      "bytes": 21385,
+                      "retained": "camera-reset.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/visuals-faceted-navigation-ac6c3-thout-a-rectangular-surface-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "821bf1ebb4ae78f6d65d-4511f7b795770a79ae93",
+          "file": "visuals.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-04T06:20:53.151Z",
+    "duration": 45285.691000000006,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

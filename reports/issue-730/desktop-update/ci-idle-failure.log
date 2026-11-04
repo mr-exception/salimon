@@ -1,0 +1,73 @@
+build	Desktop, mobile and production WebGL checks	﻿2026-11-04T06:18:12.2213310Z ##[group]Run npm run test:browser
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:12.2213533Z [36;1mnpm run test:browser[0m
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:12.2239254Z shell: /usr/bin/bash -e {0}
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:12.2239419Z ##[endgroup]
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:12.2948614Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:12.2948951Z > salimon-navigation-client@0.1.0 test:browser
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:12.2949184Z > playwright test
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:12.2949309Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:13.8505247Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:13.8505960Z Running 19 tests using 1 worker
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:13.8506225Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:24.6838903Z   ✓   1 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (10.3s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:26.4086940Z   ✘   2 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (1.6s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:30.0750134Z   ✓   3 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (3.3s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:31.7834960Z   ✓   4 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (1.7s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:33.1420394Z   ✓   5 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (1.3s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:36.2410850Z   ✓   6 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (3.1s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:38.6500824Z   ✓   7 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (2.4s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:39.5710350Z   ✓   8 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (912ms)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:40.4279320Z   ✓   9 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (846ms)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:42.7377261Z   ✓  10 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (2.3s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:44.9225937Z   ✓  11 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (2.2s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:48.0660211Z   ✓  12 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (3.1s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:51.3656300Z   ✓  13 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (3.3s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:18:54.0800443Z   ✓  14 [desktop] › tests/edges.spec.ts:48:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (2.7s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:00.1260379Z   ✓  15 [desktop] › tests/edges.spec.ts:67:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (6.0s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:02.7692539Z   ✓  16 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (2.6s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:05.3881308Z   ✓  17 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (2.6s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:08.7870427Z   ✓  18 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (3.4s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.7412843Z   ✓  19 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (5.5s)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8629873Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8632886Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8640383Z   1) [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8641245Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8641469Z     Error: expect(received).toEqual(expected) // deep equality
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8641731Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8641865Z     - Expected  - 2
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8642083Z     + Received  + 2
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8642204Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8642290Z       Array [
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8642489Z     -   50.00000000000131,
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8643626Z     -   64.09199999999919,
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8643851Z     +   50.000000000001876,
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8644071Z     +   64.09199999999782,
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8644278Z       ]
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8644381Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8644785Z       34 |   const before=await projection();await page.keyboard.down(key);await page.waitForTimeout(200);await page.keyboard.up(key)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8645540Z       35 |   const after=await projection();expect((after[axis]-before[axis])*direction).toBeGreaterThan(0)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8646124Z     > 36 |   await page.waitForTimeout(180);expect(await projection()).toEqual(after)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8646568Z          |                                                             ^
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8646854Z       37 |  }
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8647191Z       38 |  expect(await page.locator('.stat').allTextContents()).toEqual(ship)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8648236Z       39 |  const beforeForm=await projection();await page.getByLabel('Find scanned contacts').fill('wasd');await page.keyboard.down('w');await page.waitForTimeout(150);await page.keyboard.up('w');expect(await projection()).toEqual(beforeForm)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8649378Z         at /home/runner/work/salimon/salimon/client/tests/desktop.spec.ts:36:61
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8649655Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8650132Z     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8651098Z     test-results/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/test-failed-1.png
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8651858Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8652128Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8652551Z     Error Context: test-results/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/error-context.md
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8653000Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8653370Z     attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8654027Z     test-results/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/trace.zip
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8654465Z     Usage:
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8654572Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8655016Z         npx playwright show-trace test-results/desktop-WASD-pans-without--6e736--key-release-stops-movement-desktop/trace.zip
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8655495Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8655828Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8656091Z 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8656170Z   1 failed
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8656723Z     [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement 
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8657192Z   18 passed (1.0m)
+build	Desktop, mobile and production WebGL checks	2026-11-04T06:19:14.8917449Z ##[error]Process completed with exit code 1.

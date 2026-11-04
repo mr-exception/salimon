@@ -1,0 +1,318 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=desktop",
+      "--grep",
+      "continuous.*pan renders|ship rays track"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "edges.spec.ts",
+      "file": "edges.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7423,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:22:28.864Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "ship-off-screen.png",
+                      "contentType": "image/png",
+                      "sha256": "ed54aba57c271e9b7cb9acde31aef581e6a09bbf5e8df0b8033ae24ca3b8299e",
+                      "bytes": 14673,
+                      "retained": "ship-off-screen.png"
+                    },
+                    {
+                      "name": "camera-vector-state.json",
+                      "contentType": "application/json",
+                      "sha256": "4dfb6061a8e039305bea0ebacf1e2f6d7ee05b63cf92ff29da7deb3c08f8c6f5",
+                      "bytes": 4815,
+                      "retained": "camera-vector-state.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/edges-ship-rays-track-actu-db252--off-screen-origin-clipping-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0651958d5a6751bb81e4-4125cd4224db85035514",
+          "file": "edges.spec.ts",
+          "line": 48,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "panning.spec.ts",
+      "file": "panning.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "continuous keyboard pan renders scanned bodies at their current projection on every frame",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10497,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:22:37.035Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "keyboard-visible.png",
+                      "contentType": "image/png",
+                      "sha256": "24085e623d826842803e2cdde95aa31bebbb46f454c9a7cea261dc55e3136ae9",
+                      "bytes": 19507,
+                      "retained": "keyboard-visible.png"
+                    },
+                    {
+                      "name": "keyboard-empty.png",
+                      "contentType": "image/png",
+                      "sha256": "5cc9afff52941eeb483d8c00f2636d1a32ae70ec4a70c489a1fca3e09dfb232d",
+                      "bytes": 18772,
+                      "retained": "keyboard-empty.png"
+                    },
+                    {
+                      "name": "keyboard-frames.json",
+                      "contentType": "application/json",
+                      "sha256": "21d2c9a428176ecbddba47084eaa850853704fedd605afe620c17ee02afdeddf",
+                      "bytes": 102351,
+                      "retained": "keyboard-frames.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/panning-continuous-keyboar-a32c5-t-projection-on-every-frame-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6e38096e20df0c49e53-ac471b36f825ecb39d54",
+          "file": "panning.spec.ts",
+          "line": 4,
+          "column": 50
+        },
+        {
+          "title": "continuous mouse pan renders scanned bodies at their current projection on every frame",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10244,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T06:22:47.604Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "mouse-visible.png",
+                      "contentType": "image/png",
+                      "sha256": "d9e2a501d7719f67ef6d93cbf782e2ce8a757d4ab7438897559e4164fc5a8b75",
+                      "bytes": 19516,
+                      "retained": "mouse-visible.png"
+                    },
+                    {
+                      "name": "mouse-frames.json",
+                      "contentType": "application/json",
+                      "sha256": "dfef46efa3f1fca21a41a1e20b7e7b6952c628de3baf0ea475b41bf64065a3d2",
+                      "bytes": 117985,
+                      "retained": "mouse-frames.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/panning-continuous-mouse-p-6d454-t-projection-on-every-frame-desktop/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6e38096e20df0c49e53-a0842c67ade24af8b086",
+          "file": "panning.spec.ts",
+          "line": 4,
+          "column": 50
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-04T06:22:25.945Z",
+    "duration": 32180.571,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

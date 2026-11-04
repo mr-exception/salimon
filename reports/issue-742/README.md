@@ -66,3 +66,23 @@ reports/issue-742/after` also passes: reuses these exact frames to verify body
 positions/pixels, movement, scanner continuity and mathematically correct
 heading/zero-velocity rays on every sampled frame, without another GPU campaign.
 [Source hashes](source.sha256) identify the verified implementation and drivers.
+
+## Parent correction and final stack
+
+Initial #747 CI at `1ff579c` passed 18/19 routes but caught ~1e-12 percent idle
+camera drift in the unchanged exact key-release assertion. #745 fixes the
+production OrbitControls idle update; see its desktop supplement for the
+original CI failure and focused checks. The correction was merged through #746
+and this branch without rewriting published history. Current parent is
+`issue-744-ship-vector-lines` at `7989918`, containing #745 at `213338c`.
+
+`npm run build --prefix client` passes on the integrated code. Then
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser --prefix client --
+--project=desktop --grep 'continuous.*pan renders|ship rays track'`: **3/3 pass**
+([results](camera-idle-recheck/results.json),
+[log](camera-idle-recheck/browser.log),
+[build](camera-idle-recheck/build.log)). Both keyboard/mouse pan routes and
+pan/zoom/turn/off-screen ship-vector clipping pass again. New raw pan frames and
+original images are in that directory. `python reports/issue-742/verify_frames.py
+reports/issue-742/camera-idle-recheck` passes all body/projection/pixel/vector/
+scanner assertions. CI repeats the complete 19-route suite on the updated head.

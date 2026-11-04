@@ -49,8 +49,8 @@ scenes. CI uploads SHA-named originals/diffs/metadata/traces for 14 days; essent
 issue evidence is retained beside the delivery report. A page error, environment
 change, absent contacts, wrong selection or corrupted/missing reference fails.
 
-The negative driver changes the actual heading CSS to red in a disposable copy.
-Only the two heading-visible frames must fail, with >100 changed pixels each;
+The negative driver changes the actual velocity CSS to red in a disposable copy.
+Only the two velocity-visible frames must fail, with >100 changed pixels each;
 the other six must pass. Timeout, startup error or unrelated visual failures do
 not count as detecting the defect. It never edits checkout references.
 

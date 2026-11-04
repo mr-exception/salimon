@@ -845,7 +845,7 @@ No new runtime/domain behavior or cloud acceptance gate is introduced.
 Follow the [reference guide](../client/tests/navigation-baselines/README.md).
 `npm run test:browser` includes eight complete viewport comparisons. Repeat with
 `SALIMON_EVIDENCE_DIR=test-results/visual-repeat npm run test:visual`, then run
-`npm run test:visual:negative` (real heading-color CSS mutation). Use lockfile
+`npm run test:visual:negative` (real velocity-color CSS mutation). Use lockfile
 Chromium/SwiftShader and vendored fixture fonts. Retain originals, diffs, raw pixel
 counts, state/environment metadata and success/failure traces. Changed browser,
 fonts, renderer or reference hashes fail rather than regenerating baselines.

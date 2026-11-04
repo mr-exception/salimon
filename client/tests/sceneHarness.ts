@@ -15,9 +15,10 @@ export function observeScene({gl,scene,camera,invalidate,get}:RootState) {
     snapshot() {
       gl.render(scene,camera)
       const context=gl.getContext(),debug=context.getExtension('WEBGL_debug_renderer_info')
-      let surfaces=0
+      let surfaces=0,arrows=0
       const objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[]=[]
       scene.traverse(object=>{
+        if(object.type==='ArrowHelper')arrows++
         if(object.type==='GridHelper'||(object instanceof THREE.Mesh && object.geometry.type==='PlaneGeometry'))surfaces++
         if(!object.name.startsWith('nav-'))return
         const center=object.getWorldPosition(new THREE.Vector3()).project(camera)
@@ -31,8 +32,8 @@ export function observeScene({gl,scene,camera,invalidate,get}:RootState) {
         const geometry=object instanceof THREE.Mesh?object.geometry:null
         objects.push({name:object.name,type:object.type,triangles:geometry?(geometry.index?.count??geometry.getAttribute('position').count)/3:0,pixel,pixels,colors:colors.size})
       })
-      return {objects,surfaces,calls:gl.info.render.calls,triangles:gl.info.render.triangles,geometries:gl.info.memory.geometries,renderer:debug?context.getParameter(debug.UNMASKED_RENDERER_WEBGL):context.getParameter(context.RENDERER),zoom:camera.zoom}
+      return {objects,surfaces,arrows,calls:gl.info.render.calls,triangles:gl.info.render.triangles,geometries:gl.info.memory.geometries,renderer:debug?context.getParameter(debug.UNMASKED_RENDERER_WEBGL):context.getParameter(context.RENDERER),zoom:camera.zoom}
     }
   }
 }
-declare global {interface Window {radarTest:{projectLs:(point:[number,number,number])=>number[];camera:(position:[number,number,number],target:[number,number,number],zoom:number)=>void;snapshot:()=>{objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[];surfaces:number;calls:number;triangles:number;geometries:number;renderer:string;zoom:number}}}}
+declare global {interface Window {radarTest:{projectLs:(point:[number,number,number])=>number[];camera:(position:[number,number,number],target:[number,number,number],zoom:number)=>void;snapshot:()=>{objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[];surfaces:number;arrows:number;calls:number;triangles:number;geometries:number;renderer:string;zoom:number}}}}

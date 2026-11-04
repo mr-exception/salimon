@@ -1,92 +1,74 @@
 import {test,expect,type Page} from '@playwright/test'
 import type {} from './sceneHarness'
 import type {} from './fixture'
-async function front(page:Page,zoom=.5,target:[number,number,number]=[0,0,0]) {
+async function front(page:Page,target:[number,number,number]=[0,0,0],zoom=.5) {
  await page.waitForFunction(()=>!!window.radarTest)
- await page.evaluate(({zoom,target})=>window.radarTest.camera([target[0],target[1],200000],target,zoom),{zoom,target})
- await page.waitForTimeout(300)
+ await page.evaluate(({target,zoom})=>window.radarTest.camera([target[0],target[1],200000],target,zoom),{target,zoom})
 }
 async function lines(page:Page) {
- return page.locator('.direction-lines line').evaluateAll(nodes=>nodes.map(node=>({id:node.getAttribute('data-contact-id'),selected:node.classList.contains('selected'),start:[Number(node.getAttribute('x1')),Number(node.getAttribute('y1'))],end:[Number(node.getAttribute('x2')),Number(node.getAttribute('y2'))]})))
+ return page.locator('.ship-vectors line').evaluateAll(nodes=>nodes.filter(n=>(n as SVGElement).style.display!=='none').map(n=>({kind:n.getAttribute('data-vector'),start:[Number(n.getAttribute('x1')),Number(n.getAttribute('y1'))],end:[Number(n.getAttribute('x2')),Number(n.getAttribute('y2'))],stroke:getComputedStyle(n).stroke,dash:getComputedStyle(n).strokeDasharray})))
 }
 function clipped(samples:Awaited<ReturnType<typeof lines>>) {
  for(const line of samples) {
-  expect([...line.start,...line.end].every(Number.isFinite)).toBe(true)
-  expect([...line.start,...line.end].every(v=>v>=0&&v<=100)).toBe(true)
-  expect(Math.min(...line.end.map(v=>Math.min(v,100-v)))).toBeLessThan(1e-8)
+  expect([...line.start,...line.end].every(v=>Number.isFinite(v)&&v>=0&&v<=100)).toBe(true)
+  expect(Math.min(...line.end.map(v=>Math.min(v,100-v)))).toBeLessThan(1e-6)
  }
 }
-test('all edges/corners, selected keyboard contact and actual pan/orbit/zoom keep correct clipped lines',async({page},testInfo)=>{
- const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/tests/fixture.html?scenario=edges')
- await front(page);await expect(page.locator('.direction-lines line')).toHaveCount(8)
+test('ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors',async({page},info)=>{
+ await page.goto('/tests/fixture.html?scenario=edges');await front(page)
+ await expect(page.locator('.scan-status')).toContainText('8 temporary contacts')
+ await expect(page.locator('.direction-lines,[data-offscreen]')).toHaveCount(0);await expect(page.locator('.edge')).toHaveCount(0)
+ const samples=[],box=(await page.locator('.radar').boundingBox())!
+ for(const [x,y] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]) {
+  const vx=x*box.width,vy=y*box.height
+  await page.evaluate(({vx,vy})=>window.navigationTest.vectors(vx>0?-Math.PI/2:vx<0?Math.PI/2:0,Math.atan2(vy,Math.abs(vx)),[vx,vy,0]),{vx,vy})
+  await expect.poll(async()=> (await lines(page)).length).toBe(2)
+  await expect.poll(async()=>{const line=(await lines(page))[0];return line?[...(x?[Math.round(line.end[0])]:[]),...(y?[Math.round(line.end[1])]:[])]:[]}).toEqual([...(x?[x>0?100:0]:[]),...(y?[y>0?0:100]:[])])
+  const sample=await lines(page);clipped(sample);samples.push(sample)
+  const heading=sample[0];if(x)expect(heading.end[0]).toBeCloseTo(x>0?100:0);if(y)expect(heading.end[1]).toBeCloseTo(y>0?0:100)
+  expect(heading.stroke).toBe('rgb(255, 227, 106)');expect(sample[1].stroke).toBe('rgb(182, 245, 162)');expect(sample[1].dash).not.toBe('none')
+ }
+ await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[-1,0,0]));await page.waitForTimeout(150)
+ const opposite=await lines(page);expect(opposite[0].end[0]).toBe(100);expect(opposite[1].end[0]).toBe(0)
+ await info.attach('opposite-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
+ await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[0,1,0]));await page.waitForTimeout(150)
+ const differing=await lines(page);expect(differing[0].end[0]).toBe(100);expect(differing[1].end[1]).toBe(0)
+ await info.attach('differing-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
+ await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[1,0,0]));await page.waitForTimeout(150)
+ await info.attach('overlapping-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
+ await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[1,.001,0]));await page.waitForTimeout(150)
+ await info.attach('nearly-overlapping-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
+ await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[0,0,0]));await expect.poll(async()=> (await lines(page)).length).toBe(1)
+ await expect(page.locator('.legend')).toContainText('STATIONARY')
+ await page.getByLabel('Scanned contacts (8)',{exact:true}).selectOption('right');await expect(page.locator('.target-status')).toContainText('right')
+ expect(await page.evaluate(()=>window.radarTest.snapshot().arrows)).toBe(0)
+ await expect(page.locator('[marker-end],[marker-start]')).toHaveCount(0)
+ await info.attach('vector-state.json',{body:JSON.stringify({samples,opposite,differing,gpu:await page.evaluate(()=>window.radarTest.snapshot())},null,2),contentType:'application/json'})
+})
+test('ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping',async({page},info)=>{
+ await page.goto('/tests/fixture.html?scenario=visuals');await front(page)
+ await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[0,1,0]));await page.waitForTimeout(150)
  const initial=await lines(page);clipped(initial)
- for(const line of initial) {
-  expect(line.start).toEqual([50,50])
-  if(line.id?.includes('right'))expect(line.end[0]).toBeCloseTo(100)
-  if(line.id?.includes('left'))expect(line.end[0]).toBeCloseTo(0)
-  if(line.id?.includes('top'))expect(line.end[1]).toBeCloseTo(0)
-  if(line.id?.includes('bottom'))expect(line.end[1]).toBeCloseTo(100)
- }
- const labels=await page.locator('.edge').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom}}))
- const banners=await page.locator('.top-label,.legend').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom}}))
- for(let i=0;i<labels.length;i++)for(const b of [...banners,...labels.slice(i+1)]) {
-  const a=labels[i];expect(a.right<=b.x||b.right<=a.x||a.bottom<=b.y||b.bottom<=a.y,'edge labels must not overlap each other or navigation banners').toBe(true)
- }
- await testInfo.attach('all-edges.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- const right=page.getByRole('button',{name:'Off-screen right',exact:true});await right.focus();await page.keyboard.press('Enter')
- await expect(page.locator('.target-status')).toHaveText('Selected target: right')
- await expect(page.getByRole('button',{name:'Off-screen right, selected right',exact:true})).toHaveAttribute('aria-pressed','true')
- await expect(page.locator('.direction-lines line.selected')).toHaveAttribute('data-contact-id','right')
- await testInfo.attach('selected-edge.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- const before=await page.locator('.stat').allTextContents()
- // Actual browser mouse input, through production OrbitControls.
- await page.mouse.move(450,400);await page.mouse.down({button:'right'});await page.mouse.move(750,500,{steps:8});await page.mouse.up({button:'right'});await page.waitForTimeout(350)
- const panned=await lines(page);clipped(panned);expect(panned).not.toEqual(initial);expect(await page.locator('.stat').allTextContents()).toEqual(before)
- await page.mouse.move(450,400);await page.mouse.wheel(0,-450);await page.waitForTimeout(350)
- const zoomed=await lines(page);clipped(zoomed);expect(zoomed).not.toEqual(panned)
- await page.mouse.move(450,400);await page.mouse.down();await page.mouse.move(620,460,{steps:8});await page.mouse.up();await page.waitForTimeout(350)
- const rotated=await lines(page);clipped(rotated);expect(rotated).not.toEqual(zoomed)
- expect(await page.locator('.stat').allTextContents()).toEqual(before)
- await testInfo.attach('camera-moved.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await front(page,.5,[1200,0,0]);const shipOutside=await lines(page);clipped(shipOutside)
- expect(shipOutside.some(line=>Math.abs(line.start[0])<1e-8)).toBe(true)
- expect(shipOutside.some(line=>line.start[0]===50&&line.start[1]===50)).toBe(false)
- await testInfo.attach('ship-off-screen.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await front(page,.5,[2500,0,0]);await expect(page.locator('.direction-lines line')).toHaveCount(0)
- await front(page);await page.evaluate(()=>window.navigationTest.moveShipLs([200,0,0]));await page.waitForTimeout(350)
- const moved=await lines(page);clipped(moved);expect(moved).not.toEqual(initial)
- const projections=await page.evaluate(()=>({ship:window.radarTest.projectLs([0,0,0]),contacts:window.navigationTest.positions().map(b=>({id:b.id,point:window.radarTest.projectLs([...b.positionLs])}))}))
- for(const line of moved) {
-  const target=projections.contacts.find(b=>b.id===line.id)!.point
-  const dx=target[0]-projections.ship[0],dy=target[1]-projections.ship[1]
-  for(const point of [line.start,line.end])expect(Math.abs((point[0]-projections.ship[0])*dy-(point[1]-projections.ship[1])*dx)).toBeLessThan(1e-6)
- }
- const gpu=await page.evaluate(()=>window.radarTest.snapshot())
- await testInfo.attach('edge-state.json',{body:JSON.stringify({initial,panned,zoomed,rotated,shipOutside,moved,projections,gpu,errors},null,2),contentType:'application/json'})
- expect(errors).toEqual([])
+ await page.getByRole('region',{name:'Navigation radar',exact:true}).focus()
+ await page.keyboard.down('d');await page.waitForTimeout(200);await page.keyboard.up('d')
+ const keyboard=await lines(page);clipped(keyboard);expect(keyboard).not.toEqual(initial)
+ await page.mouse.move(400,400);await page.mouse.down({button:'right'});await page.mouse.move(480,450,{steps:6});await page.mouse.up({button:'right'})
+ const pointer=await lines(page);clipped(pointer);expect(pointer).not.toEqual(keyboard)
+ await page.mouse.wheel(0,-500);await page.waitForTimeout(150);const zoomed=await lines(page);clipped(zoomed);expect(zoomed).not.toEqual(pointer)
+ await page.keyboard.down('ArrowUp');await page.waitForTimeout(300);await page.keyboard.up('ArrowUp')
+ const turned=await lines(page);clipped(turned);expect(turned[0]).not.toEqual(zoomed[0]);expect(turned[1].end).toEqual(zoomed[1].end)
+ await front(page,[1200,0,0]);await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[1,0,0]));await page.waitForTimeout(150)
+ const outside=await lines(page);clipped(outside);expect(outside).toHaveLength(2)
+ for(const line of outside){expect(line.start[0]).toBe(0);expect(line.end[0]).toBe(100)}
+ await info.attach('ship-off-screen.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
+ await page.evaluate(()=>window.navigationTest.vectors(Math.PI/2,0,[-1,0,0]));await expect.poll(async()=> (await lines(page)).length).toBe(0)
+ await info.attach('camera-vector-state.json',{body:JSON.stringify({initial,keyboard,pointer,zoomed,turned,outside,gpu:await page.evaluate(()=>window.radarTest.snapshot())},null,2),contentType:'application/json'})
 })
-test('edge discovery waits for pulse; out-of-range targets stay hidden and selected contacts expire',async({page})=>{
+test('off-screen contacts stay in picker after pulse and selection still expires with scanner range',async({page})=>{
  await page.goto('/tests/fixture.html?scenario=edges-unscanned');await front(page)
- await expect(page.locator('.scan-status')).toContainText('awaiting first');await expect(page.locator('.direction-lines line')).toHaveCount(0)
+ await expect(page.locator('.scan-status')).toContainText('awaiting first');await expect(page.locator('#contact-select option')).toHaveCount(1)
  await expect(page.locator('.scan-status')).toContainText('8 temporary contacts',{timeout:15000})
- await expect(page.locator('.direction-lines line')).toHaveCount(8)
- await expect(page.getByRole('button',{name:/Out of range/})).toHaveCount(0)
- await page.getByRole('button',{name:'Off-screen right',exact:true}).click()
- await page.evaluate(()=>window.navigationTest.moveShipLs([300000,0,0]))
- await expect(page.locator('.direction-lines line')).toHaveCount(0)
- await expect(page.locator('.edge')).toHaveCount(0);await expect(page.locator('.target-status')).toHaveText('No selected target')
-})
-test('collinear contacts share one subdued ray while all IDs and selected representative stay accessible',async({page},testInfo)=>{
- await page.goto('/tests/fixture.html?scenario=edges-dense');await front(page)
- await expect(page.locator('.scan-status')).toContainText('2000 temporary contacts');await expect(page.locator('.direction-lines line')).toHaveCount(1)
- await expect(page.locator('.edge')).toHaveCount(1)
- const grouped=page.getByRole('button',{name:'Off-screen 2000 contacts',exact:true});await grouped.focus();await page.keyboard.press('Enter')
- await expect(page.locator('.contact-menu button')).toHaveCount(34)
- await page.getByRole('button',{name:'Next contacts',exact:true}).click();await page.getByRole('button',{name:'Edge contact 0032',exact:true}).click()
- await expect(page.locator('.target-status')).toContainText('Edge contact 0032')
- await page.getByLabel('Find scanned contacts').fill('1999');await page.getByLabel('Scanned contacts (2000)',{exact:true}).selectOption('edge-1999')
- await expect(page.locator('.direction-lines line.selected')).toHaveAttribute('data-contact-id','edge-1999')
- await expect(page.getByRole('button',{name:'Off-screen 2000 contacts, selected Edge contact 1999',exact:true})).toHaveAttribute('aria-pressed','true')
- await testInfo.attach('overlap.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
- await testInfo.attach('overlap-state.json',{body:JSON.stringify(await lines(page),null,2),contentType:'application/json'})
+ await expect(page.locator('#contact-select option')).toHaveCount(9);await expect(page.locator('.edge,[data-offscreen],.direction-lines')).toHaveCount(0)
+ await page.getByLabel('Scanned contacts (8)',{exact:true}).selectOption('right')
+ await page.evaluate(()=>window.navigationTest.moveShipLs([300000,0,0]));await expect(page.locator('.target-status')).toHaveText('No selected target');await expect(page.locator('#contact-select option')).toHaveCount(1)
 })

@@ -1,0 +1,66 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:4425) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4456) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:4468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (14.9s)
+  ✓   2 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (6.0s)
+  ✓   3 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (11.1s)
+  ✓   4 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (7.5s)
+  ✓   5 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (5.1s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (6.5s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (5.1s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (2.5s)
+  ✓   9 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (2.9s)
+  ✓  10 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (3.5s)
+  ✓  11 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (3.5s)
+  ✓  12 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (5.8s)
+  ✘  13 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (3.1s)
+(node:5074) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  14 [desktop] › tests/edges.spec.ts:45:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (8.5s)
+  ✓  15 [desktop] › tests/edges.spec.ts:64:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (7.8s)
+  ✓  16 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (10.3s)
+(node:5292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (7.7s)
+
+
+  1) [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors 
+
+    TypeError: Cannot read properties of undefined (reading 'stroke')
+
+      26 |   const sample=await lines(page);clipped(sample);samples.push(sample)
+      27 |   const heading=sample[0];if(x)expect(heading.end[0]).toBeCloseTo(x>0?100:0);if(y)expect(heading.end[1]).toBeCloseTo(y>0?0:100)
+    > 28 |   expect(heading.stroke).toBe('rgb(255, 227, 106)');expect(sample[1].stroke).toBe('rgb(182, 245, 162)');expect(sample[1].dash).not.toBe('none')
+         |                                                                      ^
+      29 |  }
+      30 |  await page.evaluate(()=>window.navigationTest.vectors(-Math.PI/2,0,[-1,0,0]));await page.waitForTimeout(150)
+      31 |  const opposite=await lines(page);expect(opposite[0].end[0]).toBe(100);expect(opposite[1].end[0]).toBe(0)
+        at /workspace/salimon/client/tests/edges.spec.ts:28:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors 
+  16 passed (2.0m)

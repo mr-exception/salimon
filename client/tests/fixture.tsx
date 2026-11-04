@@ -26,6 +26,6 @@ else if(!edges) {
  if(warning)navigation.advance(5)
  navigation.clock.state={...navigation.clock.state,velocityMps:[warning?-150:scenario==='destroyed'?-100:-20,0,0]}
 }
-window.navigationTest={positions(){return navigation.scanner.contacts.map(b=>({id:b.id,positionLs:radarPosition(b.position,navigation.clock.state.position)}))},moveShipLs(offset){navigation.clock.state={...navigation.clock.state,position:translate(ORIGIN,offset.map(v=>v*LIGHT_SECOND_M) as [number,number,number])}}}
-declare global {interface Window {navigationTest:{positions:()=>{id:string;positionLs:readonly [number,number,number]}[];moveShipLs:(offset:[number,number,number])=>void}}}
+window.navigationTest={vectors(yaw,pitch,velocityMps){navigation.clock.state={...navigation.clock.state,yaw,pitch,velocityMps,alignment:null}},positions(){return navigation.scanner.contacts.map(b=>({id:b.id,positionLs:radarPosition(b.position,navigation.clock.state.position)}))},moveShipLs(offset){navigation.clock.state={...navigation.clock.state,position:translate(ORIGIN,offset.map(v=>v*LIGHT_SECOND_M) as [number,number,number])}}}
+declare global {interface Window {navigationTest:{vectors:(yaw:number,pitch:number,velocity:[number,number,number])=>void;positions:()=>{id:string;positionLs:readonly [number,number,number]}[];moveShipLs:(offset:[number,number,number])=>void}}}
 ReactDOM.createRoot(document.getElementById('root')!).render(<App navigation={navigation} onSceneReady={observeScene}/> )

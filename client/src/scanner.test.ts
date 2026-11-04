@@ -29,12 +29,11 @@ test('large catalog query matches independent brute force without global precisi
 test('dense presentation groups retain every detected ID; edge is frustum based, never radial',()=>{
  const dense=Array.from({length:10000},(_,i)=>body(String(i),i))
  const groups=radarGroups(dense,ORIGIN,()=>[0,0,0],800,600)
- assert.equal(groups.length,1);assert.equal(groups[0].bodies.length,10000);assert.equal(groups[0].edge,false)
- const [edge]=radarGroups([body('edge',1)],ORIGIN,()=>[2,.5,0],800,600)
- assert.equal(edge.edge,true);assert.equal(edge.bodies[0].id,'edge');assert.ok(edge.x>50&&edge.x<100)
+ assert.equal(groups.length,1);assert.equal(groups[0].bodies.length,10000)
+ assert.deepEqual(radarGroups([body('edge',1)],ORIGIN,()=>[2,.5,0],800,600),[])
  assert.equal(radarGroups([body('hidden',R+1)],ORIGIN,()=>[0,0,0],800,600).length,0)
- assert.equal(radarGroups([body('corner',R)],ORIGIN,()=>[.8,.8,0],800,600)[0].edge,false)
- assert.equal(radarGroups([body('depth',1)],ORIGIN,()=>[0,0,2],800,600)[0].edge,true)
+ assert.equal(radarGroups([body('corner',R)],ORIGIN,()=>[.8,.8,0],800,600).length,1)
+ assert.deepEqual(radarGroups([body('depth',1)],ORIGIN,()=>[0,0,2],800,600),[])
 })
 test('grid lattice follows ship translation, preserving galactic orientation',()=>{
  const moved=translate(ORIGIN,[299792458,0,0]);assert.equal(gridOffsetLs(moved,100)[0],-1)
@@ -46,5 +45,5 @@ test('presentation count is bounded by viewport cells, not catalog length',()=>{
  let i=0
  const groups=radarGroups(bodies,ORIGIN,()=>{const n=i++;return [(n%200)/50-2,Math.floor(n/200)/25-2,0]},440,440)
  assert.ok(groups.length<=2*11*11)
- assert.equal(groups.reduce((sum,g)=>sum+g.bodies.length,0),bodies.length)
+ assert.ok(groups.reduce((sum,g)=>sum+g.bodies.length,0)<bodies.length,'off-screen contacts have no presentation group')
 })

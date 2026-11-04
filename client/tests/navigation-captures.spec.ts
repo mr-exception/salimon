@@ -6,7 +6,7 @@ import {boot,snapshot,json,EPOCH} from './deterministic'
 import {POLICY,sha256,compareImages} from '../scripts/visual-comparison.ts'
 
 const directory='tests/navigation-baselines'
-const candidate=process.env.SALIMON_CAPTURE_CANDIDATES
+const candidate=process.env.SALIMON_CAPTURE_CANDIDATES||undefined
 if(candidate&&process.env.CI)throw Error('Candidate generation is forbidden in CI')
 const cases=[
  {id:'empty-scanner',scenario:'seeded-empty',vector:'zero'},

@@ -115,7 +115,9 @@ for real keyboard input, and five simulated seconds for camera settling. The
 existing `compareImages` policy permits zero pixels beyond its fixed 0.1
 perceptual threshold, includes antialiasing and applies no masks; raw changed
 pixels and diff images are retained. A wrong-checkpoint comparison must fail.
-The earlier static TD-1/4 byte-identity check is preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
+Full-viewport PNG readback preserves the viewer pixel grid; the SVG adapter
+requests geometric precision. The earlier static TD-1/4 byte-identity check is
+preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
 inspection, footprint blocking and independence from the camera/ship pose.
 The default production `/` remains radar until #766 integrates cockpit entry.
 There is no automatic frame transfer or saved world yet (#765/#757).

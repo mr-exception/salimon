@@ -203,8 +203,8 @@ test('PLANET-1 fixed outdoor journey, source footprints and repeat screenshots',
       expect(sources).toHaveLength(2)
       const capture = async (name: string) => {
         await page.clock.runFor(5000)
-        const png = await scene(page).screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
-        await info.attach(`${name}-${replay}.json`, { body: JSON.stringify({ position: await position(page), tick: await scene(page).getAttribute('data-tick'), ground: await transform(page, 'terrain:site'), player: await transform(page, 'person:player') }), contentType: 'application/json' })
+        const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
+        await info.attach(`${name}-${replay}.json`, { body: JSON.stringify({ position: await position(page), tick: await scene(page).getAttribute('data-tick'), ground: await transform(page, 'terrain:site'), player: await transform(page, 'person:player'), viewport: page.viewportSize(), sceneBounds: await scene(page).boundingBox() }), contentType: 'application/json' })
         if (replay === 0) captures[name] = png
         else {
           const comparison = compareImages(captures[name]!, png)

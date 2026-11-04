@@ -1,0 +1,52 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down
+
+
+Running 3 tests using 1 worker
+
+(node:3660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:17:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (6.8s)
+  ✓  2 [top-down] › tests/top-down.spec.ts:46:1 › TD-2 WASD moves world beneath centered player, release/blur/hidden/resize clear movement (3.5s)
+  ✘  3 [top-down] › tests/top-down.spec.ts:68:1 › TD-5 built entry retains navigation even with development scene query (118ms)
+
+
+  1) [top-down] › tests/top-down.spec.ts:68:1 › TD-5 built entry retains navigation even with development scene query 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4175/?scene=top-down
+    Call log:
+      - navigating to "http://127.0.0.1:4175/?scene=top-down", waiting until "load"
+
+
+      67 |
+      68 | test('TD-5 built entry retains navigation even with development scene query', async ({ page }) => {
+    > 69 |   await page.goto('http://127.0.0.1:4175/?scene=top-down')
+         |              ^
+      70 |   await expect(page.getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })).toBeVisible()
+      71 |   await expect(scene(page)).toHaveCount(0)
+      72 | })
+        at /workspace/salimon/client/tests/top-down.spec.ts:69:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/top-down-cpu-repeat/top-down-TD-5-built-entry--342d0-ith-development-scene-query-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/top-down-cpu-repeat/top-down-TD-5-built-entry--342d0-ith-development-scene-query-top-down/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/top-down-cpu-repeat/top-down-TD-5-built-entry--342d0-ith-development-scene-query-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/top-down-cpu-repeat/top-down-TD-5-built-entry--342d0-ith-development-scene-query-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [top-down] › tests/top-down.spec.ts:68:1 › TD-5 built entry retains navigation even with development scene query 
+  2 passed (11.2s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

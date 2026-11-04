@@ -1,3 +1,4 @@
+import { planetaryEntities, STARTING_SITE, type SourceIdentity } from './planetarySite.ts'
 import { scoutEntities } from './scoutLayout.ts'
 import { translate } from './coordinates.ts'
 import { allowedMove, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
@@ -5,8 +6,8 @@ import { point2, relativeAnchor, rotate2, type Anchor, type Point2, type WorldFr
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
 export type Layer = typeof LAYERS[number]
-export type Appearance = 'ground' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold'
-export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance }
+export type Appearance = 'ground' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold' | 'mineral' | 'flora' | 'stones'
+export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance; readonly source?: SourceIdentity }
 export interface TopDownState {
   readonly tick: number
   readonly player: { readonly facing: number; readonly mode: 'standing' | 'walking' | 'interacting'; readonly targetId: string | null }
@@ -22,14 +23,12 @@ export const PLAYER_ID = 'person:player'
 const entity = (id: string, frame: Anchor['frame'], x: number, y: number, layer: Layer, appearance: Appearance): Entity2D =>
   ({ id, anchor: { frame, point: point2(x, y) }, layer, appearance })
 
-export function createTopDownState(view: 'interior' | 'exterior' = 'interior'): TopDownState {
+export function createTopDownState(view: 'interior' | 'exterior' = 'exterior'): TopDownState {
   const entities = [
-    entity('terrain:site', 'planet:fixture', 0, 0, 'terrain', 'ground'),
-    entity('rock:west', 'planet:fixture', -10, -3, 'terrain', 'rock'),
-    entity('rock:east', 'planet:fixture', 11, 5, 'terrain', 'rock'),
+    ...planetaryEntities(),
     entity('ship:scout', 'ship:scout', 0, 0, 'hull', 'hull'),
     entity('scout:floor', 'ship:scout', 0, 0, 'interior', 'floor'),
-    view === 'exterior' ? entity(PLAYER_ID, 'planet:fixture', -6, 3, 'people', 'player') : entity(PLAYER_ID, 'ship:scout', 0, 2, 'people', 'player'),
+    view === 'exterior' ? { ...entity(PLAYER_ID, 'planet:fixture', 0, 0, 'people', 'player'), anchor: STARTING_SITE.spawn } : entity(PLAYER_ID, 'ship:scout', 0, 2, 'people', 'player'),
     ...scoutEntities(),
   ]
   return {
@@ -37,7 +36,7 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'interior'): 
     player: { facing: 0, mode: 'standing', targetId: null }, selectedId: null, feedback: 'Approach a fixture to inspect it. Systems are inactive.',
     frames: {
       planet: { id: 'planet:fixture', universeOrigin: { cell: [10n ** 24n, -(10n ** 24n), 0n], offsetM: [0, 0, 0] }, angle: .2 },
-      ship: { id: 'ship:scout', parent: 'planet:fixture', origin: point2(2, -1), angle: -.12 },
+      ship: { id: 'ship:scout', parent: 'planet:fixture', origin: STARTING_SITE.shipOrigin, angle: STARTING_SITE.shipAngle },
     },
     entities,
     camera: { anchor: entities.find(e => e.id === PLAYER_ID)!.anchor, pixelsPerM: view === 'exterior' ? 26 : 32 },

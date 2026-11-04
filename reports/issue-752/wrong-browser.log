@@ -10,18 +10,18 @@
 2026-11-04T12:26:49.267Z pw:webserver HTTP GET: http://127.0.0.1:5175/
 2026-11-04T12:26:49.268Z pw:webserver Error while checking if http://127.0.0.1:5175/ is available: connect ECONNREFUSED 127.0.0.1:5175
 2026-11-04T12:26:49.268Z pw:webserver Waiting 100ms
-[WebServer] 
+[WebServer]
 [WebServer] > salimon-navigation-client@0.1.0 dev
 [WebServer] > vite --host 127.0.0.1 --port 5175 --strictPort
-[WebServer] 
+[WebServer]
 2026-11-04T12:26:49.368Z pw:webserver HTTP GET: http://127.0.0.1:5175/
 2026-11-04T12:26:49.369Z pw:webserver Error while checking if http://127.0.0.1:5175/ is available: connect ECONNREFUSED 127.0.0.1:5175
 2026-11-04T12:26:49.369Z pw:webserver Waiting 250ms
 [WebServer] (node:1522) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 [WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
-[WebServer] 
+[WebServer]
 [WebServer]   VITE v7.3.7  ready in 59 ms
-[WebServer] 
+[WebServer]
 [WebServer]   ➜  Local:   http://127.0.0.1:5175/
 2026-11-04T12:26:49.619Z pw:webserver HTTP GET: http://127.0.0.1:5175/
 2026-11-04T12:26:49.632Z pw:webserver HTTP Status: 200
@@ -34,10 +34,10 @@
 2026-11-04T12:26:49.637Z pw:webserver HTTP GET: http://127.0.0.1:4175/
 2026-11-04T12:26:49.638Z pw:webserver Error while checking if http://127.0.0.1:4175/ is available: connect ECONNREFUSED 127.0.0.1:4175
 2026-11-04T12:26:49.638Z pw:webserver Waiting 100ms
-[WebServer] 
+[WebServer]
 [WebServer] > salimon-navigation-client@0.1.0 preview
 [WebServer] > vite preview --host 127.0.0.1 --port 4175 --strictPort
-[WebServer] 
+[WebServer]
 2026-11-04T12:26:49.737Z pw:webserver HTTP GET: http://127.0.0.1:4175/
 2026-11-04T12:26:49.738Z pw:webserver Error while checking if http://127.0.0.1:4175/ is available: connect ECONNREFUSED 127.0.0.1:4175
 2026-11-04T12:26:49.738Z pw:webserver Waiting 250ms
@@ -59,7 +59,7 @@ Running 1 test using 1 worker
 2026-11-04T12:26:59.267Z pw:webserver Terminated the WebServer
 
 
-  1) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 
+  1) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels
 
     Error: VISUAL_PIXEL_MISMATCH heading-velocity: 520 changed pixels
 
@@ -106,4 +106,4 @@ Running 1 test using 1 worker
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   1 failed
-    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 
+    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels

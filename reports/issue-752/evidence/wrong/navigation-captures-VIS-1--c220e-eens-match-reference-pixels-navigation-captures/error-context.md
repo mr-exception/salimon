@@ -99,7 +99,7 @@ Received: false
   4  | import {join} from 'node:path'
   5  | import {boot,snapshot,json,EPOCH} from './deterministic'
   6  | import {POLICY,sha256,compareImages} from '../scripts/visual-comparison.ts'
-  7  | 
+  7  |
   8  | const directory='tests/navigation-baselines'
   9  | const candidate=process.env.SALIMON_CAPTURE_CANDIDATES||undefined
   10 | if(candidate&&process.env.CI)throw Error('Candidate generation is forbidden in CI')
@@ -170,5 +170,5 @@ Received: false
 > 75 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
      |                                                                                                                              ^ Error: VISUAL_PIXEL_MISMATCH opposite-vectors: 630 changed pixels
   76 | })
-  77 | 
+  77 |
 ```

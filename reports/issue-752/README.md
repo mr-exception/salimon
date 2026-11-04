@@ -75,6 +75,8 @@ JSON and trace:
 
 Raw Playwright attachment paths retain their original `/tmp` execution locations;
 the corresponding primary files are preserved under these relative directories.
+Text log/error-context exports trim trailing whitespace; original images, trace
+archives, JSON measurements/results and all reviewer-bound hashes are unchanged.
 Nonvisual success screenshots are not duplicated into this report. Final CI
 uploads the full fresh suite artifact under its own exact tested merge revision.
 

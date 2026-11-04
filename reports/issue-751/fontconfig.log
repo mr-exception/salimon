@@ -1,0 +1,159 @@
+
+> salimon-navigation-client@0.1.0 test:visual
+> playwright test --project=navigation-captures
+
+[WebServer] (node:5194) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5207) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:5219) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (8.9s)
+
+
+  1) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels
+
+    Error: VISUAL_PIXEL_MISMATCH empty-scanner: 467 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    Error: VISUAL_PIXEL_MISMATCH visible-contacts: 467 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    Error: VISUAL_PIXEL_MISMATCH panned-contacts: 467 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    Error: VISUAL_PIXEL_MISMATCH selected-body: 129 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    Error: VISUAL_PIXEL_MISMATCH zoom-out: 467 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    Error: VISUAL_PIXEL_MISMATCH zoom-in: 467 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    Error: VISUAL_PIXEL_MISMATCH heading-velocity: 467 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    Error: VISUAL_PIXEL_MISMATCH opposite-vectors: 467 changed pixels
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      72 |  await info.attach('comparison-summary.json',{body:json({source,launchArgs,candidate:!!candidate,results}),contentType:'application/json'})
+      73 |  // Soft per-frame failures let QA inspect every unexpected screen in one run.
+    > 74 |  for(const r of results)if(!candidate)expect.soft(r.pass,`VISUAL_PIXEL_MISMATCH ${r.id}: ${r.changedPixels} changed pixels`).toBe(true)
+         |                                                                                                                              ^
+      75 | })
+      76 |
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:74:126
+
+    attachment #18: screenshot (image/png) ─────────────────────────────────────────────────────────
+    test-results/fontconfig/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/fontconfig/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/error-context.md
+
+    attachment #20: trace (application/zip) ────────────────────────────────────────────────────────
+    test-results/fontconfig/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/fontconfig/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

@@ -10,7 +10,9 @@ at report creation. No baseline has been silently approved or regenerated.
 
 Branch `issue-751-navigation-visual-baselines` extends `main` at
 `b0318abf9c9e1e71a349ff1948e074efb04092c7`; no active PR stack existed.
-Current tested source: `538a77b20f63a736a10a133a50123a4d0d05672b`.
+Current tested source: `0ce35101daa4c9a9b826db3af61b15aa1eef452d`.
+Current candidate digest: `961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513`.
+The previous `946d...` proposal is superseded; only the new digest can approve current images.
 The original local campaign below used `46d6912`; the grayscale revision and
 actual first CI failure are recorded in the addendum below.
 Final publication head/base, remote CI and independent verdict are bound in the
@@ -188,3 +190,74 @@ mandatory. Source hashes now bind538a77b inputs; the source delta from46d6912 is
 [recorded separately](grayscale-input-delta.patch). Final head/base/CI/verdict are
 bound after publication in the PR conversation. The user intends to review and
 approve on GitHub; intent is not recorded approval and the gate remains required.
+
+
+## Final font contract and corrected candidate proposal (0ce3510)
+
+The second [CI run41821988777](https://github.com/mr-exception/salimon/actions/runs/41821988777)
+at040a760 passed units/build and23 existing browser routes. Grayscale text removed
+most mismatches, but seven captures still failed by467 pixels and selected moon
+by129 pixels. The remaining differences were exclusively inside the native
+select's displayed value; its hidden host-font fallback was not governed by the
+page's custom webfont. CDP reported the custom page font but did not expose that
+internal native-control dependency.
+
+Local `fc-match Inter` resolved to a host-specific OpenAI Sans file; a minimal
+Fontconfig policy resolving only vendored DejaVu produced **byte-identical hashes
+to all eight Ubuntu outputs**. This proves the remaining drift was an unpinned
+native-control font, rather than a canvas/layout defect. No host-specific font is
+redistributed. The licensed vendored DejaVu files now serve that fallback through
+screenshot-only `FONTCONFIG_FILE`; other browser/production projects retain host
+font coverage. The policy pins relative font directory, cache location,
+antialiasing, hinting/hintslight/autohint, rgba:none, LCDfilter and DPI75. Its bytes
+are hashed in the environment manifest, which explicitly labels the native
+fallback. The relative path works in disposable negative copies and CI.
+
+This is an **explicit revision of unapproved candidates**, not automatic approval
+or an attempt to hide a product defect. [Exact upgrade measurements](candidate-upgrade.json)
+show only native-select glyph changes: seven frames467 perceptual/586 raw pixels
+within x1008–1119,y542–553; selected moon129/169 within x1009–1044,y546–553.
+There are ZERO changed pixels elsewhere, including every body, vector, camera,
+selection marker, label and layout. The initial originals/manifest are permanently
+retained under [initial-candidates/](initial-candidates/manifest.json); prior
+reference-index links point to those exact preserved bytes. Old source/evidence
+and actual failures remain disclosed. Threshold0.1, zero accepted pixels and no
+masks remain unchanged.
+
+At exact source0ce3510, build/typecheck passes, both eight-screen runs match all
+reference bytes, and the real velocity-color mutation still fails at520/630
+pixels with six unchanged controls. Commands and logs:
+
+- `npm run build`: PASS ([log](pinned-build.log)).
+- `SALIMON_EVIDENCE_DIR=test-results/pinned npm run test:visual`: PASS ([log](pinned.log)).
+- `SALIMON_EVIDENCE_DIR=test-results/pinned-repeat npm run test:visual`: PASS ([log](pinned-repeat.log)).
+- `npm run test:visual:negative`: PASS ([log](pinned-negative.log)).
+
+Updated raw summaries/state, original captures/diffs and current-source
+success/negative traces are indexed. The repeated success trace is redundant; the
+intermediate second-CI trace remains in14-day
+[artifact13318325055](https://github.com/mr-exception/salimon/actions/runs/41821988777/artifacts/13318325055),
+while its essential originals, state and raw measurements are retained here.
+Unchanged30 unit assertions are reused; final-head CI must rerun all affected
+cloud gates, including full browser and prior navigation mutations. No CI pass
+is predicted from local evidence or the earlier failures.
+
+The distinct reviewer independently verified every new image hash, all eight
+pixel-change bounds, zero changes outside native select, the policy/source diff,
+and representative corrected originals. Advisory review preserves text semantics
+and readability; it **does not approve the baseline**. Required current-head CI
+and explicit human approval still veto acceptance.
+
+The new manifest digest is
+`961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513`.
+The previous digest946d... is INVALID for the corrected candidate set, even if an
+old approval comment appears. A human collaborator must review the corrected
+originals and post exactly onPR755:
+
+```text
+Approve navigation baselines: 961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513
+```
+
+Final publication head/base, actual CI and structured independent verdict are
+bound in the PR conversation. The issue remains open and PR draft until mandatory
+approval/checks pass. No merge/deployment/release is authorized.

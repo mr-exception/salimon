@@ -1,6 +1,9 @@
 # #744 — heading and velocity rays
 
-Parent: `issue-730-desktop-navigation` at `9398291` (PR #745).
+Initial parent: `issue-730-desktop-navigation` at `9398291` (PR #745).
+The subsequent idle-camera correction on #745 was merged here without rewriting
+history; its unchanged exact-stability checks and local results are recorded in
+the #730 desktop supplement. Updated parent/head CI evidence is on this PR.
 
 Removed celestial off-screen lines, edge indicators and heading/velocity arrow
 helpers. Every scanned contact remains selectable in the paged picker. Visible

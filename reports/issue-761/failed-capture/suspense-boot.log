@@ -1,0 +1,107 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down
+
+[WebServer] (node:1499) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1512) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:1524) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [top-down] › tests/top-down.spec.ts:15:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (10.3s)
+(node:1617) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [top-down] › tests/top-down.spec.ts:44:1 › TD-2 WASD moves world beneath centered player, release/blur/hidden/resize clear movement (10.3s)
+(node:1710) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [top-down] › tests/top-down.spec.ts:66:1 › TD-5 built entry retains navigation even with development scene query (681ms)
+
+
+  1) [top-down] › tests/top-down.spec.ts:15:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('img', { name: 'Strict overhead Scout and planetary test site' }) with timeout 10000ms
+      - waiting for getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
+
+
+       8 |   await page.clock.pauseAt(new Date('2026-11-04T00:00:01Z'))
+       9 |   await page.goto('/?scene=top-down')
+    > 10 |   await expect(scene(page)).toBeVisible()
+         |                             ^
+      11 |   await page.evaluate(() => document.fonts.ready)
+      12 |   await page.clock.runFor(32)
+      13 | }
+        at boot (/workspace/salimon/client/tests/top-down.spec.ts:10:29)
+        at /workspace/salimon/client/tests/top-down.spec.ts:19:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [top-down] › tests/top-down.spec.ts:44:1 › TD-2 WASD moves world beneath centered player, release/blur/hidden/resize clear movement 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('img', { name: 'Strict overhead Scout and planetary test site' }) with timeout 10000ms
+      - waiting for getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
+
+
+       8 |   await page.clock.pauseAt(new Date('2026-11-04T00:00:01Z'))
+       9 |   await page.goto('/?scene=top-down')
+    > 10 |   await expect(scene(page)).toBeVisible()
+         |                             ^
+      11 |   await page.evaluate(() => document.fonts.ready)
+      12 |   await page.clock.runFor(32)
+      13 | }
+        at boot (/workspace/salimon/client/tests/top-down.spec.ts:10:29)
+        at /workspace/salimon/client/tests/top-down.spec.ts:45:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/top-down-TD-2-WASD-moves-w-5b4d0-idden-resize-clear-movement-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/top-down-TD-2-WASD-moves-w-5b4d0-idden-resize-clear-movement-top-down/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/top-down-TD-2-WASD-moves-w-5b4d0-idden-resize-clear-movement-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/top-down-TD-2-WASD-moves-w-5b4d0-idden-resize-clear-movement-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [top-down] › tests/top-down.spec.ts:15:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures 
+    [top-down] › tests/top-down.spec.ts:44:1 › TD-2 WASD moves world beneath centered player, release/blur/hidden/resize clear movement 
+  1 passed (23.1s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

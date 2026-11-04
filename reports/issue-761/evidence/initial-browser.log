@@ -1,0 +1,61 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:2218) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2231) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 27 tests using 1 worker
+
+(node:2243) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [top-down] › tests/top-down.spec.ts:17:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (24.5s)
+(node:2356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [top-down] › tests/top-down.spec.ts:46:1 › TD-2 WASD moves world beneath centered player, release/blur/hidden/resize clear movement (4.2s)
+  ✓   3 [top-down] › tests/top-down.spec.ts:68:1 › TD-5 built entry retains navigation even with development scene query (545ms)
+(node:2447) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (8.6s)
+(node:2568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (6.5s)
+  ✓   6 [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (11.8s)
+  ✓   7 [deterministic] › tests/deterministic.spec.ts:77:1 › NAV-3 heading and velocity retain approved colors and viewport edges (1.8s)
+  ✓   8 [deterministic] › tests/deterministic.spec.ts:94:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (1.2s)
+(node:2720) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (10.3s)
+  ✓  10 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (6.1s)
+  ✓  11 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (6.4s)
+  ✓  12 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (2.9s)
+  ✓  13 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (1.6s)
+  ✓  14 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (4.8s)
+  ✓  15 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (3.2s)
+  ✓  16 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (1.2s)
+  ✓  17 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (2.2s)
+  ✓  18 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (2.4s)
+  ✓  19 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (2.4s)
+  ✓  20 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (6.3s)
+  ✓  21 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (24.3s)
+  ✓  22 [desktop] › tests/edges.spec.ts:50:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (7.3s)
+  ✓  23 [desktop] › tests/edges.spec.ts:68:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (11.0s)
+  ✓  24 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (4.3s)
+  ✓  25 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (4.1s)
+  ✓  26 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (10.7s)
+(node:3530) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  27 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.5s)
+
+
+
+  1) [top-down] › tests/top-down.spec.ts:17:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    
+Raw Buffer diff omitted; original PNGs and 52-pixel raw diff are retained.
+
+26 passed / 1 failed.

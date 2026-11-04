@@ -916,3 +916,15 @@ validates baseline hashes and checks the PR's approval evidence. The
 [reference guide](../client/tests/navigation-baselines/README.md) owns candidate,
 review, environment upgrade and artifact retention procedures. Reference pixel
 comparisons and human baseline approval are separate required gates.
+
+
+## Top-down browser foundation (#761)
+
+`client/src/topDownFrames.ts` owns split point conversions and abstract planet/ship
+poses; `topDownRuntime.ts` owns deterministic entities, 60 Hz updates, corridor
+walking, camera and layer order. `TopDownView.tsx` / `topDown.css` own SVG
+illustrations and DOM input. Keep radar/simulation dependencies out of these
+owners. `topDown.test.ts` covers transform/precision/state/layer contracts;
+`tests/top-down.spec.ts` covers actual SVG pixels, repeat captures, input cleanup
+and unchanged built radar entry. Run client domain tests, build and browser tests;
+[client guide](../client/README.md#top-down-foundation-761) records scope and controls.

@@ -14,6 +14,18 @@ contracts, not a claim that their gameplay has been migrated.
 
 [Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
 
+## Top-down browser foundation (#761)
+
+The development entry `/?scene=top-down` adds one strict overhead world beside
+independently reusable navigation. `client/src/topDownFrames.ts` owns split
+planet-fixed/ship-local anchor conversion, common-planet camera differences and
+abstract poses; `topDownRuntime.ts` owns stable entity IDs, immutable state,
+fixed-step walking, follow-camera and layered draw lists. `TopDownView.tsx` maps
+these lists to SVG and desktop input without importing Three or radar state.
+Planet universe poses are independent of local drawing, avoiding astronomical
+Number cancellation. No automatic frame transfer or cockpit transition is
+implemented. See [usage and boundaries](../client/README.md#top-down-foundation-761).
+
 ## Implemented architecture
 
 Salimon uses a custom Rust runtime with low-level `winit` and `wgpu`, without a

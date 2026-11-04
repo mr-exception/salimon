@@ -1,6 +1,6 @@
 # Cockpit navigation, multiplayer presence and reconnect
 
-**Status:** Approved future gameplay design, 2026-11-04. This document is authoritative for the **strict top-down 2D** player-world / **3D holographic navigation** transition and the disconnect/reconnect behavior discussed here. **Not implemented** in the current navigation-only React client; no multiplayer backend, 2D interior, shared player persistence or ship-interaction runtime is claimed.
+**Status:** Approved future gameplay design, 2026-11-04. This document is authoritative for the **strict top-down 2D** player-world / **3D holographic navigation** transition and the disconnect/reconnect behavior discussed here. **Not implemented** in the current navigation-only React client; no multiplayer backend, shared player persistence or ship-interaction runtime is claimed. Issue #761 provides only a separate development test scene with bounded 2D interior walking; it does not implement the transitions below.
 
 Companion contracts: [2D art direction](top-down-art-direction.md), [navigation-only radar prototype](radar-navigation-prototype.md), [multiplayer](multiplayer-and-npc-interaction.md), [spaceship and survival](spaceship-building-and-survival.md), and [legacy save contract](save-contract.md).
 
@@ -73,7 +73,7 @@ Past native implementation documents describing localized cell, module, door or 
 - View switching is a client presentation state change; the authoritative player stays physically inside the ship when seated, and ship motion persists independently.
 - Disconnect must atomically release occupancy/interaction locks and save a valid planet-fixed or ship-local re-entry anchor. It must not leave an offline physical player in the world.
 - Reconnect checks terminal offline death **before** spawning, resuming commands or presenting controls.
-- No implementation is authorized by this document alone; the active `client/` navigation-only radar has no 2D gameplay, cockpit avatar, live multiplayer, server persistence or module seating.
+- No implementation is authorized by this document alone; the active `client/` navigation-only radar has no integrated 2D gameplay, cockpit avatar, live multiplayer, server persistence or module seating. The #761 development scene is an isolated foundation, not these interactions.
 - **Still to design later:** exact cockpit input key/animation timing, valid-adjacent spawn fallback when a saved spot changes, server timing/race handling, full power/zero-G seating safety, multiplayer interaction with an occupied pilot, reconnect if a ship is transferred/removed without destruction, and eventual localized hull/room/module damage.
 
 ## Review examples / acceptance scenarios (future)

@@ -289,6 +289,12 @@ class RuntimeTests(unittest.TestCase):
         report, calls = self.execute()
         self.assertEqual((report["verdict"], calls), ("BLOCKED", 0))
 
+    def test_stacked_parent_cannot_self_approve_new_manifest(self):
+        original = self.api.contents
+        self.api.contents = lambda path, sha: b"different trusted manifest" if path.endswith("manifest.json") and sha == "main" else original(path, sha)
+        with self.assertRaisesRegex(ValueError, "BASELINE_APPROVAL_REQUIRED"):
+            review.baseline_approval(self.api, self.api.pr, original("manifest", HEAD), [])
+
 
 class ProviderTransportTests(unittest.TestCase):
     def test_structured_multimodal_request_and_transient_retry(self):

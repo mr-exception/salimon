@@ -21,7 +21,7 @@ Every one of eight frames must include source-bound actual/expected/diff PNGs,
 state/environment, the approved manifest hash and retained trace. The model sees
 all 24 images, per-frame state, comparison measurements and E2E results; a trace
 citation proves availability, not that a model has replayed it. Human baseline
-approval is independently verified from exact base inheritance or the existing
+approval is independently verified from exact base + trusted main inheritance or the existing
 exact human approval comment. AI cannot substitute for it. Changed CI workflow
 or mandatory npm scripts are BLOCKED for human review rather than trusted as
 successful deterministic checks. Ordinary source/test diffs remain reviewable.
@@ -47,7 +47,7 @@ artifact blocks replay even if a previous review accepted it.
 At most three model cycles per PR, including failed provider calls. There are at
 most two API requests per cycle, retrying only HTTP 429/500/502/503/504 once after
 two seconds. Each call has a 90-second timeout and 4,000 output-token cap; there
-are no model tools. Maximum six requests/12,000 output tokens across three
+are no model tools. Maximum six requests/24,000 provider output tokens across three
 cycles (retries may consume provider tokens too). Authentication errors do not
 retry. A fingerprint binds head/base/merge, issue/discussion, review state, diff,
 model/configuration presence, CI attempt/results and artifact hashes. Identical

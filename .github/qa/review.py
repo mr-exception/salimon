@@ -150,7 +150,8 @@ def baseline_approval(api, pr, manifest_bytes, comments):
     import hashlib
     checksum = hashlib.sha256(manifest_bytes).hexdigest()
     try:
-        if api.contents("client/tests/navigation-baselines/manifest.json", pr["base"]["sha"]) == manifest_bytes:
+        if (api.contents("client/tests/navigation-baselines/manifest.json", pr["base"]["sha"]) == manifest_bytes
+                and api.contents("client/tests/navigation-baselines/manifest.json", "main") == manifest_bytes):
             return {"digest": checksum, "approval": "inherited from exact base"}
     except ValueError as exc:
         if "HTTP 404" not in str(exc):
@@ -335,14 +336,14 @@ def run(api, number, requested_run=None):
             raise ValueError("CYCLE_LIMIT: three provider cycles exhausted; human must investigate stuck loop")
         if blockers:
             raise ValueError("BLOCKING_REVIEW: resolve change requests from " + ", ".join(blockers))
-        if os.environ.get("OPENAI_API_KEY"):
-            report["provider_attempted"] = True
         packet = {"binding": binding, "issue": {"number": issue_refs[0], "body": issue["body"],
             "discussion": [c["body"] for c in discussion]}, "criteria": criteria, "diff": diff,
             "jobs": report["jobs"], "evidence": report["evidence"], "states": states, "e2e": e2e,
             "reviews": reviews, "citations": sorted(citations)}
         if len(json.dumps(packet)) > 350_000:
             raise ValueError("REVIEW_PACKET_RESOURCE_BUDGET")
+        if os.environ.get("OPENAI_API_KEY"):
+            report["provider_attempted"] = True
         review, reviewer = ai_review(packet, images, criteria, citations)
         report.update(review=review, reviewer=reviewer, criteria=review["criteria"])
     except (ValueError, KeyError, TypeError, AttributeError, IndexError, OSError, zipfile.BadZipFile) as exc:

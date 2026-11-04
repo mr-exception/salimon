@@ -1,0 +1,47 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (5.8s)
+
+
+  1) [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom
+
+    Error: NAV-1 a moves the correct screen direction
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   -8.577319587628864
+
+      12 |    await page.keyboard.down(key);await page.clock.runFor(160);await page.keyboard.up(key)
+      13 |    const after=await snapshot(page)
+    > 14 |    expect((after.origin[axis]-before.origin[axis])*sign,`NAV-1 ${key} moves the correct screen direction`).toBeGreaterThan(1)
+         |                                                                                                            ^
+      15 |    expect(after.navigation.ship.yaw).toBe(start.navigation.ship.yaw)
+      16 |    expect(after.navigation.ship.pitch).toBe(start.navigation.ship.pitch)
+      17 |    expect(after.navigation.ship.velocityMps).toEqual(start.navigation.ship.velocityMps)
+        at /tmp/salimon-negative-AGHF0N/tests/deterministic.spec.ts:14:108
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/final-negative/reversed-wasd/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../workspace/salimon/client/test-results/final-negative/reversed-wasd/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../workspace/salimon/client/test-results/final-negative/reversed-wasd/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../workspace/salimon/client/test-results/final-negative/reversed-wasd/deterministic-NAV-1-seeded-d80af-tion-release-and-wheel-zoom-deterministic/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom
+
+[WebServer] (node:4263) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:4308) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

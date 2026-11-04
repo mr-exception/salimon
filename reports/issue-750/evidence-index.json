@@ -1,0 +1,296 @@
+[
+  {
+    "file": "evidence/full-NAV-1 seeded replay-seeded-replay.json",
+    "test": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+    "source_report": "full",
+    "sha256": "90b75cdc039ebb45d128f009b25cb73c2e5b9f832ce3b1e4a498882bfdfd9027",
+    "bytes": 3839
+  },
+  {
+    "file": "evidence/full-NAV-1 seeded replay-seeded-replay.png",
+    "test": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+    "source_report": "full",
+    "sha256": "72eeb49659a578b44809872e2a590f047e87ff495576f731ab27b21a0dcd0d6c",
+    "bytes": 16329
+  },
+  {
+    "file": "evidence/full-NAV-2 fixed-clock scan-keyboard-visible.png",
+    "test": "NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan",
+    "source_report": "full",
+    "sha256": "3370c40a7915d1e319eb241d176f830538198cf12805848053120ca76e317a7c",
+    "bytes": 22110
+  },
+  {
+    "file": "evidence/full-NAV-2 fixed-clock scan-mouse-visible.png",
+    "test": "NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan",
+    "source_report": "full",
+    "sha256": "d73450cc5416c53f5d3ae5067f39c5ebe026bea819442aaff01bc7d99e9037f5",
+    "bytes": 22180
+  },
+  {
+    "file": "evidence/full-NAV-2 fixed-clock scan-continuous-pan.json",
+    "test": "NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan",
+    "source_report": "full",
+    "sha256": "49baa7fd95f5515130f401ac61dffad3f2b0de5aff1a036ebb6cf281be79f7ae",
+    "bytes": 118398
+  },
+  {
+    "file": "evidence/full-NAV-2 fixed-clock scan-continuous-pan.png",
+    "test": "NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan",
+    "source_report": "full",
+    "sha256": "56a8439fe068479df22ce4a66fab1de0ffde36180b0a4de23838e9f500f63c6e",
+    "bytes": 16604
+  },
+  {
+    "file": "evidence/full-NAV-3 heading and velocity retain approved colors and viewport edges-different-vectors.json",
+    "test": "NAV-3 heading and velocity retain approved colors and viewport edges",
+    "source_report": "full",
+    "sha256": "77ece250fccc2be78ec665c4175209f0f1996febbe763527eb250d1640203834",
+    "bytes": 6055
+  },
+  {
+    "file": "evidence/full-NAV-3 heading and velocity retain approved colors and viewport edges-different-vectors.png",
+    "test": "NAV-3 heading and velocity retain approved colors and viewport edges",
+    "source_report": "full",
+    "sha256": "44a4aacd54643fb5f65751ed384dc06e05a81b73877f5aba7148de3b54b8f3a2",
+    "bytes": 17357
+  },
+  {
+    "file": "evidence/full-NAV-3 heading and velocity retain approved colors and viewport edges-stationary.json",
+    "test": "NAV-3 heading and velocity retain approved colors and viewport edges",
+    "source_report": "full",
+    "sha256": "906dc87d1332042bedeb69850f81d91dc7b39f9e5f71a4722648b537dbbd37b3",
+    "bytes": 5799
+  },
+  {
+    "file": "evidence/full-NAV-3 heading and velocity retain approved colors and viewport edges-stationary.png",
+    "test": "NAV-3 heading and velocity retain approved colors and viewport edges",
+    "source_report": "full",
+    "sha256": "72eeb49659a578b44809872e2a590f047e87ff495576f731ab27b21a0dcd0d6c",
+    "bytes": 16329
+  },
+  {
+    "file": "evidence/full-NAV-4 read-only fixture observers return detached state; production has no hooks-observer-contract.json",
+    "test": "NAV-4 read-only fixture observers return detached state; production has no hooks",
+    "source_report": "full",
+    "sha256": "8ed5fb3774c43144b18ee1b2268b70d293bd49e57a0f85a8a3f0c80ef982670c",
+    "bytes": 127
+  },
+  {
+    "file": "evidence/full-desktop.spec-desktop-controls.png",
+    "test": "wheel zoom bounds and removed desktop controls survive view changes",
+    "source_report": "full",
+    "sha256": "570563e2cd8d17eafac6285651fa5170b7dc9e695bc9fd02c2667698e92ce638",
+    "bytes": 71913
+  },
+  {
+    "file": "evidence/full-desktop.spec-desktop-state.json",
+    "test": "wheel zoom bounds and removed desktop controls survive view changes",
+    "source_report": "full",
+    "sha256": "3d5d27a86c726ffb53bb1abd7b2e5d26ef0390472657cba91d93a9b92043cd6b",
+    "bytes": 3086
+  },
+  {
+    "file": "evidence/full-desktop.spec-help.png",
+    "test": "Help has keyboard focus containment, accurate bindings and Escape/close return focus",
+    "source_report": "full",
+    "sha256": "ecc152834bf68dfed94325a09a37d4b6268c3bc21ceafa0641f57743562bd632",
+    "bytes": 116723
+  },
+  {
+    "file": "evidence/full-edges.spec-opposite-vectors.png",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "full",
+    "sha256": "f9548af69fd2986e7d136bb81dc4bd3662d3c77a11eebfacc70621e834bb04ad",
+    "bytes": 14907
+  },
+  {
+    "file": "evidence/full-test-failed-1.png",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "full",
+    "sha256": "99347d701cf43f9a866f3132246c5b1896984135a7301aee08234bfee8b8bff1",
+    "bytes": 61885
+  },
+  {
+    "file": "evidence/full-error-context.md",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "full",
+    "sha256": "0c291776ae03c5a1a6744c39ca9617399fab25fd21db8d00c4fc8826543f61ef",
+    "bytes": 3212
+  },
+  {
+    "file": "evidence/full-edges.spec-ship-off-screen.png",
+    "test": "ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping",
+    "source_report": "full",
+    "sha256": "5efa8d5deb601ac09ddce98b85307d955b3bb33e286e86fb6db41686034b5ccd",
+    "bytes": 15202
+  },
+  {
+    "file": "evidence/full-edges.spec-camera-vector-state.json",
+    "test": "ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping",
+    "source_report": "full",
+    "sha256": "54fcce057cb6ccd8ecfa6b99ab55bf750cdac248c465aa3fb2efacb716687e2b",
+    "bytes": 4734
+  },
+  {
+    "file": "evidence/full-panning.spec-keyboard-visible.png",
+    "test": "continuous keyboard pan renders scanned bodies at their current projection on every frame",
+    "source_report": "full",
+    "sha256": "85c84ef8166dfe96c0ae88b6f1811165f145cae27c358f9ecb2b4de328236795",
+    "bytes": 19559
+  },
+  {
+    "file": "evidence/full-panning.spec-keyboard-empty.png",
+    "test": "continuous keyboard pan renders scanned bodies at their current projection on every frame",
+    "source_report": "full",
+    "sha256": "9fb7679ffbd371e2550b20de0e5773afa4b0539ce5ac8341650fa2407048a37c",
+    "bytes": 18796
+  },
+  {
+    "file": "evidence/full-panning.spec-keyboard-frames.json",
+    "test": "continuous keyboard pan renders scanned bodies at their current projection on every frame",
+    "source_report": "full",
+    "sha256": "d1403a305472f217db95593ab62d84fa740294ab54a582c9e5e7131127627109",
+    "bytes": 101819
+  },
+  {
+    "file": "evidence/full-panning.spec-mouse-visible.png",
+    "test": "continuous mouse pan renders scanned bodies at their current projection on every frame",
+    "source_report": "full",
+    "sha256": "d9e2a501d7719f67ef6d93cbf782e2ce8a757d4ab7438897559e4164fc5a8b75",
+    "bytes": 19516
+  },
+  {
+    "file": "evidence/full-panning.spec-mouse-frames.json",
+    "test": "continuous mouse pan renders scanned bodies at their current projection on every frame",
+    "source_report": "full",
+    "sha256": "fcd91136dc4ac582517d580d0b039e76ae14d312b80ae21110c8ae37f073bebd",
+    "bytes": 117963
+  },
+  {
+    "file": "evidence/full-visuals.spec-zoom-0.5.png",
+    "test": "faceted navigation proxies render at readable sizes without a rectangular surface",
+    "source_report": "full",
+    "sha256": "331c89191d5667fee0d7d57478081af2865a2308a58014a41b9413212ff70b8a",
+    "bytes": 19215
+  },
+  {
+    "file": "evidence/full-visuals.spec-zoom-0.1.png",
+    "test": "faceted navigation proxies render at readable sizes without a rectangular surface",
+    "source_report": "full",
+    "sha256": "47d58689ccf594af9728391e2200faae054384bfd4bac7a4526cc7616b6d535f",
+    "bytes": 17015
+  },
+  {
+    "file": "evidence/full-visuals.spec-zoom-1.png",
+    "test": "faceted navigation proxies render at readable sizes without a rectangular surface",
+    "source_report": "full",
+    "sha256": "5bf02e3f6aafc44cebcd51fd7f07d1359e4eacbc7448305edb75768d5421a0cd",
+    "bytes": 18054
+  },
+  {
+    "file": "evidence/full-visuals.spec-selected.png",
+    "test": "faceted navigation proxies render at readable sizes without a rectangular surface",
+    "source_report": "full",
+    "sha256": "6002c15b666b9261c8f84b521874661ec12116108aaba9b55bac0a7316a434c9",
+    "bytes": 18650
+  },
+  {
+    "file": "evidence/full-visuals.spec-geometry-backend.json",
+    "test": "faceted navigation proxies render at readable sizes without a rectangular surface",
+    "source_report": "full",
+    "sha256": "506f6b42dbab1781704a2b1fb8466f6ad329d4cbb2cd935ae249827f7287b898",
+    "bytes": 11689
+  },
+  {
+    "file": "evidence/full-visuals.spec-camera-reset.png",
+    "test": "faceted navigation proxies render at readable sizes without a rectangular surface",
+    "source_report": "full",
+    "sha256": "5f6bb44d4394cacc0e384131d9e1f028c265ddda20f46bb4fd7b4a6a74cdc239",
+    "bytes": 25703
+  },
+  {
+    "file": "evidence/full-production.spec-backend.json",
+    "test": "built production bundle renders WebGL, scanner and labelled controls",
+    "source_report": "full",
+    "sha256": "0f7ae59d040fe151f7f2cfececcf3ea302799b7846d53e99127b677bc85811d8",
+    "bytes": 293
+  },
+  {
+    "file": "evidence/edge-rerun-edges.spec-opposite-vectors.png",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "edge-rerun",
+    "sha256": "f9548af69fd2986e7d136bb81dc4bd3662d3c77a11eebfacc70621e834bb04ad",
+    "bytes": 14907
+  },
+  {
+    "file": "evidence/edge-rerun-edges.spec-differing-vectors.png",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "edge-rerun",
+    "sha256": "d61a869abe2782c052ebbdd15036b34b146b036d3f159228e7a4bf22be7f111d",
+    "bytes": 15399
+  },
+  {
+    "file": "evidence/edge-rerun-edges.spec-overlapping-vectors.png",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "edge-rerun",
+    "sha256": "ffe91ece69ef642232b47b56d88fbedcd5bfb399b3c2e4395083d5a7cb0bf84d",
+    "bytes": 14875
+  },
+  {
+    "file": "evidence/edge-rerun-edges.spec-nearly-overlapping-vectors.png",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "edge-rerun",
+    "sha256": "8b8e2a6af91f2a4d39212918bb819e27c03b6728377ad6be22e5f706adb56353",
+    "bytes": 14918
+  },
+  {
+    "file": "evidence/edge-rerun-edges.spec-vector-state.json",
+    "test": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+    "source_report": "edge-rerun",
+    "sha256": "65da62a9c81e0ec794fb606d5bcf39d7e90e404189b1fd48e8118a135050c85f",
+    "bytes": 6261
+  },
+  {
+    "file": "evidence/reversed-wasd-test-failed-1.png",
+    "test": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+    "source_report": "reversed-wasd",
+    "sha256": "fc0e6742330dc539a0cd1f777c742916c43b90e54a1fdff4c6cb82f64159c378",
+    "bytes": 62390
+  },
+  {
+    "file": "evidence/reversed-wasd-error-context.md",
+    "test": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+    "source_report": "reversed-wasd",
+    "sha256": "62baed9614a92a6d2377caf6c1404a36041ce56585b84043fe8f8f8d79b828c8",
+    "bytes": 11100
+  },
+  {
+    "file": "evidence/reversed-wasd-trace.zip",
+    "test": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+    "source_report": "reversed-wasd",
+    "sha256": "ab6d16ed79f31eb083517fa6bbb53770b5693961dec5110152fb424397470a47",
+    "bytes": 1138927
+  },
+  {
+    "file": "evidence/wrong-heading-color-test-failed-1.png",
+    "test": "NAV-3 heading and velocity retain approved colors and viewport edges",
+    "source_report": "wrong-heading-color",
+    "sha256": "20d1d42aa66de999f58a0f64f4a00ed66143b2174adce5423f789bc269ab4716",
+    "bytes": 63552
+  },
+  {
+    "file": "evidence/wrong-heading-color-error-context.md",
+    "test": "NAV-3 heading and velocity retain approved colors and viewport edges",
+    "source_report": "wrong-heading-color",
+    "sha256": "60da5e1c787336ed82818a55b086375df84bb8b7c80b92b9939266c82cdb9a04",
+    "bytes": 11042
+  },
+  {
+    "file": "evidence/wrong-heading-color-trace.zip",
+    "test": "NAV-3 heading and velocity retain approved colors and viewport edges",
+    "source_report": "wrong-heading-color",
+    "sha256": "544578ae757e7fdb0f7b6b6fd25eae8bca397e7491cbe547b2c7f9ac2a6d23cf",
+    "bytes": 374727
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "mutations": [
+    {
+      "id": "reversed-wasd",
+      "file": "src/CameraControls.tsx",
+      "original_sha256": "5699d3761d8a95d931c8da21deb45591553a6b22a45b76cd45ca5968d9a448d2",
+      "mutated_sha256": "68de2cf000af02d566367f68dc4280d395f09329d80a2300a8bcb9221045a354",
+      "exit": 1,
+      "assertion": "NAV-1 a moves the correct screen direction",
+      "result": "EXPECTED_FAILURE",
+      "report": "reversed-wasd-results.json"
+    },
+    {
+      "id": "wrong-heading-color",
+      "file": "src/styles.css",
+      "original_sha256": "c5a4feaf0ab6bfdd05c156acc8d327f37a0635eaedf969d32a06b45c502c3cdf",
+      "mutated_sha256": "1fba009def8db310f733480972d04adc356800490a38d77f24bab196702734c4",
+      "exit": 1,
+      "assertion": "NAV-3 heading is yellow",
+      "result": "EXPECTED_FAILURE",
+      "report": "wrong-heading-color-results.json"
+    }
+  ]
+}

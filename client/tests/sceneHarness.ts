@@ -2,21 +2,37 @@
 import * as THREE from 'three'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { addAfterEffect, type RootState } from '@react-three/fiber'
-export function observeScene({gl,scene,camera,invalidate,get}:RootState) {
+export function observeScene({gl,scene,camera,invalidate,get}:RootState,initialView?:{position:[number,number,number];target:[number,number,number];zoom:number}) {
   if(!(camera instanceof THREE.OrthographicCamera))throw Error('Expected orthographic radar')
-  window.radarTest={
-    camera(position:[number,number,number],target:[number,number,number],zoom:number) {
-      const controls=get().controls as OrbitControls|null;const damping=controls?.enableDamping;if(controls){controls.enableDamping=false;controls.update();controls.target.set(...target)}camera.position.set(...position);camera.up.set(0,1,0);camera.lookAt(...target);camera.zoom=zoom;camera.updateProjectionMatrix();camera.updateMatrixWorld();controls?.update();if(controls&&damping!==undefined)controls.enableDamping=damping;invalidate()
-    },
+  // Initialize privately after the normal reset effect, then observe completed
+  // production frames. snapshot() neither renders nor changes the scene.
+  let initialized=false
+  let lastSnapshot:ReturnType<typeof capture>
+  addAfterEffect(()=>{
+    if(!initialized){
+      initialized=true
+      if(initialView){
+        const controls=get().controls as OrbitControls|null
+        if(controls){controls.enableDamping=false;controls.update();controls.target.set(...initialView.target)}
+        camera.position.set(...initialView.position);camera.up.set(0,1,0);camera.lookAt(...initialView.target);camera.zoom=initialView.zoom
+        camera.updateProjectionMatrix();controls?.update();camera.updateMatrixWorld();if(controls)controls.enableDamping=true
+        invalidate();return
+      }
+    }
+    lastSnapshot=capture()
+    window.radarTest=observer
+  })
+  const observer=Object.freeze({
     projectLs(point:[number,number,number]) {
       const v=new THREE.Vector3(...point).project(camera)
       return [(v.x+1)*50,(1-v.y)*50]
     },
     recordFrames(count:number) {
+      if(!Number.isInteger(count)||count<1||count>120)throw Error('Expected 1..120 frames')
       return new Promise<PanRecording>(resolve=>{
         const frames:PanFrame[]=[],captures:Record<string,string>={}
         const stop=addAfterEffect(()=>{
-          const snapshot=window.radarTest.snapshot(false),context=gl.getContext()
+          const snapshot=window.radarTest.snapshot(),context=gl.getContext()
           const expected=window.navigationTest.positions().map(body=>{
             const ndc=new THREE.Vector3(...body.positionLs).project(camera)
             return {id:body.id,ndc:[ndc.x,ndc.y,ndc.z],pixel:[(ndc.x+1)*gl.domElement.width/2,(1-ndc.y)*gl.domElement.height/2]}
@@ -36,8 +52,9 @@ export function observeScene({gl,scene,camera,invalidate,get}:RootState) {
         })
       })
     },
-    snapshot(render=true) {
-      if(render)gl.render(scene,camera)
+    snapshot:()=>structuredClone(lastSnapshot)
+  })
+  function capture() {
       const context=gl.getContext(),debug=context.getExtension('WEBGL_debug_renderer_info')
       let surfaces=0,arrows=0
       const objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[]=[]
@@ -58,10 +75,9 @@ export function observeScene({gl,scene,camera,invalidate,get}:RootState) {
         objects.push({name:object.name,type:object.type,triangles:geometry?(geometry.index?.count??geometry.getAttribute('position').count)/3:0,pixel,pixels,colors:colors.size})
       })
       return {objects,surfaces,arrows,calls:gl.info.render.calls,triangles:gl.info.render.triangles,geometries:gl.info.memory.geometries,renderer:debug?context.getParameter(debug.UNMASKED_RENDERER_WEBGL):context.getParameter(context.RENDERER),zoom:camera.zoom}
-    }
   }
 }
-declare global {interface Window {radarTest:{recordFrames:(count:number)=>Promise<PanRecording>;projectLs:(point:[number,number,number])=>number[];camera:(position:[number,number,number],target:[number,number,number],zoom:number)=>void;snapshot:(render?:boolean)=>{objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[];surfaces:number;arrows:number;calls:number;triangles:number;geometries:number;renderer:string;zoom:number}}}}
+declare global {interface Window {radarTest:{recordFrames:(count:number)=>Promise<PanRecording>;projectLs:(point:[number,number,number])=>number[];snapshot:()=>{objects:{name:string;type:string;triangles:number;pixel:number[];pixels:number;colors:number}[];surfaces:number;arrows:number;calls:number;triangles:number;geometries:number;renderer:string;zoom:number}}}}
 
 export interface PanFrame {bodies:{id:string;ndc:number[];pixel:number[];present:boolean;actualPixel:number[]|null;bright:number}[];rendered:string[];ship:number[]|null;vectors:{kind:string|null;display:string;start:number[];end:number[]}[];pulse:string}
 export interface PanRecording {frames:PanFrame[];captures:Record<string,string>;renderer:string}

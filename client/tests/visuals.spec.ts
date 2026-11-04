@@ -7,11 +7,11 @@ test('faceted navigation proxies render at readable sizes without a rectangular 
  await page.waitForFunction(()=>!!window.radarTest)
  await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).length)).toBe(4)
  const defaultView=await page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).map(o=>({name:o.name,pixel:o.pixel.map(v=>Math.round(v*1e6)/1e6)})))
- await page.evaluate(()=>window.radarTest.camera([0,125000,200000],[0,0,0],0.5))
  await expect.poll(()=>page.evaluate(()=>window.radarTest.snapshot().objects.filter(o=>o.name.startsWith('nav-body:')).length)).toBe(4)
  const samples=[]
  for(const zoom of [0.5,0.1,1]) {
-  await page.evaluate(zoom=>window.radarTest.camera([0,125000,200000],[0,0,0],zoom),zoom)
+  await page.goto(`/tests/fixture.html?scenario=visuals&view=tilted&zoom=${zoom}`)
+  await page.waitForFunction(()=>!!window.radarTest)
   await page.waitForTimeout(350)
   const snapshot=await page.evaluate(()=>window.radarTest.snapshot());samples.push(snapshot)
   expect(snapshot.surfaces).toBe(0);expect(snapshot.geometries).toBeLessThan(20)
@@ -29,6 +29,7 @@ test('faceted navigation proxies render at readable sizes without a rectangular 
  const selected=await page.evaluate(()=>window.radarTest.snapshot());samples.push(selected)
  await testInfo.attach('selected.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
  await testInfo.attach('geometry-backend.json',{body:JSON.stringify({samples,errors},null,2),contentType:'application/json'})
+ await page.goto('/tests/fixture.html?scenario=visuals');await page.waitForFunction(()=>!!window.radarTest)
  // Reset must cancel residual damping, not drift into new groups during clicks.
  await page.mouse.move(300,300);await page.mouse.down();await page.mouse.move(590,420,{steps:3});await page.mouse.up()
  await page.getByRole('button',{name:'Reset camera',exact:true}).click()

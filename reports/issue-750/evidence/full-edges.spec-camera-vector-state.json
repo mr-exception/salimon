@@ -1,0 +1,269 @@
+{
+  "initial": [
+    {
+      "kind": "heading",
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        100,
+        50
+      ],
+      "stroke": "rgb(255, 227, 106)",
+      "dash": "none"
+    },
+    {
+      "kind": "velocity",
+      "start": [
+        50,
+        50
+      ],
+      "end": [
+        50,
+        0
+      ],
+      "stroke": "rgb(182, 245, 162)",
+      "dash": "9px, 5px"
+    }
+  ],
+  "keyboard": [
+    {
+      "kind": "heading",
+      "start": [
+        33.91752577319588,
+        50
+      ],
+      "end": [
+        100,
+        50
+      ],
+      "stroke": "rgb(255, 227, 106)",
+      "dash": "none"
+    },
+    {
+      "kind": "velocity",
+      "start": [
+        33.91752577319588,
+        50
+      ],
+      "end": [
+        33.91752577319588,
+        0
+      ],
+      "stroke": "rgb(182, 245, 162)",
+      "dash": "9px, 5px"
+    }
+  ],
+  "pointer": [
+    {
+      "kind": "heading",
+      "start": [
+        42.16494845360824,
+        56.25
+      ],
+      "end": [
+        100,
+        56.25
+      ],
+      "stroke": "rgb(255, 227, 106)",
+      "dash": "none"
+    },
+    {
+      "kind": "velocity",
+      "start": [
+        42.16494845360824,
+        56.25
+      ],
+      "end": [
+        42.16494845360824,
+        0
+      ],
+      "stroke": "rgb(182, 245, 162)",
+      "dash": "9px, 5px"
+    }
+  ],
+  "zoomed": [
+    {
+      "kind": "heading",
+      "start": [
+        39.8743285513004,
+        58.07722146812385
+      ],
+      "end": [
+        100,
+        58.07722146812385
+      ],
+      "stroke": "rgb(255, 227, 106)",
+      "dash": "none"
+    },
+    {
+      "kind": "velocity",
+      "start": [
+        39.8743285513004,
+        58.07722146812385
+      ],
+      "end": [
+        39.8743285513004,
+        0
+      ],
+      "stroke": "rgb(182, 245, 162)",
+      "dash": "9px, 5px"
+    }
+  ],
+  "turned": [
+    {
+      "kind": "heading",
+      "start": [
+        39.8743285513004,
+        58.07722146812385
+      ],
+      "end": [
+        100,
+        53.085930607397145
+      ],
+      "stroke": "rgb(255, 227, 106)",
+      "dash": "none"
+    },
+    {
+      "kind": "velocity",
+      "start": [
+        39.8743285513004,
+        58.07722146812385
+      ],
+      "end": [
+        39.8743285513004,
+        0
+      ],
+      "stroke": "rgb(182, 245, 162)",
+      "dash": "9px, 5px"
+    }
+  ],
+  "outside": [
+    {
+      "kind": "heading",
+      "start": [
+        0,
+        50
+      ],
+      "end": [
+        100,
+        50
+      ],
+      "stroke": "rgb(255, 227, 106)",
+      "dash": "none"
+    },
+    {
+      "kind": "velocity",
+      "start": [
+        0,
+        50
+      ],
+      "end": [
+        100,
+        50
+      ],
+      "stroke": "rgb(182, 245, 162)",
+      "dash": "9px, 5px"
+    }
+  ],
+  "gpu": {
+    "objects": [
+      {
+        "name": "nav-galactic-lattice",
+        "type": "Points",
+        "triangles": 0,
+        "pixel": [
+          -114.99999999861015,
+          400
+        ],
+        "pixels": 0,
+        "colors": 0
+      },
+      {
+        "name": "nav-ship-heading",
+        "type": "Group",
+        "triangles": 0,
+        "pixel": [
+          -115.00000000000003,
+          400
+        ],
+        "pixels": 0,
+        "colors": 0
+      },
+      {
+        "name": "nav-ship-hull",
+        "type": "Mesh",
+        "triangles": 12,
+        "pixel": [
+          -115.00000000000003,
+          400
+        ],
+        "pixels": 0,
+        "colors": 0
+      },
+      {
+        "name": "nav-ship-wings",
+        "type": "Mesh",
+        "triangles": 4,
+        "pixel": [
+          -115.00000000000003,
+          400
+        ],
+        "pixels": 0,
+        "colors": 0
+      },
+      {
+        "name": "nav-ship-canopy",
+        "type": "Mesh",
+        "triangles": 8,
+        "pixel": [
+          -118.06,
+          394.96
+        ],
+        "pixels": 0,
+        "colors": 0
+      },
+      {
+        "name": "nav-ship-engine",
+        "type": "Mesh",
+        "triangles": 12,
+        "pixel": [
+          -99.15999999999998,
+          399.1
+        ],
+        "pixels": 0,
+        "colors": 0
+      },
+      {
+        "name": "nav-ship-engine",
+        "type": "Mesh",
+        "triangles": 12,
+        "pixel": [
+          -99.15999999999998,
+          399.1
+        ],
+        "pixels": 0,
+        "colors": 0
+      },
+      {
+        "name": "nav-body:planet:right",
+        "type": "Mesh",
+        "triangles": 80,
+        "pixel": [
+          855.0000000018902,
+          400
+        ],
+        "pixels": 490,
+        "colors": 69
+      }
+    ],
+    "surfaces": 0,
+    "arrows": 0,
+    "calls": 2,
+    "triangles": 80,
+    "geometries": 6,
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "zoom": 0.5
+  }
+}

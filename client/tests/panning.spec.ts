@@ -2,11 +2,10 @@ import {test,expect} from '@playwright/test'
 import type {PanRecording} from './sceneHarness'
 import type {} from './fixture'
 for(const input of ['keyboard','mouse'] as const)test(`continuous ${input} pan renders scanned bodies at their current projection on every frame`,async({page},info)=>{
- await page.goto('/tests/fixture.html?scenario=visuals')
+ await page.goto('/tests/fixture.html?scenario=visuals&view=panned&vector=zero')
  await page.waitForFunction(()=>!!window.radarTest)
  await expect(page.locator('.scan-status')).toContainText('4 temporary contacts')
  await page.getByLabel('Scanned contacts (4)',{exact:true}).selectOption('planet')
- await page.evaluate(()=>{window.radarTest.camera([-1250,0,200000],[-1250,0,0],.5);window.navigationTest.vectors(-Math.PI/2,0,[0,0,0])})
  await page.waitForTimeout(200)
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus()
  const recording=page.evaluate(()=>window.radarTest.recordFrames(65))

@@ -1,0 +1,59 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=deterministic
+
+[WebServer] (node:2316) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2346) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:2374) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (24.0s)
+  ✘  2 [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (1.6s)
+(node:2580) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [deterministic] › tests/deterministic.spec.ts:69:1 › NAV-3 heading and velocity retain approved colors and viewport edges (9.0s)
+  ✓  4 [deterministic] › tests/deterministic.spec.ts:86:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (5.9s)
+
+
+  1) [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan
+
+    Error: clock.pauseAt: Error: Cannot fast-forward to the past
+        at ClockController._innerFastForwardTo (eval at evaluate (:370:30), <anonymous>:201:13)
+        at ClockController.pauseAt (eval at evaluate (:370:30), <anonymous>:132:16)
+        at async <anonymous>:396:30
+        at ClockController._innerFastForwardTo (eval at evaluate (:370:30), <anonymous>:201:13)
+        at ClockController.pauseAt (eval at evaluate (:370:30), <anonymous>:132:16)
+        at async <anonymous>:396:30
+        at boot (/workspace/salimon/client/tests/deterministic.ts:9:19)
+        at /workspace/salimon/client/tests/deterministic.spec.ts:38:2
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deterministic-iteration/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deterministic-iteration/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deterministic-iteration/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deterministic-iteration/deterministic-NAV-2-fixed--5faec-ction-during-continuous-pan-deterministic/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan
+  3 passed (49.4s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

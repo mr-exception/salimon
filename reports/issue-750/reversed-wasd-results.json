@@ -1,0 +1,28 @@
+{
+  "stats": {
+    "startTime": "2026-11-04T07:39:01.049Z",
+    "duration": 9525.887999999999,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+      "project": "deterministic",
+      "status": "failed",
+      "duration_ms": 5787,
+      "errors": [
+        {
+          "location": {
+            "file": "/tmp/salimon-negative-AGHF0N/tests/deterministic.spec.ts",
+            "column": 108,
+            "line": 14
+          },
+          "message": "Error: NAV-1 a moves the correct screen direction\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m-8.577319587628864\u001b[39m\n\n  12 |    await page.keyboard.down(key);await page.clock.runFor(160);await page.keyboard.up(key)\n  13 |    const after=await snapshot(page)\n> 14 |    expect((after.origin[axis]-before.origin[axis])*sign,`NAV-1 ${key} moves the correct screen direction`).toBeGreaterThan(1)\n     |                                                                                                            ^\n  15 |    expect(after.navigation.ship.yaw).toBe(start.navigation.ship.yaw)\n  16 |    expect(after.navigation.ship.pitch).toBe(start.navigation.ship.pitch)\n  17 |    expect(after.navigation.ship.velocityMps).toEqual(start.navigation.ship.velocityMps)\n    at /tmp/salimon-negative-AGHF0N/tests/deterministic.spec.ts:14:108"
+        }
+      ]
+    }
+  ]
+}

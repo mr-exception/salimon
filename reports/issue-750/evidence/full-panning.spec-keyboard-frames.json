@@ -1,0 +1,5060 @@
+{
+  "frames": [
+    {
+      "bodies": [
+        {
+          "id": "star",
+          "ndc": [
+            0.8346721649485034,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            889.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            889.8160000000241,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:star:star"
+      ],
+      "ship": [
+        1062.3160000000244,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "none",
+          "start": [
+            50.00000000000093,
+            50.000000000000455
+          ],
+          "end": [
+            100,
+            74.5062037797128
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "star",
+          "ndc": [
+            0.7810639175258229,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            863.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            863.8160000000241,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:star:star"
+      ],
+      "ship": [
+        1036.3160000000241,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "none",
+          "start": [
+            50.00000000000093,
+            50.000000000000455
+          ],
+          "end": [
+            100,
+            74.5062037797128
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "star",
+          "ndc": [
+            0.7274556701031426,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            837.8160000000242,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            837.8160000000242,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        1010.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "none",
+          "start": [
+            50.00000000000093,
+            50.000000000000455
+          ],
+          "end": [
+            100,
+            74.5062037797128
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "planet",
+          "ndc": [
+            0.9109608247423177,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            926.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            926.8160000000241,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.673847422680462,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            811.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            811.8160000000241,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        984.3160000000241,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "none",
+          "start": [
+            50.00000000000093,
+            50.000000000000455
+          ],
+          "end": [
+            100,
+            74.5062037797128
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "planet",
+          "ndc": [
+            0.8573525773196373,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            900.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            900.8160000000241,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.6202391752577816,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            785.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            785.8160000000241,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        958.3160000000241,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            98.79546391752825,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "planet",
+          "ndc": [
+            0.8037443298969569,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            874.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            874.8160000000241,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.5666309278351012,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            759.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            759.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        932.3160000000241,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            96.11505154639424,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "planet",
+          "ndc": [
+            0.7501360824742763,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            848.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            848.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.5130226804124207,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            733.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            733.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        906.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            93.4346391752602,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "moon",
+          "ndc": [
+            0.9336412371134516,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            937.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            937.8160000000241,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.6965278350515959,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            822.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            822.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.4594144329897403,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            707.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            707.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        880.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            90.75422680412619,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "moon",
+          "ndc": [
+            0.8800329896907712,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            911.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            911.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.6429195876289155,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            796.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            796.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.40580618556705983,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            681.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            681.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        854.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            88.07381443299217,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "moon",
+          "ndc": [
+            0.8264247422680907,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            885.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            885.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.589311340206235,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            770.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            770.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.35219793814437933,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            655.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            655.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        828.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            85.39340206185815,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "moon",
+          "ndc": [
+            0.7728164948454103,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            859.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            859.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.5357030927835545,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            744.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            744.8160000000239,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.2985896907216989,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            629.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            629.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        802.3160000000239,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            82.71298969072411,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.9563216494845855,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            948.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            948.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.7192082474227298,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            833.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            833.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.48209484536087416,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            718.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            718.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.2449814432990185,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            603.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            603.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        776.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            80.0325773195901,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.9027134020619051,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            922.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            922.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.6656000000000494,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            807.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            807.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.42848659793819377,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            692.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            692.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.19137319587633808,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            577.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            577.8160000000239,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        750.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            77.35216494845608,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.8491051546392246,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            896.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            896.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.611991752577369,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            781.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            781.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.3748783505155133,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            666.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            666.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.13776494845365767,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            551.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            551.8160000000239,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        724.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            74.67175257732205,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.7954969072165443,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            870.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            870.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.5583835051546886,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            755.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            755.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.32127010309283294,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            640.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            640.8160000000239,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.08415670103097725,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            525.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            525.8160000000239,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        698.3160000000239,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            71.99134020618804,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.7418886597938639,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            844.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            844.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.5047752577320082,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            729.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            729.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.2676618556701525,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            614.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            614.8160000000239,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            0.03054845360829683,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            499.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            499.8160000000239,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        672.3160000000239,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            69.31092783505402,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.6882804123711834,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            818.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            818.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.45116701030932777,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            703.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            703.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.2140536082474721,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            588.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            588.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.023059793814383583,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            473.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            473.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        646.3160000000239,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            66.63051546391999,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.634672164948503,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            792.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            792.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.3975587628866474,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            677.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            677.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.1604453608247917,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            562.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            562.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.076668041237064,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            447.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            447.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        620.3160000000239,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            63.95010309278597,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.5810639175258226,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            766.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            766.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.34395051546396693,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            651.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            651.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.10683711340211126,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            536.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            536.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.13027628865974442,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            421.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            421.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        594.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            61.26969072165196,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.5274556701031422,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            740.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            740.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.29034226804128654,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            625.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            625.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            0.05322886597943085,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            510.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            510.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.18388453608242483,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            395.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            395.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        568.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            58.58927835051794,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.47384742268046176,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            714.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            714.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.2367340206186061,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            599.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            599.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.00037938144324957754,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            484.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            484.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.23749278350510525,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            369.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            369.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        542.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            55.90886597938392,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.42023917525778137,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            688.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            688.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.1831257731959257,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            573.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            573.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.05398762886592999,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            458.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            458.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.29110103092778566,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            343.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            343.8160000000239,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        516.3160000000239,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            53.22845360824989,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.366630927835101,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            662.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            662.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.12951752577324527,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            547.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            547.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.1075958762886104,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            432.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            432.8160000000239,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.34470927835046605,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            317.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            317.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        490.31600000002396,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            50.54804123711587,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.31302268041242054,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            636.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            636.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.07590927835056485,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            521.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            521.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.1612041237112908,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            406.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            406.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.3983175257731465,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            291.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            291.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        464.3160000000239,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            47.86762886598185,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.25941443298974015,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            610.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            610.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            0.022301030927884442,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            495.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            495.8160000000239,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.21481237113397122,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            380.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            380.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.4519257731958269,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            265.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            265.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        438.31600000002396,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            45.18721649484783,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.2058061855670597,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            584.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            584.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.03130721649479595,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            469.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            469.81600000002396,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.2684206185566516,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            354.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            354.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.5055340206185073,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            239.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            239.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        412.31600000002396,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            42.506804123713806,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.15219793814437932,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            558.8160000000239,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            558.8160000000239,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.08491546391747637,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            443.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            443.81600000002396,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.32202886597933206,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            328.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            328.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.5591422680411877,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            213.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            213.81600000002396,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        386.31600000002396,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            39.826391752579795,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.09858969072169889,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            532.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            532.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.13852371134015679,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            417.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            417.81600000002396,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.37563711340201245,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            302.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            302.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.6127505154638682,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            187.81600000002393,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            187.81600000002393,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        360.31600000002396,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            37.14597938144577,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            0.04498144329901848,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            506.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            506.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.1921319587628372,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            391.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            391.81600000002396,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.4292453608246929,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            276.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            276.81600000002396,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.6663587628865485,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            161.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            161.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        334.31600000002396,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            34.46556701031175,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.008626804123661876,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            480.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            480.81600000002396,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.24574020618551756,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            365.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            365.81600000002396,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.4828536082473732,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            250.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            250.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.7199670103092288,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            135.81600000002402,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            135.81600000002402,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        308.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            31.785154639177733,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.06223505154634229,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            454.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            454.81600000002396,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.29934845360819795,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            339.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            339.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.5364618556700536,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            224.81600000002402,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            224.81600000002402,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.7735752577319093,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            109.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            109.816000000024,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        282.31600000002396,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            29.104742268043708,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.11584329896902265,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            428.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            428.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.35295670103087834,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            313.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            313.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.590070103092734,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            198.81600000002402,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            198.81600000002402,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.8271835051545897,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            83.81600000002399,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            83.81600000002399,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        256.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            26.424329896909693,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.169451546391703,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            402.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            402.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.40656494845355867,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            287.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            287.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.6436783505154144,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            172.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            172.816000000024,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.88079175257727,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            57.816000000024026,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            57.816000000024026,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        230.31600000002405,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            23.743917525775675,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 1: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.22305979381438348,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            376.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            376.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.46017319587623917,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            261.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            261.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.6972865979380948,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            146.81600000002405,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            146.81600000002405,
+            400
+          ],
+          "bright": 503
+        },
+        {
+          "id": "star",
+          "ndc": [
+            -0.9343999999999505,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            31.81600000002401,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            31.81600000002401,
+            400
+          ],
+          "bright": 842
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        204.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            21.06350515464165,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.2766680412370639,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            350.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            350.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.5137814432989196,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            235.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            235.816000000024,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.7508948453607752,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            120.81600000002402,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            120.81600000002402,
+            400
+          ],
+          "bright": 503
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet",
+        "nav-body:star:star"
+      ],
+      "ship": [
+        178.31600000002402,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            18.38309278350763,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.3302762886597443,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            324.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            324.816000000024,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.5673896907216,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            209.81600000002402,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            209.81600000002402,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.8045030927834557,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            94.816000000024,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            94.816000000024,
+            400
+          ],
+          "bright": 503
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet"
+      ],
+      "ship": [
+        152.31600000002402,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            15.70268041237361,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.38388453608242473,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            298.81600000002396,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            298.81600000002396,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.6209979381442804,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            183.81600000002402,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            183.81600000002402,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.8581113402061361,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            68.81600000002399,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            68.81600000002399,
+            400
+          ],
+          "bright": 503
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet"
+      ],
+      "ship": [
+        126.316000000024,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            13.022268041239588,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.437492783505105,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            272.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            272.8160000000241,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.6746061855669607,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            157.81600000002405,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            157.81600000002405,
+            400
+          ],
+          "bright": 187
+        },
+        {
+          "id": "planet",
+          "ndc": [
+            -0.9117195876288163,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            42.81600000002408,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            42.81600000002408,
+            400
+          ],
+          "bright": 503
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet"
+      ],
+      "ship": [
+        100.31600000002409,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            10.341855670105577,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.4911010309277854,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            246.81600000002405,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            246.81600000002405,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.7282144329896411,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            131.81600000002408,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            131.81600000002408,
+            400
+          ],
+          "bright": 187
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon",
+        "nav-body:planet:planet"
+      ],
+      "ship": [
+        74.31600000002408,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            7.661443298971554,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.5447092783504658,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            220.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            220.8160000000241,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.7818226804123215,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            105.81600000002408,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            105.81600000002408,
+            400
+          ],
+          "bright": 187
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon"
+      ],
+      "ship": [
+        48.31600000002406,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            4.981030927837532,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.5983175257731462,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            194.81600000002408,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            194.81600000002408,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.835430927835002,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            79.81600000002406,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            79.81600000002406,
+            400
+          ],
+          "bright": 187
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon"
+      ],
+      "ship": [
+        22.316000000024044,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            2.30061855670351,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.6519257731958267,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            168.81600000002408,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            168.81600000002408,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.8890391752576824,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            53.81600000002404,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            53.81600000002404,
+            400
+          ],
+          "bright": 187
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon"
+      ],
+      "ship": [
+        -3.6839999999759163,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            99.99999999999999,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.705534020618507,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            142.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            142.8160000000241,
+            400
+          ],
+          "bright": 93
+        },
+        {
+          "id": "moon",
+          "ndc": [
+            -0.9426474226803626,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            27.816000000024133,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            27.816000000024133,
+            400
+          ],
+          "bright": 187
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon"
+      ],
+      "ship": [
+        -29.68399999997593,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.7591422680411873,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            116.81600000002415,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            116.81600000002415,
+            400
+          ],
+          "bright": 93
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid",
+        "nav-body:moon:moon"
+      ],
+      "ship": [
+        -55.68399999997584,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.8127505154638678,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            90.81600000002412,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            90.81600000002412,
+            400
+          ],
+          "bright": 93
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid"
+      ],
+      "ship": [
+        -81.68399999997585,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.8663587628865482,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            64.8160000000241,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            64.8160000000241,
+            400
+          ],
+          "bright": 93
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid"
+      ],
+      "ship": [
+        -107.68399999997587,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [
+        {
+          "id": "asteroid",
+          "ndc": [
+            -0.9199670103092286,
+            1.990051048614449e-17,
+            -0.5994801599480158
+          ],
+          "pixel": [
+            38.81600000002415,
+            400
+          ],
+          "present": true,
+          "actualPixel": [
+            38.81600000002415,
+            400
+          ],
+          "bright": 93
+        }
+      ],
+      "rendered": [
+        "nav-body:asteroid:asteroid"
+      ],
+      "ship": [
+        -133.6839999999759,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            99.99999999999999,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [
+        "nav-body:asteroid:asteroid"
+      ],
+      "ship": [
+        -159.68399999997578,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            99.99999999999999,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -185.6839999999758,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -189.8960000000242,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -198.00799999995152,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            99.99999999999999,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -203.9360000000242,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -212.8279999999516,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -221.77200000004837,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -247.7720000000484,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -254.5320000000484,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -262.48799999995157,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -267.7920000000483,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -291.4520000000481,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            99.99999999999999,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -299.1479999999512,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            99.99999999999999,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -308.2999999999997,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -314.5399999999998,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -340.0720000000482,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -344.9079999999514,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    },
+    {
+      "bodies": [],
+      "rendered": [],
+      "ship": [
+        -351.97999999999973,
+        400
+      ],
+      "vectors": [
+        {
+          "kind": "heading",
+          "display": "",
+          "start": [
+            0,
+            50
+          ],
+          "end": [
+            100,
+            50
+          ]
+        },
+        {
+          "kind": "velocity",
+          "display": "none",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            0,
+            0
+          ]
+        }
+      ],
+      "pulse": "Scanner pulse 2: 4 temporary contacts"
+    }
+  ],
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+}

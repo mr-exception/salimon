@@ -1,0 +1,92 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:3171) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3197) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3216) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 23 tests using 1 worker
+
+(node:3228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (21.2s)
+  ✓   2 [deterministic] › tests/deterministic.spec.ts:37:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (37.6s)
+  ✓   3 [deterministic] › tests/deterministic.spec.ts:77:1 › NAV-3 heading and velocity retain approved colors and viewport edges (9.3s)
+  ✓   4 [deterministic] › tests/deterministic.spec.ts:94:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (4.3s)
+(node:3402) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (17.0s)
+  ✓   6 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (16.2s)
+  ✓   7 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (17.0s)
+  ✓   8 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (8.6s)
+  ✓   9 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (6.7s)
+  ✓  10 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (11.1s)
+  ✓  11 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (7.9s)
+  ✓  12 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (3.2s)
+  ✓  13 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (4.1s)
+  ✓  14 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (3.8s)
+  ✓  15 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (3.9s)
+  ✓  16 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (13.1s)
+  ✘  17 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (32.2s)
+(node:3704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 [desktop] › tests/edges.spec.ts:48:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (22.2s)
+  ✓  19 [desktop] › tests/edges.spec.ts:66:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (12.9s)
+  ✓  20 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (11.5s)
+  ✓  21 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (11.3s)
+  ✓  22 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (26.7s)
+(node:3893) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  23 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (7.9s)
+
+
+  1) [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.screenshot: Test timeout of 30000ms exceeded.
+    Call log:
+      - taking element screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+      - attempting scroll into view action
+        - waiting for element to be stable
+
+
+      34 |  await front(page,'edges','different');await page.waitForTimeout(150)
+      35 |  const differing=await lines(page);expect(differing[0].end[0]).toBe(100);expect(differing[1].end[1]).toBe(0)
+    > 36 |  await info.attach('differing-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
+         |                                                                               ^
+      37 |  await front(page,'edges','right');await page.waitForTimeout(150)
+      38 |  await info.attach('overlapping-vectors.png',{body:await page.locator('.radar').screenshot(),contentType:'image/png'})
+      39 |  await front(page,'edges','near');await page.waitForTimeout(150)
+        at /workspace/salimon/client/tests/edges.spec.ts:36:79
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/final/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/final/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/final/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/final/edges-ship-rays-reach-ever-81a14-apping-and-opposite-vectors-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors
+  22 passed (5.4m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

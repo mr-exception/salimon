@@ -48,6 +48,47 @@ cache, `npm ci`, domain tests, build, installed Chromium and the same suite.
 CI retains these as a revision-named artifact for 14 days. Task reports retain
 selected original evidence permanently.
 
+### Deterministic navigation regression (#750)
+
+This suite targets the fresh browser prototype, not the removed native codebase.
+`npm run test:browser -- --project=deterministic` uses a uint32-seeded sample
+catalog (default seed 750), a 1280×800 viewport, DPR 1, en-US/UTC, and a paused
+Playwright browser clock starting at `2026-11-04T00:00:00Z`. Tests advance RAF and
+the production simulation with `page.clock.runFor`; input comes from actual
+Playwright keyboard/mouse actions. The seed controls illustrative fixture
+positions, not production astronomy. The ordinary desktop/production projects
+also exercise the real-time runtime.
+
+`tests/fixture.tsx` sets initial scenarios before play, including named vector
+and camera presets. Its development-only observers return detached snapshots,
+project positions, and record at most 120 completed WebGL frames. They expose
+no ship/camera setters and never force a render. The normal entry and built
+production bundle expose no observers or fixture page. `tests/deterministic.ts`
+owns controlled boot, metadata and original screenshot capture.
+
+| Criteria | Coverage |
+| --- | --- |
+| NAV-1 | Same-seed/input replay, changed seed, each WASD direction/release, wheel direction and removed buttons |
+| NAV-2 | Tick-300 first discovery, selected contact and body/framebuffer continuity during keyboard and pointer pan |
+| NAV-3 | Yellow heading/light-green dashed velocity reaching different edges, zero velocity, absent object guides/arrowheads; existing edges tests cover corners, opposite/overlap, zoom and off-screen origins |
+| NAV-4 | Detached read-only observer state and production isolation |
+
+Run `npm run test:browser:negative` **after build and the normal suite**. It copies
+the client to temporary directories, reverses WASD movement or changes the
+heading color, and requires the matching browser assertion to fail. Crashes,
+timeouts, missing reports or unrelated failures fail the demonstration. Source
+is restored by discarding the copies. `test-results/negative/` retains each
+failure's original screenshot/trace, JSON results, command log and mutation hash
+summary. CI runs both the normal and negative suites; a successful negative
+demonstration means the intentionally broken copy failed, not that broken code
+passed. Set `SALIMON_EVIDENCE_DIR` / `SALIMON_NEGATIVE_DIR` to separate output paths.
+
+These captures are evidence, not approved pixel-regression baselines. Baseline
+approval/diffs are #751; automated independent review/status gates are #752.
+The fixed Ubuntu CI runner and lockfile-selected Chromium improve repeatability;
+a browser/OS update needs relevant revalidation. SwiftShader does not qualify
+hardware GPUs, physical input, mobile/touch, native platforms or hardware FPS.
+
 The contact picker is labelled, searchable and paged at 32 items. Buttons have
 accessible names and visible focus. WASD and arrow shortcuts work without a
 prior radar click when no form/button/dialog has focus. Focused form controls

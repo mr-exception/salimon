@@ -1,0 +1,13 @@
+{
+  "plugin_id": "plugins_6adf20f9802881919b3c822ece281cfa",
+  "plugin_url": "https://chatgpt.com/plugins/plugins_6adf20f9802881919b3c822ece281cfa",
+  "version": "0.8.0",
+  "previous_release": "pluginrel_6aeb2943da988191bb7e8c0503cf28f9",
+  "release": "pluginrel_6aeb728b91548191b70cb2ab823b17a4",
+  "scope": "USER",
+  "discoverability": "PRIVATE",
+  "files_verified_by_readback": 9,
+  "skills_preserved": 6,
+  "default_prompts": "preserved exactly",
+  "verification": "JSON/YAML parsed; relative links checked; archive inspected; all saved files match validated package. Future host invocation not exercised."
+}

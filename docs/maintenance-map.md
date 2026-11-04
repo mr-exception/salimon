@@ -9,9 +9,10 @@ and Playwright scenarios/observers in `client/tests/`. See the
 [browser verification contract](../client/README.md#deterministic-navigation-regression-750).
 The crate map below describes the removed native architecture at historical revisions.
 
-Independent browser acceptance owns `.github/qa/` and the trusted
-`independent-qa.yml` workflow. See [runtime, limits and rollout](independent-game-qa.md)
-before changing evidence, status or baseline-approval contracts.
+Browser acceptance uses [review in the active Codex chat](independent-game-qa.md)
+and the existing Navigation client functional/visual CI. The automated #752
+handoff/status/scheduled-review runtime is retired; do not restore extra review
+jobs or require separate-agent identity records.
 
 For historical native work, start with the affected row, then read that crate's `README.ai.md`,
 `architecture.md` and `invariants.md`. Paths below are repository-root-relative;

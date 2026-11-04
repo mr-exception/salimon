@@ -38,22 +38,27 @@ GitHub labels or automatic checks. Verification labels still describe ownership.
 | State | Entry evidence and next step |
 | --- | --- |
 | Implementation in progress | Developer records criteria, blockers and verification plan; issue stays open. |
-| QA pending | Implementation, report and checks are available at an exact PR head/base; independent review requested. Missing or failed mandatory checks are disclosed and prevent acceptance. |
+| QA pending | Implementation, report and checks are available at an exact PR head/base; review in the active Codex chat requested. Missing or failed mandatory checks are disclosed and prevent acceptance. |
 | Changes requested | Reviewer identifies failed/unverified criteria and actionable fixes; developer revises, reruns affected checks and returns to QA pending. |
-| QA accepted | Independent reviewer records ACCEPT for the current head/base, every mandatory criterion/check passes, and no blocking review remains. Issue stays open pending merge. |
+| QA accepted | The active-session reviewer records ACCEPT for the current head/base, every mandatory criterion/check passes, and no blocking review remains. Issue stays open pending merge. |
 | Merged | Owner authorizes/executes merge; verify the accepted change reached default without invalidating evidence. Merge alone is not proof of acceptance. |
 | Closed | Delivering PR merged and mandatory acceptance remains satisfied; verify automatic closure and retain PR/report/review links. |
 
-The implementer cannot accept their own work. Use a distinct reviewer agent when
-available; otherwise disclose a logically separate evidence-based review pass and
-its limitation. The reviewer independently inspects the issue, diff and originals,
-then records criterion-by-criterion PASS/FAIL/UNVERIFIED, evidence references and
-ACCEPT, REQUEST_CHANGES or BLOCKED/INCONCLUSIVE. Missing evidence, an unavailable
-review capability, unresolved prerequisites, stale revision evidence, failed/unrun
-mandatory checks or blocking review veto ACCEPT. AI visual judgment is advisory
-and cannot override deterministic failures or approve its own baseline changes.
-Record reviewer identity/capability and cycle number. Default to at most three
-review cycles per delivery attempt, then report blockers and next actions.
+Review changes and actual evidence in the same active Codex chat after
+implementation. The implementing agent may perform this clearly labelled review
+pass; a separate agent or external reviewer is optional only when the user asks.
+Do not claim independent or separate-agent execution for the implementing
+agent's own review. Inspect the issue, final diff, originals, relevant results
+and current head/base, then record criterion-by-criterion PASS/FAIL/UNVERIFIED,
+evidence references and ACCEPT, REQUEST_CHANGES or BLOCKED/INCONCLUSIVE.
+
+Missing evidence, unresolved prerequisites, stale revision evidence, failed/unrun
+mandatory functional checks or blocking review veto ACCEPT. AI visual judgment
+cannot override deterministic failures or approve baseline changes. Record who
+reviewed, the same-session capability and any revisions. Keep review proportionate:
+reuse unchanged source-bound evidence and stop when remaining blockers require
+external action. Do not create review handoff packets, automated review statuses,
+scheduled scans or extra review CI jobs.
 
 ## Revision-bound evidence and report
 
@@ -65,7 +70,7 @@ Write `reports/issue-N/README.md` in the delivering PR (or
   tool/OS versions, browser/backend, viewport/DPR, seed/clock and input method as applicable.
 - Durable links to original screenshots, traces, logs, raw measurements and diffs;
   failures, skips, unrun checks, limits and separately owned qualifications.
-- Independent reviewer, cycle, verdict and evidence, plus delivering PR and follow-ups.
+- Active-session reviewer, verdict and evidence, plus delivering PR and follow-ups.
 
 A report cannot embed the SHA of its own commit. Record the tested source commit
 in the report and bind the final head/base, CI and reviewer verdict in a PR comment
@@ -100,11 +105,13 @@ additional mandatory checks; inspect actual current requirements before acceptan
 This policy defines acceptance; implementation of automated jobs and screenshot
 baselines is owned by #750–#752. It does not itself alter branch protection.
 
-The [independent game QA runtime](independent-game-qa.md) now implements the #752
-review/status workflow against #750/#751 evidence. Its required-check rollout is
-explicit: install/configure and observe actual jobs/statuses before an owner
-requires them. Missing current Codex session review evidence produces BLOCKED; no external AI API or key is required. This policy and
-the runtime never grant merge authority or approve changed screenshot baselines.
+The owner retired the automated #752 review/status gate on 2026-11-04.
+[Review in the active chat](independent-game-qa.md) replaces its handoff packets,
+status publication and scheduled invalidation. The Navigation client domain,
+build, browser, negative/repeat and baseline-approval checks remain required
+where applicable. No separate reviewer identity, machine review record or
+`salimon/independent-qa` status is required. A retired legacy status is historical;
+it does not replace the active review or grant merge authority.
 
 Fix mandatory cloud failures or leave the task incomplete. Missing cloud tooling
 requires a repair attempt or a meaningful equivalent reviewed against the same

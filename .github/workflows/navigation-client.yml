@@ -5,15 +5,11 @@ on:
     paths:
       - 'client/**'
       - '.github/workflows/navigation-client.yml'
-      - '.github/qa/**'
-      - '.github/workflows/independent-qa.yml'
   push:
     branches: [main]
     paths:
       - 'client/**'
       - '.github/workflows/navigation-client.yml'
-      - '.github/qa/**'
-      - '.github/workflows/independent-qa.yml'
 
 concurrency:
   group: navigation-${{ github.ref }}
@@ -29,14 +25,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - name: Independent QA policy and controlled PR/status fixtures
-        run: python -m unittest discover -s .github/qa -p 'test_*.py' -v
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

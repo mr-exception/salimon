@@ -1,0 +1,11 @@
+{
+  "functional_and_visual_steps": "preserved exactly",
+  "removed_steps": [
+    "actions/setup-python@v5",
+    "Independent QA policy and controlled PR/status fixtures"
+  ],
+  "workflow_yaml": "PASS",
+  "removed_runtime": "PASS",
+  "new_document_links": "PASS",
+  "review": "same-session source/configuration review; no gameplay inputs changed"
+}

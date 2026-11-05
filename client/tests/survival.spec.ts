@@ -63,9 +63,10 @@ test('SURV built active/pause/reload, outdoor/interior/navigation-return and ter
   await expect(hud).toContainText('200 / 200 HP')
   // Real production keyboard journey through the Scout and radar WebGL adapter.
   for (const p of [[-2, 3], [-2, 7]]) await walkTo(page, p, 'planet:fixture', true)
-  await walkTo(page, [0, 7], 'ship:scout', true)
+  for (const p of [[0, 7], [0, 2]]) await walkTo(page, p, 'ship:scout', true)
+  await expect(page.locator('[data-entity="person:player"]')).toHaveAttribute('data-frame', 'ship:scout')
   await capture('interior')
-  for (const p of [[0, 2], [0, .45], [1.35, .45], [1.35, -1.65], [0, -1.65], [0, -3.1]]) await walkTo(page, p, 'ship:scout', true)
+  for (const p of [[0, .45], [1.35, .45], [1.35, -1.65], [0, -1.65], [0, -3.1]]) await walkTo(page, p, 'ship:scout', true)
   await page.keyboard.press('e'); await page.clock.runFor(100)
   await expect(page.getByLabel('Navigation radar', { exact: true })).toBeVisible()
   await expect(hud).toBeVisible()

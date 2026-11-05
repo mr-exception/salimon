@@ -24,8 +24,9 @@ sprite caching by `topDownSprites.tsx`, and SVG/input/gameplay composition by
 `tests/top-down.spec.ts` and `tests/cockpit.spec.ts`. See the client guide for fixture boundaries.
 Resource conservation is owned by `resourceLedger.ts` (validated graph, exact
 transfer, store mass); `resourceInventory.ts` owns shared player constraints;
-`resourceSession.ts` owns schema v3, lossless v1/v2 migration and atomic publication.
-Tests are colocated; `tests/gathering.spec.ts` covers the built mining/save adapter.
+`resourceSession.ts` owns schema v4, lossless v1/v2/v3 migration and atomic publication.
+`scoutResourceContainer.ts` declares the stable Scout store; its domain tests cover
+50 kg capacity, migration and production transfers. Tests are colocated; `tests/gathering.spec.ts` covers the built mining/save adapter.
 The crate map below describes the removed native architecture at historical revisions.
 
 Browser acceptance uses [review in the active Codex chat](independent-game-qa.md)

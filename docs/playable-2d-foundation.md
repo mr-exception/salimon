@@ -85,9 +85,9 @@ mass are shown in kg; there is no volume limit. Completed transfers, source depl
 and frame-relative locations save together in this browser; reload never resumes
 gathering automatically. See [the resource contract](resource-inventory-and-gathering.md)
 for the catalog, transaction and interruption details. The multi-inventory
-ledger foundation (#783) preserves this journey and mining behavior; schema v3
-adds validated declared raw stores without enabling storage UI. Existing v1/v2
-saves migrate losslessly under the same storage key.
+ledger foundation (#783) preserves this journey and mining behavior; schema v4
+enables the identified 50 kg Scout Resource Container domain (#784), without
+its future UI (#785). Existing v1/v2/v3 saves migrate losslessly under the same key.
 
 **Unsupported future features:** ship storage/loot transfers; actual Core power; Fabricator recipes or
 production; multiplayer/backend authority and reconnect; ship damage/destruction;

@@ -20,7 +20,8 @@ IDs, fixed-step walking/facing, camera follow and layered draw lists.
 `topDownInteraction.ts` owns swept collision and stable-ID nearby selection/reach;
 entity-local footprints match the artwork. `cockpit.ts` owns local owner control,
 one-chair reservation and power/view transitions. Other interactions inspect
-placeholders. Mining and durable local saves use the resource owners below;
+placeholders; the Scout Resource Container domain is enabled by #784 with UI
+following in #785. Mining and durable local saves use the resource owners below;
 Core, Fabricator processing and server authority remain future work.
 
 `TopDownIllustration.tsx` retains the authored illustrated SVG shapes.
@@ -1028,3 +1029,8 @@ validity/time-scale contracts; they do not imply observed-body playable adoption
 ## Opening and recovered investigations (#470 / #471)
 
 [Opening/investigation contract](opening-and-investigations.md): runtime `session/narrative.rs` owns complete-packet lead admission, fixed ground-bound physical clues, modal inspections and schema-31 receipts; universe `scanner/chart.rs` owns explicit unverified same-frame route snapshots. Runtime tests, `scripts/verify_narrative.py`, existing canonical mine/carry/Fabricator persistence and production audio exports form the acceptance matrix. Scientific full-Gaia acceptance remains #524.
+
+The Scout raw-store declaration is owned by `scoutResourceContainer.ts`, bound to
+the existing `scout:storage` ship-local anchor and 50,000 g metadata. Default
+ResourceSession commands persist it atomically in schema v4; v3 saves acquire
+the previously absent container empty, while v4 missing data fails closed.

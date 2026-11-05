@@ -1,11 +1,18 @@
 # #766 — Persistent world / cockpit / radar handoff
 
-PR: [#776](https://github.com/mr-exception/salimon/pull/776).
-Tested production source: `ed84b1559a66cd9eacebc7f087e7ffb2c5ac3dbf`.
-Base: `main` at `232bc3082cbfdf57254685cf29080f37ff1604f8`.
-The final report-only head/base, current-head CI and review verdict are bound in
-the PR comment. The source matches the verified working tree apart from guide
-edits and a trailing-newline cleanup; final-head CI checks the exact commit.
+Implementation PR [#776](https://github.com/mr-exception/salimon/pull/776) was
+merged by the owner as `3eb7968125f17196a093b74e81c389623ea89a30`, including the
+Docker work from #778. Issue #766 closed automatically. This chat did not merge.
+
+**Follow-up qualification in #767:** the final renderer below was verified
+locally while the owner merged, and is carried by `issue-767-playable-slice`
+based on that updated main. It is not falsely attributed to the merged #776 head.
+The four-check local run used source `ed84b1559a66cd9eacebc7f087e7ffb2c5ac3dbf`;
+its runtime/config inputs match the reapplied source on the #767 branch by hash.
+The full built playable-slice journey then passed on that updated branch.
+Current-head CI and final acceptance belong to the #767 review comment.
+Original #776 C5 failures remain recorded; acceptance is for the integrated
+follow-up source, not an old-head CI pass.
 
 The default development/built `/` starts outside the Scout in the persistent 2D
 world. Nearby cockpit interaction reserves the owner's one chair and physically
@@ -94,9 +101,9 @@ recorded source, not the final renderer.
 
 Implementing Codex agent, same-session review: final source, criteria, actual
 measurements and original radar/standing/blackout/planet/doorway captures reviewed.
-C1–C5 PASS locally. Overall QA awaits required current-head CI; its final
-ACCEPT/BLOCKED verdict is recorded in the PR comment. No independent reviewer or
-external AI execution is claimed. Issue stays open before merge.
+C1–C5 PASS locally. Integrated follow-up QA awaits required current-head #767 CI; its final
+ACCEPT/BLOCKED verdict is recorded on that PR. No independent reviewer or
+external AI execution is claimed. The owner already merged #776; #767 stays open before its own merge.
 
 No multiplayer authority/sync, reconnect/durable persistence, actual Core energy,
 ship damage, animations or flight-driven 2D relocation is implemented. The radar

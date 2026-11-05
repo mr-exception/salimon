@@ -40,7 +40,9 @@ npm run test:browser -- --project=cockpit
 nonzero ship simulation continuity. `SLICE-1` is one uninterrupted journey through
 the **built production `/`**: outdoor spawn → mineral and biological source
 inspection → aft doorway → cabin/cockpit → real radar → standing → outside.
-Each repeats in a fresh browser context. Inputs are actual Playwright keyboard/
+Each repeats in a fresh browser context. The original artwork is cached as
+fixed-resolution sprites by `topDownSprites.tsx`; the same SVG adapter moves
+them without changing gameplay frames or footprints. Inputs are actual Playwright keyboard/
 mouse events; DOM attributes are read-only observations. No position, camera or
 simulation setters are exposed. Fixed ticks drive movement and five simulated
 seconds settle the follow camera before captures.

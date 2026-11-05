@@ -42,6 +42,18 @@ for controls, fixtures and cloud checks. The native sections below are historica
 contracts, not a claim of migrated native gameplay. The
 [architecture baseline](architecture-baseline.md) records historical priorities.
 
+## Proposed authoritative backend (not implemented)
+
+The approved future NestJS/TypeScript + MongoDB modular-monolith design,
+including server-only authoritative game state, 60 Hz fixed-step simulation
+targets, 2D client prediction, versioned WebSocket contracts and single-process
+ownership, is documented in [backend architecture](backend-architecture.md).
+Durable gameplay transactions, a strict checkpoint-staleness policy and
+crash/reconnect reconstruction are specified in
+[backend persistence and recovery](backend-persistence-recovery.md).
+These are **design contracts**, not completed online features; the browser
+currently retains local simulation and local saves.
+
 ## Implemented architecture
 
 ### Browser resource gathering (#757)

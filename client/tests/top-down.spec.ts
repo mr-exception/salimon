@@ -134,8 +134,8 @@ test('TD-3 collisions, keyboard detour, selection and request/cancel use the con
   await info.attach('journey.json', { body: JSON.stringify({ final: await position(page), input: 'actual Playwright keyboard/mouse; no state setters', targets: ['scout:core', 'scout:desk'] }), contentType: 'application/json' })
 })
 
-test('TD-5 built entry retains navigation even with development scene query', async ({ page }, info) => {
-  await page.goto('http://127.0.0.1:4175/?scene=top-down')
+test('TD-5 explicit built radar entry retains standalone navigation', async ({ page }, info) => {
+  await page.goto('http://127.0.0.1:4175/?scene=radar')
   await expect(page.getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })).toBeVisible()
   await expect(scene(page)).toHaveCount(0)
   await page.screenshot({ path: info.outputPath('radar-preflight.png') })

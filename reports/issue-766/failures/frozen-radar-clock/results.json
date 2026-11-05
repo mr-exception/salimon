@@ -1,0 +1,377 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=cockpit"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/tmp/766-browser-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/tmp/766-browser-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/tmp/766-browser-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/navigation-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/tmp/766-browser-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/tmp/766-browser-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/tmp/766-browser-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/tmp/766-browser-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text",
+              "--disable-gpu"
+            ],
+            "env": {
+              "REMOTE_DESKTOP_H265_ENABLED": "0",
+              "CODEX_EXEC_SERVER_PROXY_PRIVATE_IPS_VIA_UPSTREAM": "true",
+              "GRPC_DEFAULT_SSL_ROOTS_FILE_PATH": "/etc/ssl/certs/ca-certificates.crt",
+              "HTTPS_PROXY": "http://proxy:8080",
+              "CODEX_CI": "1",
+              "no_proxy": "localhost,127.0.0.1,::1",
+              "CODEX_EXEC_SERVER_REMOTE_BASE_URL": "https://codex-cloud-environments.chatgpt.com/api",
+              "NODE_EXTRA_CA_CERTS": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "CODEX_HOME": "/home/agent/.codex",
+              "USER": "agent",
+              "npm_config_user_agent": "npm/11.9.0 node/v24.19.0 linux x64 workspaces/false",
+              "SALIMON_EVIDENCE_DIR": "/tmp/766-browser-final",
+              "GH_TOKEN": "ghu_codex-cloud-github-proxy",
+              "npm_node_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "SHLVL": "1",
+              "npm_config_noproxy": "",
+              "HOME": "/home/agent",
+              "CODEX_CAAS_SESSION_ID": "5618f2cb7df24fdda46ccaf4969eb6a8",
+              "CODEX_PRIMARY_RUNTIME_NODE_MODULES": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "NO_PROXY": "localhost,127.0.0.1,::1",
+              "npm_package_json": "/workspace/salimon/client/package.json",
+              "NETWORK": "caas_neko_desktop",
+              "npm_package_engines_node": ">=22.18",
+              "OPENAI_CLUSTER": "applied-caas22",
+              "PAGER": "cat",
+              "LC_CTYPE": "C.UTF-8",
+              "SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_userconfig": "/home/agent/.npmrc",
+              "npm_config_local_prefix": "/workspace/salimon/client",
+              "CODEX_PRIMARY_RUNTIME_BUNDLE_VERSION": "26.1013.11914",
+              "NO_COLOR": "1",
+              "COLORTERM": "",
+              "COLOR": "0",
+              "CHROMIUM_PATH": "/usr/bin/chromium",
+              "CODEX_PROXY_CERT": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "https_proxy": "http://proxy:8080",
+              "CODEX_ENVIRONMENT_ID": "ccarenv_b64_Y2NhcmVudl9lYzhmMTgwMGQxMzg4MTkxODhmMzE0MGNkNDJhOGZiZQ",
+              "CODEX_PERMISSION_PROFILE": ":danger-full-access",
+              "CODEX_TOOL_CALL_ID": "exec-2e7e13b3-f4fc-41e8-acac-8d389d567318",
+              "http_proxy": "http://proxy:8080",
+              "_": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/npx",
+              "npm_config_npm_version": "11.9.0",
+              "CODEX_APPLY_PATCH_PRESERVE_LINE_ENDINGS": "1",
+              "RUST_LOG": "codex_exec_server=info,codex_cli=info,error",
+              "CODEX_NO_UPDATE": "1",
+              "TERM": "dumb",
+              "npm_config_cache": "/home/agent/.npm",
+              "CLOUDSDK_CORE_CUSTOM_CA_CERTS_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_node_gyp": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js",
+              "PATH": "/workspace/salimon/client/node_modules/.bin:/workspace/salimon/client/node_modules/.bin:/workspace/salimon/node_modules/.bin:/workspace/node_modules/.bin:/node_modules/.bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+              "CODEX_VERSION": "0.0.0",
+              "CODEX_SESSION_ID": "01a1aa68-99c7-72c4-9d5c-baeecdb11049",
+              "REQUESTS_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt",
+              "NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "npm_package_name": "salimon-navigation-client",
+              "LANG": "C.UTF-8",
+              "GH_PAGER": "cat",
+              "npm_lifecycle_script": "\"playwright\"",
+              "BROWSER_MANAGEMENT_SOCKET_PATH": "/home/agent/.local/run/browser-management/socket",
+              "DEBIAN_FRONTEND": "noninteractive",
+              "SHELL": "/bin/bash",
+              "NODE_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "npm_package_version": "0.1.0",
+              "npm_lifecycle_event": "npx",
+              "CODEX_PRIMARY_RUNTIME_ROOT": "/opt/codex/runtimes/codex-primary-runtime",
+              "CAAS_IMAGE_GIT_COMMIT_SHA": "969fca457cb91df54eb491d22bcaff20654139fe",
+              "NPM_CONFIG_AUDIT": "false",
+              "DOCKER_TLS_CERTDIR": "",
+              "CAAS_IMAGE_VERSION": "20261019221748-969fca457cb9",
+              "CODEX_PRIMARY_RUNTIME_PYTHON": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "CODEX_THREAD_ID": "01a1aa68-99c7-72c4-9d5c-baeecdb11049",
+              "CAAS_DIND_STORAGE_DRIVER": "vfs",
+              "GIT_PAGER": "cat",
+              "npm_config_globalconfig": "/home/agent/.local/etc/npmrc",
+              "npm_config_init_module": "/home/agent/.npm-init.js",
+              "PWD": "/workspace/salimon/client",
+              "NPM_CONFIG_FUND": "false",
+              "LC_ALL": "C.UTF-8",
+              "npm_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/bin/npm-cli.js",
+              "CODEX_BROWSER_DEFER_ACTIVATION": "1",
+              "npm_config_global_prefix": "/home/agent/.local",
+              "HTTP_PROXY": "http://proxy:8080",
+              "npm_command": "exec",
+              "CODEX_PRIMARY_RUNTIME_NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "PLAYWRIGHT_NODEJS_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "NPM_CONFIG_PREFIX": "/home/agent/.local",
+              "CODEX_PRIMARY_RUNTIME": "/opt/codex/runtimes/codex-primary-runtime",
+              "DOCKER_IGNORE_BR_NETFILTER_ERROR": "1",
+              "INIT_CWD": "/workspace/salimon/client",
+              "EDITOR": "vi",
+              "FONTCONFIG_FILE": "/workspace/salimon/client/tests/assets/fonts.conf"
+            }
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "cockpit"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/tmp/766-browser-final/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "cockpit.spec.ts",
+      "file": "cockpit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 61520,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true }) with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true }) with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })\u001b[22m\n\n    at /workspace/salimon/client/tests/cockpit.spec.ts:31:107",
+                    "location": {
+                      "file": "/workspace/salimon/client/tests/cockpit.spec.ts",
+                      "column": 107,
+                      "line": 31
+                    },
+                    "snippet": "  29 |       await page.keyboard.press('e')\n  30 |       await expect(main).toHaveAttribute('data-player-mode', 'seated'); await expect(main).toHaveAttribute('data-occupant', 'player:local')\n> 31 |       await expect(page.getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })).toBeVisible()\n     |                                                                                                           ^\n  32 |       await expect(page.locator('[data-entity=\"person:player\"]')).toHaveAttribute('data-position', '0,-3.95')\n  33 |       await expect(page.locator('[data-entity=\"person:player\"]')).toHaveAttribute('data-frame', 'ship:scout')\n  34 |       const entered = await ship()"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/workspace/salimon/client/tests/cockpit.spec.ts",
+                        "column": 107,
+                        "line": 31
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true }) with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })\u001b[22m\n\n\n  29 |       await page.keyboard.press('e')\n  30 |       await expect(main).toHaveAttribute('data-player-mode', 'seated'); await expect(main).toHaveAttribute('data-occupant', 'player:local')\n> 31 |       await expect(page.getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true })).toBeVisible()\n     |                                                                                                           ^\n  32 |       await expect(page.locator('[data-entity=\"person:player\"]')).toHaveAttribute('data-position', '0,-3.95')\n  33 |       await expect(page.locator('[data-entity=\"person:player\"]')).toHaveAttribute('data-frame', 'ship:scout')\n  34 |       const entered = await ship()\n    at /workspace/salimon/client/tests/cockpit.spec.ts:31:107"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T06:40:08.731Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/tmp/766-browser-final/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/tmp/766-browser-final/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/tmp/766-browser-final/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/workspace/salimon/client/tests/cockpit.spec.ts",
+                    "column": 107,
+                    "line": 31
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "8d194f2f5447ea2b23e4-4cee7d1f475f3e7550cb",
+          "file": "cockpit.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-05T06:40:06.713Z",
+    "duration": 66523.78600000001,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,13 @@
+[WebServer] (node:4568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:4612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[{"kind":"viewport","pass":true,"changed":0,"raw":1369},{"kind":"fullpage","pass":true,"changed":0,"raw":1369},{"kind":"viewport-second","pass":true,"changed":0,"raw":1369},{"kind":"fullpage-second","pass":true,"changed":0,"raw":1369}]
+  ✓  1 [raster] › tests/raster-diagnostic.spec.ts:4:1 › diagnose capture grid at a stationary seated return (2.0m)
+
+  1 passed (2.1m)

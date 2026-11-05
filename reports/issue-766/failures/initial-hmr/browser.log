@@ -1,0 +1,48 @@
+[WebServer] (node:1375) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1407) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:1419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (34.5s)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 613
+    Received: 56
+
+       at worldJourney.ts:51
+
+      49 |   for (let i = 0; i < 60 && await tick() < target; i++) await page.clock.runFor(16)
+      50 |   for (const code of keys) await page.keyboard.up(code)
+    > 51 |   expect(await tick()).toBe(target)
+         |                        ^
+      52 | }
+      53 |
+      54 |
+        at walkTicks (/workspace/salimon/client/tests/worldJourney.ts:51:24)
+        at walkTo (/workspace/salimon/client/tests/worldJourney.ts:36:21)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:27:102
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/766-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 

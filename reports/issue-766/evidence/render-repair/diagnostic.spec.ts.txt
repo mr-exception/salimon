@@ -1,0 +1,29 @@
+import { test, expect } from '@playwright/test'
+import { boot, walkTo } from './worldJourney'
+import { compareImages } from '../scripts/visual-comparison.ts'
+test('diagnose capture grid at a stationary seated return', async ({browser}, info) => {
+ const originals:Record<string,Buffer>={}, results=[]
+ for(let replay=0;replay<2;replay++){
+ const context=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1})
+ const page=await context.newPage()
+ await boot(page)
+ for(const p of [[-2,3],[-2,7]])await walkTo(page,p,'planet:fixture',true)
+ for(const p of [[0,7],[0,2]])await walkTo(page,p,'ship:scout',true)
+ for(const p of [[0,.45],[1.35,.45],[1.35,-1.65],[0,-1.65],[0,-3.1]])await walkTo(page,p,'ship:scout',true)
+ await page.keyboard.press('e')
+ await expect.poll(async()=>{await page.clock.runFor(50);return page.getByRole('img',{name:'Ship-centered three-dimensional radar',exact:true}).count()}).toBe(1)
+ await page.clock.runFor(500)
+ await page.getByRole('button',{name:'Exit navigation · Stand up'}).click()
+ await page.clock.runFor(5000)
+ const observations=await page.locator('[data-entity]').evaluateAll(nodes=>nodes.map(n=>({id:n.getAttribute('data-entity'),transform:n.getAttribute('transform')})))
+ for(const kind of ['viewport','fullpage','viewport-second','fullpage-second']){
+ const image=await page.screenshot({path:info.outputPath(`${kind}-${replay}.png`),fullPage:kind.startsWith('fullpage')})
+ if(replay===0) originals[kind]=image
+ else {const r=compareImages(originals[kind],image);results.push({kind,pass:r.pass,changed:r.changedPixels,raw:r.rawChangedPixels});await info.attach(`${kind}-diff.png`,{body:r.diff,contentType:'image/png'})}
+ }
+ await info.attach(`observations-${replay}.json`,{body:JSON.stringify(observations),contentType:'application/json'})
+ await context.close()
+ }
+ console.log(JSON.stringify(results))
+ await info.attach('results.json',{body:JSON.stringify(results),contentType:'application/json'})
+})

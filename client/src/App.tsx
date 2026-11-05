@@ -37,9 +37,9 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
   const [runtimeInstance]=useState(()=>navigation??new NavigationRuntime(SAMPLE_BODIES))
   const runtime=useRef(runtimeInstance)
   const [pose,setPose]=useState<Pose>(runtime.current.clock.state)
-  const [throttle,setThrottle]=useState(0)
-  const [contacts,setContacts]=useState<readonly Body[]>([])
-  const [selected,setSelected]=useState<string|null>(null)
+  const [throttle,setThrottle]=useState(runtime.current.clock.state.throttle)
+  const [contacts,setContacts]=useState<readonly Body[]>(runtime.current.scanner.contacts)
+  const [selected,setSelected]=useState<string|null>(runtime.current.scanner.selected)
   const [groups,setGroups]=useState<ContactGroup[]>([])
   const [menu,setMenu]=useState<readonly string[]>([])
   const [menuPage,setMenuPage]=useState(0)
@@ -104,7 +104,7 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
       frame=requestAnimationFrame(animate)
     }
     frame=requestAnimationFrame(animate)
-    return ()=>{cancelAnimationFrame(frame);document.removeEventListener('visibilitychange',resume)}
+    return ()=>{runtime.current.clock.state=changeThrottle(runtime.current.clock.state,throttleRef.current);cancelAnimationFrame(frame);document.removeEventListener('visibilitychange',resume)}
   },[])
   useEffect(()=>{if(selected && !contacts.some(body=>body.id===selected))setSelected(null)},[contacts,selected])
   const menuIds=new Set(menu)

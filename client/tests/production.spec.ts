@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test'
 test('built production bundle renders WebGL, scanner and labelled controls',async({page},testInfo)=>{
- const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:4175/')
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:4175/?scene=radar')
  await expect(page.getByRole('img',{name:'Ship-centered three-dimensional radar',exact:true})).toBeVisible()
  await expect(page.locator('.scan-status')).toContainText('5 temporary contacts',{timeout:15000})
  await expect(page.getByLabel('Throttle',{exact:true})).toHaveValue('0');await expect(page.locator('.target-status')).toHaveText('No selected target');await expect(page.getByRole('status',{name:'Navigation warnings'})).toContainText('No navigation warnings')

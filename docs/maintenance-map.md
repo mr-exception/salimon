@@ -11,7 +11,8 @@ The shared 2D world is owned by `topDownRuntime.ts`/`topDownFrames.ts`, collisio
 and reach by `topDownInteraction.ts`, doorway ownership/location snapshots by
 `topDownTraversal.ts`, Scout anchors/footprints by `scoutLayout.ts`,
 fixed site/source identity and outdoor spawn by `planetarySite.ts`,
-and illustrated rendering by `TopDownView.tsx`. Tests live in `topDown.test.ts`,
+local cockpit occupancy/power/control by `cockpit.ts`,
+and illustrated rendering/gameplay composition by `TopDownView.tsx`. Tests live in `topDown.test.ts`,
 `planetarySite.test.ts`, `topDownTraversal.test.ts` and `tests/top-down.spec.ts`. See the client guide for fixture boundaries.
 The crate map below describes the removed native architecture at historical revisions.
 

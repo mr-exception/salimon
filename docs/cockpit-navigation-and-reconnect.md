@@ -1,6 +1,13 @@
 # Cockpit navigation, multiplayer presence and reconnect
 
-**Status:** Approved future gameplay design, 2026-11-04. This document is authoritative for the **strict top-down 2D** player-world / **3D holographic navigation** transition and the disconnect/reconnect behavior discussed here. **Not implemented** in the current navigation-only React client; no multiplayer backend, shared player persistence or ship-interaction runtime is claimed. The #761–#765 development world supports continuous surface/Scout walking and exact frame-relative in-memory location snapshots. It does not implement cockpit view transitions or authoritative reconnect below; see the [client guide](../client/README.md#seamless-doorway-traversal-765).
+**Status:** Approved gameplay design, 2026-11-04. #766 implements the local
+2D/cockpit/radar transition, single-chair reservation, owner-control gate and
+explicit development power fixture in `client/`. The default entry is the 2D
+landing site; ship simulation survives radar presentation changes. This is
+single-player local state, with no multiplayer backend, shared persistence,
+authoritative reconnect, Core power model or flight-driven 2D relocation.
+See [client guide](../client/README.md#cockpit-gameplay-766). The remaining
+multiplayer/reconnect/death rules below are future contracts.
 
 Companion contracts: [2D art direction](top-down-art-direction.md), [navigation-only radar prototype](radar-navigation-prototype.md), [multiplayer](multiplayer-and-npc-interaction.md), [spaceship and survival](spaceship-building-and-survival.md), and [legacy save contract](save-contract.md).
 
@@ -73,7 +80,7 @@ Past native implementation documents describing localized cell, module, door or 
 - View switching is a client presentation state change; the authoritative player stays physically inside the ship when seated, and ship motion persists independently.
 - Disconnect must atomically release occupancy/interaction locks and save a valid planet-fixed or ship-local re-entry anchor. It must not leave an offline physical player in the world.
 - Reconnect checks terminal offline death **before** spawning, resuming commands or presenting controls.
-- No implementation is authorized by this document alone; the active `client/` navigation-only radar has no integrated 2D gameplay, cockpit avatar, live multiplayer, server persistence or module seating. The #761 development scene is an isolated foundation, not these interactions.
+- Implementation is authorized by active issues. #766 implements local 2D gameplay, cockpit seating and radar transitions; live multiplayer, server persistence and reconnect remain deferred.
 - **Still to design later:** exact cockpit input key/animation timing, valid-adjacent spawn fallback when a saved spot changes, server timing/race handling, full power/zero-G seating safety, multiplayer interaction with an occupied pilot, reconnect if a ship is transferred/removed without destruction, and eventual localized hull/room/module damage.
 
 ## Review examples / acceptance scenarios (future)

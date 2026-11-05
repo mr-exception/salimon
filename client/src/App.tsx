@@ -33,7 +33,7 @@ function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setView
 
   </>
 }
-export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onSceneReady?:(state:RootState)=>void}={}) {
+export function App({navigation,onSceneReady,canPilot,isPaused}:{navigation?:NavigationRuntime;canPilot?:()=>boolean;isPaused?:()=>boolean;onSceneReady?:(state:RootState)=>void}={}) {
   const [runtimeInstance]=useState(()=>navigation??new NavigationRuntime(SAMPLE_BODIES))
   const runtime=useRef(runtimeInstance)
   const [pose,setPose]=useState<Pose>(runtime.current.clock.state)
@@ -91,9 +91,9 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
     const resume=()=>timer.resume(performance.now())
     document.addEventListener('visibilitychange',resume)
     const animate=(now:number)=>{
-      const dt=timer.sample(now,document.hidden)
-      if(document.hidden){frame=requestAnimationFrame(animate);return}
-      runtime.current.clock.state=changeThrottle(runtime.current.clock.state,throttleRef.current)
+      const dt=timer.sample(now,document.hidden || isPaused?.() === true)
+      if(document.hidden || isPaused?.() === true){input.current.clear();frame=requestAnimationFrame(animate);return}
+      runtime.current.clock.state=changeThrottle(runtime.current.clock.state,canPilot?.() === false ? 0 : throttleRef.current)
       const p=runtime.current.advance(dt,input.current.controls)
       if(p.mode!=='flying'){throttleRef.current=0;setThrottle(0)}
       setAligning(p.alignment!==null)
@@ -104,7 +104,7 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
       frame=requestAnimationFrame(animate)
     }
     frame=requestAnimationFrame(animate)
-    return ()=>{runtime.current.clock.state=changeThrottle(runtime.current.clock.state,throttleRef.current);cancelAnimationFrame(frame);document.removeEventListener('visibilitychange',resume)}
+    return ()=>{runtime.current.clock.state=changeThrottle(runtime.current.clock.state,canPilot?.() === false ? 0 : throttleRef.current);cancelAnimationFrame(frame);document.removeEventListener('visibilitychange',resume)}
   },[])
   useEffect(()=>{if(selected && !contacts.some(body=>body.id===selected))setSelected(null)},[contacts,selected])
   const menuIds=new Set(menu)

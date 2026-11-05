@@ -46,10 +46,10 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'exterior', c
   }
 }
 // One continuous scene. Crossing changes ownership, never world position.
-export function stepTopDown(state: TopDownState, direction: Point2): TopDownState {
+export function stepTopDown(state: TopDownState, direction: Point2, speedMultiplier = 1): TopDownState {
   const [x, y] = state.player.mode === 'seated' ? [0, 0] : direction
   if (![x, y].every(Number.isFinite)) throw new RangeError('Expected finite movement')
-  const length = Math.hypot(x, y), scale = length > 0 ? PLAYER_SPEED_MPS * STEP_2D / Math.max(1, length) : 0
+  const length = Math.hypot(x, y), scale = length > 0 ? PLAYER_SPEED_MPS * speedMultiplier * STEP_2D / Math.max(1, length) : 0
   const player = state.entities.find(e => e.id === PLAYER_ID)!
   let anchor = player.anchor
   const angle = anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0
@@ -109,11 +109,11 @@ export function drawList(state: TopDownState): DrawItem[] {
 }
 export class TopDownClock {
   private remainder = 0
-  advance(state: TopDownState, seconds: number, direction: Point2): TopDownState {
+  advance(state: TopDownState, seconds: number, direction: Point2, step = stepTopDown): TopDownState {
     if (!Number.isFinite(seconds) || seconds < 0) throw new RangeError('Expected nonnegative finite time')
     this.remainder += Math.min(seconds, .25)
     while (this.remainder + 1e-12 >= STEP_2D) {
-      state = stepTopDown(state, direction)
+      state = step(state, direction)
       this.remainder = Math.max(0, this.remainder - STEP_2D)
     }
     return state

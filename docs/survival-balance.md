@@ -1,5 +1,7 @@
 # Survival balance evidence (#384)
 
+Current browser survival is documented in [browser survival](browser-survival.md). The historical balance evidence below does not establish browser food content or approve provisional mining penalties. Browser maximum health is 200 HP.
+
 > **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 

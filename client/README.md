@@ -2,7 +2,10 @@
 
 **2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` migrates compatible old litre-based saves without loss. See [resource design](../docs/resource-inventory-and-gathering.md).
 
-A self-contained React + TypeScript + Vite + Three.js + React Three Fiber radar. This is a new prototype and does not migrate the historical native Rust gameplay. See [design contract](../docs/radar-navigation-prototype.md).
+The default client is a React + TypeScript + Vite 2D world with a Three.js /
+React Three Fiber cockpit radar. Start with [current implementation and legacy
+contract routing](../docs/current-client-status.md) and the
+[playable journey](../docs/playable-2d-foundation.md). This is a new prototype and does not migrate the historical native Rust gameplay. See [design contract](../docs/radar-navigation-prototype.md).
 
 ## Run
 
@@ -33,7 +36,8 @@ Power loss closes radar and keeps the chair occupied; restoration stays seated
 in 2D until **E**. **Stand up / Escape** releases the chair even without power.
 Development-only `/?powerFixture=1` exposes explicit outage/restoration buttons;
 this is a test fixture, not a Core implementation. No multiplayer/server authority,
-disk persistence or reconnect behavior is implemented. Occupant identity and
+backend persistence or multiplayer reconnect behavior is implemented. Browser-local
+inventory/depletion/location persistence is implemented by `ResourceSession`. Occupant identity and
 control gating are local hooks for a future authoritative adapter.
 
 `/?scene=radar` retains the standalone navigation prototype and its regression
@@ -113,8 +117,8 @@ interior, surface props and entity IDs remain in the same SVG scene throughout.
 split anchor (bigint cells, metre offsets, frame ID) and facing. Ship-local
 locations follow later ship pose changes; planet-fixed locations stay on the
 surface. This is a hook for a future authoritative reconnect adapter, which must
-validate spawn/collision and serialize the snapshot; it does not save or reconnect
-players today. Simulated relocation is tested without adding flight controls.
+validate spawn/collision and serialize the snapshot; the default entry serializes it in local `ResourceSession` saves, while
+multiplayer reconnect remains future work. Simulated relocation is tested without adding flight controls.
 `topDownTraversal.test.ts` covers rotated handoffs, boundary/blocked paths,
 world/camera continuity and location retention. Browser `TRAVERSE-1` walks the
 outdoor-to-cockpit round trip twice, measures both handoffs, keeps the same scene,

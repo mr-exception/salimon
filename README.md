@@ -2,7 +2,8 @@
 
 The current browser entry starts in a continuous 2D Scout/planet world and opens
 the existing React/Three.js radar from its cockpit. Start with [the client guide](client/README.md) and
-[the playable foundation guide](docs/playable-2d-foundation.md).
+[the playable foundation guide](docs/playable-2d-foundation.md) and
+[current implementation and contract routing](docs/current-client-status.md).
 Development issues follow the [acceptance policy](docs/acceptance-policy.md) and
 include an evidence report and review in the active chat before merge.
 With Node >=22.18:
@@ -15,13 +16,15 @@ npm run build
 npm run dev
 ```
 
-Browser ship motion, scanner and simplified contacts are implemented; the sample
+Walking, doorway traversal, cockpit seating, gram-based mining and browser-local
+inventory/depletion/location saves are implemented. Browser ship motion, scanner
+and simplified contacts are implemented; the sample
 catalog is illustrative and energy is unlimited. The text below preserves the
 historical native architecture and does not describe migrated browser gameplay.
 
 The current 2D world also supports player gathering: **Equip gathering tool**,
-approach a mineral outcrop or plate colony, then **E / Gather** for 1 whole L/s.
-Weight (10 kg) and volume (10 L) limits apply independently. Completed transfers,
+approach a mineral outcrop or plate colony, then **E / Gather** for up to 1 kg/s.
+One 10 kg weight cap and 12 shared slots apply; no volume limit. Completed transfers,
 source depletion and player location save locally in this browser. See the
 [resource guide](docs/resource-inventory-and-gathering.md) for controls, interruptions
 and save behavior. Ship processing and multiplayer remain future work.
@@ -57,6 +60,11 @@ missing compiled assets.
 
 ## Historical native reference
 
+Everything below describes the archived Rust client, including its build commands
+and hardware context. It does not govern routine browser work. Removed source
+links point to a pinned historical revision; use the current routing guide above.
+
+
 Salimon is a space exploration game built around a custom Rust runtime. The
 current implementation extends the **Phase 0 — Technical Feasibility Showcase**
 with mining, physical fragments, carrying and EVA: a native-first, client-only
@@ -78,7 +86,7 @@ age, with held-input/power validity warnings; it never steers the ship. See the
 physical Core monitor shows conversion, consumption, depletion and warnings. Routes on both sides
 let the player walk past the console into the cockpit nose. Loose fragments can
 be dropped on the cabin deck and pile up; the separate cargo module is removed. See
-the [ship asset guide](client/assets/ship/README.md).
+the [ship asset guide](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/assets/ship/README.md).
 The native client starts outside the custom
 Salimon scout landed on Vesper in Nacre Reach (over 30 light-years from Earth), with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed/open-space
@@ -96,7 +104,7 @@ The [project documents](docs/README.md) and
 truth. Start with the [current scope](docs/project-phases.md),
 [technical architecture](docs/technical-architecture.md), and the active issue's
 linked contracts. Check an issue's
-**Blocked by** section before work. [AGENTS.md](AGENTS.md) describes the
+**Blocked by** section before work. [AGENTS.md](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/AGENTS.md) describes the
 contributor workflow. The checked-in [Phase 0 evaluation](docs/phase-0-evaluation.md)
 records the go-with-revisions decision, benchmark evidence, limitations, and
 required follow-up before Phase 1.
@@ -133,7 +141,7 @@ packaged GLB, texture and runtime metadata; `models/` owns its Blender source,
 export adapter and validation tools. The renderer loads that checked-in GLB without depending on ship state. See
 [client/README.md](client/README.md) for the dependency boundaries.
 
-The [3D authoring workspace](models/README.md) defines shared contracts for future
+The [3D authoring workspace](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/README.md) defines shared contracts for future
 Blender-authored ships, resources, items, structures, props, characters, and
 vehicles. Editable new sources belong in `models/`; validated runtime exports
 belong in `client/assets/`. The scout uses Blender source with shared
@@ -169,14 +177,14 @@ and `wgpu` dependency graph. Running the client needs no external account connec
 
 For standalone native debug/release executables on macOS, Windows, and Debian
 Linux, use `python3 scripts/build_game.py --profile release` (`python` on
-Windows). See [native build documentation](scripts/BUILDING.md) for prerequisites,
+Windows). See [native build documentation](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/BUILDING.md) for prerequisites,
 output locations, failure handling, and the single Ubuntu source-build CI check.
 [Nightly verification and weekly benchmarks](docs/periodic-ci.md) publish Actions
 summaries and a history dashboard without adding slow PR checks.
 
 Run declarative native E2E scenarios with `scripts/salimon-test suite` or
 `scripts/salimon-test run scenarios/landed-earth.json`; see
-[runner documentation](scripts/README.md) for the scenario format and JSON results.
+[runner documentation](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/README.md) for the scenario format and JSON results.
 Use `scripts/salimon-test run scenarios/cockpit-nose.json` to check the new
 walking routes on both sides and unified console.
 
@@ -263,7 +271,7 @@ snapshots in gameplay view. The nearby-body row reports the closest
 of six nonnegative camera-to-surface observations.
 
 The coordinate/depth approach and its measured precision limits are documented
-in [client/world/coordinate-strategy.md](client/world/coordinate-strategy.md).
+in [client/world/coordinate-strategy.md](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/coordinate-strategy.md).
 In brief, CPU world positions stay in `f64` meters, the renderer subtracts the
 camera origin in `f64` before narrowing relative offsets to GPU `f32`, and an
 infinite-far reverse-Z `Depth32Float` projection avoids a far clipping plane.
@@ -282,7 +290,7 @@ root `target/` directory. No application bundle or installer exists yet.
 
 This checklist targets the explicit prototype/F2 fixtures. Current ordinary
 canonical acceptance is automated by the universe/offline routes and recorded
-in the [U36 audit](reports/issue-441/README.md) and U34 evidence. It does not
+in the [U36 audit](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-441/README.md) and U34 evidence. It does not
 prescribe a compressed Earth startup for new journeys.
 
 Rendering and diagnostics require an interactive check on macOS in addition to
@@ -372,11 +380,11 @@ Use `cargo fmt --all` to apply formatting. Automated tests cover logic that does
 not require a live native surface; the native launch, drawing, overlay toggle,
 resize, minimize, restore, and close behavior still require the smoke check
 above. The renderer provides textured sphere presentation, Sun lighting, and
-per-body inspection. [Sphere rendering](client/renderer/sphere-rendering.md) records the
+per-body inspection. [Sphere rendering](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/sphere-rendering.md) records the
 precision technique, LOD budget, material source, and future terrain path.
 The runtime loads the authored scout GLB through a renderer-owned mesh path and
 keeps behavior in separate character/ship crates. Validate and regenerate its model using the
-commands in the [ship asset documentation](client/assets/ship/README.md).
+commands in the [ship asset documentation](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/assets/ship/README.md).
 Mining, carrying, fragment motion/contact, ship flight and assisted landing,
 airlock access, and EVA are implemented. Modified deposits and physical fragments
 are retained in memory across local streaming during the current session.
@@ -458,7 +466,7 @@ and Vesper stays sterile. Strict catalog/save bindings reject incompatible
 publications. Organism meshes, physical instances and harvesting remain #619–#621.
 
 
-Current universe and offline behavior is mapped in the [U36 audit](reports/issue-441/README.md)
+Current universe and offline behavior is mapped in the [U36 audit](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-441/README.md)
 and [motion/resume contract](docs/universe-offline-propagation.md). Disk checkpoints,
 canonical gravity, closed chronological work and verified resume are implemented;
 scientific full-Gaia coverage and hardware/platform release qualification retain

@@ -1,0 +1,83 @@
+[WebServer] (node:6965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:7009) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [top-down] › tests/top-down.spec.ts:20:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (1.9s)
+(node:7087) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [top-down] › tests/top-down.spec.ts:266:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.7m)
+
+
+  1) [top-down] › tests/top-down.spec.ts:20:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures 
+
+    Error: expect(received).toBeGreaterThan(expected)
+
+    Expected: > 50
+    Received:   0
+
+      40 |       if (r === 130 && g === 127 && b === 115) counts.rocks++
+      41 |     }
+    > 42 |     expect(counts.floor).toBeGreaterThan(1000); expect(counts.player).toBeGreaterThan(50); expect(counts.rocks).toBeGreaterThan(500)
+         |                                                                       ^
+      43 |     observations.push({ layers, counts, player: await transform(page, 'person:player'), viewport: page.viewportSize(), browser: page.context().browser()!.version(), dpr: await page.evaluate(() => devicePixelRatio) })
+      44 |   }
+      45 |   expect(captures[1]).toEqual(captures[0])
+        at /workspace/salimon/client/tests/top-down.spec.ts:42:71
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-surface-layer/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/766-surface-layer/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-surface-layer/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-surface-layer/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [top-down] › tests/top-down.spec.ts:266:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      291 |           await info.attach(`${name}-repeat.json`, { body: JSON.stringify({ pass: result.pass, changedPixels: result.changedPixels, rawChangedPixels: result.rawChangedPixels, policy: POLICY }), contentType: 'application/json' })
+      292 |           await info.attach(`${name}-diff.png`, { body: result.diff, contentType: 'image/png' })
+    > 293 |           expect(result.pass).toBe(true)
+          |                               ^
+      294 |         }
+      295 |       }
+      296 |       const frame = () => page.locator('[data-entity="person:player"]').getAttribute('data-frame')
+        at capture (/workspace/salimon/client/tests/top-down.spec.ts:293:31)
+        at /workspace/salimon/client/tests/top-down.spec.ts:326:7
+
+    attachment #11: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-surface-layer/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #12: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-surface-layer/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/766-surface-layer/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/error-context.md
+
+    attachment #14: trace (application/zip) ────────────────────────────────────────────────────────
+    ../../../tmp/766-surface-layer/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-surface-layer/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [top-down] › tests/top-down.spec.ts:20:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures 
+    [top-down] › tests/top-down.spec.ts:266:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 

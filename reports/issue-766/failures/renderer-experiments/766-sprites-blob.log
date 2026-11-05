@@ -1,0 +1,115 @@
+[WebServer] (node:7639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7671) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:7683) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (3.1m)
+(node:7797) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (5.2s)
+  ✓  3 [top-down] › tests/top-down.spec.ts:202:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (39.1s)
+  ✘  4 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.6m)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+
+    Test timeout of 180000ms exceeded.
+
+    Error: browserContext.close: Protocol error (Target.disposeBrowserContext): Failed to find context with id BD37C2D5429815C0DA1811A271206360
+
+      75 |       expect(await world!.evaluate(n => n.isConnected)).toBe(true); expect(errors).toEqual([])
+      76 |       measurements.push({ replay, before, entered, moving, exited, continued, final: await ship(), backend, errors })
+    > 77 |     } finally { await context.close() }
+         |                 ^
+      78 |   }
+      79 |   await info.attach('cockpit-measurements.json', { body: JSON.stringify(measurements, null, 2), contentType: 'application/json' })
+      80 | })
+        at /workspace/salimon/client/tests/cockpit.spec.ts:77:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-sprites-blob/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/766-sprites-blob/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-sprites-blob/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-sprites-blob/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Test was interrupted.
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> /home/agent/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --use-angle=swiftshader --enable-unsafe-swiftshader --disable-lcd-text --disable-gpu --user-data-dir=/tmp/playwright_chromiumdev_profile-v8oK1p --remote-debugging-pipe --no-startup-window
+    <launched> pid=7809
+    [pid=7809][err] [1105/080439.224472:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=7809][err] [1105/080439.224638:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=7809][err] [1105/080439.226654:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=7809][err] [1105/080439.229439:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=7809][err] [1105/080439.247111:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=7809][err] [1105/080439.247236:WARNING:device/bluetooth/dbus/bluez_dbus_manager.cc:209] Floss manager service not available, cannot set Floss enable/disable.
+    [pid=7809][err] [1105/080439.248549:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=7809][err] [1105/080439.262463:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=7809][err] [1105/080439.336258:WARNING:media/gpu/vaapi/vaapi_wrapper.cc:1655] drmGetDevices2() has not found any devices
+    [pid=7809][err] [1105/080439.363686:WARNING:sandbox/policy/linux/sandbox_linux.cc:405] InitializeSandbox() called with multiple threads in process gpu-process.
+    [pid=7809][err] [1105/080439.730405:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=7809][err] [1105/080439.834564:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=7809][err] [1105/080440.294329:INFO:CONSOLE:21897] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=97cc5017 (21897)
+    [pid=7809][err] [1105/080442.025015:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=7809][err] [1105/080442.250943:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=7809][err] [1105/080442.259557:INFO:CONSOLE:21897] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=97cc5017 (21897)
+    [pid=7809][err] [1105/080444.777988:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=7809][err] [1105/080444.955931:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=7809][err] [1105/080445.118139:INFO:CONSOLE:21897] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=97cc5017 (21897)
+    [pid=7809][err] [1105/080503.295790:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=7809][err] [1105/080503.396166:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=7809][err] [1105/080503.650990:INFO:CONSOLE:21897] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=97cc5017 (21897)
+    [pid=7809][err] [1105/080523.927008:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=7809][err] [1105/080523.977265:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=7809][err] [1105/080524.351901:INFO:CONSOLE:21897] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=97cc5017 (21897)
+    [pid=7809][err] [1105/080635.058712:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=7809][err] [1105/080635.211164:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=7809][err] [1105/080635.463353:INFO:CONSOLE:21897] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=97cc5017 (21897)
+    [pid=7809] <gracefully close start>
+
+      341 |       expect(errors).toEqual([])
+      342 |       journeys.push({ replay, transitions, final: await position(page), frame: await frame(), ids, errors, browser: context.browser()!.version(), input: 'Playwright keyboard through production adapter', renderer: 'Chromium SVG CPU rasterization', viewport: page.viewportSize(), dpr: await page.evaluate(() => devicePixelRatio) })
+    > 343 |     } finally { await context.close() }
+          |                 ^
+      344 |   }
+      345 |   const negative = compareImages(captures['door-outside']!, captures['cockpit-round-trip']!)
+      346 |   expect(negative.pass).toBe(false)
+        at /workspace/salimon/client/tests/top-down.spec.ts:343:17
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-sprites-blob/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-sprites-blob/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #7: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-sprites-blob/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-sprites-blob/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+  1 interrupted
+    [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+  2 passed (7.6m)

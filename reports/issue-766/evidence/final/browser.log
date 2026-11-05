@@ -1,0 +1,17 @@
+[WebServer] (node:8070) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:8102) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:8114) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (1.4m)
+(node:8207) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (3.0s)
+  ✓  3 [top-down] › tests/top-down.spec.ts:202:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (36.0s)
+  ✓  4 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.8m)
+
+  4 passed (3.9m)

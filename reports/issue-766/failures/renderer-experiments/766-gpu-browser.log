@@ -1,0 +1,111 @@
+[WebServer] (node:6304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:6347) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (3.5m)
+(node:6492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [top-down] › tests/top-down.spec.ts:201:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (32.6s)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+
+    Test timeout of 180000ms exceeded.
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> /home/agent/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --use-angle=swiftshader --enable-unsafe-swiftshader --disable-lcd-text --user-data-dir=/tmp/playwright_chromiumdev_profile-hm5mi2 --remote-debugging-pipe --no-startup-window
+    <launched> pid=6359
+    [pid=6359][err] [1105/073229.338845:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=6359][err] [1105/073229.338936:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=6359][err] [1105/073229.350847:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=6359][err] [1105/073229.351099:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=6359][err] [1105/073229.364642:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=6359][err] [1105/073229.364744:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=6359][err] [1105/073229.364892:WARNING:device/bluetooth/dbus/bluez_dbus_manager.cc:209] Floss manager service not available, cannot set Floss enable/disable.
+    [pid=6359][err] [1105/073229.370109:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=6359][err] [1105/073229.457914:WARNING:media/gpu/vaapi/vaapi_wrapper.cc:1655] drmGetDevices2() has not found any devices
+    [pid=6359][err] [1105/073229.464104:WARNING:sandbox/policy/linux/sandbox_linux.cc:405] InitializeSandbox() called with multiple threads in process gpu-process.
+    [pid=6359][err] [1105/073230.024659:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=6359][err] [1105/073230.242648:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=6359][err] [1105/073230.365536:INFO:CONSOLE:22162] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=b4e89b06 (22162)
+    [pid=6359][err] [1105/073424.719712:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=6359][err] [1105/073424.852318:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=6359][err] [1105/073424.971647:INFO:CONSOLE:22162] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=b4e89b06 (22162)
+    [pid=6359] <gracefully close start>
+
+      75 |       expect(await world!.evaluate(n => n.isConnected)).toBe(true); expect(errors).toEqual([])
+      76 |       measurements.push({ replay, before, entered, moving, exited, continued, final: await ship(), backend, errors })
+    > 77 |     } finally { await context.close() }
+         |                 ^
+      78 |   }
+      79 |   await info.attach('cockpit-measurements.json', { body: JSON.stringify(measurements, null, 2), contentType: 'application/json' })
+      80 | })
+        at /workspace/salimon/client/tests/cockpit.spec.ts:77:17
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-gpu-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/766-gpu-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-gpu-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-gpu-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [top-down] › tests/top-down.spec.ts:201:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 
+
+    Test was interrupted.
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> /home/agent/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --use-angle=swiftshader --enable-unsafe-swiftshader --disable-lcd-text --user-data-dir=/tmp/playwright_chromiumdev_profile-BmHVTZ --remote-debugging-pipe --no-startup-window
+    <launched> pid=6504
+    [pid=6504][err] [1105/073604.138642:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=6504][err] [1105/073604.143443:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=6504][err] [1105/073604.143510:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=6504][err] [1105/073604.143538:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=6504][err] [1105/073604.152564:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=6504][err] [1105/073604.152630:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=6504][err] [1105/073604.152660:WARNING:device/bluetooth/dbus/bluez_dbus_manager.cc:209] Floss manager service not available, cannot set Floss enable/disable.
+    [pid=6504][err] [1105/073604.156875:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=6504][err] [1105/073604.187405:WARNING:media/gpu/vaapi/vaapi_wrapper.cc:1655] drmGetDevices2() has not found any devices
+    [pid=6504][err] [1105/073604.206816:WARNING:sandbox/policy/linux/sandbox_linux.cc:405] InitializeSandbox() called with multiple threads in process gpu-process.
+    [pid=6504][err] [1105/073604.457430:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5175/@vite/client (733)
+    [pid=6504][err] [1105/073604.493836:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5175/@vite/client (827)
+    [pid=6504][err] [1105/073604.729197:INFO:CONSOLE:22162] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5175/node_modules/.vite/deps/react-dom_client.js?v=b4e89b06 (22162)
+    [pid=6504] <gracefully close start>
+
+      254 |       expect(await originalNode!.evaluate(node => node.isConnected)).toBe(true)
+      255 |       expect(await page.locator('[data-source-kind]').evaluateAll(nodes => nodes.map(n => `${n.getAttribute('data-entity')}/${n.getAttribute('data-source-kind')}/${n.getAttribute('data-frame')}/${n.getAttribute('data-position')}/${n.getAttribute('data-source-site')}`))).toEqual(sources)
+    > 256 |     } finally { await context.close() }
+          |                 ^
+      257 |   }
+      258 |   expect(sourceSnapshots[1]).toEqual(sourceSnapshots[0])
+      259 |   const wrongView = compareImages(captures['planet-spawn']!, captures['planet-near-rock']!)
+        at /workspace/salimon/client/tests/top-down.spec.ts:256:17
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-gpu-browser/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-gpu-browser/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+  1 interrupted
+    [top-down] › tests/top-down.spec.ts:201:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 
+  1 did not run

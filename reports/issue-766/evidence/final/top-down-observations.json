@@ -1,0 +1,53 @@
+{
+  "observations": [
+    {
+      "layers": [
+        "terrain",
+        "hull",
+        "interior",
+        "people",
+        "props",
+        "cues"
+      ],
+      "counts": {
+        "floor": 9847,
+        "player": 88,
+        "rocks": 5027
+      },
+      "player": "translate(0 0) rotate(0) scale(32)",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "browser": "156.0.8078.4",
+      "dpr": 1
+    },
+    {
+      "layers": [
+        "terrain",
+        "hull",
+        "interior",
+        "people",
+        "props",
+        "cues"
+      ],
+      "counts": {
+        "floor": 9847,
+        "player": 88,
+        "rocks": 5027
+      },
+      "player": "translate(0 0) rotate(0) scale(32)",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "browser": "156.0.8078.4",
+      "dpr": 1
+    }
+  ],
+  "errors": [],
+  "clock": "2026-11-04T00:00:01Z; 32ms",
+  "input": "Playwright synthetic",
+  "renderer": "Chromium SVG",
+  "status": "new deterministic capture; no approved pixel reference promoted"
+}

@@ -1,0 +1,85 @@
+[WebServer] (node:3980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4011) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:4024) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (1.8m)
+(node:4165) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [top-down] › tests/top-down.spec.ts:199:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (34.2s)
+  ✘  3 [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (23.1s)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+
+    Error: standing-return
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      21 |           await info.attach(`${name}-repeat.json`, { body: JSON.stringify({ pass: r.pass, changedPixels: r.changedPixels, rawChangedPixels: r.rawChangedPixels, policy: POLICY }), contentType: 'application/json' })
+      22 |           await info.attach(`${name}-diff.png`, { body: r.diff, contentType: 'image/png' })
+    > 23 |           expect(r.pass, name).toBe(true)
+         |                                ^
+      24 |         }
+      25 |       }
+      26 |       for (const p of [[-2, 3], [-2, 7]]) await walkTo(page, p, 'planet:fixture', true)
+        at capture (/workspace/salimon/client/tests/cockpit.spec.ts:23:32)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:57:7
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-settled-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-settled-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/766-settled-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #8: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-settled-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-settled-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Test was interrupted.
+
+    Error: browserContext.close: Target page, context or browser has been closed
+
+      338 |       expect(errors).toEqual([])
+      339 |       journeys.push({ replay, transitions, final: await position(page), frame: await frame(), ids, errors, browser: context.browser()!.version(), input: 'Playwright keyboard through production adapter', renderer: 'Chromium SVG CPU rasterization', viewport: page.viewportSize(), dpr: await page.evaluate(() => devicePixelRatio) })
+    > 340 |     } finally { await context.close() }
+          |                 ^
+      341 |   }
+      342 |   const negative = compareImages(captures['door-outside']!, captures['cockpit-round-trip']!)
+      343 |   expect(negative.pass).toBe(false)
+        at /workspace/salimon/client/tests/top-down.spec.ts:340:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-settled-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/766-settled-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-settled-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+  1 interrupted
+    [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+  1 passed (3.0m)

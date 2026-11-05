@@ -1,0 +1,2 @@
+import config from './playwright.config'
+export default { ...config, projects: [{ ...config.projects![0], name: 'raster', testMatch: /raster-diagnostic\.spec\.ts/ }], timeout: 120000 }

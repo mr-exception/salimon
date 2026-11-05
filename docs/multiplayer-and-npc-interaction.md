@@ -1,5 +1,12 @@
 # Multiplayer & NPC Interaction
 
+## Current implementation and 2D presence boundary
+
+**No multiplayer server or NPC world exists in the current browser.** The local cockpit owner/chair reservation and Web Lock are **not** authoritative online admission, player presence, anti-cheat or reconnect. This document is future multiplayer design; implement authoritative actor/ship state separately before marking any session-crossing scenario complete.
+
+When implemented, the world appearance remains overhead 2D: a pilot using the 3D radar stays seated and visible to other players in the 2D Scout; disconnect removes that avatar and frees interactions while preserving a planet-fixed or ship-local safe anchor. The current approved damage model is **whole-ship**, including offline death only if the destroyed vessel contained the disconnected player. Never restore historical partial-room wreck behavior as a hidden edge case. See [cockpit/reconnect decisions](cockpit-navigation-and-reconnect.md).
+
+
 > **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 

@@ -1,5 +1,12 @@
 # Canonical whole-game save contract (schema 29)
 
+## Browser 2D save boundary (not native schema 29+)
+
+The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked inventory/source/location envelope, with the v3 gram ledger delivered by #783 after v1/v2 migration. It is scoped to the authored sample site and local browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
+
+Future browser progression must specify new versioned state for equipped suit modules, actual ship stores, health/exposure, Core/Fabricator, moved ships, planet-fixed locations and server actor authority separately; it cannot serialize old Rust `.rs` types or assume native migration scripts run in the browser. Preserve this contract as historical design evidence and do not silently copy its native payload fields or reset incompatible saves.
+
+
 > **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 

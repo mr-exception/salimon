@@ -7,6 +7,22 @@ import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } fr
 import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, TopDownClock, type Appearance, type Entity2D, type TopDownState } from './topDownRuntime.ts'
 import './topDown.css'
 
+// The tiny on-crate capacity legend is vector ink, not subpixel-hinted text.
+// At exterior zoom its old ~5px font could rasterize differently at identical
+// transforms (CI PLANET/TRAVERSE failures). Keep the units in the HUD and label.
+function StorageCapacityMark() {
+  const glyphs: Record<string, string[]> = {
+    '5': ['111','100','111','001','111'], '0': ['111','101','101','101','111'],
+    'K': ['101','110','100','110','101'], 'G': ['111','100','101','101','111'],
+    '/': ['001','001','010','100','100'], 'L': ['100','100','100','100','111'],
+    ' ': ['000','000','000','000','000'],
+  }
+  const label = '50 KG/50 L'
+  const path = [...label].flatMap((letter, index) => glyphs[letter].flatMap((row, y) =>
+    [...row].flatMap((ink, x) => ink === '1' ? [`M${index * 4 + x} ${y}h1v1h-1Z`] : []))).join('')
+  return <g role="img" aria-label="50 kg / 50 L" transform="translate(-.47 .15) scale(.024 .038)"><path d={path} fill="#283d43" stroke="none" /></g>
+}
+
 function Illustration({ appearance, footprint }: { appearance: Appearance; footprint?: Entity2D['footprint'] }) {
   switch (appearance) {
     case 'ground': return <g><rect x="-200" y="-200" width="400" height="400" fill="#b5a58b" />
@@ -25,7 +41,7 @@ function Illustration({ appearance, footprint }: { appearance: Appearance; footp
     case 'desk': return <g stroke="#46575a" strokeWidth=".08"><path d="M-1.5 -.5Q0 -1.2 1.5 -.5V.4H-1.5Z" fill="#414e54" /><rect x="-.85" y="-.55" width="1.7" height=".5" rx=".08" fill="#77bcc2" /></g>
     case 'chair': return <g stroke="#46575a" strokeWidth=".07"><rect x="-.35" y="-.35" width=".7" height=".7" rx=".12" fill="#ba8864" /><path d="M-.27 .2H.27M0 -.25V.15" stroke="#e1c8a2" /></g>
     case 'fabricator': return <g stroke="#394b50" strokeWidth=".08"><rect x="-.6" y="-.65" width="1.2" height="1.3" rx=".08" fill="#607277" /><rect x="-.4" y="-.42" width=".8" height=".55" fill="#283d43" /><path d="M-.35 .35H.35" stroke="#d6a06b" strokeWidth=".14" /><circle cx=".4" cy="-.5" r=".06" fill="#91d1cd" /></g>
-    case 'storage': return <g stroke="#6b6558" strokeWidth=".07"><rect x="-.55" y="-.7" width="1.1" height="1.4" rx=".08" fill="#b6ac8c" /><path d="M-.4 -.5V.5M.4 -.5V.5M-.45 0H.45" stroke="#536064" /><text y=".34" textAnchor="middle" fontSize=".19" fill="#283d43" stroke="none">50 kg / 50 L</text></g>
+    case 'storage': return <g stroke="#6b6558" strokeWidth=".07"><rect x="-.55" y="-.7" width="1.1" height="1.4" rx=".08" fill="#b6ac8c" /><path d="M-.4 -.5V.5M.4 -.5V.5M-.45 0H.45" stroke="#536064" /><StorageCapacityMark /></g>
     case 'threshold': return <g stroke="#d6b183" strokeWidth=".08"><path d="M-1.4 -.1H1.4M-1.4 .3H1.4M-1 .65H1" /><path d="M-.25 .45L0 .15 .25 .45" fill="none" /></g>
     case 'bed': return <g stroke="#a59e8d" strokeWidth=".07"><rect x="-.4" y="-1.2" width=".85" height="2.4" rx=".08" fill="#eee8d8" /><rect x="-.3" y="-.6" width=".65" height="1.7" rx=".06" fill="#ac7860" /><rect x="-.3" y="-1.1" width=".65" height=".4" rx=".08" fill="#faf1da" /></g>
     case 'core': return <g stroke="#394b50" strokeWidth=".08"><rect x="-.4" y="-.7" width=".8" height="1.4" rx=".1" fill="#50636a" /><circle r=".25" fill="#77c5c9" /><path d="M-.25 .42H.25" stroke="#c59365" /></g>

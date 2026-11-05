@@ -190,7 +190,8 @@ async function walkTicks(page: Page, key: string | string[], ticks: number) {
   const keys = typeof key === 'string' ? [key] : key
   for (const code of keys) await page.keyboard.down(code)
   await page.clock.runFor(Math.max(0, ticks * 1000 / 60 - 25))
-  for (let i = 0; i < 60 && await tick() < target; i++) await page.clock.runFor(1)
+  // A 16 ms RAF interval advances at most one 60 Hz simulation tick.
+  for (let i = 0; i < 60 && await tick() < target; i++) await page.clock.runFor(16)
   for (const code of keys) await page.keyboard.up(code)
   expect(await tick()).toBe(target)
 }

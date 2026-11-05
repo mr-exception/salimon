@@ -112,3 +112,23 @@ current-head full browser/negative/repeat checks; new-widget/hardware remain N/A
 Previous exact-head acceptance is superseded pending fresh CI and final active-chat
 review. This repair is needed for the named issue's existing mandatory screenshot
 gate; no extra task is counted and no rendering failure is dismissed as flaky.
+
+## Merged-main conflict resolution and final clipping correction
+
+The owner merged #793 and #797. This branch now includes main `f51350a`,
+with README/schema conflicts resolved for v4 and the latest 109-row migration
+register/backend contracts preserved. Runtime, test, lockfile and configuration
+inputs are unchanged by that documentation merge. Parent is now main; merge order
+is #794 then #795. No history was rewritten or PR merged by the implementing agent.
+
+CI for prior `8f9a924` passed in full, but descendant CI 42037274989 still found
+seven corner pixels under rounded clipping. Thus the 7 px caption adjustment was
+not sufficient and is superseded. The final viewport/caption use rectangular,
+pixel-aligned clipping; the only visual change is removal of the viewport
+corner curve. World art, coordinates, camera, footprint geometry, dimensions,
+assertions, thresholds and approved references are unchanged. No failing visual
+is waived. The same original TD-1 assertion passed **5/5 fresh runs** (ten capture
+originals) under `square-browser`; build/typecheck passed. Tested rendering source:
+`9a907ba8d88daf56569e98c7f6ad0e471a30a898`. Pure gram/Node inputs are unchanged;
+unit results remain applicable. Final source hashes include the corrected CSS.
+Full current-head CI and final exact-ref review remain required after publication.

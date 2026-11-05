@@ -173,6 +173,16 @@ preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
 inspection, footprint blocking and independence from the camera/ship pose.
 The default production `/` now integrates cockpit entry (#766). Doorway frame transfer is implemented (#765); durable saves remain future work.
 
+## Playable-slice acceptance (#767)
+
+See the [full journey, local commands and mining reuse boundary](../docs/playable-2d-foundation.md).
+`SLICE-1` in the `cockpit` Playwright project exercises the built default entry,
+both source archetypes, continuous doorway/camera handoffs, actual radar controls,
+standing return and walking back outside, twice in fresh browser contexts.
+Original screenshots and raw frame/source measurements are retained in the issue report.
+This proves foundation playability; extraction, durable saves, Core, Fabricator,
+multiplayer and ship damage remain future features.
+
 ## Controls (desktop mouse and keyboard)
 
 - **W/A/S/D** pans the independent camera up/left/down/right. Left-drag empty space to orbit; right-drag to pan.

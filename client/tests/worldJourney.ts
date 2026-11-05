@@ -3,11 +3,11 @@ import { convertAnchor, point2, type FrameId } from '../src/topDownFrames.ts'
 import { createTopDownState } from '../src/topDownRuntime.ts'
 export const scene = (page: Page) => page.getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
 export const position = async (page: Page) => (await page.locator('[data-entity="person:player"]').getAttribute('data-position'))!.split(',').map(Number)
-export async function boot(page: Page, view = '') {
+export async function boot(page: Page, view = '', origin = 'http://127.0.0.1:5175') {
   await page.clock.install({ time: new Date('2026-11-04T00:00:00Z') })
   await page.clock.pauseAt(new Date('2026-11-04T00:00:01Z'))
-  await page.goto(`http://127.0.0.1:5175/${view}`)
-  // Lazy development module can resolve under React's delayed Suspense commit.
+  await page.goto(`${origin}/${view}`)
+  // Advance the controlled clock while React commits the world adapter.
   await expect.poll(async () => { await page.clock.runFor(50); return scene(page).count() }).toBe(1)
   await expect(scene(page)).toBeVisible()
   await expect.poll(async () => { await page.clock.runFor(50); return scene(page).getAttribute('data-render-ready') }).toBe('true')

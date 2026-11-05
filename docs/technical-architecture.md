@@ -3,6 +3,8 @@
 ## Active browser world and navigation
 
 The default browser `/` starts outside the Scout in one continuous 2D world.
+The [playable foundation guide](playable-2d-foundation.md) owns its full journey,
+local QA commands and mining reuse boundary.
 The cockpit opens the independently reusable [radar](radar-navigation-prototype.md).
 `coordinates.ts` owns split positions; `simulation.ts` owns deterministic SI ship
 transitions; `contact.ts` owns conservative sphere contact and observations;

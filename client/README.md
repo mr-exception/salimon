@@ -57,8 +57,9 @@ collision-aware walking, follow-camera state and deterministic draw order.
 `topDownInteraction.ts` owns swept footprint queries and deterministic nearby
 selection. Collision boxes use entity-local metres and ship/planet anchors;
 conservative player clearance is 0.46 m. Wall/door/crate art uses those same
-footprints. Sweeps prevent tunnelling and separate local axes allow sliding. `TopDownView.tsx`
-consumes the draw list as SVG: terrain, hull, cutaway interior, people, props and
+footprints. Sweeps prevent tunnelling and separate local axes allow sliding. `TopDownIllustration.tsx` owns the original SVG art. `topDownSprites.tsx` caches
+it once at fixed resolution (64 texels/metre; terrain 32), using bounded blob
+references. `TopDownView.tsx` consumes the draw list as SVG image layers: terrain, hull, cutaway interior, people, props and
 foreground cues. Terrain fill precedes terrain objects; equal-layer objects use
 stable ID ordering. There is no roof cover or roof fade. Astronomical planet
 origins never enter camera-relative drawing; planet motion changes its universe
@@ -71,6 +72,10 @@ extraction and inventory integration remain later work. `topDown.test.ts` tests 
 Playwright project exercises the production SVG adapter, pixel visibility, held
 input cleanup, production radar isolation and byte-identical fresh-run captures.
 Captures are new baseline candidates, not promoted navigation references.
+Renderer readiness waits for authored sprites and exposes only a read-only flag;
+asset caching never changes entity IDs, collision footprints, anchors or gameplay.
+World traces retain actions, screenshots and sources; explicit state JSON replaces
+redundant per-action snapshots of immutable image assets.
 
 
 ### Player interactions (#762)
@@ -122,7 +127,7 @@ cockpit desk and separate chair, bunk, partitioned aft cargo room, Core,
 Fabricator and **50 kg / 50 L** storage placeholder. Cargo passage (2.6 m) and aft
 entry (3 m) are open; visible jambs and room boundaries block walking. The
 threshold marks the aft approach. No roof layer, transparency or interior scene
-swap is used. Tiny capacity lettering uses vector ink, and the small player silhouette uses authored polygons to avoid unstable hinted/curve edges in repeat captures. `scoutLayout.ts` owns ship-local named anchors, shared collision/
+swap is used. Explicit line metrics keep the desktop SVG viewport on the device-pixel grid. `scoutLayout.ts` owns ship-local named anchors, shared collision/
 visual footprints and storage capacity metadata; machine/storage interactions
 only inspect placeholders and do not process or transfer material.
 
@@ -167,6 +172,16 @@ requests geometric precision. The earlier static TD-1/4 byte-identity check is
 preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
 inspection, footprint blocking and independence from the camera/ship pose.
 The default production `/` now integrates cockpit entry (#766). Doorway frame transfer is implemented (#765); durable saves remain future work.
+
+## Playable-slice acceptance (#767)
+
+See the [full journey, local commands and mining reuse boundary](../docs/playable-2d-foundation.md).
+`SLICE-1` in the `cockpit` Playwright project exercises the built default entry,
+both source archetypes, continuous doorway/camera handoffs, actual radar controls,
+standing return and walking back outside, twice in fresh browser contexts.
+Original screenshots and raw frame/source measurements are retained in the issue report.
+This proves foundation playability; extraction, durable saves, Core, Fabricator,
+multiplayer and ship damage remain future features.
 
 ## Controls (desktop mouse and keyboard)
 

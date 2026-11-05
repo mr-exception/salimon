@@ -19,8 +19,9 @@ These newer approved narrative contracts supersede historical Earth-start assump
 - [Issue acceptance, QA states, evidence and closure](acceptance-policy.md)
 - [Navigation acceptance matrix and known-defect review example](acceptance-navigation-example.md)
 
-## Active browser navigation prototype
+## Active browser world and cockpit
 
+- [Playable 2D foundation, QA commands and mining reuse boundary](playable-2d-foundation.md)
 - [Navigation-only holographic radar contract and migration boundary](radar-navigation-prototype.md)
 - [Approved cockpit transitions, multiplayer presence and precise reconnect](cockpit-navigation-and-reconnect.md)
 - [React prototype setup](../client/README.md)

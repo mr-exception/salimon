@@ -1,10 +1,10 @@
 # Salimon
 
-The current `main` entry point is the navigation-only React/Three.js browser
-client. Start with [the client guide](client/README.md) and
-[the browser navigation contract](docs/radar-navigation-prototype.md).
+The current browser entry starts in a continuous 2D Scout/planet world and opens
+the existing React/Three.js radar from its cockpit. Start with [the client guide](client/README.md) and
+[the playable foundation guide](docs/playable-2d-foundation.md).
 Development issues follow the [acceptance policy](docs/acceptance-policy.md) and
-include an evidence report and independent review before merge.
+include an evidence report and review in the active chat before merge.
 With Node >=22.18:
 
 ```sh

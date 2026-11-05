@@ -1,0 +1,49 @@
+[WebServer] (node:5703) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5735) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:5747) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (2.1m)
+
+
+  1) [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      289 |           await info.attach(`${name}-repeat.json`, { body: JSON.stringify({ pass: result.pass, changedPixels: result.changedPixels, rawChangedPixels: result.rawChangedPixels, policy: POLICY }), contentType: 'application/json' })
+      290 |           await info.attach(`${name}-diff.png`, { body: result.diff, contentType: 'image/png' })
+    > 291 |           expect(result.pass).toBe(true)
+          |                               ^
+      292 |         }
+      293 |       }
+      294 |       const frame = () => page.locator('[data-entity="person:player"]').getAttribute('data-frame')
+        at capture (/workspace/salimon/client/tests/top-down.spec.ts:291:31)
+        at /workspace/salimon/client/tests/top-down.spec.ts:322:7
+
+    attachment #8: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-legends-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #9: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-legends-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/766-legends-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/error-context.md
+
+    attachment #11: trace (application/zip) ────────────────────────────────────────────────────────
+    ../../../tmp/766-legends-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/766-legends-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 

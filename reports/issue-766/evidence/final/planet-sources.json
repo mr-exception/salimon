@@ -1,0 +1,21 @@
+{
+  "sources": [
+    [
+      "source:landing:biology:01/biological/planet:fixture/-5,6/site:illustrated-landing:v1",
+      "source:landing:mineral:01/mineral/planet:fixture/-9,0/site:illustrated-landing:v1"
+    ],
+    [
+      "source:landing:biology:01/biological/planet:fixture/-5,6/site:illustrated-landing:v1",
+      "source:landing:mineral:01/mineral/planet:fixture/-9,0/site:illustrated-landing:v1"
+    ]
+  ],
+  "input": "Playwright keyboard; no state setters",
+  "site": "fixed fictional living-world sample v1",
+  "comparisons": [
+    "planet-spawn",
+    "planet-near-rock",
+    "planet-near-colony",
+    "planet-near-scout"
+  ],
+  "collection": "not implemented; inspections only"
+}

@@ -1,0 +1,41 @@
+[WebServer] (node:7360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7391) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:7406) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (3.9s)
+(node:7406) TimeoutNegativeWarning: -4187.0380000000005 is a negative number.
+Timeout duration was set to 1.
+  ✘  2 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (3.1m)
+
+
+  1) [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Test timeout of 180000ms exceeded.
+
+    Fixture "trace recording" timeout of 30000ms exceeded during teardown.
+
+    Error: browserContext.close: Target page, context or browser has been closed
+
+      341 |       expect(errors).toEqual([])
+      342 |       journeys.push({ replay, transitions, final: await position(page), frame: await frame(), ids, errors, browser: context.browser()!.version(), input: 'Playwright keyboard through production adapter', renderer: 'Chromium SVG CPU rasterization', viewport: page.viewportSize(), dpr: await page.evaluate(() => devicePixelRatio) })
+    > 343 |     } finally { await context.close() }
+          |                 ^
+      344 |   }
+      345 |   const negative = compareImages(captures['door-outside']!, captures['cockpit-round-trip']!)
+      346 |   expect(negative.pass).toBe(false)
+        at /workspace/salimon/client/tests/top-down.spec.ts:343:17
+
+    Error: End of central directory record signature not found. Either not a zip file, or file is truncated.
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/766-sprites-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+  1 passed (5.0m)

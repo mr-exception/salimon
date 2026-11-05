@@ -196,3 +196,23 @@ identical to the passing d8b5711 build. The workflow is now explicitly hashed
 in source-hashes.json. Current-head full CI must still rerun and pass before
 final acceptance. All conflict resolutions and main → #794 → #795 ancestry
 remain intact.
+
+## Cold-run budget and complete fixed-tick replay
+
+CI 42056436767 spent roughly nine minutes installing Chromium and was cancelled
+at the 15-minute job boundary before later gates could run. A separate NAV-1
+assertion failed before cancellation: every compared value matched except a
+65-versus-66 tick count. The existing input script covered 1,088 ms, a fractional
+60 Hz tick window. Error context/screenshot/raw numbers and cancellation timing
+are retained in `failures/ci-42056436767`; none of these failures is waived.
+
+NAV-1 now pads the unchanged keyboard/release/wheel actions with 112 ms of idle
+time to complete 1,200 ms (75 RAF intervals and 72 fixed ticks). All original
+assertions and replay equality remain, plus an explicit exact 72-tick assertion.
+Five fresh runs passed; every raw replay pair is [72,72] (`clock-replay`). Build/
+typecheck passed. Tested verification source: `f3a73985db6832f8075e7da8437ac4c4fe359639`.
+No production code or approved references changed. The overall build/browser CI
+budget is 20 minutes to accommodate the measured cold setup and full matrix;
+individual test limits, coverage, tolerances and human baseline approval remain
+unchanged. Workflow and deterministic-spec hashes are updated; unaffected domain
+and storage evidence is reused. Full final-head CI remains required.

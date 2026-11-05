@@ -1,0 +1,14 @@
+{
+  "criterion": "NAV-1 identical seed and input clock replay",
+  "windowMilliseconds": 1088,
+  "expectedTicks": 65,
+  "receivedTicks": 66,
+  "otherComparedValues": "equal",
+  "fixWindowMilliseconds": 1200,
+  "fixExpectedTicks": 72,
+  "jobStartedAt": "2026-11-05T15:35:02Z",
+  "browserStepStartedAt": "2026-11-05T15:44:41Z",
+  "jobCompletedAt": "2026-11-05T15:50:22Z",
+  "jobConclusion": "cancelled at 15-minute budget",
+  "negativeRepeatBaselineJobs": "not run after cancellation"
+}

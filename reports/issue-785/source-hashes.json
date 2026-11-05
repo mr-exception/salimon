@@ -68,7 +68,7 @@
   "client/tests/assets/fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
   "client/tests/cockpit.spec.ts": "e0f507f63b226f5cef639aa47f2222aec5c91d65e48f384482ed675251a72eed",
   "client/tests/desktop.spec.ts": "b1ede1df80c7b6fd924d346b3497e446c7accc9d30328915210d51c4d0d499ee",
-  "client/tests/deterministic.spec.ts": "bb383c3b069b7344dcc82611723c5982f5f8a7b2884f79570833e9dc4470a59e",
+  "client/tests/deterministic.spec.ts": "b9d7417de12f1c0da8cf3f7ff3f50337648eb12b1bed54a083fbd0e35a70f6d7",
   "client/tests/deterministic.ts": "bc117792aced10e1d30dba1daf5d89c95890fc39a9778f5390b668bde1602a95",
   "client/tests/edges.spec.ts": "0616e73bbe71003c92b348fb5d8374a3f6ff94a8d9ae1b801484890ab8b81ff9",
   "client/tests/fixture.html": "00899168149b46e45a4049f61e56fa9dbe5dba26062d5e494b6be5acc67c209d",
@@ -94,5 +94,5 @@
   "client/tests/visuals.spec.ts": "791a5de5a634af7ddd813f9478f67b4b21d713b23795dd02a1d74f6aedc13fa1",
   "client/tests/worldJourney.ts": "1e8d1ecf24d838a8c4a59ef8b5a02a56234ba5587ec8ec40a3ac6c3ca2a2460d",
   "client/tsconfig.json": "dec2cc8882b6c4fe8848288251f61c0cd42b45edcad46d2a5bebbf4c777b50d4",
-  ".github/workflows/navigation-client.yml": "8b1c1198afab3ffa052a89f2aaa86a203028ffb56e606457c62d28baaffebe85"
+  ".github/workflows/navigation-client.yml": "f62f70a6d6817fe0283fc86ea041a855a9c68323ebbfe4a395758edce34f6935"
 }

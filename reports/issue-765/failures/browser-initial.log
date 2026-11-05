@@ -1,0 +1,92 @@
+[WebServer] (node:1232) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1264) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:1276) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (7.8s)
+  ✘  2 [top-down] › tests/top-down.spec.ts:73:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (30.1s)
+(node:1597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [top-down] › tests/top-down.spec.ts:98:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (8.2s)
+  ✓  4 [top-down] › tests/top-down.spec.ts:137:1 › TD-5 built entry retains navigation even with development scene query (1.3s)
+  ✓  5 [top-down] › tests/top-down.spec.ts:151:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (8.8s)
+  ✓  6 [top-down] › tests/top-down.spec.ts:197:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (34.0s)
+  ✘  7 [top-down] › tests/top-down.spec.ts:262:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (40.5s)
+
+
+  1) [top-down] › tests/top-down.spec.ts:73:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.getAttribute: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-entity="person:player"]')
+
+
+      48 | })
+      49 |
+    > 50 | const position = async (page: Page) => (await page.locator('[data-entity="person:player"]').getAttribute('data-position'))!.split(',').map(Number)
+         |                                                                                             ^
+      51 | async function walk(page: Page, keys: string[], ms: number) {
+      52 |   for (const key of keys) await page.keyboard.down(key)
+      53 |   await page.clock.runFor(ms)
+        at position (/workspace/salimon/client/tests/top-down.spec.ts:50:93)
+        at /workspace/salimon/client/tests/top-down.spec.ts:86:48
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser/top-down-TD-2-release-blur-969ee-ile-camera-settles-smoothly-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/issue-765-browser/top-down-TD-2-release-blur-969ee-ile-camera-settles-smoothly-top-down/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser/top-down-TD-2-release-blur-969ee-ile-camera-settles-smoothly-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/issue-765-browser/top-down-TD-2-release-blur-969ee-ile-camera-settles-smoothly-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [top-down] › tests/top-down.spec.ts:262:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      285 |           await info.attach(`${name}-repeat.json`, { body: JSON.stringify({ pass: result.pass, changedPixels: result.changedPixels, rawChangedPixels: result.rawChangedPixels, policy: POLICY }), contentType: 'application/json' })
+      286 |           await info.attach(`${name}-diff.png`, { body: result.diff, contentType: 'image/png' })
+    > 287 |           expect(result.pass).toBe(true)
+          |                               ^
+      288 |         }
+      289 |       }
+      290 |       const frame = () => page.locator('[data-entity="person:player"]').getAttribute('data-frame')
+        at capture (/workspace/salimon/client/tests/top-down.spec.ts:287:31)
+        at /workspace/salimon/client/tests/top-down.spec.ts:318:7
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/issue-765-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/issue-765-browser/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [top-down] › tests/top-down.spec.ts:73:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly 
+    [top-down] › tests/top-down.spec.ts:262:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+  5 passed (2.2m)

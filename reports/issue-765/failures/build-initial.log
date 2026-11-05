@@ -1,0 +1,8 @@
+
+> salimon-navigation-client@0.1.0 build
+> tsc -b && vite build
+
+src/topDownTraversal.test.ts(42,28): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
+src/topDownTraversal.test.ts(43,43): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
+tests/top-down.spec.ts(291,13): error TS7034: Variable 'transitions' implicitly has type 'any[]' in some locations where its type cannot be determined.
+tests/top-down.spec.ts(335,31): error TS7005: Variable 'transitions' implicitly has an 'any[]' type.

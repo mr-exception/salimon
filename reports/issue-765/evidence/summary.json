@@ -1,0 +1,55 @@
+{
+  "comparisons": {
+    "returned-outdoors-repeat.json": {
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 1808,
+      "policy": {
+        "threshold": 0.1,
+        "maxDiffPixels": 0,
+        "includeAA": true,
+        "masks": []
+      }
+    },
+    "door-inside-repeat.json": {
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 1494,
+      "policy": {
+        "threshold": 0.1,
+        "maxDiffPixels": 0,
+        "includeAA": true,
+        "masks": []
+      }
+    },
+    "cockpit-round-trip-repeat.json": {
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 1421,
+      "policy": {
+        "threshold": 0.1,
+        "maxDiffPixels": 0,
+        "includeAA": true,
+        "masks": []
+      }
+    },
+    "door-outside-repeat.json": {
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "policy": {
+        "threshold": 0.1,
+        "maxDiffPixels": 0,
+        "includeAA": true,
+        "masks": []
+      }
+    }
+  },
+  "crossingWorldStepMaxErrorM": 9.228728892196614e-16,
+  "crossingMaxScreenDeltaPx": 0.7322998046875,
+  "negative": {
+    "pass": false,
+    "changedPixels": 86148,
+    "rawChangedPixels": 294620
+  }
+}

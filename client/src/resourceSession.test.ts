@@ -33,6 +33,7 @@ function ticks(session: ResourceSession, count: number, direction: readonly [num
 test('production world interaction commits exactly 1000 grams per 60 ticks', () => {
   const { store, session } = make()
   session.start(mineral); ticks(session, 59)
+  assert.equal(session.snapshot.version, 2)
   assert.equal(session.snapshot.inventory.quantities.mineral, undefined)
   assert.equal(store.raw, null)
   ticks(session, 1)

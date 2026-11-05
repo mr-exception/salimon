@@ -128,7 +128,7 @@ export class ResourceSession {
   constructor(storage: ResourceStorage, world: TopDownState) {
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 1, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 2, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
       if (this.persisted !== null) {

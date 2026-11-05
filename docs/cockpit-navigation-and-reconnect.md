@@ -1,6 +1,6 @@
 # Cockpit navigation, multiplayer presence and reconnect
 
-**Status:** Approved future gameplay design, 2026-11-04. This document is authoritative for the **strict top-down 2D** player-world / **3D holographic navigation** transition and the disconnect/reconnect behavior discussed here. **Not implemented** in the current navigation-only React client; no multiplayer backend, shared player persistence or ship-interaction runtime is claimed. Issue #761 provides only a separate development test scene with bounded 2D interior walking; it does not implement the transitions below.
+**Status:** Approved future gameplay design, 2026-11-04. This document is authoritative for the **strict top-down 2D** player-world / **3D holographic navigation** transition and the disconnect/reconnect behavior discussed here. **Not implemented** in the current navigation-only React client; no multiplayer backend, shared player persistence or ship-interaction runtime is claimed. The #761–#765 development world supports continuous surface/Scout walking and exact frame-relative in-memory location snapshots. It does not implement cockpit view transitions or authoritative reconnect below; see the [client guide](../client/README.md#seamless-doorway-traversal-765).
 
 Companion contracts: [2D art direction](top-down-art-direction.md), [navigation-only radar prototype](radar-navigation-prototype.md), [multiplayer](multiplayer-and-npc-interaction.md), [spaceship and survival](spaceship-building-and-survival.md), and [legacy save contract](save-contract.md).
 

@@ -1,6 +1,8 @@
 import { test, expect, type Page } from '@playwright/test'
 import { PNG } from 'pngjs'
 import { compareImages, POLICY } from '../scripts/visual-comparison.ts'
+import { convertAnchor, point2, type FrameId } from '../src/topDownFrames.ts'
+import { createTopDownState } from '../src/topDownRuntime.ts'
 
 const scene = (page: Page) => page.getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
 const transform = (page: Page, id: string) => page.locator(`[data-entity="${id}"]`).getAttribute('transform')
@@ -51,13 +53,20 @@ async function walk(page: Page, keys: string[], ms: number) {
   for (const key of keys) await page.keyboard.up(key)
 }
 // Steer through the real keyboard adapter; DOM attributes are observations only.
-async function walkTo(page: Page, target: number[]) {
+async function positionIn(page: Page, frame: FrameId) {
+  const p = await position(page)
+  const current = await page.locator('[data-entity="person:player"]').getAttribute('data-frame') as FrameId
+  return convertAnchor({ frame: current, point: point2(p[0], p[1]) }, frame, createTopDownState().frames).point.offsetM.slice(0, 2)
+}
+async function walkTo(page: Page, target: number[], frame?: FrameId, exactTicks = false) {
+  frame ??= await page.locator('[data-entity="person:player"]').getAttribute('data-frame') as FrameId
   for (let i = 0; i < 140; i++) {
-    const p = await position(page), dx = target[0] - p[0], dy = target[1] - p[1]
+    const p = await positionIn(page, frame), dx = target[0] - p[0], dy = target[1] - p[1]
     if (Math.hypot(dx, dy) < .075) return
-    const angle = await page.locator('[data-entity="person:player"]').getAttribute('data-frame') === 'ship:scout' ? -.12 : 0, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
+    const angle = frame === 'ship:scout' ? -.12 : 0, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
     const keys = [...(Math.abs(x) > .035 ? [x > 0 ? 'd' : 'a'] : []), ...(Math.abs(y) > .035 ? [y > 0 ? 's' : 'w'] : [])]
-    await walk(page, keys, Math.max(17, Math.min(65, Math.hypot(dx, dy) / 2.4 * 1000)))
+    if (exactTicks) await walkTicks(page, keys, Math.max(1, Math.min(3, Math.floor(Math.hypot(dx, dy) / .04))))
+    else await walk(page, keys, Math.max(17, Math.min(65, Math.hypot(dx, dy) / 2.4 * 1000)))
   }
   throw new Error(`Could not walk to ${target}; stopped at ${await position(page)}`)
 }
@@ -175,13 +184,14 @@ test('SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway', as
 
 // Hold actual keyboard input for an exact observed number of fixed steps.
 // Read-only tick observations control time, never gameplay state or rendering.
-async function walkTicks(page: Page, key: string, ticks: number) {
+async function walkTicks(page: Page, key: string | string[], ticks: number) {
   const tick = async () => Number(await scene(page).getAttribute('data-tick'))
   const target = await tick() + ticks
-  await page.keyboard.down(key)
+  const keys = typeof key === 'string' ? [key] : key
+  for (const code of keys) await page.keyboard.down(code)
   await page.clock.runFor(Math.max(0, ticks * 1000 / 60 - 25))
   for (let i = 0; i < 60 && await tick() < target; i++) await page.clock.runFor(1)
-  await page.keyboard.up(key)
+  for (const code of keys) await page.keyboard.up(code)
   expect(await tick()).toBe(target)
 }
 
@@ -248,4 +258,87 @@ test('PLANET-1 fixed outdoor journey, source footprints and repeat screenshots',
   expect(wrongView.changedPixels).toBeGreaterThan(100)
   await info.attach('wrong-checkpoint-negative.json', { body: JSON.stringify({ policy: POLICY, pass: wrongView.pass, changedPixels: wrongView.changedPixels, rawChangedPixels: wrongView.rawChangedPixels }), contentType: 'application/json' })
   await info.attach('planet-sources.json', { body: JSON.stringify({ sources: sourceSnapshots, input: 'Playwright keyboard; no state setters', site: 'fixed fictional living-world sample v1', comparisons: Object.keys(captures), collection: 'not implemented; inspections only' }, null, 2), contentType: 'application/json' })
+})
+
+test('TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world', async ({ browser }, info) => {
+  test.setTimeout(180000)
+  const captures: Record<string, Buffer> = {}, journeys = []
+  for (let replay = 0; replay < 2; replay++) {
+    const context = await browser.newContext({ baseURL: 'http://127.0.0.1:5175', viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    const errors: string[] = []; page.on('pageerror', e => errors.push(e.message))
+    try {
+      await boot(page, '')
+      const go = (target: number[], frame: FrameId) => walkTo(page, target, frame, true)
+      const world = await scene(page).elementHandle()
+      const ids = await scene(page).locator('[data-entity]').evaluateAll(nodes => nodes.map(n => n.getAttribute('data-entity')))
+      const capture = async (name: string) => {
+        await page.clock.runFor(5000)
+        for (const id of ['scout:floor', 'scout:desk', 'scout:core', 'source:landing:biology:01']) {
+          const box = await page.locator(`[data-entity="${id}"]`).boundingBox(), bounds = (await scene(page).boundingBox())!
+          expect(box).not.toBeNull()
+          expect(box!.x + box!.width).toBeGreaterThan(bounds.x); expect(box!.x).toBeLessThan(bounds.x + bounds.width)
+          expect(box!.y + box!.height).toBeGreaterThan(bounds.y); expect(box!.y).toBeLessThan(bounds.y + bounds.height)
+        }
+        await info.attach(`${name}-${replay}-state.json`, { body: JSON.stringify({ position: await position(page), planet: await positionIn(page, 'planet:fixture'), frame: await page.locator('[data-entity="person:player"]').getAttribute('data-frame'), transform: await transform(page, 'terrain:site') }), contentType: 'application/json' })
+        const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
+        if (replay === 0) captures[name] = png
+        else {
+          const result = compareImages(captures[name]!, png)
+          await info.attach(`${name}-repeat.json`, { body: JSON.stringify({ pass: result.pass, changedPixels: result.changedPixels, rawChangedPixels: result.rawChangedPixels, policy: POLICY }), contentType: 'application/json' })
+          await info.attach(`${name}-diff.png`, { body: result.diff, contentType: 'image/png' })
+          expect(result.pass).toBe(true)
+        }
+      }
+      const frame = () => page.locator('[data-entity="person:player"]').getAttribute('data-frame')
+      const transitions: unknown[][] = []
+      const sampleCrossing = async (key: string, expected: string) => {
+        const samples = []
+        for (let i = 0; i < 14; i++) {
+          const before = await positionIn(page, 'planet:fixture'), previous = await frame()
+          const oldBox = (await page.locator('[data-entity="person:player"]').boundingBox())!
+          await walkTicks(page, key, 1)
+          const after = await positionIn(page, 'planet:fixture'), current = await frame()
+          const newBox = (await page.locator('[data-entity="person:player"]').boundingBox())!
+          expect(Math.hypot(after[0] - before[0], after[1] - before[1])).toBeCloseTo(.04, 7)
+          expect(Math.hypot(newBox.x - oldBox.x, newBox.y - oldBox.y)).toBeLessThan(3)
+          samples.push({ before, after, previous, current, oldBox, newBox })
+        }
+        expect(await frame()).toBe(expected)
+        expect(samples.filter(s => s.previous !== s.current)).toHaveLength(1)
+        transitions.push(samples)
+      }
+      await go([-2, 3], 'planet:fixture')
+      await go([-2, 7], 'planet:fixture')
+      await go([0, 7], 'ship:scout')
+      // Walk into an aft jamb. The real hull sweep blocks entry.
+      await go([2, 7], 'ship:scout')
+      await walkTicks(page, 'w', 42)
+      expect(await frame()).toBe('planet:fixture')
+      expect((await positionIn(page, 'ship:scout'))[1]).toBeGreaterThan(6)
+      await go([0, 7], 'ship:scout')
+      await go([0, 5.65], 'ship:scout')
+      await capture('door-outside')
+      await sampleCrossing('w', 'ship:scout')
+      await capture('door-inside')
+      await go([0, 2], 'ship:scout')
+      for (const target of [[0, .45], [1.35, .45], [1.35, -1.65], [0, -1.65], [0, -3.1]]) await go(target, 'ship:scout')
+      await expect(page.locator('[data-selection="scout:chair"]')).toHaveCount(1)
+      await page.keyboard.press('e')
+      await expect(page.locator('main')).toHaveAttribute('data-target', 'scout:chair')
+      await page.keyboard.press('Escape')
+      await capture('cockpit-round-trip')
+      for (const target of [[0, -1.65], [1.35, -1.65], [1.35, .45], [0, .45], [0, 2], [0, 5.3]]) await go(target, 'ship:scout')
+      await sampleCrossing('s', 'planet:fixture')
+      await go([0, 7], 'ship:scout')
+      await capture('returned-outdoors')
+      expect(await world!.evaluate(node => node.isConnected)).toBe(true)
+      expect(await scene(page).locator('[data-entity]').evaluateAll(nodes => nodes.map(n => n.getAttribute('data-entity')))).toEqual(ids)
+      expect(errors).toEqual([])
+      journeys.push({ replay, transitions, final: await position(page), frame: await frame(), ids, errors, browser: context.browser()!.version(), input: 'Playwright keyboard through production adapter', renderer: 'Chromium SVG CPU rasterization', viewport: page.viewportSize(), dpr: await page.evaluate(() => devicePixelRatio) })
+    } finally { await context.close() }
+  }
+  const negative = compareImages(captures['door-outside']!, captures['cockpit-round-trip']!)
+  expect(negative.pass).toBe(false)
+  await info.attach('traversal-journeys.json', { body: JSON.stringify({ journeys, wrongCheckpoint: { pass: negative.pass, changedPixels: negative.changedPixels, rawChangedPixels: negative.rawChangedPixels }, clock: '2026-11-04T00:00:01Z fixed steps', baseline: 'repeat evidence only; no approved references changed' }, null, 2), contentType: 'application/json' })
 })

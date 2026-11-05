@@ -37,10 +37,10 @@ foreground cues. Terrain fill precedes terrain objects; equal-layer objects use
 stable ID ordering. There is no roof cover or roof fade. Astronomical planet
 origins never enter camera-relative drawing; planet motion changes its universe
 pose, and ship motion changes its planet-relative pose without rewriting anchors.
-Local frame point conversion is explicit; automatic frame transfer is deferred.
+Local frame point conversion and aft doorway ownership transfer are explicit.
 
 The fixture uses authored illustrated placeholders, not scientific terrain or
-full gameplay. Cross-frame traversal, cockpit seating/navigation, multiplayer, persistence,
+full gameplay. Cockpit seating/navigation, multiplayer, persistence,
 extraction and inventory integration remain later work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
 Playwright project exercises the production SVG adapter, pixel visibility, held
 input cleanup, production radar isolation and byte-identical fresh-run captures.
@@ -57,8 +57,8 @@ produce feedback and make no gameplay changes. Inspections are explicit no-ops;
 they do not run Core machinery or open navigation. The state exposes standing,
 walking and interacting modes plus a target ID for downstream consumers.
 
-The Scout has an open cargo passage and aft entry; automatic planet/ship frame
-transfer remains #765.
+The Scout has an open cargo passage and aft entry with automatic planet/ship
+frame transfer (#765).
 Walk around the crate on its starboard side, then through the open forward
 partition to reach the cockpit. DOM focus clears held movement and editable
 controls do not leak WASD/E input. Button activation returns keyboard control to
@@ -67,6 +67,27 @@ keyboard detour, both consoles, cancellation, input cleanup, identical fresh-run
 captures and built radar isolation. Position/facing data attributes are read-only
 render observations, not state setters. Capture candidates are review evidence;
 no approved navigation baseline changes.
+
+### Seamless doorway traversal (#765)
+
+From the outdoor spawn, walk south around the Scout and north through the
+painted aft entry, then through cargo and the cabin to the cockpit. Return by the
+same opening. `topDownTraversal.ts` transfers the collision-resolved player anchor
+only when its path crosses the clear 3 m entry plane. Intact hull, jambs and
+partitions remain physical. Conversion preserves world position; the camera
+keeps its smoothing lag and zoom while adopting the player's new frame. The
+interior, surface props and entity IDs remain in the same SVG scene throughout.
+
+`capturePlayerLocation(state)` returns a detached in-memory snapshot of the exact
+split anchor (bigint cells, metre offsets, frame ID) and facing. Ship-local
+locations follow later ship pose changes; planet-fixed locations stay on the
+surface. This is a hook for a future authoritative reconnect adapter, which must
+validate spawn/collision and serialize the snapshot; it does not save or reconnect
+players today. Simulated relocation is tested without adding flight controls.
+`topDownTraversal.test.ts` covers rotated handoffs, boundary/blocked paths,
+world/camera continuity and location retention. Browser `TRAVERSE-1` walks the
+outdoor-to-cockpit round trip twice, measures both handoffs, keeps the same scene,
+and compares simultaneous indoor/outdoor captures using the unchanged visual policy.
 
 ### Scout cutaway (#763)
 
@@ -83,7 +104,7 @@ only inspect placeholders and do not process or transfer material.
 Scout to inspect its always-visible interior. The default fixture starts outdoors;
 `view=interior` explicitly selects the cabin for Scout-only checks. These initial fixture viewpoints
 are not in-play teleport controls. Walk through cargo to the entry; cross-frame
-ownership/persistent locations remain #765, cockpit seating/radar #766, and full playable-slice acceptance #767.
+ownership transfers at its open aft threshold (#765); cockpit seating/radar remains #766, and full playable-slice acceptance #767.
 Browser SCOUT-1 exercises cargo module selection, doorway clearance and simultaneous
 outside-player/interior visibility; TD-3 reaches the chair through the cabin.
 These original captures are review evidence, not approved navigation baselines.

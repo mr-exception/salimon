@@ -1,6 +1,6 @@
 # Construction material transactions (#543)
 
-> **Legacy fragment-based implementation (2026-11-04):** The physical carried-fragment intake and milligram refunds below belong to the old native game. Future 2D construction must use [whole-unit resource inventory](resource-inventory-and-gathering.md) transfers and returns. Overflow/refund policy requires further design; no new integration is claimed.
+> **Legacy fragment-based implementation (2026-11-04):** The physical carried-fragment intake and milligram refunds below belong to the old native game. Future 2D construction must use [integer-gram, weight-only resource inventory](resource-inventory-and-gathering.md) transfers and returns. Overflow/refund policy requires further design; no new integration is claimed.
 
 `ship::structure::funding` owns integer-milligram receipts on each placeholder.
 With the builder open (C), aim at the existing project and press E to contribute

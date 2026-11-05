@@ -1,6 +1,6 @@
 # Game Systems Overview
 
-> **New direction (2026-11-04):** Current browser implementation is a 3D navigation-only radar. Future interior/planet gameplay is [strict top-down illustrated 2D](top-down-art-direction.md) with [10 kg / 10 L direct resource inventory](resource-inventory-and-gathering.md). Previous native first-person and physical fragment implementations are historical.
+> **Current direction (2026-11-05):** Browser gameplay includes the strict top-down 2D Scout/planet slice and [weight-only resource gathering](resource-inventory-and-gathering.md): 10 kg / 12 shared slots, no inventory/storage volume limits. Tierless modular suits and hazards are [approved future gameplay](spacesuit-and-hazards.md); previous native first-person and fragment systems are historical.
 
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
@@ -10,7 +10,7 @@ The approved future starting state is the unknown alien homeworld, not Earth. Pl
 
 ## Long-term system areas
 
-This list describes long-term product direction rather than current implementation. The active browser client implements only navigation; former native walking, mining, carrying, fabrication and survival implementations have not migrated to it. See [current radar](radar-navigation-prototype.md).
+This list mostly describes long-term direction. The browser client currently supports 2D movement, cockpit radar, and weight-based raw gathering/local saves, but not ship crafting, playable suits/hazards, multiplayer or the historical native fragment systems. See [playable slice](playable-2d-foundation.md).
 
 1. **Exploration & navigation** — realistic-distance travel through a universe-scale world, seamless space-to-surface movement, long-term travel toward Absenat.
 2. **Player character** — strict top-down 2D walking, future EVA, planetary exploration, physical interaction, health and survival state.
@@ -18,8 +18,8 @@ This list describes long-term product direction rather than current implementati
 4. **Ship construction** — modular rooms/hull expansion while landed/docked plus interior module placement during flight.
 5. **Ship simulation** — power/Core, propulsion, oxygen, pressure, thermal state, hull, sensors, weapons, damage, maintenance and environmental protection.
 6. **Survival** — oxygen, food, water, temperature, sleep, health, radiation, pressure and stamina; permadeath resets the player's run.
-7. **Resource inventory & cargo** — raw resources occupy integer weight/volume-limited stacks, starting at 10 kg / 10 L; non-resource objects and ship cargo are separate.
-8. **Mining & gathering** — direct credit of whole raw-resource units to limited inventory, with persistent source depletion rather than carryable fragments.
+7. **Unified inventory & cargo** — 12 shared player slots and one 10 kg weight cap for integer-gram raw resources and count-based items with per-item weight/stack sizes; no volume constraints. Ship Resource Containers hold only raw resources, and dedicated suit/module storage has its own tiered slot capacities.
+8. **Mining & gathering** — direct credit of integer grams (1 kg/s current sample) to the unified inventory, with exact persistent source depletion rather than carryable fragments.
 9. **Processing & crafting** — refining raw resources, repair kits, survival supplies, construction materials, ammunition, equipment and modules.
 10. **Research & progression** — technologies that improve propulsion, modules, weapons, tools and environmental survivability, allowing farther travel.
 11. **World simulation** — real astronomical data where practical, realistic orbital motion, fictional fill content, sectors/snapshots and deterministic catch-up.

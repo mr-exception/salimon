@@ -213,7 +213,7 @@ or create separate ship/planet scenes.
 
 This fixed sample is not a canonical astronomical publication, global planetary
 generator, ecology simulation or full material/resource catalog. Inspections do
-not gather or deplete anything. Whole-litre quantities, integer grams/litre,
+not gather or deplete anything. Integer-gram quantities, weight-only capacity,
 atomic persistence and inventory integration remain #757 after #767; frame
 handoff and cockpit integration remain #765/#766. Automated browser comparisons
 cover repeated spawn, near-outcrop, near-colony and near-Scout captures plus a

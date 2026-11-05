@@ -1,0 +1,17 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit --grep COCKPIT-1|SURV
+
+[WebServer] (node:2728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2760) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:2772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (1.0m)
+  ✓  2 [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset (18.0s)
+
+  2 passed (1.4m)

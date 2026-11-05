@@ -1,0 +1,82 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit --grep COCKPIT-1|SURV
+
+[WebServer] (node:2142) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2174) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:2186) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (22.7s)
+(node:2322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset (12.0s)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 37
+    Received: 0
+
+      42 |       await page.getByLabel('Throttle', { exact: true }).fill('37'); await page.clock.runFor(500)
+      43 |       const moving = await ship()
+    > 44 |       expect(moving.throttle).toBe(37); expect(Math.abs(moving.velocityMps[2])).toBeGreaterThan(0)
+         |                               ^
+      45 |       await page.getByRole('button', { name: 'Exit navigation · Stand up' }).click()
+      46 |       const exited = await ship()
+      47 |       expect(exited.throttle).toBe(37)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:44:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser-2/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/focused-browser-2/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser-2/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/focused-browser-2/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset 
+
+    Error: Could not walk to -2,3; stopped at -6,3
+
+       at worldJourney.ts:40
+
+      38 |     else await walk(page, keys, Math.max(17, Math.min(65, Math.hypot(dx, dy) / 2.4 * 1000)))
+      39 |   }
+    > 40 |   throw new Error(`Could not walk to ${target}; stopped at ${await position(page)}`)
+         |         ^
+      41 | }
+      42 |
+      43 | export async function walkTicks(page: Page, key: string | string[], ticks: number) {
+        at walkTo (/workspace/salimon/client/tests/worldJourney.ts:40:9)
+        at /workspace/salimon/client/tests/survival.spec.ts:54:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser-2/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/focused-browser-2/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser-2/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/focused-browser-2/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+    [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset 

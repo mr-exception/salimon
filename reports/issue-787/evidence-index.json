@@ -1,0 +1,387 @@
+[
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-full.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-full.png",
+    "sha256": "d2485eddfba75c8b843e69b294699ef0a074842bdb2970eb1cead3740f35b5ba"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-save-error.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-save-error.png",
+    "sha256": "45600b8b6d22c020f3b7b972168f3998754609342726149bb7c10b392498ddbe"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-narrow.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-narrow.png",
+    "sha256": "6f5d93fb92ce56dfcf69d15d2b1b1b6a911dafbd84fcfdbfe267d1a05c1309e8"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-full-error.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/storage-full-error.png",
+    "sha256": "16ed1502de70f2468d3128808d2ecc00395330b71e66be905e0549ab32034cab"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-transferred-1.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-transferred-1.png",
+    "sha256": "a7f46a175d714b8461528aa59608b231c60472f46420724e682b89fa01a0aaf4"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-error-0.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-error-0.png",
+    "sha256": "51c9a8802d6b96279d0fe343513ab093869ea61a9d2ab1f7acfc1199e89a18b9"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-error-1.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-error-1.png",
+    "sha256": "e147bdad71b6158c18a8c7e27f053ec4025e9b38b199b050856f02e4d074d203"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-open-1.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-open-1.png",
+    "sha256": "c1838b6b892cecddd3003a4c39a7402d2fd76c9b934ffef3726ea63e8027f131"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-open-0.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-open-0.png",
+    "sha256": "ae1939518bbd3bbdc23db1bf0a7c9edac930410f5d35c92f6e2a99971c3e26bd"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-transferred-0.png",
+    "retained": "evidence/final-browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/storage-transferred-0.png",
+    "sha256": "fc7acccc89aa585ea36eee36053269c185b4a3b645903c1372ded000ccc9f821"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-narrow-0.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-narrow-0.png",
+    "sha256": "5bb10f7260ebcc5b9b47ca889449c67a4bdb705e3756f8d41a85a42ddf8b818b"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-mixed-0.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-mixed-0.png",
+    "sha256": "76725622234a68bcc426e5fffa3350d2f5e6b5ac8e380e0f8ce4fad88cc8aea6"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-mixed-1.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-mixed-1.png",
+    "sha256": "08098a301fb74b79240196960b4f7e73144cf520e9aaae54da14a62b0fa26255"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-overweight-0.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-overweight-0.png",
+    "sha256": "c0b06b53129d82c2b11ff962d149e6d530105fca6173438e7bef13152c8b4246"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-overweight-1.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-overweight-1.png",
+    "sha256": "8682c755984ca5599a6ae25b8976870668dad4f965f1721370c8e525232a30b7"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-empty-1.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-empty-1.png",
+    "sha256": "9bc631600945295e0d485bad4603f62f72ca658db654f813aee8796fa9403981"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-narrow-1.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-narrow-1.png",
+    "sha256": "064d191cfd66bc347b8ba9b1fe61be242c811a803de7583fde0c274a0a3aefd8"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-raw-1.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-raw-1.png",
+    "sha256": "7cda7f0f6cb1ae93b9df99e83a180a75e1e973e07228cabd03d13d62e20244be"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-empty-0.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-empty-0.png",
+    "sha256": "9bc631600945295e0d485bad4603f62f72ca658db654f813aee8796fa9403981"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-raw-0.png",
+    "retained": "evidence/final-browser/items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/items-raw-0.png",
+    "sha256": "281677fe16e2f9573086cb3abe2dd867aabe849f1eba20fb8802b3a7cf3473eb"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/gather-weight-full.png",
+    "retained": "evidence/final-browser/gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/gather-weight-full.png",
+    "sha256": "d9575bce9b6bcc768340dc234372d4a2740f3681c6c33156a5e54026b6b48e32"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-weight-full-0.png",
+    "retained": "evidence/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-weight-full-0.png",
+    "sha256": "b0624ec43522f489fed94799e84ce82776a08c27f14e2556a710afbd8fc149f4"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-source-ready-1.png",
+    "retained": "evidence/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-source-ready-1.png",
+    "sha256": "d7048cae588d98edbfe55d4c2fd132e5452c805ee8a8ce58048f40079dc94ef9"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-source-ready-0.png",
+    "retained": "evidence/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-source-ready-0.png",
+    "sha256": "d7048cae588d98edbfe55d4c2fd132e5452c805ee8a8ce58048f40079dc94ef9"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-weight-full-1.png",
+    "retained": "evidence/final-browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/gather-weight-full-1.png",
+    "sha256": "8d3306f2f3794f7c111aba6252b50af7e9570c10dc1553e2c99570b1b95f2f8d"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-standing-return-1.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-standing-return-1.png",
+    "sha256": "a00b262114da86bfc856b42ccf675a1a4b69f71fb49846d98e6d6183ad43af62"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-returned-outdoors-0.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-returned-outdoors-0.png",
+    "sha256": "09b73da59e8f0d3b2ffff044bc3379367fb820db08a776bc01b3c778f96bd57d"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-exterior-cutaway-1.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-exterior-cutaway-1.png",
+    "sha256": "2cb52299fc575b4c7949aff2ac6243da6c9772fd85742a0544d34abb25d42c34"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-outdoor-spawn-1.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-outdoor-spawn-1.png",
+    "sha256": "9bc631600945295e0d485bad4603f62f72ca658db654f813aee8796fa9403981"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-mineral-inspection-0.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-mineral-inspection-0.png",
+    "sha256": "fb136294a578a9d785d5862adc5186d03df70ee85b5f11ad58405ec0ca0c87e0"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-standing-return-0.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-standing-return-0.png",
+    "sha256": "04e1b2132db91b41c8386185b75406681ca020fd88eb50cfcc9fca2f3c9aebaf"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-exterior-cutaway-0.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-exterior-cutaway-0.png",
+    "sha256": "2e835fd325a900d5ee36183e54dc18ba47a606df21aa29eb4375946621bbaf11"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-returned-outdoors-1.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-returned-outdoors-1.png",
+    "sha256": "f3a57d383bb60bc32a3c8a1f9bd231774c91c7d08f387d546191f4f54693bb18"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-mineral-inspection-1.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-mineral-inspection-1.png",
+    "sha256": "6fd740317c52ff82d006b1a7b899837bff7b449eb58241f9889de19576fae987"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-outdoor-spawn-0.png",
+    "retained": "evidence/final-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/slice-outdoor-spawn-0.png",
+    "sha256": "9bc631600945295e0d485bad4603f62f72ca658db654f813aee8796fa9403981"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/radar-open-0.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/radar-open-0.png",
+    "sha256": "a1fa80e7e1dbea76006ad31c470b77363b47c7f09a67a67a8111f9563529651b"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/restored-seated-1.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/restored-seated-1.png",
+    "sha256": "c038e342f156cfff3b667344aadd20c83393cee86e2a04c77817542285550cab"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/radar-open-1.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/radar-open-1.png",
+    "sha256": "ca9814f62fec863fcfba50f370a649e5c36b73cb773d4077217228f92e2aaa11"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/blackout-seated-0.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/blackout-seated-0.png",
+    "sha256": "df8361648d76cc133eee13b38a009a2e6f971f475a75b3dac5891cfdfc94c0d2"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/standing-return-1.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/standing-return-1.png",
+    "sha256": "a728214822ce7cd18f49af75242b0762ca2a5f4fb11ae79c140ea9260c8c5d67"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/standing-return-0.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/standing-return-0.png",
+    "sha256": "29d221f60f453f2b001d96236dbfad0370f4ed667b58e1eeb6a36dc03bfe9265"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/restored-seated-0.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/restored-seated-0.png",
+    "sha256": "ce3b506348ba5939891b1b3720696038a7b70ec47b03e5846f245f88ee501f5f"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/blackout-seated-1.png",
+    "retained": "evidence/final-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/blackout-seated-1.png",
+    "sha256": "d2170ebd8ebc53660cea287027c257f5b8d789404bba34c7db4411d6ca204807"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/navigation-return.png",
+    "retained": "evidence/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/navigation-return.png",
+    "sha256": "f00258219ef5d15db2b8a9ef3b7d836d62a567e29e4e7093b6401fedaae93dfb"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/interior.png",
+    "retained": "evidence/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/interior.png",
+    "sha256": "787e3c254bb674b4512a8da451132d10f001566f5702fa1a8855f1278b790ece"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/outdoor.png",
+    "retained": "evidence/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/outdoor.png",
+    "sha256": "9bc631600945295e0d485bad4603f62f72ca658db654f813aee8796fa9403981"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/terminal.png",
+    "retained": "evidence/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/terminal.png",
+    "sha256": "0b994884a299ebae96f4895a04bb707760ec9723f89bd2ad55e3f8761b9d98e3"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/low-condition.png",
+    "retained": "evidence/final-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/low-condition.png",
+    "sha256": "4bb38234f9bd6ea871497f023a6f879a9e0bc59b034ebfd663fb3fdb300050b6"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-expected.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-expected.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-expected.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-diff.png",
+    "sha256": "64d8b08e79f40a2244f2d81f1dfa2e537e1a5aed2079e0bfe3f452208e44a6ed"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-expected.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in-diff.png",
+    "sha256": "dcbd862179f25f76c5440636878fa9adb81faa6baaccc3705ea1b274633927f7"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner.png",
+    "sha256": "a990aabd722a62ef3950048d6e613ff24f82c1ec57e77afbecd270ca6d0fc439"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts-expected.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-diff.png",
+    "sha256": "72337b844cb63611b289c49ac18cc99e2fe4a20a8c3c0a47cffb72f5f27dfc8e"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity.png",
+    "sha256": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-in.png",
+    "sha256": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-expected.png",
+    "sha256": "f402725c7c5eb38287cb5fb76f08b75cb79614392af676b15bf415a84b33f795"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/visible-contacts.png",
+    "sha256": "0e9253a7d4d6cbf084ba48a92f846568274a1d9ed948241d9918c8b5404cd21d"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts-diff.png",
+    "sha256": "26d22881d8a82eeff97d3b794387342b553d958e4e736fe1a8e22e1c047ae45b"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/selected-body-diff.png",
+    "sha256": "43010e36ab38a8a2736328a1136aba667fa94f8f50184738251e775ce170a070"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/opposite-vectors-expected.png",
+    "sha256": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/panned-contacts.png",
+    "sha256": "299b07782a3ccb290862e06b9084dec8da4ba36b9438331714c1be576136ecf9"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-diff.png",
+    "sha256": "471f04d4911c79912eee185c7d29ddac2ba0580f2fd1cbc93aa82a322fd3340e"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/empty-scanner-diff.png",
+    "sha256": "a9bad42fb8f45db0f3c4b234dcce237d271cb6cb9fe68957ab5257bba4d92bf5"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/heading-velocity-diff.png",
+    "sha256": "bf0faa0f2ed98e2c3127bcea4de7c273ff44908df8f1e543af7b2f3a1d9f1016"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "retained": "evidence/final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/comparisons/zoom-out-expected.png",
+    "sha256": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/navigation-return.png",
+    "retained": "evidence/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/navigation-return.png",
+    "sha256": "f00258219ef5d15db2b8a9ef3b7d836d62a567e29e4e7093b6401fedaae93dfb"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/interior.png",
+    "retained": "evidence/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/interior.png",
+    "sha256": "fd3c61d071b27d2e6a7995d22fd71b1ec6abecd1b74b6d738cbe5fe98246187e"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/outdoor.png",
+    "retained": "evidence/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/outdoor.png",
+    "sha256": "9bc631600945295e0d485bad4603f62f72ca658db654f813aee8796fa9403981"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/terminal.png",
+    "retained": "evidence/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/terminal.png",
+    "sha256": "0b994884a299ebae96f4895a04bb707760ec9723f89bd2ad55e3f8761b9d98e3"
+  },
+  {
+    "original": "/workspace/salimon/reports/issue-787/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/low-condition.png",
+    "retained": "evidence/survival-final/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/low-condition.png",
+    "sha256": "2592acdbc6fb78228db0707a401d79bf6129d0061c15f0d55ed11b74a31a154f"
+  }
+]

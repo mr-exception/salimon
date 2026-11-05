@@ -49,7 +49,7 @@ transfers and resource container upgrade rules remain TBD.
 ## Save format, authority and migration
 
 - The browser's pure `resourceInventory.ts` owns gram-based resource quantities, capacity grams/slots, and count-item stack/mass validation. `resourceSession.ts` owns initial 1 kg/s mining, stable sources, depletion and one atomic save envelope. The current playable HUD shows kg and slots, no litres/volume.
-- The save envelope is **version 5** (`landing-resources:v2`), storing trusted item definitions, grams, slots, count-item map, source remaining grams, identified raw stores, player location and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
+- The save envelope is **version 6** (`landing-resources:v2`), storing trusted item definitions, grams, slots, count-item map, source remaining grams, identified raw stores, player location, [survival state and launch watermark](browser-survival.md), and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
 - The active tab holds an exclusive browser Web Lock; commits use compare-and-replace localStorage before publishing state. Movement checkpoints occur at most once per simulated second and on stop/page-hide. This is browser-local single-writer persistence, **not** future backend authority, anti-cheat security or cloud sync.
 
 ## Outstanding decisions
@@ -146,7 +146,7 @@ one slot per copy; other types consume `ceil(count / stackSize)`. Gathering and
 storage withdrawal use that same combined capacity; failed credit never depletes
 a source. Player payload includes item mass once while aboard.
 
-Schema v5 retains the storage key and raw catalog identity. Saved item definitions
+Schema v6 extends the v5 item envelope with survival state and retains the storage key and raw catalog identity. Saved item definitions
 must match the trusted catalog exactly; malformed/unknown/changed definitions or
 counts preserve bytes and block writes. Valid v1–v4 saves migrate in memory with
 no items, preserving raw mass, stores, location and revision. Historical production

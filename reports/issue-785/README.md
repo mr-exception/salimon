@@ -8,10 +8,10 @@ confirm; only ResourceSession transactions publish material changes. Confirmatio
 is consumed once, while editing/closing discards only draft state.
 
 Parent: non-draft PR #794, `issue-784-resource-container`,
-`b85add7c0bd3aafb9f266c58fca8f3fdefefacb0`, verified ancestor.
+`8f9a92498cc07e9ea9c118b9840b3627f0a92096`, verified ancestor.
 Transitive #783 is merged in main `cf46092`. The unique child diff owns UI/input,
 controller, tests, owner docs and this evidence. Tested source:
-`cb576c6c91fb2766d8ac8feb7c8bb6aa900abc09`; source-hashes.json covers
+`8c9de7985bab03d7a8531254f464829f8b1f0e3b`; source-hashes.json covers
 runtime, tests, lockfile and configuration. Final report-only publication preserves
 those inputs. Child PR targets the parent head branch, never main.
 
@@ -108,9 +108,42 @@ in the PR/issue review comment. No independent execution is claimed.
 
 Documentation PR #793 appeared during implementation. Parent #794 now incorporates
 its `bf1cb0d` history and targets that branch. This child incorporates updated
-parent `b85add7` non-destructively. Runtime/test/config/assets/lockfile hashes remain
+parent `8f9a924` non-destructively. Runtime/test/config/assets/lockfile hashes remain
 unchanged from the verified source; existing local evidence is reused after hash
 comparison, and current-head full CI is required again. The migration register
 now identifies playable container transfers and preserves future machine scope.
 Final review binds exact refs/checks; prior acceptance is superseded after the
 parent change until revalidation completes.
+
+## Full CI finding and shared viewport repair
+
+CI 42033453722 passed the storage, gathering, cockpit and full journey scenarios
+(36 browser passes) but failed existing TD-1 byte-equality. Parent CI 42033304505
+failed the same gate: both originals differed at exactly eight bottom-left
+rounded caption pixels. Original PNGs, exact RGB deltas and failure output are
+retained under `failures/ci-42033453722`. No assertion failure is waived.
+
+An exploratory lazy panel-loading hypothesis passed one local TD-1 control but
+was disproven by the parent failure; its controlled-clock modal checks failed.
+That trial was reverted, not shipped or counted as a successful check. The final
+interface retains its previously validated direct loading. The shared fix is
+owned by parent #794: give the translucent caption its own 7 px inner corner
+curve matching the 8 px stage minus its 1 px border. No art, approved reference,
+assertion, mask or threshold changes. Eight replay probes and three unmodified
+TD-1 fresh-run repeats passed; parent report retains originals and measurements.
+
+This child incorporates parent `8f9a924`. Only `client/src/topDown.css` changes
+from prior verified UI source; gram/controller/browser-test/config/lockfile inputs
+remain unchanged. Build/typecheck and affected built storage scenarios are rerun
+against the merged renderer fix (`8c9de7985bab03d7a8531254f464829f8b1f0e3b`).
+Prior exact-head acceptance is superseded until current-head full CI and active-chat
+review pass. The final publication comment binds exact head/base and results.
+
+Final affected checks after shared clipping fix: **PASS**, 2/2 built storage
+scenarios (1.7 min), all three repeats and wrong-checkpoint negative, with original
+captures/raw saves under `clip-browser`. New build/typecheck passed. Original
+transferred/full/error/narrow views retain the same legible UI; only caption corner
+coverage is stabilized. Pure domain/controller/Node inputs remain unchanged;
+`clip-evidence-reuse.json` binds their earlier passing evidence to the final
+source, while current-head CI reruns the full suite. Local re-review has no
+remaining material finding; overall acceptance awaits final-head CI.

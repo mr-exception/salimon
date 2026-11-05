@@ -1,12 +1,15 @@
 # Periodic verification and reports
 
+> **Corpus migration status (#791): Historical evidence only.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 Routine verification uses [AI/cloud checks](verification-workflow.md).
 Local cloud reproduction is valid when hosted dispatch is unavailable, with
 that limitation recorded; never report it as a hosted CI pass. Human image/audio
 approval, physical platform checks and hardware budgets are separately owned.
 
 PRs keep the single **Source build (Ubuntu)** check. The separate
-[Periodic verification workflow](../.github/workflows/periodic-checks.yml) has
+[Periodic verification workflow](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/.github/workflows/periodic-checks.yml) has
 only schedule and manual triggers; it never runs on a PR or each push.
 
 | Suite | Schedule (UTC) | Coverage |
@@ -121,7 +124,7 @@ Nightly comparison uses the independently reviewed software-Vulkan corpus under
 pending corpus produces an explicit pending appearance check and pending lane,
 not a green appearance result. Temporal stability and fixture completeness remain
 required. Any real failure overrides pending status. Metadata mismatch or changed
-appearance against an approved corpus fails. See the [baseline review workflow](../scenarios/visual/README.md#approval-policy-and-style-replacement).
+appearance against an approved corpus fails. See the [baseline review workflow](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/visual/README.md#approval-policy-and-style-replacement).
 Native Metal approval (#314) and software approval (#321) remain independent.
 
 

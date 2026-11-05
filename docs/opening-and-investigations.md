@@ -1,5 +1,8 @@
 # Opening and recovered investigations (#470 / #471)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 A fresh canonical journey wakes the traveler outside the landed Scout on Vesper.
 For the first 45 active seconds, the existing skippable survival tutorial adds a
 brief reminder: Earth is home, the Scout is familiar, and the voyage/landing are
@@ -52,9 +55,9 @@ before publishing a restored session. Existing chart entries, exact source
 uncertainty and voluntary route snapshots survive reload. Inspection changes enter
 the normal discrete checkpoint fingerprint. Fresh journeys reset all evidence.
 
-Runtime [architecture](../client/runtime/architecture.md) and
-[invariants](../client/runtime/invariants.md) own composition; universe
-[chart invariants](../client/universe/invariants.md) own route validation.
+Runtime [architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/invariants.md) own composition; universe
+[chart invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md) own route validation.
 `session/narrative/tests.rs` checks paid recovery, distinct leads, route/save
 failures, aimed physical inspections, optional survival onboarding and a declared
 one-hour deterministic session. The existing canonical mine/carry/Fabricator/disk

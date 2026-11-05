@@ -1,5 +1,8 @@
 # Rare biological and mixed natural sites (#624)
 
+> **Corpus migration status (#791): Historical native implementation.** The active playable world is the [strict overhead React 2D client](current-client-status.md); its 3D display is the **cockpit radar only**. References below to native Rust modules, first-person scenes, 3D asset pipelines, or prior issue completion describe the [archived pre-2D revision](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04), not current `client/` capabilities. Keep stable canonical identities, simulation and environmental rules where approved. The planetary/world view is now illustrated overhead 2D with authoritative 2D footprints and layered sprites; celestial contacts remain faceted proxies only in the cockpit 3D radar. Historical 3D mesh, camera, physics crate and GPU details are not browser implementations. See the [per-document migration register](2d-migration-register.md) for active owners and deferred work.
+
+
 `world::environment::signature_sites::SignatureSites` publishes rare site metadata
 for **existing physical organisms**. Giant coherent structures reuse the PE08
 Giant anatomy and PE09 stable roots/parts/collision. Dense colonies require at

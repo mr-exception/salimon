@@ -1,8 +1,11 @@
 # Scientific reference fixtures and CPU workloads — U03 (#404)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 `salimon-universe::reference` is a portable comparison harness, not an ephemeris,
 gravity/trajectory integrator or runtime navigation service. The frozen
-[version-1 suite](../client/universe/fixtures/references-v1.json) combines actual
+[version-1 suite](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/fixtures/references-v1.json) combines actual
 JPL reference vectors with independent analytic coordinate/time cases. It supports
 future solver evaluation without pretending a solver already exists.
 
@@ -28,7 +31,7 @@ policies when implemented. Missing radial motion or measured uncertainty must
 never be fabricated from these fixtures.
 
 JPL source bytes, query/frame/epoch/model and SHA256 are frozen in the
-[source manifest](../catalogs/sources/manifest-v1.json) and described by the
+[source manifest](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/catalogs/sources/manifest-v1.json) and described by the
 [source contract](universe-sources.md). Goldens are separately transcribed SI
 vectors; the example/test adapter parses the frozen KM-S rows and evaluates
 production U02 transforms, GPU narrowing and split epoch motion against them.

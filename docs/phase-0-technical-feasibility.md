@@ -1,5 +1,8 @@
 # Phase 0 — Technical Feasibility Showcase
 
+> **Corpus migration status (#791): Historical evidence only.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Historical reference only:** Earth-start and compressed Solar System acceptance criteria below describe the original Phase 0 showcase, not the approved new-game design. Future gameplay starts outside the Scout on an unknown alien planet. See [narrative canon](narrative-and-lost-journey.md).
 
 > **Scope status:** This document defines the Phase 0 navigation baseline. Its
@@ -242,5 +245,5 @@ The previously completed first-person character and walkable ship shell is now T
 Phase 0 should therefore be treated as **implementation-complete, but not formally closed** until these two closure items are finished.
 
 Powered crash recovery and inertial takeoff now follow the maintained
-[ship assistance contract](../client/ship/architecture.md#safe-assisted-landing-and-recovery-190).
+[ship assistance contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md#safe-assisted-landing-and-recovery-190).
 Future upgrades to landing speed/range/energy cost remain documentation only.

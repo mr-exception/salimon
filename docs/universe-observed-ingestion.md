@@ -1,5 +1,8 @@
 # JPL and observed exoplanet ingestion — U08 (#409)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 `client/universe/src/ingestion/horizons.rs` and `exoplanets.rs` are portable local
 science adapters. They consume the [U06 verified sources](universe-sources.md),
 without downloads, clocks, runtime/renderer coupling or publication permission.

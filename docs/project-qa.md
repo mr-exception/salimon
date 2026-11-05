@@ -1,5 +1,8 @@
 # Project Q&A
 
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > **Purpose:** This page is only for unresolved product, gameplay, visual, UX, or architecture questions that require a human decision before implementation continues.
@@ -42,7 +45,7 @@ Current-cap/mixed-sphere overload is independently tracked in #455.
 within the existing Phase 0 session-only boundary. Its PR is the review point
 for the owner decision: approve in-session streaming unload/reload for this wave,
 or request a future disk-persistence wave with separate native save/relaunch
-verification. The [canonical persistence contract](../client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
+verification. The [canonical persistence contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
 records the proposed scope, evidence routes and future prerequisites.
 
 Owner approval is pending; this PR does not claim that a decision was already
@@ -56,7 +59,7 @@ Fabricator crafting is newly authorized by the [accepted five-round contracts](s
 ## Survival restriction tuning (#369, 2026-10-19)
 
 The approved movement factors and exact continuous threshold intervals are
-implemented in the [restriction contract](../client/survival/architecture.md#movement-and-interaction-restrictions-369).
+implemented in the [restriction contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/survival/architecture.md#movement-and-interaction-restrictions-369).
 Unspecified numeric interaction/minimum-speed settings are explicit configurable
 provisional tuning: minimum 10%, low-hunger and low-fatigue interaction rates
 75% each (multiplicative), 250 ms base recovery for discrete nonessential actions.
@@ -77,7 +80,7 @@ exact efficacy or medical-lore requirement. Definitions can select treatment
 healing for later items; the starter kit does not silently erase treatment-only
 wounds. Full meters allow consumption and wasted excess. Recipes, ingredients,
 production time/watts/mass and unlocks remain unchanged; advanced foods are #378.
-The [canonical recovery contract](../client/survival/architecture.md#consumable-recovery-definitions-370)
+The [canonical recovery contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/survival/architecture.md#consumable-recovery-definitions-370)
 owns validation, identity conflicts, exact continuation and offline freeze.
 
 ### When can the native Metal candidates become approved baselines?
@@ -91,7 +94,7 @@ measurements remain [#485](https://github.com/mr-exception/salimon/issues/485);
 human timbre/mix/listening review is #721, physical OS playback/device checks
 #720 and hardware budget decisions #722.
 The production continuous CPAL mixer is implemented. The
-[2026-10-31 M1 default-device probe](../reports/issue-557/README.md) confirms real
+[2026-10-31 M1 default-device probe](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-557/README.md) confirms real
 CoreAudio callbacks, not subjective listening, physical device switching/sleep
 or matched whole-frame audio-on/off budget acceptance. Those decisions remain open.
 

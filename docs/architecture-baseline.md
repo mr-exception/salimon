@@ -1,5 +1,8 @@
 # Architecture baseline and domain ownership
 
+> **Corpus migration status (#791): Historical evidence only.** The active playable world is the [strict overhead React 2D client](current-client-status.md); its 3D display is the **cockpit radar only**. References below to native Rust modules, first-person scenes, 3D asset pipelines, or prior issue completion describe the [archived pre-2D revision](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04), not current `client/` capabilities. Preserve approved domain semantics as historical design input, not evidence of browser delivery. Implement future features against the active React 2D world, with the cockpit-only 3D radar, cloud/browser checks and a new acceptance matrix. See the [per-document migration register](2d-migration-register.md) for active owners and deferred work.
+
+
 ## Reproduce
 
 Run `python3 scripts/architecture_audit.py --history-ref 69c8394 --output artifacts/architecture/current.json --summary`.

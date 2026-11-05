@@ -1,0 +1,13 @@
+{
+  "client/src/resourceInventory.ts": "1a292fe8d9ff1b579eb99843f4970c3e9c06b2314825289f53cdf1e59ebe3159",
+  "client/src/resourceLedger.ts": "75957694008d34c201bfc06ebcb2d66d6c7944fda57551860e33a6cef81e49c9",
+  "client/src/resourceLedger.test.ts": "8f92ae5956c116b641cbc2ba287ff4347f3a0fcbf6d69c2aa29d6a1901d3775c",
+  "client/src/resourceSession.ts": "4572a392886bd0993e27a228457627c3f9bbe8b8c2aeb61d16db5b8ca8136c65",
+  "client/src/resourceSession.test.ts": "68c676049cb069426049541896cbc50a000421c70305cb8e465a29b5226be7c5",
+  "client/src/TopDownView.tsx": "330faa80b0b0c8f51d4dc576949f8299b822b521f40f9ce90c0da87356c466b4",
+  "client/package-lock.json": "4bc1b14d943722363dee6252b68d0224342e0a08f69489a862f5afd16c90f029",
+  "client/playwright.config.ts": "c756434608d46642434a3f7170bf8a63a928ae7319029001e21014d1c9b96ed6",
+  "client/tests/cockpit.spec.ts": "e0f507f63b226f5cef639aa47f2222aec5c91d65e48f384482ed675251a72eed",
+  "client/tests/gathering.spec.ts": "e9db69e1fa6feb7d7fe10a3288a0d1ccdf9cd40274aeca5fc66d4780959343cf",
+  "client/tests/playable-slice.spec.ts": "c9dc82d472b715d25713401c81bceccd270a5ad9499d122ed9049dedf20b4831"
+}

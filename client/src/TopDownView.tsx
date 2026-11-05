@@ -1,3 +1,4 @@
+import { DRY_MASS_KG, setMass } from './simulation.ts'
 import { App } from './App'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
@@ -6,7 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
 import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, TopDownClock, type TopDownState } from './topDownRuntime.ts'
 import { useWorldSprites, WorldSprite } from './topDownSprites.tsx'
-import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, withResourcePayload } from './resourceSession.ts'
+import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import './topDown.css'
 
@@ -87,7 +88,7 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
       current.current = clock.advance(current.current, dt, [Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)])
       if (session.current) {
         current.current = session.current.advance(current.current)
-        navigation.clock.state = withResourcePayload(navigation.clock.state, session.current.snapshot.inventory, current.current)
+        navigation.clock.state = setMass(navigation.clock.state, DRY_MASS_KG + session.current.payload().shipGrams / 1000)
       }
       if (gameplay && inWorld) navigation.advance(dt)
       setState(current.current)

@@ -47,7 +47,7 @@
 ## Save format, authority and migration
 
 - The browser's pure `resourceInventory.ts` owns gram-based resource quantities, capacity grams/slots, and count-item stack/mass validation. `resourceSession.ts` owns initial 1 kg/s mining, stable sources, depletion and one atomic save envelope. The current playable HUD shows kg and slots, no litres/volume.
-- The save envelope is **version 2** (`landing-resources:v2`), storing grams, slots, count-item map, source remaining grams, player location and revision. The existing browser storage key is deliberately retained. Previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
+- The save envelope is **version 3** (`landing-resources:v2`), storing grams, slots, count-item map, source remaining grams, identified raw stores, player location and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
 - The active tab holds an exclusive browser Web Lock; commits use compare-and-replace localStorage before publishing state. Movement checkpoints occur at most once per simulated second and on stop/page-hide. This is browser-local single-writer persistence, **not** future backend authority, anti-cheat security or cloud sync.
 
 ## Outstanding decisions
@@ -57,3 +57,42 @@
 - Gear bench, suit/module recipes, count-item gameplay integration, machine transfers and upgrades.
 - Core yield per gram, batch accounting, priority ranking, watts and continuous processing persistence.
 - Final gathering rates, tools, full catalog/economy balance and high-capacity item stack constraints.
+
+## Atomic multi-inventory foundation (#783)
+
+`resourceLedger.ts` owns the validated raw-resource graph: player inventory,
+fixed source IDs/materials and flat identified ship-side stores. A trusted
+`ResourceStoreCatalog` declares each store's stable ID, ship ID and gram capacity;
+saved metadata must match it exactly. No ship store is enabled by default, no
+container slot count is introduced, and visible modules remain placeholders.
+
+`transferResource` accepts an expected revision, typed source/destination,
+resource ID and exact positive integer grams. Source → player/store, player ↔
+store and store → store transactions either return a completely validated next
+ledger at revision + 1 or throw without mutating inputs. Destination weight and
+player shared-slot constraints are checked before constructing a debit. Unknown
+IDs, material changes, negative/fractional/unsafe quantities, overflow, self
+transfers, source refills and stale revisions are rejected. Every resource's
+initial fixed-source mass equals its remaining source mass plus player/store
+mass. The inventory's exact `addResource`/`removeResource` helpers never partially
+succeed; only a complete ledger transaction may publish through the session.
+
+`ResourceSession.transfer` uses the same production transaction as completed
+mining intervals. It serializes the entire candidate envelope in one localStorage
+replacement, under the existing lifetime Web Lock and raw-byte stale-write check.
+Only successful persistence publishes source/inventory/stores/location at one
+revision. Domain rejection leaves the session usable; storage failure cancels
+mining and blocks further writes. The original storage key and catalog identity
+are unchanged. Migration is in-memory until a successful normal commit; failed
+migration writes preserve the original v1/v2 bytes. Unknown/corrupt/unsupported
+save versions or store IDs/metadata block writes instead of resetting material.
+Future composition must supply the same trusted store declarations on reload.
+
+`resourceLedgerMass` exposes player grams, selected ship store grams and total
+ship payload. `ResourceSession.payload` is used by `TopDownView`: stores count
+once for their owning ship; player inventory counts once only while aboard.
+Stores contain raw quantities, never nested player inventories or other stores.
+Mass is recomputed from dry ship mass each frame, never accumulated per tick.
+Gear mass beyond the existing item field and machine consumption/recipes are
+still outside this foundation. Browser-local single-writer guarantees do not
+establish multiplayer or backend authority.

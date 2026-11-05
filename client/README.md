@@ -1,6 +1,9 @@
 # Salimon browser prototypes
 
-**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` migrates compatible old litre-based saves without loss. See [resource design](../docs/resource-inventory-and-gathering.md).
+**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v3 resource ledger and migrates valid v1
+litre / v2 gram saves without loss. `resourceLedger.ts` validates exact transfers
+and store mass; future stores require trusted ID/ship/capacity declarations.
+The default world enables no ship storage or transfer UI. See [resource design](../docs/resource-inventory-and-gathering.md).
 
 The default client is a React + TypeScript + Vite 2D world with a Three.js /
 React Three Fiber cockpit radar. Start with [current implementation and legacy

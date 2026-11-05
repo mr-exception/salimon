@@ -47,8 +47,11 @@ contracts, not a claim of migrated native gameplay. The
 
 `resourceInventory.ts` owns exact integer-gram arithmetic, the 10 kg / 12-slot
 player inventory and count-item per-type stack limits. Volume is not a limit.
+`resourceLedger.ts` owns complete source/player/store conservation and exact
+revision-checked transfers; trusted store declarations validate saved identity
+and gram capacity. No store is enabled in the default world.
 `resourceSession.ts` composes the existing world interaction/tick path, a versioned
-sample gram/source catalog, atomic inventory/depletion/location saves, validated
+sample gram/source catalog, atomic v3 inventory/store/depletion/location saves with v1/v2 migration, validated
 restore and derived player/ship resource payload. `TopDownView.tsx` owns tool/UI
 actions and the exclusive browser save lock. Resource state never enters the
 SVG art or collision owners. Unit/integration coverage is in

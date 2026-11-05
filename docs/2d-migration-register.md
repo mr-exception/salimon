@@ -99,7 +99,7 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`resource-inventory-and-gathering.md`](resource-inventory-and-gathering.md) | PLAYABLE | 10 kg / 12 slots, integer grams and sample mining; schema-v4 raw ledger and identified 50 kg Scout container domain (#784); transfer UI follows in #785. |
 | [`room-finishes.md`](room-finishes.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`room-lighting.md`](room-lighting.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
-| [`save-contract.md`](save-contract.md) | NATIVE | Historical Rust schema 29+; browser v3 local gram ledger is distinct. |
+| [`save-contract.md`](save-contract.md) | NATIVE | Historical Rust schema 29+; browser v4 local gram ledger is distinct. |
 | [`scout-acoustics.md`](scout-acoustics.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`scout-and-modular-construction.md`](scout-and-modular-construction.md) | DESIGN | Approved modular structure intent, not a browser construction system. |
 | [`scout-interior-art-direction.md`](scout-interior-art-direction.md) | DESIGN | Preserve lived-in Scout; translate furniture/door/window presence into 2D cutaway art and interaction anchors. |

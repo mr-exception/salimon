@@ -15,15 +15,41 @@ npm run dev
 
 Open the URL Vite prints. `npm run build` produces `dist/`.
 
+## Cockpit gameplay (#766)
+
+The default `/` (development and production) starts outside the Scout in 2D.
+Walk around the aft hull, through the open entry, around the cabin crate and
+forward to the cockpit chair. **E / Use cockpit** seats the owner and opens the
+existing 3D radar. **Exit navigation · Stand up** returns standing beside the
+chair in one action. Ship position, velocity, orientation, throttle and scanner
+continue in the same `NavigationRuntime` while walking or viewing the radar.
+The illustrative landed 2D ship pose stays fixed: radar sample motion does not
+implement flight or move the landing site.
+
+`cockpit.ts` owns one local chair reservation, owner-control admission and power
+transitions. `TopDownView` keeps the 2D world mounted; only radar presentation is
+mounted/unmounted. A seated avatar is drawn over its chair, in ship-local space.
+Power loss closes radar and keeps the chair occupied; restoration stays seated
+in 2D until **E**. **Stand up / Escape** releases the chair even without power.
+Development-only `/?powerFixture=1` exposes explicit outage/restoration buttons;
+this is a test fixture, not a Core implementation. No multiplayer/server authority,
+disk persistence or reconnect behavior is implemented. Occupant identity and
+control gating are local hooks for a future authoritative adapter.
+
+`/?scene=radar` retains the standalone navigation prototype and its regression
+suite. `/?scene=top-down` in development retains the isolated inspection fixture
+for the #761–#765 checks. These fixture queries do not implement in-play teleport.
+`npm run test:browser -- --project=cockpit` walks from default spawn and covers
+normal exit, outage/restoration, chair state and nonzero throttle/velocity across
+view switches. It repeats original captures with the unchanged pixel policy.
+
 ## Top-down foundation (#761)
 
 During `npm run dev`, open `/?scene=top-down` for a strict overhead illustrated
 Scout and planetary site in one continuous scene. The player starts outside.
 **W/A/S/D** walks the fixed landing area or the interior fixture; visible walls, furniture and a crate block movement. The camera follows with fixed-step
 smoothing, and facing persists when movement stops. Focus loss, editable controls,
-resize and hidden-page events release movement. The normal `/` entry and built
-production bundle remain the 3D radar. This development URL is not a cockpit
-interaction or a global gameplay mode switch.
+resize and hidden-page events release movement. The isolated development fixture uses inspection-only consoles; the default `/` integrates cockpit gameplay above.
 
 `topDownFrames.ts` owns planet-fixed/ship-local anchors using the existing split
 `Position`; `topDownRuntime.ts` owns stable IDs, immutable scene state, 60 Hz steps,
@@ -40,7 +66,7 @@ pose, and ship motion changes its planet-relative pose without rewriting anchors
 Local frame point conversion and aft doorway ownership transfer are explicit.
 
 The fixture uses authored illustrated placeholders, not scientific terrain or
-full gameplay. Cockpit seating/navigation, multiplayer, persistence,
+full gameplay. The isolated fixture defers cockpit seating/navigation; multiplayer, persistence,
 extraction and inventory integration remain later work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
 Playwright project exercises the production SVG adapter, pixel visibility, held
 input cleanup, production radar isolation and byte-identical fresh-run captures.
@@ -140,8 +166,7 @@ Full-viewport PNG readback preserves the viewer pixel grid; the SVG adapter
 requests geometric precision. The earlier static TD-1/4 byte-identity check is
 preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
 inspection, footprint blocking and independence from the camera/ship pose.
-The default production `/` remains radar until #766 integrates cockpit entry.
-There is no automatic frame transfer or saved world yet (#765/#757).
+The default production `/` now integrates cockpit entry (#766). Doorway frame transfer is implemented (#765); durable saves remain future work.
 
 ## Controls (desktop mouse and keyboard)
 

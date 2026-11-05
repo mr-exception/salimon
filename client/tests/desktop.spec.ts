@@ -5,7 +5,7 @@ const heading=(page:Page)=>stat(page,'Yaw / pitch')
 async function stopped(page:Page) {await page.waitForTimeout(250);const value=await heading(page).textContent();await page.waitForTimeout(350);await expect(heading(page)).toHaveText(value!)}
 test.beforeEach(async({page})=>{page.on('pageerror',error=>{throw error})})
 test('scanner pulse, camera independence, clipping selection and manual alignment interruption',async({page})=>{
- await page.goto('/')
+ await page.goto('/?scene=radar')
  await expect(page.locator('.scan-status')).toContainText('awaiting first')
  await expect(page.locator('#contact-select option')).toHaveCount(1)
  await expect(page.locator('.scan-status')).toContainText('5 temporary contacts',{timeout:15000})
@@ -66,7 +66,7 @@ test('wheel zoom bounds and removed desktop controls survive view changes',async
  await testInfo.attach('desktop-state.json',{body:JSON.stringify({ship,gpu:await page.evaluate(()=>window.radarTest.snapshot())},null,2),contentType:'application/json'})
 })
 test('Help has keyboard focus containment, accurate bindings and Escape/close return focus',async({page},testInfo)=>{
- await page.goto('/');const help=page.getByRole('button',{name:'Help',exact:true});await help.focus();await page.keyboard.press('Enter')
+ await page.goto('/?scene=radar');const help=page.getByRole('button',{name:'Help',exact:true});await help.focus();await page.keyboard.press('Enter')
  const dialog=page.getByRole('dialog',{name:'Navigation help'});await expect(dialog).toBeVisible()
  const close=dialog.getByRole('button',{name:'Close help'});await expect(close).toBeFocused()
  await page.keyboard.press('Tab');await page.keyboard.press('Tab');await expect(close).toBeFocused()
@@ -85,7 +85,7 @@ test('right-drag pointer release outside canvas ends pan and ship controls relea
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('ArrowRight');await page.waitForTimeout(200);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await stopped(page);await page.keyboard.up('ArrowRight')
 })
 test('zero throttle coasts while ship rotates; focused slider keeps native keyboard input',async({page})=>{
- await page.goto('/');await page.getByLabel('Throttle',{exact:true}).fill('100');await page.waitForTimeout(450)
+ await page.goto('/?scene=radar');await page.getByLabel('Throttle',{exact:true}).fill('100');await page.waitForTimeout(450)
  await page.getByRole('button',{name:'Zero throttle (Space)',exact:true}).click();await page.waitForTimeout(250);const speed=await stat(page,'Speed').textContent();expect(speed).not.toBe('0.0 m/s')
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('ArrowRight');await page.waitForTimeout(400);await page.keyboard.up('ArrowRight');await expect(stat(page,'Speed')).toHaveText(speed!)
  await page.getByLabel('Throttle',{exact:true}).focus();await page.keyboard.press('ArrowRight');await expect(page.getByLabel('Throttle',{exact:true})).toHaveValue('1')

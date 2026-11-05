@@ -1,3 +1,4 @@
+import { initialCockpit, enterCockpit, isCockpitTarget, type CockpitState } from './cockpit.ts'
 import { planetaryEntities, STARTING_SITE, type SourceIdentity } from './planetarySite.ts'
 import { scoutEntities } from './scoutLayout.ts'
 import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
@@ -10,8 +11,9 @@ export type Layer = typeof LAYERS[number]
 export type Appearance = 'ground' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold' | 'mineral' | 'flora' | 'stones'
 export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance; readonly source?: SourceIdentity }
 export interface TopDownState {
+  readonly cockpit: CockpitState
   readonly tick: number
-  readonly player: { readonly facing: number; readonly mode: 'standing' | 'walking' | 'interacting'; readonly targetId: string | null }
+  readonly player: { readonly facing: number; readonly mode: 'standing' | 'walking' | 'interacting' | 'seated'; readonly targetId: string | null }
   readonly selectedId: string | null
   readonly feedback: string
   readonly frames: WorldFrames
@@ -24,7 +26,7 @@ export const PLAYER_ID = 'person:player'
 const entity = (id: string, frame: Anchor['frame'], x: number, y: number, layer: Layer, appearance: Appearance): Entity2D =>
   ({ id, anchor: { frame, point: point2(x, y) }, layer, appearance })
 
-export function createTopDownState(view: 'interior' | 'exterior' = 'exterior'): TopDownState {
+export function createTopDownState(view: 'interior' | 'exterior' = 'exterior', cockpitEnabled = false): TopDownState {
   const entities = [
     ...planetaryEntities(),
     entity('ship:scout', 'ship:scout', 0, 0, 'hull', 'hull'),
@@ -33,7 +35,7 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'exterior'): 
     ...scoutEntities(),
   ]
   return {
-    tick: 0,
+    cockpit: initialCockpit(cockpitEnabled), tick: 0,
     player: { facing: 0, mode: 'standing', targetId: null }, selectedId: null, feedback: 'Approach a fixture to inspect it. Systems are inactive.',
     frames: {
       planet: { id: 'planet:fixture', universeOrigin: { cell: [10n ** 24n, -(10n ** 24n), 0n], offsetM: [0, 0, 0] }, angle: .2 },
@@ -45,7 +47,7 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'exterior'): 
 }
 // One continuous scene. Crossing changes ownership, never world position.
 export function stepTopDown(state: TopDownState, direction: Point2): TopDownState {
-  const [x, y] = direction
+  const [x, y] = state.player.mode === 'seated' ? [0, 0] : direction
   if (![x, y].every(Number.isFinite)) throw new RangeError('Expected finite movement')
   const length = Math.hypot(x, y), scale = length > 0 ? PLAYER_SPEED_MPS * STEP_2D / Math.max(1, length) : 0
   const player = state.entities.find(e => e.id === PLAYER_ID)!
@@ -66,7 +68,7 @@ export function stepTopDown(state: TopDownState, direction: Point2): TopDownStat
     activity = { facing: Math.atan2(x, -y), mode: 'walking', targetId: null }
     if (state.player.mode === 'interacting') feedback = 'Inspection cancelled by movement.'
   } else if (activity.mode === 'walking') activity = { ...activity, mode: 'standing' }
-  if (activity.targetId) {
+  if (activity.targetId && activity.mode !== 'seated') {
     const target = entities.find(e => e.id === activity.targetId)
     if (!target || !interactionInReach(anchor, target, state.frames)) {
       activity = { ...activity, mode: 'standing', targetId: null }; feedback = 'Inspection cancelled: target unavailable.'
@@ -85,6 +87,7 @@ export function capturePlayerLocation(state: TopDownState): PlayerLocation {
   return copyPlayerLocation({ anchor: state.entities.find(e => e.id === PLAYER_ID)!.anchor, facing: state.player.facing })
 }
 export function requestInteraction(state: TopDownState, id: string | null = state.selectedId): TopDownState {
+  if (state.cockpit.enabled && isCockpitTarget(id)) return enterCockpit({ ...state, selectedId: id })
   const player = state.entities.find(e => e.id === PLAYER_ID)!, target = state.entities.find(e => e.id === id)
   if (!target || !interactionInReach(player.anchor, target, state.frames)) {
     return { ...state, feedback: 'No available object in reach. Move closer to a console.' }
@@ -97,7 +100,7 @@ export function cancelInteraction(state: TopDownState): TopDownState {
 }
 export interface DrawItem { readonly entity: Entity2D; readonly positionM: Point2; readonly angle: number }
 export function drawList(state: TopDownState): DrawItem[] {
-  return [...state.entities].sort((a, b) => LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer)
+  return state.entities.map(e => e.id === PLAYER_ID && state.player.mode === 'seated' ? { ...e, layer: 'cues' as const } : e).sort((a, b) => LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer)
     || Number(b.appearance === 'ground') - Number(a.appearance === 'ground')
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
     .map(entity => ({ entity, positionM: relativeAnchor(entity.anchor, state.camera.anchor, state.frames), angle: entity.id === PLAYER_ID ? state.player.facing : entity.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0 }))

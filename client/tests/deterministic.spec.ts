@@ -103,7 +103,7 @@ test('NAV-4 read-only fixture observers return detached state; production has no
  expect(keys.navigation.sort()).toEqual(['positions','snapshot'])
  expect(keys.radar.sort()).toEqual(['projectLs','recordFrames','snapshot'])
  await info.attach('observer-contract.json',{body:json(keys),contentType:'application/json'})
- await page.goto('http://127.0.0.1:4175/')
+ await page.goto('http://127.0.0.1:4175/?scene=radar')
  await expect(page.locator('canvas')).toBeVisible()
  expect(await page.evaluate(()=>({navigation:'navigationTest' in window,radar:'radarTest' in window}))).toEqual({navigation:false,radar:false})
  const response=await request.get('http://127.0.0.1:4175/tests/fixture.html')

@@ -5,6 +5,7 @@ import { ResourceSession, type ResourceStorage } from './resourceSession.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID as id } from './scoutResourceContainer.ts'
 import { createTopDownState, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
 import { point2 } from './topDownFrames.ts'
+import { resourceInventoryUsage } from './resourceInventory.ts'
 class Storage implements ResourceStorage {
   raw: string | null = null
   fail = false
@@ -89,11 +90,18 @@ test('out-of-range/wrong-target opens are rejected; movement/range/cockpit/scene
 })
 
 test('slot feedback distinguishes adding a raw type from an existing stack without rounding gram capacity', () => {
-  const inventory = { capacityGrams: 10000, capacitySlots: 12, quantities: { mineral: 333 }, items: {} }
-  assert.match(withdrawalCapacityError(inventory, { grams: 333, slots: 12 }, 'biomass', 1), /Player slots full: 12 \/ 12/)
-  assert.equal(withdrawalCapacityError(inventory, { grams: 333, slots: 12 }, 'mineral', 1), '')
-  assert.equal(withdrawalCapacityError(inventory, { grams: 9999, slots: 1 }, 'mineral', 1), '')
-  assert.match(withdrawalCapacityError(inventory, { grams: 9999, slots: 1 }, 'mineral', 2), /Player overweight: only 1 g free/)
+  // Real shared-slot usage from synthetic count-item definitions, no gameplay catalog grant.
+  const inventory = { capacityGrams: 10000, capacitySlots: 12, quantities: { mineral: 333 }, items: { module: 11 } }
+  const resources = { mineral: {}, biomass: {} }, items = { module: { gramsPerItem: 1, stackSize: 1 } }
+  const used = resourceInventoryUsage(inventory, resources, items)
+  assert.deepEqual(used, { grams: 344, slots: 12 })
+  assert.match(withdrawalCapacityError(inventory, used, 'biomass', 1), /Player slots full: 12 \/ 12/)
+  assert.equal(withdrawalCapacityError(inventory, used, 'mineral', 1), '')
+  const heavy = { ...inventory, quantities: { mineral: 9999 }, items: {} }
+  const heavyUsage = resourceInventoryUsage(heavy, resources, items)
+  assert.equal(withdrawalCapacityError(heavy, heavyUsage, 'mineral', 1), '')
+  assert.match(withdrawalCapacityError(heavy, heavyUsage, 'mineral', 2), /Player overweight: only 1 g free/)
+
 })
 
 test('opening saves arrival before review, so a location-only autosave cannot stale the confirmation', () => {

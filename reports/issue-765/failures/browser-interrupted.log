@@ -1,0 +1,55 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down
+
+[WebServer] (node:2445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2477) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:2489) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:20:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (7.5s)
+  ✓  2 [top-down] › tests/top-down.spec.ts:73:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (4.4s)
+  ✓  3 [top-down] › tests/top-down.spec.ts:98:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (7.5s)
+  ✓  4 [top-down] › tests/top-down.spec.ts:137:1 › TD-5 built entry retains navigation even with development scene query (1.1s)
+  ✓  5 [top-down] › tests/top-down.spec.ts:151:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (8.9s)
+  ✓  6 [top-down] › tests/top-down.spec.ts:198:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (31.4s)
+  ✘  7 [top-down] › tests/top-down.spec.ts:263:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.6m)
+
+
+  1) [top-down] › tests/top-down.spec.ts:263:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Test was interrupted.
+
+    Error: locator.getAttribute: Target page, context or browser has been closed
+
+      186 | // Read-only tick observations control time, never gameplay state or rendering.
+      187 | async function walkTicks(page: Page, key: string | string[], ticks: number) {
+    > 188 |   const tick = async () => Number(await scene(page).getAttribute('data-tick'))
+          |                                                     ^
+      189 |   const target = await tick() + ticks
+      190 |   const keys = typeof key === 'string' ? [key] : key
+      191 |   for (const code of keys) await page.keyboard.down(code)
+        at tick (/workspace/salimon/client/tests/top-down.spec.ts:188:53)
+        at walkTicks (/workspace/salimon/client/tests/top-down.spec.ts:193:35)
+        at walkTo (/workspace/salimon/client/tests/top-down.spec.ts:68:21)
+        at /workspace/salimon/client/tests/top-down.spec.ts:331:98
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser-final/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser-final/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/issue-765-browser-final/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 interrupted
+    [top-down] › tests/top-down.spec.ts:263:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+  6 passed (2.8m)

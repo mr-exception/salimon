@@ -17,6 +17,7 @@ export const SCOUT_ANCHORS: Readonly<Record<string, Anchor>> = {
   entry: { frame: 'ship:scout', point: point2(0, 5.5) },
 }
 export const STORAGE_CAPACITY = { massG: 50_000, volumeL: 50 } as const
+export const SCOUT_ENTRY_HALF_WIDTH_M = 1.5
 export function scoutEntities(): Entity2D[] {
   return [
     prop('scout:desk', 0, -5, 'desk', 1.5, .5, 'Cockpit desk'),

@@ -1,0 +1,60 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down
+
+[WebServer] (node:3115) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3146) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:3158) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:20:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (7.5s)
+  ✓  2 [top-down] › tests/top-down.spec.ts:73:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (4.5s)
+  ✓  3 [top-down] › tests/top-down.spec.ts:98:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (7.6s)
+  ✓  4 [top-down] › tests/top-down.spec.ts:137:1 › TD-5 built entry retains navigation even with development scene query (1.1s)
+  ✓  5 [top-down] › tests/top-down.spec.ts:151:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (8.7s)
+  ✓  6 [top-down] › tests/top-down.spec.ts:199:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (28.9s)
+  ✘  7 [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.1m)
+
+
+  1) [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      289 |           await info.attach(`${name}-repeat.json`, { body: JSON.stringify({ pass: result.pass, changedPixels: result.changedPixels, rawChangedPixels: result.rawChangedPixels, policy: POLICY }), contentType: 'application/json' })
+      290 |           await info.attach(`${name}-diff.png`, { body: result.diff, contentType: 'image/png' })
+    > 291 |           expect(result.pass).toBe(true)
+          |                               ^
+      292 |         }
+      293 |       }
+      294 |       const frame = () => page.locator('[data-entity="person:player"]').getAttribute('data-frame')
+        at capture (/workspace/salimon/client/tests/top-down.spec.ts:291:31)
+        at /workspace/salimon/client/tests/top-down.spec.ts:324:7
+
+    attachment #11: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser-verified/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #12: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser-verified/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/issue-765-browser-verified/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/error-context.md
+
+    attachment #14: trace (application/zip) ────────────────────────────────────────────────────────
+    ../../../tmp/issue-765-browser-verified/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/issue-765-browser-verified/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [top-down] › tests/top-down.spec.ts:264:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+  6 passed (2.1m)

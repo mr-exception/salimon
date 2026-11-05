@@ -1,8 +1,9 @@
 import { planetaryEntities, STARTING_SITE, type SourceIdentity } from './planetarySite.ts'
 import { scoutEntities } from './scoutLayout.ts'
+import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
 import { translate } from './coordinates.ts'
 import { allowedMove, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
-import { point2, relativeAnchor, rotate2, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
+import { convertAnchor, point2, relativeAnchor, rotate2, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
 export type Layer = typeof LAYERS[number]
@@ -42,8 +43,7 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'exterior'): 
     camera: { anchor: entities.find(e => e.id === PLAYER_ID)!.anchor, pixelsPerM: view === 'exterior' ? 26 : 32 },
   }
 }
-// One continuous scene. Collision queries use each object's frame/footprint;
-// crossing ownership and cockpit seating remain downstream work.
+// One continuous scene. Crossing changes ownership, never world position.
 export function stepTopDown(state: TopDownState, direction: Point2): TopDownState {
   const [x, y] = direction
   if (![x, y].every(Number.isFinite)) throw new RangeError('Expected finite movement')
@@ -57,6 +57,7 @@ export function stepTopDown(state: TopDownState, direction: Point2): TopDownStat
     const fraction = allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames)
     anchor = { ...anchor, point: translate(anchor.point, [delta[0] * fraction, delta[1] * fraction, 0]) }
   }
+  anchor = crossScoutEntry(player.anchor, anchor, state.frames)
   const entities = state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e)
   const selectedId = nearbyObject(anchor, entities, state.frames)?.id ?? null
   let activity = state.player
@@ -72,13 +73,16 @@ export function stepTopDown(state: TopDownState, direction: Point2): TopDownStat
     }
   }
   // Fixed-step exponential follow: same result at any render cadence. The camera
-  // remains in the player's frame and never flattens astronomical positions.
+  // follows through frame handoff without resetting its lag or zoom.
   const [cx, cy] = relativeAnchor(anchor, state.camera.anchor, state.frames)
   const cameraAngle = state.camera.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0
   const deltaCamera = rotate2([cx * .16, cy * .16], -cameraAngle)
   const cameraAnchor = { ...state.camera.anchor, point: translate(state.camera.anchor.point, [deltaCamera[0], deltaCamera[1], 0]) }
   return { ...state, tick: state.tick + 1, entities, player: activity, selectedId, feedback,
-    camera: { ...state.camera, anchor: cameraAnchor } }
+    camera: { ...state.camera, anchor: convertAnchor(cameraAnchor, anchor.frame, state.frames) } }
+}
+export function capturePlayerLocation(state: TopDownState): PlayerLocation {
+  return copyPlayerLocation({ anchor: state.entities.find(e => e.id === PLAYER_ID)!.anchor, facing: state.player.facing })
 }
 export function requestInteraction(state: TopDownState, id: string | null = state.selectedId): TopDownState {
   const player = state.entities.find(e => e.id === PLAYER_ID)!, target = state.entities.find(e => e.id === id)

@@ -9,18 +9,22 @@ import { capturePlayerLocation, PLAYER_ID, type TopDownState } from './topDownRu
 import type { PlayerLocation } from './topDownTraversal.ts'
 
 export const RESOURCE_SAVE_KEY = 'salimon:expedition:v1'
-export const RESOURCE_CATALOG_VERSION = 'landing-resources:v1'
-// Authored sample values, not a balance/upgrade or machine-processing contract.
+export const RESOURCE_CATALOG_VERSION = 'landing-resources:v2'
+// The existing v1 localStorage key is retained for safe one-time save migration.
+const LEGACY_CATALOG_VERSION = 'landing-resources:v1'
+const LEGACY_GRAMS_PER_LITRE = { mineral: 2500, biomass: 500 } as const
 export const RESOURCE_CATALOG = {
-  mineral: { name: 'Banded mineral', gramsPerLitre: 2500 },
-  biomass: { name: 'Plate biomass', gramsPerLitre: 500 },
+  mineral: { name: 'Banded mineral' },
+  biomass: { name: 'Plate biomass' },
 } as const
+// Count items are supported by the inventory domain; actual item catalog weights are TBD.
+export const ITEM_CATALOG = {} as const
 export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
-  'source:landing:mineral:01': { id: 'source:landing:mineral:01', resourceId: 'mineral', remainingLitres: 24 },
-  'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingLitres: 30 },
+  'source:landing:mineral:01': { id: 'source:landing:mineral:01', resourceId: 'mineral', remainingGrams: 60_000 },
+  'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave {
-  readonly version: 1
+  readonly version: 2
   readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
   readonly siteId: typeof STARTING_SITE.id
   readonly revision: number
@@ -59,25 +63,39 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
   }
   return { anchor: parsed, facing: location.facing }
 }
-/** Reject incompatible or inconsistent data; never silently reset depletion. */
+/** Reject inconsistent saves, and migrate whole-litre v1 saves to exact grams without loss. */
 export function decodeResourceSave(raw: string, world: TopDownState): ResourceSave {
   const data = object(JSON.parse(raw))
-  if (data.version !== 1 || data.catalogVersion !== RESOURCE_CATALOG_VERSION || data.siteId !== STARTING_SITE.id) throw new Error('Unsupported save version')
+  const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
+  if ((!legacy && (data.version !== 2 || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+    throw new Error('Unsupported save version')
+  }
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
-    quantities[id] = integer(quantity, 1)
+    const count = integer(quantity, 1)
+    quantities[id] = legacy ? integer(count * LEGACY_GRAMS_PER_LITRE[id as keyof typeof LEGACY_GRAMS_PER_LITRE], 1) : count
   }
-  const inventory = { capacityGrams: integer(inv.capacityGrams, 10_000), capacityLitres: integer(inv.capacityLitres, 10), quantities }
-  resourceInventoryUsage(inventory, RESOURCE_CATALOG)
+  const items: Record<string, number> = {}
+  if (!legacy) {
+    for (const [id, count] of Object.entries(object(inv.items))) items[id] = integer(count, 1)
+  }
+  const inventory: ResourceInventory = {
+    capacityGrams: integer(inv.capacityGrams, 10_000),
+    capacitySlots: legacy ? 12 : integer(inv.capacitySlots, 12),
+    quantities, items,
+  }
+  resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG)
   const savedSources = object(data.sources), sources: Record<string, ResourceSource> = {}
   if (Object.keys(savedSources).length !== Object.keys(RESOURCE_SOURCES).length) throw new Error('Wrong source set')
   for (const [id, initial] of Object.entries(RESOURCE_SOURCES)) {
-    const source = object(savedSources[id]), remainingLitres = integer(source.remainingLitres)
-    if (source.id !== id || source.resourceId !== initial.resourceId || remainingLitres + (quantities[initial.resourceId] ?? 0) !== initial.remainingLitres) throw new Error('Material conservation failed')
-    sources[id] = { id, resourceId: initial.resourceId, remainingLitres }
+    const source = object(savedSources[id])
+    const previous = integer(legacy ? source.remainingLitres : source.remainingGrams)
+    const remainingGrams = legacy ? integer(previous * LEGACY_GRAMS_PER_LITRE[initial.resourceId as keyof typeof LEGACY_GRAMS_PER_LITRE]) : previous
+    if (source.id !== id || source.resourceId !== initial.resourceId || remainingGrams + (quantities[initial.resourceId] ?? 0) !== initial.remainingGrams) throw new Error('Material conservation failed')
+    sources[id] = { id, resourceId: initial.resourceId, remainingGrams }
   }
-  return { version: 1, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, location: parseLocation(data.location, world) }
+  return { version: 2, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, location: parseLocation(data.location, world) }
 }
 export function resourcePayload(inventory: ResourceInventory, world: TopDownState) {
   const grams = resourceInventoryUsage(inventory, RESOURCE_CATALOG).grams
@@ -143,10 +161,10 @@ export class ResourceSession {
   checkpoint(): void {
     if (serialize(safeLocation(this.world)) !== serialize(this.snapshot.location)) this.commit(this.snapshot)
   }
-  upgrade(capacityGrams: number, capacityLitres: number): boolean {
-    return this.commit({ ...this.snapshot, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacityLitres, RESOURCE_CATALOG) })
+  upgrade(capacityGrams: number, capacitySlots: number): boolean {
+    return this.commit({ ...this.snapshot, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, ITEM_CATALOG) })
   }
-  cancel(message = 'Gathering stopped. Completed litres are saved.'): void {
+  cancel(message = 'Gathering stopped. Completed grams are saved.'): void {
     if (this.activeSourceId) this.feedback = message
     this.activeSourceId = null
     this.progressTicks = 0
@@ -158,12 +176,12 @@ export class ResourceSession {
   }
   private blocked(id: string): string {
     const source = this.snapshot.sources[id]
-    if (!source || source.remainingLitres === 0) return 'Source depleted. No material remains.'
-    const used = resourceInventoryUsage(this.snapshot.inventory, RESOURCE_CATALOG)
-    const density = RESOURCE_CATALOG[source.resourceId as keyof typeof RESOURCE_CATALOG].gramsPerLitre
-    const mass = this.snapshot.inventory.capacityGrams - used.grams < density
-    const volume = used.litres >= this.snapshot.inventory.capacityLitres
-    return mass || volume ? `Inventory full: ${mass && volume ? 'weight and volume' : mass ? 'weight' : 'volume'} limit. Remaining material stays in the source.` : ''
+    if (!source || source.remainingGrams === 0) return 'Source depleted. No material remains.'
+    const inventory = this.snapshot.inventory
+    const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG)
+    const mass = used.grams >= inventory.capacityGrams
+    const slots = !inventory.quantities[source.resourceId] && used.slots >= inventory.capacitySlots
+    return mass || slots ? `Inventory full: ${mass && slots ? 'weight and slot' : mass ? 'weight' : 'slot'} limit. Remaining material stays in the source.` : ''
   }
   start(id: string | null): void {
     if (this.activeSourceId) { this.cancel(); return }
@@ -177,7 +195,7 @@ export class ResourceSession {
     this.activeSourceId = id
     this.progressTicks = 0
     this.world = { ...this.world, selectedId: id, player: { ...this.world.player, mode: 'interacting', targetId: id } }
-    this.feedback = 'Gathering · 1 L/s. Move or Escape to stop.'
+    this.feedback = 'Gathering · 1 kg/s. Move or Escape to stop.'
   }
   advance(next: TopDownState): TopDownState {
     const elapsed = Math.max(0, next.tick - this.world.tick), wasWalking = this.world.player.mode === 'walking'
@@ -185,14 +203,14 @@ export class ResourceSession {
     const id = this.activeSourceId
     if (id) {
       const target = next.entities.find(e => e.id === id), player = next.entities.find(e => e.id === PLAYER_ID)!
-      if (!target || next.player.mode !== 'interacting' || next.player.targetId !== id || next.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, next.frames)) this.cancel('Gathering interrupted. Unfinished litre discarded.')
+      if (!target || next.player.mode !== 'interacting' || next.player.targetId !== id || next.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, next.frames)) this.cancel('Gathering interrupted. Unfinished second discarded.')
       else {
         this.progressTicks += elapsed
         while (this.activeSourceId && this.progressTicks >= 60) {
-          const gathered = gatherResource(this.snapshot.inventory, this.snapshot.sources[id]!, 1, RESOURCE_CATALOG)
-          if (gathered.collectedLitres && this.commit({ ...this.snapshot, inventory: gathered.inventory, sources: { ...this.snapshot.sources, [id]: gathered.source } })) {
+          const gathered = gatherResource(this.snapshot.inventory, this.snapshot.sources[id]!, 1000, RESOURCE_CATALOG, ITEM_CATALOG)
+          if (gathered.collectedGrams && this.commit({ ...this.snapshot, inventory: gathered.inventory, sources: { ...this.snapshot.sources, [id]: gathered.source } })) {
             this.progressTicks -= 60
-            this.feedback = `Gathered 1 L · ${RESOURCE_CATALOG[gathered.source.resourceId as keyof typeof RESOURCE_CATALOG].name}. Saved.`
+            this.feedback = `Gathered ${gathered.collectedGrams / 1000} kg · ${RESOURCE_CATALOG[gathered.source.resourceId as keyof typeof RESOURCE_CATALOG].name}. Saved.`
           }
           const blocked = this.blocked(id)
           if (blocked) { this.cancel(); this.feedback = blocked }

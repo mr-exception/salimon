@@ -1,0 +1,67 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit
+
+[WebServer] (node:1671) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1724) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:1736) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (3.0m)
+(node:2371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [cockpit] › tests/gathering.spec.ts:6:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (40.1s)
+  ✓  3 [cockpit] › tests/gathering.spec.ts:74:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (10.1s)
+  ✓  4 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (2.8m)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation
+
+    Test timeout of 180000ms exceeded.
+
+    Error: page.screenshot: Target page, context or browser has been closed
+
+      15 |       const capture = async (name: string) => {
+      16 |         await page.clock.runFor(5000)
+    > 17 |         const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
+         |                                ^
+      18 |         if (replay === 0) originals[name] = png
+      19 |         else {
+      20 |           const r = compareImages(originals[name]!, png)
+        at capture (/workspace/salimon/client/tests/cockpit.spec.ts:17:32)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:41:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/issue-784-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/issue-784-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/issue-784-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/issue-784-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/issue-784-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation
+  3 passed (7.1m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

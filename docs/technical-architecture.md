@@ -20,7 +20,8 @@ IDs, fixed-step walking/facing, camera follow and layered draw lists.
 `topDownInteraction.ts` owns swept collision and stable-ID nearby selection/reach;
 entity-local footprints match the artwork. `cockpit.ts` owns local owner control,
 one-chair reservation and power/view transitions. Other interactions inspect
-placeholders. Mining and durable local saves use the resource owners below;
+placeholders; the Scout Resource Container domain is enabled by #784 with UI
+following in #785. Mining and durable local saves use the resource owners below;
 Core, Fabricator processing and server authority remain future work.
 
 `TopDownIllustration.tsx` retains the authored illustrated SVG shapes.
@@ -61,9 +62,9 @@ currently retains local simulation and local saves.
 player inventory and count-item per-type stack limits. Volume is not a limit.
 `resourceLedger.ts` owns complete source/player/store conservation and exact
 revision-checked transfers; trusted store declarations validate saved identity
-and gram capacity. No store is enabled in the default world.
+and gram capacity. The default session declares the 50 kg Scout store in `scoutResourceContainer.ts`.
 `resourceSession.ts` composes the existing world interaction/tick path, a versioned
-sample gram/source catalog, atomic v3 inventory/store/depletion/location saves with v1/v2 migration, validated
+sample gram/source catalog, atomic v4 inventory/store/depletion/location saves with v1/v2/v3 migration, validated
 restore and derived player/ship resource payload. `TopDownView.tsx` owns tool/UI
 actions and the exclusive browser save lock. Resource state never enters the
 SVG art or collision owners. Unit/integration coverage is in
@@ -71,6 +72,11 @@ SVG art or collision owners. Unit/integration coverage is in
 drives the built production entry and retains repeat screenshots in existing CI.
 See [the resource contract](resource-inventory-and-gathering.md) for save/failure
 semantics and unsupported machine/server features.
+
+The Scout raw-store declaration is owned by `scoutResourceContainer.ts`, bound to
+the existing `scout:storage` ship-local anchor and 50,000 g metadata. Default
+ResourceSession commands persist it atomically in schema v4; v3 saves acquire
+the previously absent container empty, while v4 missing data fails closed.
 
 ## Historical native architecture
 

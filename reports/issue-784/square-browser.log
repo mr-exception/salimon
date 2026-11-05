@@ -1,0 +1,37 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down --grep TD-1 --repeat-each=5
+
+[WebServer] (node:10853) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:10866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:10886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:10899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:10911) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (6.6s)
+(node:11039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (4.9s)
+(node:11173) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (5.8s)
+(node:11305) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (5.1s)
+(node:11438) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (9.0s)
+
+  5 passed (45.4s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

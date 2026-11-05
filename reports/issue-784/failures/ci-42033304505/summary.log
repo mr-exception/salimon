@@ -1,0 +1,12 @@
+2026-11-05T13:18:43.3256001Z   ✓   1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (43.2s)
+2026-11-05T13:19:02.1010214Z   ✓   2 [cockpit] › tests/gathering.spec.ts:6:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (18.8s)
+2026-11-05T13:19:07.8566931Z   ✓   3 [cockpit] › tests/gathering.spec.ts:74:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (5.7s)
+2026-11-05T13:20:05.3409809Z   ✓   4 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (57.5s)
+2026-11-05T13:20:08.0073336Z   ✘   5 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (1.9s)
+2026-11-05T13:23:42.4824337Z   1) [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures
+2026-11-05T13:23:42.4842629Z     Error: expect(received).toEqual(expected) // deep equality
+2026-11-05T13:23:42.5002073Z         at /home/runner/work/salimon/salimon/client/tests/top-down.spec.ts:46:23
+2026-11-05T13:23:42.5011703Z   1 failed
+2026-11-05T13:23:42.5012731Z     [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures
+2026-11-05T13:23:42.5013445Z   34 passed (5.7m)
+2026-11-05T13:23:42.5803018Z ##[error]Process completed with exit code 1.

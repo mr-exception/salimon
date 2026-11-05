@@ -47,7 +47,7 @@
 ## Save format, authority and migration
 
 - The browser's pure `resourceInventory.ts` owns gram-based resource quantities, capacity grams/slots, and count-item stack/mass validation. `resourceSession.ts` owns initial 1 kg/s mining, stable sources, depletion and one atomic save envelope. The current playable HUD shows kg and slots, no litres/volume.
-- The save envelope is **version 3** (`landing-resources:v2`), storing grams, slots, count-item map, source remaining grams, identified raw stores, player location and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
+- The save envelope is **version 4** (`landing-resources:v2`), storing grams, slots, count-item map, source remaining grams, identified raw stores, player location and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
 - The active tab holds an exclusive browser Web Lock; commits use compare-and-replace localStorage before publishing state. Movement checkpoints occur at most once per simulated second and on stop/page-hide. This is browser-local single-writer persistence, **not** future backend authority, anti-cheat security or cloud sync.
 
 ## Outstanding decisions
@@ -63,8 +63,8 @@
 `resourceLedger.ts` owns the validated raw-resource graph: player inventory,
 fixed source IDs/materials and flat identified ship-side stores. A trusted
 `ResourceStoreCatalog` declares each store's stable ID, ship ID and gram capacity;
-saved metadata must match it exactly. No ship store is enabled by default, no
-container slot count is introduced, and visible modules remain placeholders.
+saved metadata must match it exactly. The Scout enables `scout:storage`, a ship-local 50,000 g raw-only store. No
+container slot count is introduced; its interface remains future work (#785).
 
 `transferResource` accepts an expected revision, typed source/destination,
 resource ID and exact positive integer grams. Source → player/store, player ↔
@@ -86,7 +86,10 @@ mining and blocks further writes. The original storage key and catalog identity
 are unchanged. Migration is in-memory until a successful normal commit; failed
 migration writes preserve the original v1/v2 bytes. Unknown/corrupt/unsupported
 save versions or store IDs/metadata block writes instead of resetting material.
-Future composition must supply the same trusted store declarations on reload.
+Composition supplies the same trusted store declarations on reload. Schema v3
+saves missing the newly introduced Scout container acquire it empty; schema v4
+requires it, so a damaged current save cannot silently reset cargo. Existing
+v1/v2 migration remains lossless and preserves original bytes until commit.
 
 `resourceLedgerMass` exposes player grams, selected ship store grams and total
 ship payload. `ResourceSession.payload` is used by `TopDownView`: stores count
@@ -96,3 +99,14 @@ Mass is recomputed from dry ship mass each frame, never accumulated per tick.
 Gear mass beyond the existing item field and machine consumption/recipes are
 still outside this foundation. Browser-local single-writer guarantees do not
 establish multiplayer or backend authority.
+
+## Scout Resource Container domain (#784)
+
+`scoutResourceContainer.ts` binds the existing `scout:storage` anchor to the
+50,000 g store on `ship:scout`. `ResourceSession.deposit` and `withdraw` require
+raw resource ID, exact positive integer grams and expected revision. Requests
+are all-or-nothing; a partial amount must be requested explicitly. No count
+items, unknown raw IDs, volume cap or organizational slot cap are accepted.
+Default sessions persist the identified container in the same atomic envelope
+as player inventory/source depletion/location. Its mass counts once even while
+the player is outside; onboard player mass remains separate. UI is #785.

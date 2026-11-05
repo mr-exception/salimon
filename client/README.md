@@ -2,10 +2,10 @@
 
 Use the [2D documentation migration register](../docs/2d-migration-register.md) to distinguish the current browser implementation, approved future mechanics and archived native source contracts.
 
-**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v3 resource ledger and migrates valid v1
+**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v4 resource ledger and migrates valid v1
 litre / v2 gram saves without loss. `resourceLedger.ts` validates exact transfers
 and store mass; future stores require trusted ID/ship/capacity declarations.
-The default world enables no ship storage or transfer UI. See [resource design](../docs/resource-inventory-and-gathering.md).
+The default session enables the 50 kg Scout store domain; transfer UI is #785. See [resource design](../docs/resource-inventory-and-gathering.md).
 
 The default client is a React + TypeScript + Vite 2D world with a Three.js /
 React Three Fiber cockpit radar. Start with [current implementation and legacy
@@ -136,7 +136,9 @@ cockpit desk and separate chair, bunk, partitioned aft cargo room, Core,
 Fabricator and **50 kg raw-only Resource Container** placeholder. Cargo passage (2.6 m) and aft
 entry (3 m) are open; visible jambs and room boundaries block walking. The
 threshold marks the aft approach. No roof layer, transparency or interior scene
-swap is used. Explicit line metrics keep the desktop SVG viewport on the device-pixel grid. `scoutLayout.ts` owns ship-local named anchors, shared collision/
+swap is used. Explicit line metrics keep the desktop SVG viewport on the device-pixel grid.
+The world viewport and translucent caption use rectangular pixel-aligned edges;
+curved ancestor clipping otherwise varies at compositor/capture boundaries. `scoutLayout.ts` owns ship-local named anchors, shared collision/
 visual footprints and storage capacity metadata; machine/storage interactions
 only inspect placeholders and do not process or transfer material.
 
@@ -316,3 +318,12 @@ intentional visual defect demonstration and explicit independent baseline approv
 The ordinary `test:browser` suite includes these captures. Candidate generation
 never approves a baseline; CI blocks changed references until a human collaborator
 approves the exact manifest digest. Software WebGL does not qualify hardware GPUs.
+
+## Scout container domain (#784)
+
+The default ResourceSession declares `scout:storage`, a 50,000 g raw-only store.
+Exact `deposit(resourceId, grams, revision)` / `withdraw(...)` transactions use
+the shared ledger and atomic save. Schema v4 migrates old v1/v2/v3 expeditions
+without changing source/player mass, and rejects damaged current container data.
+Store mass contributes once to ship simulation independently of player location.
+The visible storage fixture still inspects a placeholder; its playable panel is #785.

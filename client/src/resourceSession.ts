@@ -1,4 +1,5 @@
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
+import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
 import { CELL_SIZE_M } from './coordinates.ts'
 import { leaveCockpit } from './cockpit.ts'
 import { STARTING_SITE } from './planetarySite.ts'
@@ -25,7 +26,7 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
-  readonly version: 3
+  readonly version: 4
   readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
   readonly siteId: typeof STARTING_SITE.id
   readonly revision: number
@@ -65,15 +66,15 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
   return { anchor: parsed, facing: location.facing }
 }
 /** Reject inconsistent saves, and migrate whole-litre v1 saves to exact grams without loss. */
-export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = {}): ResourceSave {
+export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES): ResourceSave {
   const data = object(JSON.parse(raw))
-  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(data.version === 3 ? ['stores'] : [])]
+  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...((data.version === 3 || data.version === 4) ? ['stores'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
+  if (data.version !== 3 && data.version !== 4 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -104,8 +105,13 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     if (source.id !== id || source.resourceId !== initial.resourceId) throw new Error('Material conservation failed')
     sources[id] = { id, resourceId: initial.resourceId, remainingGrams }
   }
-  const stores = data.version === 3 ? object(data.stores) as ResourceLedger['stores'] : emptyResourceStores(storeDefinitions)
-  const save: ResourceSave = { version: 3, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
+  const savedStores = data.version === 3 || data.version === 4 ? object(data.stores) : null
+  // Only the newly introduced Scout store may be absent in v3. v4 requires it.
+  const stores = savedStores ? { ...savedStores } as Record<string, ResourceLedger['stores'][string]> : emptyResourceStores(storeDefinitions)
+  if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
+    stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
+  }
+  const save: ResourceSave = { version: 4, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
   validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
   return save
 }
@@ -138,11 +144,11 @@ export class ResourceSession {
   private checkpointTick = 0
   private readonly storage: ResourceStorage
   private readonly storeDefinitions: ResourceStoreCatalog
-  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = {}) {
+  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES) {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 3, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 4, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -184,6 +190,13 @@ export class ResourceSession {
       this.feedback = error instanceof Error ? error.message : 'Invalid transfer'
       return false
     }
+  }
+  /** Explicit exact grams, with the same atomic save and stale-revision guard as mining. */
+  deposit(resourceId: string, grams: number, revision: number): boolean {
+    return this.transfer({ revision, from: { kind: 'player' }, to: { kind: 'store', id: SCOUT_RESOURCE_CONTAINER_ID }, resourceId, grams })
+  }
+  withdraw(resourceId: string, grams: number, revision: number): boolean {
+    return this.transfer({ revision, from: { kind: 'store', id: SCOUT_RESOURCE_CONTAINER_ID }, to: { kind: 'player' }, resourceId, grams })
   }
   payload() {
     return resourceLedgerMass(this.snapshot, this.world.frames.ship.id,

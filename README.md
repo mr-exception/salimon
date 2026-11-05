@@ -41,7 +41,7 @@ with `docker compose down`. Repeat `docker compose up --build -d` after making
 client changes to rebuild the production bundle.
 
 The root [`docker-compose.yml`](docker-compose.yml) builds
-[`docker/Dockerfile`](docker/Dockerfile) with `client/package-lock.json`, then
+[`docker/Dockerfile.client`](docker/Dockerfile.client) with `client/package-lock.json`, then
 serves the resulting `client/dist/` from Nginx on container port `80`.
 The runtime container does not run Node/Vite, does not hot-reload source and
 does not include a game backend. For live development, use the Node commands

@@ -1,5 +1,15 @@
 # Spaceship, Building & Survival
 
+## Current 2D implementation boundary
+
+Today's **playable** Scout contains an open cargo doorway, local cockpit chair and radar transition, inspection-only machinery, sample mining and a persistent player inventory. Stacked issue #783 adds a raw-resource ledger **domain**, but that does not provide a functioning Resource Container interface or Core/Fabricator processing. Upcoming work is separately owned by #784–#788; do not treat old Rust implementations of power, repair, crafting, survival or ship construction as browser-delivered.
+
+For new 2D mechanics, use **10 kg and 12 shared slots** for the starting player inventory, **integer grams** for raw materials, **no volume**, and **50 kg raw-only Resource Container** as a future ship-store capacity. Tierless modular suits and the **200 HP** hazard model are approved but not present in the browser. Current 2D damage is **whole-ship only** (damaged intact or destroyed entirely); room and individual module breakage described in historical construction sections is deferred. A decorative sprite is not a running machine, protected locker, craftable item, or backed server process.
+
+
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Cockpit and ship-wide damage update (2026-11-04):** Default gameplay is 2D; owner enters 3D radar only via cockpit desk, appearing seated to others. Exiting normally stands them up; blackout returns them to seated 2D; disconnect removes avatar/releases interactions and preserves a ship-local or planet-fixed reconnect point. **Current 2D damage scope is whole-ship damage/destruction only**; old per-cell/module damage text below is legacy/deferred. See [cockpit and reconnect](cockpit-navigation-and-reconnect.md).
 
 > **Updated 2D inventory (2026-11-05):** [Strict top-down art](top-down-art-direction.md), [weight-only 10 kg / 12-slot inventory](resource-inventory-and-gathering.md) and [modular spacesuits/hazards](spacesuit-and-hazards.md) supersede earlier dual weight/volume, whole-litre, physically carried raw-resource, suit-tier and fragment-based text below. The browser currently supports weight-based raw gathering, not playable gear/crafting. Historical native implementation notes remain historical.

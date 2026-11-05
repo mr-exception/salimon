@@ -1,5 +1,8 @@
 # Closed-game motion and canonical frame (#432)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 Status: canonical motion, schema-30 migration and gravity-only launch integration are implemented on the batch branch. Scanner catch-up (#433), asynchronous menu publication (#434), the final audit (#441) and integrated evidence (#435) follow in the same PR.
 
 ## Independent propagation core
@@ -45,7 +48,7 @@ Closing snapshots explicitly disable engines/throttle/held steering while retain
 
 Canonical sessions require a `state.motion` source with exact version, definition SHA256 and TT game epoch. Schema 24–29 canonical saves without it migrate once from their recorded checkpoint time, preserving the entire physical/geographic/resource source and body-relative velocity. Current missing/unknown/mismatched motion fails atomically. Engineering worlds retain their existing independent frames and cannot carry canonical motion. Reconstruction alone advances no time or grants supplies.
 
-See the [save contract](save-contract.md) and [source/report evidence](../reports/issue-432/README.md). This changes no observed source quantity, terrain definition, resource ID, Core conversion coefficient, Jump Drive rule or backend authority.
+See the [save contract](save-contract.md) and [source/report evidence](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-432/README.md). This changes no observed source quantity, terrain definition, resource ID, Core conversion coefficient, Jump Drive rule or backend authority.
 
 ## Remaining batch work
 
@@ -62,7 +65,7 @@ The new tests exercise actual production trajectory/contact operators, a complet
 orbit against an independent analytic solution and half-step reference, progress
 partitioning, first impact/support and atomic provider/consumer failure. Fixture
 models are declared test inputs, not publication of Vesper motion or full-data
-scientific coverage. See the [work log](../reports/issue-432/README.md).
+scientific coverage. See the [work log](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-432/README.md).
 
 
 ## Offline timed systems and scanner (#433)
@@ -73,7 +76,7 @@ For a grounded stationary body-frame observer with no runnable Fabricator, conve
 
 `scanner.rs` includes Vesper and the orbiting Nacre source, uses exact fractional Core storage and validates contacts plus chart before debit/publication. Moving paths use the actual completed physical sample and existing tick timestamps, never an uncertified long affine chord. The default scanner has 1,000 W idle draw, 10,000 J per absolute five-second pulse and a 1,000,000,000 m range; upgrades/configuration retain the same source checks.
 
-Canonical launch flushes its final sub-tick work before source verification, aligning work, motion and scanner clocks. For pre-30 saves, legacy construction-only debt is settled without earlier motion/scanner time before the new epoch is introduced. Engineering fixtures retain their historical remainder queue. All launch mutations remain private until verification and durable checkpoint replacement. [Focused report](../reports/issue-433/README.md).
+Canonical launch flushes its final sub-tick work before source verification, aligning work, motion and scanner clocks. For pre-30 saves, legacy construction-only debt is settled without earlier motion/scanner time before the new epoch is introduced. Engineering fixtures retain their historical remainder queue. All launch mutations remain private until verification and durable checkpoint replacement. [Focused report](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-433/README.md).
 
 
 ## Native progress and verified resume (#434)
@@ -84,7 +87,7 @@ Normal startup runs `launch.rs` on one worker while the native window presents i
 
 Cancellation checks happen before publication and between bounded source batches. A failed/canceled job keeps its private changes out of the visible session. Atomic IO that has already started owns its verified receipt and remains recoverable through the existing two generations. A stopped worker, bad/missing source, backward local clock, unsupported calendar, lock/storage error or failed publication cannot enable Resume. The menu offers Retry/Quit with bounded readable error text. Its wall time is excluded; saved admitted tick backlog survives until Continue through `reset_wall_anchor`.
 
-Only explicit E2E mode enables `offline_launch` (controlled elapsed seconds in 0..86400, optional backward-clock fixture and bounded progress hold) and `launch_release`. They seed a new isolated temporary store and use the real worker/checkpoint path. `SALIMON_E2E_LAUNCH_DIR` additionally lets a canonical-journey E2E process reopen a designated isolated store with the actual local clock, including restart after process death. Ordinary launches do not enable protocol input or fixture gates. [Report and native routes](../reports/issue-434/README.md).
+Only explicit E2E mode enables `offline_launch` (controlled elapsed seconds in 0..86400, optional backward-clock fixture and bounded progress hold) and `launch_release`. They seed a new isolated temporary store and use the real worker/checkpoint path. `SALIMON_E2E_LAUNCH_DIR` additionally lets a canonical-journey E2E process reopen a designated isolated store with the actual local clock, including restart after process death. Ordinary launches do not enable protocol input or fixture gates. [Report and native routes](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-434/README.md).
 
 
 ## Shared physical and presentation epoch (audit #441)

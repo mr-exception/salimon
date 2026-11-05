@@ -1,5 +1,8 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Additional approved exterior direction (2026-10-24; future scope):** [Planetary environmental art direction](planetary-environment-art-direction.md) specifies coherent geology/regions, time-dependent regional weather and atmospheric effects, rare fixed biospheres, visible biological harvesting, natural landmarks, suit observations and exterior acoustics. These do not claim new runtime functionality or alter the five-second scanner, 1:1 shared clock, landing physics, published geography or unknown Earth route. Surface hydrology requires a separate design.
 
 
@@ -10,7 +13,7 @@ performance targets are unchanged. Keep actual platform results distinct.
 
 Status: **U01–U33 interfaces and canonical playable adoption are implemented;
 U34 integrated cloud evidence is delivered in the current five-task PR.**
-The [U36 audit matrix](../reports/issue-441/README.md) maps current behavior,
+The [U36 audit matrix](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-441/README.md) maps current behavior,
 source/tests and remaining scope. Ordinary play uses Vesper and the approved
 fictional two-body motion publication; compressed worlds are engineering fixtures.
 Full Gaia acceptance (#524), physical platform (#557), human presentation (#561),
@@ -61,7 +64,7 @@ Jump Drive implementation and balance, explicit at/above-c behavior and high-spe
 
 ## Implemented U01 boundary (#402)
 
-The [isolated portable schema](../client/universe/architecture.md) now implements
+The [isolated portable schema](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md) now implements
 immutable source IDs, typed records and provenance/uncertainty validation. It does
 not connect canonical truth to player discovery or replace the playable catalog.
 U02–U34 retain their dependency gates. Existing gameplay implementation work is
@@ -79,7 +82,7 @@ remains #441. This policy setup does not certify future changes or native gates.
 
 Portable split-cell galactic positions, typed instantaneous frame trees and
 calendar epoch/scale gates are delivered independently of playable migration.
-See [limits and ownership](../client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
+See [limits and ownership](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
 Actual ephemerides, astrometry ingestion and UTC leap-table conversion remain
 explicit downstream work; no reference-machine/real-dataset approval is implied.
 

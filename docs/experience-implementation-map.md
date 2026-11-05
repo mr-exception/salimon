@@ -1,5 +1,8 @@
 # Experience and narrative implementation/ownership map
 
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 Current verification routing: [cloud and human workflows](verification-workflow.md).
 #568 owns automatable corpus/matrix/experience checks; #659 owns source rights,
 #660 balance and #661 human experience decisions; #561 presentation/audio, #557 physical
@@ -46,7 +49,7 @@ Status: **documentation planning only; implementation issue descriptions do not 
 ## Versioned verification delivery (#476)
 
 [Experience validation](experience-validation.md) and the
-[26-invariant matrix](../scenarios/portable/experience-v1.json) define current
+[26-invariant matrix](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/portable/experience-v1.json) define current
 portable Scout coverage and native/backend protocols. Twelve exact Scout test
 mappings are runnable now; fourteen remaining rows explicitly retain their
 opening/navigation/story/endgame blockers. Portable passes are not full E06,

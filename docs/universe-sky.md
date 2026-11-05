@@ -1,5 +1,8 @@
 # Hybrid astronomical sky (#423)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 The canonical gameplay view now draws an analytically authored Milky Way band
 and the published host star. `renderer/src/sky.rs` and `sky.wgsl` own presentation;
 `runtime/src/app/sky.rs` maps the canonical motion epoch, analytic Nacre position, published star radius

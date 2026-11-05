@@ -3,6 +3,12 @@
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > The roadmap is intentionally incremental. Exact phases will be finalized after the first design questions are answered.
+## Active browser 2D progression (2026-11-05)
+
+Old native Phase 0 and Rust completion notes below are historical, not the current playable delivery timeline. The browser world supports overhead Scout/planet walking, cargo/cockpit crossing, holographic radar, weight-only mining and local source/inventory saves; #783 added a ledger domain, **not** a usable ship storage console. See [current status](current-client-status.md) and [the migration register](2d-migration-register.md).
+
+Next independently tested slices: [#784 Resource Container](https://github.com/mr-exception/salimon/issues/784), [#785 cargo UI](https://github.com/mr-exception/salimon/issues/785), [#786 count-item inventory](https://github.com/mr-exception/salimon/issues/786), [#787 survival](https://github.com/mr-exception/salimon/issues/787) and [#788 hazards](https://github.com/mr-exception/salimon/issues/788). Active Core/Fabricator, canonical planetary world and multiplayer need separate migration and decisions. No entire-game phase is declared finished by this documentation update.
+
 ## Future narrative/experience initiative (2026-10-21)
 
 A grounded cinematic Scout vertical slice, opening memory-loss narrative, Archive/Data Recovery, player-known charting, and eventual Absenat gate/Hall are specified in [experience roadmap](experience-implementation-map.md). Work is split into scoped issues #463–476 and reused existing dependencies. The future homeworld replaces historical Earth-start requirements when migrated; the currently shipped prototype is not retroactively changed. Backend-powered Hall is a later implementation stage, completely undiscoverable in all pre-completion player UI.

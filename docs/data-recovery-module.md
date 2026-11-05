@@ -1,5 +1,8 @@
 # Scout Data Recovery Module — #468
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 The physical Fabricator can produce one `data-recovery-module` controller package.
 Collecting that tray item with E installs its circuitry into the existing Archive
 terminal housing opposite the Fabricator. This deliberate first implementation
@@ -11,14 +14,14 @@ batch requests reject before reserving ingredients; cancellation never refunds.
 
 ## Configured recipe and work
 
-[Recipe data](../client/fabrication/config/recovery-module.json) is validated through
+[Recipe data](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/fabrication/config/recovery-module.json) is validated through
 `RecipeBook`: 1 kg iron ore + 0.5 kg silicate rock, 60 seconds at 1 MW, output
 0.75 kg. These are explicit provisional implementation defaults, subject to owner
 balance review in [#660](https://github.com/mr-exception/salimon/issues/660).
 They are not an approved progression balance. Existing 20 kg bins, physical raw
 mining/carry/intake, FIFO head, one tray, Core funding and no-refund rules apply.
 
-[Recovery data](../client/runtime/config/data-recovery.json) supplies the captured
+[Recovery data](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/config/data-recovery.json) supplies the captured
 per-run configuration: 5 MW maximum work, 3/5 GJ for the two existing damaged
 records and a 2 GJ emergency floor. Full nominal work is 600/1,000 seconds;
 resource gathering/installation and insufficient power can extend real elapsed
@@ -85,9 +88,9 @@ declared initial materials do not measure acquisition or approve recipe/energy
 balance. Human presentation is #561, physical OS/input/DPI is #557, hardware
 budgets are #563, and route/balance decisions are #660 under the
 [verification workflow](verification-workflow.md).
-See [runtime ownership](../client/runtime/architecture.md#data-recovery-module-468),
-[Fabricator ownership](../client/fabrication/architecture.md#recovery-controller-component-468)
-and [ship energy boundary](../client/ship/architecture.md#low-priority-data-recovery-energy-468).
+See [runtime ownership](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#data-recovery-module-468),
+[Fabricator ownership](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/fabrication/architecture.md#recovery-controller-component-468)
+and [ship energy boundary](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md#low-priority-data-recovery-energy-468).
 
 
 Closed-game power and eligible construction/maintenance now follow [the schema-22 offline contract](construction-offline.md). Native launch advances service/conversion, Fabricator/Recovery and eligible work while preserving the saved scene and active survival clock. Future universe/scanner/trajectory events remain #433.

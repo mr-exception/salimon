@@ -1,12 +1,15 @@
 # Experience validation — E06 (#476)
 
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 Verification ownership follows the [cloud/human policy](verification-workflow.md):
 #568 executes automated matrix rows once their implementation dependencies ship;
 #661/#561 own instructed human decisions/reviews. Physical platform tests are
 #557, hardware budgets #563. Retain all blocked/unrun rows and real backend
 requirements; cloud passes do not invent hardware or human approval.
 
-The version-1 [scenario matrix](../scenarios/portable/experience-v1.json) maps
+The version-1 [scenario matrix](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/portable/experience-v1.json) maps
 26 accepted invariants to current portable tests and human native protocols.
 It traces [experience](experience-direction.md), [lost journey](narrative-and-lost-journey.md),
 [Archive/discovery](archive-recovery-and-navigation.md) and
@@ -21,7 +24,7 @@ energy reserve/offline pause, sound observation and physical-distance contracts.
 The existing tests use controlled initial poses/deposits; their pass establishes
 portable production-command composition, not complete physical navigation,
 screenshot fidelity, audio listening or subjective/native experience acceptance.
-Run the [portable runner](../scenarios/portable/README.md#scout-and-absenat-experience-matrix-476).
+Run the [portable runner](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/portable/README.md#scout-and-absenat-experience-matrix-476).
 It preserves a failure even when other rows are blocked. A zero-test invocation
 is missing evidence and fails. Results bind source revision and matrix SHA-256;
 new test mappings require a deliberate matrix revision/review.

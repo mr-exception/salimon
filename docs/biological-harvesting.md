@@ -1,5 +1,8 @@
 # Biological harvesting and source deltas (#621)
 
+> **Corpus migration status (#791): Historical native implementation.** The active playable world is the [strict overhead React 2D client](current-client-status.md); its 3D display is the **cockpit radar only**. References below to native Rust modules, first-person scenes, 3D asset pipelines, or prior issue completion describe the [archived pre-2D revision](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04), not current `client/` capabilities. Keep stable canonical identities, simulation and environmental rules where approved. The planetary/world view is now illustrated overhead 2D with authoritative 2D footprints and layered sprites; celestial contacts remain faceted proxies only in the cockpit 3D radar. Historical 3D mesh, camera, physics crate and GPU details are not browser implementations. See the [per-document migration register](2d-migration-register.md) for active owners and deferred work.
+
+
 > **Legacy 3D implementation (2026-11-04):** Historical native detached-anatomy fragments, physical carrying and spherical extraction below are superseded for raw resources by [direct 2D inventory gathering](resource-inventory-and-gathering.md). A new authoritative world adapter is still needed; conservation and depletion requirements remain.
 
 World `environment::harvest` publishes explicit yield designations against the

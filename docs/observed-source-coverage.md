@@ -1,6 +1,9 @@
 # Selected observed-source coverage (#526)
 
-The private [frozen input](../catalogs/sources/observed-526-v1/manifest.json)
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
+The private [frozen input](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/catalogs/sources/observed-526-v1/manifest.json)
 contains all 6,451 NASA Exoplanet Archive PS `default_flag=1` rows returned on
 2026-10-31, plus 18 explicitly selected Solar System centers from Horizons API
 1.2. A separately retained `COUNT(*)` response agrees with the PS row count.
@@ -32,7 +35,7 @@ missing. Full Gaia matching/coverage and galaxy storage acceptance stay #524.
 
 ## Supported physical headers
 
-The [Horizons adapter](../client/universe/src/ingestion/horizons.rs) deliberately
+The [Horizons adapter](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/src/ingestion/horizons.rs) deliberately
 recognizes case/spacing variants of volume-mean/mean radius in km, the Charon
 IAU2015 radius label and the selected mass labels with explicit kg powers of ten.
 Spaced `+-` errors are preserved. Sun's printed approximate mass retains unknown

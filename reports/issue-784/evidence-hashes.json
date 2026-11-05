@@ -1,5 +1,5 @@
 {
-  "reports/issue-784/README.md": "95ba7de43fa5179a4afe881fc814d2e96d2d1c548fd86e4aa01d199a86e745a5",
+  "reports/issue-784/README.md": "d060c43c98ed43461cb401e779a1cef07790777f9f63d9aede0856d90a00c37b",
   "reports/issue-784/browser/.last-run.json": "7890da0d7dbcdac2f660b0a1413266d5f3bb5320034f13323b2db08c9c3c145f",
   "reports/issue-784/browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/blackout-seated-0.png": "db0c083f0f84f7e8123f4350929a0e71d20d71e987c7d30ed12d1567b6c65178",
   "reports/issue-784/browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md": "8be19e3f1fd49f78b4cec9f78babd026c31e9dcd5f8663dcfb84db8c59da5f1e",
@@ -49,7 +49,7 @@
   "reports/issue-784/browser/raw-attachments/slice-standing-return-repeat.json": "8b01bfbb247c99f232be003a646f905ed91b97edc0a4b9e66f852b06e2b30e5c",
   "reports/issue-784/browser/raw-attachments/weight-save.json": "424dc6de9db3c1821ef731750987416f93cda5117bc3797de0ea0d8b1c40d4dd",
   "reports/issue-784/browser/results.json": "212726188782433bd4239b17fcce5bd99fbdc10be56beb3780f6c53220a5134e",
-  "reports/issue-784/browser-initial.log": "2f518d10015997913b1a6a7162db3fa4385d15e23fbda965ce424ef22638058b",
+  "reports/issue-784/browser-initial.log": "64563b322606f419f3f95e9ec5e188f80e3f87f93cbe4580dab08680a3f19e23",
   "reports/issue-784/build.log": "aa4736879f46617ba3d6c4e93980c43cf188f0fe89849dabf24933ce0746d7a9",
   "reports/issue-784/cockpit-recheck/.last-run.json": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
   "reports/issue-784/cockpit-recheck/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/blackout-seated-0.png": "521812e9ae5b8b8fac491bdcd248fbdbdb510b56a268c87545e36c271572e537",
@@ -74,5 +74,6 @@
   "reports/issue-784/preflight.log": "46ed5b36300a3f1399db4498352030fe13611fcf7cd34aa7b4f2c7c1611553df",
   "reports/issue-784/production-radar.png": "bb8564a3402eab549e2fe7fc90532170445a27e7862ce256efb2722a92114cb7",
   "reports/issue-784/source-hashes.json": "42d605735f0ceccc7065c0776ed9587a92a8f54826dd439c35d473a930e83cfe",
+  "reports/issue-784/stack-links.txt": "a7270f4f8589918537a2d75fe31af3c96f57bdc0f4c70b2bf07b388b90158613",
   "reports/issue-784/unit.log": "a6e44843b18dd5ca64d0341d74146afe06e10debedf917c18944e87502f9a379"
 }

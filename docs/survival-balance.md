@@ -1,5 +1,8 @@
 # Survival balance evidence (#384)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 The portable `runtime/src/survival_balance.rs` suite exercises new-run supplies,
 generated biomass/ice mining, F pickup, physical E intake, Core-funded crafting,
 E tray collection and explicit Q consumption. It covers blocked/full slots and
@@ -30,7 +33,7 @@ per solid body near +Y within 200 m; it cannot establish a global worst case.
   30-minute hunger supply. At zero hunger, full health lasts another 1000 seconds
   under unmodified starvation. This is an arithmetic bound, not a food guarantee.
 - Default Core resource yields and conversion rate remain catalog-owned; the
-  suite neither makes fuel free nor changes them. See the [ship contract](../client/ship/architecture.md).
+  suite neither makes fuel free nor changes them. See the [ship contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md).
 
 [Raw balance rows](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-384/balance.json) report actual first-ration
 net hunger, total two-ration cycle, Core debit and declared time budgets. The

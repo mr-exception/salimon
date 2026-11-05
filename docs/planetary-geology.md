@@ -1,5 +1,8 @@
 # Canonical planetary geology (#612)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 World `terrain::geology` owns immutable version-1 geological interpretations of
 validated terrain. `TerrainDefinition::geology()` selects a documented built-in
 recipe: weathered rock for the historical Earth fixture, dry rock for other
@@ -52,8 +55,8 @@ ecologies, terrain destruction and caves remain their separate scopes.
 - `cargo test -p salimon-world --locked geology`
 - Run workspace build/tests/Clippy/format and `python3 scripts/check_docs.py`.
 
-The [world architecture](../client/world/architecture.md) and
-[invariants](../client/world/invariants.md) own this portable boundary.
+The [world architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/architecture.md) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/invariants.md) own this portable boundary.
 [Approved direction](planetary-environment-art-direction.md) retains future
 requirements. No renderer changes occur in #612; actual rendered appearance is
 #613, with subjective/hardware qualification retained in #561/#563.

@@ -1,5 +1,8 @@
 # Scout cabin mechanisms (#577)
 
+> **Corpus migration status (#791): Historical native implementation.** The active playable world is the [strict overhead React 2D client](current-client-status.md); its 3D display is the **cockpit radar only**. References below to native Rust modules, first-person scenes, 3D asset pipelines, or prior issue completion describe the [archived pre-2D revision](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04), not current `client/` capabilities. Keep approved ship layout, action and state invariants for later reimplementation. Actual gameplay uses a permanently visible top-down Scout cutaway and ship-local collision/interaction anchors; old 3D meshes, first-person cameras, physical fragment intakes and per-room destruction are not current requirements. Present 2D damage is ship-wide. See the [per-document migration register](2d-migration-register.md) for active owners and deferred work.
+
+
 Runtime `session/cabin.rs` owns five manually reversible source mechanisms, supported
 postures and restraints. Ship `mechanism.rs` supplies the bounded smoothstep motion
 primitive. Renderer fixture nodes are presentation only. Character owns admitted

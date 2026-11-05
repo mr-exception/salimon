@@ -1,5 +1,8 @@
 # Flight acceptance matrix (#437)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 Run from the repository root with a built executable, X11 display, Mesa Vulkan,
 xdotool and the [graphical prerequisites](validation.md#native-graphical-gates):
 
@@ -45,7 +48,7 @@ remain null, never zero. Cloud timings do not establish physical 60 FPS or M1/Me
 Physical device/platform behavior remains #557, handling/appearance #561, and
 hardware budgets #563. No personal signoff is needed for routine cloud acceptance.
 
-Owning contracts: [ship architecture](../client/ship/architecture.md),
-[ship invariants](../client/ship/invariants.md),
-[runtime architecture](../client/runtime/architecture.md) and
-[runtime invariants](../client/runtime/invariants.md).
+Owning contracts: [ship architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md),
+[ship invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/invariants.md),
+[runtime architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md) and
+[runtime invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/invariants.md).

@@ -116,8 +116,8 @@ approves a baseline, data rights, tuning or performance threshold.
 
 Existing commands, including Xvfb environment setup, are maintained in
 [validation](validation.md#native-graphical-gates),
-[runner usage](../scripts/README.md) and
-[visual verification](../scenarios/visual/README.md). This policy does not invent
+[runner usage](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/README.md) and
+[visual verification](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/visual/README.md). This policy does not invent
 scenario names or imply future Universe/Building adapters already exist.
 
 ## Human-verification procedure

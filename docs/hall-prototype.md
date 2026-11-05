@@ -1,5 +1,8 @@
 # Internal Hall spatial prototype (#472)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 The explicit `--e2e --scenario hall-prototype` fixture presents the approved
 circular Hall through the production wgpu renderer. It is absent from normal
 startup, menus, saves, achievements and unlock state. This backend-independent
@@ -48,4 +51,4 @@ revisit. Run workspace build/tests, all-target Clippy, fmt, script and docs gate
 Software timings do not qualify physical GPU/M1 FPS. Human art review #561,
 physical platforms #557 and hardware budgets #563 remain separate; no baseline
 is promoted. See the [narrative contract](absenat-and-hall.md) and
-[completion report](../reports/issue-472/README.md).
+[completion report](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-472/README.md).

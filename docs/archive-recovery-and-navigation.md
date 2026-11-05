@@ -1,5 +1,8 @@
 # Scout Archive, data recovery and discovered navigation
 
+> **Corpus migration status (#791): Approved design; current browser implementation varies.** The active playable world is the [strict overhead React 2D client](current-client-status.md); its 3D display is the **cockpit radar only**. References below to native Rust modules, first-person scenes, 3D asset pipelines, or prior issue completion describe the [archived pre-2D revision](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04), not current `client/` capabilities. Preserve the gameplay contract and historical numerical evidence, but reimplement through the active browser session and versioned integer-gram inventory where applicable. Current 2D health design uses 200 HP; old native saves, UI, physical fragments and source code do not carry over automatically. See the [per-document migration register](2d-migration-register.md) for active owners and deferred work.
+
+
 > **Future planetary field observations (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) adds proposed lightweight suit location/bearing marks with assisted, uncertain positioning, and review/editing through a physical Scout planetary chart. These extend **player-known observation** rather than canonical catalog, star-chart discovery or the existing automatic five-second scanner. No perfect planet GPS, automatic landmark POI reveal, new scan mode or autopilot is approved.
 
 
@@ -46,7 +49,7 @@ The separate Scout wall terminal now exposes five intact ordinary voyage/routine
 records and two damaged packets with unknown contents. Source and unknown time
 are explicit; a name or historical departure never grants a destination. Durable
 versioned identities/read selection round-trip through schema 6. Recovery states and Core-funded work are delivered by #468. Destination leads and player charting follow the [implemented investigation contract](opening-and-investigations.md). Native appearance/input signoff remains separate. See the
-[implementation boundary](../client/runtime/architecture.md#scout-archive-467).
+[implementation boundary](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#scout-archive-467).
 
 ## Local Recovery implementation (#468)
 

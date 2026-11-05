@@ -1,5 +1,7 @@
 # Salimon
 
+> **2D documentation:** [Current browser status](docs/current-client-status.md) and [complete migration register](docs/2d-migration-register.md). Rust gameplay/3D model notes in the historical section are not the active client.
+
 The current browser entry starts in a continuous 2D Scout/planet world and opens
 the existing React/Three.js radar from its cockpit. Start with [the client guide](client/README.md) and
 [the playable foundation guide](docs/playable-2d-foundation.md) and

@@ -1,5 +1,8 @@
 # Scout art direction and modular ship construction — approved design (2026-10-22)
 
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Scope supersession (2026-11-04):** For the new strict-top-down 2D gameplay, **only ship-wide damage/destruction** is approved for now. The older cell-level structural damage, module detachment and local salvage plans below are **deferred**, not part of the first 2D multiplayer behavior. Offline players saved aboard a ship destroyed in full die on reconnect. See [cockpit and reconnect](cockpit-navigation-and-reconnect.md). Modularity/building discussion is otherwise preserved for future design.
 
 Verification uses the [cloud/human workflow](verification-workflow.md)
@@ -115,7 +118,7 @@ The approved first reference slice is **a completely usable starter Scout**, not
 `salimon_ship::structure` now provides the portable 3 m Core-rooted graph,
 room/equipment footprint metadata, safe removal, damage-component handoffs,
 explicit baseline/additional mass and domain schema 1. See the
-[owned architecture](../client/ship/architecture.md#portable-structural-foundation-541).
+[owned architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md#portable-structural-foundation-541).
 This is an independent domain boundary, not playable construction, a redesigned
 starter ship, generated colliders or a whole-game save migration. Later delivery
 boundaries above remain future work.
@@ -146,7 +149,7 @@ integrated construction route. See runtime/ship guides and schema-8 save contrac
 The internal manual door has independent opposed leaves, safe swept closure and
 saved motion; open bins expose hollow shell contacts/pickup sight rather than
 virtual inventory. The central corridor remains the loading route. See
-[character geometry](../client/character/architecture.md#physical-cargo-door-and-open-bins-539)
+[character geometry](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/character/architecture.md#physical-cargo-door-and-open-bins-539)
 and [schema 9](save-contract.md#cargo-door-schema-9-539).
 
 

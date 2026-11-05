@@ -1,5 +1,8 @@
 # Absenat, cosmological threshold and Hall of Passage
 
+> **Corpus migration status (#791): Approved design; current browser implementation varies.** The active playable world is the [strict overhead React 2D client](current-client-status.md); its 3D display is the **cockpit radar only**. References below to native Rust modules, first-person scenes, 3D asset pipelines, or prior issue completion describe the [archived pre-2D revision](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04), not current `client/` capabilities. Preserve the gameplay contract and historical numerical evidence, but reimplement through the active browser session and versioned integer-gram inventory where applicable. Current 2D health design uses 200 HP; old native saves, UI, physical fragments and source code do not carry over automatically. See the [per-document migration register](2d-migration-register.md) for active owners and deferred work.
+
+
 Status: **approved endgame narrative; an internal backend-independent spatial prototype is implemented in #472. Completion, accounts, inscriptions and returning access remain future work**. See [prototype scope and verification](hall-prototype.md). Documentation issues #460–461. Some implementation details (distance discontinuities, moderation specifics, final message length) remain future contracts rather than invented canon. See [lost journey](narrative-and-lost-journey.md), [experience](experience-direction.md) and [roadmap](experience-implementation-map.md).
 
 ## Absenat and chained universes

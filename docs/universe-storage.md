@@ -1,5 +1,8 @@
 # Universe binary partition prototype — U04 (#405)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 The portable `salimon-universe::partitions` module encodes immutable,
 dependency-closed U01 catalogs into independently compressed cells. It is a
 bounded prototype, not a production universe builder or a playable-world reader.
@@ -71,7 +74,7 @@ cargo test -p salimon-universe --locked
 cargo run -p salimon-universe --example partition_bench --release --locked
 ```
 
-The [observed development fixture](../client/universe/fixtures/storage-observed-v1.json)
+The [observed development fixture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/fixtures/storage-observed-v1.json)
 uses Earth-399 mass (5.97219e24 kg, +/-0.0006e24 kg) and mean radius (6371.01 km,
 +/-0.02 km), from the frozen JPL header, plus Proxima Cen b/host identities from the
 frozen NASA PS row. Sources/digests are retained; system grouping is explicitly

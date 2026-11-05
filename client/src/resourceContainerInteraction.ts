@@ -1,4 +1,4 @@
-import { RESOURCE_CATALOG, ITEM_CATALOG, type ResourceSession } from './resourceSession.ts'
+import { RESOURCE_CATALOG, type ResourceSession } from './resourceSession.ts'
 import type { ResourceInventory } from './resourceInventory.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import { resourceStoreMass } from './resourceLedger.ts'
@@ -63,7 +63,7 @@ export class ResourceContainerInteraction {
       this.message = `Container overweight: only ${store.capacityGrams - resourceStoreMass(store, RESOURCE_CATALOG)} g free (50 kg maximum).`; return false
     }
     if (direction === 'withdraw') {
-      const used = resourceInventoryUsage(inv, RESOURCE_CATALOG, ITEM_CATALOG)
+      const used = resourceInventoryUsage(inv, RESOURCE_CATALOG, this.session.itemCatalog)
       const error = withdrawalCapacityError(inv, used, resourceId, grams)
       if (error) { this.message = error; return false }
     }

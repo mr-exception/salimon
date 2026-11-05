@@ -1,7 +1,7 @@
 /** All resource and inventory mass is expressed in integer grams, never volume. */
 export interface ResourceDefinition { readonly name?: string }
 export type ResourceCatalog = Readonly<Record<string, ResourceDefinition>>
-export interface CountItemDefinition { readonly gramsPerItem: number; readonly stackSize: number }
+export interface CountItemDefinition { readonly name?: string; readonly gramsPerItem: number; readonly stackSize: number }
 export type CountItemCatalog = Readonly<Record<string, CountItemDefinition>>
 export interface ResourceInventory {
   readonly capacityGrams: number
@@ -32,6 +32,17 @@ function item(catalog: CountItemCatalog, id: string): CountItemDefinition {
   integer(value.gramsPerItem, 'gramsPerItem', 1)
   integer(value.stackSize, 'stackSize', 1)
   return value
+}
+/** Validate every registration, including unused types; snapshot trusted authored metadata. */
+export function registerCountItems(catalog: CountItemCatalog): CountItemCatalog {
+  if (!catalog || typeof catalog !== 'object' || Array.isArray(catalog)) throw new RangeError('Invalid item catalog')
+  const entries = Object.entries(catalog).map(([id, meta]) => {
+    if (!meta || typeof meta !== 'object' || Array.isArray(meta) || Object.keys(meta).some(key => !['name', 'gramsPerItem', 'stackSize'].includes(key))) throw new RangeError('Invalid item definition')
+    item(catalog, id)
+    if (meta.name !== undefined && (typeof meta.name !== 'string' || !meta.name.trim())) throw new RangeError('Invalid item name')
+    return [id, Object.freeze({ ...meta })] as const
+  })
+  return Object.freeze(Object.fromEntries(entries))
 }
 function add(a: number, b: number): number {
   const n = a + b

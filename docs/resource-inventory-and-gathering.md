@@ -1,6 +1,6 @@
 # Unified weight-based inventory, gathering and ship processing — top-down 2D
 
-**Status (2026-11-05):** owner-approved weight-only revision superseding the prior dual 10 kg / 10 L design. The browser's current 2D mining and local saves use grams and one weight limit; count-item stacking is implemented as a pure domain boundary, but gear item definitions, equipment UI and Core processing are **not** playable. Scout Resource Container
+**Status (2026-11-05):** owner-approved weight-only revision superseding the prior dual 10 kg / 10 L design. The browser's current 2D mining and local saves use grams and one weight limit; generic count-item registration, atomic add/remove and the unified field-inventory UI are implemented, but gear item definitions, equipment UI and Core processing are **not** playable. Scout Resource Container
 transfers are playable through #785. The older native physical-fragment system is historical, not current 2D gameplay. See [spacesuits, environmental hazards and gear storage](spacesuit-and-hazards.md).
 
 ## Universal inventory quantities and limits
@@ -44,19 +44,19 @@ transfers and resource container upgrade rules remain TBD.
 - Fabricator jobs consume/reserve ingredients as **integer grams of raw material** with exact mass conservation. The previous 50 kg / 50 L input limit is now **50 kg only**. Preserve the existing queue, power pauses and output tray contract; integration of the new shared count-item inventory remains future work.
 - The Energy Core has an independent **50 kg raw-material buffer**, separate from its energy reserve in joules and its maximum generation power in watts. Material conversion is **continuous over time**, pauses when the energy reserve is full, and resumes automatically when space for energy becomes available. Unconverted input is not lost.
 - Core material yield and batch bookkeeping must be defined using **mass**, not whole litres. Its highest-yield selection, deterministic tie-breaks, initial/upgrade maximum generation power, batch reservation/withdrawal and save behavior remain unresolved; do not invent numbers or claim this is implemented.
-- Each inventory and processing buffer must contribute its contained mass exactly once to ship simulation. Resource weight currently contributes to player payload, and to ship mass when the player is aboard. Future count-item and equipped-suit mass accounting requires integration.
+- Each inventory and processing buffer must contribute its contained mass exactly once to ship simulation. Resource weight currently contributes to player payload, and to ship mass when the player is aboard. Registered carried count-item mass contributes through the same payload path; equipped-suit attribution remains pending.
 
 ## Save format, authority and migration
 
 - The browser's pure `resourceInventory.ts` owns gram-based resource quantities, capacity grams/slots, and count-item stack/mass validation. `resourceSession.ts` owns initial 1 kg/s mining, stable sources, depletion and one atomic save envelope. The current playable HUD shows kg and slots, no litres/volume.
-- The save envelope is **version 4** (`landing-resources:v2`), storing grams, slots, count-item map, source remaining grams, identified raw stores, player location and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
+- The save envelope is **version 5** (`landing-resources:v2`), storing trusted item definitions, grams, slots, count-item map, source remaining grams, identified raw stores, player location and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
 - The active tab holds an exclusive browser Web Lock; commits use compare-and-replace localStorage before publishing state. Movement checkpoints occur at most once per simulated second and on stop/page-hide. This is browser-local single-writer persistence, **not** future backend authority, anti-cheat security or cloud sync.
 
 ## Outstanding decisions
 
 - Suit base/expansion slot usage, worn suit payload, swapping locations, actual item weights and default inventory contents beyond the basic suit.
 - Slots versus mass limits for future ship containers where only a weight capacity is currently approved, and weight caps for drawer/module storage.
-- Gear bench, suit/module recipes, count-item gameplay integration, machine transfers and upgrades.
+- Gear bench, suit/module recipes, authored count-item content, machine transfers and upgrades.
 - Core yield per gram, batch accounting, priority ranking, watts and continuous processing persistence.
 - Final gathering rates, tools, full catalog/economy balance and high-capacity item stack constraints.
 
@@ -128,3 +128,33 @@ active draft. Successful transactions persist immediately and autonomous ship
 state is retained. Invalid amount/resource, balance, weight/slots, revision and
 save errors remain readable and non-destructive. Actual count-item content and
 machine processing/transfers are still future work.
+
+## Generic count-item integration (#786)
+
+`registerCountItems` validates every definition, even unused types, and freezes a
+copy of authored positive integer grams/item and stack size (plus optional name).
+The production `ITEM_CATALOG` is empty. No suit, tool, ration or module weights,
+items, equipped slots or effects are introduced. A future producer/consumer calls
+`ResourceSession.changeItem(action, id, count, expectedRevision)`; valid add/remove
+publishes only after the complete ledger save succeeds. Domain rejection leaves
+state/revision/bytes unchanged; failed or stale persistence blocks further writes.
+Removing the last copy deletes its entry and frees its exact mass and slots.
+
+The field HUD reports raw kg, item counts, item total kg and slots per type,
+combined kg/slot limits and an explicit empty item state. Stack size 1 consumes
+one slot per copy; other types consume `ceil(count / stackSize)`. Gathering and
+storage withdrawal use that same combined capacity; failed credit never depletes
+a source. Player payload includes item mass once while aboard.
+
+Schema v5 retains the storage key and raw catalog identity. Saved item definitions
+must match the trusted catalog exactly; malformed/unknown/changed definitions or
+counts preserve bytes and block writes. Valid v1–v4 saves migrate in memory with
+no items, preserving raw mass, stores, location and revision. Historical production
+catalogs were empty: nonempty legacy item maps are invalid, never assigned guessed
+weights. Future authored catalog changes require an explicit migration rather
+than silently reinterpreting saved counts.
+
+`tests/items.html` is an explicit non-shipping entry point with synthetic test-only
+stack=1 and stack=4 definitions. It injects the production session adapter into
+the real `TopDownView` under the normal Web Lock. Its controls and weights are
+absent from the distributed build; ordinary query parameters cannot enable them.

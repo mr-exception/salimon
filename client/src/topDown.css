@@ -49,3 +49,8 @@
 
 /* Keep the world viewport and translucent caption rectangular on the pixel
    grid. Rounded ancestor clipping can vary at capture/compositor boundaries. */
+
+.resource-hud { max-height:calc(100% - 28px); overflow-y:auto }
+.resource-hud .count-item { display:block; margin:8px 0 }
+.resource-hud .count-item span { display:block }
+@media(max-width:700px) { .resource-hud { max-height:none } .resource-hud ul { flex-wrap:wrap } }

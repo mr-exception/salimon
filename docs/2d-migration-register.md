@@ -1,6 +1,6 @@
 # 2D documentation migration register
 
-**Audit on 2026-11-05:** 106 existing Markdown files in `docs/` were read and classified; **107 rows including this new register** (GUIDE: 12, DESIGN: 22, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 6). Current reference: `main` after merged PRs #789 and #790. Root/client guides, GitHub workflows/templates and archived issue reports were checked as routing or evidence, not rewritten as current implementation.
+**Audit on 2026-11-05:** 106 preexisting Markdown files in `docs/` were read and classified; the migration register plus two later backend design documents bring this branch to **109 rows** (GUIDE: 12, DESIGN: 24, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 6). Current reference: `main` after merged PRs #789 and #790. Root/client guides, GitHub workflows/templates and archived issue reports were checked as routing or evidence, not rewritten as current implementation.
 
 **How to interpret status:** **PLAYABLE** means a current browser code owner/contract (individual future subsections remain future); **GUIDE** is active routing/policy; **DESIGN** is approved or proposed future gameplay, **not shipped**; **NATIVE** is revision-specific Rust/3D implementation evidence; **ARCHIVE** is evaluation/qualification or earlier discarded designs. A historical issue closing does not demonstrate browser functionality.
 
@@ -42,6 +42,8 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`active-geology.md`](active-geology.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`architecture-baseline.md`](architecture-baseline.md) | ARCHIVE | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
 | [`archive-recovery-and-navigation.md`](archive-recovery-and-navigation.md) | DESIGN | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
+| [`backend-architecture.md`](backend-architecture.md) | DESIGN | Approved future NestJS/TypeScript authoritative simulation, WebSocket networking, domain ownership and client prediction; not implemented. |
+| [`backend-persistence-recovery.md`](backend-persistence-recovery.md) | DESIGN | Approved future MongoDB durable critical state and strict checkpoint recovery/fail-closed policy; not implemented. |
 | [`biological-harvesting.md`](biological-harvesting.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`biological-signature-sites.md`](biological-signature-sites.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`cabin-mechanisms.md`](cabin-mechanisms.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |

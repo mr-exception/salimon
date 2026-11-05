@@ -31,12 +31,15 @@ export class ResourceContainerInteraction {
     if (world.selectedId !== containerId || !this.reachable(world)) return false
     this.session.cancel()
     this.session.world = requestInteraction(world, containerId)
+    // Persist arrival before capturing any draft revision. A later location-only
+    // autosave must not invalidate an otherwise unchanged transfer confirmation.
+    this.session.checkpoint()
     this.opened = true; this.pending = null; this.message = ''; this.failed = false
     return true
   }
   close(): void {
     this.opened = false; this.pending = null
-    this.session.world = cancelInteraction(this.session.world)
+    if (this.session.world.player.targetId === containerId) this.session.world = cancelInteraction(this.session.world)
   }
   synchronize(world: TopDownState): void {
     this.session.world = world

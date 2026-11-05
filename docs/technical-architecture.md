@@ -66,7 +66,8 @@ the existing `scout:storage` ship-local anchor and 50,000 g metadata. Default
 ResourceSession commands persist it atomically in schema v4; v3 saves acquire
 the previously absent container empty, while v4 missing data fails closed.
 `resourceContainerInteraction.ts` owns reachable world admission, revision-bound
-drafts and consume-once confirmation; `ResourceContainerPanel.tsx` owns the native
+drafts and consume-once confirmation (arrival location is checkpointed before
+a draft captures its revision); `ResourceContainerPanel.tsx` owns the native
 modal and exact gram/derived kg presentation. TopDownView integrates cancellation
 with the existing input/focus/scene path while retaining simulation state.
 

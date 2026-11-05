@@ -80,6 +80,7 @@ test('out-of-range/wrong-target opens are rejected; movement/range/cockpit/scene
     if (reason === 'seated') next = { ...next, player: { ...next.player, mode: 'seated' } }
     if (reason === 'target') next = { ...next, player: { ...next.player, targetId: 'scout:core' } }
     ui.synchronize(next)
+    if (reason === 'target') assert.equal(session.world.player.targetId, 'scout:core')
     assert.equal(ui.opened, false, reason); assert.equal(ui.pending, null); assert.equal(ui.confirm(), false)
     assert.equal(storage.raw, raw); assert.equal(session.snapshot.stores[id]!.quantities.mineral, 333)
     assert.equal(ui.open({ ...world, selectedId: 'scout:core' }), false)
@@ -93,4 +94,18 @@ test('slot feedback distinguishes adding a raw type from an existing stack witho
   assert.equal(withdrawalCapacityError(inventory, { grams: 333, slots: 12 }, 'mineral', 1), '')
   assert.equal(withdrawalCapacityError(inventory, { grams: 9999, slots: 1 }, 'mineral', 1), '')
   assert.match(withdrawalCapacityError(inventory, { grams: 9999, slots: 1 }, 'mineral', 2), /Player overweight: only 1 g free/)
+})
+
+test('opening saves arrival before review, so a location-only autosave cannot stale the confirmation', () => {
+  const { session, storage } = make()
+  const ui = new ResourceContainerInteraction(session)
+  const arrived = { ...session.world, tick: 59, selectedId: id, entities: session.world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout' as const, point: point2(.6, 4.25) } } : e) }
+  assert.equal(ui.open(arrived), true)
+  assert.equal(ui.review('deposit', 'mineral', '333'), true)
+  const revision = session.snapshot.revision
+  session.advance(stepTopDown(session.world, [0, 0])); ui.synchronize(session.world)
+  assert.equal(session.snapshot.revision, revision)
+  assert.equal(ui.confirm(), true)
+  assert.equal(session.snapshot.stores[id]!.quantities.mineral, 333)
+  assert.equal(new ResourceSession(storage, createTopDownState('exterior', true)).snapshot.stores[id]!.quantities.mineral, 333)
 })

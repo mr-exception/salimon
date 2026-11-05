@@ -1,0 +1,15 @@
+# Keep the production build context limited to the browser client and server config.
+**
+!client/
+!client/**
+!docker/
+!docker/**
+
+# Local/generated artifacts must never be sent into the build context.
+client/node_modules/
+client/dist/
+client/test-results/
+client/playwright-report/
+client/coverage/
+client/*.tsbuildinfo
+client/**/.DS_Store

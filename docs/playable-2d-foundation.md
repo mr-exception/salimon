@@ -72,16 +72,16 @@ reviewer or independent execution is claimed.
 | Need | Existing owner / integration surface | Gathering integration |
 | --- | --- | --- |
 | Player movement, collisions and camera | `topDownRuntime.ts`, `topDownInteraction.ts`, `TopDownView.tsx` | Same world and input adapter |
-| Stable source identity | `planetarySite.ts`: `source:landing:mineral:01` and `source:landing:biology:01`, `site:illustrated-landing:v1` | Versioned quantities, densities and depletion in `resourceSession.ts` |
+| Stable source identity | `planetarySite.ts`: `source:landing:mineral:01` and `source:landing:biology:01`, `site:illustrated-landing:v1` | Versioned gram quantities and depletion in `resourceSession.ts` |
 | Source selection and interaction | `requestInteraction` / `cancelInteraction`, reach tests, stable target ID | Tool action with capacity/success feedback and interruption semantics |
 | Exact spatial locations | `capturePlayerLocation` / `copyPlayerLocation` retain split cells, offsets, facing and frame | Validated durable local save envelope; atomic with inventory/depletion |
 | Ship-local / planet-fixed continuity | `crossScoutEntry`, `convertAnchor`; cockpit seat stays ship-local | Existing frame handoff preserved, payload counted once aboard |
 
 **Gathering (#757):** Equip the gathering tool in Field inventory, approach either
-source and use **E / Gather**. It collects 1 whole L/s directly into the player's
-independent 10 kg / 10 L inventory. Movement, Escape or stowing the tool stops it;
-unfinished litre progress is discarded. Weight/volume limits and remaining source
-litres are shown separately. Completed transfers, source depletion, capacities
+source and use **E / Gather**. It collects up to 1 kg/s directly into the player's
+10 kg / 12-slot unified inventory. Movement, Escape or stowing the tool stops it;
+unfinished extraction progress is discarded. Weight and remaining source
+mass are shown in kg; there is no volume limit. Completed transfers, source depletion, capacities
 and frame-relative locations save together in this browser; reload never resumes
 gathering automatically. See [the resource contract](resource-inventory-and-gathering.md)
 for the catalog, transaction and interruption details.
@@ -90,7 +90,7 @@ for the catalog, transaction and interruption details.
 production; multiplayer/backend authority and reconnect; ship damage/destruction;
 full planetary generation. Visible machine/storage objects are inspection
 placeholders. Gathering reuses this same world and resource-source IDs, with
-integer grams/L and atomic local persistence; no independent scene was added.
+integer grams and atomic local persistence; no independent scene was added.
 
 The sample radar's ship simulation runs continuously, but its illustrative flight
 does not relocate the authored landed 2D ship. Synthetic desktop input and

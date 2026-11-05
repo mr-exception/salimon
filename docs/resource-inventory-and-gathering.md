@@ -1,63 +1,59 @@
-# Resource inventory, gathering and ship processing — strict top-down 2D
+# Unified weight-based inventory, gathering and ship processing — top-down 2D
 
-**Status: approved gameplay direction (2026-11-04); player gathering implemented in #757.** The continuous Scout/planet browser world supports whole-litre gathering, exact integer grams/L, independent 10 kg / 10 L limits, and versioned local inventory/depletion/location saves. Ship storage transfers and continuous Core processing remain future work. Do not treat historical native physical-fragment behavior as current 2D gameplay.
+**Status (2026-11-05):** owner-approved weight-only revision superseding the prior dual 10 kg / 10 L design. The browser's current 2D mining and local saves use grams and one weight limit; count-item stacking is implemented as a pure domain boundary, but gear item definitions, equipment UI, ship storage transfers and Core processing are **not** playable. The older native physical-fragment system is historical, not current 2D gameplay. See [spacesuits, environmental hazards and gear storage](spacesuit-and-hazards.md).
 
-## Resource representation and player gathering
+## Universal inventory quantities and limits
 
-- Raw resources are **stacked in whole litres**, not carried as physical fragments. Resource quantities and mining/source depletion are whole-litre increments; no fractional litre can enter an inventory.
-- Each resource type specifies **mass per litre**; fractional kilograms are allowed (e.g. 0.5 kg/L). Use **integer grams per litre** and integer litre quantities internally to avoid floating-point inventory drift. Display kg and L independently.
-- Starting player inventory: **10 kg maximum weight AND 10 L maximum volume**, enforced simultaneously. Future inventory capacity upgrades are possible; their costs/tier values are not defined.
-- The player leaves the Scout, approaches a rock/plant/other harvestable source, equips the mining tool and mines **1 L per second** while the interaction is valid. Suitable gathering interactions for other resource categories need the same capacity and depletion rules.
-- Credit only the litres fitting BOTH remaining limits and remaining source quantity, debiting the corresponding persistent source in the same authoritative operation. Uncollected material remains at the source; no fragments, growing spheres or physical fragment piles are created.
-- The starting sample reuses each source's existing interaction reach (2.3 m mineral; 1.9 m biological). Equip the gathering tool, then **E / Gather** starts or stops continuous collection. Movement, Escape, tool stow, loss of reach, page blur/hide or cockpit entry interrupt it. Only completed 60-tick seconds commit; unfinished progress is discarded, with no offline catch-up or automatic restart after reload.
-- Authored sample catalog `landing-resources:v1`: banded mineral **2500 g/L**, initially **24 L**; plate biomass **500 g/L**, initially **30 L**. These are explicit sample values, not upgrade balance or Core conversion values. Depleted sources keep their IDs/colliders and are drawn dimmed. Tool upgrades and animation polish remain future work.
+- **No volume restriction** applies to player inventories, mining, harvesting, storage containers, Fabricator input or Energy Core fuel. Weight is the only physical capacity measure; use **integer grams** in durable state and calculations. Display kilograms with fractional precision when needed.
+- Each object, resource and count-based item has mass. Total carried inventory mass is the sum of **all** raw-resource quantities and count-item stacks; all count against the same maximum weight. Do not round fractional kilograms to whole kilograms.
+- The player's **default inventory has 12 shared slots and a maximum payload of 10 kg**. Slots are an organizational/count limit, not an additional physical dimension like volume. Gathering or adding an item must fit both the slot count and the one weight cap.
+- Raw resources are recorded as **integer grams** and stacked by resource ID (one inventory slot per resource type, until the weight cap). There is no litre quantity, density-based quantity conversion, carried raw sphere, or separate fragment physics.
+- Count-based item definitions specify **weight per item (integer grams)** and **maximum count per stack**. An item type with stack size 1 (e.g., each suit protection module) uses one slot for every item even if multiple copies are identical. Other items may stack up to their authored type limit. Invalid zero-mass, fractional-count or overflowing quantities are rejected.
+- Item definitions and exact equipment weights, inventory expansion equipment and upgrade costs remain **TBD**. A future backpack may raise personal slots from 12 to 16 and add two suit module slots; another proposed module may grant **+20 kg** resource carrying capacity (the former +20 L part is removed). These are examples, not shipped upgrades. Equipped gear mass and its effect on personal carrying capacity need a separate rule; never silently double-count mass in the ship.
+- All inventories/containers conserve item counts and gram mass exactly through transfers, crafting, persistence and multiplayer-authoritative transactions.
 
-## Initial ship-side resource capacities
+## Player mining and harvesting
 
-| Destination | Starting weight capacity | Starting volume capacity | Operation |
+- Source quantities/depletion and player resource credit use integer **grams**. For the current authored sample, equipping the gathering tool and using **E / Gather** collects up to **1,000 g per completed 60-tick second** (1 kg/s initial sample rate), limited by remaining source mass, the player's free weight and the appropriate shared inventory slot.
+- If less than 1 kg is available or fits, credit only the exact remaining grams at the next completed interval; never overfill or delete the source remainder. One atomic transaction debits exactly the mass credited. No mined fragments are created.
+- Starting sample catalog `landing-resources:v2`: mineral source **60,000 g** and biological source **15,000 g**. IDs and the authored location remain unchanged. These mass totals match the prior illustrative 24 L at 2500 g/L and 30 L at 500 g/L, for safe save migration, but **density/volume no longer governs gameplay inventory**.
+- Existing interaction reaches are 2.3 m mineral and 1.9 m biological. Movement, Escape, stowing the tool, leaving reach, losing focus/visibility and cockpit entry interrupt gathering. Incomplete intervals are discarded and do not resume after reload; already committed mass remains in the persistent source/inventory transaction.
+- A full-weight or full-slot message explains why collection stopped. Depleted sources preserve their stable IDs and collider identities and remain visibly depleted. Gathering tool upgrades and additional source types are **TBD**.
+
+## Ship storage and equipment storage
+
+| Destination/module | Weight capacity | Slots | Permitted contents |
 | --- | --- | --- | --- |
-| Player inventory | 10 kg | 10 L | Collect and transport |
-| One built-in Scout storage container | 50 kg | 50 L | Store and retrieve raw resources |
-| Fabricator input buffer | 50 kg | 50 L | Supply recipes; withdraw unused inputs |
-| Energy Core raw-material buffer | 50 kg | 50 L | Feed energy conversion; withdraw unconsumed inputs |
+| Player inventory | **10 kg**, starting | **12**, starting | Raw resources and count-based items |
+| **Resource Container** (formerly general storage) | **50 kg**, starting | TBD if needed | **Raw resources only** |
+| Fabricator raw-input buffer | **50 kg**, starting | TBD if needed | Raw resources for recipes; unused inputs withdrawable |
+| Energy Core raw-fuel buffer | **50 kg**, starting | TBD if needed | Raw resources for conversion; unconsumed fuel withdrawable |
+| **Spacesuit Drawer**, tier 1 / 2 / 3 | Weight cap TBD | **4 / 8 / 12 suit slots** | Complete, unequipped spacesuits |
+| **Protection Module Storage**, tier 1 / 2 / 3 | Weight cap TBD | **12 / 16 / 24 module slots** | Uninstalled protection modules |
 
-- Capacities are **independent per inventory/buffer**, with both weight and volume checked. Each may hold mixed resource types up to its combined limits.
-- The player can deposit and withdraw **unused** material from the general container, Fabricator and Core. Material committed to a queued Fabricator job or already converted by the Core is not withdrawable.
-- Storage-container construction and upgrades, Fabricator-buffer upgrades and Core-buffer upgrades are **future design discussions**; no recipes, tiers or costs are set here.
-- Transfers must conserve exact whole litres and associated mass without duplication. The transfer UI, whether module-to-module transfers are allowed, partial-transfer UX and how a partly converted active Core batch is treated on withdrawal remain to be finalized.
-- Player and ship resource mass must be counted once in applicable physics. General storage is distinct from physical furnishings and separately equipped tools/consumables.
+- **Storage modules do not have any volume capacities.** Weight remains the only physical capacity. Specific drawer/module-storage total weight limits are not yet approved. Their explicit suit/module slot counts remain enforced.
+- One stored suit consumes one drawer slot, including any modules installed on it. A protection module occupies a separate module-storage or personal-inventory slot only when uninstalled; an installed module is part of its suit.
+- The player starts wearing one basic suit, without suit tiers. Crafting additional suits/modules and upgrading them requires a future **Gear Crafting Bench** built inside the ship; crafting recipes, replacement/equip location, access and expansion are TBD.
+- The player may travel outside without any suit, at environmental risk. No automatic suit/module switching based on hazards is approved.
+- Players may withdraw **unconsumed** materials from the Resource Container, Fabricator or Core; resources already reserved/used by a fabrication job or converted by the Core are not recoverable. Storage transfer UI, module-to-module transfers and resource container upgrade rules remain TBD.
 
-## Fabricator
+## Fabricator and Energy Core material handling
 
-- The Fabricator has a 50 kg / 50 L reserved resource-input buffer at game start; unused materials can be retrieved.
-- Preserve the earlier crafting contract: jobs reserve/consume their ingredients on queue, operate one at a time, pause without power, and deliver finished consumables/items to the output tray. Resources already committed to a job cannot be recovered by withdrawing them from the input buffer.
-- Replacing legacy physical-fragment intake with inventory transfers is future implementation work. Fabricator capacity-upgrade behavior is deferred.
+- Fabricator jobs consume/reserve ingredients as **integer grams of raw material** with exact mass conservation. The previous 50 kg / 50 L input limit is now **50 kg only**. Preserve the existing queue, power pauses and output tray contract; integration of the new shared count-item inventory remains future work.
+- The Energy Core has an independent **50 kg raw-material buffer**, separate from its energy reserve in joules and its maximum generation power in watts. Material conversion is **continuous over time**, pauses when the energy reserve is full, and resumes automatically when space for energy becomes available. Unconverted input is not lost.
+- Core material yield and batch bookkeeping must be defined using **mass**, not whole litres. Its highest-yield selection, deterministic tie-breaks, initial/upgrade maximum generation power, batch reservation/withdrawal and save behavior remain unresolved; do not invent numbers or claim this is implemented.
+- Each inventory and processing buffer must contribute its contained mass exactly once to ship simulation. Resource weight currently contributes to player payload, and to ship mass when the player is aboard. Future count-item and equipped-suit mass accounting requires integration.
 
-## Energy Core — approved processing model
+## Save format, authority and migration
 
-- The Core starts with a **separate 50 kg / 50 L raw-material buffer**, independent of the Core's stored energy capacity (joules). Unconsumed raw resources can be withdrawn.
-- Material is selected **automatically by highest energy yield first**. The precise comparison metric when densities differ (yield per kg vs yield per whole litre) and deterministic tie-breaking still require an explicit design decision; do not silently claim either ranking is approved.
-- The Core processes **whole-litre input batches with continuous energy output over time**, not instantaneous full-batch energy grants. The energy reserve can be charged while a batch is being processed.
-- **The Core has a fixed maximum energy-generation POWER, measured in watts (J/s).** Actual conversion is bounded by this power rate, available convertible energy, and free energy-storage capacity. A more energy-rich litre can take longer to finish at the same maximum power.
-- Conversion **automatically pauses** when the energy reserve is full, preserving remaining unconverted energy/material, and **automatically resumes** as energy capacity becomes available. It must not discard fuel or generated energy simply because the reserve is full.
-- **The maximum generation power is upgradeable in the future.** This is distinct from upgrading the Core's raw-material buffer capacity or energy-storage capacity.
-- **Design deliberately deferred:** The initial maximum generation power (in MW), the upgrade mechanism, upgrade tiers, maximum upgradeable rate, required resources/costs, prerequisites, and exact power/progress behavior must be **discussed and defined in a later design session**. This document does not authorize adopting old native conversion values or any example number as the new starting rate.
-- Also deferred: how a partially converted 1 L batch is reserved/represented, whether it occupies original capacity throughout processing, what can be withdrawn during processing, save/resume and interruption details, and exact priority/tie-breaking semantics. Preserve material-energy conservation regardless.
+- The browser's pure `resourceInventory.ts` owns gram-based resource quantities, capacity grams/slots, and count-item stack/mass validation. `resourceSession.ts` owns initial 1 kg/s mining, stable sources, depletion and one atomic save envelope. The current playable HUD shows kg and slots, no litres/volume.
+- The save envelope is **version 2** (`landing-resources:v2`), storing grams, slots, count-item map, source remaining grams, player location and revision. The existing browser storage key is deliberately retained. Previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
+- The active tab holds an exclusive browser Web Lock; commits use compare-and-replace localStorage before publishing state. Movement checkpoints occur at most once per simulated second and on stop/page-hide. This is browser-local single-writer persistence, **not** future backend authority, anti-cheat security or cloud sync.
 
-## Persistence, authority and current implementation gap
+## Outstanding decisions
 
-- Source depletion and inventory credit must be authoritative and atomic so interruption, repeated input, saving/reloading or future multiplayer cannot create duplicate resources.
-- `resourceInventory.ts` now uses whole-litre quantities, `gramsPerLitre` and `capacityGrams`. `resourceSession.ts` owns the sample catalog, gathering ticks and one atomic save envelope: schema/catalog/site version, inventory quantities and capacities, source remainders, revision and split frame-relative player location.
-- `TopDownView.tsx` holds an exclusive browser Web Lock while the expedition is open. A second tab cannot gather/save. Each transaction checks the previous stored bytes and replaces the entire localStorage record before publishing its inventory credit. Failed/stale writes stop gathering without publishing the candidate. Unsupported/corrupt/nonconserving saves are preserved and block saving; they are never silently replaced by fresh resources.
-- Completed litres save synchronously. Location checkpoints occur once per simulated second, on movement stop and page hide/blur; a hard interruption may lose only movement since the last checkpoint, never half of a resource transfer. Reload restores standing in the same frame; cockpit saves restore safely beside its chair. Tool equip state and partial progress do not resume. Future upgraded capacities are validated and retained; no upgrade UI/cost is introduced.
-- This is single-browser, same-origin local persistence, requiring HTTPS or localhost for the lock. It is not a server, multiplayer authority, cloud sync or protection against manually edited/deleted browser data. Core batch/energy persistence is still unimplemented.
-- Resource payload is derived from inventory grams. It contributes once to player payload and, while ship-local, once as nested payload in the existing ship simulation's total mass. Walking has no separate mass-based physics. Payload is recomputed from dry hull mass, never accumulated per frame.
-- Older native Core fueling, physical-fragment construction refunds and storage/harvesting implementation notes remain historical only; they are not proof of 2D migration.
-
-## Open design questions for later discussion
-
-1. Initial fixed generation power (MW) and its **upgradeable rate progression**, separate from energy-storage upgrades.
-2. Core priority yield metric (per litre versus per kilogram), deterministic tie-breaks, and currently processing batch behavior.
-3. Core active-batch reservation, withdrawal, interruption and persistence.
-4. Gathering tool upgrades/animation and broader resource catalogs/balance beyond the authored starting sample.
-5. Storage/transfer UI, direct module transfer policy, and capacity upgrade tiers for inventory/storage/Fabricator/Core.
+- Suit base/expansion slot usage, worn suit payload, swapping locations, actual item weights and default inventory contents beyond the basic suit.
+- Slots versus mass limits for future ship containers where only a weight capacity is currently approved, and weight caps for drawer/module storage.
+- Gear bench, suit/module recipes, count-item gameplay integration, machine transfers and upgrades.
+- Core yield per gram, batch accounting, priority ranking, watts and continuous processing persistence.
+- Final gathering rates, tools, full catalog/economy balance and high-capacity item stack constraints.

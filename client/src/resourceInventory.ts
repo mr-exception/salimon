@@ -1,117 +1,129 @@
-/** Exact whole-litre resources. All mass arithmetic uses integer grams. */
-export interface ResourceDefinition {
-  readonly gramsPerLitre: number
-}
+/** All resource and inventory mass is expressed in integer grams, never volume. */
+export interface ResourceDefinition { readonly name?: string }
 export type ResourceCatalog = Readonly<Record<string, ResourceDefinition>>
+export interface CountItemDefinition { readonly gramsPerItem: number; readonly stackSize: number }
+export type CountItemCatalog = Readonly<Record<string, CountItemDefinition>>
 export interface ResourceInventory {
   readonly capacityGrams: number
-  readonly capacityLitres: number
+  readonly capacitySlots: number
+  /** One slot per resource type; its quantity is integer grams. */
   readonly quantities: Readonly<Record<string, number>>
+  /** Counts use as many slots as ceil(count / item stack size). */
+  readonly items: Readonly<Record<string, number>>
 }
-export interface ResourceSource {
-  readonly id: string
-  readonly resourceId: string
-  readonly remainingLitres: number
-}
+export interface ResourceSource { readonly id: string; readonly resourceId: string; readonly remainingGrams: number }
 export interface GatherResult {
   readonly inventory: ResourceInventory
   readonly source: ResourceSource
-  readonly collectedLitres: number
+  readonly collectedGrams: number
 }
 export const STARTING_CAPACITY_KG = 10
-export const STARTING_CAPACITY_LITRES = 10
+export const STARTING_CAPACITY_SLOTS = 12
 
-function integer(value: number, name: string, minimum: number): void {
-  if (!Number.isSafeInteger(value) || value < minimum) {
-    throw new RangeError(name + ' must be a safe integer >= ' + minimum)
-  }
+function integer(value: number, name: string, min: number): void {
+  if (!Number.isSafeInteger(value) || value < min) throw new RangeError(name + ' must be a safe integer >= ' + min)
 }
-function definition(catalog: ResourceCatalog, id: string): ResourceDefinition {
-  if (!id || !Object.prototype.hasOwnProperty.call(catalog, id)) {
-    throw new RangeError('Unknown resource: ' + id)
-  }
-  const entry = catalog[id]
-  if (!entry) throw new RangeError('Missing definition: ' + id)
-  integer(entry.gramsPerLitre, 'gramsPerLitre', 1)
-  return entry
+function resource(catalog: ResourceCatalog, id: string): void {
+  if (!id || !Object.hasOwn(catalog, id) || !catalog[id]) throw new RangeError('Unknown resource: ' + id)
 }
-function safeAdd(a: number, b: number, label: string): number {
-  const result = a + b
-  integer(result, label, 0)
-  return result
+function item(catalog: CountItemCatalog, id: string): CountItemDefinition {
+  if (!id || !Object.hasOwn(catalog, id) || !catalog[id]) throw new RangeError('Unknown item: ' + id)
+  const value = catalog[id]!
+  integer(value.gramsPerItem, 'gramsPerItem', 1)
+  integer(value.stackSize, 'stackSize', 1)
+  return value
 }
-function safeMultiply(a: number, b: number, label: string): number {
-  const result = a * b
-  integer(result, label, 0)
-  return result
+function add(a: number, b: number): number {
+  const n = a + b
+  integer(n, 'total', 0)
+  return n
+}
+function multiply(a: number, b: number): number {
+  const n = a * b
+  integer(n, 'product', 0)
+  return n
 }
 export function startingResourceInventory(): ResourceInventory {
-  return { capacityGrams: STARTING_CAPACITY_KG * 1000, capacityLitres: STARTING_CAPACITY_LITRES, quantities: {} }
+  return { capacityGrams: STARTING_CAPACITY_KG * 1000, capacitySlots: STARTING_CAPACITY_SLOTS, quantities: {}, items: {} }
 }
-export function resourceInventoryUsage(inventory: ResourceInventory, catalog: ResourceCatalog): {
-  readonly grams: number; readonly litres: number
-} {
-  integer(inventory.capacityGrams, 'capacityGrams', 1)
-  integer(inventory.capacityLitres, 'capacityLitres', 1)
-  let grams = 0
-  let litres = 0
-  for (const [id, quantity] of Object.entries(inventory.quantities)) {
-    integer(quantity, 'quantity', 1)
-    const entry = definition(catalog, id)
-    grams = safeAdd(grams, safeMultiply(quantity, entry.gramsPerLitre, 'grams'), 'grams')
-    litres = safeAdd(litres, quantity, 'litres')
+export function resourceInventoryUsage(
+  inv: ResourceInventory, resources: ResourceCatalog, items: CountItemCatalog = {},
+): { readonly grams: number; readonly slots: number } {
+  integer(inv.capacityGrams, 'capacityGrams', 1)
+  integer(inv.capacitySlots, 'capacitySlots', 1)
+  let grams = 0, slots = 0
+  for (const [id, quantity] of Object.entries(inv.quantities)) {
+    resource(resources, id)
+    integer(quantity, 'quantityGrams', 1)
+    grams = add(grams, quantity)
+    slots = add(slots, 1)
   }
-  if (grams > inventory.capacityGrams || litres > inventory.capacityLitres) {
-    throw new RangeError('Inventory exceeds its capacity')
+  for (const [id, count] of Object.entries(inv.items)) {
+    integer(count, 'itemCount', 1)
+    const meta = item(items, id)
+    grams = add(grams, multiply(count, meta.gramsPerItem))
+    slots = add(slots, Math.ceil(count / meta.stackSize))
   }
-  return { grams, litres }
+  if (grams > inv.capacityGrams || slots > inv.capacitySlots) throw new RangeError('Inventory exceeds its capacity')
+  return { grams, slots }
 }
-/** Credit only whole units that fit in BOTH limits, debiting a persistent source by the same amount. */
+/** Debits exactly the credited grams; no source depletion on rejected/partial requests beyond credit. */
 export function gatherResource(
-  inventory: ResourceInventory,
-  source: ResourceSource,
-  requestedLitres: number,
-  catalog: ResourceCatalog,
+  inv: ResourceInventory, source: ResourceSource, requestedGrams: number,
+  resources: ResourceCatalog, items: CountItemCatalog = {},
 ): GatherResult {
   if (!source.id) throw new RangeError('Missing source id')
-  integer(source.remainingLitres, 'remainingLitres', 0)
-  integer(requestedLitres, 'requestedLitres', 0)
-  const entry = definition(catalog, source.resourceId)
-  const used = resourceInventoryUsage(inventory, catalog)
-  const allowedByMass = Math.floor((inventory.capacityGrams - used.grams) / entry.gramsPerLitre)
-  const allowedByLitres = inventory.capacityLitres - used.litres
-  const collectedLitres = Math.min(requestedLitres, source.remainingLitres, allowedByMass, allowedByLitres)
-  if (collectedLitres === 0) return { inventory, source, collectedLitres }
-  const total = safeAdd(inventory.quantities[source.resourceId] ?? 0, collectedLitres, 'quantity')
+  integer(source.remainingGrams, 'remainingGrams', 0)
+  integer(requestedGrams, 'requestedGrams', 0)
+  resource(resources, source.resourceId)
+  const used = resourceInventoryUsage(inv, resources, items)
+  const hasSlot = !!inv.quantities[source.resourceId] || used.slots < inv.capacitySlots
+  const collectedGrams = hasSlot ? Math.min(requestedGrams, source.remainingGrams, inv.capacityGrams - used.grams) : 0
+  if (!collectedGrams) return { inventory: inv, source, collectedGrams }
   return {
-    inventory: { ...inventory, quantities: { ...inventory.quantities, [source.resourceId]: total } },
-    source: { ...source, remainingLitres: source.remainingLitres - collectedLitres },
-    collectedLitres,
+    inventory: { ...inv, quantities: { ...inv.quantities, [source.resourceId]: add(inv.quantities[source.resourceId] ?? 0, collectedGrams) } },
+    source: { ...source, remainingGrams: source.remainingGrams - collectedGrams },
+    collectedGrams,
   }
 }
-/** Exact spending/transfer debit, with no partial success. */
-export function removeResource(
-  inventory: ResourceInventory, resourceId: string, units: number, catalog: ResourceCatalog,
-): ResourceInventory {
-  integer(units, 'units', 1)
-  definition(catalog, resourceId)
-  resourceInventoryUsage(inventory, catalog)
-  const current = inventory.quantities[resourceId] ?? 0
-  if (units > current) throw new RangeError('Insufficient resources')
-  const quantities = { ...inventory.quantities }
-  if (current === units) delete quantities[resourceId]
-  else quantities[resourceId] = current - units
-  return { ...inventory, quantities }
+export function removeResource(inv: ResourceInventory, id: string, grams: number, resources: ResourceCatalog, items: CountItemCatalog = {}): ResourceInventory {
+  integer(grams, 'grams', 1)
+  resource(resources, id)
+  resourceInventoryUsage(inv, resources, items)
+  const existing = inv.quantities[id] ?? 0
+  if (grams > existing) throw new RangeError('Insufficient resources')
+  const quantities = { ...inv.quantities }
+  if (grams === existing) delete quantities[id]
+  else quantities[id] = existing - grams
+  return { ...inv, quantities }
 }
-/** Future upgrades can expand either capacity independently. */
+/** Count-based items have their own stack limit but share the same inventory mass budget. */
+export function addCountItem(inv: ResourceInventory, id: string, count: number, resources: ResourceCatalog, items: CountItemCatalog): ResourceInventory {
+  integer(count, 'count', 1)
+  item(items, id)
+  resourceInventoryUsage(inv, resources, items)
+  const next = { ...inv, items: { ...inv.items, [id]: add(inv.items[id] ?? 0, count) } }
+  resourceInventoryUsage(next, resources, items)
+  return next
+}
+export function removeCountItem(inv: ResourceInventory, id: string, count: number, resources: ResourceCatalog, items: CountItemCatalog): ResourceInventory {
+  integer(count, 'count', 1)
+  item(items, id)
+  resourceInventoryUsage(inv, resources, items)
+  const current = inv.items[id] ?? 0
+  if (count > current) throw new RangeError('Insufficient items')
+  const after = { ...inv.items }
+  if (count === current) delete after[id]
+  else after[id] = current - count
+  return { ...inv, items: after }
+}
 export function increaseResourceInventoryCapacity(
-  inventory: ResourceInventory, capacityGrams: number, capacityLitres: number, catalog: ResourceCatalog,
+  inv: ResourceInventory, capacityGrams: number, capacitySlots: number,
+  resources: ResourceCatalog, items: CountItemCatalog = {},
 ): ResourceInventory {
-  resourceInventoryUsage(inventory, catalog)
+  resourceInventoryUsage(inv, resources, items)
   integer(capacityGrams, 'capacityGrams', 1)
-  integer(capacityLitres, 'capacityLitres', 1)
-  if (capacityGrams < inventory.capacityGrams || capacityLitres < inventory.capacityLitres) {
-    throw new RangeError('Upgrade cannot reduce either capacity')
-  }
-  return { ...inventory, capacityGrams, capacityLitres }
+  integer(capacitySlots, 'capacitySlots', 1)
+  if (capacityGrams < inv.capacityGrams || capacitySlots < inv.capacitySlots) throw new RangeError('Upgrade cannot reduce either capacity')
+  return { ...inv, capacityGrams, capacitySlots }
 }

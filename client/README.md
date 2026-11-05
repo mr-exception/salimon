@@ -1,6 +1,6 @@
 # Salimon browser prototypes
 
-**2D gathering (#757):** The default continuous Scout/planet world includes a 10 kg / 10 L player inventory, whole-litre mineral/biomass gathering at 1 L/s, and versioned local saves. `resourceInventory.ts` uses integer grams/L; `resourceSession.ts` commits inventory, depletion, capacities and player location together. See [resource design](../docs/resource-inventory-and-gathering.md).
+**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` migrates compatible old litre-based saves without loss. See [resource design](../docs/resource-inventory-and-gathering.md).
 
 A self-contained React + TypeScript + Vite + Three.js + React Three Fiber radar. This is a new prototype and does not migrate the historical native Rust gameplay. See [design contract](../docs/radar-navigation-prototype.md).
 
@@ -124,7 +124,7 @@ and compares simultaneous indoor/outdoor captures using the unchanged visual pol
 
 The same world contains a graphite/slate Scout outline, exposed warm cabin,
 cockpit desk and separate chair, bunk, partitioned aft cargo room, Core,
-Fabricator and **50 kg / 50 L** storage placeholder. Cargo passage (2.6 m) and aft
+Fabricator and **50 kg raw-only Resource Container** placeholder. Cargo passage (2.6 m) and aft
 entry (3 m) are open; visible jambs and room boundaries block walking. The
 threshold marks the aft approach. No roof layer, transparency or interior scene
 swap is used. Explicit line metrics keep the desktop SVG viewport on the device-pixel grid. `scoutLayout.ts` owns ship-local named anchors, shared collision/
@@ -188,21 +188,21 @@ Core, Fabricator, multiplayer and ship damage remain future features.
 ## Gathering and saved expeditions (#757)
 
 In the default world, click **Equip gathering tool**, approach the banded outcrop
-or plate colony and press **E / Gather**. One whole litre is collected per second.
+or plate colony and press **E / Gather**. Up to **1 kg** is collected per completed second.
 Movement, Escape, loss of reach, stowing the tool or focus loss stops gathering
-and discards only unfinished litre progress. The HUD shows weight/volume limits,
-separate resource stacks and remaining source litres. A full inventory leaves
+and discards only unfinished interval progress. The HUD shows weight/slot limits,
+separate resource stacks and remaining source mass. A full inventory leaves
 the source's uncollected material intact. No physical fragments or carrying
 simulation are involved.
 
-Completed litres save immediately in this browser. Movement is checkpointed at
+Completed gram transfers save immediately in this browser. Movement is checkpointed at
 most once per simulated second, at movement stop and on page hide/blur. Reload
 restores location and inventory, never active gathering. Cockpit reloads stand
 beside the chair. A second same-origin tab cannot edit the open expedition.
 Use HTTPS or localhost; blocked storage/invalid saves pause gathering and preserve
 the saved bytes. Data is browser-local; there is no server/cloud/multiplayer save.
 
-`npm test` covers exact grams/litres, mixed capacities, interruptions, failed and
+`npm test` covers exact grams, weight/slot caps, count-item stacks, interruptions, failed and
 stale writes, malformed/incompatible saves, upgrades, depletion and payload mass.
 The existing Navigation client CI includes `GATHER-1`/`GATHER-2` through
 `npm run test:browser -- --project=cockpit --grep GATHER`, using the built entry,

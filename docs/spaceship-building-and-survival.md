@@ -2,7 +2,7 @@
 
 > **Cockpit and ship-wide damage update (2026-11-04):** Default gameplay is 2D; owner enters 3D radar only via cockpit desk, appearing seated to others. Exiting normally stands them up; blackout returns them to seated 2D; disconnect removes avatar/releases interactions and preserves a ship-local or planet-fixed reconnect point. **Current 2D damage scope is whole-ship damage/destruction only**; old per-cell/module damage text below is legacy/deferred. See [cockpit and reconnect](cockpit-navigation-and-reconnect.md).
 
-> **New 2D design (2026-11-04):** [Strict top-down illustrated art](top-down-art-direction.md) and [10 kg / 10 L direct resource inventory](resource-inventory-and-gathering.md) supersede old first-person fragment-carry/mining descriptions below. The old native code and acceptance notes are historical, not currently running in the navigation-only browser client.
+> **Updated 2D inventory (2026-11-05):** [Strict top-down art](top-down-art-direction.md), [weight-only 10 kg / 12-slot inventory](resource-inventory-and-gathering.md) and [modular spacesuits/hazards](spacesuit-and-hazards.md) supersede earlier dual weight/volume, whole-litre, physically carried raw-resource, suit-tier and fragment-based text below. The browser currently supports weight-based raw gathering, not playable gear/crafting. Historical native implementation notes remain historical.
 
 > **Approved future Scout/construction contract (2026-10-22):** [Scout art direction and modular construction](scout-and-modular-construction.md). Older entries below describe the **currently implemented** authored Scout where noted; they do not override the new target. This page is not evidence that modular building or the new cargo bay has shipped.
 
@@ -68,11 +68,11 @@ Player survival needs include:
 The ship itself must provide or support the resources and equipment needed to manage these needs.
 ## Death
 Death is intentionally severe. If the player dies or suffers unrecoverable total loss, the run ends and the player starts the game fresh. This makes preparation, maintenance, navigation, and cooperation meaningful.
-## Resource inventory and cargo (new 2D direction)
+## Unified inventory, equipment and storage (current 2D direction)
 
-Raw resources are stored in the player's **10 kg / 10 L dual-capacity inventory** in **whole litres**, using resource-specific **fractional kg/L** densities (integer grams per litre internally). No physical fragment piles or one-fragment-at-a-time carrying for raw materials. The starter Scout has one **50 kg / 50 L general storage container**, plus a **50 kg / 50 L Fabricator resource buffer** and a separate **50 kg / 50 L Energy Core fuel buffer**; players may deposit and retrieve unconsumed materials. Machine inventories are independent from the player inventory, while physical furnishings remain separate.
+The player has **12 shared item slots** and **10 kg of weight capacity** at the start. Raw resources use exact integer grams and one slot per resource type; count-based items have per-type weights and stack sizes (e.g. suit protection modules stack to one). There are **no volume limits**. A suit can be worn or removed, has no tier and initially has two protection module slots. The player starts equipped with a basic suit. See the [full resource/gathering contract](resource-inventory-and-gathering.md) and [spacesuit/hazard design](spacesuit-and-hazards.md).
 
-The new Core design uses **continuous conversion bounded by fixed maximum generation power (watts)**; **that rate can be upgraded later**, but its initial value, upgrade levels and costs are explicitly **deferred for a future design discussion**. Legacy native physical-fuel behavior below does not supersede the [current inventory and Core contract](resource-inventory-and-gathering.md).
+The Scout has a **50 kg raw-only Resource Container**, separate **50 kg Fabricator** input and **50 kg Core** fuel buffers. Future equipment storage: **Spacesuit Drawer** tiers with 4/8/12 suit slots and **Protection Module Storage** tiers with 12/16/24 uninstalled-module slots. Their weight caps remain TBD. No inventory or storage volume limits apply. Gear bench construction enables future suit/module crafting; content, recipes and upgrades are TBD.
 
 ## Space EVA and airlock
 - When the ship is in open space and is **not landed**, the player may open the airlock and leave the ship for EVA/free-flight.
@@ -83,7 +83,7 @@ The new Core design uses **continuous conversion bounded by fixed maximum genera
 - Opening the airlock in space is intentionally allowed. Future pressure, oxygen, suit-safety, decompression, and death consequences may add risk, but they must not invalidate the core ability to perform EVA.
 ## Resource gathering (new 2D direction)
 
-Asteroid mining, planetary extraction and biological harvesting credit whole raw-resource units **directly** to the player's inventory, while debiting the same quantity from the persistent source. Gather only units that fit both remaining weight and volume; leave any excess at the source. No mined spherical fragments, raw fragment carry or fragment gravity/contact behavior. Future Core/Fabricator/construction adapters should consume exact inventory quantities instead of held resource fragments. See [resource inventory and gathering](resource-inventory-and-gathering.md).
+Asteroid mining, planetary extraction and biological harvesting credit raw material by **integer grams** directly to the player's unified inventory and debit the same mass from the source. Collection is constrained by the one weight cap and shared slots, **not volume**. The authored current sample gathers up to **1 kg/s** in complete interaction intervals. Uncollected mass stays in the source; no raw fragment spheres or carrying are required. See [resource inventory and gathering](resource-inventory-and-gathering.md).
 
 ## Resource uses
 Resources may be used for:
@@ -111,14 +111,12 @@ Research and technology unlocks should enable:
 - If the owner dies, the ship becomes orphaned and remains in the world as salvage/loot. Existing future Core-based recovery applies **only where a character is still alive** and can reach that Core; it does not override offline death or resurrect an offline occupant at wreckage.
 - There are no lockable protected containers or general anti-loot protections planned; physical access means items can be taken.
 - See [cockpit navigation and reconnect](cockpit-navigation-and-reconnect.md) for authoritative character/interaction behavior.
-## Confirmed personal resource inventory (2026-11-04)
+## Confirmed personal inventory (updated 2026-11-05)
 
-- Start with 10 kg **and** 10 L, both independently enforced; future upgrades can expand either capacity.
-- Resource quantities are whole litres, with resource-specific fractional kg/L densities stored precisely as integer grams per litre.
-- Collect raw materials directly into stacks rather than physically carrying resource fragments.
-- Existing tool slots, food/medkit slots and non-resource possessions are separate interaction systems.
-- Inventory mass contributes only once to relevant physics. No source consumption without matching inventory credit.
-- See the [authoritative resource contract](resource-inventory-and-gathering.md).
+- A unified 12-slot / 10 kg starting inventory holds raw materials and count-based items. Every item has weight; item stack sizes are defined per type. Weight is the only physical carrying constraint, with no volume checks.
+- Raw-resource quantities and depletion are integer grams, not whole litres. All materials gathered directly into inventory, with atomic source debits.
+- Suits are tierless modular equipment. A basic suit starts equipped, and future drawers, module storage and Gear Crafting Bench follow [spacesuit and hazard rules](spacesuit-and-hazards.md).
+- Exact equipment masses, suit expansions, extra slots, and weight upgrade recipes remain TBD.
 
 ## Confirmed construction and damage model
 - **Approved future construction:** a **ship-local 3 m × 3 m × 3 m structural grid on all three axes**, with face-based connection to the persistent Core, multi-deck expansion, optional finer data-driven attachment snapping, and one blueprint spanning many structural cells. The older Z-only snap plan is superseded by [this approved contract](scout-and-modular-construction.md).
@@ -215,7 +213,7 @@ owned by E03; no continuous charging source is assumed by this task.
 
 ## Energy Core generation rate — new 2D design (2026-11-04)
 
-The approved future 2D Core consumes raw resources from its own **50 kg / 50 L buffer** and produces energy **continuously**, processing whole-litre batches at a **fixed maximum generation power measured in watts**. It automatically prioritizes highest-yield resources (metric still to define), pauses at full energy reserve, and resumes as room becomes available, with unused materials withdrawable.
+The approved future 2D Core consumes raw resources from its own **50 kg buffer**, with continuous energy output bounded by a fixed maximum generation power in watts. Mass-based batch/yield selection and tie-breaking remain TBD; it pauses when the energy reserve fills and resumes when capacity returns, with unconsumed materials withdrawable. There is no litre/volume storage constraint.
 
 **The maximum generation rate is upgradeable in the future.** Its starting power, tiers, upgrade costs, prerequisites and cap remain **undecided and must be explicitly discussed and defined later**; do not reuse the historical 200 MJ/s native default as an approved 2D rate. See [resource lifecycle](resource-inventory-and-gathering.md).
 

@@ -17,7 +17,7 @@ frame transfer and cockpit navigation integration remain future work.
 - Retain the existing approved Scout identity: cozy, personal but well maintained, with graphite/slate machinery, warmer ivory habitation, ochre/terracotta accents and cyan functional indicators. Preserve layout intent, privacy screen, observation window/shutter, physical furniture, localized aging and clean repairs.
 - Preserve deterministic canonical geology, climate, weather, ecology, rare biological signatures and landmarks on planets. Empty worlds must remain visually interesting. Present these in illustrated overhead layers, not arbitrary independent AI-generated background pictures.
 - Characters and tools use coherent overhead silhouettes and motion. Distinct states include walking, mining/harvesting, machine interaction and future zero-G. Raw resource gathering does not attach visible carried fragment sprites.
-- Raw materials use [the 10 kg / 10 L resource inventory](resource-inventory-and-gathering.md). Keep installed fixtures and personal non-resource objects separate until their top-down interactions are specified.
+- Raw resources and count-based items share [one 10 kg / 12-slot weight-based inventory](resource-inventory-and-gathering.md), with no volume cap. Tierless modular suits and their storage/hazard systems are [future design](spacesuit-and-hazards.md); installed fixtures stay separate until interactive.
 
 ## 3D navigation consistency
 

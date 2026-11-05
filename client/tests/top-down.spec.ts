@@ -163,7 +163,7 @@ test('SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway', as
   await walkTo(page, [.65, 4.25])
   await expect(page.locator('[data-selection="scout:storage"]')).toHaveCount(1)
   await page.keyboard.press('e')
-  await expect(page.getByRole('status')).toContainText('50 kg / 50 L')
+  await expect(page.getByRole('status')).toContainText('Resource Container · 50 kg')
   await page.screenshot({ path: info.outputPath('cargo-modules.png') })
   await page.keyboard.press('Escape')
   await walkTo(page, [0, 4.8])

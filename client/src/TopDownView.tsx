@@ -17,7 +17,7 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
   return <svg className="top-down-scene" viewBox="-600 -320 1200 640" shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label="Strict overhead Scout and planetary test site" data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {items.filter(item => item.entity.layer === layer).map(({ entity, positionM: [x, y], angle }) =>
-        <g key={entity.id} data-entity={entity.id} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-litres={session?.snapshot.sources[entity.id]?.remainingLitres} data-depleted={session?.snapshot.sources[entity.id]?.remainingLitres === 0 || undefined} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
+        <g key={entity.id} data-entity={entity.id} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.snapshot.sources[entity.id]?.remainingGrams} data-depleted={session?.snapshot.sources[entity.id]?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
           <WorldSprite entity={entity} />
         </g>)}
       {layer === 'cues' && items.filter(item => item.entity.id === state.selectedId).map(({ entity, positionM: [x, y], angle }) => <g key={entity.id} data-selection={entity.id} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={entity} selected /></g>)}
@@ -127,13 +127,13 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
         <h2>Field inventory</h2>
         {resourceSession && usage && <>
           <p data-inventory-weight><strong>{usage.grams / 1000}</strong> / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg</p>
-          <p data-inventory-volume><strong>{usage.litres}</strong> / {resourceSession.snapshot.inventory.capacityLitres} L</p>
-          <ul>{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <li key={id}>{entry.name} <span data-resource={id}>{resourceSession.snapshot.inventory.quantities[id] ?? 0} L</span></li>)}</ul>
+          <p data-inventory-slots><strong>{usage.slots}</strong> / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
+          <ul>{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <li key={id}>{entry.name} <span data-resource={id}>{(resourceSession.snapshot.inventory.quantities[id] ?? 0) / 1000} kg</span></li>)}</ul>
         </>}
         <button disabled={!resourceSession || !!resourceSession.error} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
         <p className="resource-note">{resourceSession?.error || saveStatus}</p>
-        {selectedSource && <p data-source-summary>{RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].name} · {selectedSource.remainingLitres} L remaining · {RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].gramsPerLitre / 1000} kg/L</p>}
-        {!!resourceSession?.activeSourceId && <progress aria-label="Next whole litre" max={60} value={resourceSession.progressTicks} />}
+        {selectedSource && <p data-source-summary>{RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].name} · {selectedSource.remainingGrams / 1000} kg remaining</p>}
+        {!!resourceSession?.activeSourceId && <progress aria-label="Next kilogram extraction interval" max={60} value={resourceSession.progressTicks} />}
       </aside>}
       <div className="top-down-caption"><span>01 / QUIET LANDING SITE</span><span>SCOUT — INTERIOR CUTAWAY</span></div></section>
     <aside className="top-down-interaction" aria-label="Nearby interaction">
@@ -141,6 +141,6 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
       <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={!selected && state.player.mode !== 'interacting'}>{resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
     </aside>
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
-    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · 1 L/s · Machine systems are placeholders' : 'Console inspections are a test · Systems inactive'}</p></footer>
+    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · 1 kg/s · Machine systems are placeholders' : 'Console inspections are a test · Systems inactive'}</p></footer>
   </main></>
 }

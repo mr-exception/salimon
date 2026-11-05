@@ -34,6 +34,8 @@ These newer approved narrative contracts supersede historical Earth-start assump
 - [Canonical planetary generation, multi-seed identity and approved migration policies](canonical-planet-generation.md)
 - [Spatial Jump Drive, sub-light travel, shared time and Core impulse (approved future design)](jump-drive-and-interstellar-travel.md)
 - [Spaceship, Building & Survival](spaceship-building-and-survival.md)
+- [Weight-only inventory, mining and resource storage](resource-inventory-and-gathering.md)
+- [Spacesuits, hazards, suit drawers and protection-module storage](spacesuit-and-hazards.md)
 - [Multiplayer & NPC Interaction](multiplayer-and-npc-interaction.md)
 - [Cockpit control, disconnect/reconnect and offline-death rules](cockpit-navigation-and-reconnect.md)
 - [Technical Architecture & AI Maintenance](technical-architecture.md)

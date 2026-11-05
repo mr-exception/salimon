@@ -16,7 +16,7 @@ export const SCOUT_ANCHORS: Readonly<Record<string, Anchor>> = {
   storage: { frame: 'ship:scout', point: point2(1.85, 4.25) },
   entry: { frame: 'ship:scout', point: point2(0, 5.5) },
 }
-export const STORAGE_CAPACITY = { massG: 50_000, volumeL: 50 } as const
+export const STORAGE_CAPACITY = { massG: 50_000 } as const
 export const SCOUT_ENTRY_HALF_WIDTH_M = 1.5
 export function scoutEntities(): Entity2D[] {
   return [
@@ -25,7 +25,7 @@ export function scoutEntities(): Entity2D[] {
     prop('scout:bed', -2.2, .5, 'bed', .45, 1.2),
     prop('scout:core', 1.9, 1.8, 'core', .4, .7, 'Core'),
     prop('scout:fabricator', -1.85, 3.9, 'fabricator', .6, .65, 'Fabricator'),
-    prop('scout:storage', 1.85, 4.25, 'storage', .55, .7, 'Storage · 50 kg / 50 L'),
+    prop('scout:storage', 1.85, 4.25, 'storage', .55, .7, 'Resource Container · 50 kg'),
     prop('fixture:crate', 0, -.6, 'crate', .6, .5),
     ...[
       ['wall:port', -2.65, .5, .15, 5], ['wall:starboard', 2.65, .5, .15, 5],

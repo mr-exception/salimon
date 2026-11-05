@@ -1,5 +1,8 @@
 # Missing-data inference — U09 (#410)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 `salimon-universe::inference` supplies a portable offline completion boundary for
 source-backed, explicitly classified single-main-sequence-star planetary systems.
 It produces a new immutable catalog revision and typed age, partial orbit and
@@ -138,5 +141,5 @@ See [measured report](https://github.com/mr-exception/salimon/blob/d003bd58d506e
 Private source usage is owner-authorized. Selected JPL/PS coverage is implemented
 by #526; full Gaia acceptance remains #524 and release reuse remains #659.
 U10/U11 generation, U12 packaging and U14 evaluation are implemented consumers;
-[the U36 matrix](../reports/issue-441/README.md) maps their current limits.
+[the U36 matrix](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-441/README.md) maps their current limits.
 Heuristic inference is not empirical calibration or an independent rights approval.

@@ -1,5 +1,15 @@
 # Scout interior art direction and habitation presentation
 
+## Translation to the playable top-down Scout
+
+The default 2D world renders the Scout **continuously exposed** alongside the exterior, with no toggle to a separate first-person room. Represent the aft cargo bay, service passage, main cabin, privacy nook and cockpit through consistent overhead shape and color, readable furniture silhouettes and exact ship-local interaction anchors. Floor and wall art cannot silently block a walkable route; every physical barrier uses a tested footprint/door state owned by gameplay, not sprite opacity.
+
+The player can enter the existing open aft doorway and reach the cockpit today. The proposed closable doors, movable fixtures, sleeping poses, shutters, room finishing, construction grid and ambient machines remain **future**—the art specification alone does not make them interactable. Keep the character visible behind tall furniture using the approved cutaway/occlusion treatment. Reuse the approved well-maintained, lived-in palette, but **do not require GLB models, first-person eye-height camera views, Blender exports or visible raw fragment stacks** in the 2D path. Deposited resources are integer-gram counts in storage interfaces, not free physical ore objects.
+
+
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Cockpit viewpoint and multiplayer (2026-11-04):** [Cockpit and reconnect](cockpit-navigation-and-reconnect.md) is authoritative for the new strict-top-down character/cockpit flow: navigation desk opens local 3D radar, others see a seated pilot, normal exit stands the pilot up, blackout returns them to seated 2D, and disconnect clears the chair and interaction. Preserve the Scout's approved aesthetic and furniture intent while adapting seating to illustrated overhead poses.
 
 > **2D migration (2026-11-04):** Preserve established Scout atmosphere, habitation features, furnishings and clean repairs; present them with the new [strict top-down illustrated view](top-down-art-direction.md). Old first-person camera/3D mesh requirements are historical. Raw materials follow [direct limited inventory gathering](resource-inventory-and-gathering.md).

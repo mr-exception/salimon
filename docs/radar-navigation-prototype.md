@@ -1,16 +1,16 @@
 # Navigation-only React radar prototype (2026-11-03)
 
-> **Cockpit access design (2026-11-04):** In future integrated gameplay, this 3D radar is opened **only through the powered cockpit desk** from the default 2D world. Other players see the pilot **seated in the 2D cockpit**. Voluntary exit stands the pilot up; blackout closes 3D but leaves them seated. See [cockpit and reconnect contract](cockpit-navigation-and-reconnect.md). The navigation-only sample presently has no interior/pilot/avatar/multiplayer integration.
+> **Current browser cockpit access (2026-11-05):** The 3D holographic radar opens **only from the in-world powered cockpit desk** in the default strict-top-down 2D Scout. Local owner and single-seat admission, seated representation, normal exit-to-standing and forced power-fixture return-to-seated are implemented in `client/src/cockpit.ts` and `TopDownView.tsx`. **Other players seeing the pilot seated, authoritative power failures, reconnect and backend multiplayer are still future contracts.** See [cockpit and reconnect](cockpit-navigation-and-reconnect.md).
 
-> **Separate future 2D direction (2026-11-04):** The current radar stays 3D; Scout and planetary exploration will be [strict top-down illustrated 2D](top-down-art-direction.md). [Resource inventory](resource-inventory-and-gathering.md) is a separate domain and not wired to navigation.
+> **Current world view:** Scout interiors and the illustrated landing area **are already strict top-down 2D**. The radar remains a separate 3D instrument. [Weight-only gathering and inventory](resource-inventory-and-gathering.md) are playable in the 2D world, not inside the radar.
 
 Status: approved navigation design and prototype scope. This is **not** a claim that the previous Rust/native gameplay, planetary exploration, interiors, Energy Core, or save systems were migrated.
 
 ## Scope boundary
 
-Implement a browser-based 3D holographic navigation *view*, built with React, TypeScript, Three.js and React Three Fiber under `client/`. Ship energy is **infinite in this prototype only**. No Energy Core UI, depletion, resources, 2D planetary surfaces, interior, survival, crafting, or detailed ship meshes. The deterministic **sample universe** is illustrative test data, not the production Gaia catalog.
+This section scopes the **radar subsystem**, not the entire browser game. Implement a 3D holographic navigation *view*, built with React, TypeScript, Three.js and React Three Fiber under `client/`. Ship energy is **infinite in this prototype only**. No Energy Core UI, depletion, resources, 2D planetary surfaces, interior, survival, crafting, or detailed ship meshes. The deterministic **sample universe** is illustrative test data, not the production Gaia catalog.
 
-The main branch contains the browser client; older documents mentioning Rust packages refer to a previous architecture. This prototype establishes a fresh browser entry point but does not delete or rewrite historical contracts. Production migration is separate future work.
+The active browser app now mounts the same radar from its 2D cockpit; `/?scene=radar` remains the isolated navigation fixture. The radar does not imply that historical Rust gameplay or canonical universe systems have been ported.
 
 ## Approved navigation interaction
 

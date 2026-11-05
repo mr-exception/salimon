@@ -1,5 +1,8 @@
 # macOS qualification
 
+> **Corpus migration status (#791): Historical evidence only.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 This is optional platform/release qualification under the
 [cloud-first workflow](verification-workflow.md), not a routine feature PR gate.
 Use an exact clean source revision and optimized executable, isolated saves and
@@ -42,7 +45,7 @@ SALIMON_SAVE_DIR="$PWD/artifacts/mac-smoke-saves" SALIMON_SETTINGS_FILE="$PWD/ar
 Pass an **absolute** helper path in the screenshot argv when running from a
 different directory. The helper is a trusted local argv, never scenario-supplied
 shell code. OS-injected Enter/F2 and received-event logs are distinct from human
-keyboard/mouse trials. The [fragment benchmark guide](../scripts/FRAGMENT_BENCHMARKS.md)
+keyboard/mouse trials. The [fragment benchmark guide](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/FRAGMENT_BENCHMARKS.md)
 owns matched foreground load matrices; do not substitute naturally sleeping loads
 for active-load acceptance or compare different source/settings as a regression.
 
@@ -94,8 +97,8 @@ are supporting automated evidence, not measured acquisition. Proposed 360/720 s
 targets and recovery tuning remain owner decisions; preserve approved survival
 clocks and existing construction economy decisions.
 
-Owners: runtime [architecture](../client/runtime/architecture.md) and
-[invariants](../client/runtime/invariants.md), renderer
-[architecture](../client/renderer/architecture.md) and
-[invariants](../client/renderer/invariants.md). This collection workflow changes
+Owners: runtime [architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/invariants.md), renderer
+[architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/architecture.md) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/invariants.md). This collection workflow changes
 no runtime, physics, persistence, source rights or approved numerical contracts.

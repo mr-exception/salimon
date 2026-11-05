@@ -1,14 +1,24 @@
 # Planetary environmental art direction and exploration contract
 
+## Current 2D environmental presentation boundary
+
+The **authoritative gameplay view is overhead illustrated 2D**, not an overhead camera over a low-poly 3D terrain renderer. Canonical geology, source IDs, climate, ecology and landmarks retain their deterministic meaning; surface appearance is projected into persistent regional illustrations, material sprites and readable local effects. Gameplay collision/reach uses stable 2D footprints from the same published source, not independently painted obstacles. Geological uplift, eroded ridges, biological silhouettes, rain, fog and rare sites must remain coherent across zoom and replay rather than random independent AI background images.
+
+The current authored landing site has **two sample resources only**. Neither real canonical terrain/weather nor biological family generation is implemented in the browser. World generation/planet-pack production is a **data input** to future 2D layers, not permission to inject the old Rust terrain/mesh/effects pipeline. When source data arrives, require separately tested identity/depletion/planet-anchor mapping, stable cutaway/occlusion, environment effects with no invented health damage and actual browser captures before declaring a planet integrated. Native render/hardware evidence applies only to the historical client.
+
+
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **2D migration (2026-11-04):** Keep approved deterministic geology, climate, weather, alien biology and landmark identities, but illustrate environments in [strict top-down 2D](top-down-art-direction.md). Harvested raw resource units enter [the player's inventory directly](resource-inventory-and-gathering.md). Historical physical fragment workflows are superseded.
 
-Status: **owner-approved future art/gameplay direction (2026-10-24); design-only, not a claim of implemented weather, ecology, landmarks or planetary charts**. This consolidates the fifteen-round planetary environment discussion. It is the environmental presentation/interaction source of truth alongside, not a replacement for, [canonical planet generation](canonical-planet-generation.md), [universe expansion](universe-expansion-approved-design.md), [planetary/world physics](world-and-realism.md), [visual style](visual-style.md), [experience direction](experience-direction.md), [Scout design](scout-interior-art-direction.md), [navigation and Archive](archive-recovery-and-navigation.md), and [resource contracts](../client/world/resource-contracts.md). When an approved physical or save contract is more specific, that contract controls; new capabilities require their own implementation and verification.
+Status: **owner-approved future art/gameplay direction (2026-10-24); design-only, not a claim of implemented weather, ecology, landmarks or planetary charts**. This consolidates the fifteen-round planetary environment discussion. It is the environmental presentation/interaction source of truth alongside, not a replacement for, [canonical planet generation](canonical-planet-generation.md), [universe expansion](universe-expansion-approved-design.md), [planetary/world physics](world-and-realism.md), [visual style](visual-style.md), [experience direction](experience-direction.md), [Scout design](scout-interior-art-direction.md), [navigation and Archive](archive-recovery-and-navigation.md), and [resource contracts](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/resource-contracts.md). When an approved physical or save contract is more specific, that contract controls; new capabilities require their own implementation and verification.
 
 ## Intent and scope
 
-Planet surfaces must have **plausible, persistent identity**: physical and astronomical conditions shape geology; geology and atmosphere shape climates; weather varies coherently in shared time; and rare biospheres can produce distinguishable ecological regions. A sterile planet may be almost empty but must not look like an unfinished demonstration. Seek grounded cinematic stylized low-poly silhouettes, restrained material treatment, informative environmental sound, interesting but rare exploration landmarks, and a strong contrast with the warm familiar Scout.
+Planet surfaces must have **plausible, persistent identity**: physical and astronomical conditions shape geology; geology and atmosphere shape climates; weather varies coherently in shared time; and rare biospheres can produce distinguishable ecological regions. A sterile planet may be almost empty but must not look like an unfinished demonstration. Seek grounded cinematic illustrated overhead silhouettes, restrained material treatment, informative environmental sound, interesting but rare exploration landmarks, and a strong contrast with the warm familiar Scout.
 
-This is an art direction and future-gameplay specification, **not authorization for full fluid simulation, autonomous ecology, fauna, survival toxicity, terrain destruction, caves, surface bases, a new scanner mode, an autopilot or an alternate renderer**. Design proposals below require engineering scoping and native evidence before considered shipped.
+This is an art direction and future-gameplay specification, **not authorization for full fluid simulation, autonomous ecology, fauna, survival toxicity, terrain destruction, caves, surface bases, a new scanner mode, an autopilot or an alternate renderer**. Design proposals below require engineering scoping and browser/cloud evidence before considered shipped.
 
 ## Canonical world ownership and generation
 
@@ -192,7 +202,7 @@ art/listening and M1 qualification remain #561/#563.
 
 ## Combined cloud verification (#628)
 
-The [maintained environment matrix](../scripts/README.md#planetary-environment-matrix-628)
+The [maintained environment matrix](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/README.md#planetary-environment-matrix-628)
 combines canonical sterile Vesper day/night and streaming with explicit fictional
 weather/biology positives, harvesting/reload, field marks/chart and sound evidence.
 The [dated report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-628/README.md) records exact fixture/publication

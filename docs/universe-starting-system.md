@@ -1,5 +1,8 @@
 # Permanent awakening system — U11 (#412)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Environmental preservation clarification (2026-10-24):** The approved [planetary environmental art direction](planetary-environment-art-direction.md) must preserve Vesper as the established **airless frozen mineral starting world**, not populate it with living vegetation, atmospheric wind/clouds or inferred organisms merely because provisional organic/medicinal resource keys exist. Fixed landing area, terrain, physical anchors and canonical palette remain authoritative until an explicitly approved compatible migration.
 
 
@@ -14,14 +17,14 @@ starting planet **Vesper**. Scientific-style IDs remain separate from names:
 
 Owner: `client/universe/src/starting_system.rs`; regressions:
 `client/universe/src/starting_system/tests.rs`. Read the owning
-[architecture](../client/universe/architecture.md#permanent-starting-world--u11-412)
-and [invariants](../client/universe/invariants.md),
+[architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#permanent-starting-world--u11-412)
+and [invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md),
 [approved expansion](universe-expansion-approved-design.md) and
 [canonical generation policy](canonical-planet-generation.md).
 
 ## Reproducible selection and freeze
 
-The committed [candidate request](../client/universe/fixtures/starting-candidates-v1.json)
+The committed [candidate request](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/fixtures/starting-candidates-v1.json)
 uses U10 builder v1, seed 412, a single 2 pc cuboid local-disk region, residual
 density 1 system/pc³, ages 3–8 Gyr and [Fe/H] -0.2–0.3. It publishes eight
 fictional systems and 26 planets from an explicitly empty retained baseline
@@ -82,7 +85,7 @@ temporary unlimited suit oxygen policy is not implemented by this leaf module.
 
 ## Full starting-world recipe and deterministic surface
 
-The [frozen manifest](../client/universe/fixtures/starting-world-v1.json) contains
+The [frozen manifest](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/fixtures/starting-world-v1.json) contains
 versions, provenance, scientific IDs/names, the candidate/catalog/actual source
 recipe digests, physical inputs, independent U10 seed lanes, full terrain,
 resource and visual parameters, arrival and walk paths. Its canonical compact

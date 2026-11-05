@@ -1,5 +1,15 @@
 # Canonical whole-game save contract (schema 29)
 
+## Browser 2D save boundary (not native schema 29+)
+
+The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked inventory/source/location envelope, with the v3 gram ledger delivered by #783 after v1/v2 migration. It is scoped to the authored sample site and local browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
+
+Future browser progression must specify new versioned state for equipped suit modules, actual ship stores, health/exposure, Core/Fabricator, moved ships, planet-fixed locations and server actor authority separately; it cannot serialize old Rust `.rs` types or assume native migration scripts run in the browser. Preserve this contract as historical design evidence and do not silently copy its native payload fields or reset incompatible saves.
+
+
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Future multiplayer reconnect boundary (2026-11-04):** The [cockpit/reconnect contract](cockpit-navigation-and-reconnect.md) supersedes local native assumption that disconnected player state remains physically present. The new authoritative future model saves a **planet-fixed or ship-local reconnect anchor**, cancels active interaction/seat occupancy on disconnect, and checks ship-wide offline-death outcomes before respawn. This is NOT implemented by schema 29 and does not modify legacy saves.
 
 > Current runtime captures use **schema 29**; schema 23 was the historical compressed-world baseline, and schema 24+ additionally binds canonical Vesper definitions. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
@@ -336,7 +346,7 @@ The switch participates in discrete checkpoint events; held B/keys are transient
 
 ## Portable cross-system verification (#375)
 
-The [portable scenario DSL](../scenarios/portable/README.md) composes real session
+The [portable scenario DSL](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/portable/README.md) composes real session
 encoding/validation, NativeStore checkpoints and the normal verified launch path
 at explicit UTC. Full-source equality and post-restore continuation cover landed,
 moving, outside-EVA, cargo, blackout/Core and terrain states with partial
@@ -364,7 +374,7 @@ initialize an unread Archive and preserve their existing survival/tutorial/engin
 migrations. No recovery progress or charted destinations are invented. Unknown
 versions/IDs, duplicate read IDs and missing current Archive source reject before
 replacing a live session. Discrete read/selection changes use existing atomic
-checkpoint scheduling. See [source and input](../client/runtime/architecture.md#scout-archive-467).
+checkpoint scheduling. See [source and input](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#scout-archive-467).
 
 ## Future universe new-run contract — U05 (#406)
 
@@ -420,7 +430,7 @@ See [canonical Recovery contract](data-recovery-module.md#persistence-and-verifi
 validated 3 m structural graph. It preserves the Core ID, exact grid origin,
 parts/faces/envelopes, rooms, equipment, baseline/additional mass and retired IDs;
 restore rebuilds occupancy and checks support and uniqueness. See
-[owning architecture](../client/ship/architecture.md#portable-structural-foundation-541).
+[owning architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md#portable-structural-foundation-541).
 This payload is not yet part of `GameplaySession` or disk checkpoints and does
 not change whole-game schema 7. Project/physical installation save integration
 remains #550; no player save acquires an invented grid or rounded Scout anchors.

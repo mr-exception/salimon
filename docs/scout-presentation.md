@@ -1,5 +1,8 @@
 # Scout presentation foundation
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 Verification ownership follows the [cloud/human policy](verification-workflow.md).
 #483/#485/#489/#498/#502/#505/#515/#566 own cloud-renderer/interaction/audio
 checks; #561 human presentation/listening, #557 physical platform checks and
@@ -32,7 +35,7 @@ hardware timing/budget acceptance to #563. No measured hardware budget is approv
 
 ## Comparable native and offline reference cameras
 
-[scout-cameras.json](../scenarios/visual/scout-cameras.json) owns cockpit, Core,
+[scout-cameras.json](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/visual/scout-cameras.json) owns cockpit, Core,
 Fabricator and aft-door positions/targets in runtime ship-local metres. Native
 E2E maps them through the presented ship pose without changing player/aim state.
 Blender uses the same inverse axis conversion as the existing Fabricator preview.
@@ -173,7 +176,7 @@ No native appearance, mask/tolerance or baseline approval is granted here.
 
 ## Scout UI readability contract (#466)
 
-The renderer's [ui_style.rs](../client/renderer/src/ui_style.rs) owns one 5x7
+The renderer's [ui_style.rs](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/src/ui_style.rs) owns one 5x7
 bitmap face and functional palette shared by physical instruments, runtime
 prompts/crafting/status text, toolbar and Q wheel. Runtime prose uses uppercase
 labels; instruments preserve `m`, `k` and `s` to distinguish SI readings such as

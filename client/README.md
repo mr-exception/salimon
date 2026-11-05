@@ -48,7 +48,7 @@ view switches. It repeats original captures with the unchanged pixel policy.
 During `npm run dev`, open `/?scene=top-down` for a strict overhead illustrated
 Scout and planetary site in one continuous scene. The player starts outside.
 **W/A/S/D** walks the fixed landing area or the interior fixture; visible walls, furniture and a crate block movement. The camera follows with fixed-step
-smoothing, and facing persists when movement stops. Focus loss, editable controls,
+smoothing, finishing at the exact player anchor below a nanometre of lag; facing persists when movement stops. Focus loss, editable controls,
 resize and hidden-page events release movement. The isolated development fixture uses inspection-only consoles; the default `/` integrates cockpit gameplay above.
 
 `topDownFrames.ts` owns planet-fixed/ship-local anchors using the existing split
@@ -122,7 +122,7 @@ cockpit desk and separate chair, bunk, partitioned aft cargo room, Core,
 Fabricator and **50 kg / 50 L** storage placeholder. Cargo passage (2.6 m) and aft
 entry (3 m) are open; visible jambs and room boundaries block walking. The
 threshold marks the aft approach. No roof layer, transparency or interior scene
-swap is used. `scoutLayout.ts` owns ship-local named anchors, shared collision/
+swap is used. Tiny capacity lettering uses vector ink, and the small player silhouette uses authored polygons to avoid unstable hinted/curve edges in repeat captures. `scoutLayout.ts` owns ship-local named anchors, shared collision/
 visual footprints and storage capacity metadata; machine/storage interactions
 only inspect placeholders and do not process or transfer material.
 

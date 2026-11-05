@@ -49,7 +49,7 @@
   "client/src/simulation.test.ts": "170ccda2cb9274eda75dcb33fbdd8e581faa60cf64f08f75242cbb05549b0fd4",
   "client/src/simulation.ts": "a09999df31c038d786d48c4ef422ad618f2fb0e21b8eab594a1675e3449eac60",
   "client/src/styles.css": "c5a4feaf0ab6bfdd05c156acc8d327f37a0635eaedf969d32a06b45c502c3cdf",
-  "client/src/topDown.css": "573907bfade386b1cbe1ed08b2c704f62de3d87cea413281f4505751de58742e",
+  "client/src/topDown.css": "02d79b815b8705f663d2eeb1f06bcb52be3740c4ccb0782ee166a1a2b4fe7a2a",
   "client/src/topDown.test.ts": "7884e6141f73f039928870fb893c165cae4c81a0491283c35e4bf0dd69dc99c6",
   "client/src/topDownFrames.ts": "644e762305aa425a487fd7d7650dd64ec6a25405f8f3c1f1b09f06a39d755468",
   "client/src/topDownInteraction.ts": "65e16d940c508c70ce7e7ec178382c6d122f8f66e4d5b80818dc8e50cfacb6a8",

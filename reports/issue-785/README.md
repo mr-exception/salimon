@@ -8,10 +8,10 @@ confirm; only ResourceSession transactions publish material changes. Confirmatio
 is consumed once, while editing/closing discards only draft state.
 
 Parent: non-draft PR #794, `issue-784-resource-container`,
-`8f9a92498cc07e9ea9c118b9840b3627f0a92096`, verified ancestor.
+`8a179fb4adc8bdc5e14925c2e29df22c7c38b199`, verified ancestor.
 Transitive #783 is merged in main `cf46092`. The unique child diff owns UI/input,
 controller, tests, owner docs and this evidence. Tested source:
-`8c9de7985bab03d7a8531254f464829f8b1f0e3b`; source-hashes.json covers
+`16a8eb9a825bb648b81ad53aefb0738edaa2a5f4`; source-hashes.json covers
 runtime, tests, lockfile and configuration. Final report-only publication preserves
 those inputs. Child PR targets the parent head branch, never main.
 
@@ -147,3 +147,28 @@ coverage is stabilized. Pure domain/controller/Node inputs remain unchanged;
 `clip-evidence-reuse.json` binds their earlier passing evidence to the final
 source, while current-head CI reruns the full suite. Local re-review has no
 remaining material finding; overall acceptance awaits final-head CI.
+
+## Owner merges, conflict resolution and final current source
+
+The owner merged documentation PRs #793/#797. Parent #794 now targets main
+`f51350a` and includes it without history rewriting. README/migration-register
+conflicts retain schema-v4/container behavior, all 109 register rows and the new
+backend design contracts. The backend guide's current-browser version reference
+is aligned to v4; backend authority itself remains future work. This child
+incorporates parent `8a179fb`, with no unresolved conflicts. Merge #794 then #795.
+
+CI 42037274989 passed all storage/gathering/cockpit/journey scenarios but still
+found seven rounded-corner pixels in TD-1. Exact originals/RGB deltas/failure
+output are preserved in `failures/ci-42037274989`; the 7 px adjustment was therefore
+insufficient. Parent now uses rectangular pixel-aligned viewport/caption clipping,
+removing only the viewport corner curve. Art, coordinates, footprints, dimensions,
+all assertions, tolerances and approved references are unchanged. The unchanged
+strict TD-1 gate passed five fresh runs in the parent.
+
+Final built storage rerun: **2/2 PASS (2.7 min)**, three repeat comparisons and
+wrong-checkpoint negative, with originals/raw saves in `square-browser`. New
+build/typecheck and merged-doc link checks passed. Tested UI rendering source:
+`16a8eb9a825bb648b81ad53aefb0738edaa2a5f4`; subsequent backend-version merge changes
+only Markdown. Pure gram/controller/test/config/lockfile inputs are unchanged,
+justifying their earlier unit results; final hashes include corrected CSS.
+Current-head full CI and final exact-ref review remain mandatory before ACCEPT.

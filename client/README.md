@@ -137,8 +137,8 @@ Fabricator and **50 kg raw-only Resource Container** placeholder. Cargo passage 
 entry (3 m) are open; visible jambs and room boundaries block walking. The
 threshold marks the aft approach. No roof layer, transparency or interior scene
 swap is used. Explicit line metrics keep the desktop SVG viewport on the device-pixel grid.
-The caption uses the stage's 7 px inner corner curve (8 px frame minus 1 px border),
-so translucent edge blending stays byte-identical across fresh captures. `scoutLayout.ts` owns ship-local named anchors, shared collision/
+The world viewport and translucent caption use rectangular pixel-aligned edges;
+curved ancestor clipping otherwise varies at compositor/capture boundaries. `scoutLayout.ts` owns ship-local named anchors, shared collision/
 visual footprints and storage capacity metadata; machine/storage interactions
 only inspect placeholders and do not process or transfer material.
 

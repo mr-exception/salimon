@@ -79,9 +79,11 @@ export function stepTopDown(state: TopDownState, direction: Point2): TopDownStat
   const [cx, cy] = relativeAnchor(anchor, state.camera.anchor, state.frames)
   const cameraAngle = state.camera.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0
   const deltaCamera = rotate2([cx * .16, cy * .16], -cameraAngle)
+  // Finish a settled follow exactly; residual 1e-14 m transforms can change
+  // subpixel SVG rasterization after view changes. Player/world points stay exact.
   const cameraAnchor = { ...state.camera.anchor, point: translate(state.camera.anchor.point, [deltaCamera[0], deltaCamera[1], 0]) }
   return { ...state, tick: state.tick + 1, entities, player: activity, selectedId, feedback,
-    camera: { ...state.camera, anchor: convertAnchor(cameraAnchor, anchor.frame, state.frames) } }
+    camera: { ...state.camera, anchor: Math.hypot(cx, cy) < 1e-9 ? anchor : convertAnchor(cameraAnchor, anchor.frame, state.frames) } }
 }
 export function capturePlayerLocation(state: TopDownState): PlayerLocation {
   return copyPlayerLocation({ anchor: state.entities.find(e => e.id === PLAYER_ID)!.anchor, facing: state.player.facing })

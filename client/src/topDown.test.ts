@@ -160,3 +160,17 @@ test('Scout fixtures are addressable, room boundaries physical and exterior came
   assert.deepEqual(outside.camera.anchor, originalCamera)
   assert.deepEqual(outside.entities.filter(e => e.id.startsWith('scout:')), state.entities.filter(e => e.id.startsWith('scout:')))
 })
+
+test('settled camera has exactly zero player-relative offset after different view histories', () => {
+  for (const view of ['interior', 'exterior'] as const) {
+    let state = createTopDownState(view)
+    for (let i = 0; i < 40; i++) state = stepTopDown(state, [-1, 0])
+    for (let i = 0; i < 300; i++) state = stepTopDown(state, [0, 0])
+    const player = state.entities.find(e => e.id === PLAYER_ID)!
+    assert.deepEqual(state.camera.anchor, player.anchor)
+    assert.deepEqual(drawList(state).find(e => e.entity.id === PLAYER_ID)!.positionM, [0, 0])
+    const settled = state.camera.anchor
+    for (let i = 0; i < 60; i++) state = stepTopDown(state, [0, 0])
+    assert.deepEqual(state.camera.anchor, settled)
+  }
+})

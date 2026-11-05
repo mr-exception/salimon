@@ -127,3 +127,13 @@ export function increaseResourceInventoryCapacity(
   if (capacityGrams < inv.capacityGrams || capacitySlots < inv.capacitySlots) throw new RangeError('Upgrade cannot reduce either capacity')
   return { ...inv, capacityGrams, capacitySlots }
 }
+
+/** Exact raw credit: reject weight/slot overfill before returning any next state. */
+export function addResource(inv: ResourceInventory, id: string, grams: number, resources: ResourceCatalog, items: CountItemCatalog = {}): ResourceInventory {
+  integer(grams, 'grams', 1)
+  resource(resources, id)
+  resourceInventoryUsage(inv, resources, items)
+  const next = { ...inv, quantities: { ...inv.quantities, [id]: add(inv.quantities[id] ?? 0, grams) } }
+  resourceInventoryUsage(next, resources, items)
+  return next
+}

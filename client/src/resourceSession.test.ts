@@ -33,7 +33,7 @@ function ticks(session: ResourceSession, count: number, direction: readonly [num
 test('production world interaction commits exactly 1000 grams per 60 ticks', () => {
   const { store, session } = make()
   session.start(mineral); ticks(session, 59)
-  assert.equal(session.snapshot.version, 2)
+  assert.equal(session.snapshot.version, 3)
   assert.equal(session.snapshot.inventory.quantities.mineral, undefined)
   assert.equal(store.raw, null)
   ticks(session, 1)
@@ -203,17 +203,130 @@ test('legacy litre saves migrate exactly and never reset source depletion', () =
       [biology]: { id: biology, resourceId: 'biomass', remainingLitres: 30 },
     },
   }
+  delete (legacy as any).stores
   store.raw = JSON.stringify(legacy)
   const restored = new ResourceSession(store, createTopDownState())
   assert.equal(restored.error, '')
-  assert.equal(restored.snapshot.version, 2)
+  assert.equal(restored.snapshot.version, 3)
   assert.deepEqual(restored.snapshot.inventory.quantities, { mineral: 2500 })
   assert.equal(restored.snapshot.sources[mineral]!.remainingGrams, 57_500)
   assert.equal(restored.snapshot.inventory.capacitySlots, 12)
   assert.equal(JSON.parse(store.raw!).version, 1)
   assert.equal(restored.upgrade(10_000, 12), true)
-  assert.equal(JSON.parse(store.raw!).version, 2)
+  assert.equal(JSON.parse(store.raw!).version, 3)
   const again = new ResourceSession(store, createTopDownState())
   assert.equal(again.error, '')
   assert.deepEqual(again.snapshot.inventory.quantities, { mineral: 2500 })
+})
+
+const stores = { cargo: { shipId: 'ship:scout', capacityGrams: 2333 }, remote: { shipId: 'ship:other', capacityGrams: 500 } }
+const cargo = { kind: 'store', id: 'cargo' } as const, player = { kind: 'player' } as const
+function ledgerSession() {
+  const store = new MemoryStorage()
+  const session = new ResourceSession(store, place(createTopDownState('exterior', true), -7.1, 0), stores)
+  const transfer = (grams: number) => session.transfer({ revision: session.snapshot.revision, from: { kind: 'source', id: mineral }, to: cargo, resourceId: 'mineral', grams })
+  return { store, session, transfer }
+}
+test('production session saves full ledger, store metadata and one revision through repeated restarts', () => {
+  const { store, session, transfer } = ledgerSession()
+  assert.equal(transfer(2333), true)
+  assert.equal(store.writes, 1)
+  assert.equal(session.snapshot.revision, 1)
+  assert.equal(session.transfer({ revision: 1, from: cargo, to: player, resourceId: 'mineral', grams: 333 }), true)
+  assert.equal(store.writes, 2)
+  let prior = session.snapshot
+  for (let i = 0; i < 10; i++) {
+    const restored = new ResourceSession(store, createTopDownState('exterior', true), stores)
+    assert.equal(restored.error, '')
+    assert.deepEqual(restored.snapshot, prior)
+    assert.equal(restored.transfer({ revision: restored.snapshot.revision, from: player, to: cargo, resourceId: 'mineral', grams: 1 }), true)
+    assert.equal(restored.transfer({ revision: restored.snapshot.revision, from: cargo, to: player, resourceId: 'mineral', grams: 1 }), true)
+    prior = restored.snapshot
+  }
+  assert.equal(prior.sources[mineral]!.remainingGrams, 57667)
+  assert.equal(prior.stores.cargo!.quantities.mineral, 2000)
+  assert.equal(prior.inventory.quantities.mineral, 333)
+  assert.deepEqual(prior.stores.remote, { id: 'remote', ...stores.remote, quantities: {} })
+})
+test('capacity and stale-revision rejection leave storage, state and revision unchanged', () => {
+  const { store, session, transfer } = ledgerSession()
+  assert.equal(transfer(2334), false)
+  assert.equal(store.writes, 0)
+  assert.equal(session.snapshot.revision, 0)
+  assert.equal(transfer(2333), true)
+  const before = structuredClone(session.snapshot), raw = store.raw
+  assert.equal(session.transfer({ revision: 0, from: cargo, to: player, resourceId: 'mineral', grams: 1 }), false)
+  assert.deepEqual(session.snapshot, before)
+  assert.equal(store.raw, raw)
+  assert.equal(session.error, '')
+})
+test('failed and stale ledger writes preserve both ends, source and restart bytes', () => {
+  for (const failure of ['quota', 'stale']) {
+    const { store, session, transfer } = ledgerSession()
+    assert.equal(transfer(1000), true)
+    const before = structuredClone(session.snapshot)
+    if (failure === 'quota') store.fail = true
+    else { const other = new ResourceSession(store, session.world, stores); assert.equal(other.upgrade(11000, 12), true) }
+    const raw = store.raw
+    assert.equal(session.transfer({ revision: 1, from: cargo, to: player, resourceId: 'mineral', grams: 333 }), false)
+    assert.deepEqual(session.snapshot, before)
+    assert.equal(store.raw, raw)
+    assert.match(session.error, /Saving failed/)
+    assert.equal(transfer(1), false)
+    const restart = new ResourceSession(store, createTopDownState('exterior', true), stores)
+    assert.equal(restart.error, '')
+    assert.equal(restart.snapshot.stores.cargo!.quantities.mineral, 1000)
+    assert.deepEqual(restart.snapshot.inventory.quantities, {})
+  }
+})
+test('v2 gram migration preserves all mass and old bytes until a successful v3 commit', () => {
+  const { session, store } = make()
+  session.start(mineral); ticks(session, 60)
+  const v2 = JSON.parse(store.raw!); v2.version = 2; delete v2.stores
+  store.raw = JSON.stringify(v2)
+  const oldBytes = store.raw, migrated = new ResourceSession(store, session.world, stores)
+  assert.equal(migrated.error, '')
+  assert.equal(migrated.snapshot.version, 3)
+  assert.equal(migrated.snapshot.revision, v2.revision)
+  assert.equal(migrated.snapshot.inventory.quantities.mineral, 1000)
+  assert.equal(migrated.snapshot.sources[mineral]!.remainingGrams, 59000)
+  assert.equal(store.raw, oldBytes)
+  store.fail = true
+  assert.equal(migrated.transfer({ revision: v2.revision, from: player, to: cargo, grams: 333, resourceId: 'mineral' }), false)
+  assert.equal(store.raw, oldBytes)
+  store.fail = false
+  const retry = new ResourceSession(store, session.world, stores)
+  assert.equal(retry.transfer({ revision: v2.revision, from: player, to: cargo, grams: 333, resourceId: 'mineral' }), true)
+  assert.equal(JSON.parse(store.raw!).version, 3)
+  assert.equal(retry.snapshot.revision, v2.revision + 1)
+})
+test('corrupt and unsupported ledgers preserve bytes and block every write', () => {
+  const { session, store, transfer } = ledgerSession()
+  transfer(1000)
+  const original = store.raw!
+  for (const mutate of [
+    (s: any) => { s.version = 4 }, (s: any) => { s.version = 2 },
+    (s: any) => { s.stores.cargo.inventory = s.inventory }, (s: any) => { s.futureLedger = {} },
+    (s: any) => { s.stores = null }, (s: any) => { s.stores.cargo.id = 'renamed' },
+    (s: any) => { s.stores.cargo.shipId = 'other' }, (s: any) => { s.stores.cargo.capacityGrams++ },
+    (s: any) => { s.stores.cargo.quantities.mineral++ }, (s: any) => { s.stores.cargo.quantities.mineral = 0.5 },
+    (s: any) => { s.stores.unknown = s.stores.cargo }, (s: any) => { delete s.stores.cargo },
+  ]) {
+    const data = JSON.parse(original); mutate(data); store.raw = JSON.stringify(data)
+    const bad = store.raw, restored = new ResourceSession(store, session.world, stores)
+    assert.match(restored.error, /could not be loaded/)
+    assert.equal(restored.transfer({ revision: 0, from: cargo, to: player, grams: 1, resourceId: 'mineral' }), false)
+    restored.checkpoint()
+    assert.equal(store.raw, bad)
+  }
+  store.raw = original
+  assert.match(new ResourceSession(store, session.world).error, /could not be loaded/)
+})
+test('session mass counts flat stores and onboard player exactly once', () => {
+  const { session, transfer } = ledgerSession()
+  transfer(1000)
+  session.transfer({ revision: 1, from: cargo, to: player, grams: 333, resourceId: 'mineral' })
+  assert.deepEqual(session.payload(), { playerGrams: 333, storeGrams: 667, shipGrams: 667 })
+  session.world = place(session.world, 0, 2, 'ship:scout')
+  for (let i = 0; i < 300; i++) assert.deepEqual(session.payload(), { playerGrams: 333, storeGrams: 667, shipGrams: 1000 })
 })

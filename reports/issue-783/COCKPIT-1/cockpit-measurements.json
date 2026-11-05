@@ -1,0 +1,342 @@
+[
+  {
+    "replay": 0,
+    "before": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 715
+    },
+    "entered": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 717
+    },
+    "moving": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -40.288888888888884
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -172.66666666666663
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1046
+    },
+    "exited": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -43.21805555555555
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -178.8333333333333
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1047
+    },
+    "continued": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -5562.384722222231
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -2028.833333333343
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1347
+    },
+    "final": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -46183.399999999914
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -5846.0000000000455
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1966
+    },
+    "backend": {
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    },
+    "errors": []
+  },
+  {
+    "replay": 1,
+    "before": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 715
+    },
+    "entered": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 716
+    },
+    "moving": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -43.21805555555555
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -178.8333333333333
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1046
+    },
+    "exited": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -46.24999999999999
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -184.99999999999994
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1047
+    },
+    "continued": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -5596.250000000009
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -2035.0000000000098
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1347
+    },
+    "final": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          -46086.01805555547
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        -5839.8333333333785
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 37,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 1964
+    },
+    "backend": {
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    },
+    "errors": []
+  }
+]

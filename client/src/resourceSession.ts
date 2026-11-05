@@ -1,7 +1,8 @@
+import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { CELL_SIZE_M } from './coordinates.ts'
 import { leaveCockpit } from './cockpit.ts'
 import { STARTING_SITE } from './planetarySite.ts'
-import { gatherResource, increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
+import { increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
 import { DRY_MASS_KG, setMass, type ShipState } from './simulation.ts'
 import { relativeAnchor, rotate2, type Anchor } from './topDownFrames.ts'
 import { interactionInReach, PLAYER_RADIUS_M } from './topDownInteraction.ts'
@@ -23,8 +24,8 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:mineral:01': { id: 'source:landing:mineral:01', resourceId: 'mineral', remainingGrams: 60_000 },
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
-export interface ResourceSave {
-  readonly version: 2
+export interface ResourceSave extends ResourceLedger {
+  readonly version: 3
   readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
   readonly siteId: typeof STARTING_SITE.id
   readonly revision: number
@@ -64,12 +65,15 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
   return { anchor: parsed, facing: location.facing }
 }
 /** Reject inconsistent saves, and migrate whole-litre v1 saves to exact grams without loss. */
-export function decodeResourceSave(raw: string, world: TopDownState): ResourceSave {
+export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = {}): ResourceSave {
   const data = object(JSON.parse(raw))
+  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(data.version === 3 ? ['stores'] : [])]
+  if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && (data.version !== 2 || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
     throw new Error('Unsupported save version')
   }
+  if (data.version !== 3 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -86,16 +90,24 @@ export function decodeResourceSave(raw: string, world: TopDownState): ResourceSa
     quantities, items,
   }
   resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG)
+  if (legacy) {
+    const capacityLitres = integer(inv.capacityLitres, 10)
+    const litres = Object.values(object(inv.quantities)).reduce<number>((n, q) => integer(n + integer(q, 1)), 0)
+    if (litres > capacityLitres) throw new Error('Legacy volume capacity exceeded')
+  }
   const savedSources = object(data.sources), sources: Record<string, ResourceSource> = {}
   if (Object.keys(savedSources).length !== Object.keys(RESOURCE_SOURCES).length) throw new Error('Wrong source set')
   for (const [id, initial] of Object.entries(RESOURCE_SOURCES)) {
     const source = object(savedSources[id])
     const previous = integer(legacy ? source.remainingLitres : source.remainingGrams)
     const remainingGrams = legacy ? integer(previous * LEGACY_GRAMS_PER_LITRE[initial.resourceId as keyof typeof LEGACY_GRAMS_PER_LITRE]) : previous
-    if (source.id !== id || source.resourceId !== initial.resourceId || remainingGrams + (quantities[initial.resourceId] ?? 0) !== initial.remainingGrams) throw new Error('Material conservation failed')
+    if (source.id !== id || source.resourceId !== initial.resourceId) throw new Error('Material conservation failed')
     sources[id] = { id, resourceId: initial.resourceId, remainingGrams }
   }
-  return { version: 2, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, location: parseLocation(data.location, world) }
+  const stores = data.version === 3 ? object(data.stores) as ResourceLedger['stores'] : emptyResourceStores(storeDefinitions)
+  const save: ResourceSave = { version: 3, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
+  validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
+  return save
 }
 export function resourcePayload(inventory: ResourceInventory, world: TopDownState) {
   const grams = resourceInventoryUsage(inventory, RESOURCE_CATALOG).grams
@@ -125,14 +137,17 @@ export class ResourceSession {
   private persisted: string | null = null
   private checkpointTick = 0
   private readonly storage: ResourceStorage
-  constructor(storage: ResourceStorage, world: TopDownState) {
+  private readonly storeDefinitions: ResourceStoreCatalog
+  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = {}) {
+    this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 2, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 3, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
+      validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
       if (this.persisted !== null) {
-        this.snapshot = decodeResourceSave(this.persisted, world)
+        this.snapshot = decodeResourceSave(this.persisted, world, storeDefinitions)
         const location = this.snapshot.location
         this.world = { ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
           camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' }
@@ -146,6 +161,7 @@ export class ResourceSession {
     try {
       if (this.storage.getItem(RESOURCE_SAVE_KEY) !== this.persisted) throw new Error('Save changed in another session')
       const candidate = { ...next, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
+      validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
       const raw = serialize(candidate)
       this.storage.setItem(RESOURCE_SAVE_KEY, raw)
       this.persisted = raw
@@ -157,6 +173,21 @@ export class ResourceSession {
       this.error = 'Saving failed or the save changed elsewhere. Gathering paused; reload after resolving storage access.'
       return false
     }
+  }
+  /** Domain rejection leaves the current save usable; storage failure blocks writes. */
+  transfer(request: ResourceTransfer): boolean {
+    if (this.error) return false
+    try {
+      const next = transferResource(this.snapshot, request, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
+      return this.commit({ ...this.snapshot, ...next })
+    } catch (error) {
+      this.feedback = error instanceof Error ? error.message : 'Invalid transfer'
+      return false
+    }
+  }
+  payload() {
+    return resourceLedgerMass(this.snapshot, this.world.frames.ship.id,
+      this.world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === this.world.frames.ship.id, RESOURCE_CATALOG, ITEM_CATALOG)
   }
   checkpoint(): void {
     if (serialize(safeLocation(this.world)) !== serialize(this.snapshot.location)) this.commit(this.snapshot)
@@ -207,11 +238,14 @@ export class ResourceSession {
       else {
         this.progressTicks += elapsed
         while (this.activeSourceId && this.progressTicks >= 60) {
-          const gathered = gatherResource(this.snapshot.inventory, this.snapshot.sources[id]!, 1000, RESOURCE_CATALOG, ITEM_CATALOG)
-          if (gathered.collectedGrams && this.commit({ ...this.snapshot, inventory: gathered.inventory, sources: { ...this.snapshot.sources, [id]: gathered.source } })) {
+          const source = this.snapshot.sources[id]!, inventory = this.snapshot.inventory
+          const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG)
+          const grams = inventory.quantities[source.resourceId] || used.slots < inventory.capacitySlots
+            ? Math.min(1000, source.remainingGrams, inventory.capacityGrams - used.grams) : 0
+          if (grams && this.transfer({ revision: this.snapshot.revision, from: { kind: 'source', id }, to: { kind: 'player' }, resourceId: source.resourceId, grams })) {
             this.progressTicks -= 60
-            this.feedback = `Gathered ${gathered.collectedGrams / 1000} kg · ${RESOURCE_CATALOG[gathered.source.resourceId as keyof typeof RESOURCE_CATALOG].name}. Saved.`
-          }
+            this.feedback = `Gathered ${grams / 1000} kg · ${RESOURCE_CATALOG[source.resourceId as keyof typeof RESOURCE_CATALOG].name}. Saved.`
+          } else if (grams) this.cancel('Gathering transaction rejected.')
           const blocked = this.blocked(id)
           if (blocked) { this.cancel(); this.feedback = blocked }
         }

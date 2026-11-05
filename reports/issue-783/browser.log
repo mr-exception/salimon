@@ -1,0 +1,28 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit
+
+[WebServer] (node:1987) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2147) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:2208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (56.5s)
+  ✓  2 [cockpit] › tests/gathering.spec.ts:6:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (23.4s)
+  ✓  3 [cockpit] › tests/gathering.spec.ts:74:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (6.8s)
+  ✓  4 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (1.2m)
+
+  4 passed (2.7m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

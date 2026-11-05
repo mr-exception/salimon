@@ -86,16 +86,22 @@ and frame-relative locations save together in this browser; reload never resumes
 gathering automatically. See [the resource contract](resource-inventory-and-gathering.md)
 for the catalog, transaction and interruption details. The multi-inventory
 ledger foundation (#783) preserves this journey and mining behavior; schema v4
-enables the identified 50 kg Scout Resource Container domain (#784), without
-its future UI (#785). Existing v1/v2/v3 saves migrate losslessly under the same key.
+enables the identified 50 kg Scout Resource Container domain (#784), with
+its playable E/Use deposit/withdraw panel (#785). Existing v1/v2/v3 saves migrate losslessly under the same key.
 
-**Unsupported future features:** ship storage/loot transfers; actual Core power; Fabricator recipes or
+**Unsupported future features:** loot/machine transfers; actual Core power; Fabricator recipes or
 production; multiplayer/backend authority and reconnect; ship damage/destruction;
-full planetary generation. Visible machine/storage objects are inspection
-placeholders. Gathering reuses this same world and resource-source IDs, with
+full planetary generation. Visible Core/Fabricator objects are inspection
+placeholders; the Resource Container supports confirmed gram transfers. Gathering reuses this same world and resource-source IDs, with
 integer grams and atomic local persistence; no independent scene was added.
 
 The sample radar's ship simulation runs continuously, but its illustrative flight
 does not relocate the authored landed 2D ship. Synthetic desktop input and
 SwiftShader WebGL qualify the existing cloud path; physical input, hardware GPU,
 mobile/touch, M1/Metal and native performance are unverified separately.
+
+**Container loop (#785):** Mine material, enter through the aft entry and approach
+the starboard Resource Container. Use E, enter positive integer grams, review
+deposit/withdrawal and confirm. Escape/Close/focus loss cancels only the draft;
+committed amounts survive exiting and reload. The built storage browser scenarios
+join the existing cockpit project and retain panel/full/error captures.

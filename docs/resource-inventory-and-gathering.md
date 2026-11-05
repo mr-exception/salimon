@@ -1,6 +1,7 @@
 # Unified weight-based inventory, gathering and ship processing — top-down 2D
 
-**Status (2026-11-05):** owner-approved weight-only revision superseding the prior dual 10 kg / 10 L design. The browser's current 2D mining and local saves use grams and one weight limit; count-item stacking is implemented as a pure domain boundary, but gear item definitions, equipment UI, ship storage transfers and Core processing are **not** playable. The older native physical-fragment system is historical, not current 2D gameplay. See [spacesuits, environmental hazards and gear storage](spacesuit-and-hazards.md).
+**Status (2026-11-05):** owner-approved weight-only revision superseding the prior dual 10 kg / 10 L design. The browser's current 2D mining and local saves use grams and one weight limit; count-item stacking is implemented as a pure domain boundary, but gear item definitions, equipment UI and Core processing are **not** playable. Scout Resource Container
+transfers are playable through #785. The older native physical-fragment system is historical, not current 2D gameplay. See [spacesuits, environmental hazards and gear storage](spacesuit-and-hazards.md).
 
 ## Universal inventory quantities and limits
 
@@ -35,7 +36,8 @@
 - One stored suit consumes one drawer slot, including any modules installed on it. A protection module occupies a separate module-storage or personal-inventory slot only when uninstalled; an installed module is part of its suit.
 - The player starts wearing one basic suit, without suit tiers. Crafting additional suits/modules and upgrading them requires a future **Gear Crafting Bench** built inside the ship; crafting recipes, replacement/equip location, access and expansion are TBD.
 - The player may travel outside without any suit, at environmental risk. No automatic suit/module switching based on hazards is approved.
-- Players may withdraw **unconsumed** materials from the Resource Container, Fabricator or Core; resources already reserved/used by a fabrication job or converted by the Core are not recoverable. Storage transfer UI, module-to-module transfers and resource container upgrade rules remain TBD.
+- Players may withdraw **unconsumed** materials from the Resource Container, Fabricator or Core; resources already reserved/used by a fabrication job or converted by the Core are not recoverable. The Resource Container transfer UI is implemented in #785. Machine/module-to-module
+transfers and resource container upgrade rules remain TBD.
 
 ## Fabricator and Energy Core material handling
 
@@ -64,7 +66,7 @@
 fixed source IDs/materials and flat identified ship-side stores. A trusted
 `ResourceStoreCatalog` declares each store's stable ID, ship ID and gram capacity;
 saved metadata must match it exactly. The Scout enables `scout:storage`, a ship-local 50,000 g raw-only store. No
-container slot count is introduced; its interface remains future work (#785).
+container slot count is introduced; #785 exposes the deposit/withdraw interface.
 
 `transferResource` accepts an expected revision, typed source/destination,
 resource ID and exact positive integer grams. Source → player/store, player ↔
@@ -109,4 +111,20 @@ are all-or-nothing; a partial amount must be requested explicitly. No count
 items, unknown raw IDs, volume cap or organizational slot cap are accepted.
 Default sessions persist the identified container in the same atomic envelope
 as player inventory/source depletion/location. Its mass counts once even while
-the player is outside; onboard player mass remains separate. UI is #785.
+the player is outside; onboard player mass remains separate. UI is described below.
+
+## Playable container interface (#785)
+
+Use the existing `scout:storage` anchor through shared nearby selection/reach.
+The interface controller records an exact positive-gram draft and expected
+revision; only confirmation calls `ResourceSession.deposit`/`withdraw`. It
+consumes the confirmation before committing, so repeated input cannot replay it.
+The modal shows exact kg derived from grams, remaining capacity and player slots;
+no display rounding enters commands. Typed fields retain keys and the existing
+gathering-tool context never changes a selected container into a mining target.
+
+Escape/Close/focus loss/movement or reach/scene/cockpit changes discard only the
+active draft. Successful transactions persist immediately and autonomous ship
+state is retained. Invalid amount/resource, balance, weight/slots, revision and
+save errors remain readable and non-destructive. Actual count-item content and
+machine processing/transfers are still future work.

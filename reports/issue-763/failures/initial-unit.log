@@ -1,0 +1,84 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts
+
+✔ VIS-1 comparison passes identical images and detects a changed frame with a retained diff (40.532098ms)
+✔ VIS-3 approval is exact, digest-bound and requires a human collaborator (0.319162ms)
+✔ 20 m/s safe surface boundary and 100 m/s destruction use total surface-relative speed (1.963312ms)
+✔ departing/tangent touching states do not collide, and a symbol-only flyby is safe (0.340023ms)
+✔ sweep catches complete crossing, picks earliest body independently of input order (0.278764ms)
+✔ rotation changes impact-relative velocity and destruction decision (1.029139ms)
+✔ low-speed nonplanetary contact rebounds then settles without becoming a landing (1.510746ms)
+✔ warnings are bounded/deduplicated observations, do not change thrust or motion (0.652983ms)
+✔ production fixed-step composition is deterministic through collision, scanner and restart (1.405904ms)
+✔ grounded rotation follows the surface, terminal state stops thrust, and restart clears time debt (2.093433ms)
+✔ independent key and pointer owners release without clearing another held input (5.652103ms)
+✔ frame adapter rejects negative startup delta, pauses hidden time, and resumes without catchup (1.074965ms)
+✔ navigation assets have finite bounded flat facets and a directional ship silhouette (2.725608ms)
+✔ closed ship hull triangles face outward so back-face culling preserves the upper hull (0.299535ms)
+✔ out-of-view contacts have no presentation group, including depth and malformed projections (1.695317ms)
+✔ visible dense groups retain every ID, deterministic selected representative and bounded presentation (18.230568ms)
+✔ starter has 10 kg and 10 L independent limits (1.616605ms)
+✔ mass limits mining; only accepted amount leaves the source (0.32267ms)
+✔ volume limits harvesting even when weight is available (0.136178ms)
+✔ mixed materials are limited by both dimensions (0.267028ms)
+✔ zero requests, exhausted sources and insufficient space do not duplicate materials (0.196669ms)
+✔ exact debit and upgrade preserve independently validated capacities (0.534776ms)
+✔ reject invalid, fractional, unknown, zero-weight and overflowing quantities (0.32968ms)
+✔ repeated extraction conserves whole units (0.175043ms)
+✔ indexed exact range includes boundary and rejects outside, including negative/huge anchors (9.389058ms)
+✔ only five-second pulses detect; leaving range immediately evicts selected contact, with no history (1.340789ms)
+✔ large catalog query matches independent brute force without global precision loss (50.809658ms)
+✔ dense presentation groups retain every detected ID; edge is frustum based, never radial (20.536109ms)
+✔ grid lattice follows ship translation, preserving galactic orientation (0.319911ms)
+✔ presentation count is bounded by viewport cells, not catalog length (38.127927ms)
+✔ split cells preserve millimetres at galactic anchors and cross both boundaries (1.971615ms)
+✔ fixed-step result is independent of publication/frame batching and keeps debt (3.108569ms)
+✔ approved impulse uses current total mass, signed throttle, and independent velocity (1.091941ms)
+✔ one-time alignment completes, preserves thrust, and cancels on any manual hold (2.691509ms)
+✔ ship-local points round trip through rotated and translated planet poses (3.012961ms)
+✔ passengers retain identity and anchors while pose changes; terrain stays planet-fixed (0.576056ms)
+✔ camera-relative transforms cancel astronomical roots and retain sub-mm offsets across cells (1.307284ms)
+✔ fixed stepping is repeatable across render cadence, diagonal normalized and camera follows (6.811606ms)
+✖ visible walls bound the walk fixture and input/time validation prevent invalid transforms (50.614539ms)
+✔ draw order is stable independently of insertion and has no roof cover (0.505113ms)
+✔ sweeps block high-speed motion, slide tangent/away, and resolve in an object frame (0.279081ms)
+✔ crate, furniture and walls block walking; open passages reach cockpit and cargo (21.583334ms)
+✔ nearby selection is deterministic, rejects missing/disabled/distant targets and supports request/cancel (4.275406ms)
+✔ facing is retained at rest and camera follows without a snap on move/release (0.36225ms)
+✔ Scout fixtures are addressable, room boundaries physical and exterior camera remains stable (7.562672ms)
+✔ infinite rays reach all edges/corners independently of vector magnitude (1.798333ms)
+✔ off-screen origins clip only forward visible portions; malformed, tangent and degenerate rays vanish (0.331631ms)
+✔ arbitrary rays preserve collinearity, direction and viewport clipping (2.375302ms)
+✔ orthographic projection handles independent vectors, pan, zoom, stationary and view-axis directions (1.35409ms)
+ℹ tests 49
+ℹ suites 0
+ℹ pass 48
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1574.836565
+
+✖ failing tests:
+
+test at src/topDown.test.ts:55:1
+✖ visible walls bound the walk fixture and input/time validation prevent invalid transforms (50.614539ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(point[0] <= 2.04)
+  
+      at TestContext.<anonymous> (file:///workspace/salimon/client/src/topDown.test.ts:59:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

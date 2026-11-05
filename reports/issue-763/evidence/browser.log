@@ -1,0 +1,20 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down
+
+[WebServer] (node:3386) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:3430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:17:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (7.5s)
+  ✓  2 [top-down] › tests/top-down.spec.ts:63:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (4.3s)
+  ✓  3 [top-down] › tests/top-down.spec.ts:88:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (7.0s)
+  ✓  4 [top-down] › tests/top-down.spec.ts:127:1 › TD-5 built entry retains navigation even with development scene query (977ms)
+  ✓  5 [top-down] › tests/top-down.spec.ts:141:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (8.3s)
+
+  5 passed (29.6s)

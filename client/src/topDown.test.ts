@@ -54,9 +54,9 @@ test('fixed stepping is repeatable across render cadence, diagonal normalized an
 })
 test('visible walls bound the walk fixture and input/time validation prevent invalid transforms', () => {
   let state = createTopDownState()
-  for (let i = 0; i < 2000; i++) state = stepTopDown(state, [1, 1])
+  for (let i = 0; i < 2000; i++) state = stepTopDown(state, rotate2([1, 0], state.frames.ship.angle))
   const point = state.entities.find(e => e.id === PLAYER_ID)!.anchor.point.offsetM
-  assert.ok(point[0] <= 2.04 && point[1] <= 2.12)
+  assert.ok(point[0] <= 2.04)
   for (const invalid of [NaN, Infinity, -1]) assert.throws(() => new TopDownClock().advance(state, invalid, [0, 0]), RangeError)
   assert.throws(() => stepTopDown(state, [NaN, 0]), RangeError)
   const clock = new TopDownClock()
@@ -91,7 +91,7 @@ test('sweeps block high-speed motion, slide tangent/away, and resolve in an obje
   const planetAnchor = convertAnchor(anchor, 'planet:fixture', rotated)
   assert.ok(Math.abs(allowedMove(planetAnchor, [0, 10], [object], rotated) - fraction) < 1e-9)
 })
-test('crate, furniture, walls and closed door block walking; a detour reaches cockpit', () => {
+test('crate, furniture and walls block walking; open passages reach cockpit and cargo', () => {
   let state = createTopDownState()
   state = walk(state, rotate2([0, -1], state.frames.ship.angle), 160)
   assert.ok(playerAnchor(state).point.offsetM[1] >= .36 - 1e-8, 'crate stops direct path')
@@ -100,12 +100,12 @@ test('crate, furniture, walls and closed door block walking; a detour reaches co
   state = walk(state, rotate2([0, -1], angle), 60)
   assert.ok(playerAnchor(state).point.offsetM[1] < -1.5, 'walk around crate')
   state = walk(state, rotate2([-1, 0], angle), 33)
-  state = walk(state, rotate2([0, -1], angle), 30)
+  state = walk(state, rotate2([0, -1], angle), 40)
   assert.ok(playerAnchor(state).point.offsetM[1] < -3, 'pass open cockpit partition')
   const start = createTopDownState()
   const south = rotate2([0, 1], angle)
   const door = walk(start, south, 200)
-  near(playerAnchor(door).point.offsetM.slice(0, 2), [0, 2.12], 1e-7)
+  assert.ok(playerAnchor(door).point.offsetM[1] > 5.5, 'wide cargo and aft entry are open')
   const west = walk(start, rotate2([-1, 0], angle), 200)
   assert.ok(playerAnchor(west).point.offsetM[0] >= -2.04 - 1e-7)
 })
@@ -136,4 +136,27 @@ test('facing is retained at rest and camera follows without a snap on move/relea
   const stopped = stepTopDown(moved, [0, 0])
   assert.equal(stopped.player.facing, moved.player.facing); assert.equal(stopped.player.mode, 'standing')
   assert.ok(Math.hypot(...relativeAnchor(playerAnchor(stopped), stopped.camera.anchor, stopped.frames)) > 0)
+})
+
+
+test('Scout fixtures are addressable, room boundaries physical and exterior camera remains stable', () => {
+  const state = createTopDownState(), frames = { ...state.frames, ship: { ...state.frames.ship, angle: 0 } }
+  for (const id of ['scout:desk', 'scout:chair', 'scout:core', 'scout:fabricator', 'scout:storage']) {
+    const object = state.entities.find(e => e.id === id)!
+    assert.equal(object.anchor.frame, 'ship:scout'); assert.ok(object.interaction)
+    const p = { ...object.anchor, point: translate(object.anchor.point, [id === 'scout:fabricator' ? 1.2 : id === 'scout:storage' ? -1.2 : 0, id === 'scout:fabricator' || id === 'scout:storage' ? 0 : id === 'scout:chair' ? .85 : 1.1, 0]) }
+    assert.equal(interactionInReach(p, object, state.frames), true)
+    const fixture = { ...state, entities: state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: p } : e) }
+    assert.equal(requestInteraction(fixture, id).player.targetId, id)
+  }
+  const anchor = (x: number, y: number): Anchor => ({ frame: 'ship:scout', point: point2(x, y) })
+  assert.equal(allowedMove(anchor(0, 2), [0, 4.5], state.entities, frames), 1)
+  assert.ok(allowedMove(anchor(1.6, 2), [0, 1], state.entities, frames) < 1, 'cargo bulkhead blocks outside its opening')
+  assert.ok(allowedMove(anchor(0, 4.8), [4, 0], state.entities, frames) < 1, 'intact hull blocks')
+  assert.ok(allowedMove(anchor(-1, -1), [-3, 0], state.entities, frames) < 1, 'bunk blocks')
+  let outside = createTopDownState('exterior')
+  const originalCamera = outside.camera.anchor
+  for (let i = 0; i < 100; i++) outside = stepTopDown(outside, [0, 0])
+  assert.deepEqual(outside.camera.anchor, originalCamera)
+  assert.deepEqual(outside.entities.filter(e => e.id.startsWith('scout:')), state.entities.filter(e => e.id.startsWith('scout:')))
 })

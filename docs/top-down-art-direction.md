@@ -1,6 +1,8 @@
 # Strict top-down illustrated 2D direction
 
-**Status: owner-approved art direction (2026-11-04).** Issue #761 adds a development-only playable illustrated test site (`/?scene=top-down`), with an always-visible Scout cutaway and bounded interior walking. The shipped browser entry remains the separate 3D radar prototype. Detailed art, world traversal and cockpit integration remain future work.
+**Status: owner-approved art direction (2026-11-04).** Issue #761 adds a development-only playable illustrated test site (`/?scene=top-down`), with an always-visible Scout cutaway and bounded interior walking. The shipped browser entry remains the separate 3D radar prototype. Issue #763 adds a recognizable always-exposed Scout cutaway, separate cargo bay,
+open entry and addressable module placeholders. World frame transfer and cockpit
+navigation integration remain future work.
 
 ## View and illustration
 

@@ -171,3 +171,16 @@ The [maintained lighting contract](room-lighting.md) describes implemented prese
 ## Tactile audio and physical partitions (#583)
 
 The [maintained acoustics contract](scout-acoustics.md) describes actual mechanism/attachment events, finite cargo/privacy separation, differentiated floor contact and bounded continuous CPAL filtering. E2E mapping stays silent; actual output captures and human listening remain separately identified.
+
+
+## Illustrated browser cutaway (#763)
+
+The current browser development fixture now implements a strict-overhead Scout
+outline, exposed cabin/cockpit/cargo floors, physical partitions with open cargo
+and aft entry passages, a desk/chair, bunk, Core, Fabricator and one 50 kg / 50 L
+storage placeholder. `client/src/scoutLayout.ts` owns ship-local module/entry
+anchors and visible collision footprints, consumed by the shared 2D runtime/SVG
+adapter. Interior contents remain present from the exterior fixture viewpoint.
+This is a compact authored layout, not the historical GLB or delivery of the
+full habitation/customization/audio target above. Inspections have no machinery
+or storage effects; frame handoff and cockpit seating remain #765/#766.

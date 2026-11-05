@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { RESOURCE_CATALOG, ITEM_CATALOG } from './resourceSession.ts'
+import { RESOURCE_CATALOG } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import { resourceStoreMass } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID } from './scoutResourceContainer.ts'
@@ -12,7 +12,7 @@ export function ResourceContainerPanel({ interaction, onClose, onChange }: { int
   useEffect(() => { dialog.current?.showModal() }, [])
   const { session, pending } = interaction, inventory = session.snapshot.inventory
   const store = session.snapshot.stores[SCOUT_RESOURCE_CONTAINER_ID]!
-  const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG), stored = resourceStoreMass(store, RESOURCE_CATALOG)
+  const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, interaction.session.itemCatalog), stored = resourceStoreMass(store, RESOURCE_CATALOG)
   const review = (direction: 'deposit' | 'withdraw') => { interaction.review(direction, resourceId, amount); onChange() }
   return <dialog ref={dialog} className="resource-container" aria-labelledby="container-title" onCancel={event => { event.preventDefault(); onClose() }}>
     <header><div><p className="container-eyebrow">SCOUT / CARGO BAY</p><h2 id="container-title">Resource Container</h2></div><button onClick={onClose} aria-label="Close Resource Container">Close · Esc</button></header>

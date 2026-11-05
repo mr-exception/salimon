@@ -3,7 +3,7 @@ import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResou
 import { CELL_SIZE_M } from './coordinates.ts'
 import { leaveCockpit } from './cockpit.ts'
 import { STARTING_SITE } from './planetarySite.ts'
-import { increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
+import { addCountItem, removeCountItem, registerCountItems, type CountItemCatalog, increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
 import { DRY_MASS_KG, setMass, type ShipState } from './simulation.ts'
 import { relativeAnchor, rotate2, type Anchor } from './topDownFrames.ts'
 import { interactionInReach, PLAYER_RADIUS_M } from './topDownInteraction.ts'
@@ -20,13 +20,14 @@ export const RESOURCE_CATALOG = {
   biomass: { name: 'Plate biomass' },
 } as const
 // Count items are supported by the inventory domain; actual item catalog weights are TBD.
-export const ITEM_CATALOG = {} as const
+export const ITEM_CATALOG = registerCountItems({})
 export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:mineral:01': { id: 'source:landing:mineral:01', resourceId: 'mineral', remainingGrams: 60_000 },
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
-  readonly version: 4
+  readonly version: 5
+  readonly itemDefinitions: CountItemCatalog
   readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
   readonly siteId: typeof STARTING_SITE.id
   readonly revision: number
@@ -66,15 +67,16 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
   return { anchor: parsed, facing: location.facing }
 }
 /** Reject inconsistent saves, and migrate whole-litre v1 saves to exact grams without loss. */
-export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES): ResourceSave {
+export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
+  const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
-  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...((data.version === 3 || data.version === 4) ? ['stores'] : [])]
+  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...((data.version === 3 || data.version === 4 || data.version === 5) ? ['stores'] : []), ...(data.version === 5 ? ['itemDefinitions'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && data.version !== 4 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
+  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -83,14 +85,24 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   }
   const items: Record<string, number> = {}
   if (!legacy) {
-    for (const [id, count] of Object.entries(object(inv.items))) items[id] = integer(count, 1)
+    for (const [id, count] of Object.entries(object(inv.items))) {
+      if (!Object.hasOwn(catalog, id)) throw new Error('Unknown item')
+      items[id] = integer(count, 1)
+    }
   }
   const inventory: ResourceInventory = {
     capacityGrams: integer(inv.capacityGrams, 10_000),
     capacitySlots: legacy ? 12 : integer(inv.capacitySlots, 12),
     quantities, items,
   }
-  resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG)
+  if (data.version === 5) {
+    const saved = registerCountItems(object(data.itemDefinitions) as CountItemCatalog)
+    if (Object.keys(saved).length !== Object.keys(catalog).length || Object.entries(saved).some(([id, meta]) =>
+      !Object.hasOwn(catalog, id) || meta.gramsPerItem !== catalog[id]!.gramsPerItem || meta.stackSize !== catalog[id]!.stackSize || meta.name !== catalog[id]!.name)) throw new Error('Changed item definitions')
+  } else if (Object.keys(items).length || (legacy && Object.hasOwn(inv, 'items'))) {
+    throw new Error('Items require schema v5')
+  }
+  resourceInventoryUsage(inventory, RESOURCE_CATALOG, catalog)
   if (legacy) {
     const capacityLitres = integer(inv.capacityLitres, 10)
     const litres = Object.values(object(inv.quantities)).reduce<number>((n, q) => integer(n + integer(q, 1)), 0)
@@ -105,23 +117,23 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     if (source.id !== id || source.resourceId !== initial.resourceId) throw new Error('Material conservation failed')
     sources[id] = { id, resourceId: initial.resourceId, remainingGrams }
   }
-  const savedStores = data.version === 3 || data.version === 4 ? object(data.stores) : null
+  const savedStores = data.version === 3 || data.version === 4 || data.version === 5 ? object(data.stores) : null
   // Only the newly introduced Scout store may be absent in v3. v4 requires it.
   const stores = savedStores ? { ...savedStores } as Record<string, ResourceLedger['stores'][string]> : emptyResourceStores(storeDefinitions)
   if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
     stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
   }
-  const save: ResourceSave = { version: 4, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
-  validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
+  const save: ResourceSave = { version: 5, itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
+  validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }
-export function resourcePayload(inventory: ResourceInventory, world: TopDownState) {
-  const grams = resourceInventoryUsage(inventory, RESOURCE_CATALOG).grams
+export function resourcePayload(inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG) {
+  const grams = resourceInventoryUsage(inventory, RESOURCE_CATALOG, items).grams
   return { playerGrams: grams, shipGrams: world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === world.frames.ship.id ? grams : 0 }
 }
-export function withResourcePayload(ship: ShipState, inventory: ResourceInventory, world: TopDownState): ShipState {
+export function withResourcePayload(ship: ShipState, inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG): ShipState {
   // Recompute from dry mass, never add the same nested player payload per tick.
-  return setMass(ship, DRY_MASS_KG + resourcePayload(inventory, world).shipGrams / 1000)
+  return setMass(ship, DRY_MASS_KG + resourcePayload(inventory, world, items).shipGrams / 1000)
 }
 function safeLocation(world: TopDownState): PlayerLocation {
   // A reload returns standing beside the chair, never inside its collider.
@@ -144,16 +156,18 @@ export class ResourceSession {
   private checkpointTick = 0
   private readonly storage: ResourceStorage
   private readonly storeDefinitions: ResourceStoreCatalog
-  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES) {
+  readonly itemCatalog: CountItemCatalog
+  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG) {
+    this.itemCatalog = registerCountItems(itemDefinitions)
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 4, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 5, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
-      validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
+      validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
       if (this.persisted !== null) {
-        this.snapshot = decodeResourceSave(this.persisted, world, storeDefinitions)
+        this.snapshot = decodeResourceSave(this.persisted, world, this.storeDefinitions, this.itemCatalog)
         const location = this.snapshot.location
         this.world = { ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
           camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' }
@@ -167,7 +181,7 @@ export class ResourceSession {
     try {
       if (this.storage.getItem(RESOURCE_SAVE_KEY) !== this.persisted) throw new Error('Save changed in another session')
       const candidate = { ...next, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
-      validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
+      validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       const raw = serialize(candidate)
       this.storage.setItem(RESOURCE_SAVE_KEY, raw)
       this.persisted = raw
@@ -184,10 +198,25 @@ export class ResourceSession {
   transfer(request: ResourceTransfer): boolean {
     if (this.error) return false
     try {
-      const next = transferResource(this.snapshot, request, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, ITEM_CATALOG)
+      const next = transferResource(this.snapshot, request, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       return this.commit({ ...this.snapshot, ...next })
     } catch (error) {
       this.feedback = error instanceof Error ? error.message : 'Invalid transfer'
+      return false
+    }
+  }
+  /** Generic adapter boundary for future item producers/consumers. No auto-equip or player grants. */
+  changeItem(action: 'add' | 'remove', id: string, count: number, revision: number): boolean {
+    if (this.error) return false
+    try {
+      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw new RangeError('Stale item revision')
+      if (action !== 'add' && action !== 'remove') throw new RangeError('Unknown item action')
+      const inventory = (action === 'add' ? addCountItem : removeCountItem)(this.snapshot.inventory, id, count, RESOURCE_CATALOG, this.itemCatalog)
+      const saved = this.commit({ ...this.snapshot, inventory })
+      if (saved) this.feedback = `Saved: ${action === 'add' ? 'added' : 'removed'} ${count} × ${this.itemCatalog[id]!.name ?? id}.`
+      return saved
+    } catch (error) {
+      this.feedback = error instanceof Error ? error.message : 'Invalid item transaction'
       return false
     }
   }
@@ -200,13 +229,13 @@ export class ResourceSession {
   }
   payload() {
     return resourceLedgerMass(this.snapshot, this.world.frames.ship.id,
-      this.world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === this.world.frames.ship.id, RESOURCE_CATALOG, ITEM_CATALOG)
+      this.world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === this.world.frames.ship.id, RESOURCE_CATALOG, this.itemCatalog)
   }
   checkpoint(): void {
     if (serialize(safeLocation(this.world)) !== serialize(this.snapshot.location)) this.commit(this.snapshot)
   }
   upgrade(capacityGrams: number, capacitySlots: number): boolean {
-    return this.commit({ ...this.snapshot, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, ITEM_CATALOG) })
+    return this.commit({ ...this.snapshot, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, this.itemCatalog) })
   }
   cancel(message = 'Gathering stopped. Completed grams are saved.'): void {
     if (this.activeSourceId) this.feedback = message
@@ -222,7 +251,7 @@ export class ResourceSession {
     const source = this.snapshot.sources[id]
     if (!source || source.remainingGrams === 0) return 'Source depleted. No material remains.'
     const inventory = this.snapshot.inventory
-    const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG)
+    const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, this.itemCatalog)
     const mass = used.grams >= inventory.capacityGrams
     const slots = !inventory.quantities[source.resourceId] && used.slots >= inventory.capacitySlots
     return mass || slots ? `Inventory full: ${mass && slots ? 'weight and slot' : mass ? 'weight' : 'slot'} limit. Remaining material stays in the source.` : ''
@@ -252,7 +281,7 @@ export class ResourceSession {
         this.progressTicks += elapsed
         while (this.activeSourceId && this.progressTicks >= 60) {
           const source = this.snapshot.sources[id]!, inventory = this.snapshot.inventory
-          const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, ITEM_CATALOG)
+          const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, this.itemCatalog)
           const grams = inventory.quantities[source.resourceId] || used.slots < inventory.capacitySlots
             ? Math.min(1000, source.remainingGrams, inventory.capacityGrams - used.grams) : 0
           if (grams && this.transfer({ revision: this.snapshot.revision, from: { kind: 'source', id }, to: { kind: 'player' }, resourceId: source.resourceId, grams })) {

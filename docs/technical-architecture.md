@@ -64,7 +64,7 @@ player inventory and count-item per-type stack limits. Volume is not a limit.
 revision-checked transfers; trusted store declarations validate saved identity
 and gram capacity. The default session declares the 50 kg Scout store in `scoutResourceContainer.ts`.
 `resourceSession.ts` composes the existing world interaction/tick path, a versioned
-sample gram/source catalog, atomic v4 inventory/store/depletion/location saves with v1/v2/v3 migration, validated
+sample gram/source catalog, atomic v5 inventory/item-definition/store/depletion/location saves with v1/v2/v3/v4 migration, validated
 restore and derived player/ship resource payload. `TopDownView.tsx` owns tool/UI
 actions and the exclusive browser save lock. Resource state never enters the
 SVG art or collision owners. Unit/integration coverage is in
@@ -75,13 +75,22 @@ semantics and unsupported machine/server features.
 
 The Scout raw-store declaration is owned by `scoutResourceContainer.ts`, bound to
 the existing `scout:storage` ship-local anchor and 50,000 g metadata. Default
-ResourceSession commands persist it atomically in schema v4; v3 saves acquire
+ResourceSession commands persist it atomically in schema v5; v3 saves acquire
 the previously absent container empty, while v4 missing data fails closed.
 `resourceContainerInteraction.ts` owns reachable world admission, revision-bound
 drafts and consume-once confirmation (arrival location is checkpointed before
 a draft captures its revision); `ResourceContainerPanel.tsx` owns the native
 modal and exact gram/derived kg presentation. TopDownView integrates cancellation
 with the existing input/focus/scene path while retaining simulation state.
+
+Generic count items (#786) use `registerCountItems` for immutable, fully validated
+trusted definitions and `ResourceSession.changeItem` for revision-checked exact
+add/remove under the same atomic persistence boundary. The session catalog flows
+through gathering, storage capacity previews, payload and the unified HUD.
+Schema v5 binds saved definitions to trusted authored metadata; older valid saves
+have no count items and migrate without guessing weights. `countItemSession.test.ts`
+and the non-shipping `tests/items.html`/`items.spec.ts` cover these paths. The
+production catalog remains empty pending content approval.
 
 ## Historical native architecture
 

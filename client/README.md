@@ -2,7 +2,7 @@
 
 Use the [2D documentation migration register](../docs/2d-migration-register.md) to distinguish the current browser implementation, approved future mechanics and archived native source contracts.
 
-**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v4 resource ledger and migrates valid v1
+**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v5 resource/item ledger and migrates valid v1
 litre / v2 gram saves without loss. `resourceLedger.ts` validates exact transfers
 and store mass; future stores require trusted ID/ship/capacity declarations.
 The default world enables the 50 kg Scout Resource Container and deposit/withdraw panel (#784/#785). See [resource design](../docs/resource-inventory-and-gathering.md).
@@ -323,7 +323,7 @@ approves the exact manifest digest. Software WebGL does not qualify hardware GPU
 
 The default ResourceSession declares `scout:storage`, a 50,000 g raw-only store.
 Exact `deposit(resourceId, grams, revision)` / `withdraw(...)` transactions use
-the shared ledger and atomic save. Schema v4 migrates old v1/v2/v3 expeditions
+the shared ledger and atomic save. Schema v5 migrates old v1/v2/v3/v4 expeditions
 without changing source/player mass, and rejects damaged current container data.
 Store mass contributes once to ship simulation independently of player location.
 The default game opens the playable panel described below; the isolated development
@@ -367,3 +367,18 @@ count. A partial 1,088 ms window could quantize to 65 or 66 ticks depending on
 renderer startup phase. The build/browser CI job allows 20 minutes for cold
 Chromium installation plus the full matrix; individual test limits and assertions
 remain in force.
+
+### Generic count items (#786)
+
+The field inventory displays raw kg and registered item counts/kg/shared slots.
+`ResourceSession.changeItem` validates positive integer counts, trusted authored
+weights/stack sizes and an expected revision, then atomically persists the full
+candidate. The production item catalog stays empty until content is approved.
+Schema v5 binds saved definitions to that trusted catalog and migrates valid
+v1–v4 empty-item expeditions without changing raw mass or location.
+
+`tests/items.html` is an explicit non-shipping fixture using the production
+session/HUD with synthetic stack=1/stack=4 definitions and fixture-only controls.
+Run `npx playwright test --project=cockpit items.spec.ts` for mixed inventory,
+overfill, exact removal, reload, narrow layout and repeat/negative captures.
+Normal gameplay has no query flag, controls or item grants from this fixture.

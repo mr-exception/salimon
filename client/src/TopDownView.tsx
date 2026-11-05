@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
 import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, TopDownClock, type TopDownState } from './topDownRuntime.ts'
 import { useWorldSprites, WorldSprite } from './topDownSprites.tsx'
-import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession } from './resourceSession.ts'
+import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import { ResourceContainerInteraction } from './resourceContainerInteraction.ts'
 import { ResourceContainerPanel } from './ResourceContainerPanel.tsx'
@@ -29,7 +29,8 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
   </svg>
 }
 
-export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
+const openResourceSession = (storage: ResourceStorage, world: TopDownState) => new ResourceSession(storage, world)
+export function TopDownView({ gameplay = false, createResourceSession = openResourceSession }: { gameplay?: boolean; createResourceSession?: typeof openResourceSession }) {
   const [navigation] = useState(() => new NavigationRuntime(SAMPLE_BODIES))
   const powerFixture = import.meta.env.DEV && gameplay && new URLSearchParams(location.search).has('powerFixture')
   const [state, setState] = useState(() => createTopDownState(import.meta.env.DEV && new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior', gameplay))
@@ -45,7 +46,7 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
       if (disposed) return
       if (!lock) { setSaveStatus('Another tab has this expedition open. Close it and reload to gather.'); return }
       try {
-        session.current = new ResourceSession(localStorage, current.current)
+        session.current = createResourceSession(localStorage, current.current)
         container.current = new ResourceContainerInteraction(session.current)
         current.current = session.current.world
         setState(current.current)
@@ -125,7 +126,7 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
   const update = (next: TopDownState) => { current.current = next; setState(next) }
   const cockpitTarget = gameplay && isCockpitTarget(selected?.id ?? null)
   const resourceSession = session.current
-  const usage = resourceSession && resourceInventoryUsage(resourceSession.snapshot.inventory, RESOURCE_CATALOG)
+  const usage = resourceSession && resourceInventoryUsage(resourceSession.snapshot.inventory, RESOURCE_CATALOG, resourceSession.itemCatalog)
   const selectedContainer = resourceSession && selected?.id === SCOUT_RESOURCE_CONTAINER_ID
   const closeContainer = () => { container.current?.close(); current.current = session.current?.world ?? current.current; (document.activeElement as HTMLElement | null)?.blur(); setState({ ...current.current }) }
   const selectedSource = resourceSession && selected && resourceSession.snapshot.sources[selected.id]
@@ -147,7 +148,13 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
         {resourceSession && usage && <>
           <p data-inventory-weight><strong>{usage.grams / 1000}</strong> / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg</p>
           <p data-inventory-slots><strong>{usage.slots}</strong> / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
-          <ul>{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <li key={id}>{entry.name} <span data-resource={id}>{(resourceSession.snapshot.inventory.quantities[id] ?? 0) / 1000} kg</span></li>)}</ul>
+          <ul aria-label="Raw resources">{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <li key={id}>{entry.name} <span data-resource={id}>{(resourceSession.snapshot.inventory.quantities[id] ?? 0) / 1000} kg</span></li>)}</ul>
+          <p className="resource-note">Each carried raw type uses 1 slot.</p>
+          <ul aria-label="Count items">{Object.entries(resourceSession.snapshot.inventory.items).map(([id, count]) => {
+            const meta = resourceSession.itemCatalog[id]!
+            return <li className="count-item" key={id} data-item={id}><span>{meta.name ?? id} × {count}</span><span>{count * meta.gramsPerItem / 1000} kg · {Math.ceil(count / meta.stackSize)} slots</span></li>
+          })}</ul>
+          {!Object.keys(resourceSession.snapshot.inventory.items).length && <p data-empty-items>No items carried.</p>}
         </>}
         <button disabled={!resourceSession || !!resourceSession.error} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
         <p className="resource-note">{resourceSession?.error || saveStatus}</p>

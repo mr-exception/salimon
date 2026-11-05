@@ -1,0 +1,16 @@
+{
+  "failedRun": 42053840099,
+  "syntheticMerge": "3810fb73e9560b8ee1bbf7cc48d933ca92111d9d",
+  "syntheticParents": [
+    "10582ad2ba46ba60ca1648f6cb6b987dd91f52f8",
+    "d8b5711ec099e93f1c1b87c620d90046898316e9"
+  ],
+  "declaredBase": "8a179fb4adc8bdc5e14925c2e29df22c7c38b199",
+  "checkoutDepth": 2,
+  "declaredBaseAvailableBefore": false,
+  "gateBeforeExit": 1,
+  "gateAfterExactFetchExit": 0,
+  "changedManifestWithoutHumanApprovalExit": 1,
+  "baselineManifestBlobBothBranches": "122ca69d9b1b892a470ca38f3f0f6dcdd8823937",
+  "digest": "961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513"
+}

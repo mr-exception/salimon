@@ -1,0 +1,10 @@
+
+> salimon-navigation-client@0.1.0 test:visual:approval
+> node --experimental-strip-types scripts/baseline-approval.ts
+
+Baseline approval PASS (inherited from base): 961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

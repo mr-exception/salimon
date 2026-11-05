@@ -353,3 +353,10 @@ checks a validated prior full-container save, overweight/stale-save errors and a
 narrow viewport. It is part of the existing cockpit project and full browser CI.
 The player-slot feedback helper is tested with validated synthetic usage; the
 current two-resource/empty-item catalog cannot fill all 12 slots in browser play.
+
+For stacked pull requests, the baseline-approval CI job fetches the declared
+parent SHA explicitly before comparing its manifest. GitHub's synthetic stacked
+merge ref can place the actual parent outside a depth-2 checkout. Missing history
+is repaired by fetching that exact commit; changed reference digests still require
+the existing explicit human approval. The gate itself and reference bytes are
+unchanged.

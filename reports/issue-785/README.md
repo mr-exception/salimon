@@ -172,3 +172,27 @@ build/typecheck and merged-doc link checks passed. Tested UI rendering source:
 only Markdown. Pure gram/controller/test/config/lockfile inputs are unchanged,
 justifying their earlier unit results; final hashes include corrected CSS.
 Current-head full CI and final exact-ref review remain mandatory before ACCEPT.
+
+## Stacked-checkout baseline gate correction
+
+Final d8b5711 CI passed the full browser suite (including the previously failing
+strict screenshot), navigation negatives, visual repeats and visual-negative checks.
+Only baseline-approval failed: the depth-2 checkout of synthetic merge 3810fb7
+contained synthetic parent 10582ad and child d8b5711, but not declared PR base
+8a179fb. The unchanged base/head manifest blob is identical (`122ca69d...`).
+The existing gate treats unreadable base history as an initial candidate and
+therefore requested human approval despite unchanged references.
+
+The baseline job now fetches exactly the declared base SHA with `--depth=1`
+before running the unmodified gate. A controlled shallow reproduction failed
+before the fetch, passed as inherited afterward, and still rejected a modified
+manifest without human approval. The working-tree gate also passed. Logs and
+exact refs/results are in `failures/ci-42053840099`. No approved baseline,
+manifest/image byte, approval condition, tolerance or test changes. No agent
+posted a human baseline approval.
+
+This is CI setup only; production, browser/domain test and asset inputs remain
+identical to the passing d8b5711 build. The workflow is now explicitly hashed
+in source-hashes.json. Current-head full CI must still rerun and pass before
+final acceptance. All conflict resolutions and main → #794 → #795 ancestry
+remain intact.

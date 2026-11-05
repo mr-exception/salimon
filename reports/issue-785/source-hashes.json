@@ -93,5 +93,6 @@
   "client/tests/top-down.spec.ts": "edd607ce28e301f2ab3b9b4ee89a1a1f68cbd10c5eb50cbf78161885fe5c665d",
   "client/tests/visuals.spec.ts": "791a5de5a634af7ddd813f9478f67b4b21d713b23795dd02a1d74f6aedc13fa1",
   "client/tests/worldJourney.ts": "1e8d1ecf24d838a8c4a59ef8b5a02a56234ba5587ec8ec40a3ac6c3ca2a2460d",
-  "client/tsconfig.json": "dec2cc8882b6c4fe8848288251f61c0cd42b45edcad46d2a5bebbf4c777b50d4"
+  "client/tsconfig.json": "dec2cc8882b6c4fe8848288251f61c0cd42b45edcad46d2a5bebbf4c777b50d4",
+  ".github/workflows/navigation-client.yml": "8b1c1198afab3ffa052a89f2aaa86a203028ffb56e606457c62d28baaffebe85"
 }

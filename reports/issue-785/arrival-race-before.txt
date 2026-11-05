@@ -1,0 +1,15 @@
+Same-session production-domain probe before fix (source 21f62a5):
+- Create production ResourceSession and collect 1000 g mineral.
+- Advance player to reachable ship-local (.5, 4.25), tick 59.
+- Open container; review deposit of 333 g.
+- Advance one production step, causing the regular tick-60 location checkpoint.
+Observed output:
+{
+  reviewRevision: 1,
+  afterLocationCheckpoint: 2,
+  confirm: false,
+  message: 'Stale transaction. Amounts changed; review a new transfer.'
+}
+Fix: checkpoint arrival on open before any pending revision is captured.
+Regression: resourceContainerInteraction.test.ts "opening saves arrival before review".
+This observation is retained as a real review finding, not relabelled PASS.

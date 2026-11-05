@@ -1,6 +1,6 @@
 # Salimon browser prototypes
 
-**2D resource foundation, not radar UI:** The client contains a pure whole-unit 10 kg / 10 L resource inventory and gathering domain (src/resourceInventory.ts), with node tests (src/resourceInventory.test.ts). It is not yet wired to the navigation-only interface. See [resource design](../docs/resource-inventory-and-gathering.md).
+**2D gathering (#757):** The default continuous Scout/planet world includes a 10 kg / 10 L player inventory, whole-litre mineral/biomass gathering at 1 L/s, and versioned local saves. `resourceInventory.ts` uses integer grams/L; `resourceSession.ts` commits inventory, depletion, capacities and player location together. See [resource design](../docs/resource-inventory-and-gathering.md).
 
 A self-contained React + TypeScript + Vite + Three.js + React Three Fiber radar. This is a new prototype and does not migrate the historical native Rust gameplay. See [design contract](../docs/radar-navigation-prototype.md).
 
@@ -67,8 +67,8 @@ pose, and ship motion changes its planet-relative pose without rewriting anchors
 Local frame point conversion and aft doorway ownership transfer are explicit.
 
 The fixture uses authored illustrated placeholders, not scientific terrain or
-full gameplay. The isolated fixture defers cockpit seating/navigation; multiplayer, persistence,
-extraction and inventory integration remain later work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
+full gameplay. The isolated development fixture excludes cockpit/gathering/saves;
+the default gameplay entry includes those systems. `topDown.test.ts` tests state/frames without graphics. The `top-down`
 Playwright project exercises the production SVG adapter, pixel visibility, held
 input cleanup, production radar isolation and byte-identical fresh-run captures.
 Captures are new baseline candidates, not promoted navigation references.
@@ -155,8 +155,9 @@ The banded mineral outcrop (`source:landing:mineral:01`) and alien plate colony
 footprints, source kind/archetype and site version identity. Approach them and
 **E** inspects their placeholders through the shared interaction mechanism;
 walking into either source stops at its visible footprint. Repeated inspection
-has no extraction, depletion, inventory, loot or carrying effect. Resource
-catalog densities, litre quantities and transactions belong to #757 after #767.
+has no extraction or carrying effect. In the default gameplay entry, equipping
+the gathering tool changes **E** to gathering, with catalog/depletion and atomic
+inventory transactions owned by `resourceSession.ts` (#757).
 `SourceIdentity` is descriptive metadata, not an authoritative save schema.
 
 `PLANET-1` drives a full outdoor keyboard journey twice and compares original
@@ -171,7 +172,8 @@ Full-viewport PNG readback preserves the viewer pixel grid; the SVG adapter
 requests geometric precision. The earlier static TD-1/4 byte-identity check is
 preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
 inspection, footprint blocking and independence from the camera/ship pose.
-The default production `/` now integrates cockpit entry (#766). Doorway frame transfer is implemented (#765); durable saves remain future work.
+The default production `/` integrates cockpit entry (#766), doorway frame transfer
+(#765) and durable local gathering/location saves (#757).
 
 ## Playable-slice acceptance (#767)
 
@@ -180,8 +182,33 @@ See the [full journey, local commands and mining reuse boundary](../docs/playabl
 both source archetypes, continuous doorway/camera handoffs, actual radar controls,
 standing return and walking back outside, twice in fresh browser contexts.
 Original screenshots and raw frame/source measurements are retained in the issue report.
-This proves foundation playability; extraction, durable saves, Core, Fabricator,
-multiplayer and ship damage remain future features.
+This proves foundation playability. #757 adds gathering and local saves below;
+Core, Fabricator, multiplayer and ship damage remain future features.
+
+## Gathering and saved expeditions (#757)
+
+In the default world, click **Equip gathering tool**, approach the banded outcrop
+or plate colony and press **E / Gather**. One whole litre is collected per second.
+Movement, Escape, loss of reach, stowing the tool or focus loss stops gathering
+and discards only unfinished litre progress. The HUD shows weight/volume limits,
+separate resource stacks and remaining source litres. A full inventory leaves
+the source's uncollected material intact. No physical fragments or carrying
+simulation are involved.
+
+Completed litres save immediately in this browser. Movement is checkpointed at
+most once per simulated second, at movement stop and on page hide/blur. Reload
+restores location and inventory, never active gathering. Cockpit reloads stand
+beside the chair. A second same-origin tab cannot edit the open expedition.
+Use HTTPS or localhost; blocked storage/invalid saves pause gathering and preserve
+the saved bytes. Data is browser-local; there is no server/cloud/multiplayer save.
+
+`npm test` covers exact grams/litres, mixed capacities, interruptions, failed and
+stale writes, malformed/incompatible saves, upgrades, depletion and payload mass.
+The existing Navigation client CI includes `GATHER-1`/`GATHER-2` through
+`npm run test:browser -- --project=cockpit --grep GATHER`, using the built entry,
+real input, reload, competing tabs and repeat screenshot comparisons. Approved
+navigation baselines are unchanged. Machine buffers/transfers, upgrade UI/costs
+and broader resource balance are future work.
 
 ## Controls (desktop mouse and keyboard)
 

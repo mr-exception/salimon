@@ -1,6 +1,6 @@
 # Resource inventory, gathering and ship processing — strict top-down 2D
 
-**Status: approved gameplay direction (2026-11-04); implementation pending.** The browser client is currently navigation-only. The TypeScript inventory foundation from PR #756 implements a 10 kg / 10 L starting inventory with **integer kilograms per unit** and is **not yet updated** for the newly approved fractional-kg/whole-litre design, ship storage, or continuous Core processing. Do not treat historical native physical-fragment behavior as current 2D gameplay.
+**Status: approved gameplay direction (2026-11-04); player gathering implemented in #757.** The continuous Scout/planet browser world supports whole-litre gathering, exact integer grams/L, independent 10 kg / 10 L limits, and versioned local inventory/depletion/location saves. Ship storage transfers and continuous Core processing remain future work. Do not treat historical native physical-fragment behavior as current 2D gameplay.
 
 ## Resource representation and player gathering
 
@@ -9,7 +9,8 @@
 - Starting player inventory: **10 kg maximum weight AND 10 L maximum volume**, enforced simultaneously. Future inventory capacity upgrades are possible; their costs/tier values are not defined.
 - The player leaves the Scout, approaches a rock/plant/other harvestable source, equips the mining tool and mines **1 L per second** while the interaction is valid. Suitable gathering interactions for other resource categories need the same capacity and depletion rules.
 - Credit only the litres fitting BOTH remaining limits and remaining source quantity, debiting the corresponding persistent source in the same authoritative operation. Uncollected material remains at the source; no fragments, growing spheres or physical fragment piles are created.
-- Interaction distance, animation/interrupt rules, partial-second progress, tool upgrades, resource-density catalog and source exhaustion visuals require later design/implementation.
+- The starting sample reuses each source's existing interaction reach (2.3 m mineral; 1.9 m biological). Equip the gathering tool, then **E / Gather** starts or stops continuous collection. Movement, Escape, tool stow, loss of reach, page blur/hide or cockpit entry interrupt it. Only completed 60-tick seconds commit; unfinished progress is discarded, with no offline catch-up or automatic restart after reload.
+- Authored sample catalog `landing-resources:v1`: banded mineral **2500 g/L**, initially **24 L**; plate biomass **500 g/L**, initially **30 L**. These are explicit sample values, not upgrade balance or Core conversion values. Depleted sources keep their IDs/colliders and are drawn dimmed. Tool upgrades and animation polish remain future work.
 
 ## Initial ship-side resource capacities
 
@@ -46,8 +47,11 @@
 ## Persistence, authority and current implementation gap
 
 - Source depletion and inventory credit must be authoritative and atomic so interruption, repeated input, saving/reloading or future multiplayer cannot create duplicate resources.
-- Quantities are whole litres; densities use integer grams/litre. Current `client/src/resourceInventory.ts` still enforces whole kilograms per resource unit. Updating it, its tests and the future 2D interaction system is **separate future work**, not completed by this document.
-- Save data for inventories, active Core batch progress, energy reserve and world depletion must be versioned and validated. The existing navigation-only client has none of these machine or 2D integrations.
+- `resourceInventory.ts` now uses whole-litre quantities, `gramsPerLitre` and `capacityGrams`. `resourceSession.ts` owns the sample catalog, gathering ticks and one atomic save envelope: schema/catalog/site version, inventory quantities and capacities, source remainders, revision and split frame-relative player location.
+- `TopDownView.tsx` holds an exclusive browser Web Lock while the expedition is open. A second tab cannot gather/save. Each transaction checks the previous stored bytes and replaces the entire localStorage record before publishing its inventory credit. Failed/stale writes stop gathering without publishing the candidate. Unsupported/corrupt/nonconserving saves are preserved and block saving; they are never silently replaced by fresh resources.
+- Completed litres save synchronously. Location checkpoints occur once per simulated second, on movement stop and page hide/blur; a hard interruption may lose only movement since the last checkpoint, never half of a resource transfer. Reload restores standing in the same frame; cockpit saves restore safely beside its chair. Tool equip state and partial progress do not resume. Future upgraded capacities are validated and retained; no upgrade UI/cost is introduced.
+- This is single-browser, same-origin local persistence, requiring HTTPS or localhost for the lock. It is not a server, multiplayer authority, cloud sync or protection against manually edited/deleted browser data. Core batch/energy persistence is still unimplemented.
+- Resource payload is derived from inventory grams. It contributes once to player payload and, while ship-local, once as nested payload in the existing ship simulation's total mass. Walking has no separate mass-based physics. Payload is recomputed from dry hull mass, never accumulated per frame.
 - Older native Core fueling, physical-fragment construction refunds and storage/harvesting implementation notes remain historical only; they are not proof of 2D migration.
 
 ## Open design questions for later discussion
@@ -55,5 +59,5 @@
 1. Initial fixed generation power (MW) and its **upgradeable rate progression**, separate from energy-storage upgrades.
 2. Core priority yield metric (per litre versus per kilogram), deterministic tie-breaks, and currently processing batch behavior.
 3. Core active-batch reservation, withdrawal, interruption and persistence.
-4. Mining tool reach, interruption and partial-second progress; actual resource densities and types.
+4. Gathering tool upgrades/animation and broader resource catalogs/balance beyond the authored starting sample.
 5. Storage/transfer UI, direct module transfer policy, and capacity upgrade tiers for inventory/storage/Fabricator/Core.

@@ -8,7 +8,7 @@ confirm; only ResourceSession transactions publish material changes. Confirmatio
 is consumed once, while editing/closing discards only draft state.
 
 Parent: non-draft PR #794, `issue-784-resource-container`,
-`8365b669a5d1a8a69f5f00f93a7d876405c2deb9`, verified ancestor.
+`b85add7c0bd3aafb9f266c58fca8f3fdefefacb0`, verified ancestor.
 Transitive #783 is merged in main `cf46092`. The unique child diff owns UI/input,
 controller, tests, owner docs and this evidence. Tested source:
 `cb576c6c91fb2766d8ac8feb7c8bb6aa900abc09`; source-hashes.json covers
@@ -78,7 +78,7 @@ snapshots/comparator measurements, logs and source/evidence hashes are retained.
 Same-session implementing-agent review inspects exact parent/head, criteria,
 unique diff, originals and actual check results; final verdict/current-head CI
 are published to the PR and source issue. No independent review is claimed.
-Human retains merge authority. Merge #794 before this child; source issues stay
+Human retains merge authority. Merge #793, then #794, then this child; source issues stay
 open until delivery reaches main.
 
 ## Final local evidence review
@@ -103,3 +103,14 @@ suite. No broad local campaign is repeated solely for report packaging.
 Local review: **ACCEPT** for new functionality and UI evidence; final overall
 acceptance remains pending the existing full current-head CI checks and is bound
 in the PR/issue review comment. No independent execution is claimed.
+
+## Stack refresh
+
+Documentation PR #793 appeared during implementation. Parent #794 now incorporates
+its `bf1cb0d` history and targets that branch. This child incorporates updated
+parent `b85add7` non-destructively. Runtime/test/config/assets/lockfile hashes remain
+unchanged from the verified source; existing local evidence is reused after hash
+comparison, and current-head full CI is required again. The migration register
+now identifies playable container transfers and preserves future machine scope.
+Final review binds exact refs/checks; prior acceptance is superseded after the
+parent change until revalidation completes.

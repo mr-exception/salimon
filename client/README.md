@@ -360,3 +360,10 @@ merge ref can place the actual parent outside a depth-2 checkout. Missing histor
 is repaired by fetching that exact commit; changed reference digests still require
 the existing explicit human approval. The gate itself and reference bytes are
 unchanged.
+
+The NAV-1 replay completes a 1,200 ms input window (75 × 16 ms RAF intervals,
+72 fixed 60 Hz ticks) before equality comparison, and asserts that exact tick
+count. A partial 1,088 ms window could quantize to 65 or 66 ticks depending on
+renderer startup phase. The build/browser CI job allows 20 minutes for cold
+Chromium installation plus the full matrix; individual test limits and assertions
+remain in force.

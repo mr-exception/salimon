@@ -1,9 +1,11 @@
 # Strict top-down illustrated 2D direction
 
-**Status: owner-approved art direction (2026-11-04).** Issue #761 adds a development-only playable illustrated test site (`/?scene=top-down`), with an always-visible Scout cutaway and bounded interior walking. The shipped browser entry remains the separate 3D radar prototype. Issue #763 adds a recognizable always-exposed Scout cutaway, separate cargo bay,
-open entry and addressable module placeholders. Issue #764 adds the fixed fictional planetary
-landing area, outdoor spawn and mineral/biological inspection sources. World
-frame transfer and cockpit navigation integration remain future work.
+**Status: owner-approved art direction (2026-11-04), delivered as the default
+browser world.** The Scout cutaway, fixed landing area, outdoor walking, source
+inspection/gathering, doorway frame handoff and cockpit radar are playable.
+See [current scope and source owners](current-client-status.md). The isolated
+`/?scene=top-down` development fixture remains inspection-only; it does not
+represent the full default `/` gameplay entry.
 
 ## View and illustration
 

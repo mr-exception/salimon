@@ -7,6 +7,15 @@
 
 A grounded cinematic Scout vertical slice, opening memory-loss narrative, Archive/Data Recovery, player-known charting, and eventual Absenat gate/Hall are specified in [experience roadmap](experience-implementation-map.md). Work is split into scoped issues #463–476 and reused existing dependencies. The future homeworld replaces historical Earth-start requirements when migrated; the currently shipped prototype is not retroactively changed. Backend-powered Hall is a later implementation stage, completely undiscoverable in all pre-completion player UI.
 
+## Current browser scope
+
+The default `/` delivers the 2D Scout/planet slice: walking, seamless doorway
+frames, cockpit radar and weight-only gathering with local persistence. See
+[code-verified status and future decisions](current-client-status.md) and
+[playable acceptance](playable-2d-foundation.md). Cloud/browser checks qualify
+routine 2D work; native/M1 gates remain historical or separately owned. No new
+numbered phase or completed full universe is implied.
+
 ## Phase rules
 Every phase should:
 - Have **one primary playable goal**.
@@ -35,11 +44,16 @@ The [2026-09-15 evaluation](phase-0-evaluation.md) records **GO WITH REVISIONS**
 for its evaluated revision. It does not establish a hard 60 FPS floor or certify
 later revisions. Preserve its machine-specific evidence and limitations.
 
-## Current post-baseline prototype
+## Historical native post-baseline prototype
 
-The client remains native-first and client-only. Local build scripts target macOS,
+This section and the historical implementation waves below describe the archived
+Rust client. Their delivery notes do not establish browser functionality. The
+[current browser status](current-client-status.md) governs present work.
+
+
+The historical client was native-first and client-only. Local build scripts target macOS,
 Windows and Debian-based Linux. PR CI verifies an Ubuntu source build;
-macOS is the reference playable/performance target. Web/WASM portability remains future work. No new numbered phase or formal
+macOS is the reference playable/performance target. Those native build targets do not describe the current browser client. No new numbered phase or formal
 phase closure is implied by this implementation summary.
 
 Implemented beyond the navigation baseline:
@@ -95,7 +109,7 @@ Fabricator crafting is newly authorized by the [accepted five-round contracts](s
 Approved contracts, real organic biomass/medicinal raw resources and the portable
 recipe/storage/FIFO/tray domain are delivered. Crafting remains unconnected to
 native interactions pending #339–#347; no playable-wave completion or phase
-renumbering is implied. See [fabrication architecture](../client/fabrication/architecture.md).
+renumbering is implied. See [fabrication architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/fabrication/architecture.md).
 
 ## Future Jump Drive and impulse model — approved documentation, pending implementation (2026-10-21)
 
@@ -109,7 +123,7 @@ The isolated portable catalog schema is delivered, with no playable universe
 migration. Current gameplay/visual implementation prerequisites are delivered;
 remaining native reference gates retain their existing issues. U02 and subsequent
 dependency-ordered expansion issues remain unimplemented. See
-[schema contract](../client/universe/architecture.md).
+[schema contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md).
 
 ## Ongoing universe documentation gate (#440)
 

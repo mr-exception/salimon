@@ -118,7 +118,12 @@ Research and technology unlocks should enable:
 - Suits are tierless modular equipment. A basic suit starts equipped, and future drawers, module storage and Gear Crafting Bench follow [spacesuit and hazard rules](spacesuit-and-hazards.md).
 - Exact equipment masses, suit expansions, extra slots, and weight upgrade recipes remain TBD.
 
-## Confirmed construction and damage model
+## Historical localized construction and damage model
+
+These localized damage rules are legacy/deferred. The approved future browser
+scope is whole-ship damage/destruction, as stated above; no 2D damage runtime is
+implemented. See [current implementation](current-client-status.md).
+
 - **Approved future construction:** a **ship-local 3 m × 3 m × 3 m structural grid on all three axes**, with face-based connection to the persistent Core, multi-deck expansion, optional finer data-driven attachment snapping, and one blueprint spanning many structural cells. The older Z-only snap plan is superseded by [this approved contract](scout-and-modular-construction.md).
 - Rooms and modules can be individually detached or destroyed during combat and can physically separate from the ship.
 - Structural integrity is primarily a numerical design constraint rather than a full bending/breaking simulation.
@@ -248,7 +253,7 @@ Assisted sequences retain their reserved energy and cannot be overridden.
 These numbered references reconcile the 15-round, 84-decision review with the
 owning gameplay rules above. They supersede the original direct-speed/no-energy
 Phase 0 baseline; historical evidence remains evidence of its original revision.
-The [ship architecture](../client/ship/architecture.md) owns numerical contracts,
+The [ship architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md) owns numerical contracts,
 and [technical architecture](technical-architecture.md#flight-update-and-validation-decisions-197)
 owns timing, validation and implementation boundaries.
 
@@ -343,7 +348,7 @@ start another on continued hold. Depletion releases a smaller final sphere.
 Unequip/interruption also releases. Phase 0 mining consumes no energy. Keep
 single-object carrying and physical mechanical Core feeding. Portable lifecycle,
 conservation, density/radius and sequencing are canonical in the
-[resource contract](../client/world/resource-contracts.md#spherical-mining-lifecycle-230).
+[resource contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/resource-contracts.md#spherical-mining-lifecycle-230).
 
 ## Local takeoff and powered handoff (#295)
 
@@ -412,7 +417,7 @@ transactions, Q-wheel input, and cached ship mass updates. Ship owns electricity
 its mass ledger. Renderer receives observation DTOs only. Dedicated consumable
 inventory must not enlarge world carrying or equipment capacity.
 
-Typed API (implemented in #338; [crate guide](../client/fabrication/architecture.md)): `RecipeId`, `JobId`, `Mass`,
+Typed API (implemented in #338; [crate guide](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/fabrication/architecture.md)): `RecipeId`, `JobId`, `Mass`,
 `Ingredient`, validated `RecipeBook`, `Fabricator`, `FabricationCommand` and
 `FabricatorSnapshot`. Commands insert material, enqueue recipe/quantity, cancel
 by job identity and collect tray output. Errors are typed and transactional.
@@ -508,14 +513,14 @@ settlement, inventory and mass transitions. Native visuals/signoff are separate.
 ## Hold-Q consumable wheel (#377)
 
 Exact-identity survival consumption, continuing world/vital clocks and pause/death/
-focus/restore cancellation follow the [canonical wheel contract](../client/runtime/architecture.md#hold-q-consumable-wheel-377).
+focus/restore cancellation follow the [canonical wheel contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#hold-q-consumable-wheel-377).
 
 ### Survival consumable effects (#370)
 
 The later survival expansion now defines an atomic explicit-item recovery adapter
 on top of the Fabricator inventory-only wave above. Recipe IDs map to validated
 instant/timed recovery records in the
-[canonical survival recovery contract](../client/survival/architecture.md#consumable-recovery-definitions-370).
+[canonical survival recovery contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/survival/architecture.md#consumable-recovery-definitions-370).
 Exact slot/job/unit selection replaces category-first input; M/N remain absent.
 Basic ration restores 40 hunger; medkit's provisional +25 ordinary health over
 10 active seconds is documented reviewable balancing, not an approved lore
@@ -537,7 +542,7 @@ food definitions/unlocks #378. No recipe resource, mass or power policy changes.
 New runs guide survival details, Q consumption, Fabricator inspection/crafting/
 collection and pause-menu checkpoint status. T explicitly skips. Completed
 actions count out of order and progress/skip persist per run; no free supplies,
-auto-pause or timer immunity. See the [runtime contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).
+auto-pause or timer immunity. See the [runtime contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#persistent-survival-onboarding-380).
 
 
 ## Instant direct-material Core upgrades (#548)

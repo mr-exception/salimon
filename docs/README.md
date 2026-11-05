@@ -56,13 +56,17 @@ These newer approved narrative contracts supersede historical Earth-start assump
 - [Validation matrix and prerequisites](validation.md)
 - [Historical task reports](../reports/README.md)
 
-## Repository documents
+## Historical repository documents
 
-- [3D authoring workspace and ownership](../models/README.md)
-- [Authored asset manifest schema and examples](../models/manifest.md)
-- [Shared 3D asset contracts](../models/contracts.md)
-- [Blender and AI authoring workflow](../models/authoring.md)
-- [Generic Blender export command](../models/tools/README.md)
+The native `models/` workspace was removed during the browser reset. The five
+authoring links below explicitly target the verified historical tree, preserving
+the contracts without implying these tools or assets exist in the current client.
+
+- [3D authoring workspace and ownership](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/README.md)
+- [Authored asset manifest schema and examples](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/manifest.md)
+- [Shared 3D asset contracts](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/contracts.md)
+- [Blender and AI authoring workflow](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/authoring.md)
+- [Generic Blender export command](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/tools/README.md)
 
 - [Phase 0 evaluation](phase-0-evaluation.md)
 - [Legacy Salimon hub notes](legacy-salimon-hub.md) — older entity/buffer concept, separate from the current space game.

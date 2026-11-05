@@ -20,7 +20,8 @@ IDs, fixed-step walking/facing, camera follow and layered draw lists.
 `topDownInteraction.ts` owns swept collision and stable-ID nearby selection/reach;
 entity-local footprints match the artwork. `cockpit.ts` owns local owner control,
 one-chair reservation and power/view transitions. Other interactions inspect
-placeholders; no Core, Fabricator, mining, server or durable save is claimed.
+placeholders. Mining and durable local saves use the resource owners below;
+Core, Fabricator processing and server authority remain future work.
 
 `TopDownIllustration.tsx` retains the authored illustrated SVG shapes.
 `topDownSprites.tsx` rasterizes them once at fixed density into cached PNG blob
@@ -44,9 +45,10 @@ contracts, not a claim of migrated native gameplay. The
 
 ### Browser resource gathering (#757)
 
-`resourceInventory.ts` owns exact litre/gram arithmetic and independent capacities.
+`resourceInventory.ts` owns exact integer-gram arithmetic, the 10 kg / 12-slot
+player inventory and count-item per-type stack limits. Volume is not a limit.
 `resourceSession.ts` composes the existing world interaction/tick path, a versioned
-sample density/source catalog, atomic inventory/depletion/location saves, validated
+sample gram/source catalog, atomic inventory/depletion/location saves, validated
 restore and derived player/ship resource payload. `TopDownView.tsx` owns tool/UI
 actions and the exclusive browser save lock. Resource state never enters the
 SVG art or collision owners. Unit/integration coverage is in
@@ -55,7 +57,13 @@ drives the built production entry and retains repeat screenshots in existing CI.
 See [the resource contract](resource-inventory-and-gathering.md) for save/failure
 semantics and unsupported machine/server features.
 
-Salimon uses a custom Rust runtime with low-level `winit` and `wgpu`, without a
+## Historical native architecture
+
+The remainder records the archived Rust implementation and its contracts. Removed
+source links are pinned to the historical tree. See [current status](current-client-status.md)
+for active browser ownership, approved future scope and decision boundaries.
+
+The historical Salimon client uses a custom Rust runtime with low-level `winit` and `wgpu`, without a
 full game engine. The current prototype extends the Phase 0 baseline and remains native and
 client-only. Local build scripts stage macOS, Windows and Debian-based Linux
 executables. PR CI compiles and runs portable workspace tests on Ubuntu. Separate nightly
@@ -76,7 +84,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
 | `client/character/` | Portable movement, collision, gravity, cockpit transitions and open-space/nearby-body EVA |
 | `client/renderer/` | GPU resources, GLB loading, sphere/ship/image pipelines, reverse-Z, instruments and measurements through renderer-neutral DTOs |
-| `client/diagnostics/` | Public DTO/facade plus private aggregation, formatting and CPU rasterization modules; see [source owners](../client/diagnostics/architecture.md#private-source-owners) |
+| `client/diagnostics/` | Public DTO/facade plus private aggregation, formatting and CPU rasterization modules; see [source owners](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/diagnostics/architecture.md#private-source-owners) |
 | `models/` and `client/assets/` | Offline authored sources/contracts and checked-in validated runtime exports respectively |
 | `client/platform/` and `core/` | Reserved adapter/backend boundaries; no backend implementation |
 
@@ -91,7 +99,7 @@ Implemented gameplay includes surface walking, ship flight/assists, airlock/EVA,
 resource mining, one-fragment carrying, planet/ship transfer and custom fragment
 motion/contact. Mining session deltas and physical fragments survive nearby
 streaming and normal-play process restarts through versioned whole-session
-checkpoints (#363–#366). The canonical [reload verification scope](../client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
+checkpoints (#363–#366). The canonical [reload verification scope](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
 defines in-session restoration and the proposed #236 scope clarification awaiting
 owner approval; normal play restores its active run, while E2E/benchmarks start isolated sessions. No orbital simulation,
 multiplayer is implemented. Survival meters/status/recovery, active clocks,
@@ -108,13 +116,13 @@ Core joule storage, watt consumers and power authority are implemented; assist r
   before narrowing to GPU `f32`; never subtract universe-scale `f32` positions
   in WGSL. Renderer uses infinite-far reverse-Z `Depth32Float`, clear 0 and
   greater-depth comparison with an explicit near plane. See the
-  [coordinate strategy](../client/world/coordinate-strategy.md).
+  [coordinate strategy](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/coordinate-strategy.md).
 - World/runtime axes are right-handed +Y up. Ship local +X is forward and -Z
   starboard. Surface gravity uses the selected body's local radial direction,
   not global +Y. Blender source is +Z up; export converts once. See
-  [asset contracts](../models/contracts.md).
+  [asset contracts](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/contracts.md).
 - The static catalog and tour are compressed validation fixtures, not realistic
-  orbital simulation. Follow [catalog invariants](../client/world/invariants.md)
+  orbital simulation. Follow [catalog invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/invariants.md)
   rather than treating tour tuning as a product requirement.
 - Preserve deterministic identities/update semantics, one-object carrying and
   uncancellable assists. Changes must update owning invariants and tests.
@@ -148,18 +156,18 @@ unchanged. Shared tests cover right-handed cross products, distant `f64`
 subtraction and IEEE edge behavior. Owning-crate tests cover normalization
 boundaries and quaternion composition alongside existing movement, landing,
 fragment/contact and renderer precision regressions. See
-[math maintenance](../client/math/README.ai.md).
+[math maintenance](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/math/README.ai.md).
 
 ## Authored asset boundary
 
 The scout migration (#79–#83) is complete. Blender
-[`source.blend`](../models/assets/ships/salimon-scout/README.md) owns editable
+[`source.blend`](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/assets/ships/salimon-scout/README.md) owns editable
 geometry/materials; the ship category adapter uses shared export/validation.
 The GLB is the runtime artifact, with matching glTF/bin interchange, generated
 spatial sidecar and character layouts. Required proxy/marker nodes are nonvisual
 metadata, while gameplay policy remains in Rust. Preserve named groups, axes,
 monitor UVs, door metadata, budgets and licenses. Read the
-[scout regeneration guide](../client/assets/ship/README.md#source-and-regeneration)
+[scout regeneration guide](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/assets/ship/README.md#source-and-regeneration)
 for commands and generated files; normal builds never require Blender.
 
 The current Scout retains its compact outer hull and precise ramp/cockpit/station
@@ -169,7 +177,7 @@ wall-integrated stowed bunk, galley and hygiene fixtures. Character movement,
 sight and floor placement consume the same generated bounds. Operable internal
 door/bin mechanics remain #539; habitation interactions remain #540. Historical
 cargo-removal reports describe earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
-and status material. Iron, silicate and water-ice fragments each use two Blender-authored variants selected by stable identity. All three deposit materials use four authored variants; see [renderer architecture](../client/renderer/architecture.md) for selection and bounds contracts.
+and status material. Iron, silicate and water-ice fragments each use two Blender-authored variants selected by stable identity. All three deposit materials use four authored variants; see [renderer architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/architecture.md) for selection and bounds contracts.
 
 ## Physical-object simulation decision (#114)
 
@@ -194,14 +202,14 @@ owners adapt identity/state and environment here, extending physics with focused
 contracts/tests when new rules are actually required. Do not add unrelated
 physical rules to runtime. Character locomotion and ship flight retain their
 existing domain controllers. The #148 solver uses authored convex envelopes, mass-weighted contacts and angular response with approximate isotropic inertia. The stable-ID activation cache sleeps supported quiet contact islands and wakes
-connected supports; see the [sleep contract](../client/physics/architecture.md#persistent-contact-island-sleep-156).
+connected supports; see the [sleep contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/physics/architecture.md#persistent-contact-island-sleep-156).
 Active contacts use deterministic conservative spatial candidates and sparse SAT
-geometry; see [the broad-phase contract](../client/physics/architecture.md#deterministic-spatial-candidates-157).
+geometry; see [the broad-phase contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/physics/architecture.md#deterministic-spatial-candidates-157).
 Dense piles retain quadratic worst-case work; this remains a small-object custom solver.
 Multiple ship frames must be stepped separately; the current single-ship adapter
 preserves frame grouping and deterministic order; convex substeps adapt to scale and speed.
-See [physics architecture](../client/physics/architecture.md) and
-[invariants](../client/physics/invariants.md) before extending it.
+See [physics architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/physics/architecture.md) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/physics/invariants.md) before extending it.
 
 ## Future candidates and deferred capabilities
 
@@ -225,7 +233,7 @@ add a framework or runtime service solely because it appears in this table.
 
 ## Maintenance and history
 
-Use [AGENTS.md](../AGENTS.md) for GitHub issue/blocker workflow and precedence,
+Use [AGENTS.md](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/AGENTS.md) for GitHub issue/blocker workflow and precedence,
 [coding conventions](coding-conventions.md) for implementation/report rules, and
 [validation](validation.md) for current checks. Each major implemented crate
 maintains its public Rust contract, `README.ai.md`, `architecture.md`, invariants
@@ -249,7 +257,7 @@ coordinates fit ±0.48 m; uniform scaling by `bounds_radius_meters /
 at its absolute deposit center, at every body/latitude. Variant choice ignores
 query order, camera, streaming and remaining mass. World generation, mining,
 mass, session persistence and streaming rules are unchanged. See the
-[asset guide](../models/assets/resources/water-ice-deposit-spire/README.md).
+[asset guide](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/assets/resources/water-ice-deposit-spire/README.md).
 
 ## Scout spatial geometry (#111)
 
@@ -260,7 +268,7 @@ and account for sills/fixtures; chair and cockpit-side proxies preserve the
 previous conservative walking footprints. Character layout composes clearance,
 gate/shoulder proxies and query policy from generated raw bounds. Player size,
 movement, permissions, ranges, gravity/timing and camera offsets stay in Rust.
-See the [authored geometry/policy map](../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy).
+See the [authored geometry/policy map](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy).
 Runtime builds require neither Blender nor asset generation.
 
 ## Object-relative prompt presentation (#127)
@@ -270,8 +278,8 @@ borrowed text pixels plus an absolute `f64` object anchor. Ship markers and
 selected physical poses remain the canonical position sources. Renderer owns
 camera-relative projection, viewport fitting and reverse-Z anchor visibility
 through a separate overlay pass. Global guidance and transient feedback retain
-screen placement. See [runtime flow](../client/runtime/architecture.md#contextual-action-bar-flow)
-and [renderer contract](../client/renderer/architecture.md#world-anchored-prompts-127).
+screen placement. See [runtime flow](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#contextual-action-bar-flow)
+and [renderer contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/architecture.md#world-anchored-prompts-127).
 
 ## Equipment toolbar HUD (#129)
 
@@ -279,11 +287,11 @@ Runtime field-maps five-slot equipment state to renderer-neutral toolbar DTOs
 for gameplay; precision tour omits it. Renderer rasterizes/caches numbered slots,
 mining-tool silhouette and optional highlight, and stacks global/transient
 messages above the fitted bottom-center toolbar. DPI follows bounded native
-scale-factor handling. See the [renderer contract](../client/renderer/architecture.md#equipment-toolbar-hud-129).
+scale-factor handling. See the [renderer contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/architecture.md#equipment-toolbar-hud-129).
 
 ## Integrated terrain (#170, #179–#181)
 
-World owns the immutable versioned [terrain definition/query/codec](../client/world/terrain-contract.md).
+World owns the immutable versioned [terrain definition/query/codec](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/terrain-contract.md).
 Runtime composes shared ground queries, authored landing footprints and resource
 anchoring with bounded cube-sphere patch generation. Renderer owns immutable
 patch buffers, a uniform arena and near/far presentation through renderer-neutral
@@ -310,10 +318,10 @@ Ship owns mass/force, fractional joules, single-fragment conversion, isolated
 assistance budgets and full-vector observational telemetry. Runtime supplies
 physical intake, containment and power snapshots to character/fragment adapters.
 Renderer receives observation DTOs only; it neither estimates stop feasibility
-nor commands thrust. See [ship contracts](../client/ship/architecture.md),
+nor commands thrust. See [ship contracts](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md),
 [accepted gameplay decisions](spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14),
-[portable E2E](../scripts/README.md#realistic-flight-regression-195) and
-[500-cargo CPU profiling](../scripts/FRAGMENT_BENCHMARKS.md#flight-mass-and-cabin-power-cpu-profiles-196).
+[portable E2E](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/README.md#realistic-flight-regression-195) and
+[500-cargo CPU profiling](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/FRAGMENT_BENCHMARKS.md#flight-mass-and-cabin-power-cpu-profiles-196).
 
 Issue owners: #201 inertial force, #186 throttle, #202 swept crash, #187 cached
 mass, #188 Core, #189 intake, #203 reservations, #190 safe assist/recovery,
@@ -326,7 +334,7 @@ ship gravity/orbits and manual power management are explicitly OUT OF SCOPE.
 ## Coherent render-only gameplay interpolation (#310)
 
 The runtime session retains previous/completed ship and character observations
-beside loose-fragment history. Its [presentation contract](../client/runtime/architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159)
+beside loose-fragment history. Its [presentation contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159)
 uses one clamped backlog factor and consistent world/ship-local frames. Live look
 and all gameplay authority remain current; automation renders exact snapshots.
 Lifecycle and frame transitions invalidate history. Native smoothness/latency
@@ -373,7 +381,7 @@ material-volume, mass or session persistence contract changes.
 
 Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.
 
-The #338 portable Fabricator domain is implemented in [salimon-fabrication](../client/fabrication/architecture.md). It depends only on world resource contracts; native/playable integration remains #339–#347.
+The #338 portable Fabricator domain is implemented in [salimon-fabrication](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/fabrication/architecture.md). It depends only on world resource contracts; native/playable integration remains #339–#347.
 
 ## Whole-game persistence (#363)
 
@@ -404,11 +412,11 @@ world simulation or multi-save UI is implied.
 ## Survival meters (#367)
 
 Portable meter/active-clock/offline-fatigue authority lives in
-[`salimon-survival`](../client/survival/architecture.md). Native/session persistence
+[`salimon-survival`](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/survival/architecture.md). Native/session persistence
 integration is implemented by #371; the playable session advances and saves survival.
 
 Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
-exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
+exposure status effects (#368) use the survival crate's [single pipeline](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/survival/architecture.md#damage-and-status-pipeline-368).
 
 
 ## Journey statistics (#372)
@@ -428,7 +436,7 @@ feedback/cache, with bounded raster/layout in `survival_hud/raster.rs`; `app.rs`
 owns H/[ / ] focus-safe dispatch and overlay priority. Survival's immutable
 `effect_snapshots` supplies captured rules/stacks/timers. Renderer exposes its
 existing fitted toolbar message band; existing inventory/equipment art is unchanged.
-See the [canonical HUD contract](../client/runtime/architecture.md#survival-hud-and-status-details-373).
+See the [canonical HUD contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#survival-hud-and-status-details-373).
 Tests cover actual consumables, exact penalties, visual timing/cache, all supported
 viewport/DPI layouts, full effect pagination and native input policy. #376 retains
 native visual signoff; #381/#377 integrate menu/wheel admission.
@@ -447,7 +455,7 @@ checkpoint/restart fault injection. Reference native visual/input acceptance is 
 Four-food definitions and continuous food modifiers are implemented by #378 in
 survival, with locked advanced recipes in fabrication. Native wheel input is integrated by
 #377; no progression acquisition is implemented. See the
-[canonical food contract](../client/survival/architecture.md#four-food-catalog-378)
+[canonical food contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/survival/architecture.md#four-food-catalog-378)
 for captured settings, active/offline clocks and exact drain arithmetic.
 
 Scout light zoning and reproducible native/offline cameras (#463) are defined in
@@ -480,14 +488,14 @@ Pause saves (#382) use the existing worker/store and verified receipts; see
 Survival onboarding (#380) is implemented as portable per-run objective/skip
 state in runtime, persisted by schema 4. Events come from existing successful
 Q/Fabricator/status actions; prompts use the existing action band and do not
-alter input or simulation authority. See the [owning contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).
+alter input or simulation authority. See the [owning contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#persistent-survival-onboarding-380).
 
 ## Portable persistence/survival scenario boundary (#375)
 
 Test-only runtime modules compose production full-session saves, the two-slot
 filesystem manager and normal `Checkpoints::open_at` launch transaction, plus
 worker/restart transactions over fault-injected `CheckpointStore`. The
-[versioned portable DSL](../scenarios/portable/README.md) admits checkpoint/reload
+[versioned portable DSL](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/portable/README.md) admits checkpoint/reload
 and full-source comparison without adding filesystem writes to the live E2E
 protocol. Fixture placement and supplied UTC are explicit; clocks and domain
 rules remain production-owned. Long meter partition tests run directly against
@@ -513,7 +521,7 @@ Readout rows and 3D functional inks follow [Scout presentation](scout-presentati
 Runtime owns local Archive records and modal input; the existing save manager
 persists validated identities/read progress in schema 6. Renderer adds a flush
 panel to its existing ship draw and one static instrument atlas region. No backend,
-chart or recovery authority is added. See [ownership](../client/runtime/architecture.md#scout-archive-467).
+chart or recovery authority is added. See [ownership](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#scout-archive-467).
 
 ## Canonical universe schema foundation (#402)
 
@@ -522,7 +530,7 @@ schema, exact source IDs, systems/stars/individual bodies/statistical population
 per-field provenance/uncertainty/validity and versioned canonical definition/seed
 references. It is a portable leaf, not a runtime dependency. The six-body playable
 `salimon-world`, terrain/resource-v1 and current save interpretation are unchanged.
-See [schema ownership and bounds](../client/universe/architecture.md). Catalog
+See [schema ownership and bounds](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md). Catalog
 truth grants no player chart knowledge; frames, storage/import and native world
 migration remain U02 onward.
 
@@ -538,7 +546,7 @@ CI lint #442 and final semantic audit #441 remain separate scoped work.
 
 The portable universe leaf also owns split galactic cells, typed system/body/local
 frame trees, rotating-frame velocities and validated calendar/scale arithmetic.
-See [U02 contract](../client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
+See [U02 contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
 Runtime and compressed playable-world coordinates remain unchanged; ephemerides,
 UTC leap-table conversion and production astrometry import are downstream work.
 
@@ -549,8 +557,8 @@ Persistence now depends on the portable universe leaf for validated IDs, split
 positions and epochs. Existing `SaveManager` protects catalog incompatibility as
 a fatal recovery error. Runtime retains its separate runtime envelope (now schema 26). See
 [save contract](save-contract.md#future-universe-new-run-contract--u05-406),
-[persistence architecture](../client/persistence/architecture.md) and
-[invariants](../client/persistence/invariants.md).
+[persistence architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/persistence/architecture.md) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/persistence/invariants.md).
 
 ## Universe source inputs (#407)
 
@@ -558,8 +566,8 @@ a fatal recovery error. Runtime retains its separate runtime envelope (now schem
 `scripts/import_universe_sources.py` verifies frozen local raw bytes and stages
 a deterministic bundle. `catalogs/sources/manifest-v1.json` separates synthetic
 Gaia fixtures from actual JPL/exoplanet snapshots. [Source contract](universe-sources.md),
-[architecture](../client/universe/architecture.md#source-manifests--u06-407) and
-[invariants](../client/universe/invariants.md) govern reuse/precision boundaries.
+[architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#source-manifests--u06-407) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md) govern reuse/precision boundaries.
 Production reuse/full snapshots wait for #513; science ingestion remains U07/U08.
 
 ## Data Recovery Module (#468)
@@ -568,8 +576,8 @@ Runtime `session/recovery.rs` owns Archive work; Fabricator data provides the
 controller recipe and typed tray output; ship funds low-priority surplus joules
 and accounts installed mass; renderer only styles the existing package. Runtime
 schema 7 persists source and rejects duplicate ownership. See [canonical contract](data-recovery-module.md),
-[runtime architecture](../client/runtime/architecture.md#data-recovery-module-468)
-and [invariants](../client/runtime/invariants.md). Tests: `session/recovery/tests.rs`
+[runtime architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#data-recovery-module-468)
+and [invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/invariants.md). Tests: `session/recovery/tests.rs`
 and ship auxiliary energy tests; native acceptance #515, future leads #470.
 
 ## Universe binary partitions (#405)
@@ -577,8 +585,8 @@ and ship auxiliary energy tests; native acceptance #515, future leads #470.
 Owner: `client/universe/src/partitions.rs`; tests: `partitions/tests.rs`, independent
 wire fixture `fixtures/partition-v1.bin`; workload: `examples/partition_bench.rs`
 (all relative to `client/universe/`). Read the [storage contract](universe-storage.md),
-[owning architecture](../client/universe/architecture.md#binary-partitions--u04-405)
-and [invariants](../client/universe/invariants.md). Bounded prototype only: no GB
+[owning architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#binary-partitions--u04-405)
+and [invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md). Bounded prototype only: no GB
 builder/cross-cell references/runtime cache or production reuse approval. U12/U13
 retain those boundaries. Run universe/workspace gates and the release workload.
 
@@ -588,8 +596,8 @@ Owner: `client/universe/src/reference.rs`, tests: `reference/tests.rs`, goldens:
 `fixtures/references-v1.json`, examples: `reference_compare.rs`, `reference_bench.rs`
 with `support/reference_inputs.rs` (paths within `client/universe/`/its examples).
 See [reference wire/budget/workload guide](universe-reference-fixtures.md),
-[architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
-and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
+[architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#scientific-reference-harness--u03-404)
+and [invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md). Strict SI/epoch/frame comparison
 and CPU diagnostics only; no solver/world migration or scientific model approval.
 Cloud reference measurements remain #521; full-game cloud gates remain #435–#439.
 Human presentation/platform/budget criteria are #561/#557/#563 under the
@@ -600,8 +608,8 @@ Human presentation/platform/budget criteria are #561/#557/#563 under the
 Owner: `client/universe/src/ingestion/gaia.rs`, shared `ingestion/csv.rs`; tests:
 `ingestion/gaia/tests.rs`; workload: `client/universe/examples/gaia_bench.rs`.
 See the [Gaia selection/units/cross-match contract](universe-gaia-ingestion.md),
-[architecture](../client/universe/architecture.md#gaia-ingestion--u07-408) and
-[invariants](../client/universe/invariants.md). Synthetic local ingestion and
+[architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#gaia-ingestion--u07-408) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md). Synthetic local ingestion and
 bounded canonical batches are implemented; production approval/full snapshots
 remain #513, inference U09, astrometry pack integration U12. No playable migration.
 
@@ -610,8 +618,8 @@ remain #513, inference U09, astrometry pack integration U12. No playable migrati
 Owners: `client/universe/src/ingestion/horizons.rs`, `exoplanets.rs`; tests in their
 sibling module directories; fixture example `client/universe/examples/observed_import.rs`.
 See [units/identity/validity contract](universe-observed-ingestion.md),
-[architecture](../client/universe/architecture.md#observed-solar-system-and-exoplanets--u08-409)
-and [invariants](../client/universe/invariants.md). CI compares two offline builds.
+[architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#observed-solar-system-and-exoplanets--u08-409)
+and [invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md). CI compares two offline builds.
 Actual frozen Earth/Proxima and synthetic matching work; full reviewed release
 coverage remains #526/#513, packaging U12, arbitrary-date models U14. No runtime
 world, scanner knowledge, save or rendering migration is implied.
@@ -622,7 +630,7 @@ The portable universe leaf now owns offline, model-classified single-star
 completion of missing physical quantities, age and partial orbits, with versioned
 proposal/confidence evidence and whole-system physical screens. U08 source limits
 and conflicts reject before inference. See [contract](universe-inference.md) and
-[owning architecture](../client/universe/architecture.md#missing-data-inference--u09-410).
+[owning architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#missing-data-inference--u09-410).
 This does not replace runtime/world state, fit empirical population frequencies,
 prove long-term stability or package the sidecars for production (U12).
 
@@ -635,7 +643,7 @@ populations. Observed source records remain intact. Complete generation recipes
 and partial orbital/stellar sidecars are hashed with the catalog. U11 below owns
 the selected world's full definition/surface query; other worlds' definitions
 remain downstream and U12 owns production batching/packaging. See the
-[builder contract](universe-fiction-builder.md) and [owning architecture](../client/universe/architecture.md#canonical-fiction-synthesis--u10-411).
+[builder contract](universe-fiction-builder.md) and [owning architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#canonical-fiction-synthesis--u10-411).
 Synthetic distribution/storage evidence does not certify a real Milky Way pack
 or playable/native integration.
 
@@ -646,7 +654,7 @@ cohort. `starting_system.rs` owns stable IDs/names, >=30 ly distance proof,
 physical screening, full selected-world parameters, baseline outcrops/arrival
 routes, independent domain digests and a single surface evaluator. See
 [contract](universe-starting-system.md) and
-[owning architecture](../client/universe/architecture.md#permanent-starting-world--u11-412).
+[owning architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md#permanent-starting-world--u11-412).
 U01 recipe references remain unchanged; U12 packages the expanded U11 sidecar.
 The runtime still starts in the compressed prototype. U14 states, U23 LOD and
 U24 arrival/mining integration retain their scopes, with separate native gates.
@@ -656,7 +664,7 @@ U24 arrival/mining integration retain their scopes, with separate native gates.
 Ship's independent `structure` module owns the 3 m Core-rooted sparse graph,
 structural/room/equipment IDs and envelopes, safe removal, damage component
 handoffs, explicit baseline/additional mass and domain schema 1. See the
-[owned boundary](../client/ship/architecture.md#portable-structural-foundation-541).
+[owned boundary](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md#portable-structural-foundation-541).
 Runtime composition, current authored hull/colliders and whole-game schema are
 unchanged. This foundation does not claim player construction or the redesigned
 Scout is playable; #538–#550 retain their integration scopes.
@@ -727,8 +735,8 @@ Runtime domain save adapters preserve the explicit transactional layout; see
 Runtime retains explicit typed domain fields; input owns mutable held state and
 host execution policy is a separate nonserialized value. Initialization, command
 admission, interactions and ordered tick stages have focused owners. The
-[runtime ownership table](../client/runtime/architecture.md#internal-composition-modules)
-and [stage contract](../client/runtime/invariants.md#session-composition-owners-642)
+[runtime ownership table](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#internal-composition-modules)
+and [stage contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/invariants.md#session-composition-owners-642)
 identify the update order and source files. Save/restart/offline publication copies
 host policy and resets held input; schema 23 remains unchanged. No new dynamic
 registry, event bus, dependency cycle or hidden scheduler is introduced.
@@ -740,8 +748,8 @@ Renderer resource ownership and public DTOs remain in its facade. Private
 initialization, surface and frame modules isolate GPU construction, drawable
 resize and ordered submission. Runtime native presentation and contextual
 prompts have focused app owners, while Scout visuals map through the scene
-adapter. See [renderer ownership](../client/renderer/architecture.md#pipeline-and-frame-owners-643)
-and [runtime composition](../client/runtime/architecture.md#native-presentation-composition-643).
+adapter. See [renderer ownership](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/renderer/architecture.md#pipeline-and-frame-owners-643)
+and [runtime composition](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/runtime/architecture.md#native-presentation-composition-643).
 No domain dependency, API, shader layout, draw order or simulation authority changes.
 
 
@@ -1007,7 +1015,7 @@ Offline timed/scanner host #433: [source-order and certified idle-window routing
 Native asynchronous launch #434: [worker/byte-transfer and menu/region authority](universe-offline-propagation.md#native-progress-and-verified-resume-434). Runtime owns progress/admission and protected publication; renderer readiness is observation, never save authority.
 
 
-Current universe integration: [U01–U33 source/test audit](../reports/issue-441/README.md).
+Current universe integration: [U01–U33 source/test audit](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-441/README.md).
 The canonical motion source drives live/closed ship gravity, scanner positions,
 Nacre light/disk, split streaming observer and physical environmental time.
 The generic split-inertial APIs and observed ephemerides retain their explicit

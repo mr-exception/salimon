@@ -1,7 +1,9 @@
 # Validation matrix
 
+> **Current browser scope:** Start with [code-checked implementation and validation routing](current-client-status.md). Native crate, tooling and build sections below are historical; they require the archived revision and do not gate routine 2D work.
+
 Follow the current [issue acceptance policy](acceptance-policy.md) for criterion
-matrices, independent review and current-revision evidence. For documentation-only
+matrices, review in the active chat and current-revision evidence. For documentation-only
 changes, check changed links/paths and semantic consistency; record runtime gates
 as N/A with reasons when runtime behavior is unchanged.
 
@@ -21,7 +23,7 @@ in force for their stated workload/hardware.
 Run commands from the repository root. Use `python3` on macOS/Linux where
 `python` is not available, and `python` on Windows. Native builds require Python
 3.10+, stable Rust 1.89+ with rustfmt/Clippy, locked Cargo dependencies, and the
-[platform build prerequisites](../scripts/BUILDING.md#platform-prerequisites).
+[platform build prerequisites](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/BUILDING.md#platform-prerequisites).
 Use Python 3.12 for tooling checks. Initial installation/builds require network access.
 
 ## Browser radar checks
@@ -30,7 +32,7 @@ For the fresh browser client use Node >=22.18 and `cd client && npm ci && npm te
 
 ## Automatic CI
 
-[Source build](../.github/workflows/native-build.yml) runs one Ubuntu 24.04 job
+[Source build](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/.github/workflows/native-build.yml) runs one Ubuntu 24.04 job
 on pull requests, main pushes and manual dispatch: `cargo build --workspace --locked`
 in the debug profile. It uses Cargo caching, a 15-minute timeout and cancels
 superseded runs for the same PR/branch. The same cached Ubuntu job also runs `cargo test --workspace --locked`, including
@@ -100,8 +102,8 @@ BLENDER=/path/to/blender python -m unittest discover -s models/tests -v
 
 The last command uses POSIX environment assignment; set `BLENDER` in the shell's
 environment on Windows. Blender 4.5 LTS with its bundled glTF exporter is the
-supported authoring prerequisite. See [model tooling](../models/tools/README.md)
-for generic asset export and [scout source](../models/assets/ships/salimon-scout/README.md)
+supported authoring prerequisite. See [model tooling](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/tools/README.md)
+for generic asset export and [scout source](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/assets/ships/salimon-scout/README.md)
 for generated layout ownership. Generic CLI export does not register the ship
 extension. Inspect source/export geometry and applicable native screenshots;
 passing metadata checks alone does not prove visual quality.
@@ -112,7 +114,7 @@ For local verification (also covered nightly), install the pinned local Khronos 
 `python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb`,
 and check candidates with the production CPU importers using
 `SALIMON_GLB_CANDIDATES="$PWD/artifacts/glb" cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored`.
-See [model pipeline setup, reports and disable switch](../models/tools/README.md#offline-glb-compliance-and-cost-pipeline-227).
+See [model pipeline setup, reports and disable switch](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/tools/README.md#offline-glb-compliance-and-cost-pipeline-227).
 These gates prove compliance, budgets, spatial invariants and exact importer data
 parity; native visual fidelity/performance remains a separate verification.
 
@@ -134,13 +136,13 @@ xvfb-run -a -s '-screen 0 1920x1080x24' python scripts/packaged_smoke.py --binar
 Use the actual installed lavapipe ICD filename from
 `/usr/share/vulkan/icd.d/lvp_icd*.json`; do not copy the placeholder. Install
 Xvfb, xauth, xdotool, ImageMagick and Mesa Vulkan plus the desktop libraries
-from the [build prerequisites](../scripts/BUILDING.md#platform-prerequisites). Check `import -window root` capture
+from the [build prerequisites](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/BUILDING.md#platform-prerequisites). Check `import -window root` capture
 works on the test display. Screenshot/capture failures are failures, not skips.
 
 On macOS/Windows use a local graphical desktop, omit Xvfb/Linux backend variables,
 and select the staged executable (`salimon-client.exe` on Windows). Use the
-[runner guide](../scripts/README.md) for platform capture configuration and
-[packaged smoke prerequisites](../scripts/PACKAGED_SMOKE.md) for OS input/capture.
+[runner guide](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/README.md) for platform capture configuration and
+[packaged smoke prerequisites](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/PACKAGED_SMOKE.md) for OS input/capture.
 Nightly verification runs these Linux graphical checks. macOS/Windows graphics
 remain local. Dispatch **Source build** for compilation and portable tests, or **Periodic
 verification** for a nightly/weekly suite; neither adds a PR test gate.
@@ -171,7 +173,7 @@ Retain its failed, skipped or unrun status; issue closure does not change result
 
 ## Fragment profiling (#155)
 
-Use [the benchmark guide](../scripts/FRAGMENT_BENCHMARKS.md) for opt-in 500/1,000
+Use [the benchmark guide](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/FRAGMENT_BENCHMARKS.md) for opt-in 500/1,000
 release matrices and reference-machine settings. CPU-only measurements and
 Linux software Vulkan do not establish native FPS. The ordinary workspace tests
 include large-load conservation/profiler parity/carrying/frame regressions; the
@@ -214,7 +216,7 @@ corpus v2 approval is pending #518; see [periodic CI](periodic-ci.md#current-cor
 `cargo test --workspace --locked` includes the bounded whole-session disk/launch,
 checkpoint worker failure, death/restart and survival scenario contracts. For
 focused iteration: `cargo test -p salimon-client --locked persistence_scenario`.
-The [portable DSL and operation reference](../scenarios/portable/README.md) adds
+The [portable DSL and operation reference](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scenarios/portable/README.md) adds
 checkpoint/reload/continuation actions to existing production protocol requests.
 All paths use isolated temporary storage, never the player's active save.
 
@@ -548,7 +550,7 @@ CI retains candidates and active-PR inventories without failing valid builds on 
 
 ## Integrated Scout and construction acceptance (#551)
 
-The [maintained suite](../scripts/README.md#integrated-scout-and-construction-acceptance-551)
+The [maintained suite](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/README.md#integrated-scout-and-construction-acceptance-551)
 combines production native routes for completed #538–#550 implementations and
 exact 0/50/99% cancellation/refund boundaries. Run runtime construction/offline,
 ship, persistence and workspace checks plus the suite and supplemental machinery
@@ -780,7 +782,7 @@ establish hardware FPS.
 
 ## Combined planetary environment (#628)
 
-Use the [maintained environment matrix](../scripts/README.md#planetary-environment-matrix-628)
+Use the [maintained environment matrix](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/scripts/README.md#planetary-environment-matrix-628)
 for canonical day/night, orbit-to-ground/revisit, positive biological save/harvest,
 personal chart and sound verification plus repeated source exports and production
 GPU/PCM component captures. `planetary-environment` always selects evidence routes.
@@ -808,7 +810,7 @@ Offline timed/scanner #433: `cargo test -p salimon-client --locked session::scan
 Verified native resume #434: `cargo test -p salimon-client --locked launch`, affected runner contracts and the production native routes `scenarios/evidence/offline-resume-progress.json` / `offline-clock-recovery.json` with `--screenshot-command '["native"]'`. Keep controlled-clock fixtures distinct from the real-clock launch test/probe, and retain exact backend/media provenance. [Admission, cancel/restart and publication contract](universe-offline-propagation.md#native-progress-and-verified-resume-434).
 
 
-U36 consistency audit: [matrix and current-model limits](../reports/issue-441/README.md).
+U36 consistency audit: [matrix and current-model limits](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/reports/issue-441/README.md).
 Canonical source, preview, shared sky/light and physical-environment clock
 regressions are included in workspace tests. U34 runs the integrated gates after
 U36 repairs, without creating a dependency from U36 to U34.

@@ -1,5 +1,7 @@
 # Documentation maintenance gate — Universe U35 (#440)
 
+> **Current browser scope:** Start with [code-checked implementation and validation routing](current-client-status.md). Native crate, tooling and build sections below are historical; they require the archived revision and do not gate routine 2D work.
+
 Verification claims and issue closure use the
 [cloud/human workflow](verification-workflow.md). Match recorded evidence to its
 actual context and transfer human criteria explicitly; routine cloud PRs do not
@@ -77,7 +79,7 @@ Missing or contradictory documentation, unresolved local links or an unjustified
 exception requires changes before approval/merge.
 
 [PR template](../.github/PULL_REQUEST_TEMPLATE.md) and
-[Universe issue form](../.github/ISSUE_TEMPLATE/universe-implementation.yml)
+[Universe issue form](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/.github/ISSUE_TEMPLATE/universe-implementation.yml)
 carry this checklist. Existing U01–U34 issues already include the U35 acceptance
 requirement. Authors and reviewers apply this gate now. This PR establishes a
 **review-enforced policy**, not an automatic branch-protection check, approval or
@@ -98,8 +100,8 @@ repository-permission change.
 
 ## Current foundation example
 
-[U01 schema architecture](../client/universe/architecture.md) and
-[invariants](../client/universe/invariants.md) document the delivered isolated
+[U01 schema architecture](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/architecture.md) and
+[invariants](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/universe/invariants.md) document the delivered isolated
 schema, bounded fixture JSON, exact IDs and provenance validation. The
 [technical architecture](technical-architecture.md#canonical-universe-schema-foundation-402)
 and [maintenance map](maintenance-map.md#canonical-universe-schema-402) route its

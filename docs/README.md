@@ -28,6 +28,13 @@ These newer approved narrative contracts supersede historical Earth-start assump
 - [Approved cockpit transitions, multiplayer presence and precise reconnect](cockpit-navigation-and-reconnect.md)
 - [React prototype setup](../client/README.md)
 
+## Backend design (approved future, not implemented)
+
+- [Authoritative NestJS/TypeScript backend, simulation boundaries and networking](backend-architecture.md)
+- [MongoDB durable transactions, strict checkpoint window and crash recovery](backend-persistence-recovery.md)
+
+These are planning contracts only. The current browser prototype is local, not an already-running server-authoritative multiplayer game.
+
 ## Product and gameplay
 
 - [Project Vision](project-vision.md)

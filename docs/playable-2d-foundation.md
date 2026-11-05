@@ -87,7 +87,10 @@ gathering automatically. See [the resource contract](resource-inventory-and-gath
 for the catalog, transaction and interruption details. The multi-inventory
 ledger foundation (#783) preserves this journey and mining behavior; schema v4
 enables the identified 50 kg Scout Resource Container domain (#784), with
-its playable E/Use deposit/withdraw panel (#785). Existing v1/v2/v3 saves migrate losslessly under the same key.
+its playable E/Use deposit/withdraw panel (#785). Schema v5 adds trusted count-item definitions and exact atomic add/remove (#786),
+with count/mass/shared-slot presentation in Field inventory. The production item
+catalog remains empty pending approved content. Existing v1/v2/v3/v4 saves migrate
+losslessly under the same key.
 
 **Unsupported future features:** loot/machine transfers; actual Core power; Fabricator recipes or
 production; multiplayer/backend authority and reconnect; ship damage/destruction;

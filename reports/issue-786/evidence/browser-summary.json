@@ -1,0 +1,285 @@
+{
+  "stats": {
+    "startTime": "2026-11-05T17:50:20.920Z",
+    "duration": 553779.083,
+    "expected": 39,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "file": "cockpit.spec.ts",
+      "title": "COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 65131
+    },
+    {
+      "file": "gathering.spec.ts",
+      "title": "GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 23821
+    },
+    {
+      "file": "gathering.spec.ts",
+      "title": "GATHER-2 biological weight cap, movement interruption and competing browser tab",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 8049
+    },
+    {
+      "file": "items.spec.ts",
+      "title": "ITEM-1\u20136 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 18790
+    },
+    {
+      "file": "items.spec.ts",
+      "title": "ordinary built game has no item fixture, grants or query backdoor",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 699
+    },
+    {
+      "file": "playable-slice.spec.ts",
+      "title": "SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 70925
+    },
+    {
+      "file": "storage.spec.ts",
+      "title": "STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 39963
+    },
+    {
+      "file": "storage.spec.ts",
+      "title": "STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport",
+      "project": "cockpit",
+      "status": "passed",
+      "durationMs": 4084
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures",
+      "project": "top-down",
+      "status": "passed",
+      "durationMs": 1885
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly",
+      "project": "top-down",
+      "status": "passed",
+      "durationMs": 1444
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene",
+      "project": "top-down",
+      "status": "passed",
+      "durationMs": 4019
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-5 explicit built radar entry retains standalone navigation",
+      "project": "top-down",
+      "status": "passed",
+      "durationMs": 795
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway",
+      "project": "top-down",
+      "status": "passed",
+      "durationMs": 2694
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "PLANET-1 fixed outdoor journey, source footprints and repeat screenshots",
+      "project": "top-down",
+      "status": "passed",
+      "durationMs": 23235
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world",
+      "project": "top-down",
+      "status": "passed",
+      "durationMs": 63349
+    },
+    {
+      "file": "navigation-captures.spec.ts",
+      "title": "VIS-1/2 eight navigation screens match reference pixels",
+      "project": "navigation-captures",
+      "status": "passed",
+      "durationMs": 17020
+    },
+    {
+      "file": "deterministic.spec.ts",
+      "title": "NAV-1 seeded replay: exact WASD direction, release and wheel zoom",
+      "project": "deterministic",
+      "status": "passed",
+      "durationMs": 12538
+    },
+    {
+      "file": "deterministic.spec.ts",
+      "title": "NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan",
+      "project": "deterministic",
+      "status": "passed",
+      "durationMs": 20907
+    },
+    {
+      "file": "deterministic.spec.ts",
+      "title": "NAV-3 heading and velocity retain approved colors and viewport edges",
+      "project": "deterministic",
+      "status": "passed",
+      "durationMs": 3296
+    },
+    {
+      "file": "deterministic.spec.ts",
+      "title": "NAV-4 read-only fixture observers return detached state; production has no hooks",
+      "project": "deterministic",
+      "status": "passed",
+      "durationMs": 1968
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "scanner pulse, camera independence, clipping selection and manual alignment interruption",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 13182
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "WASD pans without changing ship state and key release stops movement",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 9461
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "camera keys release on focus, blur, visibility and resize",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 9778
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "wheel zoom bounds and removed desktop controls survive view changes",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 5665
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "Help has keyboard focus containment, accurate bindings and Escape/close return focus",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 3502
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "right-drag pointer release outside canvas ends pan and ship controls release on blur",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 7699
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "zero throttle coasts while ship rotates; focused slider keeps native keyboard input",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 4748
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "production App contact fixture: warning",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 2133
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "production App contact fixture: destroyed",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 2544
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "production App contact fixture: safe",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 3083
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "production App contact fixture: asteroid",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 3393
+    },
+    {
+      "file": "desktop.spec.ts",
+      "title": "dense groups and accessible contact picker keep all IDs with bounded DOM",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 9477
+    },
+    {
+      "file": "edges.spec.ts",
+      "title": "ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 26357
+    },
+    {
+      "file": "edges.spec.ts",
+      "title": "ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 9812
+    },
+    {
+      "file": "edges.spec.ts",
+      "title": "off-screen contacts stay in picker after pulse and selection still expires with scanner range",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 11401
+    },
+    {
+      "file": "panning.spec.ts",
+      "title": "continuous keyboard pan renders scanned bodies at their current projection on every frame",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 7394
+    },
+    {
+      "file": "panning.spec.ts",
+      "title": "continuous mouse pan renders scanned bodies at their current projection on every frame",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 7583
+    },
+    {
+      "file": "visuals.spec.ts",
+      "title": "faceted navigation proxies render at readable sizes without a rectangular surface",
+      "project": "desktop",
+      "status": "passed",
+      "durationMs": 16316
+    },
+    {
+      "file": "production.spec.ts",
+      "title": "built production bundle renders WebGL, scanner and labelled controls",
+      "project": "production",
+      "status": "passed",
+      "durationMs": 7053
+    }
+  ]
+}

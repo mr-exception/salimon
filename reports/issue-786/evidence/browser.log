@@ -1,0 +1,64 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:1717) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1749) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 39 tests using 1 worker
+
+(node:1761) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (1.1m)
+  ✓   2 [cockpit] › tests/gathering.spec.ts:6:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (23.8s)
+  ✓   3 [cockpit] › tests/gathering.spec.ts:74:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (8.0s)
+  ✓   4 [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice (18.8s)
+  ✓   5 [cockpit] › tests/items.spec.ts:60:1 › ordinary built game has no item fixture, grants or query backdoor (699ms)
+  ✓   6 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (1.2m)
+  ✓   7 [cockpit] › tests/storage.spec.ts:12:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (40.0s)
+  ✓   8 [cockpit] › tests/storage.spec.ts:104:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.1s)
+(node:2204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (1.9s)
+  ✓  10 [top-down] › tests/top-down.spec.ts:76:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (1.4s)
+  ✓  11 [top-down] › tests/top-down.spec.ts:101:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (4.0s)
+  ✓  12 [top-down] › tests/top-down.spec.ts:140:1 › TD-5 explicit built radar entry retains standalone navigation (795ms)
+  ✓  13 [top-down] › tests/top-down.spec.ts:154:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (2.7s)
+  ✓  14 [top-down] › tests/top-down.spec.ts:202:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (23.2s)
+  ✓  15 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.1m)
+(node:2455) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (17.0s)
+(node:2538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (12.5s)
+  ✓  18 [deterministic] › tests/deterministic.spec.ts:42:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (20.9s)
+  ✓  19 [deterministic] › tests/deterministic.spec.ts:82:1 › NAV-3 heading and velocity retain approved colors and viewport edges (3.3s)
+  ✓  20 [deterministic] › tests/deterministic.spec.ts:99:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (2.0s)
+(node:2664) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  21 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (13.2s)
+  ✓  22 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (9.5s)
+  ✓  23 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (9.8s)
+  ✓  24 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (5.7s)
+  ✓  25 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (3.5s)
+  ✓  26 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (7.7s)
+  ✓  27 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (4.7s)
+  ✓  28 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (2.1s)
+  ✓  29 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (2.5s)
+  ✓  30 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (3.1s)
+  ✓  31 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (3.4s)
+  ✓  32 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (9.5s)
+  ✓  33 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (26.4s)
+  ✓  34 [desktop] › tests/edges.spec.ts:50:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (9.8s)
+  ✓  35 [desktop] › tests/edges.spec.ts:68:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (11.4s)
+  ✓  36 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (7.4s)
+  ✓  37 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (7.6s)
+  ✓  38 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (16.3s)
+(node:3057) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  39 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (7.1s)
+
+  39 passed (9.2m)

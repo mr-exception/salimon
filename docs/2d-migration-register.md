@@ -21,7 +21,7 @@
 | Physical suits, hazards and upgrades | Future **tierless** basic suit with two module slots, drawer tiers **4/8/12**, module-store tiers **12/16/24**, **200 HP** character health, independent exposure and **1,000 HP** absorption per module. Exact gear masses/recipes remain TBD. |
 | Native localized room/module hull damage | Current 2D design uses **ship-wide damage or total ship destruction**. Partial-room destruction and detached compartment logic deferred; offline death only after authoritative whole-ship loss. |
 | Native Gaia, terrain, gravity, streaming | Retain reproducible canonical data, IDs and physics as future port inputs; authoritative overhead surface sprites/colliders and cockpit radar proxies need independent browser/backend integration. |
-| Native whole-session save or network state | Browser-local `ResourceSession` **v3** gram ledger (after #783) is **not** native schema 29+, multiplayer authority or cloud sync. |
+| Native whole-session save or network state | Browser-local `ResourceSession` **v4** gram ledger (after #783/#784) is **not** native schema 29+, multiplayer authority or cloud sync. |
 | Rust QA and native screenshot evidence | Historical; use Node/TypeScript and real browser Playwright capture for new feature delivery. Native hardware signoff is not a default browser blocker. |
 
 ## Development sequence (not a new gameplay approval)

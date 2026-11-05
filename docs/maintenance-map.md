@@ -12,10 +12,13 @@ and reach by `topDownInteraction.ts`, doorway ownership/location snapshots by
 `topDownTraversal.ts`, Scout anchors/footprints by `scoutLayout.ts`,
 fixed site/source identity and outdoor spawn by `planetarySite.ts`,
 local cockpit occupancy/power/control by `cockpit.ts`,
+whole-litre/gram resource arithmetic by `resourceInventory.ts`, gathering/save
+transactions and payload by `resourceSession.ts`,
 original illustration authoring by `TopDownIllustration.tsx`, fixed-resolution
 sprite caching by `topDownSprites.tsx`, and SVG/input/gameplay composition by
 `TopDownView.tsx`. Tests live in `topDown.test.ts`,
 `planetarySite.test.ts`, `topDownTraversal.test.ts`, `cockpit.test.ts`,
+`resourceInventory.test.ts`, `resourceSession.test.ts`, `tests/gathering.spec.ts`,
 `tests/top-down.spec.ts` and `tests/cockpit.spec.ts`. See the client guide for fixture boundaries.
 The crate map below describes the removed native architecture at historical revisions.
 

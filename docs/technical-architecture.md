@@ -42,6 +42,19 @@ contracts, not a claim of migrated native gameplay. The
 
 ## Implemented architecture
 
+### Browser resource gathering (#757)
+
+`resourceInventory.ts` owns exact litre/gram arithmetic and independent capacities.
+`resourceSession.ts` composes the existing world interaction/tick path, a versioned
+sample density/source catalog, atomic inventory/depletion/location saves, validated
+restore and derived player/ship resource payload. `TopDownView.tsx` owns tool/UI
+actions and the exclusive browser save lock. Resource state never enters the
+SVG art or collision owners. Unit/integration coverage is in
+`resourceInventory.test.ts`/`resourceSession.test.ts`; `tests/gathering.spec.ts`
+drives the built production entry and retains repeat screenshots in existing CI.
+See [the resource contract](resource-inventory-and-gathering.md) for save/failure
+semantics and unsupported machine/server features.
+
 Salimon uses a custom Rust runtime with low-level `winit` and `wgpu`, without a
 full game engine. The current prototype extends the Phase 0 baseline and remains native and
 client-only. Local build scripts stage macOS, Windows and Debian-based Linux

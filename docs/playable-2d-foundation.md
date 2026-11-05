@@ -67,24 +67,30 @@ measurements, visual-review verdict and limitations live in the
 implementing agent in the active chat, with actual browser evidence; no separate
 reviewer or independent execution is claimed.
 
-## Reuse boundary for mining #757
+## Shared foundation used by gathering #757
 
-| Need | Existing owner / integration surface | Remaining mining work |
+| Need | Existing owner / integration surface | Gathering integration |
 | --- | --- | --- |
-| Player movement, collisions and camera | `topDownRuntime.ts`, `topDownInteraction.ts`, `TopDownView.tsx` | Reuse the same world and input adapter |
-| Stable source identity | `planetarySite.ts`: `source:landing:mineral:01` and `source:landing:biology:01`, `site:illustrated-landing:v1` | Connect quantities, density catalog/version and depletion |
-| Source selection and interaction | `requestInteraction` / `cancelInteraction`, reach tests, stable target ID | Add gathering actions, capacity/success feedback and cancellation semantics |
-| Exact spatial locations | `capturePlayerLocation` / `copyPlayerLocation` retain split cells, offsets, facing and frame | Serialize/validate/restore authoritative durable saves; snapshots are currently in-memory only |
-| Ship-local / planet-fixed continuity | `crossScoutEntry`, `convertAnchor`; cockpit seat stays ship-local | Preserve these frames during gathering/save integration |
+| Player movement, collisions and camera | `topDownRuntime.ts`, `topDownInteraction.ts`, `TopDownView.tsx` | Same world and input adapter |
+| Stable source identity | `planetarySite.ts`: `source:landing:mineral:01` and `source:landing:biology:01`, `site:illustrated-landing:v1` | Versioned quantities, densities and depletion in `resourceSession.ts` |
+| Source selection and interaction | `requestInteraction` / `cancelInteraction`, reach tests, stable target ID | Tool action with capacity/success feedback and interruption semantics |
+| Exact spatial locations | `capturePlayerLocation` / `copyPlayerLocation` retain split cells, offsets, facing and frame | Validated durable local save envelope; atomic with inventory/depletion |
+| Ship-local / planet-fixed continuity | `crossScoutEntry`, `convertAnchor`; cockpit seat stays ship-local | Existing frame handoff preserved, payload counted once aboard |
 
-**Unsupported future features:** mining/harvesting extraction, source depletion,
-loot/transfer and persistent inventory; actual Core power; Fabricator recipes or
+**Gathering (#757):** Equip the gathering tool in Field inventory, approach either
+source and use **E / Gather**. It collects 1 whole L/s directly into the player's
+independent 10 kg / 10 L inventory. Movement, Escape or stowing the tool stops it;
+unfinished litre progress is discarded. Weight/volume limits and remaining source
+litres are shown separately. Completed transfers, source depletion, capacities
+and frame-relative locations save together in this browser; reload never resumes
+gathering automatically. See [the resource contract](resource-inventory-and-gathering.md)
+for the catalog, transaction and interruption details.
+
+**Unsupported future features:** ship storage/loot transfers; actual Core power; Fabricator recipes or
 production; multiplayer/backend authority and reconnect; ship damage/destruction;
 full planetary generation. Visible machine/storage objects are inspection
-placeholders. The pure resource domain is not wired to the world: #757 must
-update its old integer-kg model to whole litres with integer grams/L, enforce
-independent 10 kg / 10 L limits, and implement durable nonduplicating transactions.
-No new independent game runtime is needed or approved by this slice.
+placeholders. Gathering reuses this same world and resource-source IDs, with
+integer grams/L and atomic local persistence; no independent scene was added.
 
 The sample radar's ship simulation runs continuously, but its illustrative flight
 does not relocate the authored landed 2D ship. Synthetic desktop input and

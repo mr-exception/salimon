@@ -1,0 +1,20 @@
+✔ production world interaction commits exactly one whole litre per 60 ticks (12.843389ms)
+✔ weight and volume limits independently stop actual gathering and preserve remainder (70.191046ms)
+✔ mixed fractional-kg resources debit exact litres, never round masses (31.152287ms)
+✔ movement, tool stow, cancel, range loss and cockpit interruption discard partial progress (16.31047ms)
+✔ reload and repeated interactions cannot resume an unfinished litre or reset depletion (12.759575ms)
+✔ failed atomic replacement publishes neither inventory credit nor source debit (8.541882ms)
+✔ stale writers fail closed rather than replace newer depletion or reset a save (7.17511ms)
+✔ valid save restores upgraded independent capacities and precise ship-local standing location (5.029404ms)
+✔ cockpit save returns beside the chair and preserves payload without restoring radar or active work (5.074801ms)
+✔ resource payload contributes once to ship mass only while aboard (5.185905ms)
+✔ malformed, incompatible, duplicated, fractional and colliding saves preserve original bytes and block writes (11.194093ms)
+✔ source exhaustion with future capacity upgrade retains IDs, colliders and exact source totals (108.540706ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 306.642382

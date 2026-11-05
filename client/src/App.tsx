@@ -140,7 +140,7 @@ export function App({navigation,onSceneReady}:{navigation?:NavigationRuntime;onS
     <aside>
       <h1>NAVIGATION</h1><p className="muted">Navigation-only prototype · unlimited energy</p>
       <p className="scan-status" role="status" aria-live="polite">{paused?'Navigation paused while hidden':pulse===0?'Scanner: awaiting first five-second pulse':`Scanner pulse ${pulse}: ${contacts.length} temporary contacts`}</p>
-      <div className="stat"><span>Total ship mass</span><strong>{fmt(pose.massKg)} kg</strong></div>
+      <div className="stat"><span>Total ship mass</span><strong>{pose.massKg.toLocaleString(undefined, { maximumFractionDigits: 3 })} kg</strong></div>
       <div className="stat"><span>Relative position</span><strong>{pose.position.offsetM.map(fmt).join(' / ')} m (cell local)</strong></div>
       <div className="stat"><span>Speed (sample inertial frame)</span><strong>{fmt(length(pose.velocityMps))} m/s</strong></div>
       <div className="stat"><span>Yaw / pitch</span><strong>{radians(pose.yaw)}° / {radians(pose.pitch)}°</strong></div>

@@ -1,0 +1,26 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts
+
+✔ scripts/visual-comparison.test.ts (228.181847ms)
+✔ src/cockpit.test.ts (163.043729ms)
+✔ src/contact.test.ts (139.294648ms)
+✔ src/input.test.ts (118.268549ms)
+✔ src/navigationVisuals.test.ts (170.992938ms)
+✔ src/planetarySite.test.ts (130.362294ms)
+✔ src/radar.test.ts (135.805103ms)
+✔ src/resourceInventory.test.ts (126.17095ms)
+✔ src/resourceSession.test.ts (449.182249ms)
+✔ src/scanner.test.ts (253.7682ms)
+✔ src/simulation.test.ts (125.483557ms)
+✔ src/topDown.test.ts (368.701524ms)
+✔ src/topDownTraversal.test.ts (211.847565ms)
+✔ src/vectorGuides.test.ts (163.603142ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2806.256263

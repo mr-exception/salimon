@@ -26,3 +26,23 @@
 .top-down-eyebrow { line-height: 16px; }
 .top-down-interaction p { line-height: 18px; }
 .top-down-app footer p { line-height: 18px; }
+
+.resource-hud { position:absolute; top:14px; right:14px; width:210px; box-sizing:border-box; padding:14px; background:#233437ed; border:1px solid #496062; border-radius:6px; font-size:12px; line-height:18px }
+.resource-hud h2 { font-size:13px; font-weight:500; margin:0 0 10px; color:#bce9df }
+.resource-hud p { margin:4px 0 }
+.resource-hud ul { list-style:none; margin:10px 0; padding:0 }
+.resource-hud li { display:flex; justify-content:space-between; gap:8px }
+.resource-hud button { width:100%; padding:8px; border:1px solid #87b7b8; border-radius:4px; color:#e4e7d6; background:#314e52; cursor:pointer }
+.resource-hud button:disabled { opacity:.5; cursor:default }
+.resource-hud button:focus-visible { outline:2px solid #bce9df; outline-offset:3px }
+.resource-hud .resource-note { font-size:10px; line-height:14px; color:#b7c2bc; margin-top:8px }
+.resource-hud progress { width:100%; height:6px; accent-color:#bce9df }
+.top-down-scene [data-depleted] { opacity:.4 }
+@media(max-width:700px) {
+  .top-down-stage { flex:none; min-height:0; display:flex; flex-direction:column }
+  .top-down-scene { position:relative; inset:auto; height:360px; min-height:360px; flex:none }
+  .resource-hud { position:static; width:100%; border-radius:0 }
+  .resource-hud ul { display:flex; gap:16px }
+  .resource-hud button { width:auto }
+  .top-down-caption { position:static; gap:12px }
+}

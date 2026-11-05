@@ -1,0 +1,17 @@
+✔ starter has 10 kg and 10 L independent limits (1.754998ms)
+✔ mass limits mining; only accepted amount leaves the source (0.25648ms)
+✔ volume limits harvesting even when weight is available (0.162991ms)
+✔ mixed materials are limited by both dimensions (0.27766ms)
+✔ zero requests, exhausted sources and insufficient space do not duplicate materials (0.146447ms)
+✔ exact debit and upgrade preserve independently validated capacities (0.416316ms)
+✔ reject invalid, fractional, unknown, zero-weight and overflowing quantities (0.327905ms)
+✔ repeated extraction conserves whole litres (0.137123ms)
+✔ gram precision remains exact at a sub-kilogram density and partial final collection (0.402156ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12.483867

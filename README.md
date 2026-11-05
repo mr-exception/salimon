@@ -19,6 +19,13 @@ Browser ship motion, scanner and simplified contacts are implemented; the sample
 catalog is illustrative and energy is unlimited. The text below preserves the
 historical native architecture and does not describe migrated browser gameplay.
 
+The current 2D world also supports player gathering: **Equip gathering tool**,
+approach a mineral outcrop or plate colony, then **E / Gather** for 1 whole L/s.
+Weight (10 kg) and volume (10 L) limits apply independently. Completed transfers,
+source depletion and player location save locally in this browser. See the
+[resource guide](docs/resource-inventory-and-gathering.md) for controls, interruptions
+and save behavior. Ship processing and multiplayer remain future work.
+
 ## Run the browser client with Docker
 
 Requires **Docker Engine/Desktop with Docker Compose v2**. From the repository

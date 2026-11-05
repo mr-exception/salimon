@@ -7,7 +7,7 @@ Schema v4 adds lossless v3 missing-container migration alongside v1/v2 migration
 current missing/corrupt stores fail closed. No UI or container slot cap is added.
 
 Base: `main` at `cf46092` (merged #783/#790); no active PR stack existed.
-Tested runtime/source commit: `05b4273659368c9d035c0afc0c58437e0c2a876c`.
+Tested gram-domain source commit: `05b4273659368c9d035c0afc0c58437e0c2a876c`.
 Final head/base and current-head CI are bound in the publication review comment.
 Later documentation/report edits leave the hashed source/test/config inputs unchanged.
 
@@ -88,3 +88,27 @@ by the final stack review comment, which binds new parent/head and CI.
 The complete unique-diff check also found trailing spaces in two preserved
 initial-timeout log lines. Trimmed whitespace only; failure text/data are retained.
 Final source hashes remain unchanged.
+
+## Required visual regression repair and re-review
+
+Final-head CI 42033304505 passed all four world/cockpit/gathering scenarios but
+failed the existing TD-1 byte-equality gate. Both PRs reproduced exactly eight
+changed pixels in the bottom-left rounded caption corner; originals, exact RGB
+deltas and failed CI output are retained under `failures/ci-42033304505`.
+A passing local parent control was insufficient to waive this observed failure.
+
+The translucent caption now has its own 7 px inner bottom curve, matching the
+stage's 8 px radius minus 1 px border. This removes compositor-dependent blending
+without changing the frame/art, thresholds, masks or approved references. Eight
+replay probes were byte-identical with this alignment, while the unmodified
+control varied. The existing unmodified TD-1 test passed **3/3 fresh repeats**
+(30.1 s); originals and results are under `clip-browser`. New build/typecheck
+passed (`clip-build.log`). The tested renderer change is `ee96f02`; all gram
+domain/test inputs remain unchanged, justifying unit reuse. Final source hashes
+include the CSS change; full new-head CI remains mandatory. Visual qualification
+is now applicable to this small shared-view repair, with TD-1 originals and
+current-head full browser/negative/repeat checks; new-widget/hardware remain N/A.
+
+Previous exact-head acceptance is superseded pending fresh CI and final active-chat
+review. This repair is needed for the named issue's existing mandatory screenshot
+gate; no extra task is counted and no rendering failure is dismissed as flaky.

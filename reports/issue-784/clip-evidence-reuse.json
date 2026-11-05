@@ -1,0 +1,9 @@
+{
+  "domainSource": "05b4273659368c9d035c0afc0c58437e0c2a876c",
+  "renderSource": "ee96f02fc5bb86403f6b2540692d9075c08c3043",
+  "changedInputs": [
+    "client/src/topDown.css"
+  ],
+  "unitReuse": "all gram/domain/test inputs unchanged; CSS not consumed by Node",
+  "browser": "new TD-1 repeated three times; full current-head CI required"
+}

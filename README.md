@@ -19,6 +19,35 @@ Browser ship motion, scanner and simplified contacts are implemented; the sample
 catalog is illustrative and energy is unlimited. The text below preserves the
 historical native architecture and does not describe migrated browser gameplay.
 
+## Run the browser client with Docker
+
+Requires **Docker Engine/Desktop with Docker Compose v2**. From the repository
+root, build the React/Vite client and serve its production static files through
+Nginx:
+
+```sh
+docker compose up --build -d
+```
+
+Open **http://localhost:8080**. The host port defaults to `8080`; to use
+another port (for example, `3000`):
+
+```sh
+SALIMON_PORT=3000 docker compose up --build -d
+```
+
+Check server output with `docker compose logs -f client`. Stop the service
+with `docker compose down`. Repeat `docker compose up --build -d` after making
+client changes to rebuild the production bundle.
+
+The root [`docker-compose.yml`](docker-compose.yml) builds
+[`docker/Dockerfile`](docker/Dockerfile) with `client/package-lock.json`, then
+serves the resulting `client/dist/` from Nginx on container port `80`.
+The runtime container does not run Node/Vite, does not hot-reload source and
+does not include a game backend. For live development, use the Node commands
+above. `docker/nginx.conf` supports client-side routes and returns 404 for
+missing compiled assets.
+
 ## Historical native reference
 
 Salimon is a space exploration game built around a custom Rust runtime. The

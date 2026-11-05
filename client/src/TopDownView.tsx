@@ -34,7 +34,7 @@ function Illustration({ appearance, footprint }: { appearance: Appearance; footp
 // Presentation receives immutable scene state. It has no radar or Three imports.
 export function TopDownScene({ state }: { state: TopDownState }) {
   const items = drawList(state)
-  return <svg className="top-down-scene" viewBox="-600 -320 1200 640" shapeRendering="geometricPrecision" role="img" aria-label="Strict overhead Scout and planetary test site" data-tick={state.tick}>
+  return <svg className="top-down-scene" viewBox="-600 -320 1200 640" shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label="Strict overhead Scout and planetary test site" data-tick={state.tick}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {items.filter(item => item.entity.layer === layer).map(({ entity, positionM: [x, y], angle }) =>
         <g key={entity.id} data-entity={entity.id} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>

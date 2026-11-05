@@ -43,8 +43,8 @@ Use meters and seconds (and explicit SI mass/volume) in contracts. Name scalar
 values with their unit when ambiguous and document world, body-local, ship-local
 or camera-relative frames on vectors/transforms. CPU absolute positions stay
 `f64`; subtract camera origin in `f64` before GPU `f32` conversion. Follow the
-[coordinate contract](../client/world/coordinate-strategy.md) and
-[asset axes](../models/contracts.md), including Blender/runtime conversion.
+[coordinate contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/coordinate-strategy.md) and
+[asset axes](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/contracts.md), including Blender/runtime conversion.
 
 Use `salimon-math` for compatible `f64` component arithmetic in migrated
 consumers. Keep domain normalization thresholds/fallbacks and frame conversion
@@ -103,8 +103,8 @@ Do not hand-edit generated GLB/glTF/bin, export reports, spatial sidecars or
 `client/character/src/spatial_contracts.rs`. For the scout use
 `python models/assets/ships/salimon-scout/export.py --blender /path/to/blender`,
 then its validator; generic asset CLI commands do not register the scout adapter.
-See [authoring](../models/authoring.md) and
-[scout source/regeneration](../client/assets/ship/README.md#source-and-regeneration).
+See [authoring](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/authoring.md) and
+[scout source/regeneration](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/assets/ship/README.md#source-and-regeneration).
 Commit source, deliberate contract changes, exports, generated layouts and
 consumer/tests/docs together. Blender is optional for normal runtime builds.
 

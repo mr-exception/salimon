@@ -1,0 +1,51 @@
+[WebServer] (node:5277) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5308) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:5320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (1.2m)
+
+
+  1) [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return 
+
+    Error: slice-exterior-cutaway
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      33 |           await info.attach(`${name}-repeat.json`, { body: JSON.stringify({ pass: r.pass, changedPixels: r.changedPixels, rawChangedPixels: r.rawChangedPixels, policy: POLICY }), contentType: 'application/json' })
+      34 |           await info.attach(`${name}-diff.png`, { body: r.diff, contentType: 'image/png' })
+    > 35 |           expect(r.pass, name).toBe(true)
+         |                                ^
+      36 |         }
+      37 |       }
+      38 |       await capture('slice-outdoor-spawn')
+        at capture (/workspace/salimon/client/tests/playable-slice.spec.ts:35:32)
+        at /workspace/salimon/client/tests/playable-slice.spec.ts:60:7
+
+    attachment #15: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../../tmp/767-fresh-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #16: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../../tmp/767-fresh-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/767-fresh-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/error-context.md
+
+    attachment #18: trace (application/zip) ────────────────────────────────────────────────────────
+    ../../../tmp/767-fresh-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/767-fresh-browser/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return 

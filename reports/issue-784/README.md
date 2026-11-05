@@ -84,3 +84,7 @@ All runtime/test/asset/config/lockfile hashes remain equal to source-hashes.json
 existing local evidence is reused. Link/diff checks are repeated and current-head
 CI reruns before final acceptance. The previous exact-head acceptance is superseded
 by the final stack review comment, which binds new parent/head and CI.
+
+The complete unique-diff check also found trailing spaces in two preserved
+initial-timeout log lines. Trimmed whitespace only; failure text/data are retained.
+Final source hashes remain unchanged.

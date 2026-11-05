@@ -13,6 +13,7 @@ async function boot(page: Page, view = 'interior') {
   // Lazy development module can resolve under React's delayed Suspense commit.
   await expect.poll(async () => { await page.clock.runFor(50); return scene(page).count() }).toBe(1)
   await expect(scene(page)).toBeVisible()
+  await expect.poll(async () => { await page.clock.runFor(50); return scene(page).getAttribute('data-render-ready') }).toBe('true')
   await page.evaluate(() => document.fonts.ready)
   await page.clock.runFor(32)
 }
@@ -28,6 +29,8 @@ test('TD-1/4 one scene, stable layers, visible interior and identical fresh-run 
     await expect(page.locator('[data-entity="ship:scout"]')).toHaveCount(1)
     await expect(page.locator('[data-entity="person:player"]')).toHaveAttribute('data-frame', 'ship:scout')
     expect(await scene(page).locator('[data-entity]').count()).toBeGreaterThan(10)
+    const box = (await scene(page).boundingBox())!
+    for (const value of [box.x, box.y, box.width, box.height]) expect(value).toBe(Math.round(value))
     const original = await scene(page).screenshot({ path: info.outputPath(`top-down-baseline-${replay}.png`), animations: 'allow' })
     captures.push(original)
     const png = PNG.sync.read(original), counts = { floor: 0, player: 0, rocks: 0 }
@@ -185,7 +188,7 @@ test('SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway', as
 // Hold actual keyboard input for an exact observed number of fixed steps.
 // Read-only tick observations control time, never gameplay state or rendering.
 async function walkTicks(page: Page, key: string | string[], ticks: number) {
-  const tick = async () => Number(await scene(page).getAttribute('data-tick'))
+  const tick = async () => Number(await page.locator('main').getAttribute('data-tick'))
   const target = await tick() + ticks
   const keys = typeof key === 'string' ? [key] : key
   for (const code of keys) await page.keyboard.down(code)
@@ -215,7 +218,7 @@ test('PLANET-1 fixed outdoor journey, source footprints and repeat screenshots',
       const capture = async (name: string) => {
         await page.clock.runFor(5000)
         const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
-        await info.attach(`${name}-${replay}.json`, { body: JSON.stringify({ position: await position(page), tick: await scene(page).getAttribute('data-tick'), ground: await transform(page, 'terrain:site'), player: await transform(page, 'person:player'), viewport: page.viewportSize(), sceneBounds: await scene(page).boundingBox() }), contentType: 'application/json' })
+        await info.attach(`${name}-${replay}.json`, { body: JSON.stringify({ position: await position(page), tick: await page.locator('main').getAttribute('data-tick'), ground: await transform(page, 'terrain:site'), player: await transform(page, 'person:player'), viewport: page.viewportSize(), sceneBounds: await scene(page).boundingBox() }), contentType: 'application/json' })
         if (replay === 0) captures[name] = png
         else {
           const comparison = compareImages(captures[name]!, png)

@@ -1,33 +1,42 @@
 # Technical architecture and AI maintenance
 
-## Active browser navigation
+## Active browser world and navigation
 
-Current `main` ships the [navigation-only browser client](radar-navigation-prototype.md).
+The default browser `/` starts outside the Scout in one continuous 2D world.
+The cockpit opens the independently reusable [radar](radar-navigation-prototype.md).
 `coordinates.ts` owns split positions; `simulation.ts` owns deterministic SI ship
 transitions; `contact.ts` owns conservative sphere contact and observations;
-`scanner.ts` owns the spatial catalog index and temporary detection;
-`navigationRuntime.ts` composes them per fixed step. React/App owns lifecycle and
-input mapping through `input.ts`, and Three/R3F owns camera and radar presentation.
-No React or GPU type enters the simulation. Test and build instructions are in
-[the client guide](../client/README.md). The native sections below are historical
-contracts, not a claim that their gameplay has been migrated.
+`scanner.ts` owns catalog indexing and temporary detection; `navigationRuntime.ts`
+composes them. `TopDownView.tsx` retains the world and runtime while `App.tsx`
+mounts radar presentation. Ship simulation continues in either view. Three/R3F
+owns only radar presentation; no React/GPU type enters the simulation.
 
-[Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
+`topDownFrames.ts` owns planet-fixed/ship-local anchor conversion and abstract
+poses, avoiding astronomical Number cancellation. `topDownRuntime.ts` owns stable
+IDs, fixed-step walking/facing, camera follow and layered draw lists.
+`topDownTraversal.ts` owns doorway handoff and detached exact location snapshots.
+`topDownInteraction.ts` owns swept collision and stable-ID nearby selection/reach;
+entity-local footprints match the artwork. `cockpit.ts` owns local owner control,
+one-chair reservation and power/view transitions. Other interactions inspect
+placeholders; no Core, Fabricator, mining, server or durable save is claimed.
 
-## Top-down browser foundation (#761)
+`TopDownIllustration.tsx` retains the authored illustrated SVG shapes.
+`topDownSprites.tsx` rasterizes them once at fixed density into cached PNG blob
+references; camera/pose/view changes reuse those assets rather than rerasterizing
+vector edges at changing subpixel transforms. `TopDownView.tsx` composes them in
+the same SVG layer/coordinate adapter. Assets have padded art bounds, independent
+of collision and gameplay anchors. Initialization exposes renderer readiness;
+read-only simulation ticks live on the main observation element. Action traces,
+original captures and explicit state JSON retain evidence without repeatedly
+serializing immutable image assets into DOM snapshots. No screenshot threshold,
+mask or approved navigation reference changes.
 
-The development entry `/?scene=top-down` adds one strict overhead world beside
-independently reusable navigation. `client/src/topDownFrames.ts` owns split
-planet-fixed/ship-local anchor conversion, common-planet camera differences and
-abstract poses; `topDownRuntime.ts` owns stable entity IDs, immutable state,
-fixed-step walking/facing, smoothed follow-camera and layered draw lists.
-`topDownInteraction.ts` owns frame-aware swept collision and stable-ID nearby
-selection/reach. Entity-local footprints drive visible wall/door/crate geometry;
-request/cancel state exposes test inspections without Core or radar effects. `TopDownView.tsx` maps
-these lists to SVG and desktop input without importing Three or radar state.
-Planet universe poses are independent of local drawing, avoiding astronomical
-Number cancellation. No automatic frame transfer or cockpit transition is
-implemented. See [usage and boundaries](../client/README.md#top-down-foundation-761).
+The isolated development inspection fixture remains `/?scene=top-down`;
+`/?scene=radar` runs standalone navigation. The sample radar's flight does not
+relocate the authored landed 2D ship. See [the client guide](../client/README.md)
+for controls, fixtures and cloud checks. The native sections below are historical
+contracts, not a claim of migrated native gameplay. The
+[architecture baseline](architecture-baseline.md) records historical priorities.
 
 ## Implemented architecture
 

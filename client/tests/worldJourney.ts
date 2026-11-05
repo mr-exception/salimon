@@ -10,6 +10,7 @@ export async function boot(page: Page, view = '') {
   // Lazy development module can resolve under React's delayed Suspense commit.
   await expect.poll(async () => { await page.clock.runFor(50); return scene(page).count() }).toBe(1)
   await expect(scene(page)).toBeVisible()
+  await expect.poll(async () => { await page.clock.runFor(50); return scene(page).getAttribute('data-render-ready') }).toBe('true')
   await page.evaluate(() => document.fonts.ready)
   await page.clock.runFor(32)
 }
@@ -40,7 +41,7 @@ export async function walkTo(page: Page, target: number[], frame?: FrameId, exac
 }
 
 export async function walkTicks(page: Page, key: string | string[], ticks: number) {
-  const tick = async () => Number(await scene(page).getAttribute('data-tick'))
+  const tick = async () => Number(await page.locator('main').getAttribute('data-tick'))
   const target = await tick() + ticks
   const keys = typeof key === 'string' ? [key] : key
   for (const code of keys) await page.keyboard.down(code)

@@ -20,3 +20,9 @@
 .top-down-app[hidden] { display: none; }
 .cockpit-exit { position: fixed; top: 12px; left: 12px; z-index: 10; }
 .power-fixture { position: fixed; bottom: 8px; left: 8px; z-index: 10; }
+/* Keep the SVG viewport on the device-pixel grid at the desktop reference size.
+   Font-dependent half-pixel line boxes otherwise shift its raster surface. */
+.top-down-app h1 { line-height: 30px; }
+.top-down-eyebrow { line-height: 16px; }
+.top-down-interaction p { line-height: 18px; }
+.top-down-app footer p { line-height: 18px; }

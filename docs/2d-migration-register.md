@@ -16,7 +16,7 @@
 | First-person player, room/terrain meshes, skybox | **Strict overhead illustrated 2D** world. Layered sprites, persistent IDs, actual 2D collision footprints/interaction anchors and intentional tall-object occlusion. Canonical world can still be physically 3D. |
 | 3D game-wide navigation | **3D holographic orthographic radar only at cockpit desk**. The sample radar does not physically relocate the authored 2D landing site. |
 | Mineable physical fragments and two volume/weight limits | Direct raw-resource credit in **integer grams**. Initial inventory: **10 kg and 12 slots**, raw type stacking, per-item count stacks/weights, **no volume**. Source debit equals credit. |
-| Cargo racks and fabrication/fuel intakes | Future 2D module interactions and exact transfers; **50 kg Resource Container**, separate **50 kg Fabricator/Core raw buffers** are approved, **not playable storage/machines**. |
+| Cargo racks and fabrication/fuel intakes | The **50 kg Resource Container** has confirmed raw-resource transfers (#784/#785). Separate **50 kg Fabricator/Core raw buffers** and processing remain approved future work. |
 | First-person Scout interior, physical modules | Continuous visible **top-down Scout cutaway**, ship-local frames, fixture footprints and concise contextual UI; preserve cozy habitation identity and build constraints when porting. |
 | Physical suits, hazards and upgrades | Future **tierless** basic suit with two module slots, drawer tiers **4/8/12**, module-store tiers **12/16/24**, **200 HP** character health, independent exposure and **1,000 HP** absorption per module. Exact gear masses/recipes remain TBD. |
 | Native localized room/module hull damage | Current 2D design uses **ship-wide damage or total ship destruction**. Partial-room destruction and detached compartment logic deferred; offline death only after authoritative whole-ship loss. |
@@ -26,7 +26,7 @@
 
 ## Development sequence (not a new gameplay approval)
 
-The persistent source/store domain is delivered by stacked #783 (now merged); the next bounded gameplay adapters are [#784 raw Resource Container](https://github.com/mr-exception/salimon/issues/784), [#785 storage UI](https://github.com/mr-exception/salimon/issues/785), [#786 count-item UI](https://github.com/mr-exception/salimon/issues/786), [#787 survival](https://github.com/mr-exception/salimon/issues/787) and [#788 hazards](https://github.com/mr-exception/salimon/issues/788). Real canonical planetary navigation, Core/Fabricator, wearable gear, full multiplayer and Absenat require further scoped work or outstanding product decisions. No original Rust issue is automatically reopened or treated as already ported.
+The persistent source/store domain is delivered by stacked #783 (now merged); the delivered container adapters are [#784 raw Resource Container](https://github.com/mr-exception/salimon/issues/784), [#785 storage UI](https://github.com/mr-exception/salimon/issues/785); next bounded adapters are [#786 count-item UI](https://github.com/mr-exception/salimon/issues/786), [#787 survival](https://github.com/mr-exception/salimon/issues/787) and [#788 hazards](https://github.com/mr-exception/salimon/issues/788). Real canonical planetary navigation, Core/Fabricator, wearable gear, full multiplayer and Absenat require further scoped work or outstanding product decisions. No original Rust issue is automatically reopened or treated as already ported.
 
 ## Complete file-by-file classification
 
@@ -98,7 +98,7 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`project-qa.md`](project-qa.md) | DESIGN | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
 | [`project-vision.md`](project-vision.md) | DESIGN | Overhead world with cockpit-only 3D radar is the active visual contract. |
 | [`radar-navigation-prototype.md`](radar-navigation-prototype.md) | PLAYABLE | Delivered 3D holographic cockpit instrument, not a global player view. |
-| [`resource-inventory-and-gathering.md`](resource-inventory-and-gathering.md) | PLAYABLE | 10 kg / 12 slots, integer grams and sample mining; schema-v4 raw ledger and identified 50 kg Scout container domain (#784); transfer UI follows in #785. |
+| [`resource-inventory-and-gathering.md`](resource-inventory-and-gathering.md) | PLAYABLE | 10 kg / 12 slots, integer grams and sample mining; schema-v4 raw ledger, identified 50 kg Scout container (#784) and playable confirmed transfers (#785). |
 | [`room-finishes.md`](room-finishes.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`room-lighting.md`](room-lighting.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`save-contract.md`](save-contract.md) | NATIVE | Historical Rust schema 29+; browser v4 local gram ledger is distinct. |

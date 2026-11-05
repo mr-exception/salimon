@@ -20,8 +20,8 @@ IDs, fixed-step walking/facing, camera follow and layered draw lists.
 `topDownInteraction.ts` owns swept collision and stable-ID nearby selection/reach;
 entity-local footprints match the artwork. `cockpit.ts` owns local owner control,
 one-chair reservation and power/view transitions. Other interactions inspect
-placeholders; the Scout Resource Container domain is enabled by #784 with UI
-following in #785. Mining and durable local saves use the resource owners below;
+Core/Fabricator placeholders; the Scout Resource Container domain (#784) and
+confirmed transfer UI (#785) are enabled. Mining and durable local saves use the resource owners below;
 Core, Fabricator processing and server authority remain future work.
 
 `TopDownIllustration.tsx` retains the authored illustrated SVG shapes.
@@ -77,6 +77,11 @@ The Scout raw-store declaration is owned by `scoutResourceContainer.ts`, bound t
 the existing `scout:storage` ship-local anchor and 50,000 g metadata. Default
 ResourceSession commands persist it atomically in schema v4; v3 saves acquire
 the previously absent container empty, while v4 missing data fails closed.
+`resourceContainerInteraction.ts` owns reachable world admission, revision-bound
+drafts and consume-once confirmation (arrival location is checkpointed before
+a draft captures its revision); `ResourceContainerPanel.tsx` owns the native
+modal and exact gram/derived kg presentation. TopDownView integrates cancellation
+with the existing input/focus/scene path while retaining simulation state.
 
 ## Historical native architecture
 

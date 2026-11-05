@@ -1,0 +1,15 @@
+✔ review is non-mutating; confirmation commits exact grams once; editing or closing cancels only the draft (9.363034ms)
+✔ invalid/unknown/insufficient amounts produce readable errors and never alter either endpoint (1.552452ms)
+✔ weight errors report which endpoint is full, preserve bytes, and allow an explicit smaller request (1.067067ms)
+✔ stale confirmation revisions are rejected; quota and externally changed save bytes block safely (2.648289ms)
+✔ out-of-range/wrong-target opens are rejected; movement/range/cockpit/scene loss closes without rolling back commits (12.123614ms)
+✔ slot feedback distinguishes adding a raw type from an existing stack without rounding gram capacity (1.651977ms)
+✔ opening saves arrival before review, so a location-only autosave cannot stale the confirmation (1.531666ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44.420492

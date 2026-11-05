@@ -1,0 +1,12 @@
+2026-11-05T13:12:04.7486642Z   ✓   1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (42.4s)
+2026-11-05T13:13:39.8575138Z   ✓   5 [cockpit] › tests/storage.spec.ts:12:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (24.6s)
+2026-11-05T13:13:43.5554720Z   ✓   6 [cockpit] › tests/storage.spec.ts:104:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (3.7s)
+2026-11-05T13:13:46.2096217Z   ✘   7 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (1.8s)
+2026-11-05T13:17:24.3237939Z   1) [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures
+2026-11-05T13:17:24.3239182Z     Error: expect(received).toEqual(expected) // deep equality
+2026-11-05T13:17:24.3411819Z         at /home/runner/work/salimon/salimon/client/tests/top-down.spec.ts:46:23
+2026-11-05T13:17:24.3414099Z     test-results/top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/test-failed-1.png
+2026-11-05T13:17:24.3421990Z   1 failed
+2026-11-05T13:17:24.3422871Z     [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures
+2026-11-05T13:17:24.3423601Z   36 passed (6.1m)
+2026-11-05T13:17:24.4296804Z ##[error]Process completed with exit code 1.

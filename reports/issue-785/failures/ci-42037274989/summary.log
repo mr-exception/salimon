@@ -1,0 +1,10 @@
+2026-11-05T13:40:04.3026101Z   ✓   5 [cockpit] › tests/storage.spec.ts:12:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (23.1s)
+2026-11-05T13:40:07.9813646Z   ✓   6 [cockpit] › tests/storage.spec.ts:104:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (3.7s)
+2026-11-05T13:40:22.4612636Z   ✘   7 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (13.7s)
+2026-11-05T13:43:44.1773916Z   1) [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures
+2026-11-05T13:43:44.1823199Z     Error: expect(received).toEqual(expected) // deep equality
+2026-11-05T13:43:44.5416874Z         at /home/runner/work/salimon/salimon/client/tests/top-down.spec.ts:46:23
+2026-11-05T13:43:44.5419554Z   1 failed
+2026-11-05T13:43:44.5419948Z     [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures
+2026-11-05T13:43:44.5420029Z   36 passed (5.8m)
+2026-11-05T13:43:44.5430213Z ##[error]Process completed with exit code 1.

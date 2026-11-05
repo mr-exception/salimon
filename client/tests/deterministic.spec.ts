@@ -26,7 +26,12 @@ test('NAV-1 seeded replay: exact WASD direction, release and wheel zoom',async({
   expect(zoomed.scene.zoom,'NAV-1 wheel up zooms in').toBeGreaterThan(start.scene.zoom)
   await page.mouse.wheel(0,400);await page.clock.runFor(160)
   expect((await snapshot(page)).scene.zoom).toBeCloseTo(start.scene.zoom,10)
-  replays.push({catalog:start.navigation.catalog,samples,zoom:zoomed.scene.zoom,ticks:(await snapshot(page)).navigation.ship.tick-start.navigation.ship.tick})
+  // 4*(160+32)+2*160 = 1088ms straddles a fractional 60Hz tick.
+  // Complete 1200ms (75 RAF intervals / 72 fixed ticks) before comparing replays.
+  await page.clock.runFor(112)
+  const ticks=(await snapshot(page)).navigation.ship.tick-start.navigation.ship.tick
+  expect(ticks,'NAV-1 replay covers 72 complete fixed ticks').toBe(72)
+  replays.push({catalog:start.navigation.catalog,samples,zoom:zoomed.scene.zoom,ticks})
  }
  expect(replays[1],'NAV-1 identical seed and input clock replay').toEqual(replays[0])
  await evidence(page,info,'seeded-replay',replays)

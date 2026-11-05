@@ -5,7 +5,7 @@ Use the [2D documentation migration register](../docs/2d-migration-register.md) 
 **2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v4 resource ledger and migrates valid v1
 litre / v2 gram saves without loss. `resourceLedger.ts` validates exact transfers
 and store mass; future stores require trusted ID/ship/capacity declarations.
-The default session enables the 50 kg Scout store domain; transfer UI is #785. See [resource design](../docs/resource-inventory-and-gathering.md).
+The default world enables the 50 kg Scout Resource Container and deposit/withdraw panel (#784/#785). See [resource design](../docs/resource-inventory-and-gathering.md).
 
 The default client is a React + TypeScript + Vite 2D world with a Three.js /
 React Three Fiber cockpit radar. Start with [current implementation and legacy
@@ -133,14 +133,14 @@ and compares simultaneous indoor/outdoor captures using the unchanged visual pol
 
 The same world contains a graphite/slate Scout outline, exposed warm cabin,
 cockpit desk and separate chair, bunk, partitioned aft cargo room, Core,
-Fabricator and **50 kg raw-only Resource Container** placeholder. Cargo passage (2.6 m) and aft
+Fabricator and **50 kg raw-only Resource Container**. Cargo passage (2.6 m) and aft
 entry (3 m) are open; visible jambs and room boundaries block walking. The
 threshold marks the aft approach. No roof layer, transparency or interior scene
 swap is used. Explicit line metrics keep the desktop SVG viewport on the device-pixel grid.
 The world viewport and translucent caption use rectangular pixel-aligned edges;
 curved ancestor clipping otherwise varies at compositor/capture boundaries. `scoutLayout.ts` owns ship-local named anchors, shared collision/
-visual footprints and storage capacity metadata; machine/storage interactions
-only inspect placeholders and do not process or transfer material.
+visual footprints and storage capacity metadata; Core/Fabricator interactions
+inspect placeholders. The Resource Container opens its transfer panel in the default game.
 
 `/?scene=top-down&view=exterior` starts a fresh development world outside the
 Scout to inspect its always-visible interior. The default fixture starts outdoors;
@@ -326,4 +326,44 @@ Exact `deposit(resourceId, grams, revision)` / `withdraw(...)` transactions use
 the shared ledger and atomic save. Schema v4 migrates old v1/v2/v3 expeditions
 without changing source/player mass, and rejects damaged current container data.
 Store mass contributes once to ship simulation independently of player location.
-The visible storage fixture still inspects a placeholder; its playable panel is #785.
+The default game opens the playable panel described below; the isolated development
+world retains inspection-only fixtures.
+
+## Resource Container transfers (#785)
+
+Approach the labelled 50 kg container on the starboard side of the aft cargo bay,
+then press **E / Use container**. The modal shows both inventories in fractional
+kg, player weight/slots and remaining container weight. Choose a raw resource and
+an exact positive whole-gram amount, select **Review deposit** or **Review
+withdrawal**, then **Confirm**. Reviewing/editing/cancelling never moves material.
+A rejected request explains insufficient balance, weight/slots, stale revision or
+save access; no smaller amount is silently transferred.
+
+Escape, Close, window focus loss, resize/hidden state, movement/target range loss
+or cockpit/scene transitions cancel only the draft. Committed transfers remain
+saved. Modal focus contains keyboard/mouse interaction; editable fields keep their
+keys. The normal world controls resume on close; ship simulation remains active.
+`resourceContainerInteraction.ts` owns admission/draft/confirmation/cancellation;
+`ResourceContainerPanel.tsx` and `resourceContainer.css` own accessible responsive
+presentation. No production state setters are exposed.
+
+`tests/storage.spec.ts` uses the built default entry to mine → enter → deposit →
+withdraw → exit → reload twice, compares original panel/error captures and
+checks a validated prior full-container save, overweight/stale-save errors and a
+narrow viewport. It is part of the existing cockpit project and full browser CI.
+The player-slot feedback helper is tested with validated synthetic usage; the
+current two-resource/empty-item catalog cannot fill all 12 slots in browser play.
+
+For stacked pull requests, the baseline-approval CI job fetches the declared
+parent SHA explicitly before comparing its manifest. GitHub's synthetic stacked
+merge ref can place the actual parent outside a depth-2 checkout. Missing history
+is repaired by fetching that exact commit; changed reference digests still require
+the existing explicit human approval. The gate itself and reference bytes are
+unchanged.
+
+The NAV-1 replay completes a 1,200 ms input window (75 × 16 ms RAF intervals,
+72 fixed 60 Hz ticks) before equality comparison, and asserts that exact tick
+count. A partial 1,088 ms window could quantize to 65 or 66 ticks depending on
+renderer startup phase. The build/browser CI job allows 20 minutes for cold
+Chromium installation plus the full matrix; individual test limits and assertions
+remain in force.

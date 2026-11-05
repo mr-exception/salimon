@@ -9,6 +9,9 @@ import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, req
 import { useWorldSprites, WorldSprite } from './topDownSprites.tsx'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
+import { ResourceContainerInteraction } from './resourceContainerInteraction.ts'
+import { ResourceContainerPanel } from './ResourceContainerPanel.tsx'
+import { SCOUT_RESOURCE_CONTAINER_ID } from './scoutResourceContainer.ts'
 import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
@@ -32,6 +35,7 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
   const [state, setState] = useState(() => createTopDownState(import.meta.env.DEV && new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior', gameplay))
   const current = useRef(state)
   const session = useRef<ResourceSession | null>(null)
+  const container = useRef<ResourceContainerInteraction | null>(null)
   const [saveStatus, setSaveStatus] = useState('Opening saved expedition…')
   useEffect(() => {
     if (!gameplay) return
@@ -42,6 +46,7 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
       if (!lock) { setSaveStatus('Another tab has this expedition open. Close it and reload to gather.'); return }
       try {
         session.current = new ResourceSession(localStorage, current.current)
+        container.current = new ResourceContainerInteraction(session.current)
         current.current = session.current.world
         setState(current.current)
         setSaveStatus('Expedition saves automatically on this browser.')
@@ -52,6 +57,8 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
       disposed = true
       session.current?.cancel()
       session.current?.checkpoint()
+      container.current?.close()
+      container.current = null
       session.current = null
       unlock?.()
     }
@@ -60,12 +67,17 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
     const input = new NavigationInput(), clock = new TopDownClock(), timer = new FrameTimer(performance.now())
     let raf = 0
     const release = () => { input.clear(); clock.reset(); timer.resume(performance.now()) }
-    const clear = () => { release(); session.current?.cancel(); current.current = cancelInteraction(current.current); session.current?.checkpoint(); setState(current.current) }
+    const clear = () => { release(); session.current?.cancel(); container.current?.close(); current.current = cancelInteraction(current.current); if (session.current) session.current.world = current.current; session.current?.checkpoint(); setState(current.current) }
     const keydown = (event: KeyboardEvent) => {
       if (current.current.cockpit.view === 'radar') return
+      if (container.current?.opened && event.code === 'KeyE') return
       if (!event.repeat && (event.code === 'Escape' || (event.code === 'KeyE' && acceptsFlightShortcut(event.target)))) {
         event.preventDefault(); input.clear()
-        if (event.code === 'KeyE' && session.current?.equipped && current.current.entities.find(e => e.id === current.current.selectedId)?.source) {
+        if (container.current?.opened && event.code === 'Escape') {
+          container.current.close(); current.current = container.current.session.world
+        } else if (event.code === 'KeyE' && current.current.selectedId === SCOUT_RESOURCE_CONTAINER_ID && container.current?.open(current.current)) {
+          current.current = container.current.session.world
+        } else if (event.code === 'KeyE' && session.current?.equipped && current.current.entities.find(e => e.id === current.current.selectedId)?.source) {
           session.current.start(current.current.selectedId)
           current.current = session.current.world
         } else {
@@ -88,6 +100,8 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
       current.current = clock.advance(current.current, dt, [Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)])
       if (session.current) {
         current.current = session.current.advance(current.current)
+        container.current?.synchronize(current.current)
+        current.current = session.current.world
         navigation.clock.state = setMass(navigation.clock.state, DRY_MASS_KG + session.current.payload().shipGrams / 1000)
       }
       if (gameplay && inWorld) navigation.advance(dt)
@@ -112,15 +126,19 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
   const cockpitTarget = gameplay && isCockpitTarget(selected?.id ?? null)
   const resourceSession = session.current
   const usage = resourceSession && resourceInventoryUsage(resourceSession.snapshot.inventory, RESOURCE_CATALOG)
+  const selectedContainer = resourceSession && selected?.id === SCOUT_RESOURCE_CONTAINER_ID
+  const closeContainer = () => { container.current?.close(); current.current = session.current?.world ?? current.current; (document.activeElement as HTMLElement | null)?.blur(); setState({ ...current.current }) }
   const selectedSource = resourceSession && selected && resourceSession.snapshot.sources[selected.id]
   const interact = () => {
-    if (resourceSession?.equipped && selectedSource) { resourceSession.start(selected!.id); current.current = resourceSession.world }
+    if (selectedContainer && container.current?.open(current.current)) current.current = container.current.session.world
+    else if (resourceSession?.equipped && selectedSource) { resourceSession.start(selected!.id); current.current = resourceSession.world }
     else { if (resourceSession) resourceSession.feedback = ''; current.current = current.current.player.mode === 'interacting' ? cancelInteraction(current.current) : requestInteraction(current.current) }
     setState(current.current)
   }
   return <>
     {state.cockpit.view === 'radar' && <><App navigation={navigation} /><button className="cockpit-exit" onClick={() => update(leaveCockpit(current.current))}>Exit navigation · Stand up</button></>}
     {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
+    {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     <main data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header><div><p className="top-down-eyebrow">SALIMON / WORLD FOUNDATION</p><h1>Scout · Surface study</h1></div><span className="top-down-tag">STRICT OVERHEAD / 2D</span></header>
     <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} />
@@ -138,8 +156,8 @@ export function TopDownView({ gameplay = false }: { gameplay?: boolean }) {
       </aside>}
       <div className="top-down-caption"><span>01 / QUIET LANDING SITE</span><span>SCOUT — INTERIOR CUTAWAY</span></div></section>
     <aside className="top-down-interaction" aria-label="Nearby interaction">
-      <div><p data-prompt>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : 'No fixture in reach · Move closer'}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
-      <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={!selected && state.player.mode !== 'interacting'}>{resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
+      <div><p data-prompt>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : 'No fixture in reach · Move closer'}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
+      <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={!selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
     </aside>
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
     <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · 1 kg/s · Machine systems are placeholders' : 'Console inspections are a test · Systems inactive'}</p></footer>

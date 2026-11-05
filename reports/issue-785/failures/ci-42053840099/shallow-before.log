@@ -1,0 +1,8 @@
+file:///tmp/salimon-baseline-shallow/client/scripts/baseline-approval.ts:19
+ if(!pr||!/^\d+$/.test(pr)||!token)throw Error(`BASELINE_APPROVAL_REQUIRED: post human review "Approve navigation baselines: ${digest}" to this PR, then rerun the gate`)
+                                         ^
+
+Error: BASELINE_APPROVAL_REQUIRED: post human review "Approve navigation baselines: 961065dae5acf782dc7b3991d33fd1916763532b48710333bcc26deda7951513" to this PR, then rerun the gate
+    at file:///tmp/salimon-baseline-shallow/client/scripts/baseline-approval.ts:19:42
+
+Node.js v24.19.0

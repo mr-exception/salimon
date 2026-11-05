@@ -198,3 +198,24 @@ weather/biology positives, harvesting/reload, field marks/chart and sound eviden
 The [dated report](https://github.com/mr-exception/salimon/blob/f1cd0b3e878fac487ce898547a0c8c35aa40519b/reports/issue-628/README.md) records exact fixture/publication
 boundaries and original captures. It does not approve perceptual presentation,
 physical platform behavior or hardware budgets; those remain #561/#557/#563.
+
+
+## Fixed illustrated browser sample (#764)
+
+The shared top-down development world now includes one authored fictional living
+landing region, identified as `site:illustrated-landing:v1` in the existing
+`planet:fixture` frame. `client/src/planetarySite.ts` owns its invariant outdoor
+spawn, Scout landing pose, flat strata presentation and stable rock/stone/plate-
+colony entities with collision footprints. Mineral and biological source IDs
+carry kind/archetype and site identity through the existing nearby inspection
+interface. The renderer reads these definitions; it does not place random props
+or create separate ship/planet scenes.
+
+This fixed sample is not a canonical astronomical publication, global planetary
+generator, ecology simulation or full material/resource catalog. Inspections do
+not gather or deplete anything. Whole-litre quantities, integer grams/litre,
+atomic persistence and inventory integration remain #757 after #767; frame
+handoff and cockpit integration remain #765/#766. Automated browser comparisons
+cover repeated spawn, near-outcrop, near-colony and near-Scout captures plus a
+continuous outdoor route with fixed source IDs. Historical native environmental
+reports above retain their original revision/platform scope.

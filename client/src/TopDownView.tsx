@@ -5,7 +5,15 @@ import './topDown.css'
 
 function Illustration({ appearance, footprint }: { appearance: Appearance; footprint?: Entity2D['footprint'] }) {
   switch (appearance) {
-    case 'ground': return <g><rect x="-200" y="-200" width="400" height="400" fill="#b5a58b" /><path d="M-30 15 Q-10 -10 20 -18 M-35 17 Q-15 -5 22 -16 M-18 -26 Q8 -3 28 4 M-20 25 Q-8 12 16 20" fill="none" stroke="#9f927c" strokeWidth=".15" /><path d="M-16 4l2 -.3m8 -13l1 .2m20 6l1 -.5m-8 20l2 .3m-20 2l1 -.4" stroke="#d7cab0" strokeWidth=".25" /></g>
+    case 'ground': return <g><rect x="-200" y="-200" width="400" height="400" fill="#b5a58b" />
+      <path d="M-28 -12Q-14 -3 -11 12L-17 19 -33 8ZM-4 -18Q12 -8 22 -12L29 -5Q11 0 -4 -8Z" fill="#a69580" />
+      <path d="M-27 -10Q-16 -1 -14 12M-26 -8Q-18 0 -16 10M-3 -16Q12 -6 23 -10M-4 -14Q11 -4 24 -8" fill="none" stroke="#c7b69b" strokeWidth=".18" />
+      <path d="M-14 5Q-8 1 -2 5T12 7M-12 6Q-7 3 -2 6T11 8M-5 -10Q-4 -5 1 -4M9 -2Q15 0 17 4" fill="none" stroke="#978573" strokeWidth=".09" />
+      <path d="M-16 4l2 -.3m8 -13l1 .2m20 6l1 -.5m-8 20l2 .3m-20 2l1 -.4m2 -8l.4 -.1m5 1l.6 .2m-1 6l.3 .2" stroke="#d7cab0" strokeWidth=".2" />
+    </g>
+    case 'mineral': return <g stroke="#6f5c58" strokeWidth=".07"><path d="M-1.2 -.3L-.7 -.9 .7 -.8 1.2 .3 .5 .9 -1 .7Z" fill="#957d76" /><path d="M-1 -.3L-.5 -.6 .7 -.5M-.9 0L.4 -.1 1 .3M-.8 .4L.4 .3 .8 .5" fill="none" stroke="#e0b37c" strokeWidth=".16" /><path d="M-.7 -.9L-.5 -.2 .7 -.8M-.5 -.2L.5 .9" fill="none" /></g>
+    case 'flora': return <g stroke="#62546a" strokeWidth=".06"><ellipse cy=".15" rx=".8" ry=".6" fill="#89717e" /><path d="M0 .6Q-1.3 .1 -.65 -.65Q.05 -.75 0 .6M0 .6Q1.3 .1 .65 -.65Q-.05 -.75 0 .6" fill="#b49da9" /><path d="M0 .55Q-.7 -.35 0 -.85Q.7 -.35 0 .55" fill="#d0b7be" /><path d="M0 .6V-.65M0 .5L-.65 -.4M0 .5L.65 -.4" stroke="#705768" fill="none" /></g>
+    case 'stones': return <g fill="#8b8274" stroke="#6b6961" strokeWidth=".06"><path d="M-.5 -.1L-.25 -.4 .15 -.3 .2 .1 -.25 .2Z" /><path d="M.1 .15L.3 -.05 .5 .15 .35 .4 .1 .35Z" /></g>
     case 'rock': return <g stroke="#6b6961" strokeWidth=".09"><path d="M-1.7 -.5L-.9 -1.4 .8 -1.2 1.6 .2 .7 1.1 -1.2 .9Z" fill="#827f73" /><path d="M-1.7 -.5L-.3 -.7 .8 -1.2 .5 .2 -1.2 .9M.5 .2L1.6 .2" fill="#aaa493" /></g>
     case 'hull': return <g stroke="#343f43" strokeWidth=".14" strokeLinejoin="round"><path d="M-3 -4.6L-1.8 -7H1.8L3 -4.6V5.5L2.1 6.5H1.5V5.5H-1.5V6.5H-2.1L-3 5.5Z" fill="#536064" /><path d="M-3 2.5H-3.7V5.8H-3M3 2.5H3.7V5.8H3" fill="#65777b" /><path d="M-1.6 -6.7H1.6" stroke="#78c6cc" strokeWidth=".2" /></g>
     case 'floor': return <g><path d="M-2.7 -4.5L-1.6 -6.5H1.6L2.7 -4.5V5.4L1.9 6.1H-1.9L-2.7 5.4Z" fill="#dfd9c6" /><path d="M-2.7 -2.5H2.7V-4.5L1.6 -6.5H-1.6L-2.7 -4.5ZM-2.7 2.8H2.7V5.4L1.9 6.1H-1.9L-2.7 5.4Z" fill="#747f7d" /><path d="M-2.5 -2.3H-.8M.8 -2.3H2.5M-2.5 2.6H-.8M.8 2.6H2.5" stroke="#b48261" strokeWidth=".16" /><path d="M-2.3 -1.7V1.8M2.3 -1.7V1.8M-2.3 4.8H1" stroke="#c6c0ae" strokeWidth=".06" /><text x="0" y="-5.75" textAnchor="middle" fontSize=".22" fill="#e9e3cf">COCKPIT</text><text x="0" y="1.4" textAnchor="middle" fontSize=".22" fill="#665a49">MAIN CABIN</text><text x="0" y="4.6" textAnchor="middle" fontSize=".22" fill="#efe3cc">CARGO</text><rect x="-1.2" y=".8" width="2.4" height="2" rx=".12" fill="#b88a6e" opacity=".35" /></g>
@@ -26,10 +34,10 @@ function Illustration({ appearance, footprint }: { appearance: Appearance; footp
 // Presentation receives immutable scene state. It has no radar or Three imports.
 export function TopDownScene({ state }: { state: TopDownState }) {
   const items = drawList(state)
-  return <svg className="top-down-scene" viewBox="-600 -320 1200 640" role="img" aria-label="Strict overhead Scout and planetary test site" data-tick={state.tick}>
+  return <svg className="top-down-scene" viewBox="-600 -320 1200 640" shapeRendering="geometricPrecision" role="img" aria-label="Strict overhead Scout and planetary test site" data-tick={state.tick}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {items.filter(item => item.entity.layer === layer).map(({ entity, positionM: [x, y], angle }) =>
-        <g key={entity.id} data-entity={entity.id} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
+        <g key={entity.id} data-entity={entity.id} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
           <Illustration appearance={entity.appearance} footprint={entity.footprint} />
         </g>)}
       {layer === 'cues' && items.filter(item => item.entity.id === state.selectedId).map(({ entity, positionM: [x, y], angle }) => <g key={entity.id} data-selection={entity.id} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`} fill="none" stroke="#bce9df" strokeWidth=".08"><rect x={-(entity.footprint?.halfWidth ?? .4) - .15} y={-(entity.footprint?.halfHeight ?? .4) - .15} width={2 * (entity.footprint?.halfWidth ?? .4) + .3} height={2 * (entity.footprint?.halfHeight ?? .4) + .3} rx=".1" /></g>)}
@@ -38,7 +46,7 @@ export function TopDownScene({ state }: { state: TopDownState }) {
 }
 
 export function TopDownView() {
-  const [state, setState] = useState(() => createTopDownState(new URLSearchParams(location.search).get('view') === 'exterior' ? 'exterior' : 'interior'))
+  const [state, setState] = useState(() => createTopDownState(new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior'))
   const current = useRef(state)
   useEffect(() => {
     const input = new NavigationInput(), clock = new TopDownClock(), timer = new FrameTimer(performance.now())

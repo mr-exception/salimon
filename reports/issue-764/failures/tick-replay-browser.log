@@ -1,0 +1,53 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=top-down
+
+
+Running 6 tests using 1 worker
+
+(node:4296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [top-down] › tests/top-down.spec.ts:17:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (8.2s)
+  ✓  2 [top-down] › tests/top-down.spec.ts:63:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (5.0s)
+  ✓  3 [top-down] › tests/top-down.spec.ts:88:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (8.0s)
+  ✓  4 [top-down] › tests/top-down.spec.ts:127:1 › TD-5 built entry retains navigation even with development scene query (843ms)
+  ✓  5 [top-down] › tests/top-down.spec.ts:141:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (8.8s)
+  ✘  6 [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (18.6s)
+
+
+  1) [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 
+
+    Error: planet-near-rock fresh-run bytes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      202 |       const png = await scene(page).screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
+      203 |       if (replay === 0) captures[name] = png
+    > 204 |       else expect(png.equals(captures[name]!), `${name} fresh-run bytes`).toBe(true)
+          |                                                                           ^
+      205 |       await info.attach(`${name}-${replay}.json`, { body: JSON.stringify({ position: await position(page), tick: await scene(page).getAttribute('data-tick') }), contentType: 'application/json' })
+      206 |     }
+      207 |     await capture('planet-spawn')
+        at capture (/workspace/salimon/client/tests/top-down.spec.ts:204:75)
+        at /workspace/salimon/client/tests/top-down.spec.ts:216:5
+
+    attachment #6: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/764-final/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/764-final/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/error-context.md
+
+    attachment #8: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/764-final/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/764-final/top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [top-down] › tests/top-down.spec.ts:187:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots 
+  5 passed (51.3s)

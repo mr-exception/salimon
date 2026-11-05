@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { PNG } from 'pngjs'
+import { compareImages, POLICY } from '../scripts/visual-comparison.ts'
 
 const scene = (page: Page) => page.getByRole('img', { name: 'Strict overhead Scout and planetary test site' })
 const transform = (page: Page, id: string) => page.locator(`[data-entity="${id}"]`).getAttribute('transform')
@@ -54,7 +55,7 @@ async function walkTo(page: Page, target: number[]) {
   for (let i = 0; i < 140; i++) {
     const p = await position(page), dx = target[0] - p[0], dy = target[1] - p[1]
     if (Math.hypot(dx, dy) < .075) return
-    const angle = -.12, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
+    const angle = await page.locator('[data-entity="person:player"]').getAttribute('data-frame') === 'ship:scout' ? -.12 : 0, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
     const keys = [...(Math.abs(x) > .035 ? [x > 0 ? 'd' : 'a'] : []), ...(Math.abs(y) > .035 ? [y > 0 ? 's' : 'w'] : [])]
     await walk(page, keys, Math.max(17, Math.min(65, Math.hypot(dx, dy) / 2.4 * 1000)))
   }
@@ -169,4 +170,82 @@ test('SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway', as
   for (let i = 0; i < png.data.length; i += 4) if (png.data[i] === 223 && png.data[i + 1] === 217 && png.data[i + 2] === 198) floorPixels++
   expect(floorPixels).toBeGreaterThan(1000)
   await info.attach('exterior-cutaway.png', { body: outside, contentType: 'image/png' })
+})
+
+
+// Hold actual keyboard input for an exact observed number of fixed steps.
+// Read-only tick observations control time, never gameplay state or rendering.
+async function walkTicks(page: Page, key: string, ticks: number) {
+  const tick = async () => Number(await scene(page).getAttribute('data-tick'))
+  const target = await tick() + ticks
+  await page.keyboard.down(key)
+  await page.clock.runFor(Math.max(0, ticks * 1000 / 60 - 25))
+  for (let i = 0; i < 60 && await tick() < target; i++) await page.clock.runFor(1)
+  await page.keyboard.up(key)
+  expect(await tick()).toBe(target)
+}
+
+test('PLANET-1 fixed outdoor journey, source footprints and repeat screenshots', async ({ browser }, info) => {
+  test.setTimeout(120000)
+  const captures: Record<string, Buffer> = {}
+  const sourceSnapshots: string[][] = []
+  for (let replay = 0; replay < 2; replay++) {
+    const context = await browser.newContext({ baseURL: 'http://127.0.0.1:5175', viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    try {
+      // Empty view exercises the default development launch, not a test-only spawn.
+      await boot(page, '')
+      await expect(page.locator('[data-entity="person:player"]')).toHaveAttribute('data-frame', 'planet:fixture')
+      expect(await position(page)).toEqual([-6, 3])
+      const originalNode = await page.locator('[data-entity="ship:scout"]').elementHandle()
+      const sources = await page.locator('[data-source-kind]').evaluateAll(nodes => nodes.map(n => `${n.getAttribute('data-entity')}/${n.getAttribute('data-source-kind')}/${n.getAttribute('data-frame')}/${n.getAttribute('data-position')}/${n.getAttribute('data-source-site')}`))
+      sourceSnapshots.push(sources)
+      expect(sources).toHaveLength(2)
+      const capture = async (name: string) => {
+        await page.clock.runFor(5000)
+        const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
+        await info.attach(`${name}-${replay}.json`, { body: JSON.stringify({ position: await position(page), tick: await scene(page).getAttribute('data-tick'), ground: await transform(page, 'terrain:site'), player: await transform(page, 'person:player'), viewport: page.viewportSize(), sceneBounds: await scene(page).boundingBox() }), contentType: 'application/json' })
+        if (replay === 0) captures[name] = png
+        else {
+          const comparison = compareImages(captures[name]!, png)
+          await info.attach(`${name}-comparison.json`, { body: JSON.stringify({ policy: POLICY, changedPixels: comparison.changedPixels, rawChangedPixels: comparison.rawChangedPixels, totalPixels: comparison.totalPixels }), contentType: 'application/json' })
+          await info.attach(`${name}-diff.png`, { body: comparison.diff, contentType: 'image/png' })
+          expect(comparison.pass, `${name} uses unchanged repository visual policy`).toBe(true)
+        }
+      }
+      await capture('planet-spawn')
+      await page.keyboard.press('e')
+      await expect(page.getByRole('status')).toContainText('No available object in reach')
+      await walkTicks(page, 'w', 75)
+      await walkTicks(page, 'a', 100)
+      expect((await position(page))[0]).toBeCloseTo(-7.34, 6)
+      await expect(page.locator('[data-selection="source:landing:mineral:01"]')).toHaveCount(1)
+      await page.keyboard.press('e')
+      await expect(page.getByRole('status')).toContainText('Banded mineral outcrop')
+      await capture('planet-near-rock')
+      await page.keyboard.press('e')
+      await page.keyboard.press('Escape')
+      await walkTicks(page, 'd', 34)
+      await walkTicks(page, 's', 110)
+      await walkTicks(page, 'd', 25)
+      await expect(page.locator('[data-selection="source:landing:biology:01"]')).toHaveCount(1)
+      await page.keyboard.press('e')
+      await expect(page.getByRole('status')).toContainText('Alien plate colony')
+      await walkTicks(page, 's', 50)
+      expect((await position(page))[1]).toBeCloseTo(4.69, 6)
+      await capture('planet-near-colony')
+      await walkTicks(page, 'd', 38)
+      await walkTicks(page, 'w', 117)
+      await walkTicks(page, 'd', 24)
+      await capture('planet-near-scout')
+      expect(await originalNode!.evaluate(node => node.isConnected)).toBe(true)
+      expect(await page.locator('[data-source-kind]').evaluateAll(nodes => nodes.map(n => `${n.getAttribute('data-entity')}/${n.getAttribute('data-source-kind')}/${n.getAttribute('data-frame')}/${n.getAttribute('data-position')}/${n.getAttribute('data-source-site')}`))).toEqual(sources)
+    } finally { await context.close() }
+  }
+  expect(sourceSnapshots[1]).toEqual(sourceSnapshots[0])
+  const wrongView = compareImages(captures['planet-spawn']!, captures['planet-near-rock']!)
+  expect(wrongView.pass).toBe(false)
+  expect(wrongView.changedPixels).toBeGreaterThan(100)
+  await info.attach('wrong-checkpoint-negative.json', { body: JSON.stringify({ policy: POLICY, pass: wrongView.pass, changedPixels: wrongView.changedPixels, rawChangedPixels: wrongView.rawChangedPixels }), contentType: 'application/json' })
+  await info.attach('planet-sources.json', { body: JSON.stringify({ sources: sourceSnapshots, input: 'Playwright keyboard; no state setters', site: 'fixed fictional living-world sample v1', comparisons: Object.keys(captures), collection: 'not implemented; inspections only' }, null, 2), contentType: 'application/json' })
 })

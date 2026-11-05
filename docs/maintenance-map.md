@@ -9,8 +9,9 @@ and Playwright scenarios/observers in `client/tests/`. See the
 [browser verification contract](../client/README.md#deterministic-navigation-regression-750).
 The shared 2D world is owned by `topDownRuntime.ts`/`topDownFrames.ts`, collision
 and reach by `topDownInteraction.ts`, Scout anchors/footprints by `scoutLayout.ts`,
-and illustrated rendering by `TopDownView.tsx`. Tests live in `topDown.test.ts`
-and `tests/top-down.spec.ts`. See the client guide for fixture boundaries.
+fixed site/source identity and outdoor spawn by `planetarySite.ts`,
+and illustrated rendering by `TopDownView.tsx`. Tests live in `topDown.test.ts`,
+`planetarySite.test.ts` and `tests/top-down.spec.ts`. See the client guide for fixture boundaries.
 The crate map below describes the removed native architecture at historical revisions.
 
 Browser acceptance uses [review in the active Codex chat](independent-game-qa.md)

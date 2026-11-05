@@ -1,0 +1,1 @@
+{"spawn_changed_pixels":0,"near_rock_changed_pixels":41160,"comparison":"strict decoded RGBA pixel equality","initial_driver":"adaptive walkTo with approximate endpoints","action":"terminated Playwright while Buffer.toEqual formatted its enormous mismatch; retain originals; use exact fixed-tick keyboard durations and boolean byte comparison; no tolerance change"}

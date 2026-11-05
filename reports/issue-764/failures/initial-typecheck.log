@@ -1,0 +1,10 @@
+
+> salimon-navigation-client@0.1.0 build
+> tsc -b && vite build
+
+src/planetarySite.test.ts(33,33): error TS2322: Type 'TopDownState' is not assignable to type '{ entities: Entity2D[]; tick: number; player: { readonly facing: number; readonly mode: "standing" | "walking" | "interacting"; readonly targetId: string | null; }; selectedId: string | null; feedback: string; frames: WorldFrames; camera: { readonly anchor: Anchor; readonly pixelsPerM: number; }; }'.
+  Types of property 'entities' are incompatible.
+    The type 'readonly Entity2D[]' is 'readonly' and cannot be assigned to the mutable type 'Entity2D[]'.
+src/planetarySite.test.ts(44,33): error TS2322: Type 'TopDownState' is not assignable to type '{ entities: Entity2D[]; tick: number; player: { readonly facing: number; readonly mode: "standing" | "walking" | "interacting"; readonly targetId: string | null; }; selectedId: string | null; feedback: string; frames: WorldFrames; camera: { readonly anchor: Anchor; readonly pixelsPerM: number; }; }'.
+  Types of property 'entities' are incompatible.
+    The type 'readonly Entity2D[]' is 'readonly' and cannot be assigned to the mutable type 'Entity2D[]'.

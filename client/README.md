@@ -18,7 +18,8 @@ Open the URL Vite prints. `npm run build` produces `dist/`.
 ## Top-down foundation (#761)
 
 During `npm run dev`, open `/?scene=top-down` for a strict overhead illustrated
-Scout and planetary site in one continuous scene. **W/A/S/D** walks the fixture cabin and cockpit; visible walls, furniture and a crate block movement. The camera follows with fixed-step
+Scout and planetary site in one continuous scene. The player starts outside.
+**W/A/S/D** walks the fixed landing area or the interior fixture; visible walls, furniture and a crate block movement. The camera follows with fixed-step
 smoothing, and facing persists when movement stops. Focus loss, editable controls,
 resize and hidden-page events release movement. The normal `/` entry and built
 production bundle remain the 3D radar. This development URL is not a cockpit
@@ -40,7 +41,7 @@ Local frame point conversion is explicit; automatic frame transfer is deferred.
 
 The fixture uses authored illustrated placeholders, not scientific terrain or
 full gameplay. Cross-frame traversal, cockpit seating/navigation, multiplayer, persistence,
-resource systems remain later work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
+extraction and inventory integration remain later work. `topDown.test.ts` tests state/frames without graphics. The `top-down`
 Playwright project exercises the production SVG adapter, pixel visibility, held
 input cleanup, production radar isolation and byte-identical fresh-run captures.
 Captures are new baseline candidates, not promoted navigation references.
@@ -79,14 +80,47 @@ visual footprints and storage capacity metadata; machine/storage interactions
 only inspect placeholders and do not process or transfer material.
 
 `/?scene=top-down&view=exterior` starts a fresh development world outside the
-Scout to inspect its always-visible interior. The normal fixture starts in the
-cabin; `view=interior` selects it explicitly. These initial fixture viewpoints
+Scout to inspect its always-visible interior. The default fixture starts outdoors;
+`view=interior` explicitly selects the cabin for Scout-only checks. These initial fixture viewpoints
 are not in-play teleport controls. Walk through cargo to the entry; cross-frame
-ownership/persistent locations remain #765, cockpit seating/radar #766, the
-starting planetary area #764, and full playable-slice acceptance #767.
+ownership/persistent locations remain #765, cockpit seating/radar #766, and full playable-slice acceptance #767.
 Browser SCOUT-1 exercises cargo module selection, doorway clearance and simultaneous
 outside-player/interior visibility; TD-3 reaches the chair through the cabin.
 These original captures are review evidence, not approved navigation baselines.
+
+### Fixed planetary landing area (#764)
+
+The development world now starts **outside** at the invariant planet-fixed
+`[-6, 3]` metre anchor. `planetarySite.ts` owns the fictional version-1 site ID,
+fixed Scout landing pose, flat illustrated strata, collidable boulders/stones,
+and sparse alien plate colonies. This is one authored living-world sample,
+not confirmed real-world biology or procedural whole-planet generation.
+The sample's `planet:fixture` reference frame and object IDs are stable across
+fresh visits, camera movement and ship pose changes.
+
+The banded mineral outcrop (`source:landing:mineral:01`) and alien plate colony
+(`source:landing:biology:01`) expose stable IDs, planet-fixed anchors, physical
+footprints, source kind/archetype and site version identity. Approach them and
+**E** inspects their placeholders through the shared interaction mechanism;
+walking into either source stops at its visible footprint. Repeated inspection
+has no extraction, depletion, inventory, loot or carrying effect. Resource
+catalog densities, litre quantities and transactions belong to #757 after #767.
+`SourceIdentity` is descriptive metadata, not an authoritative save schema.
+
+`PLANET-1` drives a full outdoor keyboard journey twice and compares original
+spawn, near-mineral, near-colony and near-Scout screenshots with the unchanged repository visual policy, while
+checking stable source identity/positions, collision stops and the same scene
+node. Replays use fresh browser contexts, exact observed simulation tick counts
+for real keyboard input, and five simulated seconds for camera settling. The
+existing `compareImages` policy permits zero pixels beyond its fixed 0.1
+perceptual threshold, includes antialiasing and applies no masks; raw changed
+pixels and diff images are retained. A wrong-checkpoint comparison must fail.
+Full-viewport PNG readback preserves the viewer pixel grid; the SVG adapter
+requests geometric precision. The earlier static TD-1/4 byte-identity check is
+preserved. Domain tests cover clear outdoor spawn, source reach, repeated inert
+inspection, footprint blocking and independence from the camera/ship pose.
+The default production `/` remains radar until #766 integrates cockpit entry.
+There is no automatic frame transfer or saved world yet (#765/#757).
 
 ## Controls (desktop mouse and keyboard)
 

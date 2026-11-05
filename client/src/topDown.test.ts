@@ -8,7 +8,7 @@ import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, req
 const near = (a: readonly number[], b: readonly number[], tolerance = 1e-8) => a.forEach((v, i) => assert.ok(Math.abs(v - b[i]) < tolerance, `${a} != ${b}`))
 test('ship-local points round trip through rotated and translated planet poses', () => {
   for (const angle of [0, Math.PI / 2, -.71, Math.PI]) {
-    const state = createTopDownState(), frames = { ...state.frames, ship: { ...state.frames.ship, origin: point2(-600, 300), angle } }
+    const state = createTopDownState('interior'), frames = { ...state.frames, ship: { ...state.frames.ship, origin: point2(-600, 300), angle } }
     const anchor: Anchor = { frame: 'ship:scout', point: point2(1.25, -2.75) }
     const planet = convertAnchor(anchor, 'planet:fixture', frames)
     near(relativeM(convertAnchor(planet, 'ship:scout', frames).point, anchor.point), [0, 0, 0])
@@ -16,7 +16,7 @@ test('ship-local points round trip through rotated and translated planet poses',
   }
 })
 test('passengers retain identity and anchors while pose changes; terrain stays planet-fixed', () => {
-  const state = createTopDownState(), player = state.entities.find(e => e.id === PLAYER_ID)!, rock = state.entities.find(e => e.id === 'rock:west')!
+  const state = createTopDownState('interior'), player = state.entities.find(e => e.id === PLAYER_ID)!, rock = state.entities.find(e => e.id === 'rock:west')!
   const moved = { ...state.frames, ship: { ...state.frames.ship, origin: point2(50, 70), angle: Math.PI / 2 } }
   near(relativeM(inPlanet(player.anchor, moved), ORIGIN), [48, 70, 0])
   assert.deepEqual(inPlanet(rock.anchor, moved), inPlanet(rock.anchor, state.frames))
@@ -24,7 +24,7 @@ test('passengers retain identity and anchors while pose changes; terrain stays p
   assert.equal(player.id, PLAYER_ID)
 })
 test('camera-relative transforms cancel astronomical roots and retain sub-mm offsets across cells', () => {
-  const state = createTopDownState()
+  const state = createTopDownState('interior')
   const shipOrigin = { cell: [10n ** 25n, -(10n ** 27n), 0n] as const, offsetM: [CELL_SIZE_M / 2 - 1, 0, 0] as const }
   const frames = { ...state.frames, ship: { ...state.frames.ship, origin: shipOrigin, angle: 0 } }
   const player: Anchor = { frame: 'ship:scout', point: point2(2.0001, .0002) }
@@ -39,7 +39,7 @@ test('camera-relative transforms cancel astronomical roots and retain sub-mm off
 })
 test('fixed stepping is repeatable across render cadence, diagonal normalized and camera follows', () => {
   const a = new TopDownClock(), b = new TopDownClock()
-  let first = createTopDownState(), second = createTopDownState()
+  let first = createTopDownState('interior'), second = createTopDownState('interior')
   for (let i = 0; i < 30; i++) first = a.advance(first, 1 / 60, [1, -1])
   for (let i = 0; i < 15; i++) second = b.advance(second, 1 / 30, [1, -1])
   assert.deepEqual(first, second)
@@ -48,24 +48,24 @@ test('fixed stepping is repeatable across render cadence, diagonal normalized an
   assert.ok(lag > 0 && lag < .22)
   const stopped = new TopDownClock().advance(first, .25, [0, 0])
   assert.ok(Math.hypot(...drawList(stopped).find(i => i.entity.id === PLAYER_ID)!.positionM) < lag)
-  const delta = relativeAnchor(player.anchor, createTopDownState().camera.anchor, first.frames)
+  const delta = relativeAnchor(player.anchor, createTopDownState('interior').camera.anchor, first.frames)
   near(delta, [1.2 / Math.sqrt(2), -1.2 / Math.sqrt(2)])
   assert.equal(new Set(first.entities.map(e => e.id)).size, first.entities.length)
 })
 test('visible walls bound the walk fixture and input/time validation prevent invalid transforms', () => {
-  let state = createTopDownState()
+  let state = createTopDownState('interior')
   for (let i = 0; i < 2000; i++) state = stepTopDown(state, rotate2([1, 0], state.frames.ship.angle))
   const point = state.entities.find(e => e.id === PLAYER_ID)!.anchor.point.offsetM
   assert.ok(point[0] <= 2.04)
   for (const invalid of [NaN, Infinity, -1]) assert.throws(() => new TopDownClock().advance(state, invalid, [0, 0]), RangeError)
   assert.throws(() => stepTopDown(state, [NaN, 0]), RangeError)
   const clock = new TopDownClock()
-  assert.equal(clock.advance(createTopDownState(), 100, [0, 0]).tick, 15)
+  assert.equal(clock.advance(createTopDownState('interior'), 100, [0, 0]).tick, 15)
   clock.advance(state, 1 / 120, [0, 0]); clock.reset()
   assert.equal(clock.advance(state, 1 / 120, [0, 0]).tick, state.tick)
 })
 test('draw order is stable independently of insertion and has no roof cover', () => {
-  const state = createTopDownState(), list = drawList(state)
+  const state = createTopDownState('interior'), list = drawList(state)
   assert.deepEqual(drawList({ ...state, entities: [...state.entities].reverse() }), list)
   assert.deepEqual([...new Set(list.map(i => i.entity.layer))], LAYERS.filter(layer => layer !== 'cues'))
   assert.ok(!list.some(i => /roof/i.test(i.entity.id)))
@@ -79,7 +79,7 @@ const walk = (state: ReturnType<typeof createTopDownState>, direction: readonly 
   return state
 }
 test('sweeps block high-speed motion, slide tangent/away, and resolve in an object frame', () => {
-  const state = createTopDownState(), frames = { ...state.frames, ship: { ...state.frames.ship, angle: 0 } }
+  const state = createTopDownState('interior'), frames = { ...state.frames, ship: { ...state.frames.ship, angle: 0 } }
   const object = { id: 'box', anchor: { frame: 'ship:scout' as const, point: point2(0, 0) }, footprint: { halfWidth: .5, halfHeight: 1 } }
   const anchor = { ...object.anchor, point: point2(-3, 0) }
   const fraction = allowedMove(anchor, [10, 0], [object], frames)
@@ -92,7 +92,7 @@ test('sweeps block high-speed motion, slide tangent/away, and resolve in an obje
   assert.ok(Math.abs(allowedMove(planetAnchor, [0, 10], [object], rotated) - fraction) < 1e-9)
 })
 test('crate, furniture and walls block walking; open passages reach cockpit and cargo', () => {
-  let state = createTopDownState()
+  let state = createTopDownState('interior')
   state = walk(state, rotate2([0, -1], state.frames.ship.angle), 160)
   assert.ok(playerAnchor(state).point.offsetM[1] >= .36 - 1e-8, 'crate stops direct path')
   const angle = state.frames.ship.angle
@@ -102,7 +102,7 @@ test('crate, furniture and walls block walking; open passages reach cockpit and 
   state = walk(state, rotate2([-1, 0], angle), 33)
   state = walk(state, rotate2([0, -1], angle), 40)
   assert.ok(playerAnchor(state).point.offsetM[1] < -3, 'pass open cockpit partition')
-  const start = createTopDownState()
+  const start = createTopDownState('interior')
   const south = rotate2([0, 1], angle)
   const door = walk(start, south, 200)
   assert.ok(playerAnchor(door).point.offsetM[1] > 5.5, 'wide cargo and aft entry are open')
@@ -110,7 +110,7 @@ test('crate, furniture and walls block walking; open passages reach cockpit and 
   assert.ok(playerAnchor(west).point.offsetM[0] >= -2.04 - 1e-7)
 })
 test('nearby selection is deterministic, rejects missing/disabled/distant targets and supports request/cancel', () => {
-  let state = createTopDownState()
+  let state = createTopDownState('interior')
   assert.equal(nearbyObject(playerAnchor(state), state.entities, state.frames), undefined)
   assert.match(requestInteraction(state).feedback, /No available object/)
   assert.equal(requestInteraction(state, 'missing').player.mode, 'standing')
@@ -130,7 +130,7 @@ test('nearby selection is deterministic, rejects missing/disabled/distant target
   assert.equal(removed.player.mode, 'standing'); assert.match(removed.feedback, /unavailable/)
 })
 test('facing is retained at rest and camera follows without a snap on move/release', () => {
-  const start = createTopDownState(), moved = stepTopDown(start, [1, 0])
+  const start = createTopDownState('interior'), moved = stepTopDown(start, [1, 0])
   assert.equal(moved.player.facing, Math.PI / 2)
   assert.ok(Math.hypot(...relativeAnchor(moved.camera.anchor, start.camera.anchor, moved.frames)) < .04)
   const stopped = stepTopDown(moved, [0, 0])
@@ -140,7 +140,7 @@ test('facing is retained at rest and camera follows without a snap on move/relea
 
 
 test('Scout fixtures are addressable, room boundaries physical and exterior camera remains stable', () => {
-  const state = createTopDownState(), frames = { ...state.frames, ship: { ...state.frames.ship, angle: 0 } }
+  const state = createTopDownState('interior'), frames = { ...state.frames, ship: { ...state.frames.ship, angle: 0 } }
   for (const id of ['scout:desk', 'scout:chair', 'scout:core', 'scout:fabricator', 'scout:storage']) {
     const object = state.entities.find(e => e.id === id)!
     assert.equal(object.anchor.frame, 'ship:scout'); assert.ok(object.interaction)

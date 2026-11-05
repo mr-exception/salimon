@@ -1,12 +1,22 @@
 # Salimon visual style
 
+## Active 2D visual language
+
+Render characters, tools, cargo fixtures and planetary features as **illustrated overhead sprites/layers** with deliberate silhouettes, consistent down-facing lighting logic, sparse readable marks and stable scale. Palette, warm/cool zoning and restrained material aging carry over from the previous stylized 3D work; polygon counts, bevel topology, PBR mesh budgets, first-person lens/camera and Blender export guidance below are **historical authoring examples**, not requirements for the active 2D client.
+
+World-facing sprites and collision footprints must agree in 2D; important doors/tools/sources require prompts and cues legible without a tilted camera. The sole intentional 3D exception is the separate orthographic holographic **cockpit radar**, whose faceted contact proxies and vector lines follow [its own contract](radar-navigation-prototype.md). Never retrofit a mandatory decorative 3D mesh into the planetary or interior view to satisfy an archived art acceptance row.
+
+
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Updated art direction (2026-11-04):** [Strict top-down illustrated 2D](top-down-art-direction.md) is authoritative for Scout interiors and planetary exploration. Existing low-poly 3D renderer/material/camera prescriptions below are historical; compatible palette and mood remain useful. 3D navigation is a separate [holographic radar](radar-navigation-prototype.md).
 
 > **Planetary exterior art direction (2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) is the approved future environment-specific specification for geological regions, atmospheric effects, alien biological materials/structures and their physically meaningful LOD/harvesting. Keep current prototype recipes and asset budgets until deliberately implemented and validated. No automatic water-body, ecology or shader implementation is implied.
 
 
-This is the authoritative art bible. Initial direction is **Option A: stylized
-low-poly science-fiction**, approved in #273–#276. Low polygon count is a design
+The following is the **archived native 3D art bible**. Its initial direction was **Option A: stylized
+low-poly science-fiction**, approved in #273–#276. The current 2D art authority is [strict top-down illustration](top-down-art-direction.md). Low polygon count is a design
 constraint, not a quality rating. Option B is a later stylized hard-surface pass:
 more deliberate bevels and material detail, with the same metric interfaces.
 Neither option changes gameplay, physics, sockets, pivots or asset identity.
@@ -111,10 +121,10 @@ approval. Its existing node, texture-memory and consumer draw caps and the five
 `budgets` remain hard gates. Optional style profiles add measurable advisory
 signals (density, normal alignment, reuse, LOD cost); shape, color and quality
 remain review decisions. Purposeful exceptions require an asset-local reason.
-See [manifest](../models/manifest.md) and [shared contracts](../models/contracts.md).
+See [manifest](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/manifest.md) and [shared contracts](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/contracts.md).
 
 The production tool/deposit palette recipe and preserved shared-sphere policy
-are documented in [resource Option A](../models/assets/resources/OPTION-A.md).
+are documented in [resource Option A](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/assets/resources/OPTION-A.md).
 
 ## Procedural body and terrain recipes (#278)
 

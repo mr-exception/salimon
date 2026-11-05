@@ -1,5 +1,8 @@
 # Instant physical-material Core upgrades (#548)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Future 2D conversion upgrade boundary (2026-11-04):** This document specifies historical **energy-storage capacity** tiers for the native Core. The new [2D resource lifecycle](resource-inventory-and-gathering.md) approves a separate **upgradeable maximum energy-generation rate (watts)** for continuous whole-litre conversion. **Its base rate, progression, upgrade resources/costs and prerequisites must be discussed and defined later.** No new generation-rate tiers are approved here, and the historical physical-fragment intake does not govern the future 2D UI.
 
 ## Balance decision and catalog

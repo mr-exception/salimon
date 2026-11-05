@@ -1,5 +1,18 @@
 # Coding conventions
 
+## Active browser/2D TypeScript conventions
+
+The active game uses React, TypeScript, Vite, a fixed-step top-down world and a separate Three/R3F cockpit radar. Read [browser code owners](current-client-status.md) and [2D migration status](2d-migration-register.md) before using the historical Rust rules below.
+
+- Keep deterministic world/ship-local frames, stable entity IDs, interaction/collision footprints and fixed tick rules in pure domain owners; the SVG/React presentation cannot mutate the source of gameplay truth.
+- Keep the 3D radar behind cockpit authority. Mounting/unmounting a view never reinitializes ship physics, positions or persistent player state.
+- Use integer grams for all raw materials and weighted count-item stacks; one 10 kg / 12 shared-slot player inventory, no volume constraints. Resource transfers and depletion are atomic, revision-bound and verified under failed writes and reloads.
+- Separate proposed ship buffers and modules from active functionality. A visible Core, Fabricator or storage case is not working power, crafting or transfers. Do not invent item masses, suit recipes, module capacities or power rates.
+- Browser verification: Node >=22.18; `cd client && npm ci && npm test && npm run build` plus affected Playwright suites and original evidence. Do not impose legacy native/M1 signoff as a routine cloud gate.
+- Update source-status and migration register in the same PR when a feature actually ports.
+
+## Historical native Rust, shader and asset conventions
+
 These rules apply to Rust runtime/domain code, Python tooling, shaders and assets.
 Use the [maintenance map](maintenance-map.md) before changing a boundary and the
 [validation matrix](validation.md) for exact checks.
@@ -30,8 +43,8 @@ Use meters and seconds (and explicit SI mass/volume) in contracts. Name scalar
 values with their unit when ambiguous and document world, body-local, ship-local
 or camera-relative frames on vectors/transforms. CPU absolute positions stay
 `f64`; subtract camera origin in `f64` before GPU `f32` conversion. Follow the
-[coordinate contract](../client/world/coordinate-strategy.md) and
-[asset axes](../models/contracts.md), including Blender/runtime conversion.
+[coordinate contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/coordinate-strategy.md) and
+[asset axes](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/contracts.md), including Blender/runtime conversion.
 
 Use `salimon-math` for compatible `f64` component arithmetic in migrated
 consumers. Keep domain normalization thresholds/fallbacks and frame conversion
@@ -90,8 +103,8 @@ Do not hand-edit generated GLB/glTF/bin, export reports, spatial sidecars or
 `client/character/src/spatial_contracts.rs`. For the scout use
 `python models/assets/ships/salimon-scout/export.py --blender /path/to/blender`,
 then its validator; generic asset CLI commands do not register the scout adapter.
-See [authoring](../models/authoring.md) and
-[scout source/regeneration](../client/assets/ship/README.md#source-and-regeneration).
+See [authoring](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/models/authoring.md) and
+[scout source/regeneration](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/assets/ship/README.md#source-and-regeneration).
 Commit source, deliberate contract changes, exports, generated layouts and
 consumer/tests/docs together. Blender is optional for normal runtime builds.
 

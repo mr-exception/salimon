@@ -69,3 +69,18 @@ Same-session implementing-agent local review: **ACCEPT**, STORE-1–5 PASS, no
 material findings. Required current-head CI is still pending publication; final
 acceptance is bound on the PR after those checks resolve. New-widget visual and
 hardware qualification are N/A for this domain-only browser-local change.
+
+## Concurrent documentation stack integration
+
+PR #793 (`issue-791-2d-doc-corpus`, `bf1cb0df46d46047e9ee01460a26a4d083f85cce`)
+appeared during implementation (created 12:44 UTC), after initial discovery found
+no active PRs. To preserve the required linear stack, this branch incorporates
+that documentation-only history non-destructively and now targets #793. Merge
+order is #793 → #794 → the #785 child. The client README conflict preserves both
+the new migration-register routing and schema-v4 container documentation. Its
+register row is updated for the newly delivered domain.
+
+All runtime/test/asset/config/lockfile hashes remain equal to source-hashes.json;
+existing local evidence is reused. Link/diff checks are repeated and current-head
+CI reruns before final acceptance. The previous exact-head acceptance is superseded
+by the final stack review comment, which binds new parent/head and CI.

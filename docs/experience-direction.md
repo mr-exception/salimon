@@ -1,5 +1,8 @@
 # Game experience direction: grounded cinematic Salimon
 
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 > **Planetary environment future design (approved 2026-10-24):** [Planetary environmental art direction](planetary-environment-art-direction.md) defines scientifically grounded geological provinces, climate/weather, rare coherent biospheres, physical harvesting, rare natural landmarks, suit observations, spatial sound and acceptance scenes. These are **future targets**, not a claim of native implementation or changed Scout interior requirements. Surface-liquid hydrology remains unapproved.
 
 

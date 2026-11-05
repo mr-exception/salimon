@@ -1,5 +1,8 @@
 # Universe source manifests and offline staging — U06 (#407)
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 ## Current private-development authorization (2026-10-27)
 
 The owner authorizes acquiring and using the public Gaia/ESA, JPL Horizons and
@@ -24,7 +27,7 @@ allow observed snapshots in non-production mode; no code change, fabricated
 review sidecar or provider-status promotion is needed. The checked-in manifest
 still describes only its existing bytes, not a newly downloaded full catalog.
 
-The frozen [manifest](../catalogs/sources/manifest-v1.json) records official Gaia
+The frozen [manifest](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/catalogs/sources/manifest-v1.json) records official Gaia
 DR3, JPL Horizons and NASA Exoplanet Archive PS sources, exact acquisition queries,
 release/model context, coverage, uncertainty, credits/reuse policy references and
 SHA256/byte counts. Checked on 2026-10-21. It is a development fixture manifest,

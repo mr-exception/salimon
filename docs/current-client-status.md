@@ -1,5 +1,7 @@
 # Current browser implementation and contract routing
 
+The [full 2D migration register](2d-migration-register.md) classifies every documentation file, maps historical 3D concepts onto active 2D design, and identifies the unfinished browser adapters.
+
 Checked against `client/src` on 2026-11-05. The default `/` is the playable
 React/TypeScript 2D Scout/planet world. The 3D radar opens at its cockpit; the
 illustrative radar ship does not relocate the authored 2D landing site.

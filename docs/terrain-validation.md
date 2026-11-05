@@ -1,7 +1,10 @@
 # Terrain integration and validation
 
+> **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved versioned identities, environmental and simulation rules; represent planets in authoritative top-down illustrated layers and footprint collision, with faceted celestial contacts only in cockpit radar. Native mesh/camera/GPU and Rust source details are archived. See the [migration register](2d-migration-register.md) for readiness and ownership.
+
+
 The canonical definition, coordinate/version rules and compact wire format live in
-[the world terrain contract](../client/world/terrain-contract.md). This guide owns
+[the world terrain contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/terrain-contract.md). This guide owns
 integration budgets, approximation limits and the reproducible native workflow.
 
 ## Ownership and activation
@@ -27,7 +30,7 @@ uncancellable and partition-independent. Free-flight movement uses bounded
 continuous segment sweeps: elevation extrema are broad bounds, and version-1
 heightfield gradient bounds drive chronological contact refinement. The existing
 conservative 16 m sphere retains local-normal clearance; see the ship-owned
-[collision/crash contract](../client/ship/architecture.md#swept-collision-and-crash-settling-202)
+[collision/crash contract](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/ship/architecture.md#swept-collision-and-crash-settling-202)
 for resolution, conservative work-cap behavior and crash-state response.
 
 Character eye height is 1.75 m along radial gravity up. Walking follows the view
@@ -53,7 +56,7 @@ definition edits/migration remain unsupported.
 A fill residual at or below 1e-12 kg after successful emission is left unextracted
 in the source instead of allocating a roundoff-only microscopic body. It is not
 credited, discarded or buffered. Initial small requests remain valid. See
-[resource output](../client/world/resource-contracts.md#handheld-extraction).
+[resource output](https://github.com/mr-exception/salimon/blob/8f112bb6e6be9f813174efb47d706a8601930d04/client/world/resource-contracts.md#handheld-extraction).
 
 ## Patch selection and near/far presentation
 

@@ -76,8 +76,8 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (event.code === 'KeyP' && !event.repeat && acceptsFlightShortcut(event.target)) {
         paused.current = !paused.current; clear(); return
       }
-      if (paused.current || session.current?.error || session.current?.survival.health === 0) return
-      if (event.code === 'KeyE' && isCockpitTarget(current.current.selectedId) && session.current && !survivalPolicy(session.current.survival).canWork) return
+      if (paused.current || session.current?.survival.health === 0) return
+      if (event.code === 'KeyE' && isCockpitTarget(current.current.selectedId) && session.current && (!!session.current.error || !survivalPolicy(session.current.survival).canWork)) return
       if (current.current.cockpit.view === 'radar') return
       if (container.current?.opened && event.code === 'KeyE') return
       if (!event.repeat && (event.code === 'Escape' || (event.code === 'KeyE' && acceptsFlightShortcut(event.target)))) {
@@ -144,7 +144,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const closeContainer = () => { container.current?.close(); current.current = session.current?.world ?? current.current; (document.activeElement as HTMLElement | null)?.blur(); setState({ ...current.current }) }
   const selectedSource = resourceSession && selected && resourceSession.snapshot.sources[selected.id]
   const interact = () => {
-    if (paused.current || resourceSession?.error || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && !survivalPolicy(resourceSession.survival).canWork) return
+    if (paused.current || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && (!!resourceSession.error || !survivalPolicy(resourceSession.survival).canWork)) return
     if (selectedContainer && container.current?.open(current.current)) current.current = container.current.session.world
     else if (resourceSession?.equipped && selectedSource) { resourceSession.start(selected!.id); current.current = resourceSession.world }
     else { if (resourceSession) resourceSession.feedback = ''; current.current = current.current.player.mode === 'interacting' ? cancelInteraction(current.current) : requestInteraction(current.current) }
@@ -189,7 +189,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <div className="top-down-caption"><span>01 / QUIET LANDING SITE</span><span>SCOUT — INTERIOR CUTAWAY</span></div></section>
     <aside className="top-down-interaction" aria-label="Nearby interaction">
       <div><p data-prompt>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : 'No fixture in reach · Move closer'}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
-      <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={paused.current || !!resourceSession?.error || resourceSession?.survival.health === 0 || !selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
+      <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={paused.current || cockpitTarget && !!resourceSession?.error || resourceSession?.survival.health === 0 || !selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
     </aside>
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
     <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · 1 kg/s · Machine systems are placeholders' : 'Console inspections are a test · Systems inactive'}</p></footer>

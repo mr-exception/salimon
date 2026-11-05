@@ -9,6 +9,12 @@ test('SURV built active/pause/reload, outdoor/interior/navigation-return and ter
   await expect(page.getByRole('meter', { name: 'Health', exact: true })).toHaveAttribute('value', '200')
   const capture = async (name: string) => {
     await expect.poll(async () => { await page.clock.runFor(32); return page.locator('.top-down-scene').getAttribute('data-render-ready') }).toBe('true')
+    await page.evaluate(async () => {
+      await Promise.all(Array.from(document.querySelectorAll('svg image')).map(async element => {
+        const bitmap = new Image(); bitmap.src = element.getAttribute('href')!; await bitmap.decode()
+      }))
+    })
+    await page.clock.runFor(64)
     await page.screenshot({ path: info.outputPath(`${name}.png`), fullPage: true })
     const box = await hud.boundingBox(); expect(box!.width).toBeGreaterThan(150); expect(box!.x).toBeGreaterThanOrEqual(0)
   }

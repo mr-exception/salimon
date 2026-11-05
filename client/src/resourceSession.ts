@@ -161,7 +161,7 @@ export class ResourceSession {
   private readonly storeDefinitions: ResourceStoreCatalog
   private readonly now: () => number
   readonly itemCatalog: CountItemCatalog
-  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG, now: () => number = Date.now) {
+  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG, now: () => number = () => Math.floor(Date.now())) {
     this.now = now
     this.survival = freshSurvival(now())
     this.itemCatalog = registerCountItems(itemDefinitions)

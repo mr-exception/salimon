@@ -120,3 +120,22 @@ test('lethal production tick commits immediately and reload cannot resurrect or 
   assert.equal(reload.transfer({ revision: reload.snapshot.revision, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 1000 }), false)
   assert.equal(reload.world.tick, session.world.tick)
 })
+
+test('v5 migration preserves the entire ledger and initializes no historic active/offline progress', () => {
+  let raw: string | null = null
+  const storage = { getItem: () => raw, setItem: (_: string, value: string) => { raw = value } }
+  const world = createTopDownState('exterior', true)
+  const old = new ResourceSession(storage, world, undefined, undefined, () => 1000)
+  old.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 333 })
+  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.survival
+  raw = JSON.stringify(v5); const bytes = raw
+  const migrated = new ResourceSession(storage, world, undefined, undefined, () => 21_601_000)
+  assert.equal(migrated.error, ''); assert.equal(raw, bytes)
+  assert.deepEqual(migrated.survival, freshSurvival(21_601_000))
+  assert.deepEqual(migrated.snapshot.inventory, v5.inventory)
+  assert.deepEqual(migrated.snapshot.sources, v5.sources)
+  assert.deepEqual(migrated.snapshot.stores, v5.stores)
+  migrated.advance(stepTopDown(migrated.world, [0, 0])); migrated.checkpoint()
+  assert.equal(JSON.parse(raw!).version, 6)
+  assert.equal(new ResourceSession(storage, world, undefined, undefined, () => 21_601_000).survival.activeTicks, 1)
+})

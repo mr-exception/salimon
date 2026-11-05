@@ -50,7 +50,7 @@ Zero fatigue denies gathering and cockpit entry, revokes current piloting and
 manual throttle, and requires fresh cockpit entry/input after recovery. World
 velocity and committed assists are preserved. Zero HP denies movement and work.
 
-Deferred tuning follow-up: the historical **provisional** 75% mining work-rate
+Deferred tuning follow-up [#799](https://github.com/mr-exception/salimon/issues/799): the historical **provisional** 75% mining work-rate
 multipliers and 250 ms discrete-action recovery are not approved 2D balancing.
 Mining retains the current 1 kg/s until owner approval of those values and their
 composition. HUD warns about established movement/exhaustion effects only.

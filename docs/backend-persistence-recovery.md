@@ -1,6 +1,6 @@
 # Backend persistence, strict checkpoint window and recovery
 
-**Status:** Approved future backend design, **not implemented** (2026-11-05). Companion to [backend authority, simulation and networking](backend-architecture.md). This describes NestJS/TypeScript + MongoDB server persistence, **not** the browser's current `ResourceSession` localStorage v3, nor the archived Rust/native whole-session save schema. Read [current client status](current-client-status.md), [resource/inventory](resource-inventory-and-gathering.md), and [cockpit/reconnect](cockpit-navigation-and-reconnect.md) for current implementation and gameplay precedence.
+**Status:** Approved future backend design, **not implemented** (2026-11-05). Companion to [backend authority, simulation and networking](backend-architecture.md). This describes NestJS/TypeScript + MongoDB server persistence, **not** the browser's current `ResourceSession` localStorage v4, nor the archived Rust/native whole-session save schema. Read [current client status](current-client-status.md), [resource/inventory](resource-inventory-and-gathering.md), and [cockpit/reconnect](cockpit-navigation-and-reconnect.md) for current implementation and gameplay precedence.
 
 ## 1. Explicit decisions and invariants
 

@@ -21,7 +21,7 @@
 | Physical suits, hazards and upgrades | Future **tierless** basic suit with two module slots, drawer tiers **4/8/12**, module-store tiers **12/16/24**, **200 HP** character health, independent exposure and **1,000 HP** absorption per module. Exact gear masses/recipes remain TBD. |
 | Native localized room/module hull damage | Current 2D design uses **ship-wide damage or total ship destruction**. Partial-room destruction and detached compartment logic deferred; offline death only after authoritative whole-ship loss. |
 | Native Gaia, terrain, gravity, streaming | Retain reproducible canonical data, IDs and physics as future port inputs; authoritative overhead surface sprites/colliders and cockpit radar proxies need independent browser/backend integration. |
-| Native whole-session save or network state | Browser-local `ResourceSession` **v3** gram ledger (after #783) is **not** native schema 29+, multiplayer authority or cloud sync. |
+| Native whole-session save or network state | Browser-local `ResourceSession` **v4** gram ledger (after #783/#784) is **not** native schema 29+, multiplayer authority or cloud sync. |
 | Rust QA and native screenshot evidence | Historical; use Node/TypeScript and real browser Playwright capture for new feature delivery. Native hardware signoff is not a default browser blocker. |
 
 ## Development sequence (not a new gameplay approval)
@@ -99,7 +99,7 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`resource-inventory-and-gathering.md`](resource-inventory-and-gathering.md) | PLAYABLE | 10 kg / 12 slots, integer grams and sample mining; schema-v4 raw ledger, identified 50 kg Scout container (#784) and playable confirmed transfers (#785). |
 | [`room-finishes.md`](room-finishes.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`room-lighting.md`](room-lighting.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
-| [`save-contract.md`](save-contract.md) | NATIVE | Historical Rust schema 29+; browser v3 local gram ledger is distinct. |
+| [`save-contract.md`](save-contract.md) | NATIVE | Historical Rust schema 29+; browser v4 local gram ledger is distinct. |
 | [`scout-acoustics.md`](scout-acoustics.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`scout-and-modular-construction.md`](scout-and-modular-construction.md) | DESIGN | Approved modular structure intent, not a browser construction system. |
 | [`scout-interior-art-direction.md`](scout-interior-art-direction.md) | DESIGN | Preserve lived-in Scout; translate furniture/door/window presence into 2D cutaway art and interaction anchors. |

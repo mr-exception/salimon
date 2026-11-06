@@ -1,0 +1,52 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=panoramic --project=look-at --project=observation
+
+[WebServer] (node:6050) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6082) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:6109) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6167) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 10 tests using 1 worker
+
+(node:6179) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [panoramic] › tests/panoramic.spec.ts:13:1 › HUD-1 full viewport, scanner authority, keyboard browser and priority Escape (16.2s)
+  ✓   2 [panoramic] › tests/panoramic.spec.ts:68:1 › HUD-2 compass render states, ship rotation, zoom and responsive warning priority (29.2s)
+  ✓   3 [panoramic] › tests/panoramic.spec.ts:110:1 › HUD-3 grounded authority and no sidebar at smaller desktop size (4.2s)
+(node:6412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation (23.3s)
+  ✓   5 [look-at] › tests/look-at.spec.ts:84:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled (11.8s)
+(node:6610) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 [observation] › tests/observation.spec.ts:23:1 › OBS-1 actual perspective camera, independent ship, reset and remount (9.4s)
+  ✓   7 [observation] › tests/observation.spec.ts:63:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation (6.7s)
+  ✓   8 [observation] › tests/observation.spec.ts:96:1 › OBS-3 DPR 2 preserves projection and origin (3.8s)
+  ✓   9 [observation] › tests/observation.spec.ts:108:1 › OBS-4 repeated wide/telescope pixels and negative comparison (8.7s)
+  ✓  10 [observation] › tests/observation.spec.ts:139:1 › OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin (26.9s)
+
+  10 passed (2.6m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

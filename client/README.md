@@ -562,3 +562,38 @@ The overlay includes expandable keyboard/action help.
 `node --experimental-strip-types --test src/observationCamera.test.ts src/contactCommands.test.ts`
 and `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=look-at`.
 Broader regression and approved visual baselines remain in existing CI.
+
+### Compact panoramic HUD (#814)
+
+`PanoramicNavigation.tsx` composes the independent observation camera, optical sky,
+scanner-gated perspective markers, collapsed contact browser and full-viewport HUD.
+Pass a `NavigationRuntime` and parent-owned `ObservationCameraState`; optional
+`canPilot`, `isPaused`, `onExit` and `onSceneReady` callbacks preserve the lifecycle
+owner's authority. The component advances the supplied runtime while mounted;
+its lifecycle owner must avoid a second simultaneous tick owner. Production cockpit
+activation and view persistence remain #815; the existing radar is retained until
+that integration. `/tests/panoramic.html` exercises the reusable production component;
+`?grounded` uses the shared Scout/Vesper domain anchor.
+
+The sky keeps #811's explicit 32-body uniform budget (`opticalBodies` may supply
+that bounded physical render set separately from the scanner catalog). CPU sensor
+occlusion uses the entire runtime catalog, with no 32-ID cap. No camera-owned
+physics or server state is introduced. All scanned contacts remain searchable and
+paged, whether grouped, occluded or behind the camera.
+
+C opens contacts from the playfield, Tab traverses controls, and Escape dismisses
+help, contacts, then telemetry before requesting cockpit exit. Focused controls
+suppress WASD, ship arrows and optical wheel. Reset returns to the current ship
+heading and 75° FOV. The compass uses a camera-relative hemispherical disk: center
+is axial, rim is sideways, up/down follows the screen. Solid markers are front;
+hollow markers are rear (exact 180° rear is at the center). Yellow triangles and
+larger green circles distinguish coincident vectors; cyan marks the view axis.
+Velocity at or below 0.01 m/s is Stationary. Speed explicitly uses the sample
+inertial frame. Warnings/terminal actions have priority over expanded telemetry.
+
+Run `npm test`, `npm run build` and
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=panoramic --project=perspective --project=look-at`
+when using an existing system Chromium (omit `CHROMIUM_PATH` for Playwright's
+installed browser). The new browser project runs in the existing functional CI;
+compass repeat captures and a front/rear negative comparison do not change or
+approve any visual baseline.

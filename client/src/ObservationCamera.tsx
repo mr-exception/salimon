@@ -61,8 +61,11 @@ export function ObservationCamera({ view }: { view: ObservationCameraState }) {
       drag.x = event.clientX; drag.y = event.clientY
     }
     const wheel = (event: WheelEvent) => {
-      if (!permitted() || event.ctrlKey || event.metaKey) return
+      if (event.ctrlKey || event.metaKey) return
+      // The full-viewport playfield has no scroll action. Consume its wheel
+      // even while a form owns focus, while keeping observation unchanged.
       event.preventDefault()
+      if (!permitted()) return
       view.command({ type: 'zoom', pixels: event.deltaY *
         (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? canvas.clientHeight : 1) })
     }

@@ -31,8 +31,9 @@ forward to the cockpit chair. **E / Use cockpit** seats the owner and opens the
 existing 3D radar. **Exit navigation · Stand up** returns standing beside the
 chair in one action. Ship position, velocity, orientation, throttle and scanner
 continue in the same `NavigationRuntime` while walking or viewing the radar.
-The illustrative landed 2D ship pose stays fixed: radar sample motion does not
-implement flight or move the landing site.
+Both views share the grounded Scout/Vesper surface anchor (#802). Unsupported
+propulsion, turning, alignment, takeoff and relocation are gated; scanner/time
+continue while the ship stays at the same authored site.
 
 `cockpit.ts` owns one local chair reservation, owner-control admission and power
 transitions. `TopDownView` keeps the 2D world mounted; only radar presentation is
@@ -49,8 +50,9 @@ control gating are local hooks for a future authoritative adapter.
 suite. `/?scene=top-down` in development retains the isolated inspection fixture
 for the #761–#765 checks. These fixture queries do not implement in-play teleport.
 `npm run test:browser -- --project=cockpit` walks from default spawn and covers
-normal exit, outage/restoration, chair state and nonzero throttle/velocity across
-view switches. It repeats original captures with the unchanged pixel policy.
+normal exit, outage/restoration, chair state, a persistent grounded anchor and
+advancing radar/scanner ticks across view switches. The production slice also
+checks repeated entry and local save/reload. It repeats original captures with the unchanged pixel policy.
 
 ## Top-down foundation (#761)
 

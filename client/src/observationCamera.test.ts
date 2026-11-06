@@ -69,3 +69,34 @@ test('snapshot restore validates atomically; reset samples heading once', () => 
     near(restored.snapshot().fov, 75)
   }
 })
+test('Look at captures once, preserves FOV/ship, and takes a continuous antipodal arc', () => {
+ for (const pitch of [0, Math.PI / 2, -Math.PI / 2]) {
+  const ship = { ...initialShip(), pitch }, saved = structuredClone(ship), view = new ObservationCameraState(ship)
+  view.zoom(-9000)
+  const back = direction(view).negate().toArray() as [number, number, number]
+  const original = view.snapshot(), start = new Quaternion(...original.quaternion)
+  assert.equal(view.lookAt(back), true); back[0] = 100
+  let previous = start
+  for (let i = 0; i < 100; i++) {
+   view.advanceLookAt(0.01)
+   const next = new Quaternion(...view.snapshot().quaternion)
+   assert.ok(previous.angleTo(next) < 0.05)
+   near(start.clone().invert().multiply(next).z, 0)
+   previous = next
+  }
+  near(direction(view).dot(new Vector3(0, 0, -1).applyQuaternion(start)), -1)
+  assert.equal(view.lookingAt, false); assert.equal(view.snapshot().fov, original.fov)
+  assert.deepEqual(ship, saved)
+  const done = view.snapshot(); view.advanceLookAt(10); assert.deepEqual(view.snapshot(), done)
+ }
+})
+test('manual camera movement/zoom/reset/restore cancels; idle input does not', () => {
+ const view = new ObservationCameraState(initialShip())
+ for (const cancel of [() => view.look(0.1, 0), () => view.zoom(10), () => view.reset(initialShip()), () => view.restore(view.snapshot()), () => view.cancelLookAt()]) {
+  view.lookAt([1, 1, 1]); view.advanceLookAt(0.2)
+  view.look(0, 0); view.zoom(0); assert.equal(view.lookingAt, true)
+  cancel(); assert.equal(view.lookingAt, false)
+  const before = view.snapshot(); view.advanceLookAt(1); assert.deepEqual(view.snapshot(), before)
+ }
+ for (const invalid of [[0, 0, 0], [NaN, 0, 1], [Infinity, 1, 0]] as const) assert.equal(view.lookAt(invalid), false)
+})

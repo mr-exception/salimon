@@ -38,7 +38,7 @@ export function ObservationCamera({ view }: { view: ObservationCameraState }) {
       const axis = panAxisForCode(event.code)
       if (!permitted() || !acceptsFlightShortcut(event.target)) { cancel(); return }
       if (event.altKey || event.ctrlKey || event.metaKey) { cancel(); return }
-      if (axis) { event.preventDefault(); held.press(event.code, axis) }
+      if (axis) { view.cancelLookAt(); event.preventDefault(); held.press(event.code, axis) }
     }
     const keyup = (event: KeyboardEvent) => { held.release(event.code) }
     const down = (event: PointerEvent) => {
@@ -47,6 +47,7 @@ export function ObservationCamera({ view }: { view: ObservationCameraState }) {
       // Reset View. Wheel/keyboard alone never steal focus from forms.
       canvas.focus({ preventScroll: true })
       if (!permitted()) return
+      view.cancelLookAt()
       drag = { id: event.pointerId, x: event.clientX, y: event.clientY }
       canvas.setPointerCapture(event.pointerId)
       event.preventDefault()
@@ -102,6 +103,7 @@ export function ObservationCamera({ view }: { view: ObservationCameraState }) {
       const step = Math.min(dt, 0.05) * 0.65 / Math.max(1, Math.hypot(right, up))
       view.command({ type: 'look', right: right * step, up: up * step })
     } else held.clear()
+    view.advanceLookAt(Math.min(dt, 0.05))
     const snapshot = view.snapshot()
     camera.position.set(0, 0, 0)
     camera.quaternion.fromArray(snapshot.quaternion)

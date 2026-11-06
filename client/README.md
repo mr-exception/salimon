@@ -502,7 +502,7 @@ contacts** for markers/browser entries; geometry only vetoes line of sight.
 Every selection/action handler rechecks live scanner membership and range.
 The parent still advances scanner ticks independently of rendering/camera input.
 An optional `onSetDirection` callback connects the existing authorized flight
-command; its caller must retain grounded/power/cockpit authority. Look at is #813.
+command; its caller retains power/cockpit authority through `canPilot` and the live `getShip` snapshot. Grounding is also guarded by the overlay. Camera-only Look at is described below.
 
 Projection rotates split-relative unit directions into camera space, explicitly
 rejects behind-camera/outside-frustum centers, and compares physical surface
@@ -527,3 +527,38 @@ compact HUD (#814). The existing 32-body optical catalog budget still applies.
 Run `npm test`, `npm run build`, and
 `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=perspective`.
 Original evidence and limitations: [issue report](../reports/issue-812/README.md).
+
+
+## One-time contact observation (#813)
+
+`PerspectiveContacts` exposes independent **Look at** and **Set direction**
+commands for a currently scanned selection. Supply `getShip` and `getOrigin`
+from the same authoritative ship snapshot, and a live `canPilot` callback for
+cockpit/power authority. Recheck flight authority in the parent callback;
+`setContactDirection` is the reusable scanner/flight guard. The current
+orthographic production radar stays unchanged until panoramic integration #815.
+
+`lookAtContact` captures the current ship-to-contact vector once, even for a
+rear/occluded browser entry. `ObservationCameraState.lookAt` transports the
+current camera frame along a shortest quaternion arc over one second of active
+view time using smoothstep interpolation. At exactly opposite directions the
+current screen-up axis breaks the tie deterministically. It preserves FOV,
+ship heading, velocity, throttle and any ongoing ship alignment. It retains
+no target reference and never tracks moving bodies or the moving ship.
+`ObservationCamera` advances it on rendered frames (delta bounded at 50 ms).
+Manual left press/drag, W/A/S/D, wheel, reset or snapshot restoration cancels it;
+idle commands and focused typing do not. Manual ship steering cancels only
+Set direction. Call `cancelLookAt()` for an explicit view interruption.
+
+Grounded Scout can observe other detected bodies without flight authority.
+Its currently landed planet is identified in the browser and both commands are
+disabled for that body; Set direction remains disabled for all grounded targets.
+Range loss clears selection/actions, while the captured animation may finish.
+Optical geometry stays opaque; Look at never exposes hidden markers.
+The overlay includes expandable keyboard/action help.
+
+`/tests/look-at.html` composes these production owners in standalone flying and
+`?grounded` shared Scout/Vesper fixtures. Verification:
+`node --experimental-strip-types --test src/observationCamera.test.ts src/contactCommands.test.ts`
+and `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=look-at`.
+Broader regression and approved visual baselines remain in existing CI.

@@ -37,6 +37,13 @@ transfer, store mass); `resourceInventory.ts` owns shared player constraints;
 owns shared-world admission, draft/confirmation and cancellation;
 `ResourceContainerPanel.tsx`/`resourceContainer.css` own the modal.
 `tests/storage.spec.ts` covers the built gather/store/reload loop and errors. Tests are colocated; `tests/gathering.spec.ts` covers the built mining/save adapter.
+`observationCamera.ts` owns captured one-shot camera interpolation and cancellation;
+`contactCommands.ts` owns scanner/grounding/flight command guards, and
+`PerspectiveContacts.tsx` renders live command availability and observation help.
+`ObservationCamera.tsx` routes manual view cancellation; `simulation.ts` retains
+ship-only alignment and steering cancellation. See `contactCommands.test.ts`,
+`observationCamera.test.ts` and `tests/look-at.spec.ts` (shared grounded Scout and
+standalone flying fixtures). Production panoramic composition remains #815.
 The crate map below describes the removed native architecture at historical revisions.
 
 Browser acceptance uses [review in the active Codex chat](independent-game-qa.md)

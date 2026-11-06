@@ -21,6 +21,7 @@ export type ObservationCommand =
 export class ObservationCameraState {
   private orientation = new Quaternion()
   private verticalFov = DEFAULT_OBSERVATION_FOV
+  private transition: { start: Quaternion; end: Quaternion; elapsed: number } | null = null
 
   constructor(heading: Pick<ShipState, 'yaw' | 'pitch'>) { this.reset(heading) }
 
@@ -33,12 +34,14 @@ export class ObservationCameraState {
         !Number.isFinite(snapshot.fov)) throw new RangeError('Invalid observation snapshot')
     const norm = Math.hypot(...snapshot.quaternion)
     if (norm < 1e-12 || !Number.isFinite(norm)) throw new RangeError('Invalid observation quaternion')
+    this.cancelLookAt()
     this.orientation.fromArray(snapshot.quaternion.map(value => value / norm))
     this.verticalFov = Math.max(MIN_OBSERVATION_FOV, Math.min(DEFAULT_OBSERVATION_FOV, snapshot.fov))
   }
 
   reset(heading: Pick<ShipState, 'yaw' | 'pitch'>): void {
     if (![heading.yaw, heading.pitch].every(Number.isFinite)) throw new RangeError('Invalid heading')
+    this.cancelLookAt()
     this.orientation.setFromEuler(new Euler(heading.pitch, heading.yaw, 0, 'YXZ'))
     this.verticalFov = DEFAULT_OBSERVATION_FOV
   }
@@ -51,14 +54,46 @@ export class ObservationCameraState {
     const axis = new Vector3(up, -right, 0)
     const magnitude = axis.length()
     if (!Number.isFinite(magnitude) || magnitude === 0) return
+    this.cancelLookAt()
     this.orientation.multiply(new Quaternion().setFromAxisAngle(axis.divideScalar(magnitude),
       magnitude * radians)).normalize()
   }
 
   zoom(pixels: number): void {
     if (!Number.isFinite(pixels)) return
+    if (pixels !== 0) this.cancelLookAt()
     this.verticalFov = Math.max(MIN_OBSERVATION_FOV, Math.min(DEFAULT_OBSERVATION_FOV,
       this.verticalFov * Math.exp(Math.max(-100, Math.min(100, pixels * 0.001)))))
+  }
+
+  cancelLookAt(): void { this.transition = null }
+  get lookingAt(): boolean { return this.transition !== null }
+
+  /** Capture a world direction once. Transport the current camera frame by the
+   * shortest arc; exactly opposite rays turn around the current screen-up axis.
+   * This deterministic tie-break preserves roll through the antipodal case.
+   */
+  lookAt(direction: readonly [number, number, number]): boolean {
+    const magnitude = Math.hypot(...direction)
+    if (!direction.every(Number.isFinite) || !Number.isFinite(magnitude) || magnitude === 0) return false
+    const local = new Vector3(...direction).divideScalar(magnitude).applyQuaternion(this.orientation.clone().invert())
+    const axis = new Vector3(local.y, -local.x, 0)
+    const sine = axis.length()
+    const angle = Math.atan2(sine, -local.z)
+    if (sine < 1e-12) axis.set(0, 1, 0)
+    else axis.divideScalar(sine)
+    const end = this.orientation.clone().multiply(new Quaternion().setFromAxisAngle(axis, angle)).normalize()
+    this.transition = { start: this.orientation.clone(), end, elapsed: 0 }
+    return true
+  }
+
+  advanceLookAt(seconds: number): void {
+    const transition = this.transition
+    if (!transition || !Number.isFinite(seconds) || seconds <= 0) return
+    transition.elapsed = Math.min(1, transition.elapsed + seconds)
+    const t = transition.elapsed
+    this.orientation.copy(transition.start).slerp(transition.end, t * t * (3 - 2 * t)).normalize()
+    if (t === 1) this.transition = null
   }
 
   command(command: ObservationCommand): void {

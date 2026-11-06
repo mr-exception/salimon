@@ -32,9 +32,9 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
 
 const openResourceSession = (storage: ResourceStorage, world: TopDownState) => new ResourceSession(storage, world)
 export function TopDownView({ gameplay = false, createResourceSession = openResourceSession }: { gameplay?: boolean; createResourceSession?: typeof openResourceSession }) {
-  const [navigation] = useState(() => new NavigationRuntime(SAMPLE_BODIES))
   const powerFixture = import.meta.env.DEV && gameplay && new URLSearchParams(location.search).has('powerFixture')
   const [state, setState] = useState(() => createTopDownState(import.meta.env.DEV && new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior', gameplay))
+  const [navigation] = useState(() => new NavigationRuntime(SAMPLE_BODIES, gameplay ? state.scoutLocation : undefined))
   const current = useRef(state)
   const session = useRef<ResourceSession | null>(null)
   const lockAttempt = useRef<Promise<unknown>>(Promise.resolve())
@@ -165,7 +165,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     {state.cockpit.view === 'radar' && <><div inert={paused.current || !!resourceSession?.error}><App navigation={navigation} isPaused={() => paused.current || !!session.current?.error} canPilot={() => !session.current || survivalPolicy(session.current.survival).canWork} /></div><button className="cockpit-exit" onClick={() => update(leaveCockpit(current.current))}>Exit navigation · Stand up</button></>}
     {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
-    <main data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
+    <main data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header><div><p className="top-down-eyebrow">SALIMON / WORLD FOUNDATION</p><h1>Scout · Surface study</h1></div><span className="top-down-tag">STRICT OVERHEAD / 2D</span></header>
     <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} />
       {gameplay && <aside className="resource-hud" aria-label="Resource inventory" data-gathering={resourceSession?.activeSourceId ?? ''}>

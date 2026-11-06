@@ -962,3 +962,14 @@ owners. `topDown.test.ts` covers transform/precision/state/layer contracts;
 `tests/top-down.spec.ts` covers actual SVG pixels, repeat captures, input cleanup
 and unchanged built radar entry. Run client domain tests, build and browser tests;
 [client guide](../client/README.md#top-down-foundation-761) records scope and controls.
+
+
+## Shared grounded Scout (#802)
+
+`client/src/scoutLocation.ts` owns the deterministic authored-site/sample-Vesper
+binding, frames and grounded physical anchor. `topDownRuntime.ts` consumes its
+frames; `navigationRuntime.ts` consumes its ship state and gates unsupported
+flight/relocation independently of React. The standalone radar fixture keeps its
+free-flight behavior. Checks: `scoutLocation.test.ts`, cockpit blackout/round trip,
+and built `SLICE-1` (re-entry, scanned Vesper, disabled flight, save/reload,
+continuous doorway/camera measurements and repeat screenshot comparisons).

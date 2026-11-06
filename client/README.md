@@ -234,7 +234,12 @@ For usability, visible sample distances are compressed *as input test fixtures*,
 
 The first scanner pulse arrives after five simulation seconds. `scanner.ts` owns the immutable catalog index and disposable contact/selection state. `radar.ts` owns visible frustum groups; `ContinuousContacts.tsx` retains meshes by scanned ID and updates grouping/visibility/positions each render frame; click a group to select any member from its paged list. Zoom never reveals unscanned catalog bodies. The lattice stays fixed to galactic axes. Off-screen objects have no scene indicator; their scanned IDs remain in the picker. Yellow heading and light-green dashed velocity rays run from the projected ship to the viewport edge. Zero speed suppresses velocity; off-screen ship origins use forward-ray clipping.
 
-`navigationRuntime.ts` composes motion, physical contact and scanning. `contact.ts` uses a conservative 5 m ship sphere and physical body radii, including rotating surface velocity. Impacts >=100 m/s end the run. Lower-speed contacts rebound/settle with zero thrust; <=20 m/s on a planet/moon is safe contact, separate from assisted landing. Nonplanetary contacts always recover as crashes. Restart navigation clears the run. Warnings observe scanned contacts without steering.
+`navigationRuntime.ts` composes motion, physical contact and scanning. `contact.ts` uses a conservative 5 m ship sphere and physical body radii, including rotating surface velocity. Impacts >=100 m/s end the run. Lower-speed contacts rebound/settle with zero thrust; <=20 m/s on a planet/moon is safe contact, separate from assisted landing. Nonplanetary contacts always recover as crashes. Restart navigation clears the standalone sample run. In the production cockpit,
+`scoutLocation.ts` binds the 2D site and radar to the same grounded Scout on
+Vesper. Takeoff/relocation, steering, alignment and propulsion are gated; the
+cockpit has no restart-to-flight action. Scanner/camera and simulation ticks
+continue. Local site-bound saves restore that same anchor; radar ticks/contacts
+are session-only. Warnings observe scanned contacts without steering.
 
 ## Verification and accessibility
 

@@ -2,9 +2,9 @@
 
 The [full 2D migration register](2d-migration-register.md) classifies every documentation file, maps historical 3D concepts onto active 2D design, and identifies the unfinished browser adapters.
 
-Checked against `client/src` on 2026-11-05. The default `/` is the playable
-React/TypeScript 2D Scout/planet world. The 3D radar opens at its cockpit; the
-illustrative radar ship does not relocate the authored 2D landing site.
+Checked against `client/src` on 2026-11-06. The default `/` is the playable
+React/TypeScript 2D Scout/planet world. The 3D radar opens at its cockpit and shares the grounded Scout / Vesper surface
+anchor with the 2D world. Takeoff and relocation are explicitly gated (#802).
 
 Start with the [playable journey](playable-2d-foundation.md),
 [client setup and verification](../client/README.md), and
@@ -19,7 +19,7 @@ requirements, not playable behavior. “Decision pending” identifies missing r
 
 | System | Browser-delivered evidence | Approved future / decision pending / legacy boundary |
 | --- | --- | --- |
-| 2D navigation and cockpit | `topDownRuntime.ts`, `topDownTraversal.ts`, `cockpit.ts`, `TopDownView.tsx`: continuous walking, collision, doorway frames, owner chair, radar entry/exit; `navigationRuntime.ts` continues simulation | Local power fixture is not Core power. No flight relocation of the landing site. [Cockpit/reconnect contract](cockpit-navigation-and-reconnect.md) separates future authority |
+| 2D navigation and cockpit | `topDownRuntime.ts`, `topDownTraversal.ts`, `cockpit.ts`, `TopDownView.tsx`: continuous walking, collision, doorway frames, owner chair, radar entry/exit; `scoutLocation.ts` binds world frames and radar physical state; `navigationRuntime.ts` continues time/scans while grounded | Local power fixture is not Core power. Takeoff/relocation unavailable until both views support the transition. [Cockpit/reconnect contract](cockpit-navigation-and-reconnect.md) separates future authority |
 | Mining | `resourceSession.ts`, `planetarySite.ts`: two fixed sources, up to 1,000 g per completed work interval, approved survival work-rate penalties and persisted partial work | Full catalog, tools and balancing pending; native physical fragments are legacy-only |
 | Inventory | `resourceInventory.ts`: 10,000 g / 12 shared slots, one raw stack per type, count-item mass/stack validation; `resourceSession.ts`: v7 ledger/item-definition/survival/hazard save, lossless v1–v7 migration | Generic item transactions and unified count/mass/slot UI are delivered; production item content, equipment UI and upgrades remain pending. [Weight-only contract](resource-inventory-and-gathering.md) supersedes volume limits |
 | Ship storage | `scoutResourceContainer.ts` declares the 50 kg raw-only `scout:storage`; `resourceContainerInteraction.ts` + `ResourceContainerPanel.tsx` provide E/Use, exact-gram review/confirmation and capacity/save feedback | Atomic domain transactions and schema-v8 saves persist both endpoints. Focus/Escape/reach/scene cancellation preserves commits; no container slot cap, count-item content or machine buffers |

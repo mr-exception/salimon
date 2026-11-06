@@ -37,7 +37,7 @@ npm run test:browser -- --project=cockpit
 ```
 
 `COCKPIT-1` covers ownership/reservation, normal exit, blackout/restoration and
-nonzero ship simulation continuity. `SLICE-1` is one uninterrupted journey through
+grounded ship/scanner time continuity. `SLICE-1` is one uninterrupted journey through
 the **built production `/`**: outdoor spawn → mineral and biological source
 inspection → aft doorway → cabin/cockpit → real radar → standing → outside.
 Each repeats in a fresh browser context. The original artwork is cached as
@@ -97,8 +97,12 @@ full planetary generation. Visible Core/Fabricator objects are inspection
 placeholders; the Resource Container supports confirmed gram transfers. Gathering reuses this same world and resource-source IDs, with
 integer grams and atomic local persistence; no independent scene was added.
 
-The sample radar's ship simulation runs continuously, but its illustrative flight
-does not relocate the authored landed 2D ship. Synthetic desktop input and
+The cockpit radar shares the authored Scout location on sample Vesper. Time and
+scanner pulses continue, but the Scout stays grounded: throttle, turning, alignment,
+takeoff and relocation cannot change its surface anchor. There is no restart-to-flight
+action in the cockpit. The separate `/?scene=radar` fixture retains sample free flight.
+Existing local saves bind to the versioned site and restore the same grounded ship;
+scanner contacts, selection and elapsed radar ticks are session-only. Synthetic desktop input and
 SwiftShader WebGL qualify the existing cloud path; physical input, hardware GPU,
 mobile/touch, M1/Metal and native performance are unverified separately.
 

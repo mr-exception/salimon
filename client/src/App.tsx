@@ -146,7 +146,8 @@ export function App({navigation,onSceneReady,canPilot,isPaused}:{navigation?:Nav
       <div className="stat"><span>Yaw / pitch</span><strong>{radians(pose.yaw)}° / {radians(pose.pitch)}°</strong></div>
       <div className="stat"><span>Alignment</span><strong>{aligning?'Turning':'Manual'}</strong></div>
       <div className="stat"><span>Flight status</span><strong>{pose.mode}</strong></div>
-      {pose.contact && <div role="status" className="contact-status">
+      {runtime.current.surfaceLocation && <p role="status" className="surface-status">Scout grounded on {runtime.current.surfaceLocation.body.name}. Takeoff and relocation are unavailable at this landing site. Scanner and camera remain available.</p>}
+      {pose.contact && !runtime.current.surfaceLocation && <div role="status" className="contact-status">
         {pose.mode==='destroyed'?'Journey ended — ship destroyed':pose.contact.outcome==='safe-contact'?'Safe surface contact':'Crash recovery'} · impact {fmt(pose.contact.impactSpeedMps)} m/s
         {(pose.mode==='destroyed'||pose.mode==='grounded') && <button onClick={restart}>Restart navigation</button>}
       </div>}

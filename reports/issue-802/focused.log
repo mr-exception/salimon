@@ -1,0 +1,11 @@
+✔ one deterministic Scout surface anchor binds 2D frames, lifecycle, Vesper and physical radar contact (2.679099ms)
+✔ ticks, steering, throttle, alignment, reset and repeated cockpit entry cannot relocate a grounded Scout (11.728177ms)
+✔ local checkpoints restore outdoor and ship-local players with the same surface and lifecycle (5.317197ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24.989951

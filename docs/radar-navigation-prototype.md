@@ -1,5 +1,22 @@
 # Navigation-only React radar prototype (2026-11-03)
 
+**Production cockpit (#802):** The default `/` starts outside the Scout, grounded
+at the authored site on sample Vesper. `scoutLocation.ts` owns a deterministic
+site/body binding and both the 2D frame pose and radar physical anchor. The
+site's local X/Y maps to sample X/Z near Vesper's +Y pole; the ship center rests
+on the physical radius (planet radius + 5 m conservative ship sphere). This is an
+illustrative mapping, with no canonical generation, ephemerides or surface rotation.
+The cockpit gates takeoff/relocation, turning, throttle and alignment; radar
+camera, scanner pulses, payload mass and time remain active. Reset cannot create
+a separate flying ship and the cockpit exposes no restart-to-flight control.
+Existing site-versioned local saves restore player/inventory in the same frames
+and reconstruct this fixed grounded anchor without a schema change. Radar time,
+contacts and selection are transient. A future launch/return transition must update
+the common domain owner and 2D world together before enabling flight.
+
+The free-flight behavior below applies to the isolated `/?scene=radar` sample.
+
+
 > **Current browser cockpit access (2026-11-05):** The 3D holographic radar opens **only from the in-world powered cockpit desk** in the default strict-top-down 2D Scout. Local owner and single-seat admission, seated representation, normal exit-to-standing and forced power-fixture return-to-seated are implemented in `client/src/cockpit.ts` and `TopDownView.tsx`. **Other players seeing the pilot seated, authoritative power failures, reconnect and backend multiplayer are still future contracts.** See [cockpit and reconnect](cockpit-navigation-and-reconnect.md).
 
 > **Current world view:** Scout interiors and the illustrated landing area **are already strict top-down 2D**. The radar remains a separate 3D instrument. [Weight-only gathering and inventory](resource-inventory-and-gathering.md) are playable in the 2D world, not inside the radar.

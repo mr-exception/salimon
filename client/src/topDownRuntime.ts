@@ -1,3 +1,4 @@
+import { startingScoutLocation, type ScoutLocation } from './scoutLocation.ts'
 import { initialCockpit, enterCockpit, isCockpitTarget, type CockpitState } from './cockpit.ts'
 import { planetaryEntities, STARTING_SITE, type SourceIdentity } from './planetarySite.ts'
 import { scoutEntities } from './scoutLayout.ts'
@@ -11,6 +12,7 @@ export type Layer = typeof LAYERS[number]
 export type Appearance = 'ground' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold' | 'mineral' | 'flora' | 'stones'
 export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance; readonly source?: SourceIdentity }
 export interface TopDownState {
+  readonly scoutLocation: ScoutLocation
   readonly cockpit: CockpitState
   readonly tick: number
   readonly player: { readonly facing: number; readonly mode: 'standing' | 'walking' | 'interacting' | 'seated'; readonly targetId: string | null }
@@ -27,6 +29,7 @@ const entity = (id: string, frame: Anchor['frame'], x: number, y: number, layer:
   ({ id, anchor: { frame, point: point2(x, y) }, layer, appearance })
 
 export function createTopDownState(view: 'interior' | 'exterior' = 'exterior', cockpitEnabled = false): TopDownState {
+  const scoutLocation = startingScoutLocation()
   const entities = [
     ...planetaryEntities(),
     entity('ship:scout', 'ship:scout', 0, 0, 'hull', 'hull'),
@@ -35,12 +38,10 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'exterior', c
     ...scoutEntities(),
   ]
   return {
+    scoutLocation,
     cockpit: initialCockpit(cockpitEnabled), tick: 0,
     player: { facing: 0, mode: 'standing', targetId: null }, selectedId: null, feedback: 'Approach a fixture to inspect it. Systems are inactive.',
-    frames: {
-      planet: { id: 'planet:fixture', universeOrigin: { cell: [10n ** 24n, -(10n ** 24n), 0n], offsetM: [0, 0, 0] }, angle: .2 },
-      ship: { id: 'ship:scout', parent: 'planet:fixture', origin: STARTING_SITE.shipOrigin, angle: STARTING_SITE.shipAngle },
-    },
+    frames: scoutLocation.frames,
     entities,
     camera: { anchor: entities.find(e => e.id === PLAYER_ID)!.anchor, pixelsPerM: view === 'exterior' ? 26 : 32 },
   }

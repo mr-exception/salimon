@@ -1,0 +1,15 @@
+[
+  {
+    "test": "SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return",
+    "errors": [
+      {
+        "location": {
+          "file": "/workspace/salimon/client/tests/playable-slice.spec.ts",
+          "column": 67,
+          "line": 102
+        },
+        "message": "Error: locator.selectOption: Error: strict mode violation: getByLabel('Scanned contacts') resolved to 2 elements:\n    1) <input value=\"\" type=\"search\" id=\"contact-search\"/> aka getByRole('searchbox', { name: 'Find scanned contacts' })\n    2) <select id=\"contact-select\">\u2026</select> aka getByLabel('Scanned contacts (5)')\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Scanned contacts')\u001b[22m\n\n\n  100 |       await expect(page.getByRole('button', { name: 'Restart navigation' })).toHaveCount(0)\n  101 |       await page.clock.runFor(5200)\n> 102 |       await page.getByRole('combobox', { name: /^Scanned contacts/ }).selectOption('vesper')\n      |                                                                   ^\n  103 |       await expect(page.getByRole('button', { name: 'Set direction' })).toBeDisabled()\n  104 |       await page.keyboard.down('ArrowLeft'); await page.clock.runFor(200); await page.keyboard.up('ArrowLeft')\n  105 |       await page.getByRole('button', { name: 'Reset camera', exact: true }).click()\n    at /workspace/salimon/client/tests/playable-slice.spec.ts:102:67"
+      }
+    ]
+  }
+]

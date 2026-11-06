@@ -1,3 +1,6 @@
+import { relativeM } from '../src/coordinates.ts'
+import { distances } from '../src/contact.ts'
+import { createTopDownState } from '../src/topDownRuntime.ts'
 import { test, expect } from '@playwright/test'
 import { compareImages, POLICY } from '../scripts/visual-comparison.ts'
 import { boot, scene, walkTo, walkTicks, position, positionIn } from './worldJourney'
@@ -16,6 +19,21 @@ test('SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and 
       const main = page.locator('main'), node = await scene(page).elementHandle()
       const frame = () => page.locator('[data-entity="person:player"]').getAttribute('data-frame')
       const sourceState = () => page.locator('[data-source-kind]').evaluateAll(nodes => nodes.map(n => ({ id: n.getAttribute('data-entity'), kind: n.getAttribute('data-source-kind'), frame: n.getAttribute('data-frame'), position: n.getAttribute('data-position'), site: n.getAttribute('data-source-site') })))
+      const shipState = async () => JSON.parse((await main.getAttribute('data-ship'))!)
+      const initial = await shipState()
+      const location = createTopDownState('exterior', true).scoutLocation
+      const serialized = JSON.stringify(location.ship.position, (_, v) => typeof v === 'bigint' ? v.toString() : v)
+      const assertGrounded = async () => {
+        const ship = await shipState()
+        expect(ship.position).toEqual(JSON.parse(serialized))
+        expect(ship.mode).toBe('grounded'); expect(ship.contact.bodyId).toBe(location.body.id)
+        expect(ship.velocityMps).toEqual([0, 0, 0]); expect(ship.throttle).toBe(0)
+        expect(ship.yaw).toBe(location.frames.ship.angle); expect(ship.pitch).toBe(0)
+        return ship
+      }
+      await assertGrounded()
+      expect(Math.abs(distances(location.ship, location.body).surfaceDistanceM)).toBeLessThan(.0001)
+      expect(relativeM(location.ship.position, location.body.position)[1]).toBeGreaterThan(location.body.radiusKm * 1000)
       const sources = await sourceState(), checkpoints: unknown[] = [], handoffs: unknown[] = []
       expect(sources.map(s => s.id).sort()).toEqual(['source:landing:biology:01', 'source:landing:mineral:01'])
       expect(await position(page)).toEqual([-6, 3]); expect(await frame()).toBe('planet:fixture')
@@ -23,7 +41,7 @@ test('SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and 
       const capture = async (name: string) => {
         await page.clock.runFor(5000)
         const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`), fullPage: true })
-        const checkpoint = { name, position: await position(page), planet: await positionIn(page, 'planet:fixture'), frame: await frame(), posture: await main.getAttribute('data-player-mode'), cameraGroundTransform: await page.locator('[data-entity="terrain:site"]').getAttribute('transform') }
+        const checkpoint = { ship: await shipState(), location: await main.getAttribute('data-scout-location'), name, position: await position(page), planet: await positionIn(page, 'planet:fixture'), frame: await frame(), posture: await main.getAttribute('data-player-mode'), cameraGroundTransform: await page.locator('[data-entity="terrain:site"]').getAttribute('transform') }
         checkpoints.push(checkpoint)
         await info.attach(`${name}-${replay}-state.json`, { body: JSON.stringify(checkpoint), contentType: 'application/json' })
         if (replay === 0) originals[name] = png
@@ -77,8 +95,17 @@ test('SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and 
       await page.keyboard.press('e')
       await expect.poll(async () => { await page.clock.runFor(50); return page.getByRole('img', { name: 'Ship-centered three-dimensional radar', exact: true }).count() }).toBe(1)
       await expect(main).toHaveAttribute('data-player-mode', 'seated')
-      await page.getByLabel('Throttle', { exact: true }).fill('15'); await page.clock.runFor(200)
-      await expect(page.getByLabel('Throttle', { exact: true })).toHaveValue('15')
+      await expect(page.getByLabel('Throttle', { exact: true })).toBeDisabled()
+      await expect(page.getByText('Scout grounded on Vesper.', { exact: false })).toBeVisible()
+      await expect(page.getByRole('button', { name: 'Restart navigation' })).toHaveCount(0)
+      await page.clock.runFor(5200)
+      await page.getByRole('combobox', { name: /^Scanned contacts/ }).selectOption('vesper')
+      await expect(page.getByRole('button', { name: 'Set direction' })).toBeDisabled()
+      await page.keyboard.down('ArrowLeft'); await page.clock.runFor(200); await page.keyboard.up('ArrowLeft')
+      await page.getByRole('button', { name: 'Reset camera', exact: true }).click()
+      const anchored = await assertGrounded()
+      expect(anchored.tick).toBeGreaterThan(initial.tick)
+      await capture('slice-grounded-radar')
       const backend = await page.locator('canvas').evaluate(c => {
         const gl = (c as HTMLCanvasElement).getContext('webgl2')!, ext = gl.getExtension('WEBGL_debug_renderer_info')!
         return { renderer: gl.getParameter(ext.UNMASKED_RENDERER_WEBGL), version: gl.getParameter(gl.VERSION) }
@@ -86,6 +113,11 @@ test('SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and 
       await page.getByRole('button', { name: 'Exit navigation · Stand up' }).click()
       await expect(main).toHaveAttribute('data-player-mode', 'standing'); await expect(main).toHaveAttribute('data-occupant', '')
       await capture('slice-standing-return')
+      await page.keyboard.press('e')
+      await expect(main).toHaveAttribute('data-cockpit-view', 'radar')
+      await page.clock.runFor(5200); await assertGrounded()
+      await page.getByRole('button', { name: 'Exit navigation · Stand up' }).click()
+      await assertGrounded()
       for (const p of [[0, -1.65], [1.35, -1.65], [1.35, .45], [0, .45], [0, 2], [0, 5.3]]) await walkTo(page, p, 'ship:scout', true)
       await cross('s', 'planet:fixture')
       await walkTo(page, [0, 7], 'ship:scout', true)
@@ -97,7 +129,15 @@ test('SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and 
       expect(await node!.evaluate(n => n.isConnected)).toBe(true)
       expect(await frame()).toBe('planet:fixture'); expect(errors).toEqual([])
       const ship = JSON.parse((await main.getAttribute('data-ship'))!)
-      expect(ship.throttle).toBe(15); expect(Math.abs(ship.velocityMps[2])).toBeGreaterThan(0)
+      await assertGrounded()
+      const savedPosition = await position(page)
+      await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')))
+      await page.reload()
+      await expect.poll(async () => { await page.clock.runFor(50); return scene(page).getAttribute('data-render-ready') }).toBe('true')
+      await expect(page.getByText('Expedition saves automatically on this browser.')).toBeVisible()
+      expect(await position(page)).toEqual(savedPosition)
+      await assertGrounded()
+      await capture('slice-reloaded-outdoors')
       journeys.push({ replay, sources, checkpoints, handoffs, ship, backend, errors, browser: browser.version(), input: 'actual keyboard/mouse via production adapters; read-only DOM observations', origin: 'built preview :4175', viewport: page.viewportSize(), dpr: await page.evaluate(() => devicePixelRatio) })
     } finally { await context.close() }
   }

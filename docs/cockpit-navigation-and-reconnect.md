@@ -5,7 +5,11 @@
 explicit development power fixture in `client/`. The default entry is the 2D
 landing site; ship simulation survives radar presentation changes. This is
 single-player local state, with no multiplayer backend, shared persistence,
-authoritative reconnect, Core power model or flight-driven 2D relocation.
+authoritative reconnect or Core power model. #802 binds world and cockpit to one
+grounded Scout on sample Vesper. Until 2D relocation is implemented, takeoff,
+steering, propulsion, alignment and restart-to-flight are unavailable. Radar time,
+scanner and camera remain active. Existing site-bound local saves restore the
+same location/lifecycle; they contain no independent free-flight state.
 See [client guide](../client/README.md#cockpit-gameplay-766). The remaining
 multiplayer/reconnect/death rules below are future contracts.
 

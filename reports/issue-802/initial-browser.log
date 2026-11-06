@@ -1,0 +1,76 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit -g COCKPIT-1|SLICE-1
+
+[WebServer] (node:1319) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1332) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:1351) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1377) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1390) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1409) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (48.9s)
+  ✘  2 [cockpit] › tests/playable-slice.spec.ts:10:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (21.6s)
+
+
+  1) [cockpit] › tests/playable-slice.spec.ts:10:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return
+
+    Error: locator.selectOption: Error: strict mode violation: getByLabel('Scanned contacts') resolved to 2 elements:
+        1) <input value="" type="search" id="contact-search"/> aka getByRole('searchbox', { name: 'Find scanned contacts' })
+        2) <select id="contact-select">…</select> aka getByLabel('Scanned contacts (5)')
+
+    Call log:
+      - waiting for getByLabel('Scanned contacts')
+
+
+      100 |       await expect(page.getByRole('button', { name: 'Restart navigation' })).toHaveCount(0)
+      101 |       await page.clock.runFor(5200)
+    > 102 |       await page.getByLabel('Scanned contacts', { exact: false }).selectOption('vesper')
+          |                                                                   ^
+      103 |       await expect(page.getByRole('button', { name: 'Set direction' })).toBeDisabled()
+      104 |       await page.keyboard.down('ArrowLeft'); await page.clock.runFor(200); await page.keyboard.up('ArrowLeft')
+      105 |       await page.getByRole('button', { name: 'Reset camera', exact: true }).click()
+        at /workspace/salimon/client/tests/playable-slice.spec.ts:102:67
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/802-browser-initial/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/802-browser-initial/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/802-browser-initial/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/802-browser-initial/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/playable-slice.spec.ts:10:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return
+  1 passed (1.3m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

@@ -1,5 +1,8 @@
 # Issue #803 — full-viewport 2D world and HUD
 
+**Current follow-up:** [universal ship-up camera and current validation](ship-up/README.md).
+The initial delivery record below describes the earlier tested revision.
+
 Implemented the default `/` as an edge-to-edge world with survival top left,
 inventory/save status top right, and nearby interaction/live feedback/key hints
 bottom left. The title remains accessible without reserving world space. Panels

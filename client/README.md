@@ -8,7 +8,7 @@ and store mass; future stores require trusted ID/ship/capacity declarations.
 The default world enables the 50 kg Scout Resource Container and deposit/withdraw panel (#784/#785). See [resource design](../docs/resource-inventory-and-gathering.md).
 
 The default client is a React + TypeScript + Vite 2D world with a Three.js /
-React Three Fiber cockpit radar. Start with [current implementation and legacy
+React Three Fiber panoramic cockpit. Start with [current implementation and legacy
 contract routing](../docs/current-client-status.md) and the
 [playable journey](../docs/playable-2d-foundation.md). This is a new prototype and does not migrate the historical native Rust gameplay. See [design contract](../docs/radar-navigation-prototype.md).
 
@@ -28,17 +28,32 @@ Open the URL Vite prints. `npm run build` produces `dist/`.
 The default `/` (development and production) starts outside the Scout in 2D.
 Walk around the aft hull, through the open entry, around the cabin crate and
 forward to the cockpit chair. **E / Use cockpit** seats the owner and opens the
-existing 3D radar. **Exit navigation · Stand up** returns standing beside the
+full-viewport panoramic observation scene. **Exit cockpit** returns standing beside the
 chair in one action. Ship position, velocity, orientation, throttle and scanner
-continue in the same `NavigationRuntime` while walking or viewing the radar.
+continue in the same `NavigationRuntime` while walking or observing the universe.
 Both views share the grounded Scout/Vesper surface anchor (#802). Unsupported
 propulsion, turning, alignment, takeoff and relocation are gated; scanner/time
 continue while the ship stays at the same authored site.
 
+
+`TopDownView` owns one `NavigationRuntime`, one `ObservationCameraState` and the
+only production navigation clock. `PanoramicNavigation` receives
+`advanceSimulation={false}`; its standalone fixtures still advance their own
+runtime. First entry/new character/reload starts at ship heading and 75°; exit
+and re-entry within the same active session preserve direction/FOV. Reset view
+aligns to heading. View state never enters the save or multiplayer domain.
+Blur, hide, pause and unmount cancel held camera input and captured Look at.
+Wheel over a hovered sensor marker shares canvas zoom; panels keep native
+scrolling and focused forms do not steer observation.
+The optical origin is the exact shared `scoutLocation.ts` ship position: Vesper
+occludes the lower hemisphere; no screen-space horizon or independent ship is
+created. Other scanned bodies support Look at; Vesper self-body actions,
+throttle, steering and takeoff stay disabled. Survival/pause remains available.
+
 `cockpit.ts` owns one local chair reservation, owner-control admission and power
-transitions. `TopDownView` keeps the 2D world mounted; only radar presentation is
+transitions. `TopDownView` keeps the 2D world mounted; only panoramic presentation is
 mounted/unmounted. A seated avatar is drawn over its chair, in ship-local space.
-Power loss closes radar and keeps the chair occupied; restoration stays seated
+Power loss closes observation and keeps the chair occupied; restoration stays seated
 in 2D until **E**. **Stand up / Escape** releases the chair even without power.
 Development-only `/?powerFixture=1` exposes explicit outage/restoration buttons;
 this is a test fixture, not a Core implementation. No multiplayer/server authority,
@@ -50,8 +65,8 @@ control gating are local hooks for a future authoritative adapter.
 suite. `/?scene=top-down` in development retains the isolated inspection fixture
 for the #761–#765 checks. These fixture queries do not implement in-play teleport.
 `npm run test:browser -- --project=cockpit` walks from default spawn and covers
-normal exit, outage/restoration, chair state, a persistent grounded anchor and
-advancing radar/scanner ticks across view switches. The production slice also
+normal exit, outage/restoration, chair state, preserved camera/FOV, a persistent grounded anchor and
+advancing ship/scanner ticks across view switches. The production slice also
 checks repeated entry and local save/reload. It repeats original captures with the unchanged pixel policy.
 
 ## Top-down foundation (#761)
@@ -421,7 +436,7 @@ indoor/outdoor ownership; viewport coverage asserts the rendered bow is vertical
 ## Perspective observation camera foundation (#810)
 
 The development-only `/tests/observation.html` fixture exercises the new camera;
-production cockpit and `/?scene=radar` still use the shipped orthographic radar.
+production cockpit uses this camera through #815; `/?scene=radar` retains the orthographic flight fixture.
 Start with `npm run dev`. This fixture uses synthetic calibration targets and
 actual fixed-step ship motion; it is not the physical sky or final cockpit HUD.
 It is absent from the production build.
@@ -463,7 +478,7 @@ baseline approval and regression gates remain required in CI.
 shared authoritative ship position. `opticalSky.ts` subtracts split coordinates
 before converting bounded directions/radius ratios to GPU uniforms. It never
 reads scanner contacts, emits identities, registers pointer actions, or changes
-simulation. Production still uses the existing radar until #815 integration.
+simulation. Production composes this camera through #815.
 
 The development route `/tests/optical.html?scenario=wide` renders a single reused
 quad with analytic per-pixel sphere intersections. Available scenarios are
@@ -522,7 +537,7 @@ For bounded software rendering, the browser scenarios use `?low-resolution`
 (480×300 optical canvas in a 960×600 CSS viewport; full-resolution DOM controls).
 The default fixture retains DPR 1. Its Telescope calibration preset centers the
 tiny test moon at 0.1°; it is not a player Look at implementation.
-The production cockpit/radar remains current until #815; this is not the final
+The production cockpit composes this sky through #815; this is not a
 compact HUD (#814). The existing 32-body optical catalog budget still applies.
 Run `npm test`, `npm run build`, and
 `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=perspective`.
@@ -536,7 +551,7 @@ commands for a currently scanned selection. Supply `getShip` and `getOrigin`
 from the same authoritative ship snapshot, and a live `canPilot` callback for
 cockpit/power authority. Recheck flight authority in the parent callback;
 `setContactDirection` is the reusable scanner/flight guard. The current
-orthographic production radar stays unchanged until panoramic integration #815.
+orthographic flight fixture stays isolated; production uses panoramic integration #815.
 
 `lookAtContact` captures the current ship-to-contact vector once, even for a
 rear/occluded browser entry. `ObservationCameraState.lookAt` transports the
@@ -569,10 +584,8 @@ Broader regression and approved visual baselines remain in existing CI.
 scanner-gated perspective markers, collapsed contact browser and full-viewport HUD.
 Pass a `NavigationRuntime` and parent-owned `ObservationCameraState`; optional
 `canPilot`, `isPaused`, `onExit` and `onSceneReady` callbacks preserve the lifecycle
-owner's authority. The component advances the supplied runtime while mounted;
-its lifecycle owner must avoid a second simultaneous tick owner. Production cockpit
-activation and view persistence remain #815; the existing radar is retained until
-that integration. `/tests/panoramic.html` exercises the reusable production component;
+owner's authority. By default the component advances the supplied runtime while mounted. Production passes `advanceSimulation={false}` because `TopDownView` owns the sole navigation tick loop. Production cockpit
+activation and view persistence are integrated by #815; the orthographic radar remains an isolated flight fixture. `/tests/panoramic.html` exercises the reusable production component;
 `?grounded` uses the shared Scout/Vesper domain anchor.
 
 The sky keeps #811's explicit 32-body uniform budget (`opticalBodies` may supply

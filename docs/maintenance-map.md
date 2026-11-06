@@ -4,11 +4,16 @@
 
 [Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
 
-The active fresh browser prototype is under `client/src/`, with production input
-in `CameraControls.tsx`/`input.ts`, per-frame contact rendering in
-`ContinuousContacts.tsx`, vector projection in `ShipVectorGuides.tsx`/`vectorGuides.ts`,
-and Playwright scenarios/observers in `client/tests/`. See the
-[browser verification contract](../client/README.md#deterministic-navigation-regression-750).
+The production cockpit presentation is `PanoramicNavigation.tsx`, composed by
+`TopDownView.tsx` with a shared `NavigationRuntime` and session-local
+`ObservationCameraState`. The 2D owner runs the sole production navigation clock;
+the panoramic component receives `advanceSimulation={false}`. Observation input
+belongs to `ObservationCamera.tsx`, physical sky to `OpticalSky.tsx`/`opticalSky.ts`,
+scanner-gated markers/actions to `PerspectiveContacts.tsx`/`contactCommands.ts`,
+and compact orientation UI to `OrientationCompass.tsx`. `App.tsx`,
+`CameraControls.tsx`, `ContinuousContacts.tsx` and `ShipVectorGuides.tsx` remain
+isolated orthographic flight fixture owners at `/?scene=radar`.
+See the [browser verification contract](../client/README.md#deterministic-navigation-regression-750).
 The shared 2D world is owned by `topDownRuntime.ts`/`topDownFrames.ts`, collision
 and reach by `topDownInteraction.ts`, doorway ownership/location snapshots by
 `topDownTraversal.ts`, Scout anchors/footprints by `scoutLayout.ts`,

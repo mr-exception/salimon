@@ -1,0 +1,16 @@
+# Project setup (no reusable environment dependency additions)
+cd client
+npm ci --cache /tmp/salimon-npm-cache
+
+# Full matrix on source b3eaf3c0a72307af1701cb4d4ef9c8a865042a86
+npm run build
+npm test
+CHROMIUM_PATH=/usr/bin/chromium SALIMON_EVIDENCE_DIR=/tmp/815-final ./node_modules/.bin/playwright test --project=cockpit --project=panoramic --project=look-at --project=observation --project=desktop --grep 'COCKPIT-1|SLICE-1|SURV built|HUD-|LOOK-|OBS-1|OBS-2|OBS-5|scanner pulse, camera independence|zero throttle coasts'
+
+# Focus-only final source 280c453e31d95c07d4747a8a38ac6a5dfdb0a37a
+npm run build
+CHROMIUM_PATH=/usr/bin/chromium SALIMON_EVIDENCE_DIR=/tmp/815-help-final ./node_modules/.bin/playwright test --project=panoramic --project=desktop --grep 'HUD-1|Help has keyboard focus'
+
+# Final packaging checks (repository root)
+git diff --check
+git diff --exit-code 280c453e31d95c07d4747a8a38ac6a5dfdb0a37a HEAD -- client docs README.md

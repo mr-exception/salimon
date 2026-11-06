@@ -1,11 +1,11 @@
 # Current browser implementation and contract routing
 
-> **Approved future presentation, not shipped:** The [360° ship-centered panoramic navigation design](panoramic-navigation-design.md) will replace the existing orthographic cockpit radar with a perspective inertial camera, physical sky and compact sensor HUD. The code-checked status below describes the **current** browser implementation until that work merges.
+> **Panoramic cockpit (#815):** Default `/` opens the shared grounded panoramic observation scene at the Scout desk. The isolated `/?scene=radar` keeps the orthographic free-flight engineering fixture. See [the delivered integration](../client/README.md#cockpit-gameplay-766).
 
 The [full 2D migration register](2d-migration-register.md) classifies every documentation file, maps historical 3D concepts onto active 2D design, and identifies the unfinished browser adapters.
 
 Checked against `client/src` on 2026-11-06. The default `/` is the playable
-React/TypeScript 2D Scout/planet world. The 3D radar opens at its cockpit and shares the grounded Scout / Vesper surface
+React/TypeScript 2D Scout/planet world. The 3D panoramic scene opens at its cockpit and shares the grounded Scout / Vesper surface
 anchor with the 2D world. Takeoff and relocation are explicitly gated (#802).
 
 Start with the [playable journey](playable-2d-foundation.md),
@@ -21,7 +21,7 @@ requirements, not playable behavior. “Decision pending” identifies missing r
 
 | System | Browser-delivered evidence | Approved future / decision pending / legacy boundary |
 | --- | --- | --- |
-| 2D navigation and cockpit | `topDownRuntime.ts`, `topDownTraversal.ts`, `cockpit.ts`, `TopDownView.tsx`: continuous walking, collision, doorway frames, owner chair, radar entry/exit; `scoutLocation.ts` binds world frames and radar physical state; `navigationRuntime.ts` continues time/scans while grounded | Local power fixture is not Core power. Takeoff/relocation unavailable until both views support the transition. [Cockpit/reconnect contract](cockpit-navigation-and-reconnect.md) separates future authority |
+| 2D navigation and cockpit | `topDownRuntime.ts`, `topDownTraversal.ts`, `cockpit.ts`, `TopDownView.tsx`: continuous walking, collision, doorway frames, owner chair, panoramic entry/exit, session-local observation persistence; `scoutLocation.ts` binds world frames and radar physical state; `navigationRuntime.ts` continues time/scans while grounded | Local power fixture is not Core power. Takeoff/relocation unavailable until both views support the transition. [Cockpit/reconnect contract](cockpit-navigation-and-reconnect.md) separates future authority |
 | Mining | `resourceSession.ts`, `planetarySite.ts`: two fixed sources, up to 1,000 g per completed work interval, approved survival work-rate penalties and persisted partial work | Full catalog, tools and balancing pending; native physical fragments are legacy-only |
 | Inventory | `resourceInventory.ts`: 10,000 g / 12 shared slots, one raw stack per type, count-item mass/stack validation; `resourceSession.ts`: v7 ledger/item-definition/survival/hazard save, lossless v1–v7 migration | Generic item transactions and unified count/mass/slot UI are delivered; production item content, equipment UI and upgrades remain pending. [Weight-only contract](resource-inventory-and-gathering.md) supersedes volume limits |
 | Ship storage | `scoutResourceContainer.ts` declares the 50 kg raw-only `scout:storage`; `resourceContainerInteraction.ts` + `ResourceContainerPanel.tsx` provide E/Use, exact-gram review/confirmation and capacity/save feedback | Atomic domain transactions and schema-v8 saves persist both endpoints. Focus/Escape/reach/scene cancellation preserves commits; no container slot cap, count-item content or machine buffers |
@@ -65,8 +65,7 @@ and unrun checks. Human retains baseline approval and merge authority.
 
 The #810 perspective camera foundation is available in development fixture
 `/tests/observation.html`: inertial full-sphere observation, ship-relative origin,
-75°–0.1° optical zoom and session-local snapshots. It does not replace the shipped
-orthographic radar or integrate the future physical sky/HUD/cockpit lifecycle.
+75°–0.1° optical zoom and session-local snapshots. It is now composed with the physical sky/HUD in the production cockpit by #815.
 See the [camera API and checks](../client/README.md#perspective-observation-camera-foundation-810).
 
 ### Physical optical sky foundation (#811)
@@ -77,8 +76,7 @@ sparse deterministic starfield. `opticalSky.ts` owns split-origin subtraction an
 stable near-surface ray geometry. The development-only optical fixture exercises
 75°/0.1° free-space views and Vesper's shared `scoutLocation.ts` grounded anchor,
 including real globe/horizon occlusion. No discovery names or actions are emitted.
-The current production cockpit/radar remains usable and unchanged; #812 owns
-scanner overlays, #815 owns final cockpit integration. See the
+Production now composes this sky with #812 scanner overlays and #815 cockpit lifecycle. See the
 [client optical guide](../client/README.md#physical-optical-sky-foundation-811)
 and [local evidence](../reports/issue-811/README.md).
 
@@ -88,8 +86,7 @@ The separate `/tests/perspective.html` development fixture composes the optical
 scene/camera with scanner-authorized markers and a searchable, paginated contact
 browser. Physical line-of-sight tests suppress occluded/behind-camera/off-screen
 marker hit targets; those scanned IDs stay in the browser. Live guards remove
-stale selection actions on range loss. This does not switch the production
-cockpit or standalone orthographic radar; #814–#816 retain their separate scope.
+stale selection actions on range loss. Production composes this overlay through #815; the standalone orthographic fixture remains isolated.
 See the [overlay API](../client/README.md#perspective-sensor-overlay-foundation-812)
 and [local evidence](../reports/issue-812/README.md); remote acceptance is pending.
 
@@ -103,6 +100,6 @@ handles opposite directions. Shared grounded Scout permits other detected bodies
 while identifying Vesper and disabling self-body actions. Scanner loss removes
 commands without a selectable ghost; foreground optical geometry remains opaque.
 The development-only `/tests/look-at.html` verifies flying and shared grounded
-composition; production panoramic cockpit integration remains #815.
+composition; #815 also integrates this into the default grounded cockpit.
 See [API/help](../client/README.md#one-time-contact-observation-813) and
 [local evidence](../reports/issue-813/README.md); CI awaits the user's report.

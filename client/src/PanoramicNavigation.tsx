@@ -17,8 +17,8 @@ import './panoramic.css'
 /** Reusable presentation. The cockpit lifecycle owner supplies the runtime and
  * local view; no simulation, discovery or view lifetime belongs to the camera.
  */
-export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady }: {
-  navigation: NavigationRuntime; view: ObservationCameraState; canPilot?: () => boolean
+export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true }: {
+  advanceSimulation?: boolean; navigation: NavigationRuntime; view: ObservationCameraState; canPilot?: () => boolean
   opticalBodies?: readonly Body[]
   isPaused?: () => boolean; onExit?: () => void; onSceneReady?: (state: RootState) => void
 }) {
@@ -27,6 +27,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   const root = useRef<HTMLDivElement>(null), contactsButton = useRef<HTMLButtonElement | null>(null)
   const previousHelp = useRef(help)
   const input = useRef(new NavigationInput())
+  const escape = useRef<(event: KeyboardEvent) => void>(() => {})
   // Read current callbacks without restarting the simulation clock on a render.
   const options = useRef({ canPilot, isPaused })
   options.current = { canPilot, isPaused }
@@ -41,13 +42,14 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
         input.current.clear()
         navigation.clock.state = setThrottle(navigation.clock.state, 0)
       }
-      navigation.advance(dt, input.current.controls)
+      if (advanceSimulation) navigation.advance(dt, input.current.controls)
       publication += dt
       if (publication >= 0.05) { redraw(n => n + 1); publication = 0 }
       frame = requestAnimationFrame(animate)
     }
     frame = requestAnimationFrame(animate)
     const clear = () => input.current.clear()
+    const interrupt = () => { clear(); view.cancelLookAt() }
     const down = (e: KeyboardEvent) => {
       if (!acceptsFlightShortcut(e.target) || e.altKey || e.ctrlKey || e.metaKey || document.querySelector('dialog[open]')) return
       const axis = axisForCode(e.code)
@@ -60,16 +62,20 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       if (e.code === 'KeyC' && !e.repeat) { setBrowser(value => !value); e.preventDefault() }
     }
     const up = (e: KeyboardEvent) => input.current.release(e.code)
-    window.addEventListener('keydown', down); window.addEventListener('keyup', up)
-    window.addEventListener('blur', clear); window.addEventListener('resize', clear)
-    document.addEventListener('focusin', clear); document.addEventListener('visibilitychange', clear)
-    return () => {
-      cancelAnimationFrame(frame); clear()
-      window.removeEventListener('keydown', down); window.removeEventListener('keyup', up)
-      window.removeEventListener('blur', clear); window.removeEventListener('resize', clear)
-      document.removeEventListener('focusin', clear); document.removeEventListener('visibilitychange', clear)
+    const outsideEscape = (e: KeyboardEvent) => {
+      // Pause/resume can leave focus on body or the separate survival HUD.
+      if (!e.defaultPrevented && !options.current.isPaused() && !root.current?.contains(e.target as Node)) escape.current(e)
     }
-  }, [navigation])
+    window.addEventListener('keydown', outsideEscape); window.addEventListener('keydown', down); window.addEventListener('keyup', up)
+    window.addEventListener('blur', interrupt); window.addEventListener('resize', interrupt)
+    document.addEventListener('focusin', clear); document.addEventListener('visibilitychange', interrupt)
+    return () => {
+      cancelAnimationFrame(frame); interrupt()
+      window.removeEventListener('keydown', outsideEscape); window.removeEventListener('keydown', down); window.removeEventListener('keyup', up)
+      window.removeEventListener('blur', interrupt); window.removeEventListener('resize', interrupt)
+      document.removeEventListener('focusin', clear); document.removeEventListener('visibilitychange', interrupt)
+    }
+  }, [navigation, view, advanceSimulation])
   useEffect(() => {
     contactsButton.current = root.current?.querySelector('.contacts-toggle') ?? null
     if (browser) root.current?.querySelector<HTMLInputElement>('#scanned-browser input')?.focus()
@@ -86,15 +92,17 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   const grounded = navigation.surfaceLocation
   const speed = Math.hypot(...ship.velocityMps)
   const throttle = (value: number) => { navigation.clock.state = setThrottle(navigation.clock.state, canPilot() ? value : 0); redraw(n => n + 1) }
-  return <div ref={root} className="panoramic" data-mode={ship.mode} onKeyDownCapture={e => {
+  const dismiss = (e: { key: string; preventDefault(): void; stopPropagation(): void }) => {
     if (e.key !== 'Escape') return
     if (help) { setHelp(false); root.current?.querySelector<HTMLButtonElement>('.help-toggle')?.focus(); e.preventDefault(); e.stopPropagation() }
     else if (browser) { closeBrowser(); e.preventDefault(); e.stopPropagation() }
     else if (telemetry) { setTelemetry(false); root.current?.querySelector<HTMLButtonElement>('.telemetry-toggle')?.focus(); e.preventDefault(); e.stopPropagation() }
     else if (onExit) { e.preventDefault(); e.stopPropagation(); onExit() }
-  }}>
-    <Canvas onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
-      <ObservationCamera view={view}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position}/>
+  }
+  escape.current = dismiss
+  return <div ref={root} className="panoramic" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDownCapture={dismiss}>
+    <Canvas onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
+      <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position}/>
     </Canvas>
     <div className="observation-reticle" aria-hidden="true">+</div>
     <header className="panoramic-status">

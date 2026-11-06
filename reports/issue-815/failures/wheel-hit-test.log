@@ -1,0 +1,11 @@
+before {
+  focus: '<canvas data-engine="three.js r180" width="1280" height="800" aria-label="Panoramic universe" tabindex="0" style="display: block; width: 1280px; heigh',
+  hit: '<button aria-label="Sensor contact Vesper Moon" style="position: absolute; left: 640px; top: 400px; transform: translate(-50%, -50%); width: 32px; height: 32px; border-radius: 50%; color: rgb(159, 234',
+  inert: undefined,
+  view: '{"quaternion":[0.150372020742544,-0.2618133447327216,0.009033163643368092,0.9532892687176654],"fov":75}',
+  main: 'radar'
+}
+afterreal {"quaternion":[0.150372020742544,-0.2618133447327216,0.009033163643368092,0.9532892687176654],"fov":75}
+wheel -400
+synthetic true
+afterdispatch {"quaternion":[0.150372020742544,-0.2618133447327216,0.009033163643368092,0.9532892687176654],"fov":50.27400345267295}

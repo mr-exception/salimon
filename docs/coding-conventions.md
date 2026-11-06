@@ -2,10 +2,10 @@
 
 ## Active browser/2D TypeScript conventions
 
-The active game uses React, TypeScript, Vite, a fixed-step top-down world and a separate Three/R3F cockpit radar. Read [browser code owners](current-client-status.md) and [2D migration status](2d-migration-register.md) before using the historical Rust rules below.
+The active game uses React, TypeScript, Vite, a fixed-step top-down world and a separate Three/R3F panoramic cockpit (orthographic radar is an isolated flight fixture). Read [browser code owners](current-client-status.md) and [2D migration status](2d-migration-register.md) before using the historical Rust rules below.
 
 - Keep deterministic world/ship-local frames, stable entity IDs, interaction/collision footprints and fixed tick rules in pure domain owners; the SVG/React presentation cannot mutate the source of gameplay truth.
-- Keep the 3D radar behind cockpit authority. Mounting/unmounting a view never reinitializes ship physics, positions or persistent player state.
+- Keep 3D observation behind cockpit authority. Mounting/unmounting a view never reinitializes ship physics, positions or persistent player state.
 - Use integer grams for all raw materials and weighted count-item stacks; one 10 kg / 12 shared-slot player inventory, no volume constraints. Resource transfers and depletion are atomic, revision-bound and verified under failed writes and reloads.
 - Separate proposed ship buffers and modules from active functionality. A visible Core, Fabricator or storage case is not working power, crafting or transfers. Do not invent item masses, suit recipes, module capacities or power rates.
 - Browser verification: Node >=22.18; `cd client && npm ci && npm test && npm run build` plus affected Playwright suites and original evidence. Do not impose legacy native/M1 signoff as a routine cloud gate.

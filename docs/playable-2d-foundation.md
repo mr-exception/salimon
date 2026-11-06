@@ -2,7 +2,7 @@
 
 The browser's default `/` is a single authored 2D landing site with a permanently
 exposed Scout interior. Walking, collisions, source inspection, automatic doorway
-frame handoff and cockpit radar entry/exit share the existing runtime. The radar
+frame handoff and panoramic cockpit entry/exit share the existing runtime. The observation scene
 is the existing Three/R3F navigation interface; it does not replace the world.
 
 ## Minimal desktop run
@@ -19,8 +19,8 @@ Open the printed URL. Start outside; **WASD** walks. Approach the banded mineral
 outcrop west of the ship or the purple plate colony southwest; **E** inspects,
 **Escape** cancels. Walk around the hull to the wide aft doorway, north through
 cargo, then around the cabin crate on its starboard side and forward through the
-partition to the chair. **E / Use cockpit** opens radar. Use its labelled controls;
-**Exit navigation · Stand up** returns standing in one action. Walk back outside.
+partition to the chair. **E / Use cockpit** opens panoramic observation. Use its labelled controls;
+**Exit cockpit** returns standing in one action. Walk back outside.
 
 For a built run: `npm run build && npm run preview`. The default built `/` has the
 same gameplay. `/?scene=radar` isolates legacy navigation. Development-only
@@ -39,7 +39,7 @@ npm run test:browser -- --project=cockpit
 `COCKPIT-1` covers ownership/reservation, normal exit, blackout/restoration and
 grounded ship/scanner time continuity. `SLICE-1` is one uninterrupted journey through
 the **built production `/`**: outdoor spawn → mineral and biological source
-inspection → aft doorway → cabin/cockpit → real radar → standing → outside.
+inspection → aft doorway → cabin/cockpit → panoramic observation → standing → outside.
 Each repeats in a fresh browser context. The original artwork is cached as
 fixed-resolution sprites by `topDownSprites.tsx`; the same SVG adapter moves
 them without changing gameplay frames or footprints. Inputs are actual Playwright keyboard/
@@ -57,7 +57,7 @@ comparisons, negative mutations, repeat visuals and baseline approval.
 
 Seven original slice checkpoints make the presentation reviewable: outdoor spawn,
 mineral inspection, exterior with simultaneous exposed Scout interior, standing
-cockpit return, return outdoors, grounded Vesper radar and reloaded outdoors. Replays use the repository's unchanged
+cockpit return, return outdoors, grounded Vesper horizon and reloaded outdoors. Replays use the repository's unchanged
 `compareImages` policy, without masks or tolerance changes. A comparison of the
 wrong checkpoint must fail. These are review evidence/candidates; they do not
 promote or alter approved navigation reference PNGs. Results, original captures,
@@ -97,7 +97,7 @@ full planetary generation. Visible Core/Fabricator objects are inspection
 placeholders; the Resource Container supports confirmed gram transfers. Gathering reuses this same world and resource-source IDs, with
 integer grams and atomic local persistence; no independent scene was added.
 
-The cockpit radar shares the authored Scout location on sample Vesper. Time and
+The panoramic cockpit shares the authored Scout location on sample Vesper. Time and
 scanner pulses continue, but the Scout stays grounded: throttle, turning, alignment,
 takeoff and relocation cannot change its surface anchor. There is no restart-to-flight
 action in the cockpit. The separate `/?scene=radar` fixture retains sample free flight.
@@ -148,4 +148,4 @@ facing and selection cues use the same basis. `viewToWorld` inversely maps
 screen-direction W/A/S/D into the existing physical movement/collision adapter.
 This is a presentation rule for every heading, not a change to the authored site
 or saved physical orientation. Frame handoff does not change the camera basis.
-The independent 3D radar keeps its existing orientation controls.
+The panoramic cockpit uses inertial observation; the independent orthographic flight fixture keeps its existing orientation controls.

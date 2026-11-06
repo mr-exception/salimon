@@ -55,3 +55,9 @@ body:has(.radar) .survival-hud { top:52px; left:12px }
   .top-down-bottom { width:calc(100% - 224px); max-height:40% }
   .top-down-interaction { flex-wrap:wrap; gap:6px }
 }
+
+/* Keep survival and pause available without covering the observation header,
+   warnings, compass or contact browser. */
+body:has(.panoramic) .survival-hud { top:220px; width:164px; max-height:calc(100dvh - 480px); padding:8px; font-size:11px; line-height:14px }
+body:has(.panoramic) .survival-hud label { margin-bottom:3px }
+body:has(.panoramic) .power-fixture { bottom:82px; left:auto; right:12px }

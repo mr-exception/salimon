@@ -1,0 +1,71 @@
+[WebServer] (node:1933) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1946) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:1965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1991) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2004) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2017) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2037) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:2049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:6:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation (3.0m)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:6:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation
+
+    Test timeout of 180000ms exceeded.
+
+    Error: page.screenshot: Target page, context or browser has been closed
+
+      16 |       const capture = async (name: string) => {
+      17 |         await page.clock.runFor(5000)
+    > 18 |         const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
+         |                                ^
+      19 |         if (replay === 0) originals[name] = png
+      20 |         else {
+      21 |           const r = compareImages(originals[name]!, png)
+        at capture (/workspace/salimon/client/tests/cockpit.spec.ts:18:32)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:48:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/815-cockpit-final/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/815-cockpit-final/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/815-cockpit-final/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/815-cockpit-final/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/cockpit.spec.ts:6:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

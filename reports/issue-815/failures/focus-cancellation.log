@@ -1,0 +1,113 @@
+[WebServer] (node:4965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:5014) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5027) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 12 tests using 1 worker
+
+(node:5065) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [panoramic] › tests/panoramic.spec.ts:13:1 › HUD-1 full viewport, scanner authority, keyboard browser and priority Escape (16.2s)
+  ✓   2 [panoramic] › tests/panoramic.spec.ts:69:1 › HUD-2 compass render states, ship rotation, zoom and responsive warning priority (29.3s)
+  ✓   3 [panoramic] › tests/panoramic.spec.ts:111:1 › HUD-3 grounded authority and no sidebar at smaller desktop size (4.1s)
+(node:5293) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   4 [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation (22.6s)
+(node:5425) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [look-at] › tests/look-at.spec.ts:84:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled (14.2s)
+(node:5572) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 [observation] › tests/observation.spec.ts:23:1 › OBS-1 actual perspective camera, independent ship, reset and remount (10.4s)
+  ✓   7 [observation] › tests/observation.spec.ts:63:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation (6.4s)
+  ✓   8 [observation] › tests/observation.spec.ts:139:1 › OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin (24.4s)
+(node:5773) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   9 [cockpit] › tests/playable-slice.spec.ts:10:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (27.7s)
+
+
+  1) [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation
+
+    Error: expect(received).toBeCloseTo(expected, precision)
+
+    Expected: 1
+    Received: 0.9567501070349826
+
+    Expected precision:    8
+    Expected difference: < 0.000000005
+    Received difference:   0.043249892965017356
+
+      77 |  await expect.poll(async () => (await state(page)).lookingAt).toBe(false)
+      78 |  const lost = await state(page)
+    > 79 |  expect(Math.abs(lost.view.quaternion[1])).toBeCloseTo(1, 8)
+         |                                            ^
+      80 |  expect(lost.contacts).toEqual([]); expect(lost.selected).toBeNull()
+      81 |  expect(errors).toEqual([])
+      82 |  await info.attach('measurements.json', { body: JSON.stringify({ initial, start, looked, turned, focused, cancelled, lost, opaqueControl: 'byte-identical', errors }, (_, v) => typeof v === 'bigint' ? String(v) : v, 2), contentType: 'application/json' })
+        at /workspace/salimon/client/tests/look-at.spec.ts:79:44
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/815-regression/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/815-regression/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/815-regression/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/815-regression/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/playable-slice.spec.ts:10:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return
+
+    Test was interrupted.
+
+    Error: locator.click: Target page, context or browser has been closed
+
+      100 |       await expect(page.getByRole('button', { name: 'Restart navigation' })).toHaveCount(0)
+      101 |       for (let elapsed = 0; elapsed < 5200; elapsed += 200) await page.clock.fastForward(200)
+    > 102 |       await page.getByRole('button', { name: /Contacts \(C\)/ }).click()
+          |                                                                  ^
+      103 |       await page.getByRole('button', { name: 'Vesper', exact: true }).click()
+      104 |       await page.keyboard.press('Escape')
+      105 |       await expect(page.getByRole('button', { name: 'Set direction' })).toBeDisabled()
+        at /workspace/salimon/client/tests/playable-slice.spec.ts:102:66
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/815-regression/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/815-regression/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/815-regression/playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation
+  1 interrupted
+    [cockpit] › tests/playable-slice.spec.ts:10:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return
+  3 did not run
+  7 passed (2.8m)

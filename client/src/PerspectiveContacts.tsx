@@ -38,7 +38,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  const last = Math.max(0, Math.ceil(entries.length / 8) - 1), currentPage = Math.min(page, last)
  const choose = (id: string) => { selectContact(scanner, getOrigin(), id); redraw(n => n + 1) }
  return <div ref={root} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-  {markers.map(marker => <button key={marker.id} aria-label={`Sensor contact ${marker.ids.length === 1 ? contacts.find(b => b.id === marker.id)?.name : `group of ${marker.ids.length}`}`}
+  {markers.map(marker => <button key={marker.id} data-sensor-marker aria-label={`Sensor contact ${marker.ids.length === 1 ? contacts.find(b => b.id === marker.id)?.name : `group of ${marker.ids.length}`}`}
    style={{ position: 'absolute', left: marker.x, top: marker.y, transform: 'translate(-50%, -50%)', width: 32, height: 32, borderRadius: '50%', color: '#9feaff', background: '#102431aa', border: '1px solid #9feaff', pointerEvents: 'auto' }}
    onClick={() => {
     const live = perspectiveMarkers(currentContacts(scanner, getOrigin()), geometry, getOrigin(), view.snapshot(), root.current!.clientWidth, root.current!.clientHeight).find(m => m.id === marker.id)

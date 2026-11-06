@@ -1,10 +1,10 @@
-# Ship-centered 360° panoramic navigation — approved future design
+# Ship-centered 360° panoramic navigation — design and grounded implementation
 
 **Decision date:** 2026-11-06  
-**Status:** Approved product/interaction design; **not implemented** in the current browser client.  
+**Status:** Grounded production cockpit implemented through #815; full flight and final qualification remain future.
 **Scope:** The 3D cockpit observation/navigation presentation in `client/`; the playable planetary surface and Scout interior remain strict-overhead illustrated 2D.
 
-This specification supersedes the **presentation and camera requirements** in [the current orthographic radar contract](radar-navigation-prototype.md) **when its implementation lands**. Until then, `radar-navigation-prototype.md` accurately describes shipped browser behavior and regression tests. Preserve the existing simulation, scanner, cockpit authority, collision rules, and 2D/3D shared location unless an explicitly separate feature authorizes a change. The standalone `/?scene=radar` fixture remains useful for isolated development.
+This specification supersedes the **presentation and camera requirements** in [the current orthographic radar contract](radar-navigation-prototype.md) **in the production grounded cockpit (#815)**. `radar-navigation-prototype.md` describes the isolated orthographic flight fixture and its regression tests. Preserve the existing simulation, scanner, cockpit authority, collision rules, and 2D/3D shared location unless an explicitly separate feature authorizes a change. The standalone `/?scene=radar` fixture remains useful for isolated development.
 
 ## Player experience and non-goals
 
@@ -100,4 +100,4 @@ Implement on top of the existing React/TypeScript + Three.js + React Three Fiber
 
 Each implementation issue is separately scoped and blocked by the documentation PR #809 merge (plus its actual technical prerequisites). This document is not an implementation status report.
 
-These are **planning packages**, not claims of implemented code. Track actual prerequisites, scope and cloud verification in GitHub issues. Coordinate with historical radar tickets #737, #744, browser QA #750/#751 and shared location #802 rather than reopening already-delivered orthographic requirements.
+These packages track implementation; see [code-checked status](current-client-status.md) for delivered scope and reports. Track actual prerequisites, scope and cloud verification in GitHub issues. Coordinate with historical radar tickets #737, #744, browser QA #750/#751 and shared location #802 rather than reopening already-delivered orthographic requirements.

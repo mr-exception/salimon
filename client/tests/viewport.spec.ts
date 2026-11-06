@@ -38,7 +38,7 @@ async function checkLayout(page: Page) {
     const m = (el as unknown as SVGGraphicsElement).getScreenCTM()!
     return { dx: m.c * -1, dy: m.d * -1 }
   })
-  expect(bow.dx).toBe(0); expect(bow.dy).toBeLessThan(0)
+  expect(Math.abs(bow.dx)).toBe(0); expect(bow.dy).toBeLessThan(0)
   expect(result.scroll).toEqual({ width, height })
   // SVG viewBox.baseVal is float32. Measure coverage on the device-pixel grid;
   // retain the unrounded projection in layout.json for numerical inspection.

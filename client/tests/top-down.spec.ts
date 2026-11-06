@@ -301,12 +301,20 @@ test('TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and 
         for (let i = 0; i < 14; i++) {
           const before = await positionIn(page, 'planet:fixture'), previous = await frame()
           const oldBox = (await page.locator('[data-entity="person:player"]').boundingBox())!
+          // Sprite bounds change when facing turns. Measure the actual world
+          // anchor to detect camera jumps independently of illustration shape.
+          const screenAnchor = () => page.locator('[data-entity="person:player"]').evaluate(el => {
+            const m = (el as unknown as SVGGraphicsElement).getScreenCTM()!
+            return { x: m.e, y: m.f }
+          })
+          const oldScreen = await screenAnchor()
           await walkTicks(page, key, 1)
           const after = await positionIn(page, 'planet:fixture'), current = await frame()
           const newBox = (await page.locator('[data-entity="person:player"]').boundingBox())!
           expect(Math.hypot(after[0] - before[0], after[1] - before[1])).toBeCloseTo(.04, 7)
-          expect(Math.hypot(newBox.x - oldBox.x, newBox.y - oldBox.y)).toBeLessThan(3)
-          samples.push({ before, after, previous, current, oldBox, newBox })
+          const newScreen = await screenAnchor()
+          expect(Math.hypot(newScreen.x - oldScreen.x, newScreen.y - oldScreen.y)).toBeLessThan(3)
+          samples.push({ before, after, previous, current, oldBox, newBox, oldScreen, newScreen })
         }
         expect(await frame()).toBe(expected)
         expect(samples.filter(s => s.previous !== s.current)).toHaveLength(1)

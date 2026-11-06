@@ -1,0 +1,174 @@
+[
+  {
+    "run": "camera",
+    "criterion": "OBS-1 actual perspective camera, independent ship, reset and remount",
+    "status": "passed",
+    "durationMs": 8971,
+    "attachments": [
+      {
+        "path": "evidence/OBS-1/wide.png",
+        "sha256": "ceaed35e8aa4a1cf7e8c0046e1b95ef32b92b8db6b1aa5ff7ee01f49a5a5b0ac"
+      },
+      {
+        "path": "evidence/OBS-1/states.json",
+        "sha256": "3011d3d94d2a91efa329fc64318e5dd5572b1b134d35528d82d42fe473f0c708"
+      }
+    ]
+  },
+  {
+    "run": "camera",
+    "criterion": "OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation",
+    "status": "passed",
+    "durationMs": 5411,
+    "attachments": [
+      {
+        "path": "evidence/OBS-2/telescope.png",
+        "sha256": "96542a3e38f127ebd33889724e1a0c99c3a6b30098962e57ef433140c8551710"
+      },
+      {
+        "path": "evidence/OBS-2/states.json",
+        "sha256": "75cece9c658ab9f1885f7c7f546f395443fb7ef2d93f0e6423e78b7f922ae219"
+      }
+    ]
+  },
+  {
+    "run": "camera",
+    "criterion": "OBS-3 DPR 2 preserves projection and origin",
+    "status": "passed",
+    "durationMs": 2953,
+    "attachments": [
+      {
+        "path": "evidence/OBS-3/dpr2.png",
+        "sha256": "2b7d4e29cdb818d6eaf8f54a25647d9bcedaac8851528c85f288fa263d8537f0"
+      }
+    ]
+  },
+  {
+    "run": "camera",
+    "criterion": "OBS-4 repeated wide/telescope pixels and negative comparison",
+    "status": "passed",
+    "durationMs": 6939,
+    "attachments": [
+      {
+        "path": "evidence/OBS-4/run-0-wide.png",
+        "sha256": "6aa5f02ecb341935741b28db46bd2bb9aded8dda16286c760219dfb42bb6995d"
+      },
+      {
+        "path": "evidence/OBS-4/run-0-telescope.png",
+        "sha256": "7449aaaa3632bbb594ed8ba020a8d273a4fc1c0ae9a7cd01d2741f62da927353"
+      },
+      {
+        "path": "evidence/OBS-4/run-1-wide.png",
+        "sha256": "6aa5f02ecb341935741b28db46bd2bb9aded8dda16286c760219dfb42bb6995d"
+      },
+      {
+        "path": "evidence/OBS-4/run-1-telescope.png",
+        "sha256": "7449aaaa3632bbb594ed8ba020a8d273a4fc1c0ae9a7cd01d2741f62da927353"
+      },
+      {
+        "path": "evidence/OBS-4/comparisons.json",
+        "sha256": "a78f81820a45753b8239adbb138946ae7f7ce5c5ba4dd4f806bb493a07ebe5fc"
+      }
+    ]
+  },
+  {
+    "run": "sphere",
+    "criterion": "OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin",
+    "status": "passed",
+    "durationMs": 21879,
+    "attachments": [
+      {
+        "path": "evidence/OBS-5/states.json",
+        "sha256": "5209b472d5e8d587a54045595cbe1f2c476d41483f91a83df1010a967be5eb86"
+      }
+    ]
+  },
+  {
+    "run": "regression",
+    "criterion": "COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation",
+    "status": "passed",
+    "durationMs": 49161,
+    "attachments": [
+      {
+        "path": "evidence/COCKPIT-1/radar-open-repeat.json",
+        "sha256": "8023a2edff66019e214a72e0477cc2cfd8fbb8e48c0db0db0f1aef98fdf79cab"
+      },
+      {
+        "path": "evidence/COCKPIT-1/radar-open-diff.png",
+        "sha256": "175989a4456a4891c7069c267321cb072116d95bfd397a18ed32458dcd7fb94f"
+      },
+      {
+        "path": "evidence/COCKPIT-1/standing-return-repeat.json",
+        "sha256": "4c3f9f74f82e7fd8604dc30aa011923c7b5bf6dd51937e621b4615811ef6db97"
+      },
+      {
+        "path": "evidence/COCKPIT-1/standing-return-diff.png",
+        "sha256": "ce983eb5d712be00f1095f2574f16d0f709678000b83b7f2d0b3f6fd5b6b4689"
+      },
+      {
+        "path": "evidence/COCKPIT-1/blackout-seated-repeat.json",
+        "sha256": "d473897c45421c6bad209dff3558f6d64dccb4b3c1fc7075cc6dfc4449ad0c97"
+      },
+      {
+        "path": "evidence/COCKPIT-1/blackout-seated-diff.png",
+        "sha256": "770f1d55ea9f53bd413333c5a9e78b537da2300e282fbe6d23ea68a4f7e23878"
+      },
+      {
+        "path": "evidence/COCKPIT-1/restored-seated-repeat.json",
+        "sha256": "676d0f224545ac3d6137685e318e02b49b952048ec879a1997aa54c7aac0f018"
+      },
+      {
+        "path": "evidence/COCKPIT-1/restored-seated-diff.png",
+        "sha256": "2a738cf81d0680fadcc8275a007abe7461a367a4361f3ca1d01d3d9b3424ad70"
+      },
+      {
+        "path": "evidence/COCKPIT-1/cockpit-measurements.json",
+        "sha256": "17283122110bb6d6b1bcca1429110e17aa0702d9c9b2e58d5ee6ea3d9c1956ae"
+      },
+      {
+        "path": "evidence/COCKPIT-1/restored-seated-0.png",
+        "sha256": "689c331045115f40e821f8ca7fa5a3759781bb1c7432f67ebed576b54f5f9ef9"
+      },
+      {
+        "path": "evidence/COCKPIT-1/blackout-seated-0.png",
+        "sha256": "902e3698a472a791708b1910dfb709f6ac2ab93ab59251322eef6c2507aaff43"
+      },
+      {
+        "path": "evidence/COCKPIT-1/standing-return-1.png",
+        "sha256": "0d1dbc71db26fc044244cc7e54a8679d3ae9bb86576f5521b52259a8c2bda5b1"
+      },
+      {
+        "path": "evidence/COCKPIT-1/radar-open-0.png",
+        "sha256": "6e33253a6ccb1a01e36904b35eebbf0396ff211273ed76c93624664e54ab9fdb"
+      },
+      {
+        "path": "evidence/COCKPIT-1/standing-return-0.png",
+        "sha256": "ed39ab182c0c9925266adbaf9967737dc0f057d8f76946d5a7d9de9adec3ced7"
+      },
+      {
+        "path": "evidence/COCKPIT-1/blackout-seated-1.png",
+        "sha256": "95b5e4391a0d7ecc6f929fba53016811f95cd7f51fbfdcc79948d786ad6b5861"
+      },
+      {
+        "path": "evidence/COCKPIT-1/restored-seated-1.png",
+        "sha256": "45b1d5dfa3b4e7cc98cba041d98565b47ec805bef364691ecbf3bdee85184c9c"
+      },
+      {
+        "path": "evidence/COCKPIT-1/radar-open-1.png",
+        "sha256": "6e33253a6ccb1a01e36904b35eebbf0396ff211273ed76c93624664e54ab9fdb"
+      }
+    ]
+  },
+  {
+    "run": "regression",
+    "criterion": "built production bundle renders WebGL, scanner and labelled controls",
+    "status": "passed",
+    "durationMs": 6394,
+    "attachments": [
+      {
+        "path": "evidence/production/backend.json",
+        "sha256": "0f7ae59d040fe151f7f2cfececcf3ea302799b7846d53e99127b677bc85811d8"
+      }
+    ]
+  }
+]

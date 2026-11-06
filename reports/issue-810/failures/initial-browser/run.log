@@ -1,0 +1,106 @@
+[WebServer] (node:1562) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:1593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1606) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1619) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1645) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1665) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:1677) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [observation] › tests/observation.spec.ts:19:1 › OBS-1 actual perspective camera, independent ship, reset and remount (6.1s)
+(node:1820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [observation] › tests/observation.spec.ts:56:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation (6.5s)
+(node:1961) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [observation] › tests/observation.spec.ts:89:1 › OBS-3 DPR 2 preserves projection and origin (1.8s)
+
+
+  1) [observation] › tests/observation.spec.ts:19:1 › OBS-1 actual perspective camera, independent ship, reset and remount
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 75
+    Received: 0.1
+
+      42 |  await expect(page.locator('canvas')).toBeVisible(); await page.clock.runFor(1000)
+      43 |  expect((await snapshot(page)).view).toEqual(zoomed.view)
+    > 44 |  await page.getByRole('button', { name: 'Reset view' }).click()
+         |                         ^
+      45 |  await expect.poll(async () => { await settle(page); return (await snapshot(page)).view.fov }).toBe(75)
+      46 |  const reset = await snapshot(page)
+      47 |  expect(reset.view.fov).toBe(75)
+        at /workspace/salimon/client/tests/observation.spec.ts:44:25
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/observation-final/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/observation-final/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/observation-final/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/observation-final/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [observation] › tests/observation.spec.ts:56:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation
+
+    TypeError: Do not know how to serialize a BigInt
+
+      84 |  expect(resized.view).toEqual(blurred.view)
+      85 |  expect(resized.render.aspect).toBeCloseTo(resized.render.width / resized.render.height)
+    > 86 |  expect(resized.render.framebuffer[0]).toBe(Math.round(resized.render.width * resized.render.dpr))
+         |                                                ^
+      87 |  await page.mouse.move(480, 300); await page.mouse.wheel(0, 10000); await settle(page)
+      88 |  expect((await snapshot(page)).render.fov).toBe(75)
+      89 |  await info.attach('states.json', { body: JSON.stringify({ telescope, drag, focused, blurred, resized }, null, 2), contentType: 'application/json' })
+        at /workspace/salimon/client/tests/observation.spec.ts:86:48
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/observation-final/observation-OBS-2-telescop-711ae-lamp-and-focus-cancellation-observation/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/observation-final/observation-OBS-2-telescop-711ae-lamp-and-focus-cancellation-observation/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/observation-final/observation-OBS-2-telescop-711ae-lamp-and-focus-cancellation-observation/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/observation-final/observation-OBS-2-telescop-711ae-lamp-and-focus-cancellation-observation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [observation] › tests/observation.spec.ts:19:1 › OBS-1 actual perspective camera, independent ship, reset and remount
+    [observation] › tests/observation.spec.ts:56:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation
+  1 passed (21.5s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

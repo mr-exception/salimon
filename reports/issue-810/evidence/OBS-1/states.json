@@ -1,0 +1,397 @@
+{
+  "initial": {
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 10
+    },
+    "held": {
+      "up": false,
+      "down": false,
+      "left": false,
+      "right": false
+    },
+    "render": {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75,
+      "aspect": 2.257142857142857,
+      "width": 1264,
+      "height": 560,
+      "dpr": 1,
+      "framebuffer": [
+        1264,
+        560
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  },
+  "steered": {
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0.08581202155638779,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 69
+    },
+    "held": {
+      "up": false,
+      "down": false,
+      "left": true,
+      "right": false
+    },
+    "render": {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75,
+      "aspect": 2.257142857142857,
+      "width": 1264,
+      "height": 560,
+      "dpr": 1,
+      "framebuffer": [
+        1264,
+        560
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  },
+  "looked": {
+    "view": {
+      "quaternion": [
+        0,
+        -0.4158046603058575,
+        0,
+        0.9094539485141238
+      ],
+      "fov": 75
+    },
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0.08581202155638779,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 130
+    },
+    "held": {
+      "up": false,
+      "down": false,
+      "left": false,
+      "right": false
+    },
+    "render": {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "quaternion": [
+        0,
+        -0.4158046603058575,
+        0,
+        0.9094539485141238
+      ],
+      "fov": 75,
+      "aspect": 2.257142857142857,
+      "width": 1264,
+      "height": 560,
+      "dpr": 1,
+      "framebuffer": [
+        1264,
+        560
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  },
+  "zoomed": {
+    "view": {
+      "quaternion": [
+        0,
+        -0.4158046603058575,
+        0,
+        0.9094539485141238
+      ],
+      "fov": 0.1
+    },
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0.08581202155638779,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 139
+    },
+    "held": {
+      "up": false,
+      "down": false,
+      "left": false,
+      "right": false
+    },
+    "render": {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "quaternion": [
+        0,
+        -0.4158046603058575,
+        0,
+        0.9094539485141238
+      ],
+      "fov": 0.1,
+      "aspect": 2.257142857142857,
+      "width": 1264,
+      "height": 560,
+      "dpr": 1,
+      "framebuffer": [
+        1264,
+        560
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  },
+  "reset": {
+    "view": {
+      "quaternion": [
+        0,
+        0.04289284752645761,
+        0,
+        0.9990796783195383
+      ],
+      "fov": 75
+    },
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0.08581202155638779,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 148
+    },
+    "held": {
+      "up": false,
+      "down": false,
+      "left": false,
+      "right": false
+    },
+    "render": {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "quaternion": [
+        0,
+        0.04289284752645761,
+        0,
+        0.9990796783195383
+      ],
+      "fov": 75,
+      "aspect": 2.257142857142857,
+      "width": 1264,
+      "height": 560,
+      "dpr": 1,
+      "framebuffer": [
+        1264,
+        560
+      ],
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  }
+}

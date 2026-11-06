@@ -1,0 +1,35 @@
+
+> salimon-navigation-client@0.1.0 test
+> node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts
+
+✔ scripts/visual-comparison.test.ts (179.151523ms)
+✔ src/cockpit.test.ts (104.744751ms)
+✔ src/contact.test.ts (119.270629ms)
+✔ src/countItemSession.test.ts (222.536556ms)
+✔ src/hazards.test.ts (205.647263ms)
+✔ src/input.test.ts (116.313079ms)
+✔ src/miningPolicy.test.ts (190.937695ms)
+✔ src/navigationVisuals.test.ts (174.634008ms)
+✔ src/observationCamera.test.ts (158.866563ms)
+✔ src/planetarySite.test.ts (125.847686ms)
+✔ src/radar.test.ts (128.366704ms)
+✔ src/resourceContainerInteraction.test.ts (151.509857ms)
+✔ src/resourceInventory.test.ts (94.977491ms)
+✔ src/resourceLedger.test.ts (112.877644ms)
+✔ src/resourceSession.test.ts (551.417473ms)
+✔ src/scanner.test.ts (252.817279ms)
+✔ src/scoutLocation.test.ts (147.708981ms)
+✔ src/scoutResourceContainer.test.ts (154.358542ms)
+✔ src/simulation.test.ts (99.642587ms)
+✔ src/survival.test.ts (163.692832ms)
+✔ src/topDown.test.ts (318.896861ms)
+✔ src/topDownTraversal.test.ts (171.843251ms)
+✔ src/vectorGuides.test.ts (132.999447ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4097.359657

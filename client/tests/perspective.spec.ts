@@ -165,6 +165,7 @@ test('SENSOR-4 telescope high-frequency input at huge origin preserves depth and
   await page.locator('canvas').dispatchEvent('wheel', { deltaY: 10, bubbles: true, cancelable: true })
   await page.keyboard.down('KeyD'); await page.clock.runFor(16); await page.keyboard.up('KeyD')
   const right = await state(page); expect(right.render.fov).toBeGreaterThan(0.1); observe('right-zoomed', right)
+  expect(Math.abs(right.markers[0].x - initial.markers[0].x), 'STRESS_MOVEMENT_NONVACUOUS').toBeGreaterThan(0.5)
   await page.keyboard.down('KeyA'); await page.clock.runFor(16); await page.keyboard.up('KeyA')
   observe('left-zoomed', await state(page))
   await page.locator('canvas').dispatchEvent('wheel', { deltaY: -10, bubbles: true, cancelable: true })

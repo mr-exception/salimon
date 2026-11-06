@@ -1,5 +1,5 @@
 {
-  "source_commit": "e8c8ac899e8a59df60d95d2df07b15c88d465961",
+  "source_commit": "cbefee248129b4a242015018e55980618935c6d1",
   "sha256": {
     ".github/workflows/docker-client.yml": "fb839bd75eabc2076ff8ac158082662b343defa335dbf3762b675979056c3131",
     ".github/workflows/navigation-client.yml": "f62f70a6d6817fe0283fc86ea041a855a9c68323ebbfe4a395758edce34f6935",
@@ -56,7 +56,7 @@
     "client/src/scanner.ts": "9fcf24deb46ce540b8240531cbe9a3697dc42b03e3856f2cbf3da35c1517b0ad",
     "client/src/scoutLayout.ts": "ce86f6aba00775aef4f729fea13c5d1892e9aec202830d5d4a8127f54b0c5ba7",
     "client/src/scoutLocation.test.ts": "3194c801f770a2dca520124b766eac8c9e1b82ab63080e438a6927e59f91bf92",
-    "client/src/scoutLocation.ts": "95257cac1b1d2b90ba204e615ce3b22df03ad52f23ebe140f524c3f01fd8220d",
+    "client/src/scoutLocation.ts": "788f2d4cb1f5a7cb857ce14922a6dd04ada3f5ad47bb7bc81cec52f62deb4a29",
     "client/src/scoutResourceContainer.test.ts": "db3b6305364774bd5da5d1dff4a2e0c8dfb7ae7384ca49e799ef00170e891b70",
     "client/src/scoutResourceContainer.ts": "ee9e500848793924b902e218623d040304ffa150bcd5a395e706ca05264f296d",
     "client/src/simulation.test.ts": "170ccda2cb9274eda75dcb33fbdd8e581faa60cf64f08f75242cbb05549b0fd4",

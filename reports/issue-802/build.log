@@ -15,4 +15,4 @@ dist/assets/index-CFtUPS9F.js   1,430.16 kB │ gzip: 408.06 kB
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 2.73s
+✓ built in 3.33s

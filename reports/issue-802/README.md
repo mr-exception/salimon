@@ -17,10 +17,13 @@ The domain owner and lifecycle restriction are pure TypeScript, separate from Re
 
 Base: `main`, `7d959ae8848efb19d4c377823f64f61a68120e37`; no active PR stack or
 formal blockers at discovery/publication. Tested source:
-`e8c8ac899e8a59df60d95d2df07b15c88d465961`, branch
+`cbefee248129b4a242015018e55980618935c6d1`, branch
 `issue-802-shared-grounded-scout`. [Source hashes](source-hashes.json) bind all
 tracked client runtime/tests/assets/config/lockfile and workflows (excluding Markdown).
-Final evidence/docs-only commit preserves these inputs. Exact published head/base
+The only source difference from browser-tested `e8c8ac8` is a removed blank EOF
+line. Unit/build were rerun at this source revision; the compiled JS/CSS names
+and content are unchanged. Browser evidence is reused for identical executable
+inputs. Final evidence/docs-only commit preserves the recorded source hashes. Exact published head/base
 and current-head CI verdict are recorded in the PR review comment.
 
 | Criterion | Result and original evidence |

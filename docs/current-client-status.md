@@ -1,5 +1,7 @@
 # Current browser implementation and contract routing
 
+> **Approved future presentation, not shipped:** The [360° ship-centered panoramic navigation design](panoramic-navigation-design.md) will replace the existing orthographic cockpit radar with a perspective inertial camera, physical sky and compact sensor HUD. The code-checked status below describes the **current** browser implementation until that work merges.
+
 The [full 2D migration register](2d-migration-register.md) classifies every documentation file, maps historical 3D concepts onto active 2D design, and identifies the unfinished browser adapters.
 
 Checked against `client/src` on 2026-11-06. The default `/` is the playable

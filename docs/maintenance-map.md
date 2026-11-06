@@ -986,3 +986,10 @@ The `observation` Playwright project covers projection, focus, poles, remount,
 resize/DPR and repeat/negative pixels. See the client guide for integration API.
 The production orthographic radar/cockpit remains current until #811–#815 supply
 physical scene, overlays, HUD and authorized lifecycle integration.
+
+The separate panoramic optical foundation is owned by `client/src/opticalSky.ts`
+(split-relative geometry, stable ray intersections, identity-free render data)
+and `OpticalSky.tsx` (bounded analytic GPU rendering). Its tests are
+`opticalSky.test.ts` and `tests/optical.spec.ts`; its development entry is
+`tests/optical.html`. Scanner ownership remains in `scanner.ts`; the optical layer
+has no scanner dependency. See the client guide for the 32-body rendering budget.

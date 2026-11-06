@@ -68,3 +68,16 @@ The #810 perspective camera foundation is available in development fixture
 75°–0.1° optical zoom and session-local snapshots. It does not replace the shipped
 orthographic radar or integrate the future physical sky/HUD/cockpit lifecycle.
 See the [camera API and checks](../client/README.md#perspective-observation-camera-foundation-810).
+
+### Physical optical sky foundation (#811)
+
+A reusable scanner-independent `client/src/OpticalSky.tsx` now provides physical
+angular sphere rendering, diffuse terminators, unresolved point spread and a
+sparse deterministic starfield. `opticalSky.ts` owns split-origin subtraction and
+stable near-surface ray geometry. The development-only optical fixture exercises
+75°/0.1° free-space views and Vesper's shared `scoutLocation.ts` grounded anchor,
+including real globe/horizon occlusion. No discovery names or actions are emitted.
+The current production cockpit/radar remains usable and unchanged; #812 owns
+scanner overlays, #815 owns final cockpit integration. See the
+[client optical guide](../client/README.md#physical-optical-sky-foundation-811)
+and [local evidence](../reports/issue-811/README.md).

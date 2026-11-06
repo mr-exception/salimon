@@ -1,0 +1,251 @@
+{
+  "telescope": {
+    "scenario": "telescope",
+    "contacts": 0,
+    "selected": null,
+    "spheres": [
+      {
+        "direction": [
+          -0.7071067811865475,
+          0.7071067811865475,
+          0
+        ],
+        "distanceM": 141421356.23730952,
+        "radiusRatio": 0.0035355339059327372,
+        "surfaceTerm": 0.9999874999999999,
+        "angularRadius": 0.003535541271669807,
+        "lightDirection": [
+          0,
+          1,
+          0
+        ],
+        "color": [
+          1,
+          0.88,
+          0.68
+        ],
+        "emissive": true
+      },
+      {
+        "direction": [
+          0.0005999998920000291,
+          0,
+          -0.9999998200000486
+        ],
+        "distanceM": 100000017.99999838,
+        "radiusRatio": 0.000013999997480000681,
+        "surfaceTerm": 0.9999999998040001,
+        "angularRadius": 0.000013999997480458014,
+        "lightDirection": [
+          -0.5775811400245092,
+          0.5772347991450222,
+          0.5772347991450222
+        ],
+        "color": [
+          0.48,
+          0.46,
+          0.42
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          0,
+          0,
+          -1
+        ],
+        "distanceM": 100000000,
+        "radiusRatio": 0.0004,
+        "surfaceTerm": 0.99999984,
+        "angularRadius": 0.00040000001066666744,
+        "lightDirection": [
+          -0.5773502691896257,
+          0.5773502691896257,
+          0.5773502691896257
+        ],
+        "color": [
+          0.48,
+          0.46,
+          0.42
+        ],
+        "emissive": false
+      }
+    ],
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 0.1
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "calls": 1,
+    "triangles": 2,
+    "camera": [
+      0,
+      0,
+      0
+    ]
+  },
+  "below": {
+    "scenario": "below",
+    "contacts": 0,
+    "selected": null,
+    "spheres": [
+      {
+        "direction": [
+          -0.9862447375540148,
+          0.14999159878409232,
+          0.06945385476130585
+        ],
+        "distanceM": 215821324136.9437,
+        "radiusRatio": 0.002363065846433196,
+        "surfaceTerm": 0.9999944159198053,
+        "angularRadius": 0.002363068045696921,
+        "lightDirection": [
+          0,
+          1,
+          0
+        ],
+        "color": [
+          1,
+          0.88,
+          0.68
+        ],
+        "emissive": true
+      },
+      {
+        "direction": [
+          -3.225803850157976e-7,
+          -0.999999999999935,
+          1.612901925078988e-7
+        ],
+        "distanceM": 6200005.000000403,
+        "radiusRatio": 0.9999991935489724,
+        "surfaceTerm": 0.0000016129014048003566,
+        "angularRadius": 1.5695263259003946,
+        "lightDirection": [
+          -0.9862404875621954,
+          0.1500196797981931,
+          0.06945355546212643
+        ],
+        "color": [
+          0.24,
+          0.36,
+          0.44
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          0.4964510337400617,
+          0.2914260729524912,
+          -0.8176840557953381
+        ],
+        "distanceM": 10265809591.7441,
+        "radiusRatio": 0.00013637502113090998,
+        "surfaceTerm": 0.9999999814018536,
+        "angularRadius": 0.0001363750215536304,
+        "lightDirection": [
+          -0.9854812345277026,
+          0.13284341263234506,
+          0.10573251209513178
+        ],
+        "color": [
+          0.48,
+          0.46,
+          0.42
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          0.6253938320077249,
+          0.18247076776171064,
+          0.7586744847423997
+        ],
+        "distanceM": 292413180332.9668,
+        "radiusRatio": 0.00003077836638468836,
+        "surfaceTerm": 0.9999999990526922,
+        "angularRadius": 0.000030778366389547786,
+        "lightDirection": [
+          -0.8852483593497379,
+          -0.04694498875339519,
+          -0.4627434605691812
+        ],
+        "color": [
+          0.24,
+          0.36,
+          0.44
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          -0.6291394783762081,
+          -0.0763644981214307,
+          0.7735321455344792
+        ],
+        "distanceM": 145336134251.1769,
+        "radiusRatio": 2.4082104688095883e-7,
+        "surfaceTerm": 0.999999999999942,
+        "angularRadius": 2.4082104688096116e-7,
+        "lightDirection": [
+          -0.7511923952098692,
+          0.26894542544550876,
+          -0.6028087122054506
+        ],
+        "color": [
+          0.35,
+          0.31,
+          0.28
+        ],
+        "emissive": false
+      }
+    ],
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        53962642442,
+        -5390064239,
+        -77946039081
+      ]
+    },
+    "view": {
+      "quaternion": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
+      "fov": 75
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "calls": 1,
+    "triangles": 2,
+    "camera": [
+      0,
+      0,
+      0
+    ]
+  },
+  "errors": []
+}

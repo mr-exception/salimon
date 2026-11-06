@@ -1,0 +1,13 @@
+✔ physical angular sizes and telescope scaling without displacement (1.519506ms)
+✔ split translation retains identical data and grounded metre clearance (0.36593ms)
+✔ foreground blocks distant unresolved moon; underground has no sky (0.152389ms)
+✔ optical geometry carries no identity and is independent of scanner pulses (12.553703ms)
+✔ invalid geometry and excessive catalogs fail explicitly (0.409616ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41.636087

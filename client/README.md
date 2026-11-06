@@ -456,3 +456,38 @@ telescope sensitivity/pixels, focus cancellation, resize/DPR, spherical input,
 repeat captures and a deliberately wrong wide-versus-telescope comparison.
 These originals are evidence, not approved navigation baselines. Existing
 baseline approval and regression gates remain required in CI.
+
+## Physical optical sky foundation (#811)
+
+`OpticalSky.tsx` consumes only catalog bodies and a `getOrigin()` callback to the
+shared authoritative ship position. `opticalSky.ts` subtracts split coordinates
+before converting bounded directions/radius ratios to GPU uniforms. It never
+reads scanner contacts, emits identities, registers pointer actions, or changes
+simulation. Production still uses the existing radar until #815 integration.
+
+The development route `/tests/optical.html?scenario=wide` renders a single reused
+quad with analytic per-pixel sphere intersections. Available scenarios are
+`wide`, `telescope` (0.1°), `surface`, `below`, `translated` and `clear` (occulted
+body removed as a negative control). Surface scenarios use `startingScoutLocation()`
+and sample Vesper's catalog radius, leaving the real 5 m ship-bound clearance.
+No eye translation or cosmetic horizon is added. Physical hit distances resolve
+occlusion without a mixed astronomical/ground depth buffer. Factored CPU surface
+terms retain near-surface clearance; perpendicular ray vectors retain tiny disks
+at telescope magnification. Uniform spheres have restrained diffuse terminators;
+no texture, atmosphere or geological detail is claimed. Subpixel bodies use an
+energy-limited Gaussian PSF. A deterministic sparse decorative starfield carries
+no contact identity. The explicit budget is 32 bodies, two triangles and one draw
+call, with constant geometry regardless of FOV/distance; larger catalogs must be
+partitioned upstream (overflow fails explicitly rather than silently hiding bodies).
+
+Run `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=optical`.
+OPT-1 checks pre-pulse disks/no selection, unchanged pixels after a real scanner
+pulse, occulted-body removal, repeat stability and a huge translated origin.
+OPT-2 captures telescope/tiny moon, the shared grounded horizon and downward
+occlusion. These captures are review candidates, not approved baselines. Existing
+CI baseline approval and negative/repeat regression gates remain unchanged.
+
+GPU ordering uses logarithmic physical ray distances, avoiding float overflow
+without exposing absolute galactic coordinates. The shader/material is disposed
+on unmount. Software-WebGL capture timings are not a GPU/Metal frame-rate claim;
+the budget bounds catalog work and geometry, not the full future cockpit HUD.

@@ -81,3 +81,14 @@ The current production cockpit/radar remains usable and unchanged; #812 owns
 scanner overlays, #815 owns final cockpit integration. See the
 [client optical guide](../client/README.md#physical-optical-sky-foundation-811)
 and [local evidence](../reports/issue-811/README.md).
+
+### Perspective sensor overlay foundation (#812)
+
+The separate `/tests/perspective.html` development fixture composes the optical
+scene/camera with scanner-authorized markers and a searchable, paginated contact
+browser. Physical line-of-sight tests suppress occluded/behind-camera/off-screen
+marker hit targets; those scanned IDs stay in the browser. Live guards remove
+stale selection actions on range loss. This does not switch the production
+cockpit or standalone orthographic radar; #813–#816 retain their separate scope.
+See the [overlay API](../client/README.md#perspective-sensor-overlay-foundation-812)
+and [local evidence](../reports/issue-812/README.md); remote acceptance is pending.

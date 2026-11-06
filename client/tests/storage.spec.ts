@@ -1,3 +1,4 @@
+import { expectSameResourceState, expectSafeSurvivalReload } from './saveAssertions'
 import { test, expect } from '@playwright/test'
 import { compareImages, POLICY } from '../scripts/visual-comparison.ts'
 import { ResourceSession, RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
@@ -56,10 +57,10 @@ test('STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and r
       const committed = await saved(page)
       await input.fill('9999'); await page.getByRole('button', { name: 'Review deposit' }).click()
       await expect(page.getByRole('status', { name: 'Container feedback' })).toContainText('Insufficient amount')
-      expect(await saved(page)).toEqual(committed)
+      expectSameResourceState(await saved(page), committed)
       await capture('storage-error')
       await input.fill('1'); await page.getByRole('button', { name: 'Review deposit' }).click(); await page.keyboard.press('Escape')
-      await expect(dialog(page)).toHaveCount(0); expect(await saved(page)).toEqual(committed)
+      await expect(dialog(page)).toHaveCount(0); expectSameResourceState(await saved(page), committed)
       await page.keyboard.press('e'); await expect(dialog(page)).toBeVisible()
       await input.fill('1'); await page.getByRole('button', { name: 'Review withdrawal' }).click()
       await page.evaluate(() => window.dispatchEvent(new Event('blur')))
@@ -78,7 +79,7 @@ test('STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and r
       await expect(page.locator('[data-resource="mineral"]')).toHaveText('0.778 kg')
       expect(await position(page)).toEqual(where)
       const afterReload = await saved(page)
-      expect(afterReload).toEqual(beforeReload)
+      expectSafeSurvivalReload(afterReload, beforeReload)
       expect(afterReload.inventory.quantities.mineral + afterReload.stores[containerId].quantities.mineral + afterReload.sources['source:landing:mineral:01'].remainingGrams).toBe(60000)
       expect(afterReload.stores[containerId].quantities.mineral).toBe(222)
       expect(errors).toEqual([])
@@ -111,14 +112,14 @@ test('STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation 
   const input = page.getByRole('textbox', { name: 'Amount in grams' }), raw = await saved(page)
   await input.fill('1'); await page.getByRole('button', { name: 'Review deposit' }).click()
   await expect(page.getByRole('status', { name: 'Container feedback' })).toContainText('Container overweight: only 0 g free')
-  expect(await saved(page)).toEqual(raw)
+  expectSameResourceState(await saved(page), raw)
   await page.clock.runFor(5000); await page.screenshot({ path: info.outputPath('storage-full-error.png') })
   await input.fill('9001'); await page.getByRole('button', { name: 'Review withdrawal' }).click()
   await expect(page.getByRole('status', { name: 'Container feedback' })).toContainText('Player overweight: only 9000 g free')
-  expect(await saved(page)).toEqual(raw)
+  expectSameResourceState(await saved(page), raw)
   for (const value of ['0', '-1', '0.5', '1e3']) { await input.fill(value); await page.getByRole('button', { name: 'Review withdrawal' }).click(); await expect(page.getByRole('status', { name: 'Container feedback' })).toContainText('positive whole number of grams') }
   await input.fill('333'); await page.getByRole('button', { name: 'Review withdrawal' }).click(); await page.getByRole('button', { name: 'Cancel transfer' }).click()
-  expect(await saved(page)).toEqual(raw)
+  expectSameResourceState(await saved(page), raw)
   await input.fill('333'); await page.getByRole('button', { name: 'Review withdrawal' }).click()
   await page.evaluate(key => localStorage.setItem(key, localStorage.getItem(key)! + ' '), RESOURCE_SAVE_KEY)
   const staleBytes = await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)

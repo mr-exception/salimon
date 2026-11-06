@@ -1,0 +1,27 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit --project=navigation-captures
+
+[WebServer] (node:6622) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6654) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 10 tests using 1 worker
+
+(node:6666) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (55.2s)
+  ✓   2 [cockpit] › tests/gathering.spec.ts:7:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (21.8s)
+  ✓   3 [cockpit] › tests/gathering.spec.ts:75:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (6.3s)
+  ✓   4 [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice (18.3s)
+  ✓   5 [cockpit] › tests/items.spec.ts:60:1 › ordinary built game has no item fixture, grants or query backdoor (618ms)
+  ✓   6 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (1.1m)
+  ✓   7 [cockpit] › tests/storage.spec.ts:13:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (36.3s)
+  ✓   8 [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.0s)
+  ✓   9 [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset (20.0s)
+(node:7047) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (15.8s)
+
+  10 passed (4.1m)

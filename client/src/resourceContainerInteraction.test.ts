@@ -117,3 +117,16 @@ test('opening saves arrival before review, so a location-only autosave cannot st
   assert.equal(session.snapshot.stores[id]!.quantities.mineral, 333)
   assert.equal(new ResourceSession(storage, createTopDownState('exterior', true)).snapshot.stores[id]!.quantities.mineral, 333)
 })
+
+test('a survival-only autosave cannot invalidate an unchanged resource confirmation', () => {
+  const { session } = make()
+  const ui = new ResourceContainerInteraction(session)
+  assert.equal(ui.open(session.world), true)
+  assert.equal(ui.review('deposit', 'mineral', '333'), true)
+  const reviewed = session.snapshot.revision
+  for (let i = 0; i < 120; i++) session.advance(stepTopDown(session.world, [0, 0]))
+  assert.ok(session.snapshot.revision > reviewed)
+  assert.equal(ui.confirm(), true)
+  assert.equal(session.snapshot.stores[id]!.quantities.mineral, 333)
+  assert.equal(ui.confirm(), false)
+})

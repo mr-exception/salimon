@@ -1,0 +1,298 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:3289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3321) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 40 tests using 1 worker
+
+(node:3333) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (1.0m)
+  ✘   2 [cockpit] › tests/gathering.spec.ts:7:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (4.8s)
+(node:3601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 [cockpit] › tests/gathering.spec.ts:75:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (8.3s)
+(node:3769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice (21.6s)
+  ✓   5 [cockpit] › tests/items.spec.ts:60:1 › ordinary built game has no item fixture, grants or query backdoor (1.1s)
+  ✓   6 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (1.2m)
+  ✘   7 [cockpit] › tests/storage.spec.ts:13:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (18.5s)
+(node:4137) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   8 [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (15.1s)
+(node:4289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset (22.2s)
+(node:4444) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (2.7s)
+  ✓  11 [top-down] › tests/top-down.spec.ts:76:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (2.0s)
+  ✓  12 [top-down] › tests/top-down.spec.ts:101:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (4.8s)
+  ✓  13 [top-down] › tests/top-down.spec.ts:140:1 › TD-5 explicit built radar entry retains standalone navigation (1.4s)
+  ✓  14 [top-down] › tests/top-down.spec.ts:154:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (3.6s)
+  ✓  15 [top-down] › tests/top-down.spec.ts:202:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (25.5s)
+  ✓  16 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.1m)
+(node:4919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  17 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (939ms)
+(node:5048) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (14.4s)
+  ✓  19 [deterministic] › tests/deterministic.spec.ts:42:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (23.3s)
+  ✓  20 [deterministic] › tests/deterministic.spec.ts:82:1 › NAV-3 heading and velocity retain approved colors and viewport edges (4.5s)
+  ✓  21 [deterministic] › tests/deterministic.spec.ts:99:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (3.0s)
+(node:5297) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  22 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (12.8s)
+  ✓  23 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (11.1s)
+  ✓  24 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (11.9s)
+  ✓  25 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (10.5s)
+  ✓  26 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (3.6s)
+  ✓  27 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (8.1s)
+  ✓  28 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (4.2s)
+  ✓  29 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (3.4s)
+  ✓  30 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (4.2s)
+  ✓  31 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (4.1s)
+  ✓  32 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (3.9s)
+  ✓  33 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (11.7s)
+  ✓  34 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (36.5s)
+  ✓  35 [desktop] › tests/edges.spec.ts:50:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (12.2s)
+  ✓  36 [desktop] › tests/edges.spec.ts:68:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (12.7s)
+  ✓  37 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (8.1s)
+  ✓  38 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (8.1s)
+  ✓  39 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (20.0s)
+(node:6223) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  40 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.8s)
+
+
+  1) [cockpit] › tests/gathering.spec.ts:7:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+      Object {
+    -   "activeTicks": 587,
+    +   "activeTicks": 646,
+        "fatigue": 3887354,
+        "health": 200,
+    -   "hunger": 3866868,
+    +   "hunger": 3864744,
+        "offlineAtMs": 1793750411836,
+    -   "recoveryTicks": 587,
+    +   "recoveryTicks": 646,
+        "starvationTicks": 0,
+      }
+
+       at saveAssertions.ts:11
+
+       9 | export function expectSafeSurvivalReload(actual: ResourceSave, before: ResourceSave) {
+      10 |   expectSameResourceState(actual, before)
+    > 11 |   expect(actual.survival).toEqual({ ...before.survival, fatigue: actual.survival.fatigue, offlineAtMs: actual.survival.offlineAtMs })
+         |                           ^
+      12 |   expect(actual.survival.fatigue).toBeGreaterThanOrEqual(before.survival.fatigue)
+      13 |   expect(actual.survival.offlineAtMs).toBeGreaterThanOrEqual(before.survival.offlineAtMs)
+      14 | }
+        at expectSafeSurvivalReload (/workspace/salimon/client/tests/saveAssertions.ts:11:27)
+        at /workspace/salimon/client/tests/gathering.spec.ts:48:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/browser/gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/gathering.spec.ts:75:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+      Object {
+    -   "activeTicks": 1017,
+    +   "activeTicks": 1043,
+        "fatigue": 3886957,
+        "health": 200,
+    -   "hunger": 3851388,
+    +   "hunger": 3850452,
+        "offlineAtMs": 1793750412995,
+    -   "recoveryTicks": 1017,
+    +   "recoveryTicks": 1043,
+        "starvationTicks": 0,
+      }
+
+       at saveAssertions.ts:11
+
+       9 | export function expectSafeSurvivalReload(actual: ResourceSave, before: ResourceSave) {
+      10 |   expectSameResourceState(actual, before)
+    > 11 |   expect(actual.survival).toEqual({ ...before.survival, fatigue: actual.survival.fatigue, offlineAtMs: actual.survival.offlineAtMs })
+         |                           ^
+      12 |   expect(actual.survival.fatigue).toBeGreaterThanOrEqual(before.survival.fatigue)
+      13 |   expect(actual.survival.offlineAtMs).toBeGreaterThanOrEqual(before.survival.offlineAtMs)
+      14 | }
+        at expectSafeSurvivalReload (/workspace/salimon/client/tests/saveAssertions.ts:11:27)
+        at /workspace/salimon/client/tests/gathering.spec.ts:99:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/browser/gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/browser/gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [cockpit] › tests/storage.spec.ts:13:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+      Object {
+    -   "activeTicks": 1765,
+    +   "activeTicks": 1824,
+        "fatigue": 3886176,
+        "health": 200,
+    -   "hunger": 3824460,
+    +   "hunger": 3822336,
+        "offlineAtMs": 1793750431521,
+    -   "recoveryTicks": 1765,
+    +   "recoveryTicks": 1824,
+        "starvationTicks": 0,
+      }
+
+       at saveAssertions.ts:11
+
+       9 | export function expectSafeSurvivalReload(actual: ResourceSave, before: ResourceSave) {
+      10 |   expectSameResourceState(actual, before)
+    > 11 |   expect(actual.survival).toEqual({ ...before.survival, fatigue: actual.survival.fatigue, offlineAtMs: actual.survival.offlineAtMs })
+         |                           ^
+      12 |   expect(actual.survival.fatigue).toBeGreaterThanOrEqual(before.survival.fatigue)
+      13 |   expect(actual.survival.offlineAtMs).toBeGreaterThanOrEqual(before.survival.offlineAtMs)
+      14 | }
+        at expectSafeSurvivalReload (/workspace/salimon/client/tests/saveAssertions.ts:11:27)
+        at /workspace/salimon/client/tests/storage.spec.ts:82:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/browser/storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('dialog', { name: 'Resource Container', exact: true })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('dialog', { name: 'Resource Container', exact: true }) with timeout 10000ms
+      - waiting for getByRole('dialog', { name: 'Resource Container', exact: true })
+
+
+      132 |   await page.setViewportSize({ width: 390, height: 844 })
+      133 |   await expect(dialog(page)).toHaveCount(0)
+    > 134 |   await page.keyboard.press('e'); await expect(dialog(page)).toBeVisible()
+          |                                                              ^
+      135 |   const bounds = await dialog(page).boundingBox()
+      136 |   expect(bounds!.x).toBeGreaterThanOrEqual(0); expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(390)
+      137 |   await page.screenshot({ path: info.outputPath('storage-narrow.png') })
+        at /workspace/salimon/client/tests/storage.spec.ts:134:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/browser/storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 
+
+    Error: VISUAL_ENVIRONMENT_DRIFT: propose separately reviewed candidates
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+    @@ -1,8 +1,8 @@
+      Object {
+        "arch": "x64",
+    -   "browser": "156.0.8078.4",
+    +   "browser": "154.0.8037.57",
+        "colorScheme": "dark",
+        "dpr": 1,
+        "epoch": "2026-11-04T00:00:00.000Z",
+        "fontHashes": Object {
+          "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+
+      33 |  await mkdir(output,{recursive:true})
+      34 |  // Drift is a failure, never an instruction to regenerate references.
+    > 35 |  if(manifest)expect(environment,'VISUAL_ENVIRONMENT_DRIFT: propose separately reviewed candidates').toEqual(manifest.environment)
+         |                                                                                                     ^
+      36 |  for(const fixture of cases) {
+      37 |   const c:{id:string;scenario?:string;vector?:string;pan?:boolean;selected?:boolean;zoom?:number}=fixture
+      38 |   await boot(page,`scenario=${c.scenario??'seeded'}&seed=750&view=front&vector=${c.vector??'zero'}&zoom=${c.zoom??.5}`)
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:35:101
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5 failed
+    [cockpit] › tests/gathering.spec.ts:7:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat 
+    [cockpit] › tests/gathering.spec.ts:75:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab 
+    [cockpit] › tests/storage.spec.ts:13:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats 
+    [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport 
+    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 
+  35 passed (9.8m)

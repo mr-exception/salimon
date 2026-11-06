@@ -382,3 +382,7 @@ session/HUD with synthetic stack=1/stack=4 definitions and fixture-only controls
 Run `npx playwright test --project=cockpit items.spec.ts` for mixed inventory,
 overfill, exact removal, reload, narrow layout and repeat/negative captures.
 Normal gameplay has no query flag, controls or item grants from this fixture.
+
+## Survival clock (#787)
+
+The playable world includes persisted 200 HP, hunger and fatigue, foreground active-time drain, launch-only fatigue recovery and a labelled top-left HUD. Pause with P or the HUD button. A terminal character can explicitly restart without restoring depleted sources or granting items. See [rates, migration and deferred tuning](../docs/browser-survival.md). Unit/integration coverage is `src/survival.test.ts`; built browser coverage and originals are `tests/survival.spec.ts`.

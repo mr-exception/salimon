@@ -1,6 +1,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { ResourceSession, RESOURCE_CATALOG, resourcePayload, withResourcePayload } from './resourceSession.ts'
+import { ResourceSession as LiveResourceSession, RESOURCE_CATALOG, resourcePayload, withResourcePayload } from './resourceSession.ts'
+class ResourceSession extends LiveResourceSession {
+  constructor(...args: ConstructorParameters<typeof LiveResourceSession>) { args[4] = () => 0; super(...args) }
+}
 import { registerCountItems, resourceInventoryUsage } from './resourceInventory.ts'
 import { createTopDownState, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
 import { point2 } from './topDownFrames.ts'
@@ -110,14 +113,14 @@ test('corrupt saved definitions/counts and unsupported migrations preserve origi
 test('v4 empty-item saves migrate losslessly; failed migration commit preserves v4 bytes', () => {
   const { storage } = make()
   const ordinary = new ResourceSession(storage, world()); ordinary.upgrade(10000, 12)
-  const old = JSON.parse(storage.raw!); old.version = 4; delete old.itemDefinitions
+  const old = JSON.parse(storage.raw!); old.version = 4; delete old.itemDefinitions; delete old.survival
   storage.raw = JSON.stringify(old); const raw = storage.raw
   const migrated = new ResourceSession(storage, world(), undefined, TEST_ITEMS)
-  assert.equal(migrated.error, ''); assert.equal(migrated.snapshot.version, 5)
+  assert.equal(migrated.error, ''); assert.equal(migrated.snapshot.version, 6)
   assert.deepEqual(migrated.snapshot.inventory, old.inventory); assert.equal(storage.raw, raw)
   storage.fail = true; assert.equal(migrated.changeItem('add', 'fixture-single', 1, old.revision), false); assert.equal(storage.raw, raw)
   storage.fail = false
   const retry = new ResourceSession(storage, world(), undefined, TEST_ITEMS)
   assert.equal(retry.changeItem('add', 'fixture-single', 1, old.revision), true)
-  assert.equal(JSON.parse(storage.getItem()!).version, 5)
+  assert.equal(JSON.parse(storage.getItem()!).version, 6)
 })

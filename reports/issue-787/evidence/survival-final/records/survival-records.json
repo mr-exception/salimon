@@ -1,0 +1,244 @@
+{
+  "active": {
+    "version": 6,
+    "survival": {
+      "hunger": 3885840,
+      "fatigue": 3887940,
+      "health": 200,
+      "activeTicks": 60,
+      "starvationTicks": 0,
+      "recoveryTicks": 60,
+      "offlineAtMs": 1793750402005
+    },
+    "itemDefinitions": {},
+    "stores": {
+      "scout:storage": {
+        "shipId": "ship:scout",
+        "capacityGrams": 50000,
+        "id": "scout:storage",
+        "quantities": {}
+      }
+    },
+    "catalogVersion": "landing-resources:v2",
+    "siteId": "site:illustrated-landing:v1",
+    "revision": 1,
+    "inventory": {
+      "capacityGrams": 10000,
+      "capacitySlots": 12,
+      "quantities": {},
+      "items": {}
+    },
+    "sources": {
+      "source:landing:mineral:01": {
+        "id": "source:landing:mineral:01",
+        "resourceId": "mineral",
+        "remainingGrams": 60000
+      },
+      "source:landing:biology:01": {
+        "id": "source:landing:biology:01",
+        "resourceId": "biomass",
+        "remainingGrams": 15000
+      }
+    },
+    "location": {
+      "anchor": {
+        "frame": "planet:fixture",
+        "point": {
+          "cell": [
+            "0",
+            "0",
+            "0"
+          ],
+          "offsetM": [
+            -6,
+            3,
+            0
+          ]
+        }
+      },
+      "facing": 0
+    }
+  },
+  "paused": {
+    "version": 6,
+    "survival": {
+      "hunger": 3885264,
+      "fatigue": 3887924,
+      "health": 200,
+      "activeTicks": 76,
+      "starvationTicks": 0,
+      "recoveryTicks": 76,
+      "offlineAtMs": 1793750402285
+    },
+    "itemDefinitions": {},
+    "stores": {
+      "scout:storage": {
+        "shipId": "ship:scout",
+        "capacityGrams": 50000,
+        "id": "scout:storage",
+        "quantities": {}
+      }
+    },
+    "catalogVersion": "landing-resources:v2",
+    "siteId": "site:illustrated-landing:v1",
+    "revision": 2,
+    "inventory": {
+      "capacityGrams": 10000,
+      "capacitySlots": 12,
+      "quantities": {},
+      "items": {}
+    },
+    "sources": {
+      "source:landing:mineral:01": {
+        "id": "source:landing:mineral:01",
+        "resourceId": "mineral",
+        "remainingGrams": 60000
+      },
+      "source:landing:biology:01": {
+        "id": "source:landing:biology:01",
+        "resourceId": "biomass",
+        "remainingGrams": 15000
+      }
+    },
+    "location": {
+      "anchor": {
+        "frame": "planet:fixture",
+        "point": {
+          "cell": [
+            "0",
+            "0",
+            "0"
+          ],
+          "offsetM": [
+            -6,
+            3,
+            0
+          ]
+        }
+      },
+      "facing": 0
+    }
+  },
+  "terminal": {
+    "version": 6,
+    "survival": {
+      "hunger": 0,
+      "fatigue": 388200,
+      "health": 0,
+      "activeTicks": 600,
+      "starvationTicks": 0,
+      "recoveryTicks": 0,
+      "offlineAtMs": 1793836800000
+    },
+    "itemDefinitions": {},
+    "catalogVersion": "landing-resources:v2",
+    "siteId": "site:illustrated-landing:v1",
+    "revision": 14,
+    "inventory": {
+      "capacityGrams": 10000,
+      "capacitySlots": 12,
+      "quantities": {},
+      "items": {}
+    },
+    "sources": {
+      "source:landing:mineral:01": {
+        "id": "source:landing:mineral:01",
+        "resourceId": "mineral",
+        "remainingGrams": 60000
+      },
+      "source:landing:biology:01": {
+        "id": "source:landing:biology:01",
+        "resourceId": "biomass",
+        "remainingGrams": 15000
+      }
+    },
+    "stores": {
+      "scout:storage": {
+        "shipId": "ship:scout",
+        "capacityGrams": 50000,
+        "id": "scout:storage",
+        "quantities": {}
+      }
+    },
+    "location": {
+      "anchor": {
+        "frame": "planet:fixture",
+        "point": {
+          "cell": [
+            "0",
+            "0",
+            "0"
+          ],
+          "offsetM": [
+            -6,
+            3,
+            0
+          ]
+        }
+      },
+      "facing": 0
+    }
+  },
+  "final": {
+    "version": 6,
+    "survival": {
+      "hunger": 3857832,
+      "fatigue": 3887162,
+      "health": 200,
+      "activeTicks": 838,
+      "starvationTicks": 0,
+      "recoveryTicks": 838,
+      "offlineAtMs": 1793750434165
+    },
+    "itemDefinitions": {},
+    "catalogVersion": "landing-resources:v2",
+    "siteId": "site:illustrated-landing:v1",
+    "revision": 31,
+    "inventory": {
+      "capacityGrams": 10000,
+      "capacitySlots": 12,
+      "quantities": {},
+      "items": {}
+    },
+    "sources": {
+      "source:landing:mineral:01": {
+        "id": "source:landing:mineral:01",
+        "resourceId": "mineral",
+        "remainingGrams": 60000
+      },
+      "source:landing:biology:01": {
+        "id": "source:landing:biology:01",
+        "resourceId": "biomass",
+        "remainingGrams": 15000
+      }
+    },
+    "stores": {
+      "scout:storage": {
+        "shipId": "ship:scout",
+        "capacityGrams": 50000,
+        "id": "scout:storage",
+        "quantities": {}
+      }
+    },
+    "location": {
+      "anchor": {
+        "frame": "ship:scout",
+        "point": {
+          "cell": [
+            "0",
+            "0",
+            "0"
+          ],
+          "offsetM": [
+            0,
+            -3.1,
+            0
+          ]
+        }
+      },
+      "facing": -0.12
+    }
+  },
+  "backend": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "input": "Playwright synthetic keyboard/mouse; saved-state low-condition fixture"
+}

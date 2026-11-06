@@ -1,0 +1,87 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit --grep COCKPIT-1|SURV
+
+[WebServer] (node:1724) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1768) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (2.5s)
+(node:1897) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset (7.8s)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3
+    Received: 0
+
+       at worldJourney.ts:52
+
+      50 |   for (let i = 0; i < 60 && await tick() < target; i++) await page.clock.runFor(16)
+      51 |   for (const code of keys) await page.keyboard.up(code)
+    > 52 |   expect(await tick()).toBe(target)
+         |                        ^
+      53 | }
+      54 |
+        at walkTicks (/workspace/salimon/client/tests/worldJourney.ts:52:24)
+        at walkTo (/workspace/salimon/client/tests/worldJourney.ts:37:21)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:26:43
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/focused-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/focused-browser/cockpit-COCKPIT-1-radar-ro-e017a-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 602
+    Received: 600
+
+       at worldJourney.ts:52
+
+      50 |   for (let i = 0; i < 60 && await tick() < target; i++) await page.clock.runFor(16)
+      51 |   for (const code of keys) await page.keyboard.up(code)
+    > 52 |   expect(await tick()).toBe(target)
+         |                        ^
+      53 | }
+      54 |
+        at walkTicks (/workspace/salimon/client/tests/worldJourney.ts:52:24)
+        at /workspace/salimon/client/tests/survival.spec.ts:40:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-787/focused-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-787/focused-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-787/focused-browser/survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation 
+    [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset 

@@ -21,6 +21,11 @@ export class ResourceContainerInteraction {
   pending: ContainerCommand | null = null
   message = ''
   failed = false
+  private reviewedResources = ''
+  private resourceSignature(): string {
+    const { inventory, sources, stores, itemDefinitions } = this.session.snapshot
+    return JSON.stringify({ inventory, sources, stores, itemDefinitions })
+  }
   constructor(session: ResourceSession) { this.session = session }
   private reachable(world: TopDownState): boolean {
     const player = world.entities.find(e => e.id === PLAYER_ID), target = world.entities.find(e => e.id === containerId)
@@ -67,6 +72,7 @@ export class ResourceContainerInteraction {
       const error = withdrawalCapacityError(inv, used, resourceId, grams)
       if (error) { this.message = error; return false }
     }
+    this.reviewedResources = this.resourceSignature()
     this.pending = { direction, resourceId, grams, revision: this.session.snapshot.revision }
     this.failed = false; this.message = 'Review the exact amount, then confirm. Nothing has moved yet.'
     return true
@@ -76,7 +82,10 @@ export class ResourceContainerInteraction {
     const command = this.pending
     this.pending = null // Consume before committing: repeated events cannot duplicate a command.
     if (!this.opened || !command) return false
-    const ok = this.session[command.direction](command.resourceId, command.grams, command.revision)
+    // Clock/location-only commits do not alter the reviewed transfer. A material
+    // change still uses its stale revision and is rejected by the session.
+    const revision = this.reviewedResources === this.resourceSignature() ? this.session.snapshot.revision : command.revision
+    const ok = this.session[command.direction](command.resourceId, command.grams, revision)
     this.failed = !ok
     this.message = ok ? `Saved: ${command.direction === 'deposit' ? 'deposited' : 'withdrew'} ${command.grams} g (${command.grams / 1000} kg).`
       : this.session.error || (/Stale/.test(this.session.feedback) ? 'Stale transaction. Amounts changed; review a new transfer.' : this.session.feedback)

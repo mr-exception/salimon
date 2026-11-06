@@ -1,3 +1,4 @@
+import { METER, survivalPolicy } from './survival.ts'
 import { DRY_MASS_KG, setMass } from './simulation.ts'
 import { App } from './App'
 import { NavigationRuntime } from './navigationRuntime.ts'
@@ -5,7 +6,7 @@ import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { isCockpitTarget, leaveCockpit, setCockpitPower } from './cockpit.ts'
 import { useEffect, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
-import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, TopDownClock, type TopDownState } from './topDownRuntime.ts'
+import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, stepTopDown, TopDownClock, type TopDownState } from './topDownRuntime.ts'
 import { useWorldSprites, WorldSprite } from './topDownSprites.tsx'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
@@ -36,13 +37,15 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const [state, setState] = useState(() => createTopDownState(import.meta.env.DEV && new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior', gameplay))
   const current = useRef(state)
   const session = useRef<ResourceSession | null>(null)
+  const lockAttempt = useRef<Promise<unknown>>(Promise.resolve())
   const container = useRef<ResourceContainerInteraction | null>(null)
+  const paused = useRef(false)
   const [saveStatus, setSaveStatus] = useState('Opening saved expedition…')
   useEffect(() => {
     if (!gameplay) return
     let disposed = false, unlock: (() => void) | undefined
     if (!navigator.locks) { setSaveStatus('Saving needs HTTPS or localhost. Gathering is paused.'); return }
-    void navigator.locks.request(RESOURCE_SAVE_KEY, { mode: 'exclusive', ifAvailable: true }, async lock => {
+    lockAttempt.current = lockAttempt.current.then(() => navigator.locks.request(RESOURCE_SAVE_KEY, { mode: 'exclusive', ifAvailable: true }, async lock => {
       if (disposed) return
       if (!lock) { setSaveStatus('Another tab has this expedition open. Close it and reload to gather.'); return }
       try {
@@ -53,7 +56,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         setSaveStatus('Expedition saves automatically on this browser.')
         await new Promise<void>(resolve => { unlock = resolve })
       } catch { setSaveStatus('Browser storage is unavailable. Gathering is paused.') }
-    }).catch(() => { if (!disposed) setSaveStatus('Could not open saved expedition. Gathering is paused.') })
+    })).catch(() => { if (!disposed) setSaveStatus('Could not open saved expedition. Gathering is paused.') })
     return () => {
       disposed = true
       session.current?.cancel()
@@ -70,6 +73,11 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     const release = () => { input.clear(); clock.reset(); timer.resume(performance.now()) }
     const clear = () => { release(); session.current?.cancel(); container.current?.close(); current.current = cancelInteraction(current.current); if (session.current) session.current.world = current.current; session.current?.checkpoint(); setState(current.current) }
     const keydown = (event: KeyboardEvent) => {
+      if (event.code === 'KeyP' && !event.repeat && acceptsFlightShortcut(event.target)) {
+        paused.current = !paused.current; clear(); return
+      }
+      if (paused.current || session.current?.survival.health === 0) return
+      if (event.code === 'KeyE' && isCockpitTarget(current.current.selectedId) && session.current && (!!session.current.error || !survivalPolicy(session.current.survival).canWork)) return
       if (current.current.cockpit.view === 'radar') return
       if (container.current?.opened && event.code === 'KeyE') return
       if (!event.repeat && (event.code === 'Escape' || (event.code === 'KeyE' && acceptsFlightShortcut(event.target)))) {
@@ -94,13 +102,18 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     }
     const keyup = (event: KeyboardEvent) => input.release(event.code)
     const frame = (now: number) => {
-      const dt = timer.sample(now, document.hidden)
+      const dt = timer.sample(now, document.hidden || paused.current || gameplay && (!session.current || !!session.current.error || session.current.survival.health === 0))
       const inWorld = current.current.cockpit.view === 'world'
       if (!inWorld) input.clear()
+      if (paused.current || document.hidden) { input.clear(); clock.reset() }
       const controls = input.controls
-      current.current = clock.advance(current.current, dt, [Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)])
+      current.current = clock.advance(current.current, dt, [Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], (world, direction) => {
+        if (!session.current) return stepTopDown(world, direction)
+        if (session.current.error || session.current.survival.health === 0) return world
+        return session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
+      })
       if (session.current) {
-        current.current = session.current.advance(current.current)
+        session.current.world = current.current
         container.current?.synchronize(current.current)
         current.current = session.current.world
         navigation.clock.state = setMass(navigation.clock.state, DRY_MASS_KG + session.current.payload().shipGrams / 1000)
@@ -131,13 +144,25 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const closeContainer = () => { container.current?.close(); current.current = session.current?.world ?? current.current; (document.activeElement as HTMLElement | null)?.blur(); setState({ ...current.current }) }
   const selectedSource = resourceSession && selected && resourceSession.snapshot.sources[selected.id]
   const interact = () => {
+    if (paused.current || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && (!!resourceSession.error || !survivalPolicy(resourceSession.survival).canWork)) return
     if (selectedContainer && container.current?.open(current.current)) current.current = container.current.session.world
     else if (resourceSession?.equipped && selectedSource) { resourceSession.start(selected!.id); current.current = resourceSession.world }
     else { if (resourceSession) resourceSession.feedback = ''; current.current = current.current.player.mode === 'interacting' ? cancelInteraction(current.current) : requestInteraction(current.current) }
     setState(current.current)
   }
+  const vital = resourceSession?.survival
+  const warning = vital?.health === 0 ? 'Run ended · zero health. Start a fresh character to continue.' : vital?.fatigue === 0 ? 'Exhausted · gathering and piloting unavailable.' : vital && vital.hunger < METER * .2 ? 'Low hunger · starvation at zero. Movement reduced.' : vital && vital.fatigue <= METER * .5 ? 'Low fatigue · movement reduced.' : ''
   return <>
-    {state.cockpit.view === 'radar' && <><App navigation={navigation} /><button className="cockpit-exit" onClick={() => update(leaveCockpit(current.current))}>Exit navigation · Stand up</button></>}
+    {gameplay && <aside className="survival-hud" aria-label="Survival condition">
+      {vital && !resourceSession.error ? <>
+        <label>Health <span>{vital.health} / 200 HP</span><meter aria-label="Health" min={0} max={200} value={vital.health} /></label>
+        <label>Hunger <span>{Math.ceil(vital.hunger / METER * 100)} / 100</span><meter aria-label="Hunger" min={0} max={100} value={Math.ceil(vital.hunger / METER * 100)} /></label>
+        <label>Fatigue <span>{Math.ceil(vital.fatigue / METER * 100)} / 100</span><meter aria-label="Fatigue" min={0} max={100} value={Math.ceil(vital.fatigue / METER * 100)} /></label>
+        <p aria-live="polite">{paused.current ? 'Paused · active time stopped' : warning}</p>
+        {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); resourceSession.freshRun(); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
+      </> : <p>{resourceSession?.error || saveStatus}</p>}
+    </aside>}
+    {state.cockpit.view === 'radar' && <><div inert={paused.current || !!resourceSession?.error}><App navigation={navigation} isPaused={() => paused.current || !!session.current?.error} canPilot={() => !session.current || survivalPolicy(session.current.survival).canWork} /></div><button className="cockpit-exit" onClick={() => update(leaveCockpit(current.current))}>Exit navigation · Stand up</button></>}
     {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     <main data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
@@ -156,7 +181,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
           })}</ul>
           {!Object.keys(resourceSession.snapshot.inventory.items).length && <p data-empty-items>No items carried.</p>}
         </>}
-        <button disabled={!resourceSession || !!resourceSession.error} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
+        <button disabled={!resourceSession || !!resourceSession.error || resourceSession.survival.health === 0 || paused.current} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
         <p className="resource-note">{resourceSession?.error || saveStatus}</p>
         {selectedSource && <p data-source-summary>{RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].name} · {selectedSource.remainingGrams / 1000} kg remaining</p>}
         {!!resourceSession?.activeSourceId && <progress aria-label="Next kilogram extraction interval" max={60} value={resourceSession.progressTicks} />}
@@ -164,7 +189,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <div className="top-down-caption"><span>01 / QUIET LANDING SITE</span><span>SCOUT — INTERIOR CUTAWAY</span></div></section>
     <aside className="top-down-interaction" aria-label="Nearby interaction">
       <div><p data-prompt>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : 'No fixture in reach · Move closer'}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
-      <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={!selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
+      <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={paused.current || cockpitTarget && !!resourceSession?.error || resourceSession?.survival.health === 0 || !selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
     </aside>
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
     <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · 1 kg/s · Machine systems are placeholders' : 'Console inspections are a test · Systems inactive'}</p></footer>

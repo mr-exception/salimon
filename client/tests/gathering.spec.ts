@@ -1,3 +1,4 @@
+import { expectSafeSurvivalReload } from './saveAssertions'
 import { test, expect } from '@playwright/test'
 import { compareImages, POLICY } from '../scripts/visual-comparison.ts'
 import { RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
@@ -44,7 +45,7 @@ test('GATHER-1 built mixed gathering, interruption, atomic reload and weight fee
       await expect(page.getByLabel('Resource inventory')).toHaveAttribute('data-gathering', '')
       expect(await position(page)).toEqual(oldPosition)
       const afterReload = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
-      expect(afterReload).toEqual(beforeReload)
+      expectSafeSurvivalReload(afterReload, beforeReload)
       expect(afterReload.sources['source:landing:mineral:01'].remainingGrams).toBe(57_000)
       await expect(page.getByRole('button', { name: 'Equip gathering tool' })).toBeVisible()
       await page.getByRole('button', { name: 'Equip gathering tool' }).click()
@@ -89,12 +90,12 @@ test('GATHER-2 biological weight cap, movement interruption and competing browse
   await boot(other, '', 'http://127.0.0.1:4175')
   await expect(other.getByLabel('Resource inventory')).toContainText('Another tab')
   await expect(other.getByRole('button', { name: 'Equip gathering tool' })).toBeDisabled()
-  const raw = await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)
   await other.close()
   await page.clock.runFor(5000)
   await page.screenshot({ path: info.outputPath('gather-weight-full.png'), fullPage: true })
+  const raw = await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)
   await page.reload()
   await expect(page.locator('[data-resource="biomass"]')).toHaveText('10 kg')
-  expect(await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)).toBe(raw)
+  expectSafeSurvivalReload(JSON.parse((await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY))!), JSON.parse(raw!))
   await info.attach('weight-save.json', { body: raw!, contentType: 'application/json' })
 })

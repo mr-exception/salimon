@@ -2,7 +2,10 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createTopDownState, PLAYER_ID, stepTopDown, type TopDownState } from './topDownRuntime.ts'
 import { point2, type Anchor } from './topDownFrames.ts'
-import { decodeResourceSave, RESOURCE_CATALOG, RESOURCE_SAVE_KEY, RESOURCE_SOURCES, ResourceSession, resourcePayload, withResourcePayload, type ResourceStorage } from './resourceSession.ts'
+import { decodeResourceSave, RESOURCE_CATALOG, RESOURCE_SAVE_KEY, RESOURCE_SOURCES, ResourceSession as LiveResourceSession, resourcePayload, withResourcePayload, type ResourceStorage } from './resourceSession.ts'
+class ResourceSession extends LiveResourceSession {
+  constructor(...args: ConstructorParameters<typeof LiveResourceSession>) { args[4] = () => 0; super(...args) }
+}
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import { initialShip } from './simulation.ts'
 import { enterCockpit } from './cockpit.ts'
@@ -33,7 +36,7 @@ function ticks(session: ResourceSession, count: number, direction: readonly [num
 test('production world interaction commits exactly 1000 grams per 60 ticks', () => {
   const { store, session } = make()
   session.start(mineral); ticks(session, 59)
-  assert.equal(session.snapshot.version, 5)
+  assert.equal(session.snapshot.version, 6)
   assert.equal(session.snapshot.inventory.quantities.mineral, undefined)
   assert.equal(store.raw, null)
   ticks(session, 1)
@@ -205,16 +208,17 @@ test('legacy litre saves migrate exactly and never reset source depletion', () =
   }
   delete (legacy as any).stores
   delete (legacy as any).itemDefinitions
+  delete (legacy as any).survival
   store.raw = JSON.stringify(legacy)
   const restored = new ResourceSession(store, createTopDownState())
   assert.equal(restored.error, '')
-  assert.equal(restored.snapshot.version, 5)
+  assert.equal(restored.snapshot.version, 6)
   assert.deepEqual(restored.snapshot.inventory.quantities, { mineral: 2500 })
   assert.equal(restored.snapshot.sources[mineral]!.remainingGrams, 57_500)
   assert.equal(restored.snapshot.inventory.capacitySlots, 12)
   assert.equal(JSON.parse(store.raw!).version, 1)
   assert.equal(restored.upgrade(10_000, 12), true)
-  assert.equal(JSON.parse(store.raw!).version, 5)
+  assert.equal(JSON.parse(store.raw!).version, 6)
   const again = new ResourceSession(store, createTopDownState())
   assert.equal(again.error, '')
   assert.deepEqual(again.snapshot.inventory.quantities, { mineral: 2500 })
@@ -280,14 +284,14 @@ test('failed and stale ledger writes preserve both ends, source and restart byte
     assert.deepEqual(restart.snapshot.inventory.quantities, {})
   }
 })
-test('v2 gram migration preserves all mass and old bytes until a successful v5 commit', () => {
+test('v2 gram migration preserves all mass and old bytes until a successful v6 commit', () => {
   const { session, store } = make()
   session.start(mineral); ticks(session, 60)
-  const v2 = JSON.parse(store.raw!); v2.version = 2; delete v2.stores; delete v2.itemDefinitions
+  const v2 = JSON.parse(store.raw!); v2.version = 2; delete v2.stores; delete v2.itemDefinitions; delete v2.survival
   store.raw = JSON.stringify(v2)
   const oldBytes = store.raw, migrated = new ResourceSession(store, session.world, stores)
   assert.equal(migrated.error, '')
-  assert.equal(migrated.snapshot.version, 5)
+  assert.equal(migrated.snapshot.version, 6)
   assert.equal(migrated.snapshot.revision, v2.revision)
   assert.equal(migrated.snapshot.inventory.quantities.mineral, 1000)
   assert.equal(migrated.snapshot.sources[mineral]!.remainingGrams, 59000)
@@ -298,7 +302,7 @@ test('v2 gram migration preserves all mass and old bytes until a successful v5 c
   store.fail = false
   const retry = new ResourceSession(store, session.world, stores)
   assert.equal(retry.transfer({ revision: v2.revision, from: player, to: cargo, grams: 333, resourceId: 'mineral' }), true)
-  assert.equal(JSON.parse(store.raw!).version, 5)
+  assert.equal(JSON.parse(store.raw!).version, 6)
   assert.equal(retry.snapshot.revision, v2.revision + 1)
 })
 test('corrupt and unsupported ledgers preserve bytes and block every write', () => {
@@ -306,7 +310,7 @@ test('corrupt and unsupported ledgers preserve bytes and block every write', () 
   transfer(1000)
   const original = store.raw!
   for (const mutate of [
-    (s: any) => { s.version = 6 }, (s: any) => { s.version = 2 },
+    (s: any) => { s.version = 7 }, (s: any) => { s.version = 2 },
     (s: any) => { s.stores.cargo.inventory = s.inventory }, (s: any) => { s.futureLedger = {} },
     (s: any) => { s.stores = null }, (s: any) => { s.stores.cargo.id = 'renamed' },
     (s: any) => { s.stores.cargo.shipId = 'other' }, (s: any) => { s.stores.cargo.capacityGrams++ },

@@ -1,3 +1,4 @@
+import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
 import { CELL_SIZE_M } from './coordinates.ts'
@@ -26,7 +27,8 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
-  readonly version: 5
+  readonly version: 6
+  readonly survival: SurvivalState
   readonly itemDefinitions: CountItemCatalog
   readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
   readonly siteId: typeof STARTING_SITE.id
@@ -70,13 +72,13 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
 export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
-  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...((data.version === 3 || data.version === 4 || data.version === 5) ? ['stores'] : []), ...(data.version === 5 ? ['itemDefinitions'] : [])]
+  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...((data.version === 3 || data.version === 4 || (data.version === 5 || data.version === 6)) ? ['stores'] : []), ...((data.version === 5 || data.version === 6) ? ['itemDefinitions'] : []), ...(data.version === 6 ? ['survival'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
+  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -95,7 +97,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     capacitySlots: legacy ? 12 : integer(inv.capacitySlots, 12),
     quantities, items,
   }
-  if (data.version === 5) {
+  if ((data.version === 5 || data.version === 6)) {
     const saved = registerCountItems(object(data.itemDefinitions) as CountItemCatalog)
     if (Object.keys(saved).length !== Object.keys(catalog).length || Object.entries(saved).some(([id, meta]) =>
       !Object.hasOwn(catalog, id) || meta.gramsPerItem !== catalog[id]!.gramsPerItem || meta.stackSize !== catalog[id]!.stackSize || meta.name !== catalog[id]!.name)) throw new Error('Changed item definitions')
@@ -117,13 +119,13 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     if (source.id !== id || source.resourceId !== initial.resourceId) throw new Error('Material conservation failed')
     sources[id] = { id, resourceId: initial.resourceId, remainingGrams }
   }
-  const savedStores = data.version === 3 || data.version === 4 || data.version === 5 ? object(data.stores) : null
+  const savedStores = data.version === 3 || data.version === 4 || (data.version === 5 || data.version === 6) ? object(data.stores) : null
   // Only the newly introduced Scout store may be absent in v3. v4 requires it.
   const stores = savedStores ? { ...savedStores } as Record<string, ResourceLedger['stores'][string]> : emptyResourceStores(storeDefinitions)
   if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
     stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
   }
-  const save: ResourceSave = { version: 5, itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
+  const save: ResourceSave = { version: 6, survival: data.version === 6 ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
   validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }
@@ -147,6 +149,7 @@ function safeLocation(world: TopDownState): PlayerLocation {
 export class ResourceSession {
   world: TopDownState
   snapshot: ResourceSave
+  survival: SurvivalState
   equipped = false
   activeSourceId: string | null = null
   progressTicks = 0
@@ -156,21 +159,33 @@ export class ResourceSession {
   private checkpointTick = 0
   private readonly storage: ResourceStorage
   private readonly storeDefinitions: ResourceStoreCatalog
+  private readonly now: () => number
   readonly itemCatalog: CountItemCatalog
-  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG) {
+  constructor(storage: ResourceStorage, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG, now: () => number = () => Math.floor(Date.now())) {
+    this.now = now
+    this.survival = freshSurvival(now())
     this.itemCatalog = registerCountItems(itemDefinitions)
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 5, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 6, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
       if (this.persisted !== null) {
         this.snapshot = decodeResourceSave(this.persisted, world, this.storeDefinitions, this.itemCatalog)
+        this.survival = this.snapshot.survival
         const location = this.snapshot.location
         this.world = { ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
           camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' }
+      }
+      if (this.persisted !== null && JSON.parse(this.persisted).version === 6) {
+        const recovered = recoverOffline(this.survival, now())
+        if (recovered.fatigue !== this.survival.fatigue) this.commit({ ...this.snapshot, survival: recovered })
+        this.survival = this.snapshot.survival
+      } else if (this.persisted !== null) {
+        this.survival = freshSurvival(now())
+        this.snapshot = { ...this.snapshot, survival: this.survival }
       }
     } catch {
       this.error = 'Saved expedition could not be loaded safely. Existing data kept; gathering paused.'
@@ -180,26 +195,29 @@ export class ResourceSession {
     if (this.error) return false
     try {
       if (this.storage.getItem(RESOURCE_SAVE_KEY) !== this.persisted) throw new Error('Save changed in another session')
-      const candidate = { ...next, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
+      const candidate = { ...next, survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
       validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
+      validateSurvival(candidate.survival)
       const raw = serialize(candidate)
       this.storage.setItem(RESOURCE_SAVE_KEY, raw)
       this.persisted = raw
       this.snapshot = candidate
+      this.survival = candidate.survival
       this.checkpointTick = this.world.tick
       return true
     } catch {
       this.cancel()
+      this.survival = this.snapshot.survival
       this.error = 'Saving failed or the save changed elsewhere. Gathering paused; reload after resolving storage access.'
       return false
     }
   }
   /** Domain rejection leaves the current save usable; storage failure blocks writes. */
   transfer(request: ResourceTransfer): boolean {
-    if (this.error) return false
+    if (this.error || this.survival.health === 0) return false
     try {
       const next = transferResource(this.snapshot, request, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
-      return this.commit({ ...this.snapshot, ...next })
+      return this.commit({ ...this.snapshot, ...next, survival: this.survival })
     } catch (error) {
       this.feedback = error instanceof Error ? error.message : 'Invalid transfer'
       return false
@@ -207,12 +225,12 @@ export class ResourceSession {
   }
   /** Generic adapter boundary for future item producers/consumers. No auto-equip or player grants. */
   changeItem(action: 'add' | 'remove', id: string, count: number, revision: number): boolean {
-    if (this.error) return false
+    if (this.error || this.survival.health === 0) return false
     try {
       if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw new RangeError('Stale item revision')
       if (action !== 'add' && action !== 'remove') throw new RangeError('Unknown item action')
       const inventory = (action === 'add' ? addCountItem : removeCountItem)(this.snapshot.inventory, id, count, RESOURCE_CATALOG, this.itemCatalog)
-      const saved = this.commit({ ...this.snapshot, inventory })
+      const saved = this.commit({ ...this.snapshot, survival: this.survival, inventory })
       if (saved) this.feedback = `Saved: ${action === 'add' ? 'added' : 'removed'} ${count} × ${this.itemCatalog[id]!.name ?? id}.`
       return saved
     } catch (error) {
@@ -227,15 +245,25 @@ export class ResourceSession {
   withdraw(resourceId: string, grams: number, revision: number): boolean {
     return this.transfer({ revision, from: { kind: 'store', id: SCOUT_RESOURCE_CONTAINER_ID }, to: { kind: 'player' }, resourceId, grams })
   }
+  /** Explicit terminal-only fresh character. The world ledger and depletion survive. */
+  freshRun(): boolean {
+    if (this.error || this.survival.health !== 0) return false
+    const next = freshSurvival(this.now())
+    if (!this.commit({ ...this.snapshot, survival: next })) return false
+    this.survival = next
+    this.equipped = false
+    return true
+  }
   payload() {
     return resourceLedgerMass(this.snapshot, this.world.frames.ship.id,
       this.world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === this.world.frames.ship.id, RESOURCE_CATALOG, this.itemCatalog)
   }
   checkpoint(): void {
-    if (serialize(safeLocation(this.world)) !== serialize(this.snapshot.location)) this.commit(this.snapshot)
+    if (serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival)) this.commit({ ...this.snapshot, survival: this.survival })
   }
   upgrade(capacityGrams: number, capacitySlots: number): boolean {
-    return this.commit({ ...this.snapshot, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, this.itemCatalog) })
+    if (this.error || this.survival.health === 0) return false
+    return this.commit({ ...this.snapshot, survival: this.survival, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, this.itemCatalog) })
   }
   cancel(message = 'Gathering stopped. Completed grams are saved.'): void {
     if (this.activeSourceId) this.feedback = message
@@ -258,7 +286,7 @@ export class ResourceSession {
   }
   start(id: string | null): void {
     if (this.activeSourceId) { this.cancel(); return }
-    if (this.error || !this.equipped) return
+    if (this.error || !survivalPolicy(this.survival).canWork || !this.equipped) return
     const target = this.world.entities.find(e => e.id === id), player = this.world.entities.find(e => e.id === PLAYER_ID)!
     if (!target?.source || !id || this.world.player.mode === 'seated' || this.world.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, this.world.frames)) {
       this.feedback = 'No resource source in reach.'; return
@@ -272,7 +300,14 @@ export class ResourceSession {
   }
   advance(next: TopDownState): TopDownState {
     const elapsed = Math.max(0, next.tick - this.world.tick), wasWalking = this.world.player.mode === 'walking'
+    if (this.error || this.survival.health === 0) return this.world
+    this.survival = advanceSurvival(this.survival, elapsed)
     this.world = next
+    if (!survivalPolicy(this.survival).canWork) {
+      this.cancel('Exhausted: gathering and piloting unavailable.')
+      if (this.world.player.mode === 'seated') this.world = leaveCockpit(this.world)
+    }
+    if (this.survival.health === 0) { this.world = { ...this.world, player: { ...this.world.player, mode: 'standing', targetId: null } }; this.checkpoint(); return this.world }
     const id = this.activeSourceId
     if (id) {
       const target = next.entities.find(e => e.id === id), player = next.entities.find(e => e.id === PLAYER_ID)!

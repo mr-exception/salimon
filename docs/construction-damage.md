@@ -3,7 +3,7 @@
 > **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 
-> **New 2D gameplay scope (2026-11-04):** The localized cell/project damage, detachment and salvage mechanics described here are **historical native implementation** and **future deferred design**, not current approved ship-damage granularity. In the future 2D/multiplayer slice, ship damage/destruction is **whole-vessel only**: offline players anchored inside a wholly destroyed ship die, with a reconnect notice and new run. See [cockpit and reconnect contract](cockpit-navigation-and-reconnect.md). Do not delete this historical evidence or infer that the 2D client already implements either damage system.
+> **Future 2D scope correction (2026-11-06):** Historical native **localized combat damage and detachment** below remain deferred; current 2D combat damage/destruction is **whole-vessel only**. However, the owner has approved **future deliberate component-by-component ship dismantling** (walls, rooms, modules and cells), not all-at-once deletion. A bound [Stasis Pod](stasis-pod-and-transfer.md) lost while its character is **offline** causes terminal death, regardless of their last physical boarding position; a living player can move their binding via approved transfer. The native C/X controls and physical fragment mechanics are archival, **not** present in the React game. Do not treat this page as a shipped implementation.
 
 `session/construction/damage.rs` composes typed physical impacts, safe deliberate
 removal and surviving-site recovery. Ship owns topology/receipts and exact paid
@@ -50,6 +50,13 @@ Partial hull loss prevents takeoff. Remove the remaining damaged assembly safely
 and build a fresh project to replace it. A wholly destroyed reservation no longer
 blocks a replacement; its project ID and original receipts cannot be reused.
 Original authored hull/Core IDs are rejected by the construction-damage boundary.
+
+## Future 2D salvage reconciliation
+
+- The newly approved **Stasis Pod** is a normal separately addressable module for build, removal and terminal pod-loss effects. Per-part deliberate dismantling must respect remaining structure, cell/room identities, occupancy and module dependencies.
+- **Not a mass hull delete:** remove one supported fixture/module/wall/structural part at a time; a multi-cell room may lose valid individual components.
+- **TBD:** exact dismantle resource yield and tools, final protected Core-root decommission, pod-support removal ordering, hazard to live occupants and what becomes of cargo if a support cell disappears.
+- Keep completed-part salvage separate from cancellation of a partially funded/building placeholder; do not reuse native fragments or Rust APIs as browser implementation evidence.
 
 ## Cancellation and dismantling
 

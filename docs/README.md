@@ -25,13 +25,14 @@ These newer approved narrative contracts supersede historical Earth-start assump
 
 - [Playable 2D foundation, QA commands and mining reuse boundary](playable-2d-foundation.md)
 - [Navigation-only holographic radar contract and migration boundary](radar-navigation-prototype.md)
-- [Approved cockpit transitions, multiplayer presence and precise reconnect](cockpit-navigation-and-reconnect.md)
+- [Approved cockpit transitions and future Stasis Pod-based reconnect](cockpit-navigation-and-reconnect.md)
 - [React prototype setup](../client/README.md)
 
 ## Backend design (approved future, not implemented)
 
 - [Authoritative NestJS/TypeScript backend, simulation boundaries and networking](backend-architecture.md)
-- [MongoDB durable transactions, strict checkpoint window and crash recovery](backend-persistence-recovery.md)
+- [MongoDB durable transactions, 5 s checkpoint target / 30 s strict window and crash recovery](backend-persistence-recovery.md)
+- [Stasis Pod safe/unsafe logout, one-hour approved transfers, pod-loss permadeath and deferred questions](stasis-pod-and-transfer.md)
 
 These are planning contracts only. The current browser prototype is local, not an already-running server-authoritative multiplayer game.
 
@@ -46,7 +47,7 @@ These are planning contracts only. The current browser prototype is local, not a
 - [Weight-only inventory, mining and resource storage](resource-inventory-and-gathering.md)
 - [Spacesuits, hazards, suit drawers and protection-module storage](spacesuit-and-hazards.md)
 - [Multiplayer & NPC Interaction](multiplayer-and-npc-interaction.md)
-- [Cockpit control, disconnect/reconnect and offline-death rules](cockpit-navigation-and-reconnect.md)
+- [Cockpit control and Stasis Pod-based disconnect/reconnect/death rules](cockpit-navigation-and-reconnect.md)
 - [Technical Architecture & AI Maintenance](technical-architecture.md)
 
 ## Business specifications

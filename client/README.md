@@ -386,3 +386,11 @@ Normal gameplay has no query flag, controls or item grants from this fixture.
 ## Survival clock (#787)
 
 The playable world includes persisted 200 HP, hunger and fatigue, foreground active-time drain, launch-only fatigue recovery and a labelled top-left HUD. Pause with P or the HUD button. A terminal character can explicitly restart without restoring depleted sources or granting items. See [rates, migration and deferred tuning](../docs/browser-survival.md). Unit/integration coverage is `src/survival.test.ts`; built browser coverage and originals are `tests/survival.spec.ts`.
+
+## Hazard domain (#788)
+
+The production session supports exact temperature damage, radiation/poison exposure
+and 1,000 HP protection budgets without shipping hazard sources or equipment. See
+[domain, save and fixture contracts](../docs/browser-hazards.md). `npm run test:browser`
+builds a separate non-shipping hazard fixture on port 4275; ordinary `npm run build`
+includes only the normal game. Unit/integration coverage lives in `src/hazards.test.ts`.

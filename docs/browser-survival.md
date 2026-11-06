@@ -1,7 +1,7 @@
 # Browser survival (#787)
 
-`client/src/survival.ts` owns integer, deterministic 60 Hz hunger/fatigue/health.
-`ResourceSession` owns admission and the schema-v6 transaction with sources,
+`client/src/survival.ts` owns deterministic 60 Hz hunger/fatigue/health; [hazards](browser-hazards.md) extend HP with exact fractional accounting.
+`ResourceSession` owns admission and the schema-v7 transaction with sources,
 player inventory, count definitions, ship stores and safe standing location.
 `TopDownView` drives the same owner outdoors, indoors and while the radar is open.
 The radar's own ship clock never advances survival a second time.
@@ -18,7 +18,7 @@ Production admits fixed steps from foreground RAF elapsed time with the existing
 250 ms frame cap. Pause [P] stops both world/survival and navigation; hidden pages
 stop active clocks, release input and checkpoint. Ordinary inspection/storage
 menus keep time active. Focus, resume and save grant no recovery. Reopening a
-validated v6 save credits **only fatigue**, at 100 points over six hours, capped
+validated v6/v7 save credits **only fatigue**, at 100 points over six hours, capped
 at full. Credit is rounded down to an integer meter unit (less than 0.000026
 point), committed before use, and protected by a monotonically increasing UTC
 watermark. Reopening at the same UTC or clock rollback grants nothing again.
@@ -56,8 +56,9 @@ Mining retains the current 1 kg/s until owner approval of those values and their
 composition. HUD warns about established movement/exhaustion effects only.
 Future machine/carrying/Core action restrictions belong with those production
 systems; no such playable actions exist yet. Food/medkits, consumption, wounds,
-hazards, oxygen, radiation, multiplayer and medical treatment are separate issues
-(#788 and later content work); this change does not introduce their catalogs.
+oxygen, multiplayer and medical treatment remain separate content work. The
+[hazard domain](browser-hazards.md) implements the specified subset without
+shipping source or equipment catalogs.
 
 The top-left HUD exposes native labelled meters and numerical text. Values change
 at whole meter points/HP; polite announcements contain condition transitions,

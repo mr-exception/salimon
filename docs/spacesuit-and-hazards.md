@@ -1,6 +1,6 @@
 # Spacesuits, gear storage and environmental hazards
 
-**Status (2026-11-05): owner-approved gameplay design, not yet shipped.** Extends [unified weight-based inventory and gathering](resource-inventory-and-gathering.md). No protective suit, gear bench, environmental damage or equipment crafting is implemented in the current browser prototype.
+**Status (2026-11-05): owner-approved gameplay design, not yet shipped.** Extends [unified weight-based inventory and gathering](resource-inventory-and-gathering.md). The [browser hazard domain](browser-hazards.md) now implements temperature, radiation/poison exposure, exact module budgets and durable session integration (#788). Normal gameplay has no hazard sources or modules; protective suits, gear bench and equipment crafting remain unimplemented.
 
 ## Suit ownership, configuration and crafting
 

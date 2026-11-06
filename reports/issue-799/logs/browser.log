@@ -1,0 +1,141 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:2361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2374) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:2393) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2406) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2432) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2465) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 43 tests using 1 worker
+
+(node:2477) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (51.2s)
+  ✓   2 [cockpit] › tests/gathering.spec.ts:7:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (23.0s)
+  ✓   3 [cockpit] › tests/gathering.spec.ts:75:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (6.7s)
+  ✓   4 [cockpit] › tests/hazards.spec.ts:6:1 › HAZ-1–5 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure (25.7s)
+  ✓   5 [cockpit] › tests/hazards.spec.ts:57:1 › normal built game exposes no hazard fixture, source sampling or module grants (1.2s)
+  ✓   6 [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice (17.6s)
+  ✓   7 [cockpit] › tests/items.spec.ts:60:1 › ordinary built game has no item fixture, grants or query backdoor (914ms)
+  ✓   8 [cockpit] › tests/playable-slice.spec.ts:7:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (56.1s)
+  ✓   9 [cockpit] › tests/storage.spec.ts:13:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (32.1s)
+  ✓  10 [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.4s)
+  ✓  11 [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset (17.8s)
+  ✓  12 [cockpit] › tests/survival.spec.ts:89:1 › SURV-799 approved rates and partial interruption/reload preserve exact grams (9.6s)
+(node:3549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (2.1s)
+  ✓  14 [top-down] › tests/top-down.spec.ts:76:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (1.5s)
+  ✓  15 [top-down] › tests/top-down.spec.ts:101:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (3.5s)
+  ✓  16 [top-down] › tests/top-down.spec.ts:140:1 › TD-5 explicit built radar entry retains standalone navigation (991ms)
+  ✓  17 [top-down] › tests/top-down.spec.ts:154:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (2.7s)
+  ✓  18 [top-down] › tests/top-down.spec.ts:202:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (21.5s)
+  ✓  19 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (57.5s)
+(node:4009) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  20 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (761ms)
+(node:4139) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  21 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (11.8s)
+  ✓  22 [deterministic] › tests/deterministic.spec.ts:42:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (19.5s)
+  ✓  23 [deterministic] › tests/deterministic.spec.ts:82:1 › NAV-3 heading and velocity retain approved colors and viewport edges (3.8s)
+  ✓  24 [deterministic] › tests/deterministic.spec.ts:99:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (2.2s)
+(node:4399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  25 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (11.4s)
+  ✓  26 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (8.4s)
+  ✓  27 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (8.9s)
+  ✓  28 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (5.0s)
+  ✓  29 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (2.3s)
+  ✓  30 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (6.4s)
+  ✓  31 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (3.1s)
+  ✓  32 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (1.7s)
+  ✓  33 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (2.9s)
+  ✓  34 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (3.2s)
+  ✓  35 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (3.1s)
+  ✓  36 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (8.7s)
+  ✓  37 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (26.3s)
+  ✓  38 [desktop] › tests/edges.spec.ts:50:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (9.8s)
+  ✓  39 [desktop] › tests/edges.spec.ts:68:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (12.4s)
+  ✓  40 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (6.7s)
+  ✓  41 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (6.7s)
+  ✓  42 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (16.8s)
+(node:5220) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  43 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.5s)
+
+
+  1) [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 
+
+    Error: VISUAL_ENVIRONMENT_DRIFT: propose separately reviewed candidates
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+    @@ -1,8 +1,8 @@
+      Object {
+        "arch": "x64",
+    -   "browser": "156.0.8078.4",
+    +   "browser": "154.0.8037.57",
+        "colorScheme": "dark",
+        "dpr": 1,
+        "epoch": "2026-11-04T00:00:00.000Z",
+        "fontHashes": Object {
+          "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+
+      33 |  await mkdir(output,{recursive:true})
+      34 |  // Drift is a failure, never an instruction to regenerate references.
+    > 35 |  if(manifest)expect(environment,'VISUAL_ENVIRONMENT_DRIFT: propose separately reviewed candidates').toEqual(manifest.environment)
+         |                                                                                                     ^
+      36 |  for(const fixture of cases) {
+      37 |   const c:{id:string;scenario?:string;vector?:string;pan?:boolean;selected?:boolean;zoom?:number}=fixture
+      38 |   await boot(page,`scenario=${c.scenario??'seeded'}&seed=750&view=front&vector=${c.vector??'zero'}&zoom=${c.zoom??.5}`)
+        at /workspace/salimon/client/tests/navigation-captures.spec.ts:35:101
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/799-final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/799-final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../tmp/799-final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/799-final-browser/navigation-captures-VIS-1--c220e-eens-match-reference-pixels-navigation-captures/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels 
+  42 passed (9.0m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

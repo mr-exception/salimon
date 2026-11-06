@@ -1,0 +1,79 @@
+[WebServer] (node:2164) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2178) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:2227) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2258) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2284) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2317) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:2329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [observation] › tests/observation.spec.ts:22:1 › OBS-1 actual perspective camera, independent ship, reset and remount (6.9s)
+  ✓  2 [observation] › tests/observation.spec.ts:62:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation (6.2s)
+  ✓  3 [observation] › tests/observation.spec.ts:95:1 › OBS-3 DPR 2 preserves projection and origin (1.7s)
+  ✘  4 [observation] › tests/observation.spec.ts:107:1 › OBS-4 repeated wide/telescope pixels and negative comparison (6.1s)
+
+
+  1) [observation] › tests/observation.spec.ts:107:1 › OBS-4 repeated wide/telescope pixels and negative comparison
+
+    Error: expect(received).toBeGreaterThan(expected)
+
+    Expected: > 100
+    Received:   0
+
+      129 |   await context.close()
+      130 |  }
+    > 131 |  expect(cyanPixels(originals[1])).toBeGreaterThan(100)
+          |                                   ^
+      132 |  expect(cyanPixels(originals[1])).toBeGreaterThan(cyanPixels(originals[0]))
+      133 |  const negative = compareImages(originals[0], originals[1])
+      134 |  expect(negative.pass).toBe(false)
+        at /workspace/salimon/client/tests/observation.spec.ts:131:35
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/observation-verified/observation-OBS-4-repeated-5368f-els-and-negative-comparison-observation/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/observation-verified/observation-OBS-4-repeated-5368f-els-and-negative-comparison-observation/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/observation-verified/observation-OBS-4-repeated-5368f-els-and-negative-comparison-observation/error-context.md
+
+    attachment #8: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/observation-verified/observation-OBS-4-repeated-5368f-els-and-negative-comparison-observation/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/observation-verified/observation-OBS-4-repeated-5368f-els-and-negative-comparison-observation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [observation] › tests/observation.spec.ts:107:1 › OBS-4 repeated wide/telescope pixels and negative comparison
+  3 passed (30.3s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

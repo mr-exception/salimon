@@ -1,0 +1,82 @@
+[WebServer] (node:2967) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:2999) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3012) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3025) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3071) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:3083) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [observation] › tests/observation.spec.ts:22:1 › OBS-1 actual perspective camera, independent ship, reset and remount (6.6s)
+  ✓  2 [observation] › tests/observation.spec.ts:62:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation (7.6s)
+  ✓  3 [observation] › tests/observation.spec.ts:95:1 › OBS-3 DPR 2 preserves projection and origin (1.8s)
+  ✓  4 [observation] › tests/observation.spec.ts:107:1 › OBS-4 repeated wide/telescope pixels and negative comparison (6.7s)
+  ✘  5 [observation] › tests/observation.spec.ts:138:1 › OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin (3.6s)
+(node:3411) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (49.2s)
+(node:3643) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.4s)
+
+
+  1) [observation] › tests/observation.spec.ts:138:1 › OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 0.3
+    Received:   0.3122612197974354
+
+      149 |    const next = await snapshot(page)
+      150 |    expect(angle(previous.view.quaternion, next.view.quaternion)).toBeGreaterThan(0.1)
+    > 151 |    expect(angle(previous.view.quaternion, next.view.quaternion)).toBeLessThan(0.3)
+          |                                                                  ^
+      152 |    expect(next.ship.yaw).toBe(0); expect(next.ship.pitch).toBe(0)
+      153 |    samples.push(next); previous = next
+      154 |   }
+        at /workspace/salimon/client/tests/observation.spec.ts:151:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/observation-delivery/observation-OBS-5-spherica-049d5-tion-and-moving-ship-origin-observation/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/observation-delivery/observation-OBS-5-spherica-049d5-tion-and-moving-ship-origin-observation/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/observation-delivery/observation-OBS-5-spherica-049d5-tion-and-moving-ship-origin-observation/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/observation-delivery/observation-OBS-5-spherica-049d5-tion-and-moving-ship-origin-observation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [observation] › tests/observation.spec.ts:138:1 › OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin
+  6 passed (1.5m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

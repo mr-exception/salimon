@@ -1,0 +1,71 @@
+[WebServer] (node:1238) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1251) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:1270) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1283) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1309) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1328) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1345) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:1357) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [observation] › tests/observation.spec.ts:19:1 › OBS-1 actual perspective camera, independent ship, reset and remount (5.5s)
+
+
+  1) [observation] › tests/observation.spec.ts:19:1 › OBS-1 actual perspective camera, independent ship, reset and remount
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 75
+    Received: 0.1
+
+      42 |  await page.getByRole('button', { name: 'Reset view' }).click(); await settle(page)
+      43 |  const reset = await snapshot(page)
+    > 44 |  expect(reset.view.fov).toBe(75)
+         |                         ^
+      45 |  const direction = new Vector3(0, 0, -1).applyQuaternion(new Quaternion(...reset.view.quaternion))
+      46 |  expect(direction.x).toBeCloseTo(-Math.sin(reset.ship.yaw))
+      47 |  expect(reset.ship.yaw).toBe(steered.ship.yaw)
+        at /workspace/salimon/client/tests/observation.spec.ts:44:25
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [observation] › tests/observation.spec.ts:19:1 › OBS-1 actual perspective camera, independent ship, reset and remount
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

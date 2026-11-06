@@ -52,6 +52,16 @@ transfers and resource container upgrade rules remain TBD.
 - The save envelope is **version 6** (`landing-resources:v2`), storing trusted item definitions, grams, slots, count-item map, source remaining grams, identified raw stores, player location, [survival state and launch watermark](browser-survival.md), and one revision. The existing browser storage key is deliberately retained. Previously valid v2 gram saves acquire empty declared stores without changing mass, capacities, location or revision; previously valid v1 whole-litre saves migrate **losslessly** using the old pinned sample densities for one-time conversion; their mined totals and source depletion remain conserved. Unsupported or corrupted saves remain preserved and block writes rather than silently resetting the expedition.
 - The active tab holds an exclusive browser Web Lock; commits use compare-and-replace localStorage before publishing state. Movement checkpoints occur at most once per simulated second and on stop/page-hide. This is browser-local single-writer persistence, **not** future backend authority, anti-cheat security or cloud sync.
 
+## Future Stasis Pod gear-loss and recoverable-loot boundary
+
+The approved [Stasis Pod and Transfer contract](stasis-pod-and-transfer.md) affects future server-owned inventories; it is **not implemented** in browser-local `ResourceSession`. Each player character and each ship/module storage compartment has its own **separate inventory document**. Ordinary carried raw materials (integer grams), count-item stacks, equipped gear, worn suit and its installed modules are all subject to the same exact-identity loss policy; preserve mass and stack limits.
+
+- **Safe pod logout:** no equipment loss; inventory and suit stay with the living character.
+- **Unsafe exit:** debit ordinary carried contents and worn equipment **exactly once** into a persistent world loot cache at the validated departure frame. **Transfer** through an approved one-hour code does the same before binding/spawning at a friend's pod. No implicit equipment transport to that friend's ship. Ship/module cargo stored separately is unaffected.
+- Explicitly classified unique/unobtainable **primary items** are reserved exceptions to unsafe/transfer loss only; there may be **no such authored items**. Their treatment on **actual permadeath** is TBD.
+- The loot cache is an owned persistent world record, not a second free player inventory. Preserve individual suit/module identities, exact resource grams and revision-checked operation receipts. If departure frame or ship-to-wreck reconciliation is unresolved, **fail closed**; do not create or delete mass speculatively.
+- **TBD:** loot recovery/decay/theft rights, unprotected gear stored at a remote ship, exact equipped-suit mass attribution, and frame conversion when a coasting ship is destroyed after departure.
+
 ## Outstanding decisions
 
 - Suit base/expansion slot usage, worn suit payload, swapping locations, actual item weights and default inventory contents beyond the basic suit.

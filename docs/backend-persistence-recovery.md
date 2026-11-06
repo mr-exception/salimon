@@ -5,7 +5,7 @@
 ## 1. Explicit decisions and invariants
 
 1. **Recovery policy A: checkpoint recovery.** On unexpected server failure, a bounded interval of uncommitted *continuous* movement/physical motion may be lost. No successfully **confirmed critical outcome** may disappear or be applied twice.
-2. **Strict checkpoint-staleness policy (the selected "section 9" recommended A).** Target one verified checkpoint every **5 seconds** initially. If the newest verified checkpoint becomes older than a configured maximum age, **suspend affected gameplay admission/simulation** until a new checkpoint is verified. Five seconds is a target cadence, **not a guaranteed rollback bound**. Exact overdue threshold and safe suspend granularity are deferred tunables, to be measured and documented before shipping.
+2. **Strict checkpoint-staleness policy (the selected "section 9" recommended A).** Target one verified checkpoint every **5 seconds** initially. If the newest verified checkpoint becomes older than a configured maximum age, **suspend affected gameplay admission/simulation** until a new checkpoint is verified. Five seconds is a target cadence, **not a guaranteed rollback bound**. The owner-approved maximum verified checkpoint age is **30 seconds**; suspend affected simulation/admission at that age until safe recovery. Safe suspend granularity and operational retry budgets remain TBD.
 3. **Durable before confirmation.** Raw-resource debits/credits, item transfers, ship-wide destruction/death, ownership changes and accepted irreversible machine jobs are critical and require an acknowledged durable commit before final presentation to clients.
 4. **Conservation and identity.** Each transfer changes the authoritative source and destination together, using integer grams and per-item count-stack rules, validated capacity, stable entity IDs, revision and one unique operation receipt. No item duplication, fractional counts, resource creation or partial credit on error.
 5. **No resurrection.** Ship destruction and death are terminal durable facts. A restored physical checkpoint must never revive a ship, player or expended source that a newer committed event invalidated.
@@ -95,9 +95,11 @@ Example: deposit/source -> player's 10 kg / 12-slot inventory. Approved browser 
 
 **Event versus snapshot:** the transaction updates *canonical materialized critical state* and commits a compact durable event/receipt together. The event is for causality, recovery and outbound retries; do not interpret an uncommitted in-memory event as permanent. No requirement to event-source every ordinary 60 Hz movement tick.
 
-### Ship-wide destruction and offline death
+### Whole-ship destruction, pod loss and offline death
 
-A terminal collision is a critical domain outcome; it cannot be exposed as final until the ship's terminal status/event is durable. Record the ship ID, precise causal time/tick, involved state/anchor needed for reconciliation, and an irreversible terminal revision. Any offline characters anchored aboard that ship must be marked dead by the same transaction when feasible, or by a reliable idempotent **terminal-death derivation** before they may reconnect. The server **must check the ship's terminal status first** so a crash between ship destruction and individual death materialization cannot spawn passengers in a destroyed vessel. The death notification is delivered once or retried idempotently; fresh run follows approved permadeath rules. A character anchored on a planet is not killed by destruction of a distant ship. Nonfatal ship damage is not terminal.
+A terminal collision/destruction is an irreversible critical domain outcome; it cannot be shown as final until durable. Record ship ID, causal frame/tick, owner fence, revision and affected **Stasis Pod module identities**. Under the later [Stasis Pod contract](stasis-pod-and-transfer.md), destruction/dismantling of a character's **active assigned pod** while they are offline causes terminal **run death**, whether or not their last physical departure position was inside that ship. Do **not** infer death solely from a disconnected passenger's last ship-local position if their active pod lives elsewhere.
+
+Commit pod terminal status, active binding invalidation, and associated offline death with unique event/receipt, atomically when bounded; otherwise derive outstanding terminal death idempotently **before admitting that account**. An online character whose pod is lost is not immediately dead but needs another binding before their next login. There is **no rescue-only session or grace deadline for already-dead runs**. A delayed checkpoint cannot restore destroyed pods, surviving-character bindings or resurrect death. Dismantling of pods/ship parts follows per-component structural rules; whole-vessel damage remains the current combat scope. Exact pod power/disablement and logout/disconnect timing are open.
 
 ## 5. Reconciling newer committed state with an older physical checkpoint
 
@@ -156,13 +158,17 @@ The selected policy is **strict**, not best-effort.
 
 Operational metrics: verified checkpoint age, write latency, failed attempts, blocked admissions, pending critical commits, reconciliation duration, universe catch-up backlog, owner fence, invariant failures, active region count and per-region tick lag.
 
-## 8. Reconnect anchors and session departure
+## 8. Stasis Pod bindings, departure location and session exit
 
-An ordinary *graceful* disconnect must commit the exact last **safe noninteraction anchor** (planet-fixed point and body ID, or ship-local point and ship ID), cancel current interaction/seat/held inputs and remove visible avatar, with one coherent durable presence update. If the player was using an object, save an adjacent reachable point rather than the occupied interaction target. This is not the same promise as an **unexpected server crash**, where continuous movement can revert to a checkpoint.
+The future [Stasis Pod contract](stasis-pod-and-transfer.md) replaces reconnect-at-last-physical-anchor with reconnect-at-**one assigned functional pod**. A durable `spawn_bindings` identity (one per character/run, unique active target pod) is separate from physical `presence_records`/frame: authoritative planet-fixed and ship-local positions remain necessary for walking, boarding, checkpointing, exact loot placement and crash reconciliation, but do not become default login spawn positions.
 
-During a network failure, server detection delay and simultaneous reconnect/disconnect order need a documented timeout/grace policy; never allow two sessions to issue control for one character simultaneously. Reconnect checks terminal state before avatar creation, revalidates identity/catalog/frame and anchors, then restores into overhead 2D standing mode without previous interactions. Saved physical coordinates and reference-frame definitions must not be silently rewritten when the planet rotates or ship moves.
+- **Safe exit** requires a committed interaction with the character's assigned functional pod; preserve ordinary carried belongings, suit and gear, then remove avatar and cancel interactions.
+- **Unsafe exit** must debit each ordinary inventory/equipped instance and credit **one recoverable physical loot record** at a validated departure frame in an idempotent transaction. Explicit unique/unobtainable **primary items** are exempt from unsafe exit and transfer loss, if ever defined; their permadeath handling is open.
+- **Transfer:** one-hour, single-use code belongs to living character/run; friend submits at an unassigned functional pod; online owner approves; server prepares safe destination, atomically commits loot/equipment drop, old/new pod binding, character location frame, code consumption and receipt; publish new 2D spawn only after durable success.
+- **Pod loss:** destroyed/dismantled assigned pod while offline causes irreversible death, not a rescue state. While online it invalidates binding but current play remains; absent reassignment by next login, restart the run. Friend must create an available pod and request a **new living character's** transfer after restart.
+- Network connection timeout/grace, uncertain logout commit, power-disabled pods, departure loot whose support ship later disappears, precise safe pod-local spawn and cross-region movement remain **TBD**, not permission to fabricate inventory, deaths or locations.
 
-Unresolved exact fallback if saved point is obstructed, furniture moved, planet surface migrates or owner ship is transferred without destruction is deferred to the owning gameplay specifications. Reject unsafe overlap rather than improvising teleportation.
+All operations must be idempotent with owner fencing. A checkpoint older than confirmed pod/binding/death/loot changes **must not overwrite them**. Verified checkpoints target **5 seconds** and gameplay suspends at **30 seconds** verified staleness.
 
 ## 9. Data model examples (illustrative, not final Mongoose schemas)
 
@@ -211,27 +217,27 @@ The domain validation owns the actual transfer amount, not the caller-supplied r
 | DB fails before durable critical commit | No canonical success or client-confirmed irreversible effect |
 | Node process dies while candidate checkpoint writes | Previous verified head remains usable |
 | Crash after 2 kg mining but before next checkpoint | Canonical inventory/source still reflect transaction; continuous location may revert |
-| Crash immediately after whole-ship terminal commit | Ship stays destroyed, offline passenger can't spawn, terminal death resolved once |
+| Crash immediately after whole-ship terminal commit | Ship stays destroyed; offline characters with destroyed **assigned pods** die once; others are not killed from ship-local location alone |
 | Checkpoint hash/catalog mismatch | No gameplay admission using invalid source/geometry |
 | Post-checkpoint critical event invalidates old physical object | Reconciler cannot resurrect object/ship or double-count mass |
 | Replica/DB temporarily unavailable | Safe pending/fail-closed behavior; critical ACK not fabricated |
 | Verified checkpoint staleness exceeds configured bound | Affected gameplay stops until safe durable recovery |
 | Two server owners attempt to publish | Stale owner fence rejects writes/head swaps |
-| Graceful disconnect mid-mining/cockpit | Completed transaction preserved; ongoing interaction cancelled, chair released, safe durable spawn anchor |
-| Reconnect after ship moves | Same ship-relative point, no phantom offline avatar |
-| Offline passenger's ship destroyed | One durable terminal result and "You died while disconnected" before fresh run |
-| Ship destroyed while player logged off on planet | No unrelated offline death |
+| Safe pod logout while mining/cockpit interaction active | Must first validate pod interaction; committed effects persist, other interactions cancel, ordinary equipment retained |
+| Reconnect after bound pod's ship moves | Spawn at same **assigned pod's new physical ship-relative location**, no phantom offline avatar |
+| Offline character's **assigned pod** destroyed or dismantled | One durable terminal death then fresh run, even if last physical logout was on another planet |
+| Ship destroyed but player's assigned pod is elsewhere | No **pod-loss** death solely from ship destruction; independent in-world lethal outcomes still apply |
 | Repeated kill/restart during startup reconciliation | No partial published state, no duplicate events or items |
 
 Test with a real MongoDB replica-set fixture, transaction fault injection, actual process termination/restart and two simultaneous browser clients. Unit-only mocks do not prove MongoDB transaction or crash behavior. Include schema migration rejection/rollback tests and production-build browser E2E evidence. Explicitly record checks not run and limitations.
 
 ## 11. Implementation decisions still open
 
-- Maximum verified-checkpoint staleness threshold (distinct from proposed **5 s write cadence**) and whether initial safety pause is global or safely partitioned.
+- Verified checkpoint **5-second target and 30-second maximum age** are approved. Global-versus-partitioned safe suspension and measurement/retry budgets remain TBD.
 - Checkpoint storage chunking/size limits, compression, checksum canonicalization and garbage collection/history retention.
 - How long to retain idempotency receipts versus durable event/history, and exact operation/region sequence composition.
 - MongoDB topology, majority semantics under failover, transaction retry budget and backup/restore/RPO/RTO operational targets.
 - Exact isolation of physics tick versus critical commit barriers and crash reconciliation for mixed physical/transaction events.
 - Time source selection and clock health policy for server-wide epoch/offline catch-up; no guessing ephemeris coverage.
-- Explicit network session timeout/grace and safe adjacent spawn fallback.
+- Explicit network session timeout/grace, safe Stasis Pod spawn geometry/environment and exact departure-loot anchor fallback.
 - Detailed multi-region ownership/lease handoff; phase one deliberately does not run >1 active owner.

@@ -3,7 +3,7 @@
 > **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 
-> **Scope supersession (2026-11-04):** For the new strict-top-down 2D gameplay, **only ship-wide damage/destruction** is approved for now. The older cell-level structural damage, module detachment and local salvage plans below are **deferred**, not part of the first 2D multiplayer behavior. Offline players saved aboard a ship destroyed in full die on reconnect. See [cockpit and reconnect](cockpit-navigation-and-reconnect.md). Modularity/building discussion is otherwise preserved for future design.
+> **Scope supersession (2026-11-06):** For strict-top-down 2D gameplay, **combat damage/destruction stays ship-wide** while localized hit/detachment mechanics remain deferred. **Deliberate modular dismantling is future approved one-part-at-a-time gameplay**, not automatic whole-ship deletion. Offline pod-bound death depends on destruction/dismantling of the character's assigned [Stasis Pod](stasis-pod-and-transfer.md), superseding the old offline-passenger-location trigger. This is **not** a claim these mechanics run in the browser.
 
 Verification uses the [cloud/human workflow](verification-workflow.md)
 (owner decision 2026-10-23). Routine implementation and integration acceptance
@@ -19,7 +19,7 @@ approved construction rules or measured asset budgets.
 
 ## Goals and experience
 
-- **One permanent Scout:** the player's first and final player-owned ship. It is a familiar, functional home/workshop/vehicle at the start and physically grows through upgrades. Do not require any building tools to use the starter.
+- **One permanent Scout per character/run:** it is their first and only owned ship within that run, a usable home/workshop/vehicle that grows through upgrades. On permadeath a **new run gets a new Scout**; any intact ship from an earlier run remains physical with immutable deceased-owner identity. Do not require building tools to use the starter.
 - **Grounded cinematic low-poly:** a warm, credible, lightly lived-in interior contrasting with the exposed alien world. Prioritize readable silhouettes and functional machinery, lighting, feedback and silence over ornament/polycount.
 - **Real physical interactions:** cargo has individual object identity, mass and geometry, with the permanent rule that a character carries **one world object at a time**. No conventional backpack, magical cargo ledger, virtual crate, invisible ship-wide construction supply or arbitrary auto-transfer.
 - **Meaningful but simple expansion:** place a transparent preview/placeholder of an object, room or module, carry and feed its required materials directly, automatically build when fully supplied, and use the completed result after a short animation.
@@ -30,7 +30,7 @@ approved construction rules or measured asset budgets.
 The starting ship comes fully playable with:
 - Forward cockpit with walkable access, a wide readable flight monitor, existing usable lower forward glazing and flight controls.
 - Main cabin containing the existing Energy Core, wall-integrated Fabricator and physical Archive terminal, with their existing working interactions; keep adequate access/carrying clearance.
-- Compact wall-integrated habitation: fold-away bunk, small food/water galley and basic hygiene/toilet/washing installation. These need honest visual/physical representation and can have simple interactions, but **do not claim future health, hunger, hygiene, pressure or water systems are playable** until those systems are implemented.
+- Compact wall-integrated habitation: fold-away bunk, small food/water galley and basic hygiene/toilet/washing installation. **Separately include one functional Stasis Pod initially bound to this run's character**, with its own stable module identity and reachable spawn point; the normal bunk is not automatically a respawn module. The exact layout/size/animation is **TBD**. Do not claim future health, hunger, hygiene, pressure or pod systems are already playable.
 - **Dedicated aft physical cargo bay**, separated from the main cabin by a **full-height structural bulkhead and wide, closable internal doorway**. This restores dedicated cargo space to the future starter, superseding the previous removal decision, without requiring a protruding cargo pod.
 - Existing aft exit/boarding ramp retained as the exterior loading path; central passage continues from ramp through cargo to the systems and cockpit. The internal door is distinct from the exterior ramp/airlock.
 - Open physical bins or simple racks for individually retrievable loose fragments and objects. No abstract types/stacking, protected containers, teleport-to-fabricator or loss of mass. A rack may physically restrain its contents if designed to do so; an open bin is not an invisible physics suppressor.
@@ -106,6 +106,12 @@ The starting ship comes fully playable with:
 - Physical salvage, repair, module recovery and project continuation must respect actual damage and stable identities. Intentional placeholder cancellation always uses the **simple proportional refund** instead of a stage salvage minigame.
 - A surviving owner may recover a damaged/destroyed ship from its persistent Core as the broader ship design already specifies. Never remove/replace that Core identity through instant upgrades.
 - Cargo and non-abstract world objects remain retrievable based on physical access; no magic protections.
+
+## Future Stasis Pod construction and component-wise removal (2026-11-06)
+
+The [Stasis Pod/logout/transfer contract](stasis-pod-and-transfer.md) specifies one pod per assigned living character/run, safe logout, unsafe-loss loot, code-accepted relocation and terminal offline pod loss. Build pods through normal module placement/funding/commissioning on the ship's Core-connected structural grid. A friend can build an **available unassigned** pod; the target living character generates a **single-use code valid one hour**, the friend enters it, and the target approves the transfer before any loss/rebinding. This **does not** transfer ship ownership.
+
+For salvage, dismantle individual eligible fixtures, walls/doors, modules and structural cells/rooms. Never model complete salvage as a one-click whole-hull deletion. Every removal uses stable IDs, supporting structure/route and physical occupancy checks, exact recovered mass and idempotent transactions; loss of supporting parts must reconcile any attached pod. An assigned pod may be intentionally dismantled, with **offline bound character death** or **online binding invalidation**, even while the rest of the ship persists. Original Core is protected; **TBD** final terminal Core/last-cell decommission, per-part yields/timers, actual salvage tooling, passenger safety, machinery dependencies and destroyed-ship loot handling. Per-cell **combat damage** remains deferred; these deliberate building/removal rules are not proof that localized hits are shipped.
 
 ## Delivery boundaries and existing implementation
 

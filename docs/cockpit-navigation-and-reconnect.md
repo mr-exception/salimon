@@ -13,6 +13,8 @@ same location/lifecycle; they contain no independent free-flight state.
 See [client guide](../client/README.md#cockpit-gameplay-766). The remaining
 multiplayer/reconnect/death rules below are future contracts.
 
+**Future reconnect precedence (2026-11-06):** [Stasis Pod, logout, transfer and death](stasis-pod-and-transfer.md) supersedes exact-last-location reconnect and blanket offline-passenger death below. The browser's existing site-bound local save remains unaffected until a backend feature is implemented.
+
 Companion contracts: [2D art direction](top-down-art-direction.md), [navigation-only radar prototype](radar-navigation-prototype.md), [multiplayer](multiplayer-and-npc-interaction.md), [spaceship and survival](spaceship-building-and-survival.md), and [legacy save contract](save-contract.md).
 
 ## Player view, chair and navigation authority
@@ -36,7 +38,7 @@ Companion contracts: [2D art direction](top-down-art-direction.md), [navigation-
 | Power returns while player remains seated | 2D | Remains seated | Navigation **does not reopen automatically** |
 | Seated authorized player explicitly interacts with powered desk again | 3D | Remains seated | Active navigation resumes |
 | Active pilot disconnects | No local view; character removed from shared world | No avatar remains | Interaction aborted; occupancy/control released |
-| Pilot reconnects following an interrupted cockpit interaction | 2D | **Standing next to cockpit** | No active navigation / chair occupancy |
+| Pilot reconnects after an interrupted cockpit interaction | 2D at **assigned Stasis Pod** | Standing at the pod; no resumed interaction | No active navigation / chair occupancy |
 
 Voluntary exit is **one action** that returns to ordinary movement; it should not require a separate stand-up command. After a forced power-failure return, the player may remain seated or stand, including without powered instruments. Seating visuals/animation should suit the strict top-down art direction, but timing and input bindings are deferred.
 
@@ -44,33 +46,32 @@ If power recovers after blackout, the user **chooses** when to open navigation a
 
 ## Multiplayer synchronization and disconnect
 
-- A disconnected player is **removed from the world**: no visible avatar, occupied chair, blocking character collider, or ongoing player interaction remains. The player is not simulated as an offline seated NPC.
-- On disconnect, **abort/cancel the in-progress player interaction and release its locks/seat/control**: cockpit navigation, storage and Fabricator interfaces, Core access, mining actions, construction interactions or other actively used modules. Do not automatically resume any of these upon reconnect.
-- Previously completed resource transfers or gathered litres remain committed. Already queued, self-running Fabricator jobs and automatic Core conversion are independent machine processes: closing the player's interface **does not undo or cancel them**. No halfway/duplicate resource transactions are permitted.
-- Persist the last safe **non-interaction** position in its appropriate coordinate frame. If disconnect occurs **during an interaction**, persist a spawn point **beside the interacted object/module**, not on the chair or inside its interaction spot. This applies to cockpit, Fabricator, Core, storage, mining and future modules.
-- Clear held movement/steering commands and **active pilot authority** on disconnect; never give another connected player owner-only navigation permission merely because the owner is absent. Ship motion and offline powered-module behavior follow existing authoritative ship/offline contracts; client view changes do not authorize changes to ship physics.
-- On reconnect, restore the player in **2D normal gameplay**, with no menu/mining/navigation interaction resumed and no occupied pilot chair. Multiplayer presence and collision return only after a valid spawn has been resolved.
+- A disconnected player has **no visible avatar, collider, chair occupancy or active module interaction**. Disconnect clears held steering, mining/work interfaces and cockpit control; independently committed jobs and ship motion continue.
+- Safe logout is a **server-acknowledged interaction with the character's own assigned functional Stasis Pod**, not ordinary disconnect at a convenient location. It preserves carried inventory, gear and worn suit; next session starts at the pod if it survives.
+- Unsafe disconnect/logout elsewhere removes carried ordinary inventory, gear, equipped suit and its modules into a **recoverable loot cache at the final authoritative departure location** (except future explicitly protected primary items). The next session starts at the active assigned Stasis Pod if still valid. This is a new explicit gameplay rule; exact logout/grace timing is **TBD**.
+- Connection failure and session timeout cannot accidentally claim an uncommitted safe exit. Complete durable resource transactions survive both paths; no duplicate inventory drop or resumed interactions. The location/frame at departure remains important for loot and crash recovery, **not the normal reconnect spawn target**.
+- A living character may transfer to a friend's available Stasis Pod through a **single-use, one-hour code**, friend entry and **online player approval**. Display loading, drop all ordinary possessions (including suit) at departure, atomically release the old pod and assign the new one, then spawn at the new ship-local pod. Original ship ownership and ship cargo remain unchanged. See [Stasis Pod contract](stasis-pod-and-transfer.md).
+- A player can occupy any compatible visited ship and use permitted modules, but neither pod assignment nor being a guest grants owner-only cockpit/navigation authority.
 
-## Precise reconnect location
+## Stasis Pod reconnect location
 
-| Last state | Saved location / reconnect |
+| Condition | Next-login rule |
 | --- | --- |
-| On a planet, not using an object | **Same exact surface point** on the **same planet**. Persist canonical planet/body ID and a **planet-fixed surface-relative** anchor, not an obsolete inertial world XYZ that would drift as the planet moves/rotates. |
-| On a planet, actively interacting | Cancel interaction and return **beside that resource/object**, in a valid reachable surface location. |
-| Inside a live ship, not interacting | **Same ship-relative interior point**, on the **same ship**, even if the ship has moved through space while the player was away. |
-| Inside a live ship, operating a module or chair | Cancel/release interaction and reconnect **standing next to that object**, in ship-local space. |
-| Ship containing offline player is damaged but still exists | Reconnect on the ship as above; ship-wide nonfatal damage does not itself kill the offline player. |
-| Ship containing offline player is destroyed | **Offline death**; do not spawn at the wreck or transport the player to a saved planet. |
+| Assigned Stasis Pod intact and functional | Spawn at that pod in overhead 2D, even if last adventure ended on another planet or ship; no interaction resumed. |
+| Assigned pod lost while character **offline** | Character permanently dead; next login processes terminal notice and begins a **fresh run** outside a new landed Scout, with a new assigned pod. |
+| Assigned pod lost while character **online** | Remains alive in present session; can bind another valid pod before ending session. Otherwise next login begins a fresh run. |
+| Whole ship destroyed, but character's **bound pod is on a different ship** | No automatic pod-loss death from that ship alone. Separate truly lethal physical/world events still apply. |
+| Pod temporarily disabled or unpowered but not destroyed | **TBD:** safe spawn/repair, without inventing an automatic rescue mode or death from mere power loss. |
 
-An invalid or obstructed stored point must never create an overlapping/unsafe avatar. Exact fallback placement for changed planetary surfaces, moved/removed furniture or blocked approach points is a **future design task**, not permission to relocate the player to an unrelated planet or ship.
+Persist planet-fixed/ship-local frame anchors for ordinary physics, boarding/disembarking, loot placement, causal events and crash reconciliation. Their precision still matters, but they **do not override the assigned pod on normal login**. If the pod's local spawn is blocked/unsafe, fail closed pending an explicit spawn/safety rule; do not teleport elsewhere without approval.
 
 ## Offline death and restart
 
-- During disconnect, the server/persistent world tracks the player's **last anchored location and current alive/dead outcome**, even though the avatar is absent.
-- **If the player was aboard a ship when disconnected and that ship is wholly destroyed while they remain offline, that character is dead.** Record a durable terminal/death result, not a merely missing ship reference.
-- On next reconnect, **do not spawn** that character. First display the clear notification: **“You died while disconnected.”** Explain that the ship they were aboard was destroyed, then begin a **fresh run from Salimon's normal starting state**, applying existing permadeath rules.
-- A player whose last saved location is on a planet **is not killed merely because their ship elsewhere is destroyed**. Nonlethal ship-wide damage to the ship containing an offline player also does not trigger this death rule.
-- Preserve the destroyed ship's world/wreck/salvage consequences under their own existing game systems; do not turn the wreck into an automatic respawn point. The same destruction event must not apply death or reset repeatedly.
+- Destruction/dismantling of an **offline character's active assigned pod** is terminal and durable. There is **no rescue-only mode, no rescue deadline, no replacement after death**, and no offline friend's code that reverses death.
+- Pod loss while the character is online invalidates their binding but is not immediate character death; if they log out without a replacement, their next login starts a new run.
+- New-run initialization creates a **new character/run, Scout, starting inventory and starting Stasis Pod**, while the old character/ship identity and world history are preserved. An intact old owner's ship remains in the universe as salvage/loot and its old owner-only cockpit rights are never inherited.
+- A friend wishing to play together after death must construct or supply another **available pod** for the new character and use a **new one-hour transfer code with approval**. Transfer drops ordinary gear and suit as recoverable loot; it cannot revive a dead character.
+- Whether uniquely classified primary items survive **permadeath**, safe-logout UX details, and disconnect grace are **TBD**. Primary items are protected from unsafe logout and transfer only when explicitly cataloged.
 
 ## Current ship-damage scope (simplification)
 
@@ -80,20 +81,19 @@ Past native implementation documents describing localized cell, module, door or 
 
 ## Invariants, implementation and deferred discussion
 
-- One cockpit seat has at most one active occupant; one ship has at most one authorized active pilot; ship owner-only navigation remains protected.
-- View switching is a client presentation state change; the authoritative player stays physically inside the ship when seated, and ship motion persists independently.
-- Disconnect must atomically release occupancy/interaction locks and save a valid planet-fixed or ship-local re-entry anchor. It must not leave an offline physical player in the world.
-- Reconnect checks terminal offline death **before** spawning, resuming commands or presenting controls.
-- Implementation is authorized by active issues. #766 implements local 2D gameplay, cockpit seating and radar transitions; live multiplayer, server persistence and reconnect remain deferred.
-- **Still to design later:** exact cockpit input key/animation timing, valid-adjacent spawn fallback when a saved spot changes, server timing/race handling, full power/zero-G seating safety, multiplayer interaction with an occupied pilot, reconnect if a ship is transferred/removed without destruction, and eventual localized hull/room/module damage.
+- One cockpit seat has at most one active occupant; only living owner may navigate. Pod assignment never grants navigation authority.
+- One assigned pod per character/run and one living character per pod. The **Stasis Pod** is a separate buildable module; the decorative/functional sleeping bunk does not automatically act as a spawn pod.
+- Safe logout, unsafe-loot settlement, pod reassignment, pod destruction/death and new-run creation require idempotent durable operations; old physical checkpoints cannot revert them. Backend still targets **5 s** verified checkpoints with strict suspension at **30 s** verified age.
+- Continue using precise reference frames for movement, departure loot and server recovery; normal reconnect uses assigned pod. Current browser has neither server pod admission nor multiplayer implementation.
+- **TBD:** pod power/disablement and suitless arrival environment; disconnect/grace and combat logout; valid pod spawn clearance; protected primary item eligibility/permadeath; structural removal and Core-root terminal disposal; code UI/security and pending-approval timeout; simultaneous pod-loss/transfer races; exact online-unbound session exit handling.
 
 ## Review examples / acceptance scenarios (future)
 
-1. Two connected players aboard the Scout: owner enters 3D navigation, observer still sees owner's character seated in the 2D cockpit; another occupant cannot claim the same chair.
-2. Normal navigation exit returns the owner to 2D **standing**; power loss returns them to 2D **seated**; restored power does not force 3D open.
-3. Disconnect during cockpit navigation removes the avatar and releases the chair/control; reconnect places them standing beside the desk in 2D.
-4. Disconnect on a rotating/moving planet returns to identical planet-fixed surface coordinates, not inertial-space coordinates.
-5. Disconnect in a coasting/traveling ship returns to the same ship-local point despite movement.
-6. Disconnect during active mining or inventory transfer cancels the active action, keeps already committed output, and returns beside the object without duplicating resources.
-7. Offline ship-wide nonfatal damage permits normal reconnect aboard; **whole-ship destruction** produces a one-time offline-death notice and fresh start instead of spawning in wreckage.
-8. Disconnect on a planet survives destruction of a separate ship; no unrelated death.
+1. Owner enters 3D radar while guest sees a seated 2D character; disconnect releases cockpit without resuming it on login.
+2. Safe pod interaction preserves inventory, suit and gear; reconnect spawns at that pod.
+3. Disconnect on a planet without safe pod logout creates one loot cache with ordinary possessions; reconnect spawns at **assigned pod**, not at planet position.
+4. Friend enters valid hour-long code at vacant pod; online user approves; loading/commit drops ordinary gear/suit, changes binding and frame exactly once; old ship remains their property.
+5. Offline character's assigned pod is dismantled or destroyed; next login starts a new run, no resurrection or rescue-only session.
+6. Online character's pod is lost; current play continues, and reassignment before logout avoids next-login run loss.
+7. Destruction of a ship that contains an offline visitor **without their active pod** does not independently trigger pod-loss permadeath; lethal damage mechanics remain separate.
+8. Same-account new character cannot use old run's pod/code or pilot an intact ship owned by the deceased character.

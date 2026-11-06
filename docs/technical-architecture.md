@@ -75,13 +75,21 @@ semantics and unsupported machine/server features.
 
 The Scout raw-store declaration is owned by `scoutResourceContainer.ts`, bound to
 the existing `scout:storage` ship-local anchor and 50,000 g metadata. Default
-ResourceSession commands persist it atomically in schema v5; v3 saves acquire
+ResourceSession commands persist it atomically in schema v7; v3 saves acquire
 the previously absent container empty, while v4 missing data fails closed.
 `resourceContainerInteraction.ts` owns reachable world admission, revision-bound
 drafts and consume-once confirmation (arrival location is checkpointed before
 a draft captures its revision); `ResourceContainerPanel.tsx` owns the native
 modal and exact gram/derived kg presentation. TopDownView integrates cancellation
 with the existing input/focus/scene path while retaining simulation state.
+
+
+Hazard arithmetic (#788) is owned by `hazards.ts` and reduced rational `exact.ts`.
+`survival.ts` applies hazard damage inside the sole 60 Hz loop before healing;
+`resourceSession.ts` commits exact HP/exposure/budgets in schema v7 before
+publication. See [browser hazard invariants](browser-hazards.md) and the explicit,
+separately built `tests/hazards.html` fixture; normal gameplay has no sources or
+modules. Equipment, planetary sampling and unspecified categories remain future.
 
 Generic count items (#786) use `registerCountItems` for immutable, fully validated
 trusted definitions and `ResourceSession.changeItem` for revision-checked exact

@@ -18,12 +18,12 @@
       ]
     },
     "survival": {
-      "hunger": 3887640,
-      "fatigue": 3887990,
+      "hunger": 3887676,
+      "fatigue": 3887991,
       "health": 200,
-      "activeTicks": 10,
+      "activeTicks": 9,
       "starvationTicks": 0,
-      "recoveryTicks": 10,
+      "recoveryTicks": 9,
       "offlineAtMs": 1793750401182
     },
     "itemDefinitions": {},
@@ -93,13 +93,13 @@
       ]
     },
     "survival": {
-      "hunger": 3887028,
-      "fatigue": 3887973,
+      "hunger": 3887064,
+      "fatigue": 3887974,
       "health": 199.97166666666666,
-      "activeTicks": 27,
+      "activeTicks": 26,
       "starvationTicks": 0,
-      "recoveryTicks": 27,
-      "offlineAtMs": 1793750401477,
+      "recoveryTicks": 26,
+      "offlineAtMs": 1793750401476,
       "healthExact": "119983/600"
     },
     "itemDefinitions": {},
@@ -169,12 +169,12 @@
       ]
     },
     "survival": {
-      "hunger": 3887028,
+      "hunger": 3887064,
       "fatigue": 3888000,
       "health": 199.97166666666666,
-      "activeTicks": 27,
+      "activeTicks": 26,
       "starvationTicks": 0,
-      "recoveryTicks": 27,
+      "recoveryTicks": 26,
       "offlineAtMs": 1793750403488,
       "healthExact": "119983/600"
     },
@@ -245,13 +245,13 @@
       ]
     },
     "survival": {
-      "hunger": 3714228,
+      "hunger": 3714264,
       "fatigue": 3883200,
       "health": 188.60333333333332,
-      "activeTicks": 4827,
+      "activeTicks": 4826,
       "starvationTicks": 0,
-      "recoveryTicks": 1227,
-      "offlineAtMs": 1793750483493,
+      "recoveryTicks": 1226,
+      "offlineAtMs": 1793750483492,
       "healthExact": "56581/300"
     },
     "itemDefinitions": {},
@@ -321,13 +321,13 @@
       ]
     },
     "survival": {
-      "hunger": 3712068,
+      "hunger": 3712104,
       "fatigue": 3883140,
       "health": 188.60333333333332,
-      "activeTicks": 4887,
+      "activeTicks": 4886,
       "starvationTicks": 0,
-      "recoveryTicks": 1287,
-      "offlineAtMs": 1793750484501,
+      "recoveryTicks": 1286,
+      "offlineAtMs": 1793750484500,
       "healthExact": "56581/300"
     },
     "itemDefinitions": {},
@@ -397,13 +397,13 @@
       ]
     },
     "survival": {
-      "hunger": 3712068,
+      "hunger": 3712104,
       "fatigue": 3883140,
       "health": 188.60333333333332,
-      "activeTicks": 4887,
+      "activeTicks": 4886,
       "starvationTicks": 0,
-      "recoveryTicks": 1287,
-      "offlineAtMs": 1793750484501,
+      "recoveryTicks": 1286,
+      "offlineAtMs": 1793750484500,
       "healthExact": "56581/300"
     },
     "itemDefinitions": {},
@@ -460,8 +460,8 @@
     "hazards": {
       "version": 1,
       "exposure": {
-        "radiation": "93/1",
-        "poison": "2417/480"
+        "radiation": "1853/20",
+        "poison": "2297/480"
       },
       "modules": [
         {
@@ -473,19 +473,19 @@
       ]
     },
     "survival": {
-      "hunger": 3712068,
-      "fatigue": 3883320,
+      "hunger": 3711996,
+      "fatigue": 3883317,
       "health": 188.60333333333332,
-      "activeTicks": 4887,
+      "activeTicks": 4889,
       "starvationTicks": 0,
-      "recoveryTicks": 1287,
-      "offlineAtMs": 1793750485503,
+      "recoveryTicks": 1289,
+      "offlineAtMs": 1793750485556,
       "healthExact": "56581/300"
     },
     "itemDefinitions": {},
     "catalogVersion": "landing-resources:v2",
     "siteId": "site:illustrated-landing:v1",
-    "revision": 4880,
+    "revision": 4883,
     "inventory": {
       "capacityGrams": 10000,
       "capacitySlots": 12,

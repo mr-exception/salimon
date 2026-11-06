@@ -54,6 +54,11 @@ ownership, is documented in [backend architecture](backend-architecture.md).
 Durable gameplay transactions, a strict checkpoint-staleness policy and
 crash/reconnect reconstruction are specified in
 [backend persistence and recovery](backend-persistence-recovery.md).
+The proposed future [Stasis Pod contract](stasis-pod-and-transfer.md) now owns
+safe/unsafe logout, single-use one-hour approved multiplayer transfer,
+per-run pod binding and terminal offline pod loss; it supersedes old last-frame
+reconnect and broad offline-passenger death assumptions. Verification remains
+**5 s checkpoint target and 30 s maximum verified age with strict suspension**.
 These are **design contracts**, not completed online features; the browser
 currently retains local simulation and local saves.
 

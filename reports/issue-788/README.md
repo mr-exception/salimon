@@ -23,7 +23,7 @@ No wearable equipment, unapproved item masses, planetary strengths or fire rules
 | Build (mandatory) | `cd client && npm run build` | PASS: TypeScript + Vite; [original log](build.log). Existing large-bundle advisory remains |
 | Focused built E2E | `cd client && npm run test:browser -- --project=cockpit hazards.spec.ts` | PASS: 2/2; [log](browser-focused.log), [original results](browser-focused-results.json), [original numerical records](hazard-records.json). Build uses same runtime inputs as tested source; later added tombstone unit test changes no browser inputs |
 | Full browser / existing CI gates (mandatory) | Navigation client workflow: full `npm run test:browser`, navigation negative, visual repeat/negative, baseline approval | Pending at initial publication; current results linked in PR review comment |
-| Visual | N/A to new domain: no hazard presentation. Existing navigation visual/repeat/negative gates retained in CI | No baseline promotion |
+| Visual | N/A to new domain: no hazard presentation. Existing navigation visual/repeat/negative gates retained in CI | No baseline promotion; automatic final captures retained as [fixture](fixture-final.png) / [normal game](normal-game.png), not approved baselines |
 | Manual/hardware | N/A to deterministic browser-local domain; real planetary sampling, balancing and hardware performance outside this issue | No qualification claimed |
 
 Initial iteration found an unconnected damage callback, old-schema test fixtures

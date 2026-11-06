@@ -1,0 +1,392 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=cockpit",
+      "hazards.spec.ts"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice|gathering|storage|items|survival|hazards)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/navigation-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": true,
+            "sources": true
+          },
+          "launchOptions": {
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text",
+              "--disable-gpu"
+            ],
+            "env": {
+              "REMOTE_DESKTOP_H265_ENABLED": "0",
+              "CODEX_EXEC_SERVER_PROXY_PRIVATE_IPS_VIA_UPSTREAM": "true",
+              "GRPC_DEFAULT_SSL_ROOTS_FILE_PATH": "/etc/ssl/certs/ca-certificates.crt",
+              "HTTPS_PROXY": "http://proxy:8080",
+              "CODEX_CI": "1",
+              "no_proxy": "localhost,127.0.0.1,::1",
+              "CODEX_EXEC_SERVER_REMOTE_BASE_URL": "https://codex-cloud-environments.chatgpt.com/api",
+              "NODE_EXTRA_CA_CERTS": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "CODEX_HOME": "/home/agent/.codex",
+              "USER": "agent",
+              "npm_config_user_agent": "npm/11.9.0 node/v24.19.0 linux x64 workspaces/false",
+              "GH_TOKEN": "ghu_codex-cloud-github-proxy",
+              "npm_node_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "SHLVL": "1",
+              "npm_config_noproxy": "",
+              "HOME": "/home/agent",
+              "CODEX_CAAS_SESSION_ID": "c147ab8a3b9a49d0a69f39f473c129d5",
+              "CODEX_PRIMARY_RUNTIME_NODE_MODULES": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "NO_PROXY": "localhost,127.0.0.1,::1",
+              "npm_package_json": "/workspace/salimon/client/package.json",
+              "NETWORK": "caas_neko_desktop",
+              "npm_package_engines_node": ">=22.18",
+              "OPENAI_CLUSTER": "applied-caas53",
+              "PAGER": "cat",
+              "LC_CTYPE": "C.UTF-8",
+              "SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_userconfig": "/home/agent/.npmrc",
+              "npm_config_local_prefix": "/workspace/salimon/client",
+              "CODEX_PRIMARY_RUNTIME_BUNDLE_VERSION": "26.1013.11914",
+              "NO_COLOR": "1",
+              "COLORTERM": "",
+              "COLOR": "0",
+              "CODEX_PROXY_CERT": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "https_proxy": "http://proxy:8080",
+              "CODEX_ENVIRONMENT_ID": "ccarenv_b64_Y2NhcmVudl8yMzBkODk3ZTFlOTA4MTkxYjJhNjk1MDY2MDJhNTI1YQ",
+              "CODEX_PERMISSION_PROFILE": ":danger-full-access",
+              "CODEX_TOOL_CALL_ID": "exec-982d54e8-0b81-481e-a44f-9015f9b7b711",
+              "http_proxy": "http://proxy:8080",
+              "_": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/npm",
+              "npm_config_npm_version": "11.9.0",
+              "CODEX_APPLY_PATCH_PRESERVE_LINE_ENDINGS": "1",
+              "RUST_LOG": "codex_exec_server=info,codex_cli=info,error",
+              "CODEX_NO_UPDATE": "1",
+              "TERM": "dumb",
+              "npm_config_cache": "/home/agent/.npm",
+              "CLOUDSDK_CORE_CUSTOM_CA_CERTS_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_node_gyp": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js",
+              "PATH": "/workspace/salimon/client/node_modules/.bin:/workspace/salimon/node_modules/.bin:/workspace/node_modules/.bin:/node_modules/.bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+              "CODEX_VERSION": "0.0.0",
+              "CODEX_SESSION_ID": "01a1af5a-b0a9-7183-80de-0438f9de3074",
+              "REQUESTS_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt",
+              "NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "npm_package_name": "salimon-navigation-client",
+              "LANG": "C.UTF-8",
+              "GH_PAGER": "cat",
+              "npm_lifecycle_script": "playwright test",
+              "BROWSER_MANAGEMENT_SOCKET_PATH": "/home/agent/.local/run/browser-management/socket",
+              "DEBIAN_FRONTEND": "noninteractive",
+              "SHELL": "/bin/bash",
+              "NODE_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "npm_package_version": "0.1.0",
+              "npm_lifecycle_event": "test:browser",
+              "CODEX_PRIMARY_RUNTIME_ROOT": "/opt/codex/runtimes/codex-primary-runtime",
+              "CAAS_IMAGE_GIT_COMMIT_SHA": "969fca457cb91df54eb491d22bcaff20654139fe",
+              "NPM_CONFIG_AUDIT": "false",
+              "DOCKER_TLS_CERTDIR": "",
+              "CAAS_IMAGE_VERSION": "20261019221748-969fca457cb9",
+              "CODEX_PRIMARY_RUNTIME_PYTHON": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "CODEX_THREAD_ID": "01a1af5a-b0a9-7183-80de-0438f9de3074",
+              "CAAS_DIND_STORAGE_DRIVER": "vfs",
+              "GIT_PAGER": "cat",
+              "npm_config_globalconfig": "/home/agent/.local/etc/npmrc",
+              "npm_config_init_module": "/home/agent/.npm-init.js",
+              "PWD": "/workspace/salimon/client",
+              "NPM_CONFIG_FUND": "false",
+              "LC_ALL": "C.UTF-8",
+              "npm_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/bin/npm-cli.js",
+              "CODEX_BROWSER_DEFER_ACTIVATION": "1",
+              "npm_config_global_prefix": "/home/agent/.local",
+              "HTTP_PROXY": "http://proxy:8080",
+              "npm_command": "run",
+              "CODEX_PRIMARY_RUNTIME_NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "PLAYWRIGHT_NODEJS_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "NPM_CONFIG_PREFIX": "/home/agent/.local",
+              "CODEX_PRIMARY_RUNTIME": "/opt/codex/runtimes/codex-primary-runtime",
+              "DOCKER_IGNORE_BR_NETFILTER_ERROR": "1",
+              "INIT_CWD": "/workspace/salimon/client",
+              "EDITOR": "vi",
+              "BROWSERSLIST_IGNORE_OLD_DATA": "true",
+              "FONTCONFIG_FILE": "/workspace/salimon/client/tests/assets/fonts.conf"
+            }
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "cockpit"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "hazards.spec.ts",
+      "file": "hazards.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "HAZ-1\u20135 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 25014,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T05:43:19.633Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "hazard-records.json",
+                      "contentType": "application/json",
+                      "body": "ewogICJicm93c2VyIjogIjE1Ni4wLjgwNzguNCIsCiAgImluaXRpYWwiOiB7CiAgICAidmVyc2lvbiI6IDcsCiAgICAiaGF6YXJkcyI6IHsKICAgICAgInZlcnNpb24iOiAxLAogICAgICAiZXhwb3N1cmUiOiB7CiAgICAgICAgInJhZGlhdGlvbiI6ICIwLzEiLAogICAgICAgICJwb2lzb24iOiAiMC8xIgogICAgICB9LAogICAgICAibW9kdWxlcyI6IFsKICAgICAgICB7CiAgICAgICAgICAiaWQiOiAiZml4dHVyZS1yYWRpYXRpb24tbW9kdWxlIiwKICAgICAgICAgICJ0eXBlIjogInJhZGlhdGlvbiIsCiAgICAgICAgICAicHJvdGVjdGlvbiI6IDIsCiAgICAgICAgICAicmVtYWluaW5nIjogIjEwMDAvMSIKICAgICAgICB9CiAgICAgIF0KICAgIH0sCiAgICAic3Vydml2YWwiOiB7CiAgICAgICJodW5nZXIiOiAzODg3NjQwLAogICAgICAiZmF0aWd1ZSI6IDM4ODc5OTAsCiAgICAgICJoZWFsdGgiOiAyMDAsCiAgICAgICJhY3RpdmVUaWNrcyI6IDEwLAogICAgICAic3RhcnZhdGlvblRpY2tzIjogMCwKICAgICAgInJlY292ZXJ5VGlja3MiOiAxMCwKICAgICAgIm9mZmxpbmVBdE1zIjogMTc5Mzc1MDQwMTE4MgogICAgfSwKICAgICJpdGVtRGVmaW5pdGlvbnMiOiB7fSwKICAgICJzdG9yZXMiOiB7CiAgICAgICJzY291dDpzdG9yYWdlIjogewogICAgICAgICJzaGlwSWQiOiAic2hpcDpzY291dCIsCiAgICAgICAgImNhcGFjaXR5R3JhbXMiOiA1MDAwMCwKICAgICAgICAiaWQiOiAic2NvdXQ6c3RvcmFnZSIsCiAgICAgICAgInF1YW50aXRpZXMiOiB7fQogICAgICB9CiAgICB9LAogICAgImNhdGFsb2dWZXJzaW9uIjogImxhbmRpbmctcmVzb3VyY2VzOnYyIiwKICAgICJzaXRlSWQiOiAic2l0ZTppbGx1c3RyYXRlZC1sYW5kaW5nOnYxIiwKICAgICJyZXZpc2lvbiI6IDEsCiAgICAiaW52ZW50b3J5IjogewogICAgICAiY2FwYWNpdHlHcmFtcyI6IDEwMDAwLAogICAgICAiY2FwYWNpdHlTbG90cyI6IDEyLAogICAgICAicXVhbnRpdGllcyI6IHt9LAogICAgICAiaXRlbXMiOiB7fQogICAgfSwKICAgICJzb3VyY2VzIjogewogICAgICAic291cmNlOmxhbmRpbmc6bWluZXJhbDowMSI6IHsKICAgICAgICAiaWQiOiAic291cmNlOmxhbmRpbmc6bWluZXJhbDowMSIsCiAgICAgICAgInJlc291cmNlSWQiOiAibWluZXJhbCIsCiAgICAgICAgInJlbWFpbmluZ0dyYW1zIjogNjAwMDAKICAgICAgfSwKICAgICAgInNvdXJjZTpsYW5kaW5nOmJpb2xvZ3k6MDEiOiB7CiAgICAgICAgImlkIjogInNvdXJjZTpsYW5kaW5nOmJpb2xvZ3k6MDEiLAogICAgICAgICJyZXNvdXJjZUlkIjogImJpb21hc3MiLAogICAgICAgICJyZW1haW5pbmdHcmFtcyI6IDE1MDAwCiAgICAgIH0KICAgIH0sCiAgICAibG9jYXRpb24iOiB7CiAgICAgICJhbmNob3IiOiB7CiAgICAgICAgImZyYW1lIjogInBsYW5ldDpmaXh0dXJlIiwKICAgICAgICAicG9pbnQiOiB7CiAgICAgICAgICAiY2VsbCI6IFsKICAgICAgICAgICAgIjAiLAogICAgICAgICAgICAiMCIsCiAgICAgICAgICAgICIwIgogICAgICAgICAgXSwKICAgICAgICAgICJvZmZzZXRNIjogWwogICAgICAgICAgICAtNiwKICAgICAgICAgICAgMywKICAgICAgICAgICAgMAogICAgICAgICAgXQogICAgICAgIH0KICAgICAgfSwKICAgICAgImZhY2luZyI6IDAKICAgIH0KICB9LAogICJwYXJ0aWFsIjogewogICAgInZlcnNpb24iOiA3LAogICAgImhhemFyZHMiOiB7CiAgICAgICJ2ZXJzaW9uIjogMSwKICAgICAgImV4cG9zdXJlIjogewogICAgICAgICJyYWRpYXRpb24iOiAiMjIxLzYwMCIsCiAgICAgICAgInBvaXNvbiI6ICIxNy80ODAiCiAgICAgIH0sCiAgICAgICJtb2R1bGVzIjogWwogICAgICAgIHsKICAgICAgICAgICJpZCI6ICJmaXh0dXJlLXJhZGlhdGlvbi1tb2R1bGUiLAogICAgICAgICAgInR5cGUiOiAicmFkaWF0aW9uIiwKICAgICAgICAgICJwcm90ZWN0aW9uIjogMiwKICAgICAgICAgICJyZW1haW5pbmciOiAiMjk5ODMvMzAiCiAgICAgICAgfQogICAgICBdCiAgICB9LAogICAgInN1cnZpdmFsIjogewogICAgICAiaHVuZ2VyIjogMzg4NzAyOCwKICAgICAgImZhdGlndWUiOiAzODg3OTczLAogICAgICAiaGVhbHRoIjogMTk5Ljk3MTY2NjY2NjY2NjY2LAogICAgICAiYWN0aXZlVGlja3MiOiAyNywKICAgICAgInN0YXJ2YXRpb25UaWNrcyI6IDAsCiAgICAgICJyZWNvdmVyeVRpY2tzIjogMjcsCiAgICAgICJvZmZsaW5lQXRNcyI6IDE3OTM3NTA0MDE0NzcsCiAgICAgICJoZWFsdGhFeGFjdCI6ICIxMTk5ODMvNjAwIgogICAgfSwKICAgICJpdGVtRGVmaW5pdGlvbnMiOiB7fSwKICAgICJzdG9yZXMiOiB7CiAgICAgICJzY291dDpzdG9yYWdlIjogewogICAgICAgICJzaGlwSWQiOiAic2hpcDpzY291dCIsCiAgICAgICAgImNhcGFjaXR5R3JhbXMiOiA1MDAwMCwKICAgICAgICAiaWQiOiAic2NvdXQ6c3RvcmFnZSIsCiAgICAgICAgInF1YW50aXRpZXMiOiB7fQogICAgICB9CiAgICB9LAogICAgImNhdGFsb2dWZXJzaW9uIjogImxhbmRpbmctcmVzb3VyY2VzOnYyIiwKICAgICJzaXRlSWQiOiAic2l0ZTppbGx1c3RyYXRlZC1sYW5kaW5nOnYxIiwKICAgICJyZXZpc2lvbiI6IDE4LAogICAgImludmVudG9yeSI6IHsKICAgICAgImNhcGFjaXR5R3JhbXMiOiAxMDAwMCwKICAgICAgImNhcGFjaXR5U2xvdHMiOiAxMiwKICAgICAgInF1YW50aXRpZXMiOiB7fSwKICAgICAgIml0ZW1zIjoge30KICAgIH0sCiAgICAic291cmNlcyI6IHsKICAgICAgInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiOiB7CiAgICAgICAgImlkIjogInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiLAogICAgICAgICJyZXNvdXJjZUlkIjogIm1pbmVyYWwiLAogICAgICAgICJyZW1haW5pbmdHcmFtcyI6IDYwMDAwCiAgICAgIH0sCiAgICAgICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIjogewogICAgICAgICJpZCI6ICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIiwKICAgICAgICAicmVzb3VyY2VJZCI6ICJiaW9tYXNzIiwKICAgICAgICAicmVtYWluaW5nR3JhbXMiOiAxNTAwMAogICAgICB9CiAgICB9LAogICAgImxvY2F0aW9uIjogewogICAgICAiYW5jaG9yIjogewogICAgICAgICJmcmFtZSI6ICJwbGFuZXQ6Zml4dHVyZSIsCiAgICAgICAgInBvaW50IjogewogICAgICAgICAgImNlbGwiOiBbCiAgICAgICAgICAgICIwIiwKICAgICAgICAgICAgIjAiLAogICAgICAgICAgICAiMCIKICAgICAgICAgIF0sCiAgICAgICAgICAib2Zmc2V0TSI6IFsKICAgICAgICAgICAgLTYsCiAgICAgICAgICAgIDMsCiAgICAgICAgICAgIDAKICAgICAgICAgIF0KICAgICAgICB9CiAgICAgIH0sCiAgICAgICJmYWNpbmciOiAwCiAgICB9CiAgfSwKICAicmVzdG9yZWQiOiB7CiAgICAidmVyc2lvbiI6IDcsCiAgICAiaGF6YXJkcyI6IHsKICAgICAgInZlcnNpb24iOiAxLAogICAgICAiZXhwb3N1cmUiOiB7CiAgICAgICAgInJhZGlhdGlvbiI6ICIyMjEvNjAwIiwKICAgICAgICAicG9pc29uIjogIjE3LzQ4MCIKICAgICAgfSwKICAgICAgIm1vZHVsZXMiOiBbCiAgICAgICAgewogICAgICAgICAgImlkIjogImZpeHR1cmUtcmFkaWF0aW9uLW1vZHVsZSIsCiAgICAgICAgICAidHlwZSI6ICJyYWRpYXRpb24iLAogICAgICAgICAgInByb3RlY3Rpb24iOiAyLAogICAgICAgICAgInJlbWFpbmluZyI6ICIyOTk4My8zMCIKICAgICAgICB9CiAgICAgIF0KICAgIH0sCiAgICAic3Vydml2YWwiOiB7CiAgICAgICJodW5nZXIiOiAzODg3MDI4LAogICAgICAiZmF0aWd1ZSI6IDM4ODgwMDAsCiAgICAgICJoZWFsdGgiOiAxOTkuOTcxNjY2NjY2NjY2NjYsCiAgICAgICJhY3RpdmVUaWNrcyI6IDI3LAogICAgICAic3RhcnZhdGlvblRpY2tzIjogMCwKICAgICAgInJlY292ZXJ5VGlja3MiOiAyNywKICAgICAgIm9mZmxpbmVBdE1zIjogMTc5Mzc1MDQwMzQ4OCwKICAgICAgImhlYWx0aEV4YWN0IjogIjExOTk4My82MDAiCiAgICB9LAogICAgIml0ZW1EZWZpbml0aW9ucyI6IHt9LAogICAgImNhdGFsb2dWZXJzaW9uIjogImxhbmRpbmctcmVzb3VyY2VzOnYyIiwKICAgICJzaXRlSWQiOiAic2l0ZTppbGx1c3RyYXRlZC1sYW5kaW5nOnYxIiwKICAgICJyZXZpc2lvbiI6IDE5LAogICAgImludmVudG9yeSI6IHsKICAgICAgImNhcGFjaXR5R3JhbXMiOiAxMDAwMCwKICAgICAgImNhcGFjaXR5U2xvdHMiOiAxMiwKICAgICAgInF1YW50aXRpZXMiOiB7fSwKICAgICAgIml0ZW1zIjoge30KICAgIH0sCiAgICAic291cmNlcyI6IHsKICAgICAgInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiOiB7CiAgICAgICAgImlkIjogInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiLAogICAgICAgICJyZXNvdXJjZUlkIjogIm1pbmVyYWwiLAogICAgICAgICJyZW1haW5pbmdHcmFtcyI6IDYwMDAwCiAgICAgIH0sCiAgICAgICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIjogewogICAgICAgICJpZCI6ICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIiwKICAgICAgICAicmVzb3VyY2VJZCI6ICJiaW9tYXNzIiwKICAgICAgICAicmVtYWluaW5nR3JhbXMiOiAxNTAwMAogICAgICB9CiAgICB9LAogICAgInN0b3JlcyI6IHsKICAgICAgInNjb3V0OnN0b3JhZ2UiOiB7CiAgICAgICAgInNoaXBJZCI6ICJzaGlwOnNjb3V0IiwKICAgICAgICAiY2FwYWNpdHlHcmFtcyI6IDUwMDAwLAogICAgICAgICJpZCI6ICJzY291dDpzdG9yYWdlIiwKICAgICAgICAicXVhbnRpdGllcyI6IHt9CiAgICAgIH0KICAgIH0sCiAgICAibG9jYXRpb24iOiB7CiAgICAgICJhbmNob3IiOiB7CiAgICAgICAgImZyYW1lIjogInBsYW5ldDpmaXh0dXJlIiwKICAgICAgICAicG9pbnQiOiB7CiAgICAgICAgICAiY2VsbCI6IFsKICAgICAgICAgICAgIjAiLAogICAgICAgICAgICAiMCIsCiAgICAgICAgICAgICIwIgogICAgICAgICAgXSwKICAgICAgICAgICJvZmZzZXRNIjogWwogICAgICAgICAgICAtNiwKICAgICAgICAgICAgMywKICAgICAgICAgICAgMAogICAgICAgICAgXQogICAgICAgIH0KICAgICAgfSwKICAgICAgImZhY2luZyI6IDAKICAgIH0KICB9LAogICJmdWxsIjogewogICAgInZlcnNpb24iOiA3LAogICAgImhhemFyZHMiOiB7CiAgICAgICJ2ZXJzaW9uIjogMSwKICAgICAgImV4cG9zdXJlIjogewogICAgICAgICJyYWRpYXRpb24iOiAiMTAwLzEiLAogICAgICAgICJwb2lzb24iOiAiNDgxNy80ODAiCiAgICAgIH0sCiAgICAgICJtb2R1bGVzIjogWwogICAgICAgIHsKICAgICAgICAgICJpZCI6ICJmaXh0dXJlLXJhZGlhdGlvbi1tb2R1bGUiLAogICAgICAgICAgInR5cGUiOiAicmFkaWF0aW9uIiwKICAgICAgICAgICJwcm90ZWN0aW9uIjogMiwKICAgICAgICAgICJyZW1haW5pbmciOiAiMjUxODMvMzAiCiAgICAgICAgfQogICAgICBdCiAgICB9LAogICAgInN1cnZpdmFsIjogewogICAgICAiaHVuZ2VyIjogMzcxNDIyOCwKICAgICAgImZhdGlndWUiOiAzODgzMjAwLAogICAgICAiaGVhbHRoIjogMTg4LjYwMzMzMzMzMzMzMzMyLAogICAgICAiYWN0aXZlVGlja3MiOiA0ODI3LAogICAgICAic3RhcnZhdGlvblRpY2tzIjogMCwKICAgICAgInJlY292ZXJ5VGlja3MiOiAxMjI3LAogICAgICAib2ZmbGluZUF0TXMiOiAxNzkzNzUwNDgzNDkzLAogICAgICAiaGVhbHRoRXhhY3QiOiAiNTY1ODEvMzAwIgogICAgfSwKICAgICJpdGVtRGVmaW5pdGlvbnMiOiB7fSwKICAgICJjYXRhbG9nVmVyc2lvbiI6ICJsYW5kaW5nLXJlc291cmNlczp2MiIsCiAgICAic2l0ZUlkIjogInNpdGU6aWxsdXN0cmF0ZWQtbGFuZGluZzp2MSIsCiAgICAicmV2aXNpb24iOiA0ODE5LAogICAgImludmVudG9yeSI6IHsKICAgICAgImNhcGFjaXR5R3JhbXMiOiAxMDAwMCwKICAgICAgImNhcGFjaXR5U2xvdHMiOiAxMiwKICAgICAgInF1YW50aXRpZXMiOiB7fSwKICAgICAgIml0ZW1zIjoge30KICAgIH0sCiAgICAic291cmNlcyI6IHsKICAgICAgInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiOiB7CiAgICAgICAgImlkIjogInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiLAogICAgICAgICJyZXNvdXJjZUlkIjogIm1pbmVyYWwiLAogICAgICAgICJyZW1haW5pbmdHcmFtcyI6IDYwMDAwCiAgICAgIH0sCiAgICAgICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIjogewogICAgICAgICJpZCI6ICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIiwKICAgICAgICAicmVzb3VyY2VJZCI6ICJiaW9tYXNzIiwKICAgICAgICAicmVtYWluaW5nR3JhbXMiOiAxNTAwMAogICAgICB9CiAgICB9LAogICAgInN0b3JlcyI6IHsKICAgICAgInNjb3V0OnN0b3JhZ2UiOiB7CiAgICAgICAgInNoaXBJZCI6ICJzaGlwOnNjb3V0IiwKICAgICAgICAiY2FwYWNpdHlHcmFtcyI6IDUwMDAwLAogICAgICAgICJpZCI6ICJzY291dDpzdG9yYWdlIiwKICAgICAgICAicXVhbnRpdGllcyI6IHt9CiAgICAgIH0KICAgIH0sCiAgICAibG9jYXRpb24iOiB7CiAgICAgICJhbmNob3IiOiB7CiAgICAgICAgImZyYW1lIjogInBsYW5ldDpmaXh0dXJlIiwKICAgICAgICAicG9pbnQiOiB7CiAgICAgICAgICAiY2VsbCI6IFsKICAgICAgICAgICAgIjAiLAogICAgICAgICAgICAiMCIsCiAgICAgICAgICAgICIwIgogICAgICAgICAgXSwKICAgICAgICAgICJvZmZzZXRNIjogWwogICAgICAgICAgICAtNiwKICAgICAgICAgICAgMywKICAgICAgICAgICAgMAogICAgICAgICAgXQogICAgICAgIH0KICAgICAgfSwKICAgICAgImZhY2luZyI6IDAKICAgIH0KICB9LAogICJleGl0ZWQiOiB7CiAgICAidmVyc2lvbiI6IDcsCiAgICAiaGF6YXJkcyI6IHsKICAgICAgInZlcnNpb24iOiAxLAogICAgICAiZXhwb3N1cmUiOiB7CiAgICAgICAgInJhZGlhdGlvbiI6ICI5My8xIiwKICAgICAgICAicG9pc29uIjogIjI0MTcvNDgwIgogICAgICB9LAogICAgICAibW9kdWxlcyI6IFsKICAgICAgICB7CiAgICAgICAgICAiaWQiOiAiZml4dHVyZS1yYWRpYXRpb24tbW9kdWxlIiwKICAgICAgICAgICJ0eXBlIjogInJhZGlhdGlvbiIsCiAgICAgICAgICAicHJvdGVjdGlvbiI6IDIsCiAgICAgICAgICAicmVtYWluaW5nIjogIjI1MTgzLzMwIgogICAgICAgIH0KICAgICAgXQogICAgfSwKICAgICJzdXJ2aXZhbCI6IHsKICAgICAgImh1bmdlciI6IDM3MTIwNjgsCiAgICAgICJmYXRpZ3VlIjogMzg4MzE0MCwKICAgICAgImhlYWx0aCI6IDE4OC42MDMzMzMzMzMzMzMzMiwKICAgICAgImFjdGl2ZVRpY2tzIjogNDg4NywKICAgICAgInN0YXJ2YXRpb25UaWNrcyI6IDAsCiAgICAgICJyZWNvdmVyeVRpY2tzIjogMTI4NywKICAgICAgIm9mZmxpbmVBdE1zIjogMTc5Mzc1MDQ4NDUwMSwKICAgICAgImhlYWx0aEV4YWN0IjogIjU2NTgxLzMwMCIKICAgIH0sCiAgICAiaXRlbURlZmluaXRpb25zIjoge30sCiAgICAiY2F0YWxvZ1ZlcnNpb24iOiAibGFuZGluZy1yZXNvdXJjZXM6djIiLAogICAgInNpdGVJZCI6ICJzaXRlOmlsbHVzdHJhdGVkLWxhbmRpbmc6djEiLAogICAgInJldmlzaW9uIjogNDg3OSwKICAgICJpbnZlbnRvcnkiOiB7CiAgICAgICJjYXBhY2l0eUdyYW1zIjogMTAwMDAsCiAgICAgICJjYXBhY2l0eVNsb3RzIjogMTIsCiAgICAgICJxdWFudGl0aWVzIjoge30sCiAgICAgICJpdGVtcyI6IHt9CiAgICB9LAogICAgInNvdXJjZXMiOiB7CiAgICAgICJzb3VyY2U6bGFuZGluZzptaW5lcmFsOjAxIjogewogICAgICAgICJpZCI6ICJzb3VyY2U6bGFuZGluZzptaW5lcmFsOjAxIiwKICAgICAgICAicmVzb3VyY2VJZCI6ICJtaW5lcmFsIiwKICAgICAgICAicmVtYWluaW5nR3JhbXMiOiA2MDAwMAogICAgICB9LAogICAgICAic291cmNlOmxhbmRpbmc6YmlvbG9neTowMSI6IHsKICAgICAgICAiaWQiOiAic291cmNlOmxhbmRpbmc6YmlvbG9neTowMSIsCiAgICAgICAgInJlc291cmNlSWQiOiAiYmlvbWFzcyIsCiAgICAgICAgInJlbWFpbmluZ0dyYW1zIjogMTUwMDAKICAgICAgfQogICAgfSwKICAgICJzdG9yZXMiOiB7CiAgICAgICJzY291dDpzdG9yYWdlIjogewogICAgICAgICJzaGlwSWQiOiAic2hpcDpzY291dCIsCiAgICAgICAgImNhcGFjaXR5R3JhbXMiOiA1MDAwMCwKICAgICAgICAiaWQiOiAic2NvdXQ6c3RvcmFnZSIsCiAgICAgICAgInF1YW50aXRpZXMiOiB7fQogICAgICB9CiAgICB9LAogICAgImxvY2F0aW9uIjogewogICAgICAiYW5jaG9yIjogewogICAgICAgICJmcmFtZSI6ICJwbGFuZXQ6Zml4dHVyZSIsCiAgICAgICAgInBvaW50IjogewogICAgICAgICAgImNlbGwiOiBbCiAgICAgICAgICAgICIwIiwKICAgICAgICAgICAgIjAiLAogICAgICAgICAgICAiMCIKICAgICAgICAgIF0sCiAgICAgICAgICAib2Zmc2V0TSI6IFsKICAgICAgICAgICAgLTYsCiAgICAgICAgICAgIDMsCiAgICAgICAgICAgIDAKICAgICAgICAgIF0KICAgICAgICB9CiAgICAgIH0sCiAgICAgICJmYWNpbmciOiAwCiAgICB9CiAgfSwKICAiYmVmb3JlRmFpbHVyZSI6IHsKICAgICJ2ZXJzaW9uIjogNywKICAgICJoYXphcmRzIjogewogICAgICAidmVyc2lvbiI6IDEsCiAgICAgICJleHBvc3VyZSI6IHsKICAgICAgICAicmFkaWF0aW9uIjogIjkzLzEiLAogICAgICAgICJwb2lzb24iOiAiMjQxNy80ODAiCiAgICAgIH0sCiAgICAgICJtb2R1bGVzIjogWwogICAgICAgIHsKICAgICAgICAgICJpZCI6ICJmaXh0dXJlLXJhZGlhdGlvbi1tb2R1bGUiLAogICAgICAgICAgInR5cGUiOiAicmFkaWF0aW9uIiwKICAgICAgICAgICJwcm90ZWN0aW9uIjogMiwKICAgICAgICAgICJyZW1haW5pbmciOiAiMjUxODMvMzAiCiAgICAgICAgfQogICAgICBdCiAgICB9LAogICAgInN1cnZpdmFsIjogewogICAgICAiaHVuZ2VyIjogMzcxMjA2OCwKICAgICAgImZhdGlndWUiOiAzODgzMTQwLAogICAgICAiaGVhbHRoIjogMTg4LjYwMzMzMzMzMzMzMzMyLAogICAgICAiYWN0aXZlVGlja3MiOiA0ODg3LAogICAgICAic3RhcnZhdGlvblRpY2tzIjogMCwKICAgICAgInJlY292ZXJ5VGlja3MiOiAxMjg3LAogICAgICAib2ZmbGluZUF0TXMiOiAxNzkzNzUwNDg0NTAxLAogICAgICAiaGVhbHRoRXhhY3QiOiAiNTY1ODEvMzAwIgogICAgfSwKICAgICJpdGVtRGVmaW5pdGlvbnMiOiB7fSwKICAgICJjYXRhbG9nVmVyc2lvbiI6ICJsYW5kaW5nLXJlc291cmNlczp2MiIsCiAgICAic2l0ZUlkIjogInNpdGU6aWxsdXN0cmF0ZWQtbGFuZGluZzp2MSIsCiAgICAicmV2aXNpb24iOiA0ODc5LAogICAgImludmVudG9yeSI6IHsKICAgICAgImNhcGFjaXR5R3JhbXMiOiAxMDAwMCwKICAgICAgImNhcGFjaXR5U2xvdHMiOiAxMiwKICAgICAgInF1YW50aXRpZXMiOiB7fSwKICAgICAgIml0ZW1zIjoge30KICAgIH0sCiAgICAic291cmNlcyI6IHsKICAgICAgInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiOiB7CiAgICAgICAgImlkIjogInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiLAogICAgICAgICJyZXNvdXJjZUlkIjogIm1pbmVyYWwiLAogICAgICAgICJyZW1haW5pbmdHcmFtcyI6IDYwMDAwCiAgICAgIH0sCiAgICAgICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIjogewogICAgICAgICJpZCI6ICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIiwKICAgICAgICAicmVzb3VyY2VJZCI6ICJiaW9tYXNzIiwKICAgICAgICAicmVtYWluaW5nR3JhbXMiOiAxNTAwMAogICAgICB9CiAgICB9LAogICAgInN0b3JlcyI6IHsKICAgICAgInNjb3V0OnN0b3JhZ2UiOiB7CiAgICAgICAgInNoaXBJZCI6ICJzaGlwOnNjb3V0IiwKICAgICAgICAiY2FwYWNpdHlHcmFtcyI6IDUwMDAwLAogICAgICAgICJpZCI6ICJzY291dDpzdG9yYWdlIiwKICAgICAgICAicXVhbnRpdGllcyI6IHt9CiAgICAgIH0KICAgIH0sCiAgICAibG9jYXRpb24iOiB7CiAgICAgICJhbmNob3IiOiB7CiAgICAgICAgImZyYW1lIjogInBsYW5ldDpmaXh0dXJlIiwKICAgICAgICAicG9pbnQiOiB7CiAgICAgICAgICAiY2VsbCI6IFsKICAgICAgICAgICAgIjAiLAogICAgICAgICAgICAiMCIsCiAgICAgICAgICAgICIwIgogICAgICAgICAgXSwKICAgICAgICAgICJvZmZzZXRNIjogWwogICAgICAgICAgICAtNiwKICAgICAgICAgICAgMywKICAgICAgICAgICAgMAogICAgICAgICAgXQogICAgICAgIH0KICAgICAgfSwKICAgICAgImZhY2luZyI6IDAKICAgIH0KICB9LAogICJmaW5hbCI6IHsKICAgICJ2ZXJzaW9uIjogNywKICAgICJoYXphcmRzIjogewogICAgICAidmVyc2lvbiI6IDEsCiAgICAgICJleHBvc3VyZSI6IHsKICAgICAgICAicmFkaWF0aW9uIjogIjkzLzEiLAogICAgICAgICJwb2lzb24iOiAiMjQxNy80ODAiCiAgICAgIH0sCiAgICAgICJtb2R1bGVzIjogWwogICAgICAgIHsKICAgICAgICAgICJpZCI6ICJmaXh0dXJlLXJhZGlhdGlvbi1tb2R1bGUiLAogICAgICAgICAgInR5cGUiOiAicmFkaWF0aW9uIiwKICAgICAgICAgICJwcm90ZWN0aW9uIjogMiwKICAgICAgICAgICJyZW1haW5pbmciOiAiMjUxODMvMzAiCiAgICAgICAgfQogICAgICBdCiAgICB9LAogICAgInN1cnZpdmFsIjogewogICAgICAiaHVuZ2VyIjogMzcxMjA2OCwKICAgICAgImZhdGlndWUiOiAzODgzMzIwLAogICAgICAiaGVhbHRoIjogMTg4LjYwMzMzMzMzMzMzMzMyLAogICAgICAiYWN0aXZlVGlja3MiOiA0ODg3LAogICAgICAic3RhcnZhdGlvblRpY2tzIjogMCwKICAgICAgInJlY292ZXJ5VGlja3MiOiAxMjg3LAogICAgICAib2ZmbGluZUF0TXMiOiAxNzkzNzUwNDg1NTAzLAogICAgICAiaGVhbHRoRXhhY3QiOiAiNTY1ODEvMzAwIgogICAgfSwKICAgICJpdGVtRGVmaW5pdGlvbnMiOiB7fSwKICAgICJjYXRhbG9nVmVyc2lvbiI6ICJsYW5kaW5nLXJlc291cmNlczp2MiIsCiAgICAic2l0ZUlkIjogInNpdGU6aWxsdXN0cmF0ZWQtbGFuZGluZzp2MSIsCiAgICAicmV2aXNpb24iOiA0ODgwLAogICAgImludmVudG9yeSI6IHsKICAgICAgImNhcGFjaXR5R3JhbXMiOiAxMDAwMCwKICAgICAgImNhcGFjaXR5U2xvdHMiOiAxMiwKICAgICAgInF1YW50aXRpZXMiOiB7fSwKICAgICAgIml0ZW1zIjoge30KICAgIH0sCiAgICAic291cmNlcyI6IHsKICAgICAgInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiOiB7CiAgICAgICAgImlkIjogInNvdXJjZTpsYW5kaW5nOm1pbmVyYWw6MDEiLAogICAgICAgICJyZXNvdXJjZUlkIjogIm1pbmVyYWwiLAogICAgICAgICJyZW1haW5pbmdHcmFtcyI6IDYwMDAwCiAgICAgIH0sCiAgICAgICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIjogewogICAgICAgICJpZCI6ICJzb3VyY2U6bGFuZGluZzpiaW9sb2d5OjAxIiwKICAgICAgICAicmVzb3VyY2VJZCI6ICJiaW9tYXNzIiwKICAgICAgICAicmVtYWluaW5nR3JhbXMiOiAxNTAwMAogICAgICB9CiAgICB9LAogICAgInN0b3JlcyI6IHsKICAgICAgInNjb3V0OnN0b3JhZ2UiOiB7CiAgICAgICAgInNoaXBJZCI6ICJzaGlwOnNjb3V0IiwKICAgICAgICAiY2FwYWNpdHlHcmFtcyI6IDUwMDAwLAogICAgICAgICJpZCI6ICJzY291dDpzdG9yYWdlIiwKICAgICAgICAicXVhbnRpdGllcyI6IHt9CiAgICAgIH0KICAgIH0sCiAgICAibG9jYXRpb24iOiB7CiAgICAgICJhbmNob3IiOiB7CiAgICAgICAgImZyYW1lIjogInBsYW5ldDpmaXh0dXJlIiwKICAgICAgICAicG9pbnQiOiB7CiAgICAgICAgICAiY2VsbCI6IFsKICAgICAgICAgICAgIjAiLAogICAgICAgICAgICAiMCIsCiAgICAgICAgICAgICIwIgogICAgICAgICAgXSwKICAgICAgICAgICJvZmZzZXRNIjogWwogICAgICAgICAgICAtNiwKICAgICAgICAgICAgMywKICAgICAgICAgICAgMAogICAgICAgICAgXQogICAgICAgIH0KICAgICAgfSwKICAgICAgImZhY2luZyI6IDAKICAgIH0KICB9LAogICJpbnB1dCI6ICJQbGF5d3JpZ2h0IHN5bnRoZXRpYyBidXR0b25zIGFuZCBjb250cm9sbGVkIGNsb2NrOyBzZXBhcmF0ZWx5IGJ1aWx0IHRlc3Qtb25seSBzb3VyY2VzL21vZHVsZXMiCn0="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/hazards-HAZ-1\u20135-built-non--7fe28-ery-pause-and-write-failure-cockpit/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a479af62a44191a1eaa7-e14603b501993605ab33",
+          "file": "hazards.spec.ts",
+          "line": 6,
+          "column": 1
+        },
+        {
+          "title": "normal built game exposes no hazard fixture, source sampling or module grants",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 821,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T05:43:44.852Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/hazards-normal-built-game--db121-e-sampling-or-module-grants-cockpit/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a479af62a44191a1eaa7-69f55083baf980f80358",
+          "file": "hazards.spec.ts",
+          "line": 55,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-06T05:43:13.718Z",
+    "duration": 32029.183,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

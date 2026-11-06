@@ -9,6 +9,7 @@ represent the full default `/` gameplay entry.
 
 ## View and illustration
 
+- **Universal ship-up rule:** the active spaceship is always vertical in the 2D view, bow pointing to the top of the screen, indoors and outdoors. Rotate the scene basis consistently; preserve physical headings, world anchors and collision geometry. W/A/S/D follows screen directions.
 - **Strict overhead top-down**, not isometric or three-quarter. Ground positions, collision footprints, collection ranges and rendering alignment must refer to the same top-down world space.
 - **Stylized illustrated 2D** sprites and environmental layers, with strong silhouettes, controlled textures, readable materials and restrained highlights/shadows. No pixel-art requirement or mandatory decorative 3D meshes.
 - Avoid visual clutter and decorative geometry that hides important objects or changes gameplay collision. Ensure legibility at normal gameplay zoom.
@@ -28,3 +29,12 @@ represent the full default `/` gameplay entry.
 - Share instrument typography, functional accent colors, visual warning language, restrained animation and material sensibility between navigation and 2D exploration. The navigation heading/velocity rays and scanner rules remain unchanged.
 
 The former 3D low-poly art bible and first-person interior/environment camera contracts are legacy implementation references. Their mood, narrative and world-identity decisions remain useful, but incompatible camera, mesh and fragment-specific presentation rules are superseded.
+
+## World viewport
+
+The playable 2D world fills the available browser viewport. Survival, inventory,
+interaction/status feedback and key hints sit on translucent HUD panels over the
+scene; decorative titles, borders and footer bars must not reserve world space.
+Preserve overhead proportions by expanding the visible world to the window's
+aspect ratio, with the followed character clear of the HUD. See the
+[viewport/input contract and verification](playable-2d-foundation.md#viewport-and-hud-803).

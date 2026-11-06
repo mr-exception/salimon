@@ -1,0 +1,165 @@
+[WebServer] (node:6367) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:6399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6437) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6469) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:6481) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.5s)
+  ✘  2 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison (956ms)
+(node:6658) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison (1.4s)
+(node:6819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [cockpit] › tests/viewport.spec.ts:135:1 › VIEWPORT DPR 2 and standalone development fixture preserve projection (2.0s)
+(node:6946) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (11.7s)
+
+
+  1) [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: -0
+
+      39 |     return { dx: m.c * -1, dy: m.d * -1 }
+      40 |   })
+    > 41 |   expect(bow.dx).toBe(0); expect(bow.dy).toBeLessThan(0)
+         |                  ^
+      42 |   expect(result.scroll).toEqual({ width, height })
+      43 |   // SVG viewBox.baseVal is float32. Measure coverage on the device-pixel grid;
+      44 |   // retain the unrounded projection in layout.json for numerical inspection.
+        at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:41:18)
+        at /workspace/salimon/client/tests/viewport.spec.ts:76:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/803-ship-up-final/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/803-ship-up-final/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: -0
+
+      39 |     return { dx: m.c * -1, dy: m.d * -1 }
+      40 |   })
+    > 41 |   expect(Math.abs(bow.dx)).toBe(0); expect(bow.dy).toBeLessThan(0)
+         |                  ^
+      42 |   expect(result.scroll).toEqual({ width, height })
+      43 |   // SVG viewBox.baseVal is float32. Measure coverage on the device-pixel grid;
+      44 |   // retain the unrounded projection in layout.json for numerical inspection.
+        at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:41:18)
+        at /workspace/salimon/client/tests/viewport.spec.ts:76:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/803-ship-up-final/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/803-ship-up-final/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [cockpit] › tests/viewport.spec.ts:135:1 › VIEWPORT DPR 2 and standalone development fixture preserve projection 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: -0
+
+      39 |     return { dx: m.c * -1, dy: m.d * -1 }
+      40 |   })
+    > 41 |   expect(Math.abs(bow.dx)).toBe(0); expect(bow.dy).toBeLessThan(0)
+         |                  ^
+      42 |   expect(result.scroll).toEqual({ width, height })
+      43 |   // SVG viewBox.baseVal is float32. Measure coverage on the device-pixel grid;
+      44 |   // retain the unrounded projection in layout.json for numerical inspection.
+        at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:41:18)
+        at /workspace/salimon/client/tests/viewport.spec.ts:139:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/viewport-VIEWPORT-DPR-2-an-32fd0-fixture-preserve-projection-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/803-ship-up-final/viewport-VIEWPORT-DPR-2-an-32fd0-fixture-preserve-projection-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/viewport-VIEWPORT-DPR-2-an-32fd0-fixture-preserve-projection-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/803-ship-up-final/viewport-VIEWPORT-DPR-2-an-32fd0-fixture-preserve-projection-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 3
+    Received:   9.371422566732825
+
+      306 |           const screenAnchor = () => page.locator('[data-entity="person:player"]').evaluate(el => {
+      307 |             const m = (el as unknown as SVGGraphicsElement).getScreenCTM()!
+    > 308 |             return { x: m.e, y: m.f }
+          |                                      ^
+      309 |           })
+      310 |           const oldScreen = await screenAnchor()
+      311 |           await walkTicks(page, key, 1)
+        at sampleCrossing (/workspace/salimon/client/tests/top-down.spec.ts:308:72)
+        at /workspace/salimon/client/tests/top-down.spec.ts:326:7
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/803-ship-up-final/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/803-ship-up-final/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/803-ship-up-final/top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison 
+    [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison 
+    [cockpit] › tests/viewport.spec.ts:135:1 › VIEWPORT DPR 2 and standalone development fixture preserve projection 
+    [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world 
+  1 passed (30.6s)

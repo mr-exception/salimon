@@ -1,0 +1,7 @@
+{
+  "client/src/TopDownView.tsx": "7b6e04ba174d3c6b58481ddb8bb0b01ff56e47f028e68ff8881d936b55a18fc7",
+  "client/src/topDown.css": "d63225fe6e9ad706f81185210c1571223da63b906035e97503cb0c6e48bedca3",
+  "client/tests/viewport.spec.ts": "4614375a1b89ad4d95afd221892d70a851ea84e45f874fca6c1fbe0ebf813520",
+  "client/playwright.config.ts": "33a06bf474f84d19c18a959c1faa7d6c586a9726222e6d39073749b62d25f823",
+  "client/package-lock.json": "4bc1b14d943722363dee6252b68d0224342e0a08f69489a862f5afd16c90f029"
+}

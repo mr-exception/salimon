@@ -1,0 +1,31 @@
+[WebServer] (node:7127) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7140) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:7159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7172) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7197) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:7241) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.5s)
+  ✓  2 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison (3.8s)
+  ✓  3 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison (3.2s)
+  ✓  4 [cockpit] › tests/viewport.spec.ts:135:1 › VIEWPORT DPR 2 and standalone development fixture preserve projection (1.7s)
+(node:7584) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.0m)
+
+  5 passed (1.4m)

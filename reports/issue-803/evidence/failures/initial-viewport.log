@@ -1,0 +1,113 @@
+[WebServer] (node:1316) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1348) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1386) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:1430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/viewport.spec.ts:47:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison (3.0s)
+(node:1589) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [cockpit] › tests/viewport.spec.ts:47:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison (2.6s)
+(node:1757) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [cockpit] › tests/viewport.spec.ts:101:1 › VIEWPORT DPR 2 and standalone development fixture preserve projection (1.6s)
+
+
+  1) [cockpit] › tests/viewport.spec.ts:47:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison 
+
+    Error: expect(received).toBeCloseTo(expected, precision)
+
+    Expected: 680
+    Received: 679.9999949137369
+
+    Expected precision:    5
+    Expected difference: < 0.000005
+    Received difference:   0.000005086263058728946
+
+      26 |   for (const key of ['x', 'y'] as const) expect(result.projection[key]).toBeCloseTo(0, 5)
+      27 |   expect(result.projection.width).toBeCloseTo(width, 5)
+    > 28 |   expect(result.projection.height).toBeCloseTo(height, 5)
+         |                                    ^
+      29 |   expect(result.projection.scaleX).toBeCloseTo(result.projection.scaleY, 8)
+      30 |   for (const box of result.hud) {
+      31 |     expect(box.x).toBeGreaterThanOrEqual(0); expect(box.y).toBeGreaterThanOrEqual(0)
+        at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:28:36)
+        at /workspace/salimon/client/tests/viewport.spec.ts:90:24
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/viewport.spec.ts:47:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison 
+
+    Error: expect(received).toBeCloseTo(expected, precision)
+
+    Expected: 0
+    Received: 6
+
+    Expected precision:    5
+    Expected difference: < 0.000005
+    Received difference:   6
+
+      24 |   expect(result.stage).toEqual(result.world)
+      25 |   expect(result.scroll).toEqual({ width, height })
+    > 26 |   for (const key of ['x', 'y'] as const) expect(result.projection[key]).toBeCloseTo(0, 5)
+         |                                                                         ^
+      27 |   expect(result.projection.width).toBeCloseTo(width, 5)
+      28 |   expect(result.projection.height).toBeCloseTo(height, 5)
+      29 |   expect(result.projection.scaleX).toBeCloseTo(result.projection.scaleY, 8)
+        at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:26:73)
+        at /workspace/salimon/client/tests/viewport.spec.ts:90:24
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [cockpit] › tests/viewport.spec.ts:47:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison 
+    [cockpit] › tests/viewport.spec.ts:47:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison 
+  1 passed (14.0s)

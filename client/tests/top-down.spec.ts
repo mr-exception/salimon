@@ -66,7 +66,7 @@ async function walkTo(page: Page, target: number[], frame?: FrameId, exactTicks 
   for (let i = 0; i < 140; i++) {
     const p = await positionIn(page, frame), dx = target[0] - p[0], dy = target[1] - p[1]
     if (Math.hypot(dx, dy) < .075) return
-    const angle = frame === 'ship:scout' ? -.12 : 0, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
+    const angle = frame === 'ship:scout' ? 0 : -createTopDownState().frames.ship.angle, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
     const keys = [...(Math.abs(x) > .035 ? [x > 0 ? 'd' : 'a'] : []), ...(Math.abs(y) > .035 ? [y > 0 ? 's' : 'w'] : [])]
     if (exactTicks) await walkTicks(page, keys, Math.max(1, Math.min(3, Math.floor(Math.hypot(dx, dy) / .04))))
     else await walk(page, keys, Math.max(17, Math.min(65, Math.hypot(dx, dy) / 2.4 * 1000)))
@@ -301,12 +301,20 @@ test('TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and 
         for (let i = 0; i < 14; i++) {
           const before = await positionIn(page, 'planet:fixture'), previous = await frame()
           const oldBox = (await page.locator('[data-entity="person:player"]').boundingBox())!
+          // Sprite bounds change when facing turns. Measure the actual world
+          // anchor to detect camera jumps independently of illustration shape.
+          const screenAnchor = () => page.locator('[data-entity="person:player"]').evaluate(el => {
+            const m = (el as unknown as SVGGraphicsElement).getScreenCTM()!
+            return { x: m.e, y: m.f }
+          })
+          const oldScreen = await screenAnchor()
           await walkTicks(page, key, 1)
           const after = await positionIn(page, 'planet:fixture'), current = await frame()
           const newBox = (await page.locator('[data-entity="person:player"]').boundingBox())!
           expect(Math.hypot(after[0] - before[0], after[1] - before[1])).toBeCloseTo(.04, 7)
-          expect(Math.hypot(newBox.x - oldBox.x, newBox.y - oldBox.y)).toBeLessThan(3)
-          samples.push({ before, after, previous, current, oldBox, newBox })
+          const newScreen = await screenAnchor()
+          expect(Math.hypot(newScreen.x - oldScreen.x, newScreen.y - oldScreen.y)).toBeLessThan(3)
+          samples.push({ before, after, previous, current, oldBox, newBox, oldScreen, newScreen })
         }
         expect(await frame()).toBe(expected)
         expect(samples.filter(s => s.previous !== s.current)).toHaveLength(1)

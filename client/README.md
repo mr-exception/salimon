@@ -401,3 +401,19 @@ and 1,000 HP protection budgets without shipping hazard sources or equipment. Se
 [domain, save and fixture contracts](../docs/browser-hazards.md). `npm run test:browser`
 builds a separate non-shipping hazard fixture on port 4275; ordinary `npm run build`
 includes only the normal game. Unit/integration coverage lives in `src/hazards.test.ts`.
+
+## Full-viewport 2D HUD (#803)
+
+The world fills the browser viewport, with survival top left, inventory/save
+status top right and nearby actions/key hints bottom left. Panels scroll their
+own overflowing content; the page stays fixed. Resize expands the SVG view
+without distorting world proportions. `tests/viewport.spec.ts` belongs to the
+cockpit project and verifies the built `/` at 1280×720/960×600, repeat/negative
+screenshots, DPR 2, focus, resize and the standalone dev fixture. See the
+[layout contract](../docs/playable-2d-foundation.md#viewport-and-hud-803).
+
+The 2D camera universally keeps the active ship vertical with its bow screen-up.
+All scene positions/facings and selection cues share that basis; W/A/S/D is
+screen-relative through the inverse input transform. Physical ship headings,
+anchors and saves are unchanged. Unit coverage tests arbitrary headings and
+indoor/outdoor ownership; viewport coverage asserts the rendered bow is vertical.

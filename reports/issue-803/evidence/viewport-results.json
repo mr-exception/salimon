@@ -1,0 +1,479 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=cockpit",
+      "viewport.spec.ts"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice|gathering|storage|items|survival|hazards|viewport)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/navigation-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": true,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text",
+              "--disable-gpu"
+            ],
+            "env": {
+              "REMOTE_DESKTOP_H265_ENABLED": "0",
+              "CODEX_EXEC_SERVER_PROXY_PRIVATE_IPS_VIA_UPSTREAM": "true",
+              "GRPC_DEFAULT_SSL_ROOTS_FILE_PATH": "/etc/ssl/certs/ca-certificates.crt",
+              "HTTPS_PROXY": "http://proxy:8080",
+              "CODEX_CI": "1",
+              "no_proxy": "localhost,127.0.0.1,::1",
+              "CODEX_EXEC_SERVER_REMOTE_BASE_URL": "https://codex-cloud-environments.chatgpt.com/api",
+              "NODE_EXTRA_CA_CERTS": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "CODEX_HOME": "/home/agent/.codex",
+              "USER": "agent",
+              "npm_config_user_agent": "npm/11.9.0 node/v24.19.0 linux x64 workspaces/false",
+              "SALIMON_EVIDENCE_DIR": "test-results/803-viewport-final",
+              "GH_TOKEN": "ghu_codex-cloud-github-proxy",
+              "npm_node_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "SHLVL": "1",
+              "npm_config_noproxy": "",
+              "HOME": "/home/agent",
+              "CODEX_CAAS_SESSION_ID": "bcd844fb93f24c33ad101824f99ba49e",
+              "CODEX_PRIMARY_RUNTIME_NODE_MODULES": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "NO_PROXY": "localhost,127.0.0.1,::1",
+              "npm_package_json": "/workspace/salimon/client/package.json",
+              "NETWORK": "caas_neko_desktop",
+              "npm_package_engines_node": ">=22.18",
+              "OPENAI_CLUSTER": "applied-caas57",
+              "PAGER": "cat",
+              "LC_CTYPE": "C.UTF-8",
+              "SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_userconfig": "/home/agent/.npmrc",
+              "npm_config_local_prefix": "/workspace/salimon/client",
+              "CODEX_PRIMARY_RUNTIME_BUNDLE_VERSION": "26.1013.11914",
+              "NO_COLOR": "1",
+              "COLORTERM": "",
+              "COLOR": "0",
+              "CHROMIUM_PATH": "/usr/bin/chromium",
+              "CODEX_PROXY_CERT": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "https_proxy": "http://proxy:8080",
+              "CODEX_ENVIRONMENT_ID": "ccarenv_b64_Y2NhcmVudl9hNDU4ZmMzMDdmMzQ4MTkxODNhZGE4YzUxNGZlOTUxZg",
+              "CODEX_TOOL_CALL_ID": "exec-1ea650ee-1c6e-450f-a7f3-c013a3361c69",
+              "http_proxy": "http://proxy:8080",
+              "_": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/npx",
+              "npm_config_npm_version": "11.9.0",
+              "CODEX_APPLY_PATCH_PRESERVE_LINE_ENDINGS": "1",
+              "RUST_LOG": "codex_exec_server=info,codex_cli=info,error",
+              "CODEX_NO_UPDATE": "1",
+              "TERM": "dumb",
+              "npm_config_cache": "/home/agent/.npm",
+              "CLOUDSDK_CORE_CUSTOM_CA_CERTS_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_node_gyp": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js",
+              "PATH": "/workspace/salimon/client/node_modules/.bin:/workspace/salimon/client/node_modules/.bin:/workspace/salimon/node_modules/.bin:/workspace/node_modules/.bin:/node_modules/.bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+              "CODEX_VERSION": "0.0.0",
+              "CODEX_SESSION_ID": "01a1b021-14bf-7706-ac61-93157f9a006d",
+              "REQUESTS_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt",
+              "NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "npm_package_name": "salimon-navigation-client",
+              "CODEX_SANDBOX_NETWORK_DISABLED": "1",
+              "LANG": "C.UTF-8",
+              "GH_PAGER": "cat",
+              "npm_lifecycle_script": "\"playwright\"",
+              "BROWSER_MANAGEMENT_SOCKET_PATH": "/home/agent/.local/run/browser-management/socket",
+              "DEBIAN_FRONTEND": "noninteractive",
+              "SHELL": "/bin/bash",
+              "NODE_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "npm_package_version": "0.1.0",
+              "npm_lifecycle_event": "npx",
+              "CODEX_PRIMARY_RUNTIME_ROOT": "/opt/codex/runtimes/codex-primary-runtime",
+              "CAAS_IMAGE_GIT_COMMIT_SHA": "969fca457cb91df54eb491d22bcaff20654139fe",
+              "NPM_CONFIG_AUDIT": "false",
+              "DOCKER_TLS_CERTDIR": "",
+              "CAAS_IMAGE_VERSION": "20261019221748-969fca457cb9",
+              "CODEX_PRIMARY_RUNTIME_PYTHON": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "CODEX_THREAD_ID": "01a1b021-14bf-7706-ac61-93157f9a006d",
+              "CAAS_DIND_STORAGE_DRIVER": "vfs",
+              "GIT_PAGER": "cat",
+              "npm_config_globalconfig": "/home/agent/.local/etc/npmrc",
+              "npm_config_init_module": "/home/agent/.npm-init.js",
+              "PWD": "/workspace/salimon/client",
+              "NPM_CONFIG_FUND": "false",
+              "LC_ALL": "C.UTF-8",
+              "npm_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/bin/npm-cli.js",
+              "CODEX_BROWSER_DEFER_ACTIVATION": "1",
+              "npm_config_global_prefix": "/home/agent/.local",
+              "HTTP_PROXY": "http://proxy:8080",
+              "npm_command": "exec",
+              "CODEX_PRIMARY_RUNTIME_NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "PLAYWRIGHT_NODEJS_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "NPM_CONFIG_PREFIX": "/home/agent/.local",
+              "CODEX_PRIMARY_RUNTIME": "/opt/codex/runtimes/codex-primary-runtime",
+              "DOCKER_IGNORE_BR_NETFILTER_ERROR": "1",
+              "INIT_CWD": "/workspace/salimon/client",
+              "EDITOR": "vi",
+              "FONTCONFIG_FILE": "/workspace/salimon/client/tests/assets/fonts.conf"
+            }
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "cockpit"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/803-viewport-final/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "viewport.spec.ts",
+      "file": "viewport.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "VIEWPORT production 1280x720 HUD, input, repeat and negative comparison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4045,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T09:20:31.056Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "negative.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjpmYWxzZSwiY2hhbmdlZFBpeGVscyI6MTI2OTMxLCJyYXdDaGFuZ2VkUGl4ZWxzIjoyNTMzMDEsInBvbGljeSI6eyJ0aHJlc2hvbGQiOjAuMSwibWF4RGlmZlBpeGVscyI6MCwiaW5jbHVkZUFBIjp0cnVlLCJtYXNrcyI6W119fQ=="
+                    },
+                    {
+                      "name": "fresh-repeat.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjp0cnVlLCJjaGFuZ2VkUGl4ZWxzIjowLCJyYXdDaGFuZ2VkUGl4ZWxzIjozOSwidG90YWxQaXhlbHMiOjkyMTYwMCwicG9saWN5Ijp7InRocmVzaG9sZCI6MC4xLCJtYXhEaWZmUGl4ZWxzIjowLCJpbmNsdWRlQUEiOnRydWUsIm1hc2tzIjpbXX19"
+                    },
+                    {
+                      "name": "repeat.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjp0cnVlLCJjaGFuZ2VkUGl4ZWxzIjowLCJyYXdDaGFuZ2VkUGl4ZWxzIjowLCJ0b3RhbFBpeGVscyI6OTIxNjAwLCJwb2xpY3kiOnsidGhyZXNob2xkIjowLjEsIm1heERpZmZQaXhlbHMiOjAsImluY2x1ZGVBQSI6dHJ1ZSwibWFza3MiOltdfX0="
+                    },
+                    {
+                      "name": "layout.json",
+                      "contentType": "application/json",
+                      "body": "ewogICJyZWNvcmRzIjogWwogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJkcHIiOiAxLAogICAgICAic2Nyb2xsIjogewogICAgICAgICJ3aWR0aCI6IDEyODAsCiAgICAgICAgImhlaWdodCI6IDcyMAogICAgICB9LAogICAgICAid29ybGQiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxMjgwLAogICAgICAgICJoZWlnaHQiOiA3MjAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJodWQiOiBbCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAxOTAsCiAgICAgICAgICAiaGVpZ2h0IjogMTkwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEwNTgsCiAgICAgICAgICAieSI6IDEyLAogICAgICAgICAgIndpZHRoIjogMjEwLAogICAgICAgICAgImhlaWdodCI6IDI4NAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogNTkzLjUsCiAgICAgICAgICAid2lkdGgiOiA2NTAsCiAgICAgICAgICAiaGVpZ2h0IjogMTE0LjUKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJwcm9qZWN0aW9uIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwLAogICAgICAgICJzY2FsZVgiOiAxLjA2NjY2NjY2NjY2NjY2NjcsCiAgICAgICAgInNjYWxlWSI6IDEuMDY2NjY2NjY2NjY2NjY2NwogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJkcHIiOiAxLAogICAgICAic2Nyb2xsIjogewogICAgICAgICJ3aWR0aCI6IDEyODAsCiAgICAgICAgImhlaWdodCI6IDcyMAogICAgICB9LAogICAgICAid29ybGQiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxMjgwLAogICAgICAgICJoZWlnaHQiOiA3MjAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJodWQiOiBbCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAxOTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjMyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEwNTgsCiAgICAgICAgICAieSI6IDEyLAogICAgICAgICAgIndpZHRoIjogMjEwLAogICAgICAgICAgImhlaWdodCI6IDI4NAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogNTkzLjUsCiAgICAgICAgICAid2lkdGgiOiA2NTAsCiAgICAgICAgICAiaGVpZ2h0IjogMTE0LjUKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJwcm9qZWN0aW9uIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwLAogICAgICAgICJzY2FsZVgiOiAxLjA2NjY2NjY2NjY2NjY2NjcsCiAgICAgICAgInNjYWxlWSI6IDEuMDY2NjY2NjY2NjY2NjY2NwogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJkcHIiOiAxLAogICAgICAic2Nyb2xsIjogewogICAgICAgICJ3aWR0aCI6IDEyODAsCiAgICAgICAgImhlaWdodCI6IDcyMAogICAgICB9LAogICAgICAid29ybGQiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxMjgwLAogICAgICAgICJoZWlnaHQiOiA3MjAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJodWQiOiBbCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAxOTAsCiAgICAgICAgICAiaGVpZ2h0IjogMTkwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEwNTgsCiAgICAgICAgICAieSI6IDEyLAogICAgICAgICAgIndpZHRoIjogMjEwLAogICAgICAgICAgImhlaWdodCI6IDI4NAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogNTkzLjUsCiAgICAgICAgICAid2lkdGgiOiA2NTAsCiAgICAgICAgICAiaGVpZ2h0IjogMTE0LjUKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJwcm9qZWN0aW9uIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwLAogICAgICAgICJzY2FsZVgiOiAxLjA2NjY2NjY2NjY2NjY2NjcsCiAgICAgICAgInNjYWxlWSI6IDEuMDY2NjY2NjY2NjY2NjY2NwogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJkcHIiOiAxLAogICAgICAic2Nyb2xsIjogewogICAgICAgICJ3aWR0aCI6IDEyODAsCiAgICAgICAgImhlaWdodCI6IDcyMAogICAgICB9LAogICAgICAid29ybGQiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxMjgwLAogICAgICAgICJoZWlnaHQiOiA3MjAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwCiAgICAgIH0sCiAgICAgICJodWQiOiBbCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAxOTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjMyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEwNTgsCiAgICAgICAgICAieSI6IDEyLAogICAgICAgICAgIndpZHRoIjogMjEwLAogICAgICAgICAgImhlaWdodCI6IDI4NAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogNTkzLjUsCiAgICAgICAgICAid2lkdGgiOiA2NTAsCiAgICAgICAgICAiaGVpZ2h0IjogMTE0LjUKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJwcm9qZWN0aW9uIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTI4MCwKICAgICAgICAiaGVpZ2h0IjogNzIwLAogICAgICAgICJzY2FsZVgiOiAxLjA2NjY2NjY2NjY2NjY2NjcsCiAgICAgICAgInNjYWxlWSI6IDEuMDY2NjY2NjY2NjY2NjY2NwogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogMTEwMCwKICAgICAgICAiaGVpZ2h0IjogNjgwCiAgICAgIH0sCiAgICAgICJkcHIiOiAxLAogICAgICAic2Nyb2xsIjogewogICAgICAgICJ3aWR0aCI6IDExMDAsCiAgICAgICAgImhlaWdodCI6IDY4MAogICAgICB9LAogICAgICAid29ybGQiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxMTAwLAogICAgICAgICJoZWlnaHQiOiA2ODAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTEwMCwKICAgICAgICAiaGVpZ2h0IjogNjgwCiAgICAgIH0sCiAgICAgICJodWQiOiBbCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAxOTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjMyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDg3OCwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAyMTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjg0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiA1NTMuNSwKICAgICAgICAgICJ3aWR0aCI6IDY1MCwKICAgICAgICAgICJoZWlnaHQiOiAxMTQuNQogICAgICAgIH0KICAgICAgXSwKICAgICAgInByb2plY3Rpb24iOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMC4wMDAwMDI1NDMxMzE1MjkzNjQ0NzMsCiAgICAgICAgIndpZHRoIjogMTEwMCwKICAgICAgICAiaGVpZ2h0IjogNjc5Ljk5OTk5NDkxMzczNjksCiAgICAgICAgInNjYWxlWCI6IDAuOTE2NjY2NjY2NjY2NjY2NiwKICAgICAgICAic2NhbGVZIjogMC45MTY2NjY2NjY2NjY2NjY2CiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJ2aWV3cG9ydCI6IHsKICAgICAgICAid2lkdGgiOiAxNjAwLAogICAgICAgICJoZWlnaHQiOiA3MDAKICAgICAgfSwKICAgICAgImRwciI6IDEsCiAgICAgICJzY3JvbGwiOiB7CiAgICAgICAgIndpZHRoIjogMTYwMCwKICAgICAgICAiaGVpZ2h0IjogNzAwCiAgICAgIH0sCiAgICAgICJ3b3JsZCI6IHsKICAgICAgICAieCI6IDAsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ3aWR0aCI6IDE2MDAsCiAgICAgICAgImhlaWdodCI6IDcwMAogICAgICB9LAogICAgICAic3RhZ2UiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxNjAwLAogICAgICAgICJoZWlnaHQiOiA3MDAKICAgICAgfSwKICAgICAgImh1ZCI6IFsKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDE5MCwKICAgICAgICAgICJoZWlnaHQiOiAyMzIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogMTM3OCwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAyMTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjg0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiA1NzMuNSwKICAgICAgICAgICJ3aWR0aCI6IDY1MCwKICAgICAgICAgICJoZWlnaHQiOiAxMTQuNQogICAgICAgIH0KICAgICAgXSwKICAgICAgInByb2plY3Rpb24iOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMC4wMDAwMDgzNDQ2NTAwNDExODEwMTIsCiAgICAgICAgIndpZHRoIjogMTYwMCwKICAgICAgICAiaGVpZ2h0IjogNjk5Ljk5OTk4MzMxMDY5OTksCiAgICAgICAgInNjYWxlWCI6IDEuMDkzNzQ5OTczOTIyOTY4NiwKICAgICAgICAic2NhbGVZIjogMS4wOTM3NDk5NzM5MjI5Njg2CiAgICAgIH0KICAgIH0KICBdLAogICJyZW5kZXJlciI6ICJDaHJvbWl1bSBTVkcgQ1BVIHJhc3Rlcml6YXRpb24iLAogICJpbnB1dCI6ICJQbGF5d3JpZ2h0IGtleWJvYXJkL21vdXNlIiwKICAiYmFzZWxpbmUiOiAic2FtZS1ydW4gcmVwZWF0czsgYXBwcm92ZWQgbmF2aWdhdGlvbiByZWZlcmVuY2VzIHVuY2hhbmdlZCIKfQ=="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport-final/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-finished-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport-final/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-finished-2.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-f53b1582bda57c955063",
+          "file": "viewport.spec.ts",
+          "line": 56,
+          "column": 3
+        },
+        {
+          "title": "VIEWPORT production 960x600 HUD, input, repeat and negative comparison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3208,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T09:20:35.345Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "negative.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjpmYWxzZSwiY2hhbmdlZFBpeGVscyI6ODkzOTEsInJhd0NoYW5nZWRQaXhlbHMiOjE3OTU1OSwicG9saWN5Ijp7InRocmVzaG9sZCI6MC4xLCJtYXhEaWZmUGl4ZWxzIjowLCJpbmNsdWRlQUEiOnRydWUsIm1hc2tzIjpbXX19"
+                    },
+                    {
+                      "name": "fresh-repeat.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjp0cnVlLCJjaGFuZ2VkUGl4ZWxzIjowLCJyYXdDaGFuZ2VkUGl4ZWxzIjowLCJ0b3RhbFBpeGVscyI6NTc2MDAwLCJwb2xpY3kiOnsidGhyZXNob2xkIjowLjEsIm1heERpZmZQaXhlbHMiOjAsImluY2x1ZGVBQSI6dHJ1ZSwibWFza3MiOltdfX0="
+                    },
+                    {
+                      "name": "repeat.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjp0cnVlLCJjaGFuZ2VkUGl4ZWxzIjowLCJyYXdDaGFuZ2VkUGl4ZWxzIjowLCJ0b3RhbFBpeGVscyI6NTc2MDAwLCJwb2xpY3kiOnsidGhyZXNob2xkIjowLjEsIm1heERpZmZQaXhlbHMiOjAsImluY2x1ZGVBQSI6dHJ1ZSwibWFza3MiOltdfX0="
+                    },
+                    {
+                      "name": "layout.json",
+                      "contentType": "application/json",
+                      "body": "ewogICJyZWNvcmRzIjogWwogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImRwciI6IDEsCiAgICAgICJzY3JvbGwiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgIndvcmxkIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImh1ZCI6IFsKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDE5MCwKICAgICAgICAgICJoZWlnaHQiOiAxOTAKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogNzM4LAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDIxMCwKICAgICAgICAgICJoZWlnaHQiOiAyODQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogMTIsCiAgICAgICAgICAieSI6IDQ3My41LAogICAgICAgICAgIndpZHRoIjogNjUwLAogICAgICAgICAgImhlaWdodCI6IDExNC41CiAgICAgICAgfQogICAgICBdLAogICAgICAicHJvamVjdGlvbiI6IHsKICAgICAgICAieCI6IDAsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ3aWR0aCI6IDk2MCwKICAgICAgICAiaGVpZ2h0IjogNjAwLAogICAgICAgICJzY2FsZVgiOiAwLjgsCiAgICAgICAgInNjYWxlWSI6IDAuOAogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImRwciI6IDEsCiAgICAgICJzY3JvbGwiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgIndvcmxkIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImh1ZCI6IFsKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDE5MCwKICAgICAgICAgICJoZWlnaHQiOiAyMzIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogNzM4LAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDIxMCwKICAgICAgICAgICJoZWlnaHQiOiAyODQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogMTIsCiAgICAgICAgICAieSI6IDQ3My41LAogICAgICAgICAgIndpZHRoIjogNjUwLAogICAgICAgICAgImhlaWdodCI6IDExNC41CiAgICAgICAgfQogICAgICBdLAogICAgICAicHJvamVjdGlvbiI6IHsKICAgICAgICAieCI6IDAsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ3aWR0aCI6IDk2MCwKICAgICAgICAiaGVpZ2h0IjogNjAwLAogICAgICAgICJzY2FsZVgiOiAwLjgsCiAgICAgICAgInNjYWxlWSI6IDAuOAogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImRwciI6IDEsCiAgICAgICJzY3JvbGwiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgIndvcmxkIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImh1ZCI6IFsKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDE5MCwKICAgICAgICAgICJoZWlnaHQiOiAxOTAKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogNzM4LAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDIxMCwKICAgICAgICAgICJoZWlnaHQiOiAyODQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogMTIsCiAgICAgICAgICAieSI6IDQ3My41LAogICAgICAgICAgIndpZHRoIjogNjUwLAogICAgICAgICAgImhlaWdodCI6IDExNC41CiAgICAgICAgfQogICAgICBdLAogICAgICAicHJvamVjdGlvbiI6IHsKICAgICAgICAieCI6IDAsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ3aWR0aCI6IDk2MCwKICAgICAgICAiaGVpZ2h0IjogNjAwLAogICAgICAgICJzY2FsZVgiOiAwLjgsCiAgICAgICAgInNjYWxlWSI6IDAuOAogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImRwciI6IDEsCiAgICAgICJzY3JvbGwiOiB7CiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgIndvcmxkIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogOTYwLAogICAgICAgICJoZWlnaHQiOiA2MDAKICAgICAgfSwKICAgICAgImh1ZCI6IFsKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDE5MCwKICAgICAgICAgICJoZWlnaHQiOiAyMzIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogNzM4LAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDIxMCwKICAgICAgICAgICJoZWlnaHQiOiAyODQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogMTIsCiAgICAgICAgICAieSI6IDQ3My41LAogICAgICAgICAgIndpZHRoIjogNjUwLAogICAgICAgICAgImhlaWdodCI6IDExNC41CiAgICAgICAgfQogICAgICBdLAogICAgICAicHJvamVjdGlvbiI6IHsKICAgICAgICAieCI6IDAsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ3aWR0aCI6IDk2MCwKICAgICAgICAiaGVpZ2h0IjogNjAwLAogICAgICAgICJzY2FsZVgiOiAwLjgsCiAgICAgICAgInNjYWxlWSI6IDAuOAogICAgICB9CiAgICB9LAogICAgewogICAgICAidmlld3BvcnQiOiB7CiAgICAgICAgIndpZHRoIjogMTEwMCwKICAgICAgICAiaGVpZ2h0IjogNjgwCiAgICAgIH0sCiAgICAgICJkcHIiOiAxLAogICAgICAic2Nyb2xsIjogewogICAgICAgICJ3aWR0aCI6IDExMDAsCiAgICAgICAgImhlaWdodCI6IDY4MAogICAgICB9LAogICAgICAid29ybGQiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxMTAwLAogICAgICAgICJoZWlnaHQiOiA2ODAKICAgICAgfSwKICAgICAgInN0YWdlIjogewogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogMTEwMCwKICAgICAgICAiaGVpZ2h0IjogNjgwCiAgICAgIH0sCiAgICAgICJodWQiOiBbCiAgICAgICAgewogICAgICAgICAgIngiOiAxMiwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAxOTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjMyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDg3OCwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAyMTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjg0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiA1NTMuNSwKICAgICAgICAgICJ3aWR0aCI6IDY1MCwKICAgICAgICAgICJoZWlnaHQiOiAxMTQuNQogICAgICAgIH0KICAgICAgXSwKICAgICAgInByb2plY3Rpb24iOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMC4wMDAwMDI1NDMxMzE1MjkzNjQ0NzMsCiAgICAgICAgIndpZHRoIjogMTEwMCwKICAgICAgICAiaGVpZ2h0IjogNjc5Ljk5OTk5NDkxMzczNjksCiAgICAgICAgInNjYWxlWCI6IDAuOTE2NjY2NjY2NjY2NjY2NiwKICAgICAgICAic2NhbGVZIjogMC45MTY2NjY2NjY2NjY2NjY2CiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJ2aWV3cG9ydCI6IHsKICAgICAgICAid2lkdGgiOiAxNjAwLAogICAgICAgICJoZWlnaHQiOiA3MDAKICAgICAgfSwKICAgICAgImRwciI6IDEsCiAgICAgICJzY3JvbGwiOiB7CiAgICAgICAgIndpZHRoIjogMTYwMCwKICAgICAgICAiaGVpZ2h0IjogNzAwCiAgICAgIH0sCiAgICAgICJ3b3JsZCI6IHsKICAgICAgICAieCI6IDAsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ3aWR0aCI6IDE2MDAsCiAgICAgICAgImhlaWdodCI6IDcwMAogICAgICB9LAogICAgICAic3RhZ2UiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiAxNjAwLAogICAgICAgICJoZWlnaHQiOiA3MDAKICAgICAgfSwKICAgICAgImh1ZCI6IFsKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiAxMiwKICAgICAgICAgICJ3aWR0aCI6IDE5MCwKICAgICAgICAgICJoZWlnaHQiOiAyMzIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJ4IjogMTM3OCwKICAgICAgICAgICJ5IjogMTIsCiAgICAgICAgICAid2lkdGgiOiAyMTAsCiAgICAgICAgICAiaGVpZ2h0IjogMjg0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAieCI6IDEyLAogICAgICAgICAgInkiOiA1NzMuNSwKICAgICAgICAgICJ3aWR0aCI6IDY1MCwKICAgICAgICAgICJoZWlnaHQiOiAxMTQuNQogICAgICAgIH0KICAgICAgXSwKICAgICAgInByb2plY3Rpb24iOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMC4wMDAwMDgzNDQ2NTAwNDExODEwMTIsCiAgICAgICAgIndpZHRoIjogMTYwMCwKICAgICAgICAiaGVpZ2h0IjogNjk5Ljk5OTk4MzMxMDY5OTksCiAgICAgICAgInNjYWxlWCI6IDEuMDkzNzQ5OTczOTIyOTY4NiwKICAgICAgICAic2NhbGVZIjogMS4wOTM3NDk5NzM5MjI5Njg2CiAgICAgIH0KICAgIH0KICBdLAogICJyZW5kZXJlciI6ICJDaHJvbWl1bSBTVkcgQ1BVIHJhc3Rlcml6YXRpb24iLAogICJpbnB1dCI6ICJQbGF5d3JpZ2h0IGtleWJvYXJkL21vdXNlIiwKICAiYmFzZWxpbmUiOiAic2FtZS1ydW4gcmVwZWF0czsgYXBwcm92ZWQgbmF2aWdhdGlvbiByZWZlcmVuY2VzIHVuY2hhbmdlZCIKfQ=="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport-final/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-finished-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport-final/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-finished-2.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-82b683f999d17e182382",
+          "file": "viewport.spec.ts",
+          "line": 56,
+          "column": 3
+        },
+        {
+          "title": "VIEWPORT DPR 2 and standalone development fixture preserve projection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1568,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T09:20:38.567Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport-final/viewport-VIEWPORT-DPR-2-an-32fd0-fixture-preserve-projection-cockpit/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-bf26897ef629cfee4b13",
+          "file": "viewport.spec.ts",
+          "line": 125,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-06T09:20:23.785Z",
+    "duration": 16468.102000000003,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

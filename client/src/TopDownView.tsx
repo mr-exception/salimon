@@ -1,3 +1,4 @@
+import { viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
 import { DRY_MASS_KG, setMass } from './simulation.ts'
 import { App } from './App'
@@ -17,9 +18,23 @@ import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
 export function TopDownScene({ state, session }: { state: TopDownState; session?: ResourceSession | null }) {
+  const viewport = useRef<SVGSVGElement>(null)
+  const [size, setSize] = useState({ width: 1200, height: 640 })
+  useEffect(() => {
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      if (width > 0 && height > 0) setSize({ width, height })
+    })
+    observer.observe(viewport.current!)
+    return () => observer.disconnect()
+  }, [])
+  // Expand the visible world to the viewport aspect; never stretch or crop the
+  // reference scene. SVG's screen CTM remains the world-to-screen authority.
+  const width = Math.max(1200, 640 * size.width / size.height)
+  const height = Math.max(640, 1200 * size.height / size.width)
   const items = drawList(state)
   const sprites = useWorldSprites(state.entities)
-  return <svg className="top-down-scene" viewBox="-600 -320 1200 640" shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label="Strict overhead Scout and planetary test site" data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
+  return <svg ref={viewport} className="top-down-scene" viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label="Strict overhead Scout and planetary test site" data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {items.filter(item => item.entity.layer === layer).map(({ entity, positionM: [x, y], angle }) =>
         <g key={entity.id} data-entity={entity.id} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.snapshot.sources[entity.id]?.remainingGrams} data-depleted={session?.snapshot.sources[entity.id]?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
@@ -107,7 +122,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (!inWorld) input.clear()
       if (paused.current || document.hidden) { input.clear(); clock.reset() }
       const controls = input.controls
-      current.current = clock.advance(current.current, dt, [Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], (world, direction) => {
+      current.current = clock.advance(current.current, dt, viewToWorld([Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], current.current.frames), (world, direction) => {
         if (!session.current) return stepTopDown(world, direction)
         if (session.current.error || session.current.survival.health === 0) return world
         return session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
@@ -166,7 +181,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     <main data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
-    <header><div><p className="top-down-eyebrow">SALIMON / WORLD FOUNDATION</p><h1>Scout · Surface study</h1></div><span className="top-down-tag">STRICT OVERHEAD / 2D</span></header>
+    <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
     <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} />
       {gameplay && <aside className="resource-hud" aria-label="Resource inventory" data-gathering={resourceSession?.activeSourceId ?? ''}>
         <h2>Field inventory</h2>
@@ -187,12 +202,14 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         {!!resourceSession?.activeSourceId && <p>Mining rate: {survivalPolicy(resourceSession.survival).miningUnits / 16} kg/s · partial work saved per source</p>}
         {!!resourceSession?.activeSourceId && <progress aria-label="Next kilogram extraction interval" max={60} value={resourceSession.progressTicks} />}
       </aside>}
-      <div className="top-down-caption"><span>01 / QUIET LANDING SITE</span><span>SCOUT — INTERIOR CUTAWAY</span></div></section>
+    </section>
+    <div className="top-down-bottom">
     <aside className="top-down-interaction" aria-label="Nearby interaction">
       <div><p data-prompt>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : 'No fixture in reach · Move closer'}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
       <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={paused.current || cockpitTarget && !!resourceSession?.error || resourceSession?.survival.health === 0 || !selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
     </aside>
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
-    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · up to 1 kg/s · Low hunger/fatigue reduce rate · Partial work saved' : 'Console inspections are a test · Systems inactive'}</p></footer>
+    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p><p>{gameplay ? 'Gathering · up to 1 kg/s · Low hunger/fatigue reduce rate · Partial work saved' : 'Console inspections are a test · Systems inactive'}</p></footer>
+    </div>
   </main></>
 }

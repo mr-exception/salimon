@@ -8,6 +8,8 @@ export interface SurvivalState {
   health: number
   /** Present only for fractional HP; health is its numerical presentation. */
   healthExact?: string
+  /** Active tick deadline; absent in older saves. */
+  actionReadyTick?: number
   activeTicks: number
   starvationTicks: number
   recoveryTicks: number
@@ -18,7 +20,8 @@ export function validateSurvival(value: unknown): SurvivalState {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid survival')
   const s = value as SurvivalState
   const limits = { hunger: METER, fatigue: METER, health: MAX_HEALTH, activeTicks: Number.MAX_SAFE_INTEGER, starvationTicks: 599, recoveryTicks: 3599, offlineAtMs: Number.MAX_SAFE_INTEGER }
-  if (Object.keys(s).length !== Object.keys(limits).length + (s.healthExact === undefined ? 0 : 1)) throw new Error('Unknown survival metadata')
+  if (s.actionReadyTick !== undefined && (!Number.isSafeInteger(s.actionReadyTick) || s.actionReadyTick < 0 || s.actionReadyTick > Number.MAX_SAFE_INTEGER - 15 || s.actionReadyTick > s.activeTicks + 15)) throw new Error('Invalid action recovery')
+  if (Object.keys(s).length !== Object.keys(limits).length + (s.healthExact === undefined ? 0 : 1) + (s.actionReadyTick === undefined ? 0 : 1)) throw new Error('Unknown survival metadata')
   for (const [key, max] of Object.entries(limits)) {
     const n = s[key as keyof SurvivalState]
     if (key === 'health' && s.healthExact !== undefined) continue
@@ -59,7 +62,7 @@ export function survivalPolicy(s: SurvivalState) {
   const hunger = s.hunger / METER * 100, fatigue = s.fatigue / METER * 100
   const hungerRate = hunger >= 50 ? 1 : hunger >= 20 ? .9 : .75
   const fatigueRate = fatigue > 50 ? 1 : fatigue > 20 ? .85 : fatigue > 0 ? .65 : .3
-  return { movement: s.health === 0 ? 0 : hungerRate * fatigueRate, canWork: s.health > 0 && s.fatigue > 0 }
+  return { movement: s.health === 0 ? 0 : Math.max(.1, hungerRate * fatigueRate), miningUnits: s.health === 0 || s.fatigue === 0 ? 0 : (s.hunger < METER / 5 ? 3 : 4) * (s.fatigue <= METER / 5 ? 3 : 4), canWork: s.health > 0 && s.fatigue > 0 }
 }
 
 export const healthValue = (s: SurvivalState) => s.healthExact === undefined ? exact.decimal(s.health) : exact.decode(s.healthExact)
@@ -68,4 +71,18 @@ export function setHealth(s: SurvivalState, hp: exact.Exact): void {
   s.health = exact.number(hp)
   if (hp[1] === 1n) delete s.healthExact
   else s.healthExact = exact.encode(hp)
+}
+
+/** Future playable machine adapter: successful non-emergency actions share a 15-tick recovery.
+ * Inspection, movement, continuous mining and emergency controls never use this gate.
+ * Call only after validating the action; commit its result with the machine transaction.
+ */
+export type DiscreteMachineAction = 'core-intake' | 'fabricator-submit' | 'tray-collect' | 'emergency'
+export function completeDiscreteAction(state: SurvivalState, action: DiscreteMachineAction): SurvivalState | null {
+  const s = validateSurvival(state)
+  if (!['core-intake', 'fabricator-submit', 'tray-collect', 'emergency'].includes(action)) throw new Error('Unknown machine action')
+  if (action === 'emergency') return s
+  if (!survivalPolicy(s).canWork || s.activeTicks < (s.actionReadyTick ?? 0)) return null
+  if (!Number.isSafeInteger(s.activeTicks + 30)) throw new RangeError('Action clock overflow')
+  return { ...s, actionReadyTick: s.activeTicks + 15 }
 }

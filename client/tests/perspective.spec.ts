@@ -1,0 +1,106 @@
+import { test, expect, type Page } from '@playwright/test'
+import { PNG } from 'pngjs'
+type State = { tick: number; contacts: string[]; selected: string | null; actions: number; renderer: string; view: { fov: number; quaternion: number[] }; markers: { id: string; ids: string[]; x: number; y: number }[] }
+const state = (page: Page) => page.evaluate(() => (window as unknown as { sensorSnapshot(): State }).sensorSnapshot())
+const sceneMarkers = (page: Page) => page.getByRole('button', { name: /^Sensor contact / })
+async function boot(page: Page, translated = false) {
+ await page.goto(`/tests/perspective.html?low-resolution${translated ? '&translated' : ''}`)
+ await expect.poll(async () => (await state(page))?.renderer).toContain('SwiftShader')
+}
+test('SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction', async ({ page }, info) => {
+ const errors: string[] = []; page.on('pageerror', e => errors.push(e.message))
+ await boot(page)
+ expect((await state(page)).contacts).toEqual([])
+ await expect(sceneMarkers(page)).toHaveCount(0)
+ await expect(page.getByText('Detected planet', { exact: true })).toHaveCount(0)
+ // The visible optical globe has no discovery target before the pulse.
+ await page.locator('canvas').click({ position: { x: 480, y: 300 } })
+ expect((await state(page)).selected).toBeNull()
+ const before = await page.screenshot()
+ const png = PNG.sync.read(before), center = (300 * png.width + 480) * 4
+ expect(png.data[center] + png.data[center + 1] + png.data[center + 2]).toBeGreaterThan(10)
+ await info.attach('before-pulse.png', { body: before, contentType: 'image/png' })
+ await page.getByRole('button', { name: 'Tick', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(0)
+ await page.getByRole('button', { name: 'Pulse', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(3)
+ const scanned = await state(page)
+ expect(scanned.contacts).toHaveLength(23)
+ expect(scanned.markers.flatMap(m => m.ids).sort()).toEqual(['planet', 'tiny', ...Array.from({ length: 18 }, (_, i) => `dense-${String(i).padStart(2, '0')}`)].sort())
+ await info.attach('scanned.png', { body: await page.screenshot(), contentType: 'image/png' })
+ await page.getByRole('button', { name: 'Sensor contact Detected tiny', exact: true }).click()
+ await expect(page.getByRole('status')).toHaveText('Selected: Detected tiny')
+ for (const id of ['hidden', 'back', 'outside']) {
+  await page.getByRole('textbox').fill(id)
+  await page.getByRole('button', { name: `Detected ${id}`, exact: true }).click()
+  await expect(page.getByRole('status')).toHaveText(`Selected: Detected ${id}`)
+ }
+ await page.getByRole('button', { name: 'Set direction', exact: true }).click()
+ await expect.poll(async () => (await state(page)).actions).toBe(1)
+ await page.getByRole('textbox').fill('')
+ await page.getByRole('button', { name: 'Sensor contact group of 18', exact: true }).click()
+ const ids: string[] = []
+ for (let i = 0; i < 3; i++) {
+  const buttons = page.getByRole('region', { name: 'Detected contacts' }).locator('li button')
+  ids.push(...await buttons.allTextContents())
+  await buttons.last().click()
+  if (i < 2) await page.getByRole('button', { name: 'Next', exact: true }).click()
+ }
+ expect(ids).toHaveLength(18); expect(new Set(ids).size).toBe(18)
+ await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled()
+ await page.getByRole('button', { name: 'All contacts', exact: true }).click()
+ await page.getByRole('textbox').fill('tiny')
+ await page.getByRole('button', { name: 'Detected tiny', exact: true }).click()
+ await page.getByRole('button', { name: 'Telescope', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(1)
+ await page.getByRole('button', { name: 'Sensor contact Detected tiny', exact: true }).click()
+ await info.attach('tiny-telescope.png', { body: await page.screenshot(), contentType: 'image/png' })
+ await expect(page.getByRole('status')).toHaveText('Selected: Detected tiny')
+ await page.getByRole('button', { name: 'Leave range', exact: true }).click()
+ await expect(page.getByRole('status')).toHaveText('No selection')
+ await expect(page.getByRole('button', { name: 'Set direction', exact: true })).toHaveCount(0)
+ await expect(sceneMarkers(page)).toHaveCount(0)
+ expect((await state(page)).selected).toBeNull()
+ expect((await state(page)).contacts).toEqual([])
+ expect(errors).toEqual([])
+ await info.attach('measurements.json', { body: JSON.stringify({ scanned, groupIds: ids, evicted: await state(page), errors }, null, 2), contentType: 'application/json' })
+})
+test('SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression', async ({ page }, info) => {
+ await boot(page)
+ await page.getByRole('button', { name: 'Pulse', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(3)
+ // Blur Pulse so focus decorations cannot differ between captures.
+ await page.locator('canvas').click({ position: { x: 50, y: 550 } })
+ const first = await page.screenshot(), initial = await state(page)
+ expect((await page.screenshot()).equals(first)).toBe(true)
+ await boot(page, true)
+ await page.getByRole('button', { name: 'Pulse', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(3)
+ await page.locator('canvas').click({ position: { x: 50, y: 550 } })
+ expect((await page.screenshot()).equals(first)).toBe(true)
+ expect((await state(page)).markers).toEqual(initial.markers)
+ await page.getByRole('button', { name: 'Sensor contact group of 18', exact: true }).click()
+ await page.getByRole('button', { name: 'Telescope', exact: true }).click()
+ await expect(page.getByText('Group no longer visible')).toBeVisible()
+ await expect(page.getByRole('region', { name: 'Detected contacts' }).locator('li button')).toHaveCount(0)
+ await page.getByRole('button', { name: 'All contacts', exact: true }).click()
+ await page.getByRole('textbox').fill('back')
+ await page.keyboard.press('KeyD')
+ const focused = (await state(page)).view
+ await page.keyboard.down('KeyD'); await page.waitForTimeout(100); await page.keyboard.up('KeyD')
+ expect((await state(page)).view).toEqual(focused)
+ await page.locator('canvas').click({ position: { x: 50, y: 550 } })
+ await page.keyboard.down('KeyD')
+ const motion = await page.evaluate(async () => {
+  const samples: (State & { domMarkers: number })[] = []
+  for (let i = 0; i < 6; i++) { await new Promise(requestAnimationFrame); samples.push({ ...(window as unknown as { sensorSnapshot(): State }).sensorSnapshot(), domMarkers: document.querySelectorAll('button[aria-label^="Sensor contact "]').length }) }
+  return samples
+ })
+ await page.keyboard.up('KeyD')
+ expect(motion.every(s => s.domMarkers === 1 && s.markers.length === 1 && s.markers.every(m => Number.isFinite(m.x) && Number.isFinite(m.y)))).toBe(true)
+ await expect.poll(async () => (await state(page)).view.quaternion).not.toEqual(focused.quaternion)
+ expect((await state(page)).contacts).toEqual(initial.contacts)
+ expect((await state(page)).tick).toBe(300)
+ await info.attach('telescope.png', { body: await page.screenshot(), contentType: 'image/png' })
+ await info.attach('measurements.json', { body: JSON.stringify({ initial, motion, moved: await state(page), repeat: 'byte-identical', translated: 'byte-identical' }, null, 2), contentType: 'application/json' })
+})

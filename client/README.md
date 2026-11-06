@@ -491,3 +491,39 @@ GPU ordering uses logarithmic physical ray distances, avoiding float overflow
 without exposing absolute galactic coordinates. The shader/material is disposed
 on unmount. Software-WebGL capture timings are not a GPU/Metal frame-rate claim;
 the budget bounds catalog work and geometry, not the full future cockpit HUD.
+
+## Perspective sensor overlay foundation (#812)
+
+`PerspectiveContacts.tsx` is the reusable DOM companion to `ObservationCamera`
+and `OpticalSky`; mount it in the same positioned viewport. The parent supplies
+its live `Scanner`, `ObservationCameraState`, physical `getOrigin`, and optical
+catalog geometry. `perspectiveContacts.ts` consumes **only current scanner
+contacts** for markers/browser entries; geometry only vetoes line of sight.
+Every selection/action handler rechecks live scanner membership and range.
+The parent still advances scanner ticks independently of rendering/camera input.
+An optional `onSetDirection` callback connects the existing authorized flight
+command; its caller must retain grounded/power/cockpit authority. Look at is #813.
+
+Projection rotates split-relative unit directions into camera space, explicitly
+rejects behind-camera/outside-frustum centers, and compares physical surface
+ray intersections using the optical layer's stable CPU geometry. No astronomical
+near/far plane narrowing or physical-radius inflation is used. Occluded center
+rays have no marker/hit target, including partially occulted centers; scanned
+contacts remain searchable/paginated in the browser. The simplified physical
+planet globe provides the grounded surface occluder; detailed terrain is not
+introduced. Marker overlap components retain sorted unique IDs, with eight
+entries per browser page. Menus lose their actionable entries if their current
+visible group disappears; range eviction removes selection actions.
+
+The separate development route `/tests/perspective.html` exercises the composed
+panoramic scene; `?translated` repeats it at huge galactic cell offsets. Tests:
+`src/perspectiveContacts.test.ts` and Playwright project `perspective`.
+For bounded software rendering, the browser scenarios use `?low-resolution`
+(480×300 optical canvas in a 960×600 CSS viewport; full-resolution DOM controls).
+The default fixture retains DPR 1. Its Telescope calibration preset centers the
+tiny test moon at 0.1°; it is not a player Look at implementation.
+The production cockpit/radar remains current until #815; this is not the final
+compact HUD (#814). The existing 32-body optical catalog budget still applies.
+Run `npm test`, `npm run build`, and
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=perspective`.
+Original evidence and limitations: [issue report](../reports/issue-812/README.md).

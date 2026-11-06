@@ -993,3 +993,11 @@ and `OpticalSky.tsx` (bounded analytic GPU rendering). Its tests are
 `opticalSky.test.ts` and `tests/optical.spec.ts`; its development entry is
 `tests/optical.html`. Scanner ownership remains in `scanner.ts`; the optical layer
 has no scanner dependency. See the client guide for the 32-body rendering budget.
+
+Perspective scanner overlays (#812): `client/src/perspectiveContacts.ts` owns
+scanner-only admission, direction projection, physical center-ray occlusion and
+lossless overlap components. `PerspectiveContacts.tsx` owns current contact
+browser pagination/search, marker hit targets and live selection/action guards.
+`perspectiveContacts.test.ts` and `tests/perspective.spec.ts` exercise the separate
+composed panoramic fixture. Scanner acquisition remains in `scanner.ts`, optical
+geometry in `opticalSky.ts`; final cockpit integration remains #815.

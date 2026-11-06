@@ -62,3 +62,9 @@ test('dense/transitive overlap groups retain unique scanned IDs in stable order'
  assert.deepEqual(groups.flatMap(m => m.ids).sort(), bodies.map(b => b.id).sort())
  assert.deepEqual(project([...bodies].reverse(), []), project(bodies, []))
 })
+
+test('CPU contact occlusion supports more IDs than the optical shader budget', () => {
+ const bodies = Array.from({ length: 40 }, (_, i) => ({ ...body('many-' + i, [i * 100, 0, -10000]), radiusKm: 0.001 }))
+ const markers = perspectiveMarkers(bodies, bodies, ORIGIN, new ObservationCameraState({ yaw: 0, pitch: 0 }).snapshot(), 1280, 720)
+ assert.equal(markers.flatMap(marker => marker.ids).length, 40)
+})

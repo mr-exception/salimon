@@ -26,7 +26,9 @@ export function perspectiveMarkers(contacts: readonly Body[], geometry: readonly
  view: ObservationSnapshot, width: number, height: number): PerspectiveMarker[] {
  if (![width, height, view.fov, ...view.quaternion].every(Number.isFinite) || width <= 0 || height <= 0 || view.fov < 0.1 || view.fov > 75) return []
  const inverse = new Quaternion(...view.quaternion).normalize().invert()
- const spheres = opticalSpheres(geometry, origin)
+ // Occluder geometry is CPU-side and may exceed the optical shader's uniform
+ // budget. Never cap scanned IDs or omit foreground blockers with that budget.
+ const spheres = geometry.flatMap(body => opticalSpheres([body], origin))
  const tan = Math.tan(view.fov * Math.PI / 360), aspect = width / height
  const markers: PerspectiveMarker[] = [], seen = new Set<string>()
  for (const body of contacts) {

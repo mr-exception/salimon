@@ -1008,3 +1008,15 @@ browser pagination/search, marker hit targets and live selection/action guards.
 `perspectiveContacts.test.ts` and `tests/perspective.spec.ts` exercise the separate
 composed panoramic fixture. Scanner acquisition remains in `scanner.ts`, optical
 geometry in `opticalSky.ts`; final cockpit integration remains #815.
+
+## Compact panoramic HUD (#814)
+
+`client/src/PanoramicNavigation.tsx` composes the full-viewport HUD and existing
+camera/sky/sensor owners. `orientationCompass.ts` owns camera-relative spherical
+projection; `OrientationCompass.tsx` owns distinct camera/heading/velocity glyphs.
+`panoramic.css` owns desktop overlays and warning priority. `PerspectiveContacts`
+retains scanner authority and adds a controlled collapsed browser. Pure tests are
+`orientationCompass.test.ts` and `perspectiveContacts.test.ts`; actual WebGL,
+keyboard, resize, warning/terminal and 40-ID checks are `tests/panoramic.spec.ts`.
+The reusable scene is exercised in `/tests/panoramic.html`; #815 owns production
+cockpit activation and view lifetime. See the client guide and issue report.

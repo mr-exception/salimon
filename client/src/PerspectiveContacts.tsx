@@ -11,7 +11,8 @@ import { currentContacts, perspectiveMarkers, selectContact, selectedContact } f
  * physical origin and optional flight action. No optical raycaster/hit meshes.
  * Every handler rechecks live scanner authority, including stale DOM events.
  */
-export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShip, canPilot = () => true, onSetDirection }: {
+export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShip, canPilot = () => true, onSetDirection, compact = false, browserOpen = true, onBrowserChange }: {
+ compact?: boolean; browserOpen?: boolean; onBrowserChange?: (open: boolean) => void
  scanner: Scanner; geometry: readonly Body[]; view: ObservationCameraState; getOrigin: () => Position
  getShip: () => ShipState; canPilot?: () => boolean
  onSetDirection?: (body: Body) => void
@@ -43,10 +44,12 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
     const live = perspectiveMarkers(currentContacts(scanner, getOrigin()), geometry, getOrigin(), view.snapshot(), root.current!.clientWidth, root.current!.clientHeight).find(m => m.id === marker.id)
     if (!live) return
     if (live.ids.length === 1) choose(live.id)
-    else { setGroup(live.ids); setPage(0); setQuery('') }
+    else { setGroup(live.ids); setPage(0); setQuery(''); onBrowserChange?.(true) }
    }}>{marker.ids.length === 1 ? '+' : marker.ids.length}</button>)}
-  <section aria-label="Detected contacts" style={{ position: 'absolute', right: 8, top: 8, width: 240, padding: 12, color: 'white', background: '#102431ee', pointerEvents: 'auto' }}>
-   <details><summary>Observation help</summary><p>Look at turns only the camera once, preserving zoom and ship motion. Drag, W/A/S/D or wheel cancels it. Set direction turns only the ship without thrust; arrow keys cancel that turn. Grounded ships can observe other detected bodies, but cannot aim at their landing planet center. Typing and focused controls do not steer the view.</p></details>
+  <section className={compact ? "panoramic-contacts" : undefined} aria-label="Detected contacts" style={compact ? undefined : { position: 'absolute', right: 8, top: 8, width: 240, padding: 12, color: 'white', background: '#102431ee', pointerEvents: 'auto' }}>
+   {!compact && <details><summary>Observation help</summary><p>Look at turns only the camera once, preserving zoom and ship motion. Drag, W/A/S/D or wheel cancels it. Set direction turns only the ship without thrust; arrow keys cancel that turn. Grounded ships can observe other detected bodies, but cannot aim at their landing planet center. Typing and focused controls do not steer the view.</p></details>}
+   {compact && <button className="contacts-toggle" aria-expanded={browserOpen} aria-controls="scanned-browser" onClick={() => onBrowserChange?.(!browserOpen)}>Contacts (C) · {contacts.length}</button>}
+   {browserOpen && <div id="scanned-browser" className={compact ? "scanned-browser" : undefined}>
    <label>Search contacts <input value={query} onChange={e => { setQuery(e.target.value); setPage(0) }}/></label>
    {group && <button onClick={() => { setGroup(null); setPage(0) }}>All contacts</button>}
    {group && !activeGroup && <p>Group no longer visible</p>}
@@ -54,7 +57,8 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
    <button disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Previous</button>
    <span> {currentPage + 1}/{last + 1} </span>
    <button disabled={currentPage === last} onClick={() => setPage(currentPage + 1)}>Next</button>
-   <p role="status">{selected ? `Selected: ${selected.name}` : 'No selection'}</p>
+   </div>}
+   <div className="selected-contact"><p role="status">{selected ? `Selected: ${selected.name}` : 'No selection'}</p>
    {selected && availability && <>
     {availability.currentPlanet && <p>Current landing planet: {selected.name}</p>}
     <button disabled={!availability.lookAt} onClick={() => {
@@ -66,6 +70,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
      if (live && contactCommandAvailability(getShip(), live, canPilot()).setDirection) onSetDirection(live)
     }}>Set direction</button>}
    </>}
+   </div>
   </section>
  </div>
 }

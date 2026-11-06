@@ -1,13 +1,13 @@
 # 2D documentation migration register
 
-**Audit on 2026-11-05:** 106 preexisting Markdown files in `docs/` were read and classified; the migration register plus two later backend design documents bring this branch to **109 rows** (GUIDE: 12, DESIGN: 24, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 6). Current reference: `main` after merged PRs #789 and #790. Root/client guides, GitHub workflows/templates and archived issue reports were checked as routing or evidence, not rewritten as current implementation.
+**Original audit on 2026-11-05:** 106 preexisting Markdown files were read and classified; backend documents originally expanded the register to 109 entries. **Register synchronization on 2026-11-06:** the main branch now contains two further browser survival/hazards documents, and this PR adds the Stasis Pod future specification: **112 rows** (GUIDE: 12, DESIGN: 25, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 8). This is a document classification, **not** a claim all designs run in the browser. Original source-status and native test evidence are retained.
 
 **How to interpret status:** **PLAYABLE** means a current browser code owner/contract (individual future subsections remain future); **GUIDE** is active routing/policy; **DESIGN** is approved or proposed future gameplay, **not shipped**; **NATIVE** is revision-specific Rust/3D implementation evidence; **ARCHIVE** is evaluation/qualification or earlier discarded designs. A historical issue closing does not demonstrate browser functionality.
 
 ## Contract precedence and approved 2D interpretation
 
 1. **Current capability:** [browser implementation status](current-client-status.md), actual `client/src` implementation and its production tests. Never infer active functionality from a removed Rust module.
-2. **Future behavior:** latest owner-approved [2D art](top-down-art-direction.md), [cockpit/reconnect](cockpit-navigation-and-reconnect.md), [weight-only inventory](resource-inventory-and-gathering.md), [suits and hazards](spacesuit-and-hazards.md), [planet environment](planetary-environment-art-direction.md) and [narrative](narrative-and-lost-journey.md). Where rules are unresolved, keep explicit TBDs.
+2. **Future behavior:** latest owner-approved [2D art](top-down-art-direction.md), [Stasis Pod/login/transfer/death](stasis-pod-and-transfer.md), [cockpit/reconnect](cockpit-navigation-and-reconnect.md), [weight-only inventory](resource-inventory-and-gathering.md), [suits and hazards](spacesuit-and-hazards.md), [planet environment](planetary-environment-art-direction.md) and [narrative](narrative-and-lost-journey.md). Where rules are unresolved, keep explicit TBDs.
 3. **Historical contracts:** native Rust source, models, 3D screen/camera, fragment, original build, reports and benchmarks in the [pinned pre-2D tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) provide evidence **for that revision**. Preserve useful numbers/identity; do not import superseded assumptions into current browser development.
 4. **Verification:** cloud browser/TS tests and captures are the routine gate; physical device, M1/Metal and subjective release review retain separate ownership.
 
@@ -46,9 +46,11 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`backend-persistence-recovery.md`](backend-persistence-recovery.md) | DESIGN | Approved future MongoDB durable critical state and strict checkpoint recovery/fail-closed policy; not implemented. |
 | [`biological-harvesting.md`](biological-harvesting.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`biological-signature-sites.md`](biological-signature-sites.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
+| [`browser-hazards.md`](browser-hazards.md) | PLAYABLE | Active browser hazard arithmetic/fixture contract; specific authored hazard sources and gear remain future. |
+| [`browser-survival.md`](browser-survival.md) | PLAYABLE | Active 2D survival state/tuning, but server authority and Stasis Pod mechanics not implemented. |
 | [`cabin-mechanisms.md`](cabin-mechanisms.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`canonical-planet-generation.md`](canonical-planet-generation.md) | DESIGN | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
-| [`cockpit-navigation-and-reconnect.md`](cockpit-navigation-and-reconnect.md) | PLAYABLE | Delivered local chair transitions; multiplayer reconnect/offline death still future. |
+| [`cockpit-navigation-and-reconnect.md`](cockpit-navigation-and-reconnect.md) | PLAYABLE | Local chair/cockpit transitions playable; future multiplayer **Stasis Pod spawn and pod-loss death** supersede old exact-location policy. |
 | [`coding-conventions.md`](coding-conventions.md) | GUIDE | TypeScript/React domain conventions should govern active edits; Rust sections archival. |
 | [`construction-damage.md`](construction-damage.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`construction-flight-safety.md`](construction-flight-safety.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
@@ -108,6 +110,7 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`scout-presentation.md`](scout-presentation.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`spaceship-building-and-survival.md`](spaceship-building-and-survival.md) | DESIGN | Preserve approved ship rules; current 2D damage is ship-wide, raw resources have no volume, machine systems deferred. |
 | [`spacesuit-and-hazards.md`](spacesuit-and-hazards.md) | DESIGN | Approved tierless suits, 200 HP exposure model and drawer/module slots; unimplemented. |
+| [`stasis-pod-and-transfer.md`](stasis-pod-and-transfer.md) | DESIGN | Approved **future** pod safe/unsafe logout, one-hour approved multiplayer transfer, recoverable gear/suit loss and terminal offline pod-loss death. No server implementation; explicit TBDs. |
 | [`suit-observations.md`](suit-observations.md) | NATIVE | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
 | [`surface-age.md`](surface-age.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`survival-balance.md`](survival-balance.md) | NATIVE | Archived native gameplay/state; requires a distinct browser session implementation and acceptance. |

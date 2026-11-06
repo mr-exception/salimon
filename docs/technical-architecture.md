@@ -5,13 +5,16 @@
 The default browser `/` starts outside the Scout in one continuous 2D world.
 The [playable foundation guide](playable-2d-foundation.md) owns its full journey,
 local QA commands and mining reuse boundary.
-The cockpit opens the independently reusable [radar](radar-navigation-prototype.md).
+The cockpit opens reusable [panoramic observation](panoramic-navigation-design.md); the orthographic radar remains an isolated flight fixture.
 `coordinates.ts` owns split positions; `simulation.ts` owns deterministic SI ship
 transitions; `contact.ts` owns conservative sphere contact and observations;
 `scanner.ts` owns catalog indexing and temporary detection; `navigationRuntime.ts`
-composes them. `TopDownView.tsx` retains the world and runtime while `App.tsx`
-mounts radar presentation. Ship simulation continues in either view. Three/R3F
-owns only radar presentation; no React/GPU type enters the simulation.
+composes them. `TopDownView.tsx` retains the world, runtime and session-local
+`ObservationCameraState` and advances the sole navigation clock in either view.
+`PanoramicNavigation.tsx` mounts presentation with `advanceSimulation={false}`;
+Three/R3F owns only observation rendering and camera input. No React/GPU type
+enters the simulation. View quaternion/FOV survive cockpit visits but are not
+authoritative save or multiplayer state.
 
 `topDownFrames.ts` owns planet-fixed/ship-local anchor conversion and abstract
 poses, avoiding astronomical Number cancellation. `topDownRuntime.ts` owns stable

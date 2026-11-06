@@ -3,6 +3,10 @@ import { RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
 import { freshSurvival, METER } from '../src/survival.ts'
 import { boot, walkTicks, walkTo, position } from './worldJourney'
 
+// Original captures and raw state are explicit below; avoid synchronizing every
+// software WebGL frame for a trace filmstrip. Failure action traces remain.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: false, sources: true } })
+
 test('SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset', async ({ page }, info) => {
   await boot(page, '', 'http://127.0.0.1:4175')
   const hud = page.getByLabel('Survival condition')
@@ -68,20 +72,22 @@ test('SURV built active/pause/reload, outdoor/interior/navigation-return and ter
   await capture('interior')
   for (const p of [[0, .45], [1.35, .45], [1.35, -1.65], [0, -1.65], [0, -3.1]]) await walkTo(page, p, 'ship:scout', true)
   await page.keyboard.press('e'); await page.clock.runFor(100)
-  await expect(page.getByLabel('Navigation radar', { exact: true })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Panoramic navigation', exact: true })).toBeVisible()
   await expect(hud).toBeVisible()
-  await page.clock.runFor(1000)
+  for (let elapsed = 0; elapsed < 1000; elapsed += 200) await page.clock.fastForward(200)
   const radarActive = (await save()).survival.activeTicks
   await page.getByRole('button', { name: 'Pause [P]', exact: true }).click()
   const shipPaused = await page.locator('main').getAttribute('data-ship')
-  await page.clock.runFor(1000)
+  const viewPaused = await page.locator('.panoramic').getAttribute('data-observation')
+  for (let elapsed = 0; elapsed < 1000; elapsed += 200) await page.clock.fastForward(200)
   expect(await page.locator('main').getAttribute('data-ship')).toBe(shipPaused)
+  expect(await page.locator('.panoramic').getAttribute('data-observation')).toBe(viewPaused)
   expect((await save()).survival.activeTicks).toBeGreaterThanOrEqual(radarActive)
   await page.getByRole('button', { name: 'Resume [P]' }).click()
-  await page.clock.runFor(1100)
+  for (let elapsed = 0; elapsed < 1100; elapsed += 100) await page.clock.fastForward(100)
   expect((await save()).survival.activeTicks).toBeGreaterThan(radarActive)
   const backend = await page.locator('canvas').evaluate(c => { const gl = (c as HTMLCanvasElement).getContext('webgl2')!; const ext = gl.getExtension('WEBGL_debug_renderer_info')!; return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) })
-  await page.getByRole('button', { name: 'Exit navigation · Stand up' }).click()
+  await page.getByRole('button', { name: 'Exit cockpit' }).click()
   await capture('navigation-return')
   await info.attach('survival-records.json', { body: JSON.stringify({ active, paused, terminal, final: await save(), backend, input: 'Playwright synthetic keyboard/mouse; saved-state low-condition fixture' }, null, 2), contentType: 'application/json' })
 })

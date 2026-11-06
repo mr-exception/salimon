@@ -14,7 +14,7 @@
 | Historical 3D concept | Current 2D treatment |
 | --- | --- |
 | First-person player, room/terrain meshes, skybox | **Strict overhead illustrated 2D** world. Layered sprites, persistent IDs, actual 2D collision footprints/interaction anchors and intentional tall-object occlusion. Canonical world can still be physically 3D. |
-| 3D game-wide navigation | **3D holographic orthographic radar only at cockpit desk**. The sample radar does not physically relocate the authored 2D landing site. |
+| 3D game-wide navigation | **3D panoramic observation only at cockpit desk** (#815), shared grounded Vesper origin, session-local camera/FOV and compact HUD. Isolated orthographic free-flight fixture at `/?scene=radar`; no relocation of the authored 2D site. |
 | Mineable physical fragments and two volume/weight limits | Direct raw-resource credit in **integer grams**. Initial inventory: **10 kg and 12 slots**, raw type stacking, per-item count stacks/weights, **no volume**. Source debit equals credit. |
 | Cargo racks and fabrication/fuel intakes | The **50 kg Resource Container** has confirmed raw-resource transfers (#784/#785). Separate **50 kg Fabricator/Core raw buffers** and processing remain approved future work. |
 | First-person Scout interior, physical modules | Continuous visible **top-down Scout cutaway**, ship-local frames, fixture footprints and concise contextual UI; preserve cozy habitation identity and build constraints when porting. |
@@ -98,8 +98,8 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`product-requirements.md`](product-requirements.md) | DESIGN | Evaluate active browser against future product requirements; no implied native port. |
 | [`project-phases.md`](project-phases.md) | GUIDE | Active 2D delivery roadmap; older Phase 0 native results are historical. |
 | [`project-qa.md`](project-qa.md) | DESIGN | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
-| [`project-vision.md`](project-vision.md) | DESIGN | Overhead world with cockpit-only 3D radar is the active visual contract. |
-| [`radar-navigation-prototype.md`](radar-navigation-prototype.md) | PLAYABLE | Delivered 3D holographic cockpit instrument, not a global player view. |
+| [`project-vision.md`](project-vision.md) | DESIGN | Overhead world with cockpit-only panoramic 3D observation is the active visual contract. |
+| [`radar-navigation-prototype.md`](radar-navigation-prototype.md) | PLAYABLE | Historical orthographic engineering fixture; production now uses panoramic observation (#815), not a global player view. |
 | [`resource-inventory-and-gathering.md`](resource-inventory-and-gathering.md) | PLAYABLE | 10 kg / 12 slots, integer grams and sample mining; schema-v4 raw ledger, identified 50 kg Scout container (#784) and playable confirmed transfers (#785). |
 | [`room-finishes.md`](room-finishes.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`room-lighting.md`](room-lighting.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
@@ -116,7 +116,7 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`survival-balance.md`](survival-balance.md) | NATIVE | Archived native gameplay/state; requires a distinct browser session implementation and acceptance. |
 | [`technical-architecture.md`](technical-architecture.md) | GUIDE | Active browser owners first; Rust crate owners archival. |
 | [`terrain-validation.md`](terrain-validation.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
-| [`top-down-art-direction.md`](top-down-art-direction.md) | PLAYABLE | Authoritative overhead illustration, collision footprints, avatar visibility; radar 3D only. |
+| [`top-down-art-direction.md`](top-down-art-direction.md) | PLAYABLE | Authoritative overhead illustration, collision footprints, avatar visibility; cockpit navigation 3D only. |
 | [`universe-atmosphere.md`](universe-atmosphere.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
 | [`universe-contact.md`](universe-contact.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
 | [`universe-ephemerides.md`](universe-ephemerides.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
@@ -133,7 +133,7 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`universe-pack.md`](universe-pack.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
 | [`universe-reader.md`](universe-reader.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
 | [`universe-reference-fixtures.md`](universe-reference-fixtures.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
-| [`universe-scanner.md`](universe-scanner.md) | DESIGN | Approved discovery contract; current scanner uses sample radar not full native catalog. |
+| [`universe-scanner.md`](universe-scanner.md) | DESIGN | Approved discovery contract; current scanner uses an illustrative browser catalog, not the full native catalog. |
 | [`universe-sky.md`](universe-sky.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
 | [`universe-sources.md`](universe-sources.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |
 | [`universe-starting-system.md`](universe-starting-system.md) | NATIVE | Archived native universe/catalog/physics implementation. Keep deterministic identities and mathematical contracts for later browser integration. |

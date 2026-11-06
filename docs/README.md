@@ -24,8 +24,8 @@ These newer approved narrative contracts supersede historical Earth-start assump
 ## Active browser world and cockpit
 
 - [Playable 2D foundation, QA commands and mining reuse boundary](playable-2d-foundation.md)
-- [Approved future: ship-centered 360° panoramic navigation design](panoramic-navigation-design.md) — **not yet implemented**
-- [Current orthographic radar implementation and historical prototype contract](radar-navigation-prototype.md)
+- [Ship-centered 360° panoramic navigation design](panoramic-navigation-design.md) — grounded cockpit delivered; full flight remains future
+- [Isolated orthographic flight fixture and historical prototype contract](radar-navigation-prototype.md)
 - [Approved cockpit transitions and future Stasis Pod-based reconnect](cockpit-navigation-and-reconnect.md)
 - [React prototype setup](../client/README.md)
 

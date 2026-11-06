@@ -1,10 +1,11 @@
 import { viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
 import { DRY_MASS_KG, setMass } from './simulation.ts'
-import { App } from './App'
+import { PanoramicNavigation } from './PanoramicNavigation.tsx'
+import { ObservationCameraState } from './observationCamera.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
-import { isCockpitTarget, leaveCockpit, setCockpitPower } from './cockpit.ts'
+import { controlsCockpit, LOCAL_PLAYER, isCockpitTarget, leaveCockpit, setCockpitPower } from './cockpit.ts'
 import { useEffect, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
 import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, stepTopDown, TopDownClock, type TopDownState } from './topDownRuntime.ts'
@@ -50,6 +51,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const powerFixture = import.meta.env.DEV && gameplay && new URLSearchParams(location.search).has('powerFixture')
   const [state, setState] = useState(() => createTopDownState(import.meta.env.DEV && new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior', gameplay))
   const [navigation] = useState(() => new NavigationRuntime(SAMPLE_BODIES, gameplay ? state.scoutLocation : undefined))
+  const [observation] = useState(() => new ObservationCameraState(navigation.clock.state))
   const current = useRef(state)
   const session = useRef<ResourceSession | null>(null)
   const lockAttempt = useRef<Promise<unknown>>(Promise.resolve())
@@ -133,7 +135,8 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         current.current = session.current.world
         navigation.clock.state = setMass(navigation.clock.state, DRY_MASS_KG + session.current.payload().shipGrams / 1000)
       }
-      if (gameplay && inWorld) navigation.advance(dt)
+      // One navigation clock across world/cockpit; the view only observes it.
+      if (gameplay) navigation.advance(dt)
       setState(current.current)
       raf = requestAnimationFrame(frame)
     }
@@ -174,10 +177,14 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         <label>Hunger <span>{Math.ceil(vital.hunger / METER * 100)} / 100</span><meter aria-label="Hunger" min={0} max={100} value={Math.ceil(vital.hunger / METER * 100)} /></label>
         <label>Fatigue <span>{Math.ceil(vital.fatigue / METER * 100)} / 100</span><meter aria-label="Fatigue" min={0} max={100} value={Math.ceil(vital.fatigue / METER * 100)} /></label>
         <p aria-live="polite">{paused.current ? 'Paused · active time stopped' : warning}</p>
-        {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); resourceSession.freshRun(); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
+        {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); if (resourceSession.freshRun()) observation.reset(navigation.clock.state); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
       </> : <p>{resourceSession?.error || saveStatus}</p>}
     </aside>}
-    {state.cockpit.view === 'radar' && <><div inert={paused.current || !!resourceSession?.error}><App navigation={navigation} isPaused={() => paused.current || !!session.current?.error} canPilot={() => !session.current || survivalPolicy(session.current.survival).canWork} /></div><button className="cockpit-exit" onClick={() => update(leaveCockpit(current.current))}>Exit navigation · Stand up</button></>}
+    {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
+      <PanoramicNavigation navigation={navigation} view={observation} advanceSimulation={false}
+        isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
+        canPilot={() => false} onExit={() => update(leaveCockpit(current.current))} />
+    </div>}
     {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     <main data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>

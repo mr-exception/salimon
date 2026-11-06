@@ -1,4 +1,4 @@
-> **Future approved design (2026-11-06, NOT YET IMPLEMENTED):** [Ship-centered 360° panoramic navigation](panoramic-navigation-design.md) supersedes this page's orthographic camera, faceted fixed-size optical proxies, lattice, vector-line HUD and legacy contact interaction **when the implementation is merged**. This document remains the source of truth for the currently shipped radar and its existing regression tests. Scanner cadence/range, simulation, collision and shared grounded Scout location carry forward. Do not interpret this notice as browser delivery.
+> **Isolated engineering fixture:** Production now uses [panoramic observation](panoramic-navigation-design.md) through #815. This page describes `/?scene=radar` and historical orthographic regression fixtures. Scanner cadence/range, simulation, collision and the shared grounded Scout location remain authoritative.
 
 # Navigation-only React radar prototype (2026-11-03)
 

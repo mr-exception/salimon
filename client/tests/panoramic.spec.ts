@@ -62,6 +62,7 @@ test('HUD-1 full viewport, scanner authority, keyboard browser and priority Esca
  await page.keyboard.press('Escape')
  await expect(page.getByRole('region', { name: 'Detailed telemetry' })).toHaveCount(0)
  expect((await state(page)).exits).toBe(0)
+ await page.evaluate(() => (document.activeElement as HTMLElement)?.blur())
  await page.keyboard.press('Escape'); expect((await state(page)).exits).toBe(1)
  await info.attach('browser-state.json', { body: JSON.stringify(await state(page), (_, value) => typeof value === 'bigint' ? String(value) : value), contentType: 'application/json' })
 })

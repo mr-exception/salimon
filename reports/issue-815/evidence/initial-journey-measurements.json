@@ -1,0 +1,518 @@
+[
+  {
+    "replay": 0,
+    "before": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 659
+    },
+    "entered": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 662
+    },
+    "moving": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 696
+    },
+    "exited": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 811
+    },
+    "continued": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 1111
+    },
+    "final": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 1877
+    },
+    "enteredView": {
+      "quaternion": [
+        0,
+        -0.059964006479444595,
+        0,
+        0.9982005399352042
+      ],
+      "fov": 75
+    },
+    "savedView": {
+      "quaternion": [
+        0.15063773049635712,
+        -0.32639340876043643,
+        -0.0012715417849318003,
+        0.9331527206465933
+      ],
+      "fov": 50.27400345267295
+    },
+    "beforeBlackout": {
+      "quaternion": [
+        0.15063773049635712,
+        -0.32639340876043643,
+        -0.0012715417849318003,
+        0.9331527206465933
+      ],
+      "fov": 50.27400345267295
+    },
+    "ticks": 61,
+    "backend": {
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    },
+    "errors": []
+  },
+  {
+    "replay": 1,
+    "before": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 658
+    },
+    "entered": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 661
+    },
+    "moving": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 694
+    },
+    "exited": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 810
+    },
+    "continued": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 1109
+    },
+    "final": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 1875
+    },
+    "enteredView": {
+      "quaternion": [
+        0,
+        -0.059964006479444595,
+        0,
+        0.9982005399352042
+      ],
+      "fov": 75
+    },
+    "savedView": {
+      "quaternion": [
+        0.15063773049635712,
+        -0.32639340876043643,
+        -0.0012715417849318003,
+        0.9331527206465933
+      ],
+      "fov": 50.27400345267295
+    },
+    "beforeBlackout": {
+      "quaternion": [
+        0.15063773049635712,
+        -0.32639340876043643,
+        -0.0012715417849318003,
+        0.9331527206465933
+      ],
+      "fov": 50.27400345267295
+    },
+    "ticks": 61,
+    "backend": {
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    },
+    "errors": []
+  }
+]

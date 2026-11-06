@@ -1,0 +1,2244 @@
+{
+  "journeys": [
+    {
+      "replay": 0,
+      "sources": [
+        {
+          "id": "source:landing:biology:01",
+          "kind": "biological",
+          "frame": "planet:fixture",
+          "position": "-5,6",
+          "site": "site:illustrated-landing:v1"
+        },
+        {
+          "id": "source:landing:mineral:01",
+          "kind": "mineral",
+          "frame": "planet:fixture",
+          "position": "-9,0",
+          "site": "site:illustrated-landing:v1"
+        }
+      ],
+      "checkpoints": [
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 310
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-outdoor-spawn",
+          "position": [
+            -6,
+            3
+          ],
+          "planet": [
+            -6,
+            3
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(164.21569936173887 -58.76396925953016) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 785
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-mineral-inspection",
+          "position": [
+            -7.339999999960288,
+            0.5004229215940755
+          ],
+          "planet": [
+            -7.339999999960288,
+            0.5004229215940755
+          ],
+          "frame": "planet:fixture",
+          "posture": "interacting",
+          "cameraGroundTransform": "translate(191.02517511089866 9.928448487310435) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 1568
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-exterior-cutaway",
+          "position": [
+            2.674527193851527,
+            4.629889988658332
+          ],
+          "planet": [
+            2.674527193851527,
+            4.629889988658332
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(-54.62702296570077 -127.83597625821248) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 2196
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-grounded-panoramic",
+          "position": [
+            0,
+            -3.95
+          ],
+          "planet": [
+            1.5271367812087684,
+            -4.921594111622772
+          ],
+          "frame": "ship:scout",
+          "posture": "seated",
+          "cameraGroundTransform": "translate(-54.73856645391295 122.28798975317673) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 2496
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-standing-return",
+          "position": [
+            0,
+            -3.1
+          ],
+          "planet": [
+            1.62889215740435,
+            -4.077706771146985
+          ],
+          "frame": "ship:scout",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(-54.73856645391295 100.18798975317672) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 3761
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-returned-outdoors",
+          "position": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "planet": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(162.46464564720148 -58.301144460314035) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 305
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-reloaded-outdoors",
+          "position": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "planet": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(162.46464564720148 -58.301144460314035) rotate(6.875493541569878) scale(26)"
+        }
+      ],
+      "handoffs": [
+        [
+          {
+            "before": [
+              2.674527193851527,
+              4.629889988658332
+            ],
+            "after": [
+              2.66973870555997,
+              4.590177643224177
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 383.5333251953125,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 382.60150146484375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.66973870555997,
+              4.590177643224177
+            ],
+            "after": [
+              2.664950217268413,
+              4.550465297790022
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 382.60150146484375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 381.8187561035156,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.664950217268413,
+              4.550465297790022
+            ],
+            "after": [
+              2.660161728976856,
+              4.510752952355867
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 381.8187561035156,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 381.1612548828125,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.660161728976856,
+              4.510752952355867
+            ],
+            "after": [
+              2.6553732406852992,
+              4.471040606921712
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 381.1612548828125,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 380.60894775390625,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.6553732406852992,
+              4.471040606921712
+            ],
+            "after": [
+              2.6505847523937422,
+              4.4313282614875575
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 380.60894775390625,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 380.1449890136719,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6505847523937422,
+              4.4313282614875575
+            ],
+            "after": [
+              2.6457962641021857,
+              4.391615916053403
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 380.1449890136719,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 379.7552795410156,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6457962641021857,
+              4.391615916053403
+            ],
+            "after": [
+              2.6410077758106287,
+              4.351903570619248
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 379.7552795410156,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 379.4279479980469,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.6410077758106287,
+              4.351903570619248
+            ],
+            "after": [
+              2.636219287519072,
+              4.312191225185094
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 379.4279479980469,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 379.1529541015625,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.636219287519072,
+              4.312191225185094
+            ],
+            "after": [
+              2.631430799227515,
+              4.272478879750939
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 379.1529541015625,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.9219665527344,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.631430799227515,
+              4.272478879750939
+            ],
+            "after": [
+              2.6266423109359587,
+              4.232766534316784
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.9219665527344,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.72796630859375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.6266423109359587,
+              4.232766534316784
+            ],
+            "after": [
+              2.6218538226444017,
+              4.19305418888263
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.72796630859375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.5649719238281,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6218538226444017,
+              4.19305418888263
+            ],
+            "after": [
+              2.617065334352845,
+              4.153341843448475
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.5649719238281,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.4280700683594,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.617065334352845,
+              4.153341843448475
+            ],
+            "after": [
+              2.612276846061288,
+              4.11362949801432
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.4280700683594,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.3130798339844,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.612276846061288,
+              4.11362949801432
+            ],
+            "after": [
+              2.607488357769731,
+              4.073917152580165
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.3130798339844,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.21649169921875,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          }
+        ],
+        [
+          {
+            "before": [
+              2.6296862103397167,
+              4.222173424591342
+            ],
+            "after": [
+              2.6344746986312733,
+              4.261885770025497
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6344746986312733,
+              4.261885770025497
+            ],
+            "after": [
+              2.63926318692283,
+              4.301598115459652
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.63926318692283,
+              4.301598115459652
+            ],
+            "after": [
+              2.6440516752143868,
+              4.341310460893807
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6440516752143868,
+              4.341310460893807
+            ],
+            "after": [
+              2.6488401635059438,
+              4.3810228063279615
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6488401635059438,
+              4.3810228063279615
+            ],
+            "after": [
+              2.6536286517975003,
+              4.420735151762116
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6536286517975003,
+              4.420735151762116
+            ],
+            "after": [
+              2.6584171400890573,
+              4.46044749719627
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6584171400890573,
+              4.46044749719627
+            ],
+            "after": [
+              2.663205628380614,
+              4.500159842630425
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.663205628380614,
+              4.500159842630425
+            ],
+            "after": [
+              2.667994116672171,
+              4.53987218806458
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.667994116672171,
+              4.53987218806458
+            ],
+            "after": [
+              2.6727826049637278,
+              4.579584533498735
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6727826049637278,
+              4.579584533498735
+            ],
+            "after": [
+              2.6775710932552848,
+              4.619296878932889
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6775710932552848,
+              4.619296878932889
+            ],
+            "after": [
+              2.6823595815468417,
+              4.659009224367044
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6823595815468417,
+              4.659009224367044
+            ],
+            "after": [
+              2.6871480698383987,
+              4.698721569801199
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6871480698383987,
+              4.698721569801199
+            ],
+            "after": [
+              2.6919365581299557,
+              4.738433915235354
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6919365581299557,
+              4.738433915235354
+            ],
+            "after": [
+              2.6967250464215127,
+              4.778146260669509
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          }
+        ]
+      ],
+      "ship": {
+        "position": {
+          "cell": [
+            "0",
+            "0",
+            "0"
+          ],
+          "offsetM": [
+            53962642442,
+            -5390064239,
+            -77946039081
+          ]
+        },
+        "velocityMps": [
+          0,
+          0,
+          0
+        ],
+        "yaw": -0.12,
+        "pitch": 0,
+        "massKg": 100000,
+        "throttle": 0,
+        "alignment": null,
+        "mode": "grounded",
+        "contact": {
+          "bodyId": "vesper",
+          "outcome": "safe-contact",
+          "impactSpeedMps": 0,
+          "normal": [
+            3.2258038501581854e-7,
+            0.9999999999999349,
+            -1.6129019250790927e-7
+          ],
+          "ageTicks": 60
+        },
+        "tick": 3761
+      },
+      "backend": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "errors": [],
+      "browser": "154.0.8037.57",
+      "input": "actual keyboard/mouse via production adapters; read-only DOM observations",
+      "origin": "built preview :4175",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "dpr": 1
+    },
+    {
+      "replay": 1,
+      "sources": [
+        {
+          "id": "source:landing:biology:01",
+          "kind": "biological",
+          "frame": "planet:fixture",
+          "position": "-5,6",
+          "site": "site:illustrated-landing:v1"
+        },
+        {
+          "id": "source:landing:mineral:01",
+          "kind": "mineral",
+          "frame": "planet:fixture",
+          "position": "-9,0",
+          "site": "site:illustrated-landing:v1"
+        }
+      ],
+      "checkpoints": [
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 310
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-outdoor-spawn",
+          "position": [
+            -6,
+            3
+          ],
+          "planet": [
+            -6,
+            3
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(164.21569936173887 -58.76396925953016) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 785
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-mineral-inspection",
+          "position": [
+            -7.339999999960288,
+            0.5004229215940755
+          ],
+          "planet": [
+            -7.339999999960288,
+            0.5004229215940755
+          ],
+          "frame": "planet:fixture",
+          "posture": "interacting",
+          "cameraGroundTransform": "translate(191.02517511089866 9.928448487310435) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 1566
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-exterior-cutaway",
+          "position": [
+            2.674527193851527,
+            4.629889988658332
+          ],
+          "planet": [
+            2.674527193851527,
+            4.629889988658332
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(-54.62702296570077 -127.83597625821248) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 2194
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-grounded-panoramic",
+          "position": [
+            0,
+            -3.95
+          ],
+          "planet": [
+            1.5271367812087684,
+            -4.921594111622772
+          ],
+          "frame": "ship:scout",
+          "posture": "seated",
+          "cameraGroundTransform": "translate(-54.73856645391295 122.28798975317673) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 2493
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-standing-return",
+          "position": [
+            0,
+            -3.1
+          ],
+          "planet": [
+            1.62889215740435,
+            -4.077706771146985
+          ],
+          "frame": "ship:scout",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(-54.73856645391295 100.18798975317672) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 3759
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-returned-outdoors",
+          "position": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "planet": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(162.46464564720148 -58.301144460314035) rotate(6.875493541569878) scale(26)"
+        },
+        {
+          "ship": {
+            "position": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                53962642442,
+                -5390064239,
+                -77946039081
+              ]
+            },
+            "velocityMps": [
+              0,
+              0,
+              0
+            ],
+            "yaw": -0.12,
+            "pitch": 0,
+            "massKg": 100000,
+            "throttle": 0,
+            "alignment": null,
+            "mode": "grounded",
+            "contact": {
+              "bodyId": "vesper",
+              "outcome": "safe-contact",
+              "impactSpeedMps": 0,
+              "normal": [
+                3.2258038501581854e-7,
+                0.9999999999999349,
+                -1.6129019250790927e-7
+              ],
+              "ageTicks": 60
+            },
+            "tick": 305
+          },
+          "location": "{\"siteId\":\"site:illustrated-landing:v1\",\"body\":{\"id\":\"vesper\",\"name\":\"Vesper\",\"kind\":\"planet\",\"radiusKm\":6200,\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5396264244,-77946039080]}},\"frames\":{\"planet\":{\"id\":\"planet:fixture\",\"universeOrigin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642440,-5390064239,-77946039080]},\"angle\":0},\"ship\":{\"id\":\"ship:scout\",\"parent\":\"planet:fixture\",\"origin\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[2,-1,0]},\"angle\":-0.12}},\"ship\":{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTicks\":60},\"tick\":0}}",
+          "name": "slice-reloaded-outdoors",
+          "position": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "planet": [
+            -5.935267097256366,
+            2.9742646552770067
+          ],
+          "frame": "planet:fixture",
+          "posture": "standing",
+          "cameraGroundTransform": "translate(162.46464564720148 -58.301144460314035) rotate(6.875493541569878) scale(26)"
+        }
+      ],
+      "handoffs": [
+        [
+          {
+            "before": [
+              2.674527193851527,
+              4.629889988658332
+            ],
+            "after": [
+              2.66973870555997,
+              4.590177643224177
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 383.5333251953125,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 382.60150146484375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.66973870555997,
+              4.590177643224177
+            ],
+            "after": [
+              2.664950217268413,
+              4.550465297790022
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 382.60150146484375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 381.8187561035156,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.664950217268413,
+              4.550465297790022
+            ],
+            "after": [
+              2.660161728976856,
+              4.510752952355867
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 381.8187561035156,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 381.1612548828125,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.660161728976856,
+              4.510752952355867
+            ],
+            "after": [
+              2.6553732406852992,
+              4.471040606921712
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 381.1612548828125,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 380.60894775390625,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.6553732406852992,
+              4.471040606921712
+            ],
+            "after": [
+              2.6505847523937422,
+              4.4313282614875575
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 380.60894775390625,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 380.1449890136719,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6505847523937422,
+              4.4313282614875575
+            ],
+            "after": [
+              2.6457962641021857,
+              4.391615916053403
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 380.1449890136719,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 379.7552795410156,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6457962641021857,
+              4.391615916053403
+            ],
+            "after": [
+              2.6410077758106287,
+              4.351903570619248
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 379.7552795410156,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 379.4279479980469,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.6410077758106287,
+              4.351903570619248
+            ],
+            "after": [
+              2.636219287519072,
+              4.312191225185094
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 379.4279479980469,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 379.1529541015625,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.636219287519072,
+              4.312191225185094
+            ],
+            "after": [
+              2.631430799227515,
+              4.272478879750939
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 379.1529541015625,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.9219665527344,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.631430799227515,
+              4.272478879750939
+            ],
+            "after": [
+              2.6266423109359587,
+              4.232766534316784
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.9219665527344,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.72796630859375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.6266423109359587,
+              4.232766534316784
+            ],
+            "after": [
+              2.6218538226444017,
+              4.19305418888263
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.72796630859375,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.5649719238281,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6218538226444017,
+              4.19305418888263
+            ],
+            "after": [
+              2.617065334352845,
+              4.153341843448475
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.5649719238281,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.4280700683594,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.617065334352845,
+              4.153341843448475
+            ],
+            "after": [
+              2.612276846061288,
+              4.11362949801432
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.4280700683594,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.3130798339844,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          },
+          {
+            "before": [
+              2.612276846061288,
+              4.11362949801432
+            ],
+            "after": [
+              2.607488357769731,
+              4.073917152580165
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 378.3130798339844,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 378.21649169921875,
+              "width": 35.5333251953125,
+              "height": 32.933319091796875
+            }
+          }
+        ],
+        [
+          {
+            "before": [
+              2.6296862103397167,
+              4.222173424591342
+            ],
+            "after": [
+              2.6344746986312733,
+              4.261885770025497
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6344746986312733,
+              4.261885770025497
+            ],
+            "after": [
+              2.63926318692283,
+              4.301598115459652
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.63926318692283,
+              4.301598115459652
+            ],
+            "after": [
+              2.6440516752143868,
+              4.341310460893807
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6440516752143868,
+              4.341310460893807
+            ],
+            "after": [
+              2.6488401635059438,
+              4.3810228063279615
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6488401635059438,
+              4.3810228063279615
+            ],
+            "after": [
+              2.6536286517975003,
+              4.420735151762116
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6536286517975003,
+              4.420735151762116
+            ],
+            "after": [
+              2.6584171400890573,
+              4.46044749719627
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "ship:scout",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6584171400890573,
+              4.46044749719627
+            ],
+            "after": [
+              2.663205628380614,
+              4.500159842630425
+            ],
+            "oldFrame": "ship:scout",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.663205628380614,
+              4.500159842630425
+            ],
+            "after": [
+              2.667994116672171,
+              4.53987218806458
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.667994116672171,
+              4.53987218806458
+            ],
+            "after": [
+              2.6727826049637278,
+              4.579584533498735
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6727826049637278,
+              4.579584533498735
+            ],
+            "after": [
+              2.6775710932552848,
+              4.619296878932889
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6775710932552848,
+              4.619296878932889
+            ],
+            "after": [
+              2.6823595815468417,
+              4.659009224367044
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6823595815468417,
+              4.659009224367044
+            ],
+            "after": [
+              2.6871480698383987,
+              4.698721569801199
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6871480698383987,
+              4.698721569801199
+            ],
+            "after": [
+              2.6919365581299557,
+              4.738433915235354
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          },
+          {
+            "before": [
+              2.6919365581299557,
+              4.738433915235354
+            ],
+            "after": [
+              2.6967250464215127,
+              4.778146260669509
+            ],
+            "oldFrame": "planet:fixture",
+            "newFrame": "planet:fixture",
+            "oldBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            },
+            "newBox": {
+              "x": 622.2333374023438,
+              "y": 389.3573303222656,
+              "width": 35.5333251953125,
+              "height": 32.933349609375
+            }
+          }
+        ]
+      ],
+      "ship": {
+        "position": {
+          "cell": [
+            "0",
+            "0",
+            "0"
+          ],
+          "offsetM": [
+            53962642442,
+            -5390064239,
+            -77946039081
+          ]
+        },
+        "velocityMps": [
+          0,
+          0,
+          0
+        ],
+        "yaw": -0.12,
+        "pitch": 0,
+        "massKg": 100000,
+        "throttle": 0,
+        "alignment": null,
+        "mode": "grounded",
+        "contact": {
+          "bodyId": "vesper",
+          "outcome": "safe-contact",
+          "impactSpeedMps": 0,
+          "normal": [
+            3.2258038501581854e-7,
+            0.9999999999999349,
+            -1.6129019250790927e-7
+          ],
+          "ageTicks": 60
+        },
+        "tick": 3759
+      },
+      "backend": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "errors": [],
+      "browser": "154.0.8037.57",
+      "input": "actual keyboard/mouse via production adapters; read-only DOM observations",
+      "origin": "built preview :4175",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "dpr": 1
+    }
+  ],
+  "wrongCheckpoint": {
+    "pass": false,
+    "changedPixels": 136746,
+    "rawChangedPixels": 284302
+  },
+  "clock": "2026-11-04T00:00:00Z fixed-step controlled browser clock",
+  "baseline": "review candidates; no approved references changed",
+  "future": [
+    "mining extraction/depletion/inventory persistence",
+    "Core energy",
+    "Fabricator production",
+    "multiplayer",
+    "ship damage"
+  ]
+}

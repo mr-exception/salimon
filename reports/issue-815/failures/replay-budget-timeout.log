@@ -1,0 +1,68 @@
+[WebServer] (node:4034) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4047) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:4066) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4079) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4105) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:4117) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [cockpit] › tests/cockpit.spec.ts:6:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation (6.0m)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:6:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation
+
+    Test timeout of 360000ms exceeded.
+
+    Error: page.screenshot: Target page, context or browser has been closed
+
+      17 |       const capture = async (name: string) => {
+      18 |         await page.clock.runFor(await page.locator('.panoramic').count() ? 64 : 5000)
+    > 19 |         const png = await page.screenshot({ path: info.outputPath(`${name}-${replay}.png`) })
+         |                                ^
+      20 |         if (replay === 0) originals[name] = png
+      21 |         else {
+      22 |           const r = compareImages(originals[name]!, png)
+        at capture (/workspace/salimon/client/tests/cockpit.spec.ts:19:32)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:113:7
+
+    attachment #9: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../tmp/815-cockpit-fixed/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #10: screenshot (image/png) ─────────────────────────────────────────────────────────
+    ../../../tmp/815-cockpit-fixed/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../tmp/815-cockpit-fixed/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #12: trace (application/zip) ────────────────────────────────────────────────────────
+    ../../../tmp/815-cockpit-fixed/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../tmp/815-cockpit-fixed/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Slow test file: [cockpit] › tests/cockpit.spec.ts (6.0m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  1 failed
+    [cockpit] › tests/cockpit.spec.ts:6:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation

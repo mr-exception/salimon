@@ -1,0 +1,1351 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=cockpit",
+      "--project=panoramic",
+      "--project=look-at",
+      "--project=observation",
+      "--project=desktop",
+      "--grep",
+      "COCKPIT-1|SLICE-1|SURV built|HUD-|LOOK-|OBS-1|OBS-2|OBS-5|scanner pulse, camera independence|zero throttle coasts"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "panoramic",
+        "name": "panoramic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/panoramic\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "look-at",
+        "name": "look-at",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/look-at\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "perspective",
+        "name": "perspective",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/perspective\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "optical",
+        "name": "optical",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/optical\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "observation",
+        "name": "observation",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/observation\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice|gathering|storage|items|survival|hazards|viewport)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/navigation-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "panoramic",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": false,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "panoramic"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "look-at",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 960,
+            "height": 600
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": false,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "look-at"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "observation",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "observation"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": true,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text",
+              "--disable-gpu"
+            ],
+            "env": {
+              "FONTCONFIG_FILE": "/workspace/salimon/client/tests/assets/fonts.conf"
+            }
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "cockpit"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/tmp/815-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/tmp/815-final/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "panoramic.spec.ts",
+      "file": "panoramic.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "HUD-1 full viewport, scanner authority, keyboard browser and priority Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "panoramic",
+              "projectName": "panoramic",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14862,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:50:37.995Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "desktop-1280x720.png",
+                      "contentType": "image/png",
+                      "path": "HUD-1/desktop-1280x720.png"
+                    },
+                    {
+                      "name": "help.png",
+                      "contentType": "image/png",
+                      "path": "HUD-1/help.png"
+                    },
+                    {
+                      "name": "browser-state.json",
+                      "contentType": "application/json",
+                      "path": "HUD-1/browser-state.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "HUD-1/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "14c32449942346a2da4d-66d8a22d9163c7b1b9e7",
+          "file": "panoramic.spec.ts",
+          "line": 13,
+          "column": 1
+        },
+        {
+          "title": "HUD-2 compass render states, ship rotation, zoom and responsive warning priority",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "panoramic",
+              "projectName": "panoramic",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 31884,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:50:53.208Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "rear.png",
+                      "contentType": "image/png",
+                      "path": "HUD-2/rear.png"
+                    },
+                    {
+                      "name": "overlap.png",
+                      "contentType": "image/png",
+                      "path": "HUD-2/overlap.png"
+                    },
+                    {
+                      "name": "warning-960x600.png",
+                      "contentType": "image/png",
+                      "path": "HUD-2/warning-960x600.png"
+                    },
+                    {
+                      "name": "terminal-960x600.png",
+                      "contentType": "image/png",
+                      "path": "HUD-2/terminal-960x600.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "HUD-2/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "14c32449942346a2da4d-ab846a760aa8c2b3f9a5",
+          "file": "panoramic.spec.ts",
+          "line": 69,
+          "column": 1
+        },
+        {
+          "title": "HUD-3 grounded authority and no sidebar at smaller desktop size",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "panoramic",
+              "projectName": "panoramic",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4691,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:51:25.129Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "grounded-960x600.png",
+                      "contentType": "image/png",
+                      "path": "HUD-3/grounded-960x600.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "HUD-3/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "14c32449942346a2da4d-67777b8dce1e3a77c90c",
+          "file": "panoramic.spec.ts",
+          "line": 111,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "look-at.spec.ts",
+      "file": "look-at.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "look-at",
+              "projectName": "look-at",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 26013,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:51:30.686Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "occluded.png",
+                      "contentType": "image/png",
+                      "path": "LOOK-1/occluded.png"
+                    },
+                    {
+                      "name": "measurements.json",
+                      "contentType": "application/json",
+                      "path": "LOOK-1/measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "LOOK-1/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5e7d4000f824134e6be-a250529a153cc782da86",
+          "file": "look-at.spec.ts",
+          "line": 12,
+          "column": 1
+        },
+        {
+          "title": "LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "look-at",
+              "projectName": "look-at",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14011,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:51:57.021Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "vesper.png",
+                      "contentType": "image/png",
+                      "path": "LOOK-2/vesper.png"
+                    },
+                    {
+                      "name": "grounded-observation.png",
+                      "contentType": "image/png",
+                      "path": "LOOK-2/grounded-observation.png"
+                    },
+                    {
+                      "name": "measurements.json",
+                      "contentType": "application/json",
+                      "path": "LOOK-2/measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "LOOK-2/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5e7d4000f824134e6be-fe92fe200fe075d3f1a6",
+          "file": "look-at.spec.ts",
+          "line": 84,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "observation.spec.ts",
+      "file": "observation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "OBS-1 actual perspective camera, independent ship, reset and remount",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8770,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:52:11.700Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "wide.png",
+                      "contentType": "image/png",
+                      "path": "OBS-1/wide.png"
+                    },
+                    {
+                      "name": "states.json",
+                      "contentType": "application/json",
+                      "path": "OBS-1/states.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "OBS-1/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-f18c490c58b809c66d49",
+          "file": "observation.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7277,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:52:20.869Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "telescope.png",
+                      "contentType": "image/png",
+                      "path": "OBS-2/telescope.png"
+                    },
+                    {
+                      "name": "states.json",
+                      "contentType": "application/json",
+                      "path": "OBS-2/states.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "OBS-2/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-7c8f598def0f2d35e0e3",
+          "file": "observation.spec.ts",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 23549,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:52:28.167Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "states.json",
+                      "contentType": "application/json",
+                      "path": "OBS-5/states.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "OBS-5/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-f8174abae42f0372157a",
+          "file": "observation.spec.ts",
+          "line": 139,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "cockpit.spec.ts",
+      "file": "cockpit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 360000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 212672,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:52:52.329Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "panoramic-horizon-repeat.json",
+                      "contentType": "application/json",
+                      "path": "COCKPIT-1/panoramic-horizon-repeat.json"
+                    },
+                    {
+                      "name": "panoramic-horizon-diff.png",
+                      "contentType": "image/png",
+                      "path": "COCKPIT-1/panoramic-horizon-diff.png"
+                    },
+                    {
+                      "name": "external-body-observation-repeat.json",
+                      "contentType": "application/json",
+                      "path": "COCKPIT-1/external-body-observation-repeat.json"
+                    },
+                    {
+                      "name": "external-body-observation-diff.png",
+                      "contentType": "image/png",
+                      "path": "COCKPIT-1/external-body-observation-diff.png"
+                    },
+                    {
+                      "name": "standing-return-repeat.json",
+                      "contentType": "application/json",
+                      "path": "COCKPIT-1/standing-return-repeat.json"
+                    },
+                    {
+                      "name": "standing-return-diff.png",
+                      "contentType": "image/png",
+                      "path": "COCKPIT-1/standing-return-diff.png"
+                    },
+                    {
+                      "name": "blackout-seated-repeat.json",
+                      "contentType": "application/json",
+                      "path": "COCKPIT-1/blackout-seated-repeat.json"
+                    },
+                    {
+                      "name": "blackout-seated-diff.png",
+                      "contentType": "image/png",
+                      "path": "COCKPIT-1/blackout-seated-diff.png"
+                    },
+                    {
+                      "name": "restored-seated-repeat.json",
+                      "contentType": "application/json",
+                      "path": "COCKPIT-1/restored-seated-repeat.json"
+                    },
+                    {
+                      "name": "restored-seated-diff.png",
+                      "contentType": "image/png",
+                      "path": "COCKPIT-1/restored-seated-diff.png"
+                    },
+                    {
+                      "name": "cockpit-measurements.json",
+                      "contentType": "application/json",
+                      "path": "COCKPIT-1/cockpit-measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "COCKPIT-1/test-finished-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "COCKPIT-1/test-finished-2.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8d194f2f5447ea2b23e4-e6863e09f82abab9a0de",
+          "file": "cockpit.spec.ts",
+          "line": 10,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "playable-slice.spec.ts",
+      "file": "playable-slice.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 159489,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:56:25.729Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "slice-outdoor-spawn-0-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-outdoor-spawn-0-state.json"
+                    },
+                    {
+                      "name": "slice-mineral-inspection-0-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-mineral-inspection-0-state.json"
+                    },
+                    {
+                      "name": "slice-exterior-cutaway-0-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-exterior-cutaway-0-state.json"
+                    },
+                    {
+                      "name": "slice-grounded-panoramic-0-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-grounded-panoramic-0-state.json"
+                    },
+                    {
+                      "name": "slice-standing-return-0-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-standing-return-0-state.json"
+                    },
+                    {
+                      "name": "slice-returned-outdoors-0-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-returned-outdoors-0-state.json"
+                    },
+                    {
+                      "name": "slice-reloaded-outdoors-0-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-reloaded-outdoors-0-state.json"
+                    },
+                    {
+                      "name": "slice-outdoor-spawn-1-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-outdoor-spawn-1-state.json"
+                    },
+                    {
+                      "name": "slice-outdoor-spawn-repeat.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-outdoor-spawn-repeat.json"
+                    },
+                    {
+                      "name": "slice-outdoor-spawn-diff.png",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/slice-outdoor-spawn-diff.png"
+                    },
+                    {
+                      "name": "slice-mineral-inspection-1-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-mineral-inspection-1-state.json"
+                    },
+                    {
+                      "name": "slice-mineral-inspection-repeat.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-mineral-inspection-repeat.json"
+                    },
+                    {
+                      "name": "slice-mineral-inspection-diff.png",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/slice-mineral-inspection-diff.png"
+                    },
+                    {
+                      "name": "slice-exterior-cutaway-1-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-exterior-cutaway-1-state.json"
+                    },
+                    {
+                      "name": "slice-exterior-cutaway-repeat.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-exterior-cutaway-repeat.json"
+                    },
+                    {
+                      "name": "slice-exterior-cutaway-diff.png",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/slice-exterior-cutaway-diff.png"
+                    },
+                    {
+                      "name": "slice-grounded-panoramic-1-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-grounded-panoramic-1-state.json"
+                    },
+                    {
+                      "name": "slice-grounded-panoramic-repeat.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-grounded-panoramic-repeat.json"
+                    },
+                    {
+                      "name": "slice-grounded-panoramic-diff.png",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/slice-grounded-panoramic-diff.png"
+                    },
+                    {
+                      "name": "slice-standing-return-1-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-standing-return-1-state.json"
+                    },
+                    {
+                      "name": "slice-standing-return-repeat.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-standing-return-repeat.json"
+                    },
+                    {
+                      "name": "slice-standing-return-diff.png",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/slice-standing-return-diff.png"
+                    },
+                    {
+                      "name": "slice-returned-outdoors-1-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-returned-outdoors-1-state.json"
+                    },
+                    {
+                      "name": "slice-returned-outdoors-repeat.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-returned-outdoors-repeat.json"
+                    },
+                    {
+                      "name": "slice-returned-outdoors-diff.png",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/slice-returned-outdoors-diff.png"
+                    },
+                    {
+                      "name": "slice-reloaded-outdoors-1-state.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-reloaded-outdoors-1-state.json"
+                    },
+                    {
+                      "name": "slice-reloaded-outdoors-repeat.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-reloaded-outdoors-repeat.json"
+                    },
+                    {
+                      "name": "slice-reloaded-outdoors-diff.png",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/slice-reloaded-outdoors-diff.png"
+                    },
+                    {
+                      "name": "slice-journeys.json",
+                      "contentType": "application/json",
+                      "path": "SLICE-1/slice-journeys.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/test-finished-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "SLICE-1/test-finished-2.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4f790d294be560a5a24d-79c4e22ffe2c0a3733f6",
+          "file": "playable-slice.spec.ts",
+          "line": 14,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "survival.spec.ts",
+      "file": "survival.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 31656,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:59:06.115Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "survival-records.json",
+                      "contentType": "application/json",
+                      "path": "SURV/survival-records.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "SURV/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c89f5ad21aae584c9d54-209c058ddb85fdaacd3c",
+          "file": "survival.spec.ts",
+          "line": 10,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "desktop.spec.ts",
+      "file": "desktop.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "scanner pulse, camera independence, clipping selection and manual alignment interruption",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12424,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:59:38.568Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "FLIGHT-selection/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-9b5be75bfe1af93b47bc",
+          "file": "desktop.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "zero throttle coasts while ship rotates; focused slider keeps native keyboard input",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3801,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T15:59:51.227Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "FLIGHT-velocity/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "12cc77c408bab7a1d6ba-e7f85959647dd86710ad",
+          "file": "desktop.spec.ts",
+          "line": 87,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-06T15:50:30.304Z",
+    "duration": 564953.887,
+    "expected": 13,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

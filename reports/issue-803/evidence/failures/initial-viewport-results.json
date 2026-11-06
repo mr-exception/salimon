@@ -1,0 +1,528 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=cockpit",
+      "viewport.spec.ts"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice|gathering|storage|items|survival|hazards|viewport)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/navigation-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/client/test-results/803-viewport",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": true,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text",
+              "--disable-gpu"
+            ],
+            "env": {
+              "REMOTE_DESKTOP_H265_ENABLED": "0",
+              "CODEX_EXEC_SERVER_PROXY_PRIVATE_IPS_VIA_UPSTREAM": "true",
+              "GRPC_DEFAULT_SSL_ROOTS_FILE_PATH": "/etc/ssl/certs/ca-certificates.crt",
+              "HTTPS_PROXY": "http://proxy:8080",
+              "CODEX_CI": "1",
+              "no_proxy": "localhost,127.0.0.1,::1",
+              "CODEX_EXEC_SERVER_REMOTE_BASE_URL": "https://codex-cloud-environments.chatgpt.com/api",
+              "NODE_EXTRA_CA_CERTS": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "CODEX_HOME": "/home/agent/.codex",
+              "USER": "agent",
+              "npm_config_user_agent": "npm/11.9.0 node/v24.19.0 linux x64 workspaces/false",
+              "SALIMON_EVIDENCE_DIR": "test-results/803-viewport",
+              "GH_TOKEN": "ghu_codex-cloud-github-proxy",
+              "npm_node_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "SHLVL": "1",
+              "npm_config_noproxy": "",
+              "HOME": "/home/agent",
+              "CODEX_CAAS_SESSION_ID": "bcd844fb93f24c33ad101824f99ba49e",
+              "CODEX_PRIMARY_RUNTIME_NODE_MODULES": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "NO_PROXY": "localhost,127.0.0.1,::1",
+              "npm_package_json": "/workspace/salimon/client/package.json",
+              "NETWORK": "caas_neko_desktop",
+              "npm_package_engines_node": ">=22.18",
+              "OPENAI_CLUSTER": "applied-caas57",
+              "PAGER": "cat",
+              "LC_CTYPE": "C.UTF-8",
+              "SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_userconfig": "/home/agent/.npmrc",
+              "npm_config_local_prefix": "/workspace/salimon/client",
+              "CODEX_PRIMARY_RUNTIME_BUNDLE_VERSION": "26.1013.11914",
+              "NO_COLOR": "1",
+              "COLORTERM": "",
+              "COLOR": "0",
+              "CHROMIUM_PATH": "/usr/bin/chromium",
+              "CODEX_PROXY_CERT": "/usr/local/share/ca-certificates/environment-proxy-ca.crt",
+              "https_proxy": "http://proxy:8080",
+              "CODEX_ENVIRONMENT_ID": "ccarenv_b64_Y2NhcmVudl9hNDU4ZmMzMDdmMzQ4MTkxODNhZGE4YzUxNGZlOTUxZg",
+              "CODEX_TOOL_CALL_ID": "exec-52622f4b-fca0-430f-afc5-850a5b2cd95f",
+              "http_proxy": "http://proxy:8080",
+              "_": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/npx",
+              "npm_config_npm_version": "11.9.0",
+              "CODEX_APPLY_PATCH_PRESERVE_LINE_ENDINGS": "1",
+              "RUST_LOG": "codex_exec_server=info,codex_cli=info,error",
+              "CODEX_NO_UPDATE": "1",
+              "TERM": "dumb",
+              "npm_config_cache": "/home/agent/.npm",
+              "CLOUDSDK_CORE_CUSTOM_CA_CERTS_FILE": "/etc/ssl/certs/ca-certificates.crt",
+              "npm_config_node_gyp": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js",
+              "PATH": "/workspace/salimon/client/node_modules/.bin:/workspace/salimon/client/node_modules/.bin:/workspace/salimon/node_modules/.bin:/workspace/node_modules/.bin:/node_modules/.bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+              "CODEX_VERSION": "0.0.0",
+              "CODEX_SESSION_ID": "01a1b021-14bf-7706-ac61-93157f9a006d",
+              "REQUESTS_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt",
+              "NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "npm_package_name": "salimon-navigation-client",
+              "CODEX_SANDBOX_NETWORK_DISABLED": "1",
+              "LANG": "C.UTF-8",
+              "GH_PAGER": "cat",
+              "npm_lifecycle_script": "\"playwright\"",
+              "BROWSER_MANAGEMENT_SOCKET_PATH": "/home/agent/.local/run/browser-management/socket",
+              "DEBIAN_FRONTEND": "noninteractive",
+              "SHELL": "/bin/bash",
+              "NODE_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+              "npm_package_version": "0.1.0",
+              "npm_lifecycle_event": "npx",
+              "CODEX_PRIMARY_RUNTIME_ROOT": "/opt/codex/runtimes/codex-primary-runtime",
+              "CAAS_IMAGE_GIT_COMMIT_SHA": "969fca457cb91df54eb491d22bcaff20654139fe",
+              "NPM_CONFIG_AUDIT": "false",
+              "DOCKER_TLS_CERTDIR": "",
+              "CAAS_IMAGE_VERSION": "20261019221748-969fca457cb9",
+              "CODEX_PRIMARY_RUNTIME_PYTHON": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+              "CODEX_THREAD_ID": "01a1b021-14bf-7706-ac61-93157f9a006d",
+              "CAAS_DIND_STORAGE_DRIVER": "vfs",
+              "GIT_PAGER": "cat",
+              "npm_config_globalconfig": "/home/agent/.local/etc/npmrc",
+              "npm_config_init_module": "/home/agent/.npm-init.js",
+              "PWD": "/workspace/salimon/client",
+              "NPM_CONFIG_FUND": "false",
+              "LC_ALL": "C.UTF-8",
+              "npm_execpath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/bin/npm-cli.js",
+              "CODEX_BROWSER_DEFER_ACTIVATION": "1",
+              "npm_config_global_prefix": "/home/agent/.local",
+              "HTTP_PROXY": "http://proxy:8080",
+              "npm_command": "exec",
+              "CODEX_PRIMARY_RUNTIME_NODE": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "PLAYWRIGHT_NODEJS_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+              "NPM_CONFIG_PREFIX": "/home/agent/.local",
+              "CODEX_PRIMARY_RUNTIME": "/opt/codex/runtimes/codex-primary-runtime",
+              "DOCKER_IGNORE_BR_NETFILTER_ERROR": "1",
+              "INIT_CWD": "/workspace/salimon/client",
+              "EDITOR": "vi",
+              "BROWSERSLIST_IGNORE_OLD_DATA": "true",
+              "FONTCONFIG_FILE": "/workspace/salimon/client/tests/assets/fonts.conf"
+            }
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "cockpit"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/803-viewport/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "viewport.spec.ts",
+      "file": "viewport.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "VIEWPORT production 1280x720 HUD, input, repeat and negative comparison",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3039,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m680\u001b[39m\nReceived: \u001b[31m679.9999949137369\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m0.000005086263058728946\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m680\u001b[39m\nReceived: \u001b[31m679.9999949137369\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m0.000005086263058728946\u001b[39m\n    at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:28:36)\n    at /workspace/salimon/client/tests/viewport.spec.ts:90:24",
+                    "location": {
+                      "file": "/workspace/salimon/client/tests/viewport.spec.ts",
+                      "column": 36,
+                      "line": 28
+                    },
+                    "snippet": "  26 |   for (const key of ['x', 'y'] as const) expect(result.projection[key]).toBeCloseTo(0, 5)\n  27 |   expect(result.projection.width).toBeCloseTo(width, 5)\n> 28 |   expect(result.projection.height).toBeCloseTo(height, 5)\n     |                                    ^\n  29 |   expect(result.projection.scaleX).toBeCloseTo(result.projection.scaleY, 8)\n  30 |   for (const box of result.hud) {\n  31 |     expect(box.x).toBeGreaterThanOrEqual(0); expect(box.y).toBeGreaterThanOrEqual(0)"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/workspace/salimon/client/tests/viewport.spec.ts",
+                        "column": 36,
+                        "line": 28
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m680\u001b[39m\nReceived: \u001b[31m679.9999949137369\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m0.000005086263058728946\u001b[39m\n\n  26 |   for (const key of ['x', 'y'] as const) expect(result.projection[key]).toBeCloseTo(0, 5)\n  27 |   expect(result.projection.width).toBeCloseTo(width, 5)\n> 28 |   expect(result.projection.height).toBeCloseTo(height, 5)\n     |                                    ^\n  29 |   expect(result.projection.scaleX).toBeCloseTo(result.projection.scaleY, 8)\n  30 |   for (const box of result.hud) {\n  31 |     expect(box.x).toBeGreaterThanOrEqual(0); expect(box.y).toBeGreaterThanOrEqual(0)\n    at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:28:36)\n    at /workspace/salimon/client/tests/viewport.spec.ts:90:24"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T09:15:58.195Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "negative.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjpmYWxzZSwiY2hhbmdlZFBpeGVscyI6MTI2OTMxLCJyYXdDaGFuZ2VkUGl4ZWxzIjoyNTMzMDEsInBvbGljeSI6eyJ0aHJlc2hvbGQiOjAuMSwibWF4RGlmZlBpeGVscyI6MCwiaW5jbHVkZUFBIjp0cnVlLCJtYXNrcyI6W119fQ=="
+                    },
+                    {
+                      "name": "repeat.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjp0cnVlLCJjaGFuZ2VkUGl4ZWxzIjowLCJyYXdDaGFuZ2VkUGl4ZWxzIjowLCJ0b3RhbFBpeGVscyI6OTIxNjAwLCJwb2xpY3kiOnsidGhyZXNob2xkIjowLjEsIm1heERpZmZQaXhlbHMiOjAsImluY2x1ZGVBQSI6dHJ1ZSwibWFza3MiOltdfX0="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-failed-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-failed-2.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/workspace/salimon/client/tests/viewport.spec.ts",
+                    "column": 36,
+                    "line": 28
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "24876809b35b098bf297-f53b1582bda57c955063",
+          "file": "viewport.spec.ts",
+          "line": 47,
+          "column": 3
+        },
+        {
+          "title": "VIEWPORT production 960x600 HUD, input, repeat and negative comparison",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2567,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m6\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m6\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m6\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m6\u001b[39m\n    at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:26:73)\n    at /workspace/salimon/client/tests/viewport.spec.ts:90:24",
+                    "location": {
+                      "file": "/workspace/salimon/client/tests/viewport.spec.ts",
+                      "column": 73,
+                      "line": 26
+                    },
+                    "snippet": "  24 |   expect(result.stage).toEqual(result.world)\n  25 |   expect(result.scroll).toEqual({ width, height })\n> 26 |   for (const key of ['x', 'y'] as const) expect(result.projection[key]).toBeCloseTo(0, 5)\n     |                                                                         ^\n  27 |   expect(result.projection.width).toBeCloseTo(width, 5)\n  28 |   expect(result.projection.height).toBeCloseTo(height, 5)\n  29 |   expect(result.projection.scaleX).toBeCloseTo(result.projection.scaleY, 8)"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/workspace/salimon/client/tests/viewport.spec.ts",
+                        "column": 73,
+                        "line": 26
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m6\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m6\u001b[39m\n\n  24 |   expect(result.stage).toEqual(result.world)\n  25 |   expect(result.scroll).toEqual({ width, height })\n> 26 |   for (const key of ['x', 'y'] as const) expect(result.projection[key]).toBeCloseTo(0, 5)\n     |                                                                         ^\n  27 |   expect(result.projection.width).toBeCloseTo(width, 5)\n  28 |   expect(result.projection.height).toBeCloseTo(height, 5)\n  29 |   expect(result.projection.scaleX).toBeCloseTo(result.projection.scaleY, 8)\n    at checkLayout (/workspace/salimon/client/tests/viewport.spec.ts:26:73)\n    at /workspace/salimon/client/tests/viewport.spec.ts:90:24"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T09:16:02.047Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "negative.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjpmYWxzZSwiY2hhbmdlZFBpeGVscyI6ODkzOTEsInJhd0NoYW5nZWRQaXhlbHMiOjE3OTU1OSwicG9saWN5Ijp7InRocmVzaG9sZCI6MC4xLCJtYXhEaWZmUGl4ZWxzIjowLCJpbmNsdWRlQUEiOnRydWUsIm1hc2tzIjpbXX19"
+                    },
+                    {
+                      "name": "repeat.json",
+                      "contentType": "application/json",
+                      "body": "eyJwYXNzIjp0cnVlLCJjaGFuZ2VkUGl4ZWxzIjowLCJyYXdDaGFuZ2VkUGl4ZWxzIjowLCJ0b3RhbFBpeGVscyI6NTc2MDAwLCJwb2xpY3kiOnsidGhyZXNob2xkIjowLjEsIm1heERpZmZQaXhlbHMiOjAsImluY2x1ZGVBQSI6dHJ1ZSwibWFza3MiOltdfX0="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-failed-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-failed-2.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/workspace/salimon/client/tests/viewport.spec.ts",
+                    "column": 73,
+                    "line": 26
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "24876809b35b098bf297-82b683f999d17e182382",
+          "file": "viewport.spec.ts",
+          "line": 47,
+          "column": 3
+        },
+        {
+          "title": "VIEWPORT DPR 2 and standalone development fixture preserve projection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "cockpit",
+              "projectName": "cockpit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1577,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T09:16:05.281Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/client/test-results/803-viewport/viewport-VIEWPORT-DPR-2-an-32fd0-fixture-preserve-projection-cockpit/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-bf26897ef629cfee4b13",
+          "file": "viewport.spec.ts",
+          "line": 101,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-06T09:15:53.128Z",
+    "duration": 13995.596,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

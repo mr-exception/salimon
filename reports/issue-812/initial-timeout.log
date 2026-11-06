@@ -1,0 +1,97 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=perspective
+
+[WebServer] (node:1008) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1021) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1078) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1090) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [perspective] › tests/perspective.spec.ts:10:1 › SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction (2.1m)
+(node:1535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [perspective] › tests/perspective.spec.ts:64:1 › SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression (2.2m)
+
+
+  1) [perspective] › tests/perspective.spec.ts:10:1 › SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction
+
+    Test timeout of 120000ms exceeded.
+
+    Error: locator.click: Test timeout of 120000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Detected hidden', exact: true })
+        - locator resolved to <button aria-pressed="false">Detected hidden</button>
+      - attempting click action
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+
+
+      31 |  for (const id of ['hidden', 'back', 'outside']) {
+      32 |   await page.getByRole('textbox').fill(id)
+    > 33 |   await page.getByRole('button', { name: `Detected ${id}`, exact: true }).click()
+         |                                                                           ^
+      34 |   await expect(page.getByRole('status')).toHaveText(`Selected: Detected ${id}`)
+      35 |  }
+      36 |  await page.getByRole('button', { name: 'Set direction', exact: true }).click()
+        at /workspace/salimon/client/tests/perspective.spec.ts:33:75
+
+    Error Context: ../reports/issue-812/browser/perspective-SENSOR-1-scann-5f09e-oup-pagination-and-eviction-perspective/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-812/browser/perspective-SENSOR-1-scann-5f09e-oup-pagination-and-eviction-perspective/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-812/browser/perspective-SENSOR-1-scann-5f09e-oup-pagination-and-eviction-perspective/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [perspective] › tests/perspective.spec.ts:64:1 › SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression
+
+    Test timeout of 120000ms exceeded.
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /^Sensor contact / })
+    Expected: 3
+    Received: undefined
+
+
+      72 |  await boot(page, true)
+      73 |  await page.getByRole('button', { name: 'Pulse', exact: true }).click()
+    > 74 |  await expect(sceneMarkers(page)).toHaveCount(3)
+         |                                   ^
+      75 |  await page.locator('canvas').click({ position: { x: 50, y: 650 } })
+      76 |  expect((await page.screenshot()).equals(first)).toBe(true)
+      77 |  expect((await state(page)).markers).toEqual(initial.markers)
+        at /workspace/salimon/client/tests/perspective.spec.ts:74:35
+
+    Error Context: ../reports/issue-812/browser/perspective-SENSOR-2-repea-6c270-and-stale-group-suppression-perspective/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-812/browser/perspective-SENSOR-2-repea-6c270-and-stale-group-suppression-perspective/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-812/browser/perspective-SENSOR-2-repea-6c270-and-stale-group-suppression-perspective/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [perspective] › tests/perspective.spec.ts:10:1 › SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction
+    [perspective] › tests/perspective.spec.ts:64:1 › SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression

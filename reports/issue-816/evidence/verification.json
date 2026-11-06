@@ -1,0 +1,98 @@
+{
+  "parent": "15a6e73c36f6ac151434e583eb4d65d5d1c35871",
+  "finalSource": "a63c90e06cdaf8bb03f178b9cbcda13a3e884dff",
+  "finalClientTree": "572e01f01e2f8c89935e86633cd7330e628faa8b",
+  "CI": "UNVERIFIED: awaiting user report",
+  "baselineApproval": "UNVERIFIED: awaiting human approval",
+  "runs": {
+    "full": {
+      "source": "8e6666018bf8962b0256d7bc4e40589ee7f1e82a",
+      "stats": {
+        "startTime": "2026-11-06T18:06:12.367Z",
+        "duration": 1858796.72,
+        "expected": 63,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      }
+    },
+    "final-focused": {
+      "source": "b7224b7fb8375cf532537f55efa14bb3c4a4f4f4",
+      "stats": {
+        "startTime": "2026-11-06T18:39:22.184Z",
+        "duration": 182237.30599999998,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    "visual-repeat": {
+      "source": "cb5b87a5c859f50802bb45bc47abf00dbfb672b9",
+      "stats": {
+        "startTime": "2026-11-06T18:43:58.512Z",
+        "duration": 310415.766,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  },
+  "negative": {
+    "navigation": {
+      "schema_version": 1,
+      "status": "PASS",
+      "mutations": [
+        {
+          "id": "unscanned-optical-markers",
+          "file": "src/perspectiveContacts.ts",
+          "original_sha256": "04ee9787f74ca8c371ab4f546ef583d6e369cbb40a4ef42988c77dd75cf53a02",
+          "mutated_sha256": "fbf5324898605c87e27764592a6df44eae4414e7a855ae93c34ab192c2e06dac",
+          "exit": 1,
+          "assertion": "UNSCANNED_OPTICAL_MARKER_LEAK",
+          "result": "EXPECTED_FAILURE",
+          "report": "unscanned-optical-markers/results.json"
+        },
+        {
+          "id": "reversed-wasd",
+          "file": "src/CameraControls.tsx",
+          "original_sha256": "5699d3761d8a95d931c8da21deb45591553a6b22a45b76cd45ca5968d9a448d2",
+          "mutated_sha256": "68de2cf000af02d566367f68dc4280d395f09329d80a2300a8bcb9221045a354",
+          "exit": 1,
+          "assertion": "NAV-1 a moves the correct screen direction",
+          "result": "EXPECTED_FAILURE",
+          "report": "reversed-wasd/results.json"
+        },
+        {
+          "id": "wrong-heading-color",
+          "file": "src/styles.css",
+          "original_sha256": "c5a4feaf0ab6bfdd05c156acc8d327f37a0635eaedf969d32a06b45c502c3cdf",
+          "mutated_sha256": "1fba009def8db310f733480972d04adc356800490a38d77f24bab196702734c4",
+          "exit": 1,
+          "assertion": "NAV-3 heading is yellow",
+          "result": "EXPECTED_FAILURE",
+          "report": "wrong-heading-color/results.json"
+        }
+      ]
+    },
+    "olderVisual": {
+      "status": "PASS",
+      "source": "a63c90e06cdaf8bb03f178b9cbcda13a3e884dff"
+    },
+    "panoramicVisual": {
+      "status": "PASS",
+      "source": "a63c90e06cdaf8bb03f178b9cbcda13a3e884dff",
+      "expectedMutation": "01388c6e21621b6301dc47991ebb6983278e7325da31099ec2559da3af414d5b",
+      "original": "ccb5ce340a913b8190f4bb08a122d837b51918769bb3ca005e1a0f0721f6ebf9",
+      "failures": [
+        {
+          "id": "telescope",
+          "changedPixels": 10000,
+          "rawChangedPixels": 10000
+        }
+      ]
+    },
+    "interruption": "aggregate visual-negative wrapper interrupted; first resume invalid startup from owned orphan servers; after identified test-server cleanup only the panoramic child reran and passed"
+  }
+}

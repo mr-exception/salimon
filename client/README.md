@@ -417,3 +417,42 @@ All scene positions/facings and selection cues share that basis; W/A/S/D is
 screen-relative through the inverse input transform. Physical ship headings,
 anchors and saves are unchanged. Unit coverage tests arbitrary headings and
 indoor/outdoor ownership; viewport coverage asserts the rendered bow is vertical.
+
+## Perspective observation camera foundation (#810)
+
+The development-only `/tests/observation.html` fixture exercises the new camera;
+production cockpit and `/?scene=radar` still use the shipped orthographic radar.
+Start with `npm run dev`. This fixture uses synthetic calibration targets and
+actual fixed-step ship motion; it is not the physical sky or final cockpit HUD.
+It is absent from the production build.
+
+`observationCamera.ts` owns a session-local `ObservationCameraState`. Construct
+it once from current ship yaw/pitch outside the mounted scene. Pass that owner
+to `<ObservationCamera view={view}/>`. `snapshot()` returns detached quaternion
+and FOV values; `restore(snapshot)` validates/normalizes them atomically and
+clamps FOV. `command({type:'reset', heading: currentShip})` samples current
+heading once and restores 75°. Look/zoom commands are separate from flight
+controls; the view owner never writes a ship snapshot.
+
+Use `observationFrame(view, currentShip).origin` as the split physical render
+origin, and `observationRelativePosition(body.position, currentShip)` for scene
+coordinates. The Three camera stays at zero in this ship-relative frame; never
+narrow absolute bigint galactic cells to Number. A future optical renderer must
+provide appropriate distance/depth staging (#811).
+
+WASD rotates around the current screen up/right axes; left-drag grabs the view.
+Pole crossings transport that basis continuously rather than snapping to world
+up; there is no commanded optical-axis roll. Wheel zoom is exponential per
+normalized wheel pixel, clamped to 0.1°–75° vertical FOV. Look increments scale
+with FOV, including keyboard and drag. Arrow keys remain exclusively ship
+steering. Form focus blocks keyboard/wheel observation; explicitly clicking the
+canvas transfers focus back to observation. Blur, visibilitychange, focus,
+resize, pointer cancellation and unmount release active input.
+
+Run `npm test && npm run build`, then
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=observation`.
+OBS-1–5 cover real WebGL, independent ship steering/motion, reset/remount,
+telescope sensitivity/pixels, focus cancellation, resize/DPR, spherical input,
+repeat captures and a deliberately wrong wide-versus-telescope comparison.
+These originals are evidence, not approved navigation baselines. Existing
+baseline approval and regression gates remain required in CI.

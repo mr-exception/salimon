@@ -62,3 +62,9 @@ their actual context, not physical hardware performance.
 Review code, criteria and actual evidence in the active implementation chat;
 no independent reviewer or retired automated QA gate is required. Preserve failed
 and unrun checks. Human retains baseline approval and merge authority.
+
+The #810 perspective camera foundation is available in development fixture
+`/tests/observation.html`: inertial full-sphere observation, ship-relative origin,
+75°–0.1° optical zoom and session-local snapshots. It does not replace the shipped
+orthographic radar or integrate the future physical sky/HUD/cockpit lifecycle.
+See the [camera API and checks](../client/README.md#perspective-observation-camera-foundation-810).

@@ -973,3 +973,16 @@ flight/relocation independently of React. The standalone radar fixture keeps its
 free-flight behavior. Checks: `scoutLocation.test.ts`, cockpit blackout/round trip,
 and built `SLICE-1` (re-entry, scanned Vesper, disabled flight, save/reload,
 continuous doorway/camera measurements and repeat screenshot comparisons).
+
+## Perspective observation foundation (#810)
+
+`client/src/observationCamera.ts` owns inertial quaternion/FOV, detached snapshots,
+explicit observation commands and split ship-relative render-origin helpers.
+`ObservationCamera.tsx` owns the R3F perspective camera and DOM look/zoom input;
+its parent retains the view owner across scene remounts. Unit coverage is
+`observationCamera.test.ts`; `tests/observation.html` / `observation.tsx` are an
+isolated development fixture with actual ship motion and calibration targets.
+The `observation` Playwright project covers projection, focus, poles, remount,
+resize/DPR and repeat/negative pixels. See the client guide for integration API.
+The production orthographic radar/cockpit remains current until #811–#815 supply
+physical scene, overlays, HUD and authorized lifecycle integration.

@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "zoom": 0,
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0
+    },
+    {
+      "zoom": 1,
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0
+    }
+  ],
+  "negative": {
+    "pass": false,
+    "changedPixels": 21366
+  },
+  "cyan": [
+    0,
+    19170
+  ]
+}

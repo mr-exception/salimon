@@ -1,0 +1,168 @@
+{
+  "initial": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 0
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "lookingAt": false,
+    "selected": null,
+    "contacts": [
+      {
+        "id": "caligo",
+        "name": "Caligo"
+      },
+      {
+        "id": "nacre",
+        "name": "Nacre"
+      },
+      {
+        "id": "relay",
+        "name": "Uncharted asteroid"
+      },
+      {
+        "id": "vesper",
+        "name": "Vesper"
+      },
+      {
+        "id": "vesper-moon",
+        "name": "Vesper Moon"
+      }
+    ],
+    "markers": [
+      {
+        "id": "vesper-moon",
+        "ids": [
+          "vesper-moon"
+        ],
+        "x": 717.3731928454888,
+        "y": 160.6574813753422
+      }
+    ],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "observed": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          53962642442,
+          -5390064239,
+          -77946039081
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.12,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "grounded",
+      "contact": {
+        "bodyId": "vesper",
+        "outcome": "safe-contact",
+        "impactSpeedMps": 0,
+        "normal": [
+          3.2258038501581854e-7,
+          0.9999999999999349,
+          -1.6129019250790927e-7
+        ],
+        "ageTicks": 60
+      },
+      "tick": 0
+    },
+    "view": {
+      "quaternion": [
+        0.26264956175049337,
+        -0.900195784306655,
+        0,
+        0.34736545255508666
+      ],
+      "fov": 75
+    },
+    "lookingAt": false,
+    "selected": "caligo",
+    "contacts": [
+      {
+        "id": "caligo",
+        "name": "Caligo"
+      },
+      {
+        "id": "nacre",
+        "name": "Nacre"
+      },
+      {
+        "id": "relay",
+        "name": "Uncharted asteroid"
+      },
+      {
+        "id": "vesper",
+        "name": "Vesper"
+      },
+      {
+        "id": "vesper-moon",
+        "name": "Vesper Moon"
+      }
+    ],
+    "markers": [
+      {
+        "id": "caligo",
+        "ids": [
+          "caligo"
+        ],
+        "x": 479.9999999999999,
+        "y": 300
+      }
+    ],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  }
+}

@@ -5,6 +5,7 @@ import { ObservationCameraState } from '../src/observationCamera.ts'
 import { OpticalSky } from '../src/OpticalSky.tsx'
 import { PerspectiveContacts } from '../src/PerspectiveContacts.tsx'
 import { currentContacts, perspectiveMarkers } from '../src/perspectiveContacts.ts'
+import { initialShip } from '../src/simulation.ts'
 import { ORIGIN, translate } from '../src/coordinates.ts'
 import type { Body } from '../src/sampleUniverse.ts'
 import { CatalogIndex, Scanner, SCANNER_RADIUS_M } from '../src/scanner.ts'
@@ -29,7 +30,7 @@ function Scene() {
 }
 createRoot(document.getElementById('root')!).render(<>
  <div style={{ height: '100vh', position: 'relative' }}><Canvas dpr={lowResolution ? 0.5 : 1} gl={{ preserveDrawingBuffer: true }}><Scene/></Canvas>
- <PerspectiveContacts scanner={scanner} geometry={bodies} view={view} getOrigin={() => origin} onSetDirection={() => actions++}/></div>
+ <PerspectiveContacts scanner={scanner} geometry={bodies} view={view} getOrigin={() => origin} getShip={() => ({ ...initialShip(), position: origin })} onSetDirection={() => actions++}/></div>
  <nav style={{ position: 'absolute', bottom: 8, left: 8 }}>
  <button onClick={() => scanner.update(++tick, origin)}>Tick</button>
  <button onClick={() => { tick = Math.ceil((tick + 1) / 300) * 300; scanner.update(tick, origin) }}>Pulse</button>

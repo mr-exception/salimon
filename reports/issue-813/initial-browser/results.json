@@ -1,0 +1,399 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=look-at"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "look-at",
+        "name": "look-at",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/look-at\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "perspective",
+        "name": "perspective",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/perspective\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "optical",
+        "name": "optical",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/optical\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "observation",
+        "name": "observation",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/observation\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice|gathering|storage|items|survival|hazards|viewport)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/navigation-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "look-at",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 960,
+            "height": 600
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": false,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "look-at"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/workspace/salimon/reports/issue-813/browser/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "look-at.spec.ts",
+      "file": "look-at.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "look-at",
+              "projectName": "look-at",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 21930,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:32:39.146Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "occluded.png",
+                      "contentType": "image/png",
+                      "path": "attachments/1-occluded.png"
+                    },
+                    {
+                      "name": "measurements.json",
+                      "contentType": "application/json",
+                      "path": "attachments/1-measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5e7d4000f824134e6be-a250529a153cc782da86",
+          "file": "look-at.spec.ts",
+          "line": 12,
+          "column": 1
+        },
+        {
+          "title": "LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "look-at",
+              "projectName": "look-at",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 181744,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/workspace/salimon/client/tests/look-at.spec.ts",
+                        "column": 56,
+                        "line": 10
+                      },
+                      "message": "Error: locator.click: Test timeout of 180000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Caligo', exact: true })\u001b[22m\n\n\n   8 | async function choose(page: Page, name: string) {\n   9 |  await page.getByRole('textbox').fill(name)\n> 10 |  await page.getByRole('button', { name, exact: true }).click()\n     |                                                        ^\n  11 | }\n  12 | test('LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation', async ({ page }, info) => {\n  13 |  const errors: string[] = []; page.on('pageerror', e => errors.push(e.message))\n    at choose (/workspace/salimon/client/tests/look-at.spec.ts:10:56)\n    at /workspace/salimon/client/tests/look-at.spec.ts:86:2"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:33:01.417Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "vesper.png",
+                      "contentType": "image/png",
+                      "path": "attachments/2-vesper.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a5e7d4000f824134e6be-fe92fe200fe075d3f1a6",
+          "file": "look-at.spec.ts",
+          "line": 75,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-06T13:32:32.720Z",
+    "duration": 210801.195,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

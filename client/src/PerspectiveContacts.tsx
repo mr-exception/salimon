@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { contactCommandAvailability, lookAtContact } from './contactCommands.ts'
+import type { ShipState } from './simulation.ts'
 import type { Position } from './coordinates.ts'
 import type { ObservationCameraState } from './observationCamera.ts'
 import type { Body } from './sampleUniverse.ts'
@@ -9,8 +11,9 @@ import { currentContacts, perspectiveMarkers, selectContact, selectedContact } f
  * physical origin and optional flight action. No optical raycaster/hit meshes.
  * Every handler rechecks live scanner authority, including stale DOM events.
  */
-export function PerspectiveContacts({ scanner, geometry, view, getOrigin, onSetDirection }: {
+export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShip, canPilot = () => true, onSetDirection }: {
  scanner: Scanner; geometry: readonly Body[]; view: ObservationCameraState; getOrigin: () => Position
+ getShip: () => ShipState; canPilot?: () => boolean
  onSetDirection?: (body: Body) => void
 }) {
  const root = useRef<HTMLDivElement>(null)
@@ -25,6 +28,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, onSetD
  }, [])
  const origin = getOrigin(), contacts = currentContacts(scanner, origin)
  const selected = selectedContact(scanner, origin)
+ const availability = selected && contactCommandAvailability(getShip(), selected, canPilot())
  const bounds = root.current?.getBoundingClientRect()
  const markers = perspectiveMarkers(contacts, geometry, origin, view.snapshot(), bounds?.width ?? 0, bounds?.height ?? 0)
  // A grouping menu belongs to the current visible group, never to stale IDs.
@@ -42,6 +46,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, onSetD
     else { setGroup(live.ids); setPage(0); setQuery('') }
    }}>{marker.ids.length === 1 ? '+' : marker.ids.length}</button>)}
   <section aria-label="Detected contacts" style={{ position: 'absolute', right: 8, top: 8, width: 240, padding: 12, color: 'white', background: '#102431ee', pointerEvents: 'auto' }}>
+   <details><summary>Observation help</summary><p>Look at turns only the camera once, preserving zoom and ship motion. Drag, W/A/S/D or wheel cancels it. Set direction turns only the ship without thrust; arrow keys cancel that turn. Grounded ships can observe other detected bodies, but cannot aim at their landing planet center. Typing and focused controls do not steer the view.</p></details>
    <label>Search contacts <input value={query} onChange={e => { setQuery(e.target.value); setPage(0) }}/></label>
    {group && <button onClick={() => { setGroup(null); setPage(0) }}>All contacts</button>}
    {group && !activeGroup && <p>Group no longer visible</p>}
@@ -50,7 +55,17 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, onSetD
    <span> {currentPage + 1}/{last + 1} </span>
    <button disabled={currentPage === last} onClick={() => setPage(currentPage + 1)}>Next</button>
    <p role="status">{selected ? `Selected: ${selected.name}` : 'No selection'}</p>
-   {selected && onSetDirection && <button onClick={() => { const live = selectedContact(scanner, getOrigin()); if (live) onSetDirection(live) }}>Set direction</button>}
+   {selected && availability && <>
+    {availability.currentPlanet && <p>Current landing planet: {selected.name}</p>}
+    <button disabled={!availability.lookAt} onClick={() => {
+     const live = selectedContact(scanner, getOrigin())
+     if (live) lookAtContact(scanner, getShip(), view, live.id)
+    }}>Look at</button>
+    {onSetDirection && <button disabled={!availability.setDirection} onClick={() => {
+     const live = selectedContact(scanner, getOrigin())
+     if (live && contactCommandAvailability(getShip(), live, canPilot()).setDirection) onSetDirection(live)
+    }}>Set direction</button>}
+   </>}
   </section>
  </div>
 }

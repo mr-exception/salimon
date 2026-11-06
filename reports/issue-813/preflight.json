@@ -1,0 +1,43 @@
+{
+  "ship": {
+    "position": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "velocityMps": [
+      0,
+      0,
+      0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "massKg": 100000,
+    "throttle": 0,
+    "alignment": null,
+    "mode": "flying",
+    "contact": null,
+    "tick": 0
+  },
+  "view": {
+    "quaternion": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "fov": 75
+  },
+  "lookingAt": false,
+  "selected": null,
+  "contacts": [],
+  "markers": [],
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+}

@@ -89,6 +89,20 @@ scene/camera with scanner-authorized markers and a searchable, paginated contact
 browser. Physical line-of-sight tests suppress occluded/behind-camera/off-screen
 marker hit targets; those scanned IDs stay in the browser. Live guards remove
 stale selection actions on range loss. This does not switch the production
-cockpit or standalone orthographic radar; #813–#816 retain their separate scope.
+cockpit or standalone orthographic radar; #814–#816 retain their separate scope.
 See the [overlay API](../client/README.md#perspective-sensor-overlay-foundation-812)
 and [local evidence](../reports/issue-812/README.md); remote acceptance is pending.
+
+
+### One-time perspective contact observation (#813)
+
+The reusable perspective overlay now offers scanner-guarded Look at (camera)
+and Set direction (ship), with separate cancellation and live flight gates.
+Look at captures direction once, preserves zoom/ship motion, and deterministically
+handles opposite directions. Shared grounded Scout permits other detected bodies
+while identifying Vesper and disabling self-body actions. Scanner loss removes
+commands without a selectable ghost; foreground optical geometry remains opaque.
+The development-only `/tests/look-at.html` verifies flying and shared grounded
+composition; production panoramic cockpit integration remains #815.
+See [API/help](../client/README.md#one-time-contact-observation-813) and
+[local evidence](../reports/issue-813/README.md); CI awaits the user's report.

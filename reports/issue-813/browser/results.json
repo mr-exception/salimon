@@ -1,0 +1,858 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=look-at",
+      "--project=perspective",
+      "--project=observation"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "look-at",
+        "name": "look-at",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/look-at\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "perspective",
+        "name": "perspective",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/perspective\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "optical",
+        "name": "optical",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/optical\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "observation",
+        "name": "observation",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/observation\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice|gathering|storage|items|survival|hazards|viewport)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/navigation-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "look-at",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 960,
+            "height": 600
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": false,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "look-at"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "perspective",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 960,
+            "height": 600
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": false,
+            "sources": true
+          },
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "perspective"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/reports/issue-813/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "observation",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": "retain-on-failure",
+          "launchOptions": {
+            "executablePath": "/usr/bin/chromium",
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "observation"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/workspace/salimon/reports/issue-813/browser/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "look-at.spec.ts",
+      "file": "look-at.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "look-at",
+              "projectName": "look-at",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 22087,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:36:44.069Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "occluded.png",
+                      "contentType": "image/png",
+                      "path": "attachments/1-occluded.png"
+                    },
+                    {
+                      "name": "measurements.json",
+                      "contentType": "application/json",
+                      "path": "attachments/1-measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5e7d4000f824134e6be-a250529a153cc782da86",
+          "file": "look-at.spec.ts",
+          "line": 12,
+          "column": 1
+        },
+        {
+          "title": "LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "look-at",
+              "projectName": "look-at",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12060,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:37:06.430Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "vesper.png",
+                      "contentType": "image/png",
+                      "path": "attachments/2-vesper.png"
+                    },
+                    {
+                      "name": "grounded-observation.png",
+                      "contentType": "image/png",
+                      "path": "attachments/2-grounded-observation.png"
+                    },
+                    {
+                      "name": "measurements.json",
+                      "contentType": "application/json",
+                      "path": "attachments/2-measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5e7d4000f824134e6be-fe92fe200fe075d3f1a6",
+          "file": "look-at.spec.ts",
+          "line": 82,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "perspective.spec.ts",
+      "file": "perspective.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "perspective",
+              "projectName": "perspective",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 71667,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:37:19.117Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "before-pulse.png",
+                      "contentType": "image/png",
+                      "path": "attachments/3-before-pulse.png"
+                    },
+                    {
+                      "name": "scanned.png",
+                      "contentType": "image/png",
+                      "path": "attachments/3-scanned.png"
+                    },
+                    {
+                      "name": "tiny-telescope.png",
+                      "contentType": "image/png",
+                      "path": "attachments/3-tiny-telescope.png"
+                    },
+                    {
+                      "name": "measurements.json",
+                      "contentType": "application/json",
+                      "path": "attachments/3-measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "perspective-SENSOR-1-scann-5f09e-oup-pagination-and-eviction-perspective/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aa3dbf1c81632a83becb-2fd3352ae5ccd54832c4",
+          "file": "perspective.spec.ts",
+          "line": 10,
+          "column": 1
+        },
+        {
+          "title": "SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "perspective",
+              "projectName": "perspective",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 36855,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:38:31.023Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "telescope.png",
+                      "contentType": "image/png",
+                      "path": "attachments/4-telescope.png"
+                    },
+                    {
+                      "name": "measurements.json",
+                      "contentType": "application/json",
+                      "path": "attachments/4-measurements.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "perspective-SENSOR-2-repea-6c270-and-stale-group-suppression-perspective/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aa3dbf1c81632a83becb-03bb6472df2caaad084d",
+          "file": "perspective.spec.ts",
+          "line": 68,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "observation.spec.ts",
+      "file": "observation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "OBS-1 actual perspective camera, independent ship, reset and remount",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9318,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:39:08.667Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "wide.png",
+                      "contentType": "image/png",
+                      "path": "attachments/5-wide.png"
+                    },
+                    {
+                      "name": "states.json",
+                      "contentType": "application/json",
+                      "path": "attachments/5-states.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "observation-OBS-1-actual-p-e77ab-dent-ship-reset-and-remount-observation/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-f18c490c58b809c66d49",
+          "file": "observation.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6471,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:39:18.231Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "telescope.png",
+                      "contentType": "image/png",
+                      "path": "attachments/6-telescope.png"
+                    },
+                    {
+                      "name": "states.json",
+                      "contentType": "application/json",
+                      "path": "attachments/6-states.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "observation-OBS-2-telescop-711ae-lamp-and-focus-cancellation-observation/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-7c8f598def0f2d35e0e3",
+          "file": "observation.spec.ts",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "OBS-3 DPR 2 preserves projection and origin",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3637,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:39:24.718Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "dpr2.png",
+                      "contentType": "image/png",
+                      "path": "attachments/7-dpr2.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "observation-OBS-3-DPR-2-preserves-projection-and-origin-observation/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-e7568fbf42f6051bb09a",
+          "file": "observation.spec.ts",
+          "line": 96,
+          "column": 1
+        },
+        {
+          "title": "OBS-4 repeated wide/telescope pixels and negative comparison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8500,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:39:28.380Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "run-0-wide.png",
+                      "contentType": "image/png",
+                      "path": "attachments/8-run-0-wide.png"
+                    },
+                    {
+                      "name": "run-0-telescope.png",
+                      "contentType": "image/png",
+                      "path": "attachments/8-run-0-telescope.png"
+                    },
+                    {
+                      "name": "run-1-wide.png",
+                      "contentType": "image/png",
+                      "path": "attachments/8-run-1-wide.png"
+                    },
+                    {
+                      "name": "run-1-telescope.png",
+                      "contentType": "image/png",
+                      "path": "attachments/8-run-1-telescope.png"
+                    },
+                    {
+                      "name": "comparisons.json",
+                      "contentType": "application/json",
+                      "path": "attachments/8-comparisons.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "observation-OBS-4-repeated-5368f-els-and-negative-comparison-observation/test-finished-1.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "observation-OBS-4-repeated-5368f-els-and-negative-comparison-observation/test-finished-2.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-c519844ae22ffdb0ef56",
+          "file": "observation.spec.ts",
+          "line": 108,
+          "column": 1
+        },
+        {
+          "title": "OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "observation",
+              "projectName": "observation",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 23049,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-06T13:39:36.892Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "states.json",
+                      "contentType": "application/json",
+                      "path": "attachments/9-states.json"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "observation-OBS-5-spherica-049d5-tion-and-moving-ship-origin-observation/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "79ed05eb40dfa20d179e-f8174abae42f0372157a",
+          "file": "observation.spec.ts",
+          "line": 139,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-06T13:36:37.095Z",
+    "duration": 202994.21899999998,
+    "expected": 9,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -32,7 +32,7 @@ export async function walkTo(page: Page, target: number[], frame?: FrameId, exac
   for (let i = 0; i < 140; i++) {
     const p = await positionIn(page, frame), dx = target[0] - p[0], dy = target[1] - p[1]
     if (Math.hypot(dx, dy) < .075) return
-    const angle = frame === 'ship:scout' ? -.12 : 0, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
+    const angle = frame === 'ship:scout' ? 0 : -createTopDownState().frames.ship.angle, x = Math.cos(angle) * dx - Math.sin(angle) * dy, y = Math.sin(angle) * dx + Math.cos(angle) * dy
     const keys = [...(Math.abs(x) > .035 ? [x > 0 ? 'd' : 'a'] : []), ...(Math.abs(y) > .035 ? [y > 0 ? 's' : 'w'] : [])]
     if (exactTicks) await walkTicks(page, keys, Math.max(1, Math.min(3, Math.floor(Math.hypot(dx, dy) / .04))))
     else await walk(page, keys, Math.max(17, Math.min(65, Math.hypot(dx, dy) / 2.4 * 1000)))

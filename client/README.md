@@ -411,3 +411,9 @@ without distorting world proportions. `tests/viewport.spec.ts` belongs to the
 cockpit project and verifies the built `/` at 1280×720/960×600, repeat/negative
 screenshots, DPR 2, focus, resize and the standalone dev fixture. See the
 [layout contract](../docs/playable-2d-foundation.md#viewport-and-hud-803).
+
+The 2D camera universally keeps the active ship vertical with its bow screen-up.
+All scene positions/facings and selection cues share that basis; W/A/S/D is
+screen-relative through the inverse input transform. Physical ship headings,
+anchors and saves are unchanged. Unit coverage tests arbitrary headings and
+indoor/outdoor ownership; viewport coverage asserts the rendered bow is vertical.

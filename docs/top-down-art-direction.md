@@ -9,6 +9,7 @@ represent the full default `/` gameplay entry.
 
 ## View and illustration
 
+- **Universal ship-up rule:** the active spaceship is always vertical in the 2D view, bow pointing to the top of the screen, indoors and outdoors. Rotate the scene basis consistently; preserve physical headings, world anchors and collision geometry. W/A/S/D follows screen directions.
 - **Strict overhead top-down**, not isometric or three-quarter. Ground positions, collision footprints, collection ranges and rendering alignment must refer to the same top-down world space.
 - **Stylized illustrated 2D** sprites and environmental layers, with strong silhouettes, controlled textures, readable materials and restrained highlights/shadows. No pixel-art requirement or mandatory decorative 3D meshes.
 - Avoid visual clutter and decorative geometry that hides important objects or changes gameplay collision. Ensure legibility at normal gameplay zoom.

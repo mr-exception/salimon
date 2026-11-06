@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { CELL_SIZE_M, ORIGIN, relativeM, translate } from './coordinates.ts'
-import { convertAnchor, inPlanet, point2, relativeAnchor, rotate2, type Anchor } from './topDownFrames.ts'
+import { convertAnchor, inPlanet, point2, relativeAnchor, rotate2, worldToView, viewToWorld, type Anchor } from './topDownFrames.ts'
 import { allowedMove, interactionInReach, nearbyObject, PLAYER_RADIUS_M } from './topDownInteraction.ts'
 import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, stepTopDown, TopDownClock } from './topDownRuntime.ts'
 
@@ -172,5 +172,31 @@ test('settled camera has exactly zero player-relative offset after different vie
     const settled = state.camera.anchor
     for (let i = 0; i < 60; i++) state = stepTopDown(state, [0, 0])
     assert.deepEqual(state.camera.anchor, settled)
+  }
+})
+
+test('universal ship-up projection and screen-direction input agree at every ship heading', () => {
+  for (const angle of [0, -.12, Math.PI / 2, -Math.PI, 2.8, 7]) {
+    for (const view of ['interior', 'exterior'] as const) {
+      const base = createTopDownState(view)
+      const state = { ...base, frames: { ...base.frames, ship: { ...base.frames.ship, angle } } }
+      const before = JSON.stringify(state, (_, value) => typeof value === 'bigint' ? value.toString() : value)
+      const items = drawList(state)
+      for (const item of items) {
+        near(item.positionM, worldToView(relativeAnchor(item.entity.anchor, state.camera.anchor, state.frames), state.frames))
+        if (item.entity.anchor.frame === 'ship:scout' && item.entity.id !== PLAYER_ID) assert.equal(item.angle, 0)
+      }
+      assert.equal(JSON.stringify(state, (_, value) => typeof value === 'bigint' ? value.toString() : value), before)
+      for (const direction of [[0, -1], [1, 0], [0, 1], [-1, 0]] as const) {
+        near(worldToView(viewToWorld(direction, state.frames), state.frames), direction)
+      }
+      // Follow a freely placed outdoor character using screen-up input.
+      const anchor: Anchor = { frame: 'planet:fixture', point: point2(100, 100) }
+      const outside = { ...state, camera: { ...state.camera, anchor }, entities: state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e) }
+      const stepped = stepTopDown(outside, viewToWorld([0, -1], state.frames))
+      near(worldToView(relativeAnchor(stepped.entities.find(e => e.id === PLAYER_ID)!.anchor, anchor, state.frames), state.frames), [0, -.04])
+      const facing = drawList(stepped).find(e => e.entity.id === PLAYER_ID)!.angle
+      near([Math.sin(facing), -Math.cos(facing)], [0, -1])
+    }
   }
 })

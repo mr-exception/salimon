@@ -29,6 +29,16 @@ async function checkLayout(page: Page) {
   const result = await layout(page), { width, height } = result.viewport
   expect(result.world).toEqual({ x: 0, y: 0, width, height })
   expect(result.stage).toEqual(result.world)
+  for (const id of ['ship:scout', 'scout:floor', 'scout:desk', 'scout:entry']) {
+    const transform = await page.locator(`[data-entity="${id}"]`).getAttribute('transform')
+    expect(transform).toContain('rotate(0)')
+  }
+  // A ship-local bow-to-stern vector must project vertically in screen space.
+  const bow = await page.locator('[data-entity="ship:scout"]').evaluate(el => {
+    const m = (el as unknown as SVGGraphicsElement).getScreenCTM()!
+    return { dx: m.c * -1, dy: m.d * -1 }
+  })
+  expect(bow.dx).toBe(0); expect(bow.dy).toBeLessThan(0)
   expect(result.scroll).toEqual({ width, height })
   // SVG viewBox.baseVal is float32. Measure coverage on the device-pixel grid;
   // retain the unrounded projection in layout.json for numerical inspection.

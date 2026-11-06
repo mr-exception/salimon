@@ -5,7 +5,7 @@ import { scoutEntities } from './scoutLayout.ts'
 import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
 import { translate } from './coordinates.ts'
 import { allowedMove, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
-import { convertAnchor, point2, relativeAnchor, rotate2, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
+import { convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
 export type Layer = typeof LAYERS[number]
@@ -106,7 +106,7 @@ export function drawList(state: TopDownState): DrawItem[] {
   return state.entities.map(e => e.id === PLAYER_ID && state.player.mode === 'seated' ? { ...e, layer: 'cues' as const } : e).sort((a, b) => LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer)
     || Number(b.appearance === 'ground') - Number(a.appearance === 'ground')
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
-    .map(entity => ({ entity, positionM: relativeAnchor(entity.anchor, state.camera.anchor, state.frames), angle: entity.id === PLAYER_ID ? state.player.facing : entity.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0 }))
+    .map(entity => ({ entity, positionM: worldToView(relativeAnchor(entity.anchor, state.camera.anchor, state.frames), state.frames), angle: ( entity.id === PLAYER_ID ? state.player.facing : entity.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0) - state.frames.ship.angle }))
 }
 export class TopDownClock {
   private remainder = 0

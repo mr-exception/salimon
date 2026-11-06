@@ -41,3 +41,9 @@ export function relativeAnchor(target: Anchor, origin: Anchor, frames: WorldFram
   const [x, y] = relativeM(inPlanet(target, frames), inPlanet(origin, frames))
   return [x, y]
 }
+
+// Universal 2D presentation basis: the active ship's bow is always screen-up.
+// Domain anchors and collision remain in planet/ship frames; only presentation
+// and its inverse input mapping rotate. Ownership handoff never changes basis.
+export const worldToView = (direction: Point2, frames: WorldFrames): Point2 => rotate2(direction, -frames.ship.angle)
+export const viewToWorld = (direction: Point2, frames: WorldFrames): Point2 => rotate2(direction, frames.ship.angle)

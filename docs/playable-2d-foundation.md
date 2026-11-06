@@ -137,3 +137,15 @@ buttons versus walking, pause/resume, resize, DPR 2, and the dev fixture. Each
 reference-size scene is captured twice and compared using the existing pixel
 policy; an intentional inset-stage mutation must fail comparison. These captures
 are repeat evidence, not approved navigation baselines.
+
+### Universal ship-up orientation
+
+The active ship's bow always points to the top of the 2D screen, whether the
+character is outdoors, aboard, inspecting, gathering, paused, or returning from
+the cockpit. `worldToView` rotates planet-axis relative positions by the inverse
+ship heading; ship fixtures therefore render at zero angle. Terrain, player
+facing and selection cues use the same basis. `viewToWorld` inversely maps
+screen-direction W/A/S/D into the existing physical movement/collision adapter.
+This is a presentation rule for every heading, not a change to the authored site
+or saved physical orientation. Frame handoff does not change the camera basis.
+The independent 3D radar keeps its existing orientation controls.

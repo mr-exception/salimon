@@ -1,3 +1,4 @@
+import { viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
 import { DRY_MASS_KG, setMass } from './simulation.ts'
 import { App } from './App'
@@ -121,7 +122,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (!inWorld) input.clear()
       if (paused.current || document.hidden) { input.clear(); clock.reset() }
       const controls = input.controls
-      current.current = clock.advance(current.current, dt, [Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], (world, direction) => {
+      current.current = clock.advance(current.current, dt, viewToWorld([Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], current.current.frames), (world, direction) => {
         if (!session.current) return stepTopDown(world, direction)
         if (session.current.error || session.current.survival.health === 0) return world
         return session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))

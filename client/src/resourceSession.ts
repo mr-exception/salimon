@@ -1,3 +1,4 @@
+import { freshHazards, validateHazards, hazardRates, stepHazards, type HazardState, type HazardSource, type HazardEvent, type ProtectionModule } from './hazards.ts'
 import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
@@ -27,7 +28,8 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
-  readonly version: 6
+  readonly version: 7
+  readonly hazards: HazardState
   readonly survival: SurvivalState
   readonly itemDefinitions: CountItemCatalog
   readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
@@ -72,13 +74,16 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
 export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
-  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...((data.version === 3 || data.version === 4 || (data.version === 5 || data.version === 6)) ? ['stores'] : []), ...((data.version === 5 || data.version === 6) ? ['itemDefinitions'] : []), ...(data.version === 6 ? ['survival'] : [])]
+  const hasStores = [3, 4, 5, 6, 7].includes(data.version as number)
+  const hasItems = [5, 6, 7].includes(data.version as number)
+  const hasSurvival = data.version === 6 || data.version === 7
+  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(data.version === 7 ? ['hazards'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
+  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -97,7 +102,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     capacitySlots: legacy ? 12 : integer(inv.capacitySlots, 12),
     quantities, items,
   }
-  if ((data.version === 5 || data.version === 6)) {
+  if (hasItems) {
     const saved = registerCountItems(object(data.itemDefinitions) as CountItemCatalog)
     if (Object.keys(saved).length !== Object.keys(catalog).length || Object.entries(saved).some(([id, meta]) =>
       !Object.hasOwn(catalog, id) || meta.gramsPerItem !== catalog[id]!.gramsPerItem || meta.stackSize !== catalog[id]!.stackSize || meta.name !== catalog[id]!.name)) throw new Error('Changed item definitions')
@@ -119,13 +124,13 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     if (source.id !== id || source.resourceId !== initial.resourceId) throw new Error('Material conservation failed')
     sources[id] = { id, resourceId: initial.resourceId, remainingGrams }
   }
-  const savedStores = data.version === 3 || data.version === 4 || (data.version === 5 || data.version === 6) ? object(data.stores) : null
+  const savedStores = hasStores ? object(data.stores) : null
   // Only the newly introduced Scout store may be absent in v3. v4 requires it.
   const stores = savedStores ? { ...savedStores } as Record<string, ResourceLedger['stores'][string]> : emptyResourceStores(storeDefinitions)
   if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
     stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
   }
-  const save: ResourceSave = { version: 6, survival: data.version === 6 ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
+  const save: ResourceSave = { version: 7, hazards: data.version === 7 ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
   validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }
@@ -150,6 +155,9 @@ export class ResourceSession {
   world: TopDownState
   snapshot: ResourceSave
   survival: SurvivalState
+  hazards: HazardState = freshHazards()
+  hazardEvents: HazardEvent[] = []
+  private sources: HazardSource[] = []
   equipped = false
   activeSourceId: string | null = null
   progressTicks = 0
@@ -168,24 +176,25 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 6, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 7, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
       if (this.persisted !== null) {
         this.snapshot = decodeResourceSave(this.persisted, world, this.storeDefinitions, this.itemCatalog)
         this.survival = this.snapshot.survival
+        this.hazards = this.snapshot.hazards
         const location = this.snapshot.location
         this.world = { ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
           camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' }
       }
-      if (this.persisted !== null && JSON.parse(this.persisted).version === 6) {
+      if (this.persisted !== null && JSON.parse(this.persisted).version >= 6) {
         const recovered = recoverOffline(this.survival, now())
         if (recovered.fatigue !== this.survival.fatigue) this.commit({ ...this.snapshot, survival: recovered })
         this.survival = this.snapshot.survival
       } else if (this.persisted !== null) {
         this.survival = freshSurvival(now())
-        this.snapshot = { ...this.snapshot, survival: this.survival }
+        this.snapshot = { ...this.snapshot, hazards: this.hazards, survival: this.survival }
       }
     } catch {
       this.error = 'Saved expedition could not be loaded safely. Existing data kept; gathering paused.'
@@ -198,26 +207,41 @@ export class ResourceSession {
       const candidate = { ...next, survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
       validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       validateSurvival(candidate.survival)
+      validateHazards(candidate.hazards)
       const raw = serialize(candidate)
       this.storage.setItem(RESOURCE_SAVE_KEY, raw)
       this.persisted = raw
       this.snapshot = candidate
       this.survival = candidate.survival
+      this.hazards = candidate.hazards
       this.checkpointTick = this.world.tick
       return true
     } catch {
       this.cancel()
       this.survival = this.snapshot.survival
+      this.hazards = this.snapshot.hazards
+      this.hazardEvents = []
       this.error = 'Saving failed or the save changed elsewhere. Gathering paused; reload after resolving storage access.'
       return false
     }
+  }
+  /** Future environment adapter boundary. Sources are sampled, never restored as live planet data. */
+  setHazardSources(sources: readonly HazardSource[]): void {
+    hazardRates(sources)
+    this.sources = structuredClone([...sources])
+  }
+  /** Explicit module declaration boundary; production has no caller or default equipment. */
+  addProtection(module: Omit<ProtectionModule, 'remaining'>): boolean {
+    if (this.error || this.survival.health === 0 || this.hazards.modules.some(m => m.id === module.id)) return false
+    const hazards = validateHazards({ ...this.hazards, modules: [...this.hazards.modules, { ...module, remaining: '1000/1' }] })
+    return this.commit({ ...this.snapshot, survival: this.survival, hazards })
   }
   /** Domain rejection leaves the current save usable; storage failure blocks writes. */
   transfer(request: ResourceTransfer): boolean {
     if (this.error || this.survival.health === 0) return false
     try {
       const next = transferResource(this.snapshot, request, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
-      return this.commit({ ...this.snapshot, ...next, survival: this.survival })
+      return this.commit({ ...this.snapshot, ...next, hazards: this.hazards, survival: this.survival })
     } catch (error) {
       this.feedback = error instanceof Error ? error.message : 'Invalid transfer'
       return false
@@ -230,7 +254,7 @@ export class ResourceSession {
       if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw new RangeError('Stale item revision')
       if (action !== 'add' && action !== 'remove') throw new RangeError('Unknown item action')
       const inventory = (action === 'add' ? addCountItem : removeCountItem)(this.snapshot.inventory, id, count, RESOURCE_CATALOG, this.itemCatalog)
-      const saved = this.commit({ ...this.snapshot, survival: this.survival, inventory })
+      const saved = this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival, inventory })
       if (saved) this.feedback = `Saved: ${action === 'add' ? 'added' : 'removed'} ${count} × ${this.itemCatalog[id]!.name ?? id}.`
       return saved
     } catch (error) {
@@ -249,7 +273,7 @@ export class ResourceSession {
   freshRun(): boolean {
     if (this.error || this.survival.health !== 0) return false
     const next = freshSurvival(this.now())
-    if (!this.commit({ ...this.snapshot, survival: next })) return false
+    if (!this.commit({ ...this.snapshot, hazards: { ...this.hazards, exposure: freshHazards().exposure }, survival: next })) return false
     this.survival = next
     this.equipped = false
     return true
@@ -259,11 +283,11 @@ export class ResourceSession {
       this.world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === this.world.frames.ship.id, RESOURCE_CATALOG, this.itemCatalog)
   }
   checkpoint(): void {
-    if (serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival)) this.commit({ ...this.snapshot, survival: this.survival })
+    if (serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival) || serialize(this.hazards) !== serialize(this.snapshot.hazards)) this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival })
   }
   upgrade(capacityGrams: number, capacitySlots: number): boolean {
     if (this.error || this.survival.health === 0) return false
-    return this.commit({ ...this.snapshot, survival: this.survival, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, this.itemCatalog) })
+    return this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, this.itemCatalog) })
   }
   cancel(message = 'Gathering stopped. Completed grams are saved.'): void {
     if (this.activeSourceId) this.feedback = message
@@ -299,10 +323,23 @@ export class ResourceSession {
     this.feedback = 'Gathering · 1 kg/s. Move or Escape to stop.'
   }
   advance(next: TopDownState): TopDownState {
-    const elapsed = Math.max(0, next.tick - this.world.tick), wasWalking = this.world.player.mode === 'walking'
+    if (!Number.isSafeInteger(next.tick) || next.tick < this.world.tick) return this.world
+    const elapsed = next.tick - this.world.tick, wasWalking = this.world.player.mode === 'walking'
     if (this.error || this.survival.health === 0) return this.world
-    this.survival = advanceSurvival(this.survival, elapsed)
+    const previousWorld = this.world
+    const rates = hazardRates(this.sources)
+    const needsHazards = this.sources.length > 0 || Object.values(this.hazards.exposure).some(v => v !== '0/1')
+    this.hazardEvents = []
+    this.survival = advanceSurvival(this.survival, elapsed, needsHazards ? survival => {
+      const result = stepHazards(this.hazards, rates, survival)
+      this.hazards = result.state
+      this.hazardEvents.push(...result.events)
+    } : undefined)
     this.world = next
+    // Publish hazard progress only after the whole health/exposure/budget transaction is durable.
+    if (elapsed > 0 && needsHazards) {
+      if (!this.commit({ ...this.snapshot, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
+    }
     if (!survivalPolicy(this.survival).canWork) {
       this.cancel('Exhausted: gathering and piloting unavailable.')
       if (this.world.player.mode === 'seated') this.world = leaveCockpit(this.world)

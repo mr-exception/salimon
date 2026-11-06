@@ -24,6 +24,11 @@ sprite caching by `topDownSprites.tsx`, and SVG/input/gameplay composition by
 `tests/top-down.spec.ts` and `tests/cockpit.spec.ts`. See the client guide for fixture boundaries.
 `survival.ts` owns active ticks, meter bounds, starvation, recovery and movement/action policy; `ResourceSession` persists schema v6 and launch credit. `TopDownView` owns pause/HUD. See [browser survival](browser-survival.md), `survival.test.ts` and `tests/survival.spec.ts`.
 
+`hazards.ts` owns temperature/exposure/protection arithmetic and events; `exact.ts`
+owns reduced rational state. `survival.ts` advances hazard damage on its sole
+60 Hz clock; `resourceSession.ts` commits exact health/exposure/budgets atomically.
+See [browser hazards](browser-hazards.md), `hazards.test.ts` and the separately
+built non-shipping `tests/hazards.spec.ts` fixture.
 Resource conservation is owned by `resourceLedger.ts` (validated graph, exact
 transfer, store mass); `resourceInventory.ts` owns shared player constraints;
 `resourceSession.ts` owns schema v6, trusted count-item registration/transactions, lossless v1–v5 migration and atomic publication.

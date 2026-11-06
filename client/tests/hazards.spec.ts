@@ -1,0 +1,65 @@
+import { test, expect } from '@playwright/test'
+import { RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
+import { decode, encode, sub, mul, decimal } from '../src/exact.ts'
+import { boot, walkTicks } from './worldJourney.ts'
+
+test('HAZ-1–5 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure', async ({ page, browser }, info) => {
+  await boot(page, 'tests/hazards.html', 'http://127.0.0.1:4275')
+  const save = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
+  await page.getByRole('button', { name: 'Declare test module' }).click()
+  const initial = await save()
+  expect(initial.hazards.modules[0].remaining).toBe('1000/1')
+  await page.getByRole('button', { name: 'Enter test hazards' }).click()
+  await walkTicks(page, [], 17)
+  await page.getByRole('button', { name: 'Pause [P]', exact: true }).click()
+  const partial = await save(), ticks = partial.survival.activeTicks - initial.survival.activeTicks
+  // No real timers advance between actions; all intervals are controlled RAF ticks.
+  expect(partial.hazards.exposure.radiation).toBe(encode(mul(decimal(ticks), [13n, 600n])))
+  expect(partial.hazards.exposure.poison).toBe(encode(mul(decimal(ticks), [1n, 480n])))
+  expect(partial.hazards.modules[0].remaining).toBe(encode(sub(decimal(1000), mul(decimal(ticks), [1n, 30n]))))
+  expect(partial.survival.healthExact).toBe(encode(sub(decimal(200), mul(decimal(ticks), [1n, 600n]))))
+  await page.clock.runFor(2000); expect(await save()).toEqual(partial)
+  await page.reload()
+  // Sources are deliberately not persisted as real planetary sampling. Stop immediately to inspect restore.
+  await page.getByRole('button', { name: 'Pause [P]', exact: true }).click()
+  const restored = await save()
+  expect(restored.survival.healthExact).toBe(partial.survival.healthExact)
+  expect(restored.hazards.modules).toEqual(partial.hazards.modules)
+  expect(Number(decode(restored.hazards.exposure.radiation)[0])).toBeGreaterThanOrEqual(0)
+  await page.getByRole('button', { name: 'Enter test hazards' }).click()
+  await page.getByRole('button', { name: 'Resume [P]', exact: true }).click()
+  await walkTicks(page, [], 4800) // 80s: threshold crossed; recovery heals one HP at 60s.
+  await page.getByRole('button', { name: 'Pause [P]', exact: true }).click()
+  const full = await save()
+  expect(full.hazards.exposure.radiation).toBe('100/1')
+  expect(full.survival.health).toBeLessThan(192)
+  await page.getByRole('button', { name: 'Exit test hazards' }).click()
+  await page.getByRole('button', { name: 'Resume [P]', exact: true }).click()
+  await walkTicks(page, [], 60)
+  await page.getByRole('button', { name: 'Pause [P]', exact: true }).click()
+  const exited = await save()
+  expect(exited.hazards.exposure.radiation).toBe('93/1')
+  expect(exited.hazards.modules).toEqual(full.hazards.modules)
+  expect(exited.survival.healthExact).toBe(full.survival.healthExact)
+  await page.getByRole('button', { name: 'Enter test hazards' }).click()
+  await page.getByRole('button', { name: 'Fail test saves' }).click()
+  const beforeFailure = await save()
+  await page.getByRole('button', { name: 'Resume [P]', exact: true }).click()
+  await page.clock.runFor(1000)
+  await expect(page.getByLabel('Survival condition')).toContainText('Saving failed')
+  expect(await save()).toEqual(beforeFailure)
+  await page.reload(); await expect(page.getByRole('meter', { name: 'Health', exact: true })).toHaveAttribute('value', String(beforeFailure.survival.health))
+  await expect(page.getByLabel('Survival condition')).toContainText(`${Math.ceil(beforeFailure.survival.health)} / 200 HP`)
+  await expect.poll(async () => { await page.clock.runFor(32); return page.locator('.top-down-scene').getAttribute('data-render-ready') }).toBe('true')
+  await info.attach('hazard-records.json', { body: JSON.stringify({ browser: browser.version(), initial, partial, restored, full, exited, beforeFailure, final: await save(), input: 'Playwright synthetic buttons and controlled clock; separately built test-only sources/modules' }, null, 2), contentType: 'application/json' })
+})
+
+test('normal built game exposes no hazard fixture, source sampling or module grants', async ({ page }) => {
+  await boot(page, '?hazardsFixture=1', 'http://127.0.0.1:4175')
+  await walkTicks(page, [], 60)
+  await expect(page.getByRole('button', { name: 'Declare test module' })).toHaveCount(0)
+  await expect(page.getByRole('meter', { name: 'Health', exact: true })).toHaveAttribute('value', '200')
+  const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
+  expect(saved.hazards).toEqual({ version: 1, exposure: { radiation: '0/1', poison: '0/1' }, modules: [] })
+  expect(await (await page.request.get('http://127.0.0.1:4175/tests/hazards.html')).text()).not.toContain('hazards.tsx')
+})

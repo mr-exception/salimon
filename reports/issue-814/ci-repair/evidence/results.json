@@ -1,0 +1,118 @@
+{
+  "sourceRevision": "d681fb9439f1a0adfa02d69fe990fcdcbb0b24db",
+  "command": "CHROMIUM_PATH=/usr/bin/chromium SALIMON_EVIDENCE_DIR=test-results/issue814-ci-repair-final npm run test:browser -- --project=panoramic --project=look-at --project=observation",
+  "stats": {
+    "startTime": "2026-11-06T14:46:28.899Z",
+    "duration": 155964.848,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "HUD-1 full viewport, scanner authority, keyboard browser and priority Escape",
+      "status": "passed",
+      "durationMs": 16211,
+      "errors": [],
+      "attachments": [
+        "HUD-1/desktop-1280x720.png",
+        "HUD-1/help.png",
+        "HUD-1/browser-state.json"
+      ]
+    },
+    {
+      "title": "HUD-2 compass render states, ship rotation, zoom and responsive warning priority",
+      "status": "passed",
+      "durationMs": 29208,
+      "errors": [],
+      "attachments": [
+        "../../evidence/HUD-2/rear.png",
+        "HUD-2/overlap.png",
+        "HUD-2/warning-960x600.png",
+        "HUD-2/terminal-960x600.png"
+      ]
+    },
+    {
+      "title": "HUD-3 grounded authority and no sidebar at smaller desktop size",
+      "status": "passed",
+      "durationMs": 4242,
+      "errors": [],
+      "attachments": [
+        "../../evidence/HUD-3/grounded-960x600.png"
+      ]
+    },
+    {
+      "title": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+      "status": "passed",
+      "durationMs": 23336,
+      "errors": [],
+      "attachments": [
+        "../../evidence/LOOK-1/occluded.png",
+        "LOOK-1/measurements.json"
+      ]
+    },
+    {
+      "title": "LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled",
+      "status": "passed",
+      "durationMs": 11826,
+      "errors": [],
+      "attachments": [
+        "../../evidence/LOOK-2/vesper.png",
+        "../../evidence/LOOK-2/grounded-observation.png",
+        "LOOK-2/measurements.json"
+      ]
+    },
+    {
+      "title": "OBS-1 actual perspective camera, independent ship, reset and remount",
+      "status": "passed",
+      "durationMs": 9405,
+      "errors": [],
+      "attachments": [
+        "OBS-1/wide.png",
+        "OBS-1/states.json"
+      ]
+    },
+    {
+      "title": "OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation",
+      "status": "passed",
+      "durationMs": 6654,
+      "errors": [],
+      "attachments": [
+        "OBS-2/telescope.png",
+        "OBS-2/states.json"
+      ]
+    },
+    {
+      "title": "OBS-3 DPR 2 preserves projection and origin",
+      "status": "passed",
+      "durationMs": 3796,
+      "errors": [],
+      "attachments": [
+        "OBS-3/dpr2.png"
+      ]
+    },
+    {
+      "title": "OBS-4 repeated wide/telescope pixels and negative comparison",
+      "status": "passed",
+      "durationMs": 8718,
+      "errors": [],
+      "attachments": [
+        "OBS-4/run-0-wide.png",
+        "OBS-4/run-0-telescope.png",
+        "OBS-4/run-0-wide.png",
+        "OBS-4/run-0-telescope.png",
+        "OBS-4/comparisons.json"
+      ]
+    },
+    {
+      "title": "OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin",
+      "status": "passed",
+      "durationMs": 26868,
+      "errors": [],
+      "attachments": [
+        "OBS-5/states.json"
+      ]
+    }
+  ]
+}

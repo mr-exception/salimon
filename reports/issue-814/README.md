@@ -94,3 +94,11 @@ above. No unresolved local findings. Review identity: implementing Codex agent
 in this active chat. Local review PASS; **QA pending / CI UNVERIFIED**, final
 ACCEPT pending the user's report for the unchanged publication head. Nothing
 merged or deployed. This standalone PR targets `main`; #815 may follow it.
+
+## Owner-reported CI failure and repair
+
+The initial published head failed Navigation client run 42232661938 (58/60 browser
+scenarios passed). The prior local PASS did not establish CI acceptance. See the
+[diagnosis, test synchronization repairs and new evidence](ci-repair/README.md).
+QA remains pending for the updated head until the owner reports its required CI
+results in this chat.

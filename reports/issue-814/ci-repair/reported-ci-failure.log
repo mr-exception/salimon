@@ -1,0 +1,146 @@
+build	Deterministic navigation, desktop and production WebGL checks	﻿2026-11-06T14:18:39.4078385Z ##[group]Run npm run test:browser
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:39.4078732Z [36;1mnpm run test:browser[0m
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:39.4098709Z shell: /usr/bin/bash -e {0}
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:39.4098979Z ##[endgroup]
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:39.5063094Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:39.5063676Z > salimon-navigation-client@0.1.0 test:browser
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:39.5064120Z > playwright test
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:39.5064281Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:44.0748339Z [WebServer]
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:44.0749705Z [WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:44.0750882Z [WebServer] - Using dynamic import() to code-split the application
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:44.0752046Z [WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:44.0753072Z [WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:47.2357024Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:47.2357791Z Running 60 tests using 1 worker
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:18:47.2358191Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:19:09.0518040Z   ✘   1 [panoramic] › tests/panoramic.spec.ts:12:1 › HUD-1 full viewport, scanner authority, keyboard browser and priority Escape (13.4s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:20:09.7421680Z   ✓   2 [panoramic] › tests/panoramic.spec.ts:59:1 › HUD-2 compass render states, ship rotation, zoom and responsive warning priority (1.0m)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:20:32.0871967Z   ✓   3 [panoramic] › tests/panoramic.spec.ts:101:1 › HUD-3 grounded authority and no sidebar at smaller desktop size (22.3s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:20:43.7699970Z   ✘   4 [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation (5.5s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:20:53.8172120Z   ✓   5 [look-at] › tests/look-at.spec.ts:82:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled (9.5s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:21:51.6751733Z   ✓   6 [perspective] › tests/perspective.spec.ts:10:1 › SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction (55.6s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:22:27.0241601Z   ✓   7 [perspective] › tests/perspective.spec.ts:68:1 › SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression (35.3s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:24:14.2201576Z   ✓   8 [optical] › tests/optical.spec.ts:13:1 › OPT-1 optical disks before scanning, repeat, occultation and far origin invariance (1.7m)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:25:22.9711884Z   ✓   9 [optical] › tests/optical.spec.ts:39:1 › OPT-2 telescope tiny moon and grounded horizon with below-surface occlusion (1.1m)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:25:36.8507006Z   ✓  10 [observation] › tests/observation.spec.ts:23:1 › OBS-1 actual perspective camera, independent ship, reset and remount (4.8s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:25:40.8063744Z   ✓  11 [observation] › tests/observation.spec.ts:63:1 › OBS-2 telescope pixels, drag, resize/DPR, wheel clamp and focus cancellation (3.9s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:25:43.5383434Z   ✓  12 [observation] › tests/observation.spec.ts:96:1 › OBS-3 DPR 2 preserves projection and origin (2.7s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:25:49.7238332Z   ✓  13 [observation] › tests/observation.spec.ts:108:1 › OBS-4 repeated wide/telescope pixels and negative comparison (6.2s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:26:05.1101374Z   ✓  14 [observation] › tests/observation.spec.ts:139:1 › OBS-5 spherical keyboard continuity, visibility/pointer cancellation and moving ship origin (15.4s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:26:54.2247697Z   ✓  15 [cockpit] › tests/cockpit.spec.ts:5:1 › COCKPIT-1 radar round trip, reserved seat, blackout and persistent simulation (48.5s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:27:15.9720742Z   ✓  16 [cockpit] › tests/gathering.spec.ts:7:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (21.7s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:27:22.1712109Z   ✓  17 [cockpit] › tests/gathering.spec.ts:75:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (6.2s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:27:46.8302281Z   ✓  18 [cockpit] › tests/hazards.spec.ts:6:1 › HAZ-1–5 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure (24.6s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:27:47.6796313Z   ✓  19 [cockpit] › tests/hazards.spec.ts:57:1 › normal built game exposes no hazard fixture, source sampling or module grants (837ms)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:28:04.8600672Z   ✓  20 [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice (17.1s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:28:05.4448698Z   ✓  21 [cockpit] › tests/items.spec.ts:60:1 › ordinary built game has no item fixture, grants or query backdoor (567ms)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:29:51.2151198Z   ✓  22 [cockpit] › tests/playable-slice.spec.ts:10:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (1.8m)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:30:27.7513481Z   ✓  23 [cockpit] › tests/storage.spec.ts:13:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (36.5s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:30:31.7578562Z   ✓  24 [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.0s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:30:50.2010130Z   ✓  25 [cockpit] › tests/survival.spec.ts:6:1 › SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset (18.4s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:30:59.0981606Z   ✓  26 [cockpit] › tests/survival.spec.ts:89:1 › SURV-799 approved rates and partial interruption/reload preserve exact grams (8.9s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:02.0861019Z   ✓  27 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison (3.0s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:04.7736482Z   ✓  28 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison (2.7s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:06.0079241Z   ✓  29 [cockpit] › tests/viewport.spec.ts:135:1 › VIEWPORT DPR 2 and standalone development fixture preserve projection (1.2s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:08.8764331Z   ✓  30 [top-down] › tests/top-down.spec.ts:21:1 › TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures (1.9s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:10.1858453Z   ✓  31 [top-down] › tests/top-down.spec.ts:76:1 › TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly (1.3s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:13.8156990Z   ✓  32 [top-down] › tests/top-down.spec.ts:101:1 › TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene (3.6s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:14.6072008Z   ✓  33 [top-down] › tests/top-down.spec.ts:140:1 › TD-5 explicit built radar entry retains standalone navigation (780ms)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:17.1260203Z   ✓  34 [top-down] › tests/top-down.spec.ts:154:1 › SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway (2.5s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:31:39.1485631Z   ✓  35 [top-down] › tests/top-down.spec.ts:202:1 › PLANET-1 fixed outdoor journey, source footprints and repeat screenshots (22.0s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:32:44.1763409Z   ✓  36 [top-down] › tests/top-down.spec.ts:267:1 › TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world (1.1m)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:32:57.7071662Z   ✓  37 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (12.4s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:07.3747004Z   ✓  38 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (9.0s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:21.4988358Z   ✓  39 [deterministic] › tests/deterministic.spec.ts:42:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (14.1s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:24.0912395Z   ✓  40 [deterministic] › tests/deterministic.spec.ts:82:1 › NAV-3 heading and velocity retain approved colors and viewport edges (2.6s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:25.6688244Z   ✓  41 [deterministic] › tests/deterministic.spec.ts:99:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (1.6s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:37.6165865Z   ✓  42 [desktop] › tests/desktop.spec.ts:7:1 › scanner pulse, camera independence, clipping selection and manual alignment interruption (11.3s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:44.3155880Z   ✓  43 [desktop] › tests/desktop.spec.ts:26:1 › WASD pans without changing ship state and key release stops movement (6.7s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:51.2281922Z   ✓  44 [desktop] › tests/desktop.spec.ts:41:1 › camera keys release on focus, blur, visibility and resize (6.9s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:54.5801825Z   ✓  45 [desktop] › tests/desktop.spec.ts:55:1 › wheel zoom bounds and removed desktop controls survive view changes (3.3s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:33:57.3138114Z   ✓  46 [desktop] › tests/desktop.spec.ts:68:1 › Help has keyboard focus containment, accurate bindings and Escape/close return focus (2.7s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:03.0262022Z   ✓  47 [desktop] › tests/desktop.spec.ts:78:1 › right-drag pointer release outside canvas ends pan and ship controls release on blur (5.7s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:06.6111811Z   ✓  48 [desktop] › tests/desktop.spec.ts:87:1 › zero throttle coasts while ship rotates; focused slider keeps native keyboard input (3.6s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:08.1311862Z   ✓  49 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: warning (1.5s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:09.9292117Z   ✓  50 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: destroyed (1.8s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:12.6553524Z   ✓  51 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: safe (2.7s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:15.2891686Z   ✓  52 [desktop] › tests/desktop.spec.ts:95:65 › production App contact fixture: asteroid (2.6s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:22.4041862Z   ✓  53 [desktop] › tests/desktop.spec.ts:102:1 › dense groups and accessible contact picker keep all IDs with bounded DOM (7.1s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:40.2885304Z   ✓  54 [desktop] › tests/edges.spec.ts:17:1 › ship rays reach every edge/corner; no object guides or arrowheads; zero, differing, overlapping and opposite vectors (17.9s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:47.1198969Z   ✓  55 [desktop] › tests/edges.spec.ts:50:1 › ship rays track actual pointer/WASD pan, wheel zoom, turn and off-screen origin clipping (6.8s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:34:58.0855749Z   ✓  56 [desktop] › tests/edges.spec.ts:68:1 › off-screen contacts stay in picker after pulse and selection still expires with scanner range (11.0s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:02.9848864Z   ✓  57 [desktop] › tests/panning.spec.ts:4:50 › continuous keyboard pan renders scanned bodies at their current projection on every frame (4.9s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:07.9423744Z   ✓  58 [desktop] › tests/panning.spec.ts:4:50 › continuous mouse pan renders scanned bodies at their current projection on every frame (4.9s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:19.4154584Z   ✓  59 [desktop] › tests/visuals.spec.ts:3:1 › faceted navigation proxies render at readable sizes without a rectangular surface (11.5s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.3992062Z   ✓  60 [production] › tests/production.spec.ts:2:1 › built production bundle renders WebGL, scanner and labelled controls (6.3s)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8238179Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8245012Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8259996Z   1) [panoramic] › tests/panoramic.spec.ts:12:1 › HUD-1 full viewport, scanner authority, keyboard browser and priority Escape
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8261071Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8261505Z     Error: expect(received).toBe(expected) // Object.is equality
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8262033Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8262208Z     Expected: 40
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8262616Z     Received: 0
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8262841Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8263001Z     Call Log:
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8263582Z     - Timeout 10000ms exceeded while waiting on the predicate
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8264042Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8264623Z       18 |  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(720)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8265827Z       19 |  await expect(page.getByText('Stationary', { exact: false })).toBeVisible()
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8266927Z     > 20 |  await expect.poll(async () => (await state(page)).contacts.length).toBe(40)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8267815Z          |                                                                     ^
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8268581Z       21 |  await capture(page, 'desktop-1280x720.png', info)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8269822Z       22 |  await page.locator('canvas').focus(); await page.keyboard.press('Tab')
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8272079Z       23 |  for (let i = 0; i < 45 && !await page.getByRole('button', { name: /Contacts \(C\)/ }).evaluate(el => el === document.activeElement); i++) await page.keyboard.press('Tab')
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8273661Z         at /home/runner/work/salimon/salimon/client/tests/panoramic.spec.ts:20:69
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8274277Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8275172Z     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8276647Z     test-results/panoramic-HUD-1-full-viewp-3939b-browser-and-priority-Escape-panoramic/test-failed-1.png
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8278207Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8278716Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8279987Z     Error Context: test-results/panoramic-HUD-1-full-viewp-3939b-browser-and-priority-Escape-panoramic/error-context.md
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8281242Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8281905Z     attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8283152Z     test-results/panoramic-HUD-1-full-viewp-3939b-browser-and-priority-Escape-panoramic/trace.zip
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8284009Z     Usage:
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8284192Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8285027Z         npx playwright show-trace test-results/panoramic-HUD-1-full-viewp-3939b-browser-and-priority-Escape-panoramic/trace.zip
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8286041Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8286698Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8287202Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8288261Z   2) [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8289179Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8289840Z     Error: expect(received).toBe(expected) // Object.is equality
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8290374Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8290536Z     Expected: 75
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8290958Z     Received: 27.590958087858176
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8291283Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8291523Z       25 |  const looked = await state(page)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8292166Z       26 |  expect(looked.ship).toEqual(initial.ship)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8292892Z     > 27 |  expect(looked.view.fov).toBe(start.view.fov)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8293491Z          |                          ^
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8294201Z       28 |  expect(Math.abs(looked.view.quaternion[1])).toBeCloseTo(1, 8)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8295142Z       29 |  expect(looked.markers.flatMap(m => m.ids)).not.toContain('Behind')
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8296111Z       30 |  await page.locator('canvas').click({ position: { x: 30, y: 500 } })
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8297091Z         at /home/runner/work/salimon/salimon/client/tests/look-at.spec.ts:27:26
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8297626Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8298312Z     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8299852Z     test-results/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/test-failed-1.png
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8301783Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8302301Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8303129Z     Error Context: test-results/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/error-context.md
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8304025Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8304663Z     attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8305929Z     test-results/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/trace.zip
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8306790Z     Usage:
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8306999Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8307861Z         npx playwright show-trace test-results/look-at-LOOK-1-rear-browse-3d542--alignment-and-cancellation-look-at/trace.zip
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8309051Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8310057Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8310612Z
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8310764Z   2 failed
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8311918Z     [panoramic] › tests/panoramic.spec.ts:12:1 › HUD-1 full viewport, scanner authority, keyboard browser and priority Escape
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8313790Z     [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.8314804Z   58 passed (16.8m)
+build	Deterministic navigation, desktop and production WebGL checks	2026-11-06T14:35:26.9838090Z ##[error]Process completed with exit code 1.

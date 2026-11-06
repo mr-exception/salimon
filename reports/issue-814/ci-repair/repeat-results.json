@@ -1,0 +1,60 @@
+{
+  "sourceRevision": "d681fb9439f1a0adfa02d69fe990fcdcbb0b24db",
+  "command": "CHROMIUM_PATH=/usr/bin/chromium SALIMON_EVIDENCE_DIR=test-results/issue814-ci-repair-repeat npm run test:browser -- --project=panoramic --project=look-at --grep 'HUD-1|LOOK-1' --repeat-each=2",
+  "stats": {
+    "startTime": "2026-11-06T14:49:29.212Z",
+    "duration": 89076.052,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "HUD-1 full viewport, scanner authority, keyboard browser and priority Escape",
+      "iteration": 0,
+      "status": "passed",
+      "durationMs": 16176,
+      "errors": [],
+      "attachments": [
+        "evidence/HUD-1/desktop-1280x720.png",
+        "evidence/HUD-1/help.png",
+        "repeat/HUD-1-0/browser-state.json"
+      ]
+    },
+    {
+      "title": "HUD-1 full viewport, scanner authority, keyboard browser and priority Escape",
+      "iteration": 1,
+      "status": "passed",
+      "durationMs": 14413,
+      "errors": [],
+      "attachments": [
+        "evidence/HUD-1/desktop-1280x720.png",
+        "evidence/HUD-1/help.png",
+        "repeat/HUD-1-1/browser-state.json"
+      ]
+    },
+    {
+      "title": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+      "iteration": 0,
+      "status": "passed",
+      "durationMs": 23024,
+      "errors": [],
+      "attachments": [
+        "../evidence/LOOK-1/occluded.png",
+        "repeat/LOOK-1-0/measurements.json"
+      ]
+    },
+    {
+      "title": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+      "iteration": 1,
+      "status": "passed",
+      "durationMs": 22635,
+      "errors": [],
+      "attachments": [
+        "../evidence/LOOK-1/occluded.png",
+        "repeat/LOOK-1-1/measurements.json"
+      ]
+    }
+  ]
+}

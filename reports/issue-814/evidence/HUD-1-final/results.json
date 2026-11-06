@@ -1,0 +1,25 @@
+{
+  "command": "CHROMIUM_PATH=/usr/bin/chromium SALIMON_EVIDENCE_DIR=test-results/hud-help-final npm run test:browser -- --project=panoramic --grep HUD-1",
+  "sourceRevision": "3fe06bf2c403524c36dd7ba0d31166beb8fd5e35",
+  "stats": {
+    "startTime": "2026-11-06T14:15:23.962Z",
+    "duration": 28121.777,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "HUD-1 full viewport, scanner authority, keyboard browser and priority Escape",
+      "status": "passed",
+      "durationMs": 19760,
+      "errors": [],
+      "attachments": [
+        "desktop-1280x720.png",
+        "help.png",
+        "browser-state.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "command": "CHROMIUM_PATH=/usr/bin/chromium SALIMON_EVIDENCE_DIR=test-results/hud-verified npm run test:browser -- --project=panoramic --project=perspective --project=look-at",
+  "sourceRevision": "3fe06bf2c403524c36dd7ba0d31166beb8fd5e35",
+  "note": "HUD-1 final help styling/capture is additionally verified by the focused final run; the other six scenarios use unchanged inputs. The two desktop originals are byte-identical; both result entries reference the retained canonical PNG.",
+  "stats": {
+    "startTime": "2026-11-06T14:10:20.217Z",
+    "duration": 284438.844,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "HUD-1 full viewport, scanner authority, keyboard browser and priority Escape",
+      "project": "panoramic",
+      "status": "passed",
+      "durationMs": 33354,
+      "errors": [],
+      "attachments": [
+        "HUD-1-final/desktop-1280x720.png",
+        "HUD-1/browser-state.json"
+      ]
+    },
+    {
+      "title": "HUD-2 compass render states, ship rotation, zoom and responsive warning priority",
+      "project": "panoramic",
+      "status": "passed",
+      "durationMs": 70204,
+      "errors": [],
+      "attachments": [
+        "HUD-2/rear.png",
+        "HUD-2/overlap.png",
+        "HUD-2/warning-960x600.png",
+        "HUD-2/terminal-960x600.png"
+      ]
+    },
+    {
+      "title": "HUD-3 grounded authority and no sidebar at smaller desktop size",
+      "project": "panoramic",
+      "status": "passed",
+      "durationMs": 13073,
+      "errors": [],
+      "attachments": [
+        "HUD-3/grounded-960x600.png"
+      ]
+    },
+    {
+      "title": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+      "project": "look-at",
+      "status": "passed",
+      "durationMs": 27773,
+      "errors": [],
+      "attachments": [
+        "LOOK-1/occluded.png",
+        "LOOK-1/measurements.json"
+      ]
+    },
+    {
+      "title": "LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled",
+      "project": "look-at",
+      "status": "passed",
+      "durationMs": 12970,
+      "errors": [],
+      "attachments": [
+        "LOOK-2/vesper.png",
+        "LOOK-2/grounded-observation.png",
+        "LOOK-2/measurements.json"
+      ]
+    },
+    {
+      "title": "SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction",
+      "project": "perspective",
+      "status": "passed",
+      "durationMs": 75880,
+      "errors": [],
+      "attachments": [
+        "SENSOR-1/before-pulse.png",
+        "SENSOR-1/scanned.png",
+        "SENSOR-1/tiny-telescope.png",
+        "SENSOR-1/measurements.json"
+      ]
+    },
+    {
+      "title": "SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression",
+      "project": "perspective",
+      "status": "passed",
+      "durationMs": 43190,
+      "errors": [],
+      "attachments": [
+        "SENSOR-2/telescope.png",
+        "SENSOR-2/measurements.json"
+      ]
+    }
+  ]
+}

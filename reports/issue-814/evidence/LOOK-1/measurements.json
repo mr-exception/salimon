@@ -1,0 +1,389 @@
+{
+  "initial": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 0
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "lookingAt": false,
+    "selected": null,
+    "contacts": [
+      {
+        "id": "Behind",
+        "name": "Behind"
+      },
+      {
+        "id": "Foreground",
+        "name": "Foreground"
+      }
+    ],
+    "markers": [],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "start": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 0
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 27.590958087858176
+    },
+    "lookingAt": false,
+    "selected": "Behind",
+    "contacts": [
+      {
+        "id": "Behind",
+        "name": "Behind"
+      },
+      {
+        "id": "Foreground",
+        "name": "Foreground"
+      }
+    ],
+    "markers": [],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "looked": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 0
+    },
+    "view": {
+      "quaternion": [
+        0,
+        1,
+        0,
+        6.123233995736766e-17
+      ],
+      "fov": 27.590958087858176
+    },
+    "lookingAt": false,
+    "selected": "Behind",
+    "contacts": [
+      {
+        "id": "Behind",
+        "name": "Behind"
+      },
+      {
+        "id": "Foreground",
+        "name": "Foreground"
+      }
+    ],
+    "markers": [
+      {
+        "id": "Foreground",
+        "ids": [
+          "Foreground"
+        ],
+        "x": 479.99999999999983,
+        "y": 300
+      }
+    ],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "turned": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.0174532925199433,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": {
+        "yaw": -3.141592653589793,
+        "pitch": 0
+      },
+      "mode": "flying",
+      "contact": null,
+      "tick": 12
+    },
+    "view": {
+      "quaternion": [
+        0,
+        1,
+        0,
+        6.123233995736766e-17
+      ],
+      "fov": 27.590958087858176
+    },
+    "lookingAt": false,
+    "selected": "Behind",
+    "contacts": [
+      {
+        "id": "Behind",
+        "name": "Behind"
+      },
+      {
+        "id": "Foreground",
+        "name": "Foreground"
+      }
+    ],
+    "markers": [
+      {
+        "id": "Foreground",
+        "ids": [
+          "Foreground"
+        ],
+        "x": 479.99999999999983,
+        "y": 300
+      }
+    ],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "focused": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.07708537529641615,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 110
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0.9999693829871142,
+        0,
+        0.0078251574022497
+      ],
+      "fov": 27.590958087858176
+    },
+    "lookingAt": false,
+    "selected": "Behind",
+    "contacts": [
+      {
+        "id": "Behind",
+        "name": "Behind"
+      },
+      {
+        "id": "Foreground",
+        "name": "Foreground"
+      }
+    ],
+    "markers": [
+      {
+        "id": "Foreground",
+        "ids": [
+          "Foreground"
+        ],
+        "x": 460.876729818444,
+        "y": 300
+      }
+    ],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "cancelled": {
+    "ship": {
+      "position": {
+        "cell": [
+          "0",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          0,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.07708537529641615,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 243
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0.8669882892319561,
+        0,
+        0.4983285124640631
+      ],
+      "fov": 75
+    },
+    "lookingAt": false,
+    "selected": "Behind",
+    "contacts": [
+      {
+        "id": "Behind",
+        "name": "Behind"
+      },
+      {
+        "id": "Foreground",
+        "name": "Foreground"
+      }
+    ],
+    "markers": [],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "lost": {
+    "ship": {
+      "position": {
+        "cell": [
+          "55",
+          "0",
+          "0"
+        ],
+        "offsetM": [
+          -514647927680,
+          0,
+          0
+        ]
+      },
+      "velocityMps": [
+        0,
+        0,
+        0
+      ],
+      "yaw": -0.07708537529641615,
+      "pitch": 0,
+      "massKg": 100000,
+      "throttle": 0,
+      "alignment": null,
+      "mode": "flying",
+      "contact": null,
+      "tick": 358
+    },
+    "view": {
+      "quaternion": [
+        0,
+        1,
+        0,
+        -5.551115123125783e-17
+      ],
+      "fov": 75
+    },
+    "lookingAt": false,
+    "selected": null,
+    "contacts": [],
+    "markers": [],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "opaqueControl": "byte-identical",
+  "errors": []
+}

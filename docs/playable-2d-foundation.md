@@ -111,3 +111,29 @@ the starboard Resource Container. Use E, enter positive integer grams, review
 deposit/withdrawal and confirm. Escape/Close/focus loss cancels only the draft;
 committed amounts survive exiting and reload. The built storage browser scenarios
 join the existing cockpit project and retain panel/full/error captures.
+
+## Viewport and HUD (#803)
+
+The default production `/` and the isolated `/?scene=top-down` fixture render the
+world edge to edge in a `100dvh` stage. There is no outer page padding or separate
+header/footer space. The accessible scene title remains available to screen
+readers. `TopDownScene` observes its actual SVG size and expands the reference
+1200×640 view symmetrically to match the viewport aspect ratio, preserving uniform
+world scale and the overhead camera. Resizing reveals more world along one axis
+rather than stretching or cropping the reference scene; SVG screen transforms
+remain authoritative at any device pixel ratio.
+
+Survival/pause is anchored top left, inventory/save feedback top right, and
+nearby actions/live status plus compact key hints bottom left. Panels intercept
+input only inside their visible bounds, retain native button focus, and scroll
+internally if their content grows. The followed character remains in the open
+center. The existing resize/blur/visibility handlers release walking and cancel
+uncommitted interactions. Storage uses a modal dialog in the browser top layer;
+cockpit navigation retains its separate layout and survival HUD positioning.
+
+`tests/viewport.spec.ts` covers the built default route at 1280×720 and 960×600,
+HUD bounds/non-overlap, no page scrolling, uniform full-edge projection, focused
+buttons versus walking, pause/resume, resize, DPR 2, and the dev fixture. Each
+reference-size scene is captured twice and compared using the existing pixel
+policy; an intentional inset-stage mutation must fail comparison. These captures
+are repeat evidence, not approved navigation baselines.

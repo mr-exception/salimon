@@ -161,3 +161,17 @@ test('HAZ-4 destroyed module tombstones survive save/reload and fresh character;
   assert.equal(reload.hazards.modules[0]!.remaining, '0/1')
   assert.equal(reload.addProtection({ id: 'fixture', type: 'radiation', protection: 1000 }), false)
 })
+
+
+test('exact HP below numeric range stays alive until exact lethal damage', () => {
+  const hp = freshSurvival()
+  setHealth(hp, q.div(q.decimal(Number.MIN_VALUE), q.decimal(60)))
+  assert.equal(hp.health, Number.MIN_VALUE)
+  validateSurvival(hp)
+  const alive = advanceSurvival(hp, 1)
+  assert.equal(alive.activeTicks, 1)
+  assert.equal(alive.healthExact, hp.healthExact)
+  const lethal = run([{ id: 'tiny', type: 'temperature', temperatureC: 24.1 }], 60, freshHazards(), hp)
+  assert.equal(lethal.survival.health, 0)
+  assert.equal(lethal.survival.activeTicks, 1)
+})

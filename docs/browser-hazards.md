@@ -40,7 +40,8 @@ bounded canonical numerator/positive denominator and validate before publication
 Exposure, durability and fractional HP retain exact rational state across ticks
 and saves. `survival.health` is a numeric projection for existing consumers;
 optional `healthExact` is the authority whenever HP is fractional. Integer health
-omits it. Starvation and regeneration update that same authority. All damage
+omits it. Positive exact HP below the numeric range projects to MIN_VALUE so
+underflow cannot end a living run. Starvation and regeneration update that same authority. All damage
 precedes passive regeneration and lethal damage prevents revival in that tick.
 
 The existing survival loop is the sole 60 Hz authority, including navigation.

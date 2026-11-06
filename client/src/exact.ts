@@ -20,7 +20,9 @@ export const encode = (a: Exact) => `${a[0]}/${a[1]}`
 export const number = (a: Exact) => {
   const sign = a[0] < 0n ? '-' : '', n = a[0] < 0n ? -a[0] : a[0]
   const fraction = ((n % a[1]) * 10n ** 340n / a[1]).toString().padStart(340, '0')
-  return Number(`${sign}${n / a[1]}.${fraction}`)
+  const projected = Number(`${sign}${n / a[1]}.${fraction}`)
+  // Preserve a positive/negative liveness projection even below double precision.
+  return projected === 0 && n > 0n ? (sign ? -Number.MIN_VALUE : Number.MIN_VALUE) : projected
 }
 export function decode(s: unknown): Exact {
   if (typeof s !== 'string' || !/^-?\d{1,2048}\/[1-9]\d{0,2047}$/.test(s)) throw new Error('Invalid exact value')

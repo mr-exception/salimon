@@ -626,7 +626,9 @@ regressions remain in the full browser suite.
 `OPT-3` compares identical angular scenes from 1 cm to 1e24 m depth and repeats
 0.1° optics at huge split coordinates. `SENSOR-4` stresses alternating keyboard
 movement and high-frequency wheel events at telescope FOV, retaining every
-sample and checking marker precision, stable pixels and unchanged scanner time.
+sample, rendered zoom states and raw 24×24 GPU readbacks. A physical one-metre
+stress target makes blank-frame checks meaningful. Marker precision, exact
+origin, stable endpoint pixels and unchanged scanner time are asserted.
 `OBS-5` covers full spherical turns and physical ship-origin following.
 `SENSOR-3` rejects unscanned optical markers and stale marker click-through.
 `npm run test:browser:negative` deliberately leaks optical markers in a disposable
@@ -638,14 +640,16 @@ pixel comparison to fail. A crash, timeout or environment drift is not success.
 To propose panoramic references locally, run:
 
 ```sh
-SALIMON_PANORAMIC_CANDIDATES=1 npm run test:visual -- --grep PANO-VIS
+SALIMON_PANORAMIC_CANDIDATES=/tmp/panoramic-candidates npm run test:visual -- --grep PANO-VIS
 npm run test:visual
 SALIMON_EVIDENCE_DIR=test-results/visual-repeat npm run test:visual
 npm run test:visual:negative
 ```
 
-Candidate generation retains the older references and adds the panoramic images
-to the existing manifest. It is forbidden in CI. These images are **awaiting
+Candidate generation writes a complete proposal outside the tracked references,
+retaining the older images and shared manifest fields. Review the originals and
+copy the proposed PNGs/manifest into a dedicated reviewable change before normal
+comparison. It rejects relative/in-place output and is forbidden in CI. These images are **awaiting
 human review** until the existing baseline-approval job finds the owner's
 explicit approval of the exact changed manifest digest; generating or matching
 candidates does not approve appearance. Never regenerate references to resolve

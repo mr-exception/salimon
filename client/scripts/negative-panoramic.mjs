@@ -27,6 +27,7 @@ try {
   cwd: scratch, env: { ...process.env, CI: 'true', SALIMON_PANORAMIC_CANDIDATES: '', SALIMON_EVIDENCE_DIR: output }, encoding: 'utf8', timeout: 480000, maxBuffer: 2e6,
  })
  await mkdir(output, { recursive: true }); await writeFile(join(output, 'command.log'), `${child.stdout ?? ''}\n${child.stderr ?? ''}`)
+ await writeFile(join(output, 'mutated-expected.png'), changed)
  const report = JSON.parse(await readFile(join(output, 'results.json'), 'utf8'))
  const specs = suite => [...(suite.specs ?? []), ...(suite.suites ?? []).flatMap(specs)]
  const results = report.suites.flatMap(specs).flatMap(s => s.tests ?? []).flatMap(t => t.results ?? [])

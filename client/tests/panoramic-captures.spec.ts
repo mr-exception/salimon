@@ -1,11 +1,13 @@
 import { test, expect, type Page } from '@playwright/test'
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { execFileSync } from 'node:child_process'
+import { isAbsolute, resolve, sep } from 'node:path'
 import { compareImages, POLICY, sha256 } from '../scripts/visual-comparison.ts'
 
 const directory = 'tests/navigation-baselines'
-const candidate = process.env.SALIMON_PANORAMIC_CANDIDATES === '1'
+const candidate = process.env.SALIMON_PANORAMIC_CANDIDATES || undefined
 if (candidate && process.env.CI) throw Error('Candidate generation is forbidden in CI')
+if (candidate && (!isAbsolute(candidate) || resolve(candidate) === resolve(directory) || resolve(candidate).startsWith(resolve(directory) + sep))) throw Error('Use an absolute candidate directory outside tracked references')
 const json = (v: unknown) => JSON.stringify(v, (_, x) => typeof x === 'bigint' ? String(x) : x, 2)
 // Observers are fixture-only, read-only snapshots of the production adapters.
 async function state(page: Page, owner: string): Promise<Record<string, unknown>> {
@@ -23,7 +25,7 @@ test('PANO-VIS panoramic optical, sensor, actions and HUD reference matrix', asy
  const manifest = JSON.parse(await readFile(`${directory}/manifest.json`, 'utf8'))
  if (!candidate) expect(environment, 'PANORAMIC_ENVIRONMENT_DRIFT').toEqual(manifest.panoramic.environment)
  const images: Record<string, string> = {}, results: Record<string, unknown>[] = []
- const output = info.outputPath('comparisons'); await mkdir(output, { recursive: true })
+ const output = candidate ?? info.outputPath('comparisons'); await mkdir(output, { recursive: true })
  await page.clock.install({ time: new Date(environment.epoch) })
  await page.clock.pauseAt(new Date('2026-11-06T12:00:01Z'))
  const settle = async () => { await page.clock.runFor(160) }
@@ -114,7 +116,9 @@ test('PANO-VIS panoramic optical, sensor, actions and HUD reference matrix', asy
  await writeFile(`${output}/summary.json`, json({ source, environment, candidate, results, errors }))
  await info.attach('panoramic-summary.json', { body: json({ source, environment, candidate, results, errors }), contentType: 'application/json' })
  if (candidate) {
-  for (const name of Object.keys(images)) await writeFile(`${directory}/${name}`, await readFile(`${output}/${name}`))
-  await writeFile(`${directory}/manifest.json`, json({ ...manifest, panoramic: { environment, status: 'AWAITING_HUMAN_REVIEW' }, images: { ...manifest.images, ...images } }) + '\n')
+  // A complete proposal retains every other reference family, without editing
+  // the tracked corpus or granting appearance approval.
+  for (const name of Object.keys(manifest.images)) if (!images[name]) await writeFile(`${output}/${name}`, await readFile(`${directory}/${name}`))
+  await writeFile(`${output}/manifest.json`, json({ ...manifest, panoramic: { environment, status: 'AWAITING_HUMAN_REVIEW' }, images: { ...manifest.images, ...images } }) + '\n')
  }
 })

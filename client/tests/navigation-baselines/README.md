@@ -1,6 +1,6 @@
 # Navigation visual references (#751)
 
-These eight images are **corrected candidates pending explicit human approval**.
+These eight original #751 images are **corrected candidates pending explicit human approval**.
 The initial proposal exposed a hidden native-select host-font dependency. The
 current proposal pins Fontconfig to the licensed vendored DejaVu files; the only
 image changes are the selected-value glyphs. See the [upgrade measurements](../../../reports/issue-751/candidate-upgrade.json)
@@ -99,3 +99,30 @@ operated an account. Required human decisions stay visible as BLOCKED until made
 Software SwiftShader browser coverage does not qualify physical input, discrete
 GPUs, Metal, Windows rendering, native platforms, hardware FPS or subjective art.
 Historical native mesh regression #228 is a distinct renderer/asset contract.
+
+## Panoramic candidates (#816)
+
+The shared manifest adds **19 panoramic candidates awaiting human review**; the
+eight older PNGs and their environment/pixel policy are unchanged. The same
+baseline-approval job checks the complete manifest digest. A passing comparison
+does not approve either a new reference or its appearance.
+
+| Originals | Case |
+| --- | --- |
+| [Wide](panoramic-wide.png), [translated wide](panoramic-translated.png) | 75° optical scene, no scan |
+| [Telescope](panoramic-telescope.png), [translated telescope](panoramic-telescope-translated.png) | 0.1° and huge split origin |
+| [Surface](panoramic-surface.png), [below horizon](panoramic-below.png) | Shared grounded horizon/opaque globe |
+| [Empty](panoramic-empty-scanner.png), [detected](panoramic-detected-occluded-rear.png) | Scanner authority; hidden/rear contacts |
+| [Overlap](panoramic-overlap.png), [pagination](panoramic-pagination.png) | Dense contact browser |
+| [Sensor telescope](panoramic-sensor-telescope.png), [loss](panoramic-lost-contact.png) | Narrow markers and invalid action removal |
+| [Look at](panoramic-look-at-occluded.png), [Set direction](panoramic-set-direction.png) | Independent camera/ship actions |
+| [Stationary](panoramic-compass-stationary.png), [rear](panoramic-compass-rear.png), [overlap](panoramic-compass-overlap.png) | Compass states |
+| [Warning](panoramic-small-warning.png), [terminal](panoramic-small-destroyed.png) | 960×600 priority |
+
+See the [acceptance commands](../../README.md#panoramic-acceptance-matrix-816).
+Generate a complete proposal with
+`SALIMON_PANORAMIC_CANDIDATES=/tmp/panoramic-candidates npm run test:visual -- --grep PANO-VIS`,
+inspect it, then copy the proposed PNGs/manifest here in a reviewable change.
+Normal comparisons run the shared pixel policy, and the negative driver retains
+a deliberately mutated expected telescope image, its isolated failure and trace.
+Human approval and merge authority remain separate from these local checks.

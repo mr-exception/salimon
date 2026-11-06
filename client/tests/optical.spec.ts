@@ -11,6 +11,7 @@ async function boot(page: Page, scenario: string) {
 }
 const brightness = (png: PNG, x: number, y: number) => { const i = (y * png.width + x) * 4; return png.data[i] + png.data[i + 1] + png.data[i + 2] }
 test('OPT-1 optical disks before scanning, repeat, occultation and far origin invariance', async ({ page }, info) => {
+ test.setTimeout(240000) // Four full-resolution software-WebGL scene boots.
  const errors: string[] = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if(m.type() === 'error') errors.push(m.text()) })
  await boot(page, 'wide')
  const initial = await snapshot(page)

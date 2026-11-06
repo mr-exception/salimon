@@ -151,7 +151,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     setState(current.current)
   }
   const vital = resourceSession?.survival
-  const warning = vital?.health === 0 ? 'Run ended · zero health. Start a fresh character to continue.' : vital?.fatigue === 0 ? 'Exhausted · gathering and piloting unavailable.' : vital && vital.hunger < METER * .2 ? 'Low hunger · starvation at zero. Movement reduced.' : vital && vital.fatigue <= METER * .5 ? 'Low fatigue · movement reduced.' : ''
+  const warning = vital?.health === 0 ? 'Run ended · zero health. Start a fresh character to continue.' : vital?.fatigue === 0 ? 'Exhausted · gathering and piloting unavailable.' : vital && vital.hunger < METER * .2 ? 'Low hunger · starvation at zero. Movement and mining reduced.' : vital && vital.fatigue <= METER * .5 ? 'Low fatigue · movement reduced; mining reduced at 20 or below.' : ''
   return <>
     {gameplay && <aside className="survival-hud" aria-label="Survival condition">
       {vital && !resourceSession.error ? <>
@@ -184,6 +184,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         <button disabled={!resourceSession || !!resourceSession.error || resourceSession.survival.health === 0 || paused.current} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
         <p className="resource-note">{resourceSession?.error || saveStatus}</p>
         {selectedSource && <p data-source-summary>{RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].name} · {selectedSource.remainingGrams / 1000} kg remaining</p>}
+        {!!resourceSession?.activeSourceId && <p>Mining rate: {survivalPolicy(resourceSession.survival).miningUnits / 16} kg/s · partial work saved per source</p>}
         {!!resourceSession?.activeSourceId && <progress aria-label="Next kilogram extraction interval" max={60} value={resourceSession.progressTicks} />}
       </aside>}
       <div className="top-down-caption"><span>01 / QUIET LANDING SITE</span><span>SCOUT — INTERIOR CUTAWAY</span></div></section>
@@ -192,6 +193,6 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={paused.current || cockpitTarget && !!resourceSession?.error || resourceSession?.survival.health === 0 || !selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
     </aside>
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
-    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · 1 kg/s · Machine systems are placeholders' : 'Console inspections are a test · Systems inactive'}</p></footer>
+    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel</p><p>{gameplay ? 'Gathering · up to 1 kg/s · Low hunger/fatigue reduce rate · Partial work saved' : 'Console inspections are a test · Systems inactive'}</p></footer>
   </main></>
 }

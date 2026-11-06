@@ -2,7 +2,7 @@
 
 Use the [2D documentation migration register](../docs/2d-migration-register.md) to distinguish the current browser implementation, approved future mechanics and archived native source contracts.
 
-**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **1 kg/s integer-gram** sample gathering with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v7 resource/item/survival/hazard ledger and migrates valid v1
+**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **up to 1 kg/s integer-gram** sample gathering with approved survival penalties with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v8 resource/item/survival/hazard ledger and migrates valid v1
 litre / v2 gram saves without loss. `resourceLedger.ts` validates exact transfers
 and store mass; future stores require trusted ID/ship/capacity declarations.
 The default world enables the 50 kg Scout Resource Container and deposit/withdraw panel (#784/#785). See [resource design](../docs/resource-inventory-and-gathering.md).
@@ -199,9 +199,9 @@ Core, Fabricator, multiplayer and ship damage remain future features.
 ## Gathering and saved expeditions (#757)
 
 In the default world, click **Equip gathering tool**, approach the banded outcrop
-or plate colony and press **E / Gather**. Up to **1 kg** is collected per completed second.
+or plate colony and press **E / Gather**. Up to **1 kg** is collected per completed work interval; low hunger/fatigue reduce the rate. See [approved tuning](../docs/browser-survival.md#approved-work-and-action-tuning-799).
 Movement, Escape, loss of reach, stowing the tool or focus loss stops gathering
-and discards only unfinished interval progress. The HUD shows weight/slot limits,
+and checkpoints source-bound partial work, which survives reload. The HUD shows weight/slot limits,
 separate resource stacks and remaining source mass. A full inventory leaves
 the source's uncollected material intact. No physical fragments or carrying
 simulation are involved.

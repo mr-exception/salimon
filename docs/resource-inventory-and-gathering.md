@@ -15,10 +15,10 @@ transfers are playable through #785. The older native physical-fragment system i
 
 ## Player mining and harvesting
 
-- Source quantities/depletion and player resource credit use integer **grams**. For the current authored sample, equipping the gathering tool and using **E / Gather** collects up to **1,000 g per completed 60-tick second** (1 kg/s initial sample rate), limited by remaining source mass, the player's free weight and the appropriate shared inventory slot.
+- Source quantities/depletion and player resource credit use integer **grams**. For the current authored sample, equipping the gathering tool and using **E / Gather** collects up to **1,000 g per completed work interval** (1 kg/s baseline; approved hunger/fatigue multipliers apply), limited by remaining source mass, the player's free weight and the appropriate shared inventory slot.
 - If less than 1 kg is available or fits, credit only the exact remaining grams at the next completed interval; never overfill or delete the source remainder. One atomic transaction debits exactly the mass credited. No mined fragments are created.
 - Starting sample catalog `landing-resources:v2`: mineral source **60,000 g** and biological source **15,000 g**. IDs and the authored location remain unchanged. These mass totals match the prior illustrative 24 L at 2500 g/L and 30 L at 500 g/L, for safe save migration, but **density/volume no longer governs gameplay inventory**.
-- Existing interaction reaches are 2.3 m mineral and 1.9 m biological. Movement, Escape, stowing the tool, leaving reach, losing focus/visibility and cockpit entry interrupt gathering. Incomplete intervals are discarded and do not resume after reload; already committed mass remains in the persistent source/inventory transaction.
+- Existing interaction reaches are 2.3 m mineral and 1.9 m biological. Movement, Escape, stowing the tool, leaving reach, losing focus/visibility and cockpit entry interrupt gathering. Partial work is checkpointed per source and retained across interruptions/reload; gathering itself requires explicit restart. See [approved tuning](browser-survival.md#approved-work-and-action-tuning-799). Completed mass and work debit share the atomic source/inventory transaction.
 - A full-weight or full-slot message explains why collection stopped. Depleted sources preserve their stable IDs and collider identities and remain visibly depleted. Gathering tool upgrades and additional source types are **TBD**.
 
 ## Ship storage and equipment storage

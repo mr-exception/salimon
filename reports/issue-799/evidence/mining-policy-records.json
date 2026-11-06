@@ -1,0 +1,669 @@
+[
+  {
+    "hunger": 10,
+    "fatigue": 100,
+    "rate": 0.75,
+    "totalTicks": 80,
+    "partial": {
+      "version": 8,
+      "miningWork": {
+        "source:landing:mineral:01": 444
+      },
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 387324,
+        "fatigue": 3887959,
+        "health": 200,
+        "activeTicks": 41,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 3,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {},
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 60000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "extracted": {
+      "version": 8,
+      "miningWork": {},
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 385668,
+        "fatigue": 3887913,
+        "health": 200,
+        "activeTicks": 87,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 4,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {
+          "mineral": 1000
+        },
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 59000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "restored": {
+      "version": 8,
+      "miningWork": {},
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 385668,
+        "fatigue": 3887913,
+        "health": 200,
+        "activeTicks": 87,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 4,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {
+          "mineral": 1000
+        },
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 59000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "browser": "154.0.8037.57",
+    "input": "synthetic keyboard/mouse, controlled clock; saved meter fixture only"
+  },
+  {
+    "hunger": 100,
+    "fatigue": 20,
+    "rate": 0.75,
+    "totalTicks": 80,
+    "partial": {
+      "version": 8,
+      "miningWork": {
+        "source:landing:mineral:01": 444
+      },
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 3886524,
+        "fatigue": 777559,
+        "health": 200,
+        "activeTicks": 41,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 3,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {},
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 60000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "extracted": {
+      "version": 8,
+      "miningWork": {},
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 3884796,
+        "fatigue": 777511,
+        "health": 200,
+        "activeTicks": 89,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 4,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {
+          "mineral": 1000
+        },
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 59000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "restored": {
+      "version": 8,
+      "miningWork": {},
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 3884796,
+        "fatigue": 777511,
+        "health": 200,
+        "activeTicks": 89,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 4,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {
+          "mineral": 1000
+        },
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 59000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "browser": "154.0.8037.57",
+    "input": "synthetic keyboard/mouse, controlled clock; saved meter fixture only"
+  },
+  {
+    "hunger": 10,
+    "fatigue": 20,
+    "rate": 0.5625,
+    "totalTicks": 107,
+    "partial": {
+      "version": 8,
+      "miningWork": {
+        "source:landing:mineral:01": 333
+      },
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 387324,
+        "fatigue": 777559,
+        "health": 200,
+        "activeTicks": 41,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 3,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {},
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 60000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "extracted": {
+      "version": 8,
+      "miningWork": {
+        "source:landing:mineral:01": 3
+      },
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 384660,
+        "fatigue": 777485,
+        "health": 200,
+        "activeTicks": 115,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 5,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {
+          "mineral": 1000
+        },
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 59000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "restored": {
+      "version": 8,
+      "miningWork": {
+        "source:landing:mineral:01": 3
+      },
+      "hazards": {
+        "version": 1,
+        "exposure": {
+          "radiation": "0/1",
+          "poison": "0/1"
+        },
+        "modules": []
+      },
+      "survival": {
+        "hunger": 384660,
+        "fatigue": 777485,
+        "health": 200,
+        "activeTicks": 115,
+        "starvationTicks": 0,
+        "recoveryTicks": 0,
+        "offlineAtMs": 1793836802611
+      },
+      "itemDefinitions": {},
+      "catalogVersion": "landing-resources:v2",
+      "siteId": "site:illustrated-landing:v1",
+      "revision": 5,
+      "inventory": {
+        "capacityGrams": 10000,
+        "capacitySlots": 12,
+        "quantities": {
+          "mineral": 1000
+        },
+        "items": {}
+      },
+      "sources": {
+        "source:landing:mineral:01": {
+          "id": "source:landing:mineral:01",
+          "resourceId": "mineral",
+          "remainingGrams": 59000
+        },
+        "source:landing:biology:01": {
+          "id": "source:landing:biology:01",
+          "resourceId": "biomass",
+          "remainingGrams": 15000
+        }
+      },
+      "stores": {
+        "scout:storage": {
+          "shipId": "ship:scout",
+          "capacityGrams": 50000,
+          "id": "scout:storage",
+          "quantities": {}
+        }
+      },
+      "location": {
+        "anchor": {
+          "frame": "planet:fixture",
+          "point": {
+            "cell": [
+              "0",
+              "0",
+              "0"
+            ],
+            "offsetM": [
+              -7.103086578651019,
+              0.016913421348980898,
+              0
+            ]
+          }
+        },
+        "facing": 0
+      }
+    },
+    "browser": "154.0.8037.57",
+    "input": "synthetic keyboard/mouse, controlled clock; saved meter fixture only"
+  }
+]

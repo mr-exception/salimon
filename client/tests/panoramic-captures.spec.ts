@@ -40,7 +40,7 @@ test('PANO-VIS panoramic optical, sensor, actions and HUD reference matrix', asy
   const actual = await page.screenshot({ caret: 'hide' }), name = `panoramic-${id}.png`
   images[name] = sha256(actual)
   await writeFile(`${output}/${name}`, actual)
-  await writeFile(`${output}/panoramic-${id}.json`, json({ source, environment, snapshot, errors }))
+  await writeFile(`${output}/panoramic-${id}.json`, json({ source, environment, viewport: page.viewportSize(), dpr: await page.evaluate(() => window.devicePixelRatio), snapshot, errors }))
   await info.attach(name, { body: actual, contentType: 'image/png' })
   if (candidate) { results.push({ id, status: 'CANDIDATE', sha256: images[name] }); return }
   const expected = await readFile(`${directory}/${name}`)

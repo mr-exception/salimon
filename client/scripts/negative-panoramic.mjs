@@ -35,7 +35,7 @@ try {
  const summary = attachment ? JSON.parse(attachment.body ? Buffer.from(attachment.body, 'base64').toString() : await readFile(attachment.path, 'utf8')) : null
  const failed = summary?.results.filter(r => !r.pass)
  const valid = child.status === 1 && !child.error && report.stats.unexpected === 1 && results.length === 1 &&
-  failed?.length === 1 && failed[0].id === 'telescope' && failed[0].changedPixels >= 10000 &&
+  failed?.length === 1 && failed[0].id === 'telescope' && failed[0].actual === hash(original) && failed[0].changedPixels >= 10000 &&
   results[0].errors.some(e => e.message?.includes('PANORAMIC_PIXEL_MISMATCH telescope'))
  await writeFile(join(output, 'mutation-summary.json'), JSON.stringify({ status: valid ? 'PASS' : 'INVALID_DEMONSTRATION', source, name, original: hash(original), mutated: hash(changed), exit: child.status, summary }, null, 2))
  if (!valid) throw Error(`Expected telescope screenshot failure was not isolated: ${output}`)

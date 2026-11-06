@@ -49,6 +49,8 @@ test('HAZ-1–5 built non-shipping fixture uses production clock/save, exact rel
   await expect(page.getByLabel('Survival condition')).toContainText('Saving failed')
   expect(await save()).toEqual(beforeFailure)
   await page.reload(); await expect(page.getByRole('meter', { name: 'Health', exact: true })).toHaveAttribute('value', String(beforeFailure.survival.health))
+  await expect(page.getByLabel('Survival condition')).toContainText(`${Math.ceil(beforeFailure.survival.health)} / 200 HP`)
+  await expect.poll(async () => { await page.clock.runFor(32); return page.locator('.top-down-scene').getAttribute('data-render-ready') }).toBe('true')
   await info.attach('hazard-records.json', { body: JSON.stringify({ browser: browser.version(), initial, partial, restored, full, exited, beforeFailure, final: await save(), input: 'Playwright synthetic buttons and controlled clock; separately built test-only sources/modules' }, null, 2), contentType: 'application/json' })
 })
 

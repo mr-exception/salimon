@@ -155,7 +155,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   return <>
     {gameplay && <aside className="survival-hud" aria-label="Survival condition">
       {vital && !resourceSession.error ? <>
-        <label>Health <span>{vital.health} / 200 HP</span><meter aria-label="Health" min={0} max={200} value={vital.health} /></label>
+        <label>Health <span>{Math.ceil(vital.health)} / 200 HP</span><meter aria-label="Health" min={0} max={200} value={vital.health} /></label>
         <label>Hunger <span>{Math.ceil(vital.hunger / METER * 100)} / 100</span><meter aria-label="Hunger" min={0} max={100} value={Math.ceil(vital.hunger / METER * 100)} /></label>
         <label>Fatigue <span>{Math.ceil(vital.fatigue / METER * 100)} / 100</span><meter aria-label="Fatigue" min={0} max={100} value={Math.ceil(vital.fatigue / METER * 100)} /></label>
         <p aria-live="polite">{paused.current ? 'Paused · active time stopped' : warning}</p>

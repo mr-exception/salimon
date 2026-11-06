@@ -1,0 +1,477 @@
+{
+  "initial": {
+    "tick": 300,
+    "contacts": [
+      "back",
+      "dense-00",
+      "dense-01",
+      "dense-02",
+      "dense-03",
+      "dense-04",
+      "dense-05",
+      "dense-06",
+      "dense-07",
+      "dense-08",
+      "dense-09",
+      "dense-10",
+      "dense-11",
+      "dense-12",
+      "dense-13",
+      "dense-14",
+      "dense-15",
+      "dense-16",
+      "dense-17",
+      "hidden",
+      "outside",
+      "planet",
+      "tiny"
+    ],
+    "selected": null,
+    "actions": 0,
+    "markers": [
+      {
+        "id": "dense-00",
+        "ids": [
+          "dense-00",
+          "dense-01",
+          "dense-02",
+          "dense-03",
+          "dense-04",
+          "dense-05",
+          "dense-06",
+          "dense-07",
+          "dense-08",
+          "dense-09",
+          "dense-10",
+          "dense-11",
+          "dense-12",
+          "dense-13",
+          "dense-14",
+          "dense-15",
+          "dense-16",
+          "dense-17"
+        ],
+        "x": 323.61295525905535,
+        "y": 221.80647762952765
+      },
+      {
+        "id": "planet",
+        "ids": [
+          "planet"
+        ],
+        "x": 480,
+        "y": 300
+      },
+      {
+        "id": "tiny",
+        "ids": [
+          "tiny"
+        ],
+        "x": 636.3870447409446,
+        "y": 300
+      }
+    ],
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "canvas": {
+      "width": 480,
+      "height": 300
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "motion": [
+    {
+      "tick": 300,
+      "contacts": [
+        "back",
+        "dense-00",
+        "dense-01",
+        "dense-02",
+        "dense-03",
+        "dense-04",
+        "dense-05",
+        "dense-06",
+        "dense-07",
+        "dense-08",
+        "dense-09",
+        "dense-10",
+        "dense-11",
+        "dense-12",
+        "dense-13",
+        "dense-14",
+        "dense-15",
+        "dense-16",
+        "dense-17",
+        "hidden",
+        "outside",
+        "planet",
+        "tiny"
+      ],
+      "selected": null,
+      "actions": 0,
+      "markers": [
+        {
+          "id": "tiny",
+          "ids": [
+            "tiny"
+          ],
+          "x": 473.9160015436909,
+          "y": 300
+        }
+      ],
+      "view": {
+        "quaternion": [
+          0,
+          -0.18911621030218168,
+          0,
+          0.9819547133146932
+        ],
+        "fov": 0.1
+      },
+      "canvas": {
+        "width": 480,
+        "height": 300
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "domMarkers": 1
+    },
+    {
+      "tick": 300,
+      "contacts": [
+        "back",
+        "dense-00",
+        "dense-01",
+        "dense-02",
+        "dense-03",
+        "dense-04",
+        "dense-05",
+        "dense-06",
+        "dense-07",
+        "dense-08",
+        "dense-09",
+        "dense-10",
+        "dense-11",
+        "dense-12",
+        "dense-13",
+        "dense-14",
+        "dense-15",
+        "dense-16",
+        "dense-17",
+        "hidden",
+        "outside",
+        "planet",
+        "tiny"
+      ],
+      "selected": null,
+      "actions": 0,
+      "markers": [
+        {
+          "id": "tiny",
+          "ids": [
+            "tiny"
+          ],
+          "x": 454.416006447121,
+          "y": 300
+        }
+      ],
+      "view": {
+        "quaternion": [
+          0,
+          -0.1891440600332531,
+          0,
+          0.981949349281386
+        ],
+        "fov": 0.1
+      },
+      "canvas": {
+        "width": 480,
+        "height": 300
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "domMarkers": 1
+    },
+    {
+      "tick": 300,
+      "contacts": [
+        "back",
+        "dense-00",
+        "dense-01",
+        "dense-02",
+        "dense-03",
+        "dense-04",
+        "dense-05",
+        "dense-06",
+        "dense-07",
+        "dense-08",
+        "dense-09",
+        "dense-10",
+        "dense-11",
+        "dense-12",
+        "dense-13",
+        "dense-14",
+        "dense-15",
+        "dense-16",
+        "dense-17",
+        "hidden",
+        "outside",
+        "planet",
+        "tiny"
+      ],
+      "selected": null,
+      "actions": 0,
+      "markers": [
+        {
+          "id": "tiny",
+          "ids": [
+            "tiny"
+          ],
+          "x": 448.33200794917565,
+          "y": 300
+        }
+      ],
+      "view": {
+        "quaternion": [
+          0,
+          -0.18915274911820887,
+          0,
+          0.9819476755413316
+        ],
+        "fov": 0.1
+      },
+      "canvas": {
+        "width": 480,
+        "height": 300
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "domMarkers": 1
+    },
+    {
+      "tick": 300,
+      "contacts": [
+        "back",
+        "dense-00",
+        "dense-01",
+        "dense-02",
+        "dense-03",
+        "dense-04",
+        "dense-05",
+        "dense-06",
+        "dense-07",
+        "dense-08",
+        "dense-09",
+        "dense-10",
+        "dense-11",
+        "dense-12",
+        "dense-13",
+        "dense-14",
+        "dense-15",
+        "dense-16",
+        "dense-17",
+        "hidden",
+        "outside",
+        "planet",
+        "tiny"
+      ],
+      "selected": null,
+      "actions": 0,
+      "markers": [
+        {
+          "id": "tiny",
+          "ids": [
+            "tiny"
+          ],
+          "x": 428.83201261094206,
+          "y": 300
+        }
+      ],
+      "view": {
+        "quaternion": [
+          0,
+          -0.18918059864966308,
+          0,
+          0.9819423104717279
+        ],
+        "fov": 0.1
+      },
+      "canvas": {
+        "width": 480,
+        "height": 300
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "domMarkers": 1
+    },
+    {
+      "tick": 300,
+      "contacts": [
+        "back",
+        "dense-00",
+        "dense-01",
+        "dense-02",
+        "dense-03",
+        "dense-04",
+        "dense-05",
+        "dense-06",
+        "dense-07",
+        "dense-08",
+        "dense-09",
+        "dense-10",
+        "dense-11",
+        "dense-12",
+        "dense-13",
+        "dense-14",
+        "dense-15",
+        "dense-16",
+        "dense-17",
+        "hidden",
+        "outside",
+        "planet",
+        "tiny"
+      ],
+      "selected": null,
+      "actions": 0,
+      "markers": [
+        {
+          "id": "tiny",
+          "ids": [
+            "tiny"
+          ],
+          "x": 409.3320169434022,
+          "y": 300
+        }
+      ],
+      "view": {
+        "quaternion": [
+          0,
+          -0.18920844802894413,
+          0,
+          0.9819369446122691
+        ],
+        "fov": 0.1
+      },
+      "canvas": {
+        "width": 480,
+        "height": 300
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "domMarkers": 1
+    },
+    {
+      "tick": 300,
+      "contacts": [
+        "back",
+        "dense-00",
+        "dense-01",
+        "dense-02",
+        "dense-03",
+        "dense-04",
+        "dense-05",
+        "dense-06",
+        "dense-07",
+        "dense-08",
+        "dense-09",
+        "dense-10",
+        "dense-11",
+        "dense-12",
+        "dense-13",
+        "dense-14",
+        "dense-15",
+        "dense-16",
+        "dense-17",
+        "hidden",
+        "outside",
+        "planet",
+        "tiny"
+      ],
+      "selected": null,
+      "actions": 0,
+      "markers": [
+        {
+          "id": "tiny",
+          "ids": [
+            "tiny"
+          ],
+          "x": 389.83202082114866,
+          "y": 300
+        }
+      ],
+      "view": {
+        "quaternion": [
+          0,
+          -0.1892362972560296,
+          0,
+          0.9819315779629595
+        ],
+        "fov": 0.1
+      },
+      "canvas": {
+        "width": 480,
+        "height": 300
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "domMarkers": 1
+    }
+  ],
+  "moved": {
+    "tick": 300,
+    "contacts": [
+      "back",
+      "dense-00",
+      "dense-01",
+      "dense-02",
+      "dense-03",
+      "dense-04",
+      "dense-05",
+      "dense-06",
+      "dense-07",
+      "dense-08",
+      "dense-09",
+      "dense-10",
+      "dense-11",
+      "dense-12",
+      "dense-13",
+      "dense-14",
+      "dense-15",
+      "dense-16",
+      "dense-17",
+      "hidden",
+      "outside",
+      "planet",
+      "tiny"
+    ],
+    "selected": null,
+    "actions": 0,
+    "markers": [
+      {
+        "id": "tiny",
+        "ids": [
+          "tiny"
+        ],
+        "x": 370.33202411865466,
+        "y": 300
+      }
+    ],
+    "view": {
+      "quaternion": [
+        0,
+        -0.18926414633089714,
+        0,
+        0.9819262105238035
+      ],
+      "fov": 0.1
+    },
+    "canvas": {
+      "width": 480,
+      "height": 300
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "repeat": "byte-identical",
+  "translated": "byte-identical"
+}

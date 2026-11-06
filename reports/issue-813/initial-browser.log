@@ -1,0 +1,76 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=look-at
+
+[WebServer] (node:1302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1315) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] npm notice
+[WebServer] npm notice New major version of npm available! 11.9.0 -> 12.2.2
+[WebServer] npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+[WebServer] npm notice To update run: npm install -g npm@12.2.2
+[WebServer] npm notice
+[WebServer] (node:1334) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1347) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1373) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1385) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation (21.9s)
+  ✘  2 [look-at] › tests/look-at.spec.ts:75:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled (3.0m)
+
+
+  1) [look-at] › tests/look-at.spec.ts:75:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled
+
+    Test timeout of 180000ms exceeded.
+
+    Error: locator.click: Test timeout of 180000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Caligo', exact: true })
+
+
+       8 | async function choose(page: Page, name: string) {
+       9 |  await page.getByRole('textbox').fill(name)
+    > 10 |  await page.getByRole('button', { name, exact: true }).click()
+         |                                                        ^
+      11 | }
+      12 | test('LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation', async ({ page }, info) => {
+      13 |  const errors: string[] = []; page.on('pageerror', e => errors.push(e.message))
+        at choose (/workspace/salimon/client/tests/look-at.spec.ts:10:56)
+        at /workspace/salimon/client/tests/look-at.spec.ts:86:2
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-813/browser/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-813/browser/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-813/browser/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-813/browser/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [look-at] › tests/look-at.spec.ts:75:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled
+  1 passed (3.5m)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

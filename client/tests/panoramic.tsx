@@ -11,6 +11,11 @@ const navigation = new NavigationRuntime(bodies, grounded ? startingScoutLocatio
 const view = new ObservationCameraState(navigation.clock.state)
 let renderer: string | null = null, exits = 0
 Object.assign(window, {
+ // Exercise the domain clock without tying scanner acquisition to GPU frame time.
+ hudAdvance: (seconds: number) => {
+  // Stay below NavigationClock's per-call catch-up limit.
+  for (let elapsed = 0; elapsed < seconds; elapsed++) navigation.advance(Math.min(1, seconds - elapsed))
+ },
  hudSnapshot: () => ({ ship: structuredClone(navigation.clock.state), view: view.snapshot(), contacts: navigation.scanner.contacts.map(b => b.id), renderer, exits }),
  hudScenario: (kind: string) => {
   if (kind === 'rear') navigation.clock.state = { ...navigation.clock.state, yaw: Math.PI, velocityMps: [0, 0, 10] }

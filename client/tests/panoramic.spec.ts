@@ -1,6 +1,7 @@
 import { test, expect, type Page, type TestInfo } from '@playwright/test'
 type State = { ship: { yaw: number; pitch: number; throttle: number; velocityMps: number[] }; view: { quaternion: number[]; fov: number }; renderer: string; contacts: string[]; exits: number }
 const state = (page: Page) => page.evaluate(() => (window as unknown as { hudSnapshot(): State }).hudSnapshot())
+const acquireContacts = (page: Page) => page.evaluate(() => (window as unknown as { hudAdvance(seconds: number): void }).hudAdvance(5))
 const scenario = (page: Page, kind: string) => page.evaluate(kind => (window as unknown as { hudScenario(kind: string): void }).hudScenario(kind), kind)
 async function boot(page: Page, grounded = false) {
  await page.goto(`/tests/panoramic.html${grounded ? '?grounded' : ''}`)
@@ -17,6 +18,8 @@ test('HUD-1 full viewport, scanner authority, keyboard browser and priority Esca
  expect(dimensions).toMatchObject({ x: 0, y: 0, width: 1280, height: 720 })
  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(720)
  await expect(page.getByText('Stationary', { exact: false })).toBeVisible()
+ // Advance five domain seconds; scanner cadence/range still belongs to the runtime.
+ await acquireContacts(page)
  await expect.poll(async () => (await state(page)).contacts.length).toBe(40)
  await capture(page, 'desktop-1280x720.png', info)
  await page.locator('canvas').focus(); await page.keyboard.press('Tab')
@@ -26,6 +29,12 @@ test('HUD-1 full viewport, scanner authority, keyboard browser and priority Esca
  await expect(page.getByLabel('Search contacts')).toBeFocused()
  const focused = await state(page)
  await page.keyboard.press('KeyD'); await page.keyboard.press('ArrowLeft')
+ const consumed = await page.evaluate(() => {
+  const event = new WheelEvent('wheel', { deltaY: -500, bubbles: true, cancelable: true })
+  document.querySelector('canvas')!.dispatchEvent(event)
+  return event.defaultPrevented
+ })
+ expect(consumed).toBe(true)
  await page.mouse.move(500, 400); await page.mouse.wheel(0, -500)
  expect((await state(page)).view).toEqual(focused.view)
  expect((await state(page)).ship.yaw).toBe(focused.ship.yaw)
@@ -101,6 +110,7 @@ test('HUD-2 compass render states, ship rotation, zoom and responsive warning pr
 test('HUD-3 grounded authority and no sidebar at smaller desktop size', async ({ page }, info) => {
  await page.setViewportSize({ width: 960, height: 600 }); await boot(page, true)
  await expect(page.getByRole('slider', { name: 'Throttle', exact: true })).toBeDisabled()
+ await acquireContacts(page)
  await expect.poll(async () => (await state(page)).contacts.length).toBeGreaterThan(0)
  await page.locator('canvas').focus(); await page.keyboard.press('KeyC')
  await page.getByLabel('Search contacts').fill('Vesper')

@@ -18,6 +18,8 @@ test('LOOK-1 rear browser contact, opaque foreground, independent ship alignment
  expect(initial.markers).toHaveLength(0)
  await choose(page, 'Behind')
  await page.getByRole('button', { name: 'Zoom', exact: true }).click()
+ // The observer publishes after the render frame, not synchronously with clicks.
+ await expect.poll(async () => (await state(page)).view.fov).toBeLessThan(initial.view.fov)
  const start = await state(page)
  await page.getByRole('button', { name: 'Look at', exact: true }).click()
  await expect.poll(async () => (await state(page)).view.quaternion).not.toEqual(start.view.quaternion)
@@ -43,7 +45,7 @@ test('LOOK-1 rear browser contact, opaque foreground, independent ship alignment
  await page.keyboard.press('KeyD')
  expect((await state(page)).ship.alignment).not.toBeNull()
  await page.keyboard.press('ArrowLeft')
- expect((await state(page)).ship.alignment).toBeNull()
+ await expect.poll(async () => (await state(page)).ship.alignment).toBeNull()
  // Help disclosure is a keyboard control, never a steering surface.
  await page.locator('summary').focus()
  const helpFocus = await state(page)

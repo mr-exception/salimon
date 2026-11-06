@@ -55,9 +55,9 @@ ship relocation and detached location snapshots. The normal Navigation client CI
 also runs legacy desktop/deterministic/production radar checks, approved navigation
 comparisons, negative mutations, repeat visuals and baseline approval.
 
-Five original slice checkpoints make the presentation reviewable: outdoor spawn,
+Seven original slice checkpoints make the presentation reviewable: outdoor spawn,
 mineral inspection, exterior with simultaneous exposed Scout interior, standing
-cockpit return and return outdoors. Replays use the repository's unchanged
+cockpit return, return outdoors, grounded Vesper radar and reloaded outdoors. Replays use the repository's unchanged
 `compareImages` policy, without masks or tolerance changes. A comparison of the
 wrong checkpoint must fail. These are review evidence/candidates; they do not
 promote or alter approved navigation reference PNGs. Results, original captures,

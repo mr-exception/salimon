@@ -29,4 +29,3 @@ export function startingScoutLocation() {
   return { siteId: STARTING_SITE.id, body, frames, ship } as const
 }
 export type ScoutLocation = ReturnType<typeof startingScoutLocation>
-

@@ -23,7 +23,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    # Full browser regression plus panoramic reference/repeat/negative runs.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:

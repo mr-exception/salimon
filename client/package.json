@@ -11,7 +11,7 @@
     "test:browser": "playwright test",
     "test:browser:negative": "node scripts/negative-navigation.mjs",
     "test:visual": "playwright test --project=navigation-captures",
-    "test:visual:negative": "node scripts/negative-visual.mjs",
+    "test:visual:negative": "node scripts/negative-visual.mjs && node scripts/negative-panoramic.mjs",
     "test:visual:approval": "node --experimental-strip-types scripts/baseline-approval.ts"
   },
   "dependencies": {

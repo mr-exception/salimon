@@ -610,3 +610,46 @@ when using an existing system Chromium (omit `CHROMIUM_PATH` for Playwright's
 installed browser). The new browser project runs in the existing functional CI;
 compass repeat captures and a front/rear negative comparison do not change or
 approve any visual baseline.
+
+## Panoramic acceptance matrix (#816)
+
+`npm run test:visual` also runs `PANO-VIS` in the existing navigation-captures
+project: 19 fixed-clock production-adapter screenshots cover 75°/0.1° optics,
+huge split origin, scanner acquisition/loss, opaque occlusion and rear contacts,
+overlap/pagination, grounded horizon, Look at, free-flight Set direction,
+compass stationary/rear/overlap and 960×600 warning/terminal priority. The default
+production chair/power/2D journey remains `COCKPIT-1`, with two fresh contexts,
+originals, unchanged pixel policy and state assertions. `HUD-1` covers keyboard
+Tab/Enter, search, Escape priority and focus restoration. Existing 2D/scanner/ship
+regressions remain in the full browser suite.
+
+`OPT-3` compares identical angular scenes from 1 cm to 1e24 m depth and repeats
+0.1° optics at huge split coordinates. `SENSOR-4` stresses alternating keyboard
+movement and high-frequency wheel events at telescope FOV, retaining every
+sample and checking marker precision, stable pixels and unchanged scanner time.
+`OBS-5` covers full spherical turns and physical ship-origin following.
+`SENSOR-3` rejects unscanned optical markers and stale marker click-through.
+`npm run test:browser:negative` deliberately leaks optical markers in a disposable
+source copy and must fail that named assertion, alongside the older mutations.
+`npm run test:visual:negative` additionally changes one expected telescope PNG
+in a disposable copy, updates its integrity hash, and requires exactly that
+pixel comparison to fail. A crash, timeout or environment drift is not success.
+
+To propose panoramic references locally, run:
+
+```sh
+SALIMON_PANORAMIC_CANDIDATES=1 npm run test:visual -- --grep PANO-VIS
+npm run test:visual
+SALIMON_EVIDENCE_DIR=test-results/visual-repeat npm run test:visual
+npm run test:visual:negative
+```
+
+Candidate generation retains the older references and adds the panoramic images
+to the existing manifest. It is forbidden in CI. These images are **awaiting
+human review** until the existing baseline-approval job finds the owner's
+explicit approval of the exact changed manifest digest; generating or matching
+candidates does not approve appearance. Never regenerate references to resolve
+a failure. Keep originals, diffs, JSON metadata and traces in `test-results/`
+and retain essential raw evidence with the issue report before artifacts expire.
+Software SwiftShader measurements do not establish target-device GPU/Metal FPS;
+physical input/platform and subjective qualification remain with #720–#722.

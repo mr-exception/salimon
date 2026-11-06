@@ -104,3 +104,68 @@ test('SENSOR-2 repeat/translated pixels, telescope motion and stale group suppre
  await info.attach('telescope.png', { body: await page.screenshot(), contentType: 'image/png' })
  await info.attach('measurements.json', { body: JSON.stringify({ initial, motion, moved: await state(page), repeat: 'byte-identical', translated: 'byte-identical' }, null, 2), contentType: 'application/json' })
 })
+
+test('SENSOR-3 adversarial optical leak and stale marker click-through', async ({ page }, info) => {
+ await boot(page)
+ await expect(sceneMarkers(page), 'UNSCANNED_OPTICAL_MARKER_LEAK').toHaveCount(0)
+ await page.locator('canvas').click({ position: { x: 480, y: 300 } })
+ expect((await state(page)).selected, 'OPTICAL_SELECTION_LEAK').toBeNull()
+ await page.getByRole('button', { name: 'Pulse', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(3)
+ const planet = page.getByRole('button', { name: 'Sensor contact Detected planet', exact: true })
+ await planet.click()
+ expect((await state(page)).selected).toBe('planet')
+ for (const hidden of ['hidden', 'back', 'outside']) {
+  await expect(page.getByRole('button', { name: `Sensor contact Detected ${hidden}`, exact: true })).toHaveCount(0)
+ }
+ const detached = await planet.elementHandle()
+ await page.getByRole('button', { name: 'Leave range', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(0)
+ // A captured pointer target must not resurrect a stale or occluded contact.
+ await detached!.evaluate(el => el.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+ await expect(page.getByRole('button', { name: 'Set direction', exact: true })).toHaveCount(0)
+ expect((await state(page)).selected).toBeNull()
+ expect((await state(page)).actions).toBe(0)
+ await info.attach('adversarial.json', { body: JSON.stringify(await state(page)), contentType: 'application/json' })
+})
+
+test('SENSOR-4 telescope high-frequency input at huge origin preserves depth and authority', async ({ page }, info) => {
+ test.setTimeout(180000)
+ const errors: string[] = []; page.on('pageerror', e => errors.push(e.message))
+ await page.clock.install({ time: new Date('2026-11-06T12:00:00Z') })
+ await page.clock.pauseAt(new Date('2026-11-06T12:00:01Z'))
+ await page.goto('/tests/perspective.html?low-resolution&translated')
+ await expect.poll(async () => { await page.clock.runFor(32); return (await state(page))?.renderer }).toContain('SwiftShader')
+ await page.getByRole('button', { name: 'Pulse', exact: true }).click(); await page.clock.runFor(32)
+ await page.getByRole('button', { name: 'Telescope', exact: true }).click(); await page.clock.runFor(32)
+ await page.locator('canvas').focus()
+ await page.keyboard.press('Shift') // Match keyboard focus-visible decoration in both originals.
+ await page.clock.runFor(32)
+ const initial = await state(page), samples = []
+ expect(initial.view.fov).toBe(0.1)
+ const first = await page.locator('canvas').screenshot()
+ // 60 wheel events and 60 held-key intervals over 60 completed frames. Each pair returns
+ // to the same pose/FOV: every rendered sample must retain the tiny target.
+ for (let i = 0; i < 30; i++) {
+  await page.locator('canvas').dispatchEvent('wheel', { deltaY: 10, bubbles: true, cancelable: true })
+  await page.locator('canvas').dispatchEvent('wheel', { deltaY: -10, bubbles: true, cancelable: true })
+  await page.keyboard.down('KeyD'); await page.clock.runFor(16); await page.keyboard.up('KeyD')
+  await page.keyboard.down('KeyA'); await page.clock.runFor(16); await page.keyboard.up('KeyA')
+  const next = await state(page)
+  expect(next.view.fov).toBeCloseTo(0.1, 12)
+  expect(next.view.quaternion.every(Number.isFinite)).toBe(true)
+  expect(next.markers).toHaveLength(1)
+  expect(next.markers[0].ids).toEqual(['tiny'])
+  expect(next.markers[0].x).toBeCloseTo(initial.markers[0].x, 7)
+  expect(next.markers[0].y).toBeCloseTo(initial.markers[0].y, 7)
+  expect(next.contacts).toEqual(initial.contacts); expect(next.tick).toBe(initial.tick)
+  samples.push(next)
+ }
+ await page.clock.runFor(32)
+ const final = await page.locator('canvas').screenshot()
+ await info.attach('stress-original.png', { body: first, contentType: 'image/png' })
+ await info.attach('stress-final.png', { body: final, contentType: 'image/png' })
+ await info.attach('stress.json', { body: JSON.stringify({ initial, final: await state(page), samples, errors, input: 'Playwright keyboard and synthetic DOM wheel; no physical input or FPS claim' }), contentType: 'application/json' })
+ expect(final.equals(first), 'STRESS_REPEAT_PIXELS').toBe(true)
+ expect(errors).toEqual([])
+})

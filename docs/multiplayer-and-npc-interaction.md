@@ -4,7 +4,7 @@
 
 **No multiplayer server or NPC world exists in the current browser.** The local cockpit owner/chair reservation and Web Lock are **not** authoritative online admission, player presence, anti-cheat or reconnect. This document is future multiplayer design; implement authoritative actor/ship state separately before marking any session-crossing scenario complete.
 
-When implemented, the world appearance remains overhead 2D: a pilot using the 3D radar stays seated and visible to other players in the 2D Scout; disconnect removes that avatar and frees interactions while preserving a planet-fixed or ship-local safe anchor. The current approved damage model is **whole-ship**, including offline death only if the destroyed vessel contained the disconnected player. Never restore historical partial-room wreck behavior as a hidden edge case. See [cockpit/reconnect decisions](cockpit-navigation-and-reconnect.md).
+When implemented, the world appearance remains overhead 2D: a pilot using the 3D radar stays seated and visible to others; disconnect removes the avatar and releases interactions. **Future login is at the assigned [Stasis Pod](stasis-pod-and-transfer.md), not the previous planet/ship position.** Pod loss while offline means death/fresh run; the last physical ship location alone does not determine pod-loss death. Combat damage stays ship-wide; deliberate modular dismantling is separate future construction.
 
 
 > **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
@@ -20,18 +20,18 @@ Salimon uses a **persistent shared world**. Multiplayer is not a separate sessio
 - Players meet naturally in the world rather than through lobby matchmaking.
 - A player can physically enter another player's ship; multiple players can travel together aboard one ship.
 - **On disconnect the avatar is removed entirely** from the world, and active interactions (including cockpit seating) are aborted and released. The user does not leave behind a simulated offline body.
-- **On reconnect, restore the same logical location:** an exact planet-fixed surface point on the same planet, or an exact ship-local point on the same moving ship. If the player disconnected during any interaction, restore them **standing beside that object/module**, with the interaction cancelled and not automatically resumed.
-- A disconnected player who was aboard a ship **dies if the entire ship is destroyed while offline**. On reconnect, show **"You died while disconnected"** and begin a fresh run; do not spawn at the wreck. Destruction of a distant ship does not kill a player logged off on a planet.
-- Leaving one's own ship does not create a teleport-back shortcut. The player's own spaceship should remain visible as a home marker where appropriate.
-- Detailed rules: [cockpit and reconnect contract](cockpit-navigation-and-reconnect.md).
+- **On future reconnect, spawn at the character's assigned functioning Stasis Pod**, even after exploring somewhere else; do not resume earlier interactions. Keep precise planet-fixed and ship-local positions for loot/collision/transaction causality rather than as login targets. The current local client has no multiplayer pod system.
+- An offline character **dies if their assigned pod is destroyed/dismantled** (including destruction of the host ship). Next login starts a fresh run; no rescue-only session or posthumous replacement. Destroying an unrelated ship containing their last departure position does not itself cause pod-loss death.
+- Leaving one's own ship does not change its ownership or provide a free travel shortcut. A Stasis Transfer is a separate deliberate, **approved**, equipment-dropping relocation with one-hour code; the original ship stays where physics places it.
+- Detailed rules: [Stasis Pod/logout/transfer](stasis-pod-and-transfer.md) supersedes older [cockpit/reconnect](cockpit-navigation-and-reconnect.md) exact-location spawn rules.
 
 ## Shared ship rules
-- Ship ownership is permanent and each player owns one ship.
+- Ship ownership is **immutable per character/run**, one owned ship per run, not one inherited ship per account. A deceased owner's intact ship persists for salvage, but nobody receives its pilot authority. Each fresh run gets its own new Scout.
 - Only the owner may operate navigation/cockpit controls. The powered cockpit desk opens the 3D radar from default 2D play; the owner's avatar stays **seated** in the cockpit and visible to other connected players.
 - One active pilot-chair occupant at a time; normal exit returns to standing 2D, power loss returns to seated 2D, and power restoration does not reopen radar.
 - Visiting players may walk inside and interact with other modules, including weapons, repair, cargo and machinery unless a later system-specific rule restricts an interaction.
 - There is no general invitation/role system required for basic access; physical access to the ship is the main gate.
-- When the owner disconnects, remove their avatar and release cockpit authority. Passengers who remain connected stay aboard and cannot pilot the owner's ship. Ship motion and independent machinery continue under their existing simulation/offline rules.
+- When the owner disconnects, remove their avatar and release cockpit authority. Passengers remain aboard and cannot pilot the owner's ship. Ship motion and machinery continue. A friend may build an unassigned pod, redeem a living player's one-hour code and obtain **explicit online approval** for transfer; transfer drops that player's ordinary gear/suit as recoverable loot and switches only pod binding, not ship ownership.
 ## PvP and conflict
 PvP is a natural part of the world.
 - Players may damage one another.

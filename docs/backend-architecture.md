@@ -4,7 +4,7 @@
 
 **Decisions recorded:** NestJS + TypeScript + MongoDB; a modular monolith running simulation **inside the single NestJS Node.js process initially**; **fully server-authoritative** gameplay with client-side input prediction; one canonical persistent universe; and checkpoint-based crash recovery with strict staleness suspension. The companion [persistence/recovery contract](backend-persistence-recovery.md) owns durability, write ordering, failure modes, and restart behavior.
 
-**Specification precedence:** Current browser capabilities are inventoried in [current-client-status](current-client-status.md), [technical-architecture](technical-architecture.md) and [playable-2d-foundation](playable-2d-foundation.md). Existing approved multiplayer/presence, [cockpit/reconnect](cockpit-navigation-and-reconnect.md), [resource/inventory](resource-inventory-and-gathering.md), [canonical planetary generation](canonical-planet-generation.md), and [universe expansion](universe-expansion-approved-design.md) define gameplay rules. This file introduces backend boundaries, not new balancing, damage, physics, canonical catalog, or authentication-product decisions. Historical Rust/native save or networking notes are **not** current browser implementation.
+**Specification precedence:** Current browser capabilities are inventoried in [current-client-status](current-client-status.md), [technical-architecture](technical-architecture.md) and [playable-2d-foundation](playable-2d-foundation.md). Existing approved multiplayer/presence, [cockpit/reconnect](cockpit-navigation-and-reconnect.md), [Stasis Pod/run lifecycle](stasis-pod-and-transfer.md), [resource/inventory](resource-inventory-and-gathering.md), [canonical planetary generation](canonical-planet-generation.md), and [universe expansion](universe-expansion-approved-design.md) define gameplay rules. This file introduces backend boundaries, not new balancing, damage, physics, canonical catalog, or authentication-product decisions. Historical Rust/native save or networking notes are **not** current browser implementation.
 
 ## 1. Technology and deployment scope
 
@@ -126,17 +126,17 @@ Inactive regions are eligible for event-driven or analytic advancement only when
 
 Later multiple workers need region owner handoff, lease fencing, cross-region event ordering and atomic publication. Running `node server` in two live replicas before those mechanisms exist would create conflicting authorities.
 
-## 5. Presence, cockpit and offline behavior
+## 5. Presence, cockpit, Stasis Pod and offline behavior
 
-Follow [cockpit-navigation-and-reconnect](cockpit-navigation-and-reconnect.md) without changing established gameplay:
+Follow [Stasis Pod, logout, transfer and permadeath](stasis-pod-and-transfer.md) as the **new future reconnect authority**, alongside [cockpit-navigation-and-reconnect](cockpit-navigation-and-reconnect.md) for chair and 2D/3D interaction:
 
-- Each player permanently owns one ship; only owner navigates. One active pilot chair occupant, atomically reserved by server; visitors can physically enter another ship and use permitted modules.
-- Disconnect removes avatar and collider, cancels current interactions/held input/pilot authority, frees chair; does **not** stop independent jobs or ship motion.
-- Normal authorized disconnect durably records a valid planet-fixed or ship-local safe point, using a reachable adjacent position if an interaction was active. Reconnect resolves terminal outcomes **before** joining the world, then enters ordinary overhead 2D with no resumed interaction.
-- Offline player aboard a ship destroyed as a whole dies; player logged off on a planet does not die because their own ship elsewhere was lost. Ship-wide nonfatal damage alone does not kill an offline passenger. Preserve one-time durable death notice and fresh-run semantics.
-- Exact obstruction/relocation fallback when saved surface or fixtures change, disconnect/network timeout grace timing, zero-G cockpit details and other marked [open gameplay rules](cockpit-navigation-and-reconnect.md) remain unresolved; do not invent them here.
-
-Normal orderly disconnect promises the last validated anchor after durable confirmation; unexpected process failure may revert **continuous movement only** to a verified checkpoint, per [recovery policy](backend-persistence-recovery.md). These two conditions must be distinguishable to the player and tests.
+- Every character/run permanently owns **one distinct ship**, with an assigned starter pod on the Scout. A fresh run starts **outside** its landed Scout. Moving pod binding never reassigns ship ownership or grants a guest pilot rights. Ships of deceased characters remain in the world, intact if not physically destroyed.
+- Disconnect removes avatar/collider, cancels interactions/held inputs and releases chair/pilot controls; it does not stop committed jobs or ship motion. A **confirmed assigned-pod interaction** is the only safe logout and preserves ordinary inventory/equipment/suit.
+- An unsafe logout elsewhere **drops ordinary carried inventory, equipment and equipped suit into one recoverable loot cache at the departure frame** (primary items protected only if explicitly defined), then reconnect is to **the bound pod**, not the old planet-fixed/ship-local position.
+- One **single-use, one-hour code** entered in an available friend's pod creates an online approval request; on approval, an idempotent durable transfer drops ordinary gear/suit as loot, rebinds pod, relocates with a loading screen and preserves original ship ownership.
+- Offline loss of assigned pod through ship destruction or deliberate modular dismantling causes **permanent run death**; next login starts a **new** run. There is **no rescue-only state/deadline or post-death pod reassignment**. Online loss leaves the character alive in that session but requires a new assignment before the next login.
+- Keep actual frame-relative world positions for physical movement, boarding, causal transactions and loot/wreck reconstruction. These are **not the normal login spawn anchor** once Stasis Pods govern reconnect.
+- **TBD:** network grace/accidental disconnect, pod power/disablement, primary-item policy, suitless arrival safety, code approval expiry/rate limits, per-part salvage yields and Core-root decommission. Do not invent an implementation rule for these.
 
 ## 6. Development milestones and validation
 
@@ -145,7 +145,7 @@ Normal orderly disconnect promises the last validated anchor after durable confi
 | 1. Bootstrap | `server/` NestJS, MongoDB replica-set development config, WS/REST auth skeleton, health/readiness, ownership fence | Build, config/health, one-instance ownership, startup with unavailable DB |
 | 2. Movement | Pure 2D movement and collision contracts, server 60 Hz scheduler, typed inputs, prediction/reconciliation, two clients | Deterministic tick/reference tests, malformed commands, latency/jitter/reorder, actual browser E2E |
 | 3. Shared mining | Source/ledger conservation, atomic gram transfers, count-item validation, checked revisions, durable operations | Two-player depletion race, retries, full capacity, crash at each commit boundary |
-| 4. Ship and reconnect | Owner-only chair, shared ship-relative location, disconnect cancellation, persisted anchor, ship-wide death | Two players aboard, release chair on disconnect, ship moving during absence, destroyed-ship offline death |
+| 4. Ship, pod and reconnect | Owner-only chair, modular pod placement, safe/unsafe logout, single-use approved transfer, per-run ownership and pod-loss death | Two players aboard, cargo-safe logout vs dropped suit/gear, 1h code races, online/offline pod loss, fresh run, 2D destination spawn |
 | 5. Scaling readiness (later) | Region isolation/metrics, idle catch-up qualification, fenced ownership handoff | Transfer, crash/recovery and simultaneous-region acceptance; no unverified seamless scale claim |
 
 Production browser Playwright and Node/TypeScript tests are the active gates; retired native Rust or M1-specific tests do not certify or automatically block this planned backend.
@@ -158,6 +158,6 @@ Production browser Playwright and Node/TypeScript tests are the active gates; re
 - Region borders, safe ownership handoff, horizontal scaling, service placement, and multiplayer combat rewind/lag compensation.
 - Movement input grace on network stalls and definition of disconnect versus transient reconnection; precise blocked-anchor fallback.
 - Core/Fabricator balance, full catalog/planet generation deployment, combat/economy/NPC and broader content delivery.
-- Exact checkpoint overdue threshold and operational budgets: strict staleness **policy is chosen**, its numerical bound remains configurable and TBD.
+- Verified checkpoint target is **every 5 seconds**; strict gameplay suspension is required at **30 seconds** since the latest verified checkpoint. Implementation-specific retry/monitoring budgets and safe partition scope remain TBD.
 
 See [backend persistence and recovery](backend-persistence-recovery.md) for the fixed durability guarantees and open implementation knobs.

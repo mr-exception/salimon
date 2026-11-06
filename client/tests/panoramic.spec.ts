@@ -55,6 +55,8 @@ test('HUD-1 full viewport, scanner authority, keyboard browser and priority Esca
  await page.getByRole('button', { name: 'Telemetry', exact: true }).click()
  await page.getByRole('button', { name: 'Help', exact: true }).click()
  await expect(page.getByRole('dialog')).toBeVisible()
+ await expect(page.getByRole('heading', { name: 'Navigation help', exact: true })).toBeFocused()
+ await expect(page.getByRole('heading', { name: 'Navigation help', exact: true })).toBeInViewport()
  await capture(page, 'help.png', info)
  await page.keyboard.press('Escape')
  await expect(page.getByRole('dialog')).toHaveCount(0)

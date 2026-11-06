@@ -13,6 +13,8 @@ Salimon is a grounded cinematic science-fiction survival exploration sandbox wit
 
 The Core remains lore canon: an unknown entity delivered a Core to Earth every 18 hours with the message **“Reach the Absenat, where everything started.”** Humanity used the extraordinary energy-storage technology; the Core, its sale/commercialization and the entity remain important to the larger mystery. Do not change origin/explanation without a later explicit decision. Absenat remains the final destination and gate ending.
 
+**Future Stasis Pod continuity (2026-11-06):** A fresh run provisions its own functional, character-assigned [Stasis Pod](stasis-pod-and-transfer.md) **inside** the starting Scout, but **the opening scene remains outside the landed ship**. This is the first safe-logoff/spawn module; it must not rewrite the approved lost-memory premise or make the player wake inside the pod. Old intact ships from dead runs may persist in the shared world but are not inherited by new characters. Exact pod depiction and narrative explanation are **TBD**.
+
 ## Last intact voyage evidence
 
 The physical Ship Archive holds ordinary logs and messages before the data break:

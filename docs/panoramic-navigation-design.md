@@ -88,4 +88,16 @@ Implement on top of the existing React/TypeScript + Three.js + React Three Fiber
 4. One-time Look at plus mini-compass and compact cockpit HUD.
 5. 2D/cockpit lifecycle integration, persistence, accessibility and complete browser verification.
 
+## GitHub implementation tracking (not delivered)
+
+- [#810 — Inertial perspective camera and 0.1° zoom](https://github.com/mr-exception/salimon/issues/810)
+- [#811 — Physical sky, angular-scale bodies and grounded horizon](https://github.com/mr-exception/salimon/issues/811)
+- [#812 — Scanner-gated perspective overlays, selection and occlusion](https://github.com/mr-exception/salimon/issues/812)
+- [#813 — Independent one-time Look at](https://github.com/mr-exception/salimon/issues/813)
+- [#814 — Compact full-screen HUD and 3D orientation compass](https://github.com/mr-exception/salimon/issues/814)
+- [#815 — Grounded Scout/cockpit integration and camera persistence](https://github.com/mr-exception/salimon/issues/815)
+- [#816 — Browser E2E, visual, telescope-precision and accessibility QA](https://github.com/mr-exception/salimon/issues/816)
+
+Each implementation issue is separately scoped and blocked by the documentation PR #809 merge (plus its actual technical prerequisites). This document is not an implementation status report.
+
 These are **planning packages**, not claims of implemented code. Track actual prerequisites, scope and cloud verification in GitHub issues. Coordinate with historical radar tickets #737, #744, browser QA #750/#751 and shared location #802 rather than reopening already-delivered orthographic requirements.

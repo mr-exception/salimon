@@ -1,0 +1,138 @@
+{
+  "source": "d716d840d9155af8341e4227e5a02b2f99e94f85",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "browser": "156.0.8078.4",
+    "playwright": "1.64.1",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "dpr": 1,
+    "epoch": "2026-11-06T12:00:00.000Z",
+    "locale": "en-US",
+    "timezone": "UTC",
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "fonts": {
+      "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
+      "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab"
+    }
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "dpr": 1,
+  "snapshot": {
+    "tick": 300,
+    "contacts": [
+      "back",
+      "dense-00",
+      "dense-01",
+      "dense-02",
+      "dense-03",
+      "dense-04",
+      "dense-05",
+      "dense-06",
+      "dense-07",
+      "dense-08",
+      "dense-09",
+      "dense-10",
+      "dense-11",
+      "dense-12",
+      "dense-13",
+      "dense-14",
+      "dense-15",
+      "dense-16",
+      "dense-17",
+      "hidden",
+      "outside",
+      "planet",
+      "tiny"
+    ],
+    "selected": null,
+    "actions": 0,
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "render": {
+      "fov": 75,
+      "pixels": null
+    },
+    "markers": [
+      {
+        "id": "dense-00",
+        "ids": [
+          "dense-00",
+          "dense-01",
+          "dense-02",
+          "dense-03",
+          "dense-04",
+          "dense-05",
+          "dense-06",
+          "dense-07",
+          "dense-08",
+          "dense-09",
+          "dense-10",
+          "dense-11",
+          "dense-12",
+          "dense-13",
+          "dense-14",
+          "dense-15",
+          "dense-16",
+          "dense-17"
+        ],
+        "x": 431.4839403454072,
+        "y": 295.74197017270353
+      },
+      {
+        "id": "planet",
+        "ids": [
+          "planet"
+        ],
+        "x": 640,
+        "y": 400
+      },
+      {
+        "id": "tiny",
+        "ids": [
+          "tiny"
+        ],
+        "x": 848.5160596545928,
+        "y": 400
+      }
+    ],
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "canvas": {
+      "width": 640,
+      "height": 400
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "errors": []
+}

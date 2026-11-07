@@ -1,0 +1,159 @@
+{
+  "source": "d716d840d9155af8341e4227e5a02b2f99e94f85",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "browser": "156.0.8078.4",
+    "playwright": "1.64.1",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "dpr": 1,
+    "epoch": "2026-11-06T12:00:00.000Z",
+    "locale": "en-US",
+    "timezone": "UTC",
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "fonts": {
+      "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
+      "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab"
+    }
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "dpr": 1,
+  "snapshot": {
+    "scenario": "wide",
+    "contacts": 0,
+    "selected": null,
+    "spheres": [
+      {
+        "direction": [
+          0,
+          0,
+          -1
+        ],
+        "distanceM": 10000,
+        "radiusRatio": 0.1,
+        "surfaceTerm": 0.9900000000000001,
+        "angularRadius": 0.1001674211615598,
+        "lightDirection": [
+          -0.7071067794187805,
+          0.7071067794187805,
+          0.00007071067794187806
+        ],
+        "color": [
+          0.48,
+          0.46,
+          0.42
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          -0.7071067811865475,
+          0.7071067811865475,
+          0
+        ],
+        "distanceM": 141421356.23730952,
+        "radiusRatio": 0.0035355339059327372,
+        "surfaceTerm": 0.9999874999999999,
+        "angularRadius": 0.003535541271669807,
+        "lightDirection": [
+          0,
+          1,
+          0
+        ],
+        "color": [
+          1,
+          0.88,
+          0.68
+        ],
+        "emissive": true
+      },
+      {
+        "direction": [
+          0.0005999998920000291,
+          0,
+          -0.9999998200000486
+        ],
+        "distanceM": 100000017.99999838,
+        "radiusRatio": 0.000013999997480000681,
+        "surfaceTerm": 0.9999999998040001,
+        "angularRadius": 0.000013999997480458014,
+        "lightDirection": [
+          -0.5775811400245092,
+          0.5772347991450222,
+          0.5772347991450222
+        ],
+        "color": [
+          0.48,
+          0.46,
+          0.42
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          0,
+          0,
+          -1
+        ],
+        "distanceM": 100000000,
+        "radiusRatio": 0.0004,
+        "surfaceTerm": 0.99999984,
+        "angularRadius": 0.00040000001066666744,
+        "lightDirection": [
+          -0.5773502691896257,
+          0.5773502691896257,
+          0.5773502691896257
+        ],
+        "color": [
+          0.48,
+          0.46,
+          0.42
+        ],
+        "emissive": false
+      }
+    ],
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        0,
+        0,
+        0
+      ]
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "calls": 1,
+    "triangles": 2,
+    "camera": [
+      0,
+      0,
+      0
+    ]
+  },
+  "errors": []
+}

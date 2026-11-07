@@ -1,0 +1,29 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=panoramic --grep HUD-BRIGHT
+
+[WebServer] (node:2490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2507) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:2526) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2564) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:2576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [panoramic] › tests/panoramic.spec.ts:186:2 › HUD-BRIGHT warning summaries survive focused help over a bright body at 960 (4.1s)
+  ✓  2 [panoramic] › tests/panoramic.spec.ts:186:2 › HUD-BRIGHT warning summaries survive focused help over a bright body at 1280 (5.1s)
+  ✓  3 [panoramic] › tests/panoramic.spec.ts:186:2 › HUD-BRIGHT warning summaries survive focused help over a bright body at 1920 (11.6s)
+
+  3 passed (27.1s)

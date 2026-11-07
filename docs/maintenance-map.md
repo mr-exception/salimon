@@ -17,6 +17,10 @@ Panoramic acceptance (#816) extends the existing navigation-captures project in
 `tests/panoramic-captures.spec.ts`, optical/sensor regressions and the existing
 negative scripts; `scripts/negative-panoramic.mjs` proves one expected-image
 mutation fails. References share the existing manifest and human-approval gate.
+Panoramic styling consumes the shared `ui/tokens.css` and `ui/primitives.css`
+presentation classes; native control handlers and domain owners stay in place.
+`HUD-STYLE`/`HUD-BRIGHT` cover viewport contrast and focused warning summaries;
+see [#828](../reports/issue-828/README.md).
 See the [browser verification contract](../client/README.md#deterministic-navigation-regression-750).
 The shared 2D world is owned by `topDownRuntime.ts`/`topDownFrames.ts`, collision
 and reach by `topDownInteraction.ts`, doorway ownership/location snapshots by

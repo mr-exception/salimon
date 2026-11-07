@@ -1,0 +1,132 @@
+{
+  "runs": [
+    {
+      "results": "browser/results.json",
+      "stats": {
+        "startTime": "2026-11-07T15:40:49.151Z",
+        "duration": 680274.1950000001,
+        "expected": 13,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "checks": [
+        {
+          "name": "HUD-1 full viewport, scanner authority, keyboard browser and priority Escape",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "HUD-2 compass render states, ship rotation, zoom and responsive warning priority",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "HUD-3 grounded authority and no sidebar at smaller desktop size",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "HUD-STYLE projected controls, contrast and focused help at 960",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "HUD-STYLE projected controls, contrast and focused help at 1280",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "HUD-STYLE projected controls, contrast and focused help at 1920",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation",
+          "project": "look-at",
+          "status": "passed"
+        },
+        {
+          "name": "LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled",
+          "project": "look-at",
+          "status": "passed"
+        },
+        {
+          "name": "SENSOR-1 scanner authority, hidden/browser contacts, group pagination and eviction",
+          "project": "perspective",
+          "status": "passed"
+        },
+        {
+          "name": "SENSOR-2 repeat/translated pixels, telescope motion and stale group suppression",
+          "project": "perspective",
+          "status": "passed"
+        },
+        {
+          "name": "SENSOR-3 adversarial optical leak and stale marker click-through",
+          "project": "perspective",
+          "status": "passed"
+        },
+        {
+          "name": "SENSOR-4 telescope high-frequency input at huge origin preserves depth and authority",
+          "project": "perspective",
+          "status": "passed"
+        },
+        {
+          "name": "COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation",
+          "project": "cockpit",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "results": "bright/results.json",
+      "stats": {
+        "startTime": "2026-11-07T15:52:36.556Z",
+        "duration": 27100.264,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "checks": [
+        {
+          "name": "HUD-BRIGHT warning summaries survive focused help over a bright body at 960",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "HUD-BRIGHT warning summaries survive focused help over a bright body at 1280",
+          "project": "panoramic",
+          "status": "passed"
+        },
+        {
+          "name": "HUD-BRIGHT warning summaries survive focused help over a bright body at 1920",
+          "project": "panoramic",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "results": "candidate-run/results.json",
+      "stats": {
+        "startTime": "2026-11-07T15:53:09.612Z",
+        "duration": 227160.477,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "checks": [
+        {
+          "name": "PANO-VIS panoramic optical, sensor, actions and HUD reference matrix",
+          "project": "navigation-captures",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "visualChanges": "visual/changes.json",
+  "initialInterruptedRun": "initial/results.json",
+  "initialSource": "initial-source-inputs.json",
+  "finalSource": "source-inputs.json"
+}

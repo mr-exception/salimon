@@ -106,7 +106,7 @@ test('SURV-799 approved rates and partial interruption/reload preserve exact gra
     }, { key: RESOURCE_SAVE_KEY, hunger, fatigue, meter: METER })
     await page.reload(); await page.clock.runFor(100)
     await page.getByRole('button', { name: 'Equip gathering tool' }).click(); await page.keyboard.press('e')
-    await expect(page.getByLabel('Resource inventory')).toContainText(`Mining rate: ${rate} kg/s`)
+    await expect(page.locator('.gathering-status')).toContainText(`Mining rate: ${rate} kg/s`)
     const hud = page.getByLabel('Survival condition')
     await expect(hud).toContainText(hunger < 20 ? 'Movement and mining reduced' : 'mining reduced at 20')
     await walkTicks(page, [], 37)

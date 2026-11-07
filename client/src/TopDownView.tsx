@@ -15,6 +15,7 @@ import { resourceInventoryUsage } from './resourceInventory.ts'
 import { ResourceContainerInteraction } from './resourceContainerInteraction.ts'
 import { ResourceContainerPanel } from './ResourceContainerPanel.tsx'
 import { SCOUT_RESOURCE_CONTAINER_ID } from './scoutResourceContainer.ts'
+import { Button, Dialog, KeyHint, Meter, Progress, UtilityPanel } from './ui/primitives.tsx'
 import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
@@ -57,6 +58,17 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const lockAttempt = useRef<Promise<unknown>>(Promise.resolve())
   const container = useRef<ResourceContainerInteraction | null>(null)
   const paused = useRef(false)
+  const [inventoryOpen, setInventoryOpen] = useState(false)
+  const inventoryExpanded = useRef(false)
+  const inventoryTrigger = useRef<HTMLButtonElement>(null)
+  const inventoryPanel = useRef<HTMLDivElement>(null)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const toggleInventory = (open: boolean, restoreFocus = false) => {
+    inventoryExpanded.current = open; setInventoryOpen(open)
+    if (open) session.current?.cancel()
+    else if (restoreFocus) inventoryTrigger.current?.focus()
+  }
+  useEffect(() => { if (inventoryOpen) inventoryPanel.current?.focus({ preventScroll: true }) }, [inventoryOpen])
   const [saveStatus, setSaveStatus] = useState('Opening saved expedition…')
   useEffect(() => {
     if (!gameplay) return
@@ -90,6 +102,13 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     const release = () => { input.clear(); clock.reset(); timer.resume(performance.now()) }
     const clear = () => { release(); session.current?.cancel(); container.current?.close(); current.current = cancelInteraction(current.current); if (session.current) session.current.world = current.current; session.current?.checkpoint(); setState(current.current) }
     const keydown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return
+      if (event.code === 'Escape' && inventoryExpanded.current && !container.current?.opened) {
+        event.preventDefault(); release(); toggleInventory(false, true); return
+      }
+      if (event.code === 'KeyI' && !event.repeat && acceptsFlightShortcut(event.target) && current.current.cockpit.view === 'world' && !container.current?.opened) {
+        event.preventDefault(); release(); toggleInventory(!inventoryExpanded.current); return
+      }
       if (event.code === 'KeyP' && !event.repeat && acceptsFlightShortcut(event.target)) {
         paused.current = !paused.current; clear(); return
       }
@@ -140,16 +159,17 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       setState(current.current)
       raf = requestAnimationFrame(frame)
     }
+    const focus = () => { release(); if (document.activeElement?.closest('.hud-utility, dialog')) session.current?.cancel() }
     window.addEventListener('keydown', keydown); window.addEventListener('keyup', keyup)
     window.addEventListener('blur', clear); window.addEventListener('resize', clear)
-    document.addEventListener('visibilitychange', clear); window.addEventListener('focusin', release)
+    document.addEventListener('visibilitychange', clear); window.addEventListener('focusin', focus)
     window.addEventListener('pagehide', clear)
     raf = requestAnimationFrame(frame)
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('keydown', keydown); window.removeEventListener('keyup', keyup)
       window.removeEventListener('blur', clear); window.removeEventListener('resize', clear)
-      document.removeEventListener('visibilitychange', clear); window.removeEventListener('focusin', release)
+      document.removeEventListener('visibilitychange', clear); window.removeEventListener('focusin', focus)
       window.removeEventListener('pagehide', clear)
     }
   }, [])
@@ -169,17 +189,32 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     setState(current.current)
   }
   const vital = resourceSession?.survival
-  const warning = vital?.health === 0 ? 'Run ended · zero health. Start a fresh character to continue.' : vital?.fatigue === 0 ? 'Exhausted · gathering and piloting unavailable.' : vital && vital.hunger < METER * .2 ? 'Low hunger · starvation at zero. Movement and mining reduced.' : vital && vital.fatigue <= METER * .5 ? 'Low fatigue · movement reduced; mining reduced at 20 or below.' : ''
-  return <>
+  const warning = vital?.health === 0 ? 'Run ended · zero health. Start a fresh character to continue.' : [
+    vital && vital.health <= 40 ? 'Low health · critical condition.' : '',
+    vital?.fatigue === 0 ? 'Exhausted · gathering and piloting unavailable.' : '',
+    vital && vital.hunger < METER * .2 ? 'Low hunger · starvation at zero. Movement and mining reduced.' : '',
+    vital && vital.fatigue > 0 && vital.fatigue <= METER * .5 ? 'Low fatigue · movement reduced; mining reduced at 20 or below.' : '',
+  ].filter(Boolean).join(' ')
+  const gatherBlocked = selectedSource && resourceSession?.equipped && usage && !resourceSession.activeSourceId ? selectedSource.remainingGrams === 0 ? 'Source depleted. No material remains.' : usage.grams >= resourceSession.snapshot.inventory.capacityGrams ? 'Inventory full: weight limit.' : !resourceSession.snapshot.inventory.quantities[selectedSource.resourceId] && usage.slots >= resourceSession.snapshot.inventory.capacitySlots ? 'Inventory full: slot limit.' : '' : ''
+  const canAct = !(cockpitTarget && !state.cockpit.powered) && !gatherBlocked && !!selected?.interaction && !paused.current && !resourceSession?.error && vital?.health !== 0 && !(cockpitTarget && vital && !survivalPolicy(vital).canWork) && !(selectedSource && resourceSession?.equipped && vital && !survivalPolicy(vital).canWork)
+  return <div className="expedition-ui">
     {gameplay && <aside className="survival-hud" aria-label="Survival condition">
       {vital && !resourceSession.error ? <>
-        <label>Health <span>{Math.ceil(vital.health)} / 200 HP</span><meter aria-label="Health" min={0} max={200} value={vital.health} /></label>
-        <label>Hunger <span>{Math.ceil(vital.hunger / METER * 100)} / 100</span><meter aria-label="Hunger" min={0} max={100} value={Math.ceil(vital.hunger / METER * 100)} /></label>
-        <label>Fatigue <span>{Math.ceil(vital.fatigue / METER * 100)} / 100</span><meter aria-label="Fatigue" min={0} max={100} value={Math.ceil(vital.fatigue / METER * 100)} /></label>
-        <p aria-live="polite">{paused.current ? 'Paused · active time stopped' : warning}</p>
+        <div className="vital-meters">
+        <div className="ui-meter"><span>Health: {Math.ceil(vital.health)} / 200 HP</span><meter aria-label="Health" min={0} max={200} value={vital.health} aria-valuetext={`${vital.health} / 200 HP`} /></div>
+        <Meter label="Hunger" value={Math.ceil(vital.hunger / METER * 100)} max={100} unit="" />
+        <Meter label="Fatigue" value={Math.ceil(vital.fatigue / METER * 100)} max={100} unit="" />
+        </div>
+        <p aria-live="polite">{[paused.current ? 'Paused · active time stopped' : '', warning].filter(Boolean).join(' · ')}</p>
         {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); if (resourceSession.freshRun()) observation.reset(navigation.clock.state); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
       </> : <p>{resourceSession?.error || saveStatus}</p>}
+      <Button variant="secondary" onClick={() => setHelpOpen(true)}>Help</Button>
     </aside>}
+    <Dialog open={helpOpen} title="Surface controls" onDismiss={() => setHelpOpen(false)}>
+      <p>W A S D: walk · E: nearby action · Escape: close panel, then cancel interaction.</p>
+      <p>I: inventory · P: pause active time. Menus do not pause time. Movement, Escape or stowing the tool interrupts gathering; partial work is saved.</p>
+      <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>
+    </Dialog>
     {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
       <PanoramicNavigation navigation={navigation} view={observation} advanceSimulation={false}
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
@@ -191,10 +226,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
     <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} />
       {gameplay && <aside className="resource-hud" aria-label="Resource inventory" data-gathering={resourceSession?.activeSourceId ?? ''}>
-        <h2>Field inventory</h2>
+        <button ref={inventoryTrigger} aria-expanded={inventoryOpen} aria-controls="field-inventory" onClick={() => toggleInventory(!inventoryOpen)}>Field inventory <KeyHint>I</KeyHint></button>
         {resourceSession && usage && <>
           <p data-inventory-weight><strong>{usage.grams / 1000}</strong> / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg</p>
           <p data-inventory-slots><strong>{usage.slots}</strong> / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
+          <div id="field-inventory" ref={inventoryPanel} className="hud-utility" hidden={!inventoryOpen} tabIndex={-1} onKeyDown={event => { if (event.code !== 'Escape') event.stopPropagation() }}>
+          <UtilityPanel title="Carried resources and items">
           <ul aria-label="Raw resources">{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <li key={id}>{entry.name} <span data-resource={id}>{(resourceSession.snapshot.inventory.quantities[id] ?? 0) / 1000} kg</span></li>)}</ul>
           <p className="resource-note">Each carried raw type uses 1 slot.</p>
           <ul aria-label="Count items">{Object.entries(resourceSession.snapshot.inventory.items).map(([id, count]) => {
@@ -202,21 +239,28 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
             return <li className="count-item" key={id} data-item={id}><span>{meta.name ?? id} × {count}</span><span>{count * meta.gramsPerItem / 1000} kg · {Math.ceil(count / meta.stackSize)} slots</span></li>
           })}</ul>
           {!Object.keys(resourceSession.snapshot.inventory.items).length && <p data-empty-items>No items carried.</p>}
+          <p className="resource-note">{resourceSession.error || saveStatus}</p>
+          <Button onClick={() => toggleInventory(false, true)}>Close inventory</Button>
+          </UtilityPanel></div>
         </>}
         <button disabled={!resourceSession || !!resourceSession.error || resourceSession.survival.health === 0 || paused.current} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
-        <p className="resource-note">{resourceSession?.error || saveStatus}</p>
-        {selectedSource && <p data-source-summary>{RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].name} · {selectedSource.remainingGrams / 1000} kg remaining</p>}
-        {!!resourceSession?.activeSourceId && <p>Mining rate: {survivalPolicy(resourceSession.survival).miningUnits / 16} kg/s · partial work saved per source</p>}
-        {!!resourceSession?.activeSourceId && <progress aria-label="Next kilogram extraction interval" max={60} value={resourceSession.progressTicks} />}
+        {(!resourceSession || resourceSession.error) && <p role="status">{resourceSession?.error || saveStatus}</p>}
       </aside>}
     </section>
     <div className="top-down-bottom">
     <aside className="top-down-interaction" aria-label="Nearby interaction">
-      <div><p data-prompt>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : 'No fixture in reach · Move closer'}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
-      <button onClick={event => { interact(); event.currentTarget.blur() }} disabled={paused.current || cockpitTarget && !!resourceSession?.error || resourceSession?.survival.health === 0 || !selected && state.player.mode !== 'interacting'}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>
+      <div><p data-prompt hidden={!canAct}>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : ''}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
+      {canAct && <button onClick={event => { interact(); event.currentTarget.blur() }}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>}
     </aside>
+    {gatherBlocked && <p className="source-summary">{gatherBlocked}</p>}
+    {selectedSource && <p className="source-summary" data-source-summary>{RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].name} · {selectedSource.remainingGrams / 1000} kg remaining</p>}
+    {!!resourceSession?.activeSourceId && <div className="gathering-status">
+      <Progress label="Next kilogram extraction interval" value={resourceSession.progressTicks} max={60} unit="ticks" />
+      <p>Mining rate: {survivalPolicy(resourceSession.survival).miningUnits / 16} kg/s · partial work saved per source</p>
+      <p>Capacity: {usage!.grams / 1000} / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg · {usage!.slots} / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
+    </div>}
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
-    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p><p>{gameplay ? 'Gathering · up to 1 kg/s · Low hunger/fatigue reduce rate · Partial work saved' : 'Console inspections are a test · Systems inactive'}</p></footer>
+    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p></footer>
     </div>
-  </main></>
+  </main></div>
 }

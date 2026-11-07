@@ -123,20 +123,32 @@ world scale and the overhead camera. Resizing reveals more world along one axis
 rather than stretching or cropping the reference scene; SVG screen transforms
 remain authoritative at any device pixel ratio.
 
-Survival/pause is anchored top left, inventory/save feedback top right, and
-nearby actions/live status plus compact key hints bottom left. Panels intercept
-input only inside their visible bounds, retain native button focus, and scroll
-internally if their content grows. The followed character remains in the open
-center. The existing resize/blur/visibility handlers release walking and cancel
-uncommitted interactions. Storage uses a modal dialog in the browser top layer;
-cockpit navigation retains its separate layout and survival HUD positioning.
+Survival/pause/help is anchored top left with compact labelled Health (200 HP),
+Hunger and Fatigue meters. Low health, hunger, fatigue, exhaustion and terminal
+conditions remain explicit; pausing does not replace condition warnings.
+Top right retains carried kg / 10 kg, shared slots / 12 and the gathering tool
+control. **Field inventory / I** opens a utility panel listing every raw type and
+all carried count-item stacks with their exact mass/slots. Escape closes that
+panel first and returns focus to its trigger. Menus do not pause active time.
+Help is a keyboard-accessible dialog; P / Pause retains existing clock behavior.
 
-`tests/viewport.spec.ts` covers the built default route at 1280×720 and 960×600,
-HUD bounds/non-overlap, no page scrolling, uniform full-edge projection, focused
-buttons versus walking, pause/resume, resize, DPR 2, and the dev fixture. Each
-reference-size scene is captured twice and compared using the existing pixel
-policy; an intentional inset-stage mutation must fail comparison. These captures
-are repeat evidence, not approved navigation baselines.
+The bottom HUD shows the eligible nearby E action, concise feedback and key hints.
+No nearby target means no disabled action. Depleted/full sources explain the
+actual weight/slot restriction without advertising Gather. Active gathering adds
+source identity/remaining kg, exact extraction ticks, rate and capacity; no
+permanent mining diagnostics remain. Pointer interception stays within visible
+HUD bounds. Focused utility/dialog controls release walking and interrupt mining;
+E/WASD inside them cannot reach gameplay. Existing resize/blur/visibility cleanup,
+storage top-layer dialog and scene coordinates remain authoritative.
+
+`tests/viewport.spec.ts` covers the built default route at 960×600, 1280×720 and
+1920×1080, HUD bounds/non-overlap, no page scrolling, uniform full-edge projection,
+focused controls versus walking, pause/resume, inventory/help/Escape isolation,
+resize, DPR 2 and the dev fixture. Repeated originals use the existing pixel
+policy; an intentional inset-stage mutation must fail. Captures remain review
+candidates, not approved navigation baselines. The existing gathering, count-item,
+storage, survival and cockpit journeys cover domain adapter continuity.
+See [#827 evidence](../reports/issue-827/README.md).
 
 ### Universal ship-up orientation
 

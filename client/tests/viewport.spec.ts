@@ -1,5 +1,6 @@
+import { RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
 import { test, expect, type Page } from '@playwright/test'
-import { boot, position, scene, walkTicks } from './worldJourney'
+import { boot, position, scene, walkTicks, walkTo } from './worldJourney'
 import { compareImages, POLICY } from '../scripts/visual-comparison.ts'
 
 async function layout(page: Page) {
@@ -62,7 +63,7 @@ async function checkLayout(page: Page) {
   return result
 }
 
-for (const viewport of [{ width: 1280, height: 720 }, { width: 960, height: 600 }]) {
+for (const viewport of [{ width: 1280, height: 720 }, { width: 960, height: 600 }, { width: 1920, height: 1080 }]) {
   test(`VIEWPORT production ${viewport.width}x${viewport.height} HUD, input, repeat and negative comparison`, async ({ browser }, info) => {
     let original: Buffer | undefined, fresh: Buffer | undefined
     const records = []
@@ -143,4 +144,50 @@ test('VIEWPORT DPR 2 and standalone development fixture preserve projection', as
   expect(await scene(page).boundingBox()).toEqual({ x: 0, y: 0, width: 960, height: 600 })
   await expect(page.getByLabel('Nearby interaction')).toBeVisible()
   await context.close()
+})
+
+test('HUD inventory/help focus isolates walking, mining and Escape; menus keep active time', async ({ page }, info) => {
+  await boot(page, '', 'http://127.0.0.1:4175')
+  const panel = page.locator('#field-inventory')
+  await expect(panel).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Inspect fixture' })).toHaveCount(0)
+  const before = await position(page)
+  await page.keyboard.press('i'); await page.clock.runFor(32)
+  await expect(panel).toBeVisible(); await expect(panel).toBeFocused()
+  const tick = Number(await page.locator('main').getAttribute('data-tick'))
+  await page.keyboard.down('w'); await page.keyboard.press('e'); await page.clock.runFor(200); await page.keyboard.up('w')
+  expect(await position(page)).toEqual(before)
+  expect(Number(await page.locator('main').getAttribute('data-tick'))).toBeGreaterThan(tick)
+  await expect(page.getByLabel('Resource inventory')).toHaveAttribute('data-gathering', '')
+  await page.screenshot({ path: info.outputPath('inventory-expanded.png') })
+  await page.keyboard.press('Escape')
+  await expect(panel).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Field inventory' })).toBeFocused()
+  await page.getByRole('button', { name: 'Help', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: 'Surface controls' })).toBeVisible()
+  await page.keyboard.press('e'); await page.keyboard.down('w'); await page.clock.runFor(200); await page.keyboard.up('w')
+  expect(await position(page)).toEqual(before)
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Help', exact: true })).toBeFocused()
+})
+
+
+test('HUD opening inventory interrupts extraction and preserves partial work without E leakage', async ({ page }, info) => {
+  await boot(page, '', 'http://127.0.0.1:4175')
+  await walkTo(page, [-7.1, 0], 'planet:fixture', true)
+  await page.getByRole('button', { name: 'Equip gathering tool' }).click()
+  await page.keyboard.press('e'); await walkTicks(page, [], 37)
+  await expect(page.getByLabel('Resource inventory')).toHaveAttribute('data-gathering', 'source:landing:mineral:01')
+  await page.getByRole('button', { name: 'Field inventory' }).click()
+  await expect(page.locator('#field-inventory')).toBeFocused()
+  await expect(page.getByLabel('Resource inventory')).toHaveAttribute('data-gathering', '')
+  const partial = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
+  await page.keyboard.press('e'); await page.clock.runFor(200)
+  await expect(page.getByLabel('Resource inventory')).toHaveAttribute('data-gathering', '')
+  const after = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
+  expect(after.miningWork).toEqual(partial.miningWork)
+  expect(Object.values(partial.miningWork)).toEqual([37 * 16])
+  expect(after.inventory).toEqual(partial.inventory)
+  await info.attach('inventory-interruption.json', {body:JSON.stringify({partial,after}),contentType:'application/json'})
 })

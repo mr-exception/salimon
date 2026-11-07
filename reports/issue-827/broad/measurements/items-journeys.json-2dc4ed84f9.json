@@ -1,0 +1,364 @@
+{
+  "records": [
+    {
+      "replay": 0,
+      "browser": "154.0.8037.57",
+      "before": {
+        "version": 8,
+        "miningWork": {},
+        "hazards": {
+          "version": 1,
+          "exposure": {
+            "radiation": "0/1",
+            "poison": "0/1"
+          },
+          "modules": []
+        },
+        "survival": {
+          "hunger": 3849552,
+          "fatigue": 3886932,
+          "health": 200,
+          "activeTicks": 1068,
+          "starvationTicks": 0,
+          "recoveryTicks": 1068,
+          "offlineAtMs": 1793750418891
+        },
+        "itemDefinitions": {
+          "fixture-single": {
+            "name": "Single fixture",
+            "gramsPerItem": 125,
+            "stackSize": 1
+          },
+          "fixture-stack": {
+            "name": "Stack fixture",
+            "gramsPerItem": 250,
+            "stackSize": 4
+          }
+        },
+        "stores": {
+          "scout:storage": {
+            "shipId": "ship:scout",
+            "capacityGrams": 50000,
+            "id": "scout:storage",
+            "quantities": {}
+          }
+        },
+        "catalogVersion": "landing-resources:v2",
+        "siteId": "site:illustrated-landing:v1",
+        "revision": 19,
+        "inventory": {
+          "capacityGrams": 10000,
+          "capacitySlots": 12,
+          "quantities": {
+            "mineral": 1000
+          },
+          "items": {
+            "fixture-single": 2,
+            "fixture-stack": 5
+          }
+        },
+        "sources": {
+          "source:landing:mineral:01": {
+            "id": "source:landing:mineral:01",
+            "resourceId": "mineral",
+            "remainingGrams": 59000
+          },
+          "source:landing:biology:01": {
+            "id": "source:landing:biology:01",
+            "resourceId": "biomass",
+            "remainingGrams": 15000
+          }
+        },
+        "location": {
+          "anchor": {
+            "frame": "planet:fixture",
+            "point": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                -7.339999999960288,
+                0.14128629972731796,
+                0
+              ]
+            }
+          },
+          "facing": -1.6907963267948967
+        }
+      },
+      "after": {
+        "version": 8,
+        "miningWork": {},
+        "hazards": {
+          "version": 1,
+          "exposure": {
+            "radiation": "0/1",
+            "poison": "0/1"
+          },
+          "modules": []
+        },
+        "survival": {
+          "hunger": 3838644,
+          "fatigue": 3886629,
+          "health": 200,
+          "activeTicks": 1371,
+          "starvationTicks": 0,
+          "recoveryTicks": 1371,
+          "offlineAtMs": 1793750423982
+        },
+        "itemDefinitions": {
+          "fixture-single": {
+            "name": "Single fixture",
+            "gramsPerItem": 125,
+            "stackSize": 1
+          },
+          "fixture-stack": {
+            "name": "Stack fixture",
+            "gramsPerItem": 250,
+            "stackSize": 4
+          }
+        },
+        "catalogVersion": "landing-resources:v2",
+        "siteId": "site:illustrated-landing:v1",
+        "revision": 26,
+        "inventory": {
+          "capacityGrams": 10000,
+          "capacitySlots": 12,
+          "quantities": {
+            "mineral": 1000
+          },
+          "items": {
+            "fixture-single": 2,
+            "fixture-stack": 4
+          }
+        },
+        "sources": {
+          "source:landing:mineral:01": {
+            "id": "source:landing:mineral:01",
+            "resourceId": "mineral",
+            "remainingGrams": 59000
+          },
+          "source:landing:biology:01": {
+            "id": "source:landing:biology:01",
+            "resourceId": "biomass",
+            "remainingGrams": 15000
+          }
+        },
+        "stores": {
+          "scout:storage": {
+            "shipId": "ship:scout",
+            "capacityGrams": 50000,
+            "id": "scout:storage",
+            "quantities": {}
+          }
+        },
+        "location": {
+          "anchor": {
+            "frame": "planet:fixture",
+            "point": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                -7.339999999960288,
+                0.14128629972731796,
+                0
+              ]
+            }
+          },
+          "facing": -1.6907963267948967
+        }
+      },
+      "errors": []
+    },
+    {
+      "replay": 1,
+      "browser": "154.0.8037.57",
+      "before": {
+        "version": 8,
+        "miningWork": {},
+        "hazards": {
+          "version": 1,
+          "exposure": {
+            "radiation": "0/1",
+            "poison": "0/1"
+          },
+          "modules": []
+        },
+        "survival": {
+          "hunger": 3849588,
+          "fatigue": 3886933,
+          "health": 200,
+          "activeTicks": 1067,
+          "starvationTicks": 0,
+          "recoveryTicks": 1067,
+          "offlineAtMs": 1793750418889
+        },
+        "itemDefinitions": {
+          "fixture-single": {
+            "name": "Single fixture",
+            "gramsPerItem": 125,
+            "stackSize": 1
+          },
+          "fixture-stack": {
+            "name": "Stack fixture",
+            "gramsPerItem": 250,
+            "stackSize": 4
+          }
+        },
+        "stores": {
+          "scout:storage": {
+            "shipId": "ship:scout",
+            "capacityGrams": 50000,
+            "id": "scout:storage",
+            "quantities": {}
+          }
+        },
+        "catalogVersion": "landing-resources:v2",
+        "siteId": "site:illustrated-landing:v1",
+        "revision": 19,
+        "inventory": {
+          "capacityGrams": 10000,
+          "capacitySlots": 12,
+          "quantities": {
+            "mineral": 1000
+          },
+          "items": {
+            "fixture-single": 2,
+            "fixture-stack": 5
+          }
+        },
+        "sources": {
+          "source:landing:mineral:01": {
+            "id": "source:landing:mineral:01",
+            "resourceId": "mineral",
+            "remainingGrams": 59000
+          },
+          "source:landing:biology:01": {
+            "id": "source:landing:biology:01",
+            "resourceId": "biomass",
+            "remainingGrams": 15000
+          }
+        },
+        "location": {
+          "anchor": {
+            "frame": "planet:fixture",
+            "point": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                -7.339999999960288,
+                0.14128629972731796,
+                0
+              ]
+            }
+          },
+          "facing": -1.6907963267948967
+        }
+      },
+      "after": {
+        "version": 8,
+        "miningWork": {},
+        "hazards": {
+          "version": 1,
+          "exposure": {
+            "radiation": "0/1",
+            "poison": "0/1"
+          },
+          "modules": []
+        },
+        "survival": {
+          "hunger": 3838680,
+          "fatigue": 3886630,
+          "health": 200,
+          "activeTicks": 1370,
+          "starvationTicks": 0,
+          "recoveryTicks": 1370,
+          "offlineAtMs": 1793750423982
+        },
+        "itemDefinitions": {
+          "fixture-single": {
+            "name": "Single fixture",
+            "gramsPerItem": 125,
+            "stackSize": 1
+          },
+          "fixture-stack": {
+            "name": "Stack fixture",
+            "gramsPerItem": 250,
+            "stackSize": 4
+          }
+        },
+        "catalogVersion": "landing-resources:v2",
+        "siteId": "site:illustrated-landing:v1",
+        "revision": 26,
+        "inventory": {
+          "capacityGrams": 10000,
+          "capacitySlots": 12,
+          "quantities": {
+            "mineral": 1000
+          },
+          "items": {
+            "fixture-single": 2,
+            "fixture-stack": 4
+          }
+        },
+        "sources": {
+          "source:landing:mineral:01": {
+            "id": "source:landing:mineral:01",
+            "resourceId": "mineral",
+            "remainingGrams": 59000
+          },
+          "source:landing:biology:01": {
+            "id": "source:landing:biology:01",
+            "resourceId": "biomass",
+            "remainingGrams": 15000
+          }
+        },
+        "stores": {
+          "scout:storage": {
+            "shipId": "ship:scout",
+            "capacityGrams": 50000,
+            "id": "scout:storage",
+            "quantities": {}
+          }
+        },
+        "location": {
+          "anchor": {
+            "frame": "planet:fixture",
+            "point": {
+              "cell": [
+                "0",
+                "0",
+                "0"
+              ],
+              "offsetM": [
+                -7.339999999960288,
+                0.14128629972731796,
+                0
+              ]
+            }
+          },
+          "facing": -1.6907963267948967
+        }
+      },
+      "errors": []
+    }
+  ],
+  "negative": {
+    "pass": false,
+    "changedPixels": 252129
+  },
+  "policy": {
+    "threshold": 0.1,
+    "maxDiffPixels": 0,
+    "includeAA": true,
+    "masks": []
+  }
+}

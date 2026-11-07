@@ -20,44 +20,47 @@
 .top-down-app[hidden] { display: none; }
 .cockpit-exit { position: fixed; top: 12px; left: 12px; z-index: 10; }
 .power-fixture { position: fixed; bottom: 8px; left: 8px; z-index: 10; }
-.resource-hud { position:absolute; top:14px; right:14px; width:210px; box-sizing:border-box; padding:14px; background:#233437ed; border:1px solid #496062; border-radius:6px; font-size:12px; line-height:18px }
-.resource-hud h2 { font-size:13px; font-weight:500; margin:0 0 10px; color:#bce9df }
-.resource-hud p { margin:4px 0 }
-.resource-hud ul { list-style:none; margin:10px 0; padding:0 }
-.resource-hud li { display:flex; justify-content:space-between; gap:8px }
-.resource-hud button { width:100%; padding:8px; border:1px solid #87b7b8; border-radius:4px; color:#e4e7d6; background:#314e52; cursor:pointer }
-.resource-hud button:disabled { opacity:.5; cursor:default }
-.resource-hud button:focus-visible { outline:2px solid #bce9df; outline-offset:3px }
-.resource-hud .resource-note { font-size:10px; line-height:14px; color:#b7c2bc; margin-top:8px }
-.resource-hud progress { width:100%; height:6px; accent-color:#bce9df }
 .top-down-scene [data-depleted] { opacity:.4 }
-.resource-hud { max-height:calc(100% - 28px); overflow-y:auto }
+.resource-hud { position:absolute; top:12px; right:12px; z-index:2; box-sizing:border-box; font-size:12px; line-height:18px }
+.resource-hud p { margin:4px 0 }
+.resource-hud ul { list-style:none; padding:0 }
+.resource-hud li { display:flex; justify-content:space-between; gap:8px }
+.resource-hud button { width:100%; border:1px solid var(--ui-active); border-radius:4px; color:var(--ui-text); background:var(--ui-surface); padding:8px; cursor:pointer }
+.resource-hud button:disabled { opacity:.5; cursor:default }
+.resource-hud .resource-note { font-size:12px; line-height:16px; color:var(--ui-muted); margin-top:8px }
 .resource-hud .count-item { display:block; margin:8px 0 }
 .resource-hud .count-item span { display:block }
-
-
-.survival-hud { position:fixed; top:12px; left:12px; z-index:12; width:190px; padding:12px; border:1px solid #87b7b8; border-radius:6px; background:#233437f5; color:#e8e1d1; font:12px/18px system-ui,sans-serif }
-.survival-hud label { display:block; margin-bottom:6px }
-.survival-hud label span { float:right }
-.survival-hud meter { display:block; width:100%; height:10px; accent-color:#bce9df }
-.survival-hud p { margin:6px 0; color:#ffe3ac }
+.survival-hud { position:fixed; top:12px; left:12px; z-index:12; font:12px/18px system-ui,sans-serif; max-height:calc(100dvh - 24px); overflow:auto }
+.survival-hud button { color:var(--ui-text); background:var(--ui-surface); border:1px solid var(--ui-active); border-radius:4px; min-height:36px; padding:6px; cursor:pointer }
 .survival-hud p:empty { display:none }
-.survival-hud button { color:#e8e1d1; background:#314e52; border:1px solid #87b7b8; border-radius:4px; padding:5px; cursor:pointer }
-.survival-hud button:focus-visible { outline:2px solid #bce9df; outline-offset:3px }
-body:has(.radar) .survival-hud { top:52px; left:12px }
-
-
-.top-down-app .resource-hud { z-index:2; top:12px; right:12px; max-height:calc(100% - 24px) }
-.survival-hud { max-height:calc(100dvh - 24px); overflow:auto }
-@media(max-width:700px) {
-  .survival-hud { width:170px; padding:10px }
-  .top-down-app .resource-hud { width:190px; padding:10px }
-  .top-down-bottom { width:calc(100% - 224px); max-height:40% }
-  .top-down-interaction { flex-wrap:wrap; gap:6px }
-}
-
-/* Keep survival and pause available without covering the observation header,
-   warnings, compass or contact browser. */
-body:has(.panoramic) .survival-hud { top:220px; width:164px; max-height:calc(100dvh - 480px); padding:8px; font-size:11px; line-height:14px }
-body:has(.panoramic) .survival-hud label { margin-bottom:3px }
 body:has(.panoramic) .power-fixture { bottom:82px; left:auto; right:12px }
+
+/* Adaptive projected instrumentation. World geometry remains independent. */
+.expedition-ui .survival-hud, .expedition-ui .resource-hud, .expedition-ui .top-down-bottom {
+  background:var(--ui-void); color:var(--ui-text); border:1px solid var(--ui-surface); border-radius:var(--ui-radius); font-size:12px;
+}
+.expedition-ui .survival-hud { width:280px; padding:8px; box-sizing:border-box }
+.vital-meters { display:flex; gap:10px }
+.vital-meters .ui-meter { min-width:0; flex:1; margin:0; font-size:12px }
+.vital-meters .ui-meter span { display:block; line-height:18px }
+.expedition-ui .survival-hud .ui-button { min-height:32px; padding:4px 8px }
+.expedition-ui .survival-hud p { margin:6px 0; color:var(--ui-mechanical) }
+.expedition-ui .resource-hud { width:224px; padding:8px; overflow:visible; max-height:none }
+.expedition-ui .resource-hud button { min-height:36px; font-size:12px }
+.expedition-ui .resource-hud ul { margin:8px 0 }
+.hud-utility { position:absolute; top:calc(100% + 8px); right:0; width:280px; max-height:calc(100dvh - 190px); overflow:auto; background:var(--ui-void); border:1px solid var(--ui-active); border-radius:4px }
+.hud-utility:focus-visible { outline:2px solid var(--ui-active); outline-offset:2px }
+.hud-utility .ui-panel { margin:0; padding:12px }
+.expedition-ui .top-down-bottom { width:max-content; max-width:calc(100% - 24px); min-width:280px; max-height:35%; font-size:12px }
+.expedition-ui .top-down-interaction { padding:6px 10px; gap:10px }
+.expedition-ui .top-down-interaction:has([data-prompt][hidden]):has([role=status]:empty) { display:none }
+.source-summary, .gathering-status { margin:0; padding:0 10px 6px; font-size:12px }
+.gathering-status .ui-meter { margin:0 }
+.gathering-status p { margin:4px 0 }
+.expedition-ui .top-down-app footer { font-size:11px; padding:4px 10px }
+body:has(.panoramic) .expedition-ui .survival-hud { width:220px; top:220px; max-height:calc(100dvh - 420px); font-size:12px; line-height:16px }
+body:has(.panoramic) .vital-meters { gap:6px }
+@media(max-width:1000px) {
+  .expedition-ui .survival-hud { width:260px }
+  .expedition-ui .resource-hud { width:208px }
+}

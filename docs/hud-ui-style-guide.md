@@ -170,6 +170,18 @@ Run `cd client && npm test && npm run build && npm run test:browser`; focused
 iteration uses `npx playwright test --project=ui`. Captures are **candidates for
 human review**, not approved visual baselines. See the [#826 report](../reports/issue-826/README.md).
 
+## Resource Container equipment implementation (#829)
+
+`EquipmentDialog` now composes the shared native `Dialog` with industrial accent,
+identity/title/status, content, feedback and action/dismiss regions. The existing
+Resource Container is its first production consumer; no future machine mechanics
+are created. `ResourceContainerPanel.tsx` uses shared Button/Progress and tokens,
+retaining exact kg/g, slot/free capacity and review → confirm authority.
+`tests/storage.spec.ts` covers live transactions plus keyboard, contrast, local
+scroll, motion and repeat captures at all three desktop sizes. The
+[#829 report](../reports/issue-829/README.md) records actual evidence; deployed
+visual review remains with the owner under the current repository policy.
+
 ## 10. Explicit non-goals and delivery state
 
 No new UI framework, physical 3D cockpit art, mobile interface, simulated machine operation, new game resource, gameplay balance change, authoritative backend, save migration, scanner discovery change, unscanned names, automatic pause, or photorealistic fidelity requirement.

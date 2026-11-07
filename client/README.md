@@ -369,12 +369,22 @@ saved. Modal focus contains keyboard/mouse interaction; editable fields keep the
 keys. The normal world controls resume on close; ship simulation remains active.
 `resourceContainerInteraction.ts` owns admission/draft/confirmation/cancellation;
 `ResourceContainerPanel.tsx` and `resourceContainer.css` own accessible responsive
-presentation. No production state setters are exposed.
+presentation through shared `EquipmentDialog`, Button and Progress primitives
+(#829). The opaque industrial shell shares identity/title/status, machine content,
+feedback and dismiss/action regions. Carried/container kg, exact g meters and free
+capacity stay visible alongside the raw table. Draft, committed and rejected
+states use explicit words; save-blocked controls retain reachable explanations.
+Small desktop windows scroll inside the native dialog. No production state setters
+are exposed.
 
 `tests/storage.spec.ts` uses the built default entry to mine → enter → deposit →
 withdraw → exit → reload twice, compares original panel/error captures and
 checks a validated prior full-container save, overweight/stale-save errors and a
-narrow viewport. It is part of the existing cockpit project and full browser CI.
+narrow viewport. `STORE-UI-3` verifies the production shell at 960×600,
+1280×720 and 1920×1080: focus wrapping/isolation, accessible names/descriptions,
+text contrast, reduced motion, panel-local overflow, repeat originals and a wrong
+checkpoint negative. Captures/measurements are retained in
+[the #829 report](../reports/issue-829/README.md). It is part of the existing cockpit project and full browser CI.
 The player-slot feedback helper is tested with validated synthetic usage; the
 current two-resource/empty-item catalog cannot fill all 12 slots in browser play.
 
@@ -670,7 +680,9 @@ Import components from `src/ui/primitives.tsx` and wrap consumers in
 Use `disabledReason` for an unavailable action, `pending` for work awaiting an
 authoritative result, and `StatusLabel` for event-driven feedback. A controlled
 `Dialog` requires `open`, `title`, `onDismiss` and children; it restores focus to
-its opener. Native modal inertness and keyboard handling supplement the existing
+its opener. `EquipmentDialog` adds the mechanical accent and short interruptible
+entry fade; optional `eyebrow`, `status`, `feedback` and `actions` slots share the
+machine layout while children retain machine-specific controls. Native modal inertness and keyboard handling supplement the existing
 view owner's shortcut/input-release gates. Widgets do not hold game state.
 
 `/tests/ui.html` is a development-only bright-planet/dark-space component gallery;

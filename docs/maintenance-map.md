@@ -48,7 +48,8 @@ transfer, store mass); `resourceInventory.ts` owns shared player constraints;
 `scoutResourceContainer.ts` declares the stable Scout store; its domain tests cover
 50 kg capacity, migration and production transfers. `resourceContainerInteraction.ts`
 owns shared-world admission, draft/confirmation and cancellation;
-`ResourceContainerPanel.tsx`/`resourceContainer.css` own the modal.
+`ResourceContainerPanel.tsx`/`resourceContainer.css` own the machine content; shared `ui/primitives.tsx` EquipmentDialog owns its
+industrial shell, modal focus and scoped presentation.
 `tests/storage.spec.ts` covers the built gather/store/reload loop and errors. Tests are colocated; `tests/gathering.spec.ts` covers the built mining/save adapter.
 `observationCamera.ts` owns captured one-shot camera interpolation and cancellation;
 `contactCommands.ts` owns scanner/grounding/flight command guards, and

@@ -1,0 +1,17 @@
+
+Error: Candidate generation is forbidden in CI
+
+   at panoramic-captures.spec.ts:9
+
+   7 | const directory = 'tests/navigation-baselines'
+   8 | const candidate = process.env.SALIMON_PANORAMIC_CANDIDATES || undefined
+>  9 | if (candidate && process.env.CI) throw Error('Candidate generation is forbidden in CI')
+     |                                        ^
+  10 | if (candidate && (!isAbsolute(candidate) || resolve(candidate) === resolve(directory) || resolve(candidate).startsWith(resolve(directory) + sep))) throw Error('Use an absolute candidate directory outside tracked references')
+  11 | const json = (v: unknown) => JSON.stringify(v, (_, x) => typeof x === 'bigint' ? String(x) : x, 2)
+  12 | // Observers are fixture-only, read-only snapshots of the production adapters.
+    at /workspace/salimon/client/tests/panoramic-captures.spec.ts:9:40
+
+Error: No tests found
+Listing tests:
+Total: 0 tests in 0 files

@@ -10,19 +10,37 @@ import { ORIGIN, translate } from '../src/coordinates.ts'
 import type { Body } from '../src/sampleUniverse.ts'
 import { CatalogIndex, Scanner, SCANNER_RADIUS_M } from '../src/scanner.ts'
 const lowResolution = new URLSearchParams(location.search).has('low-resolution')
+const stress = new URLSearchParams(location.search).has('stress')
 const base = new URLSearchParams(location.search).has('translated') ? { cell: [10n ** 24n, -(10n ** 24n), 10n ** 30n] as const, offsetM: [0, 0, 0] as const } : ORIGIN
 let origin = base, tick = 0, actions = 0
 const make = (id: string, x: number, y: number, z: number, radiusKm = 0.00001): Body => ({ id, name: `Detected ${id}`, kind: 'moon', radiusKm, position: translate(base, [x, y, z]) })
-const bodies = [make('planet', 0, 0, -10000, 1), make('hidden', 0, 0, -20000), make('tiny', 4000, 0, -10000), make('back', 0, 0, 10000), make('outside', 20000, 0, -10000),
+// A physical one-metre stress target makes GPU pixel-presence checks meaningful.
+const bodies = [make('planet', 0, 0, -10000, 1), make('hidden', 0, 0, -20000), make('tiny', 4000, 0, -10000, stress ? 0.001 : 0.00001), make('back', 0, 0, 10000), make('outside', 20000, 0, -10000),
  ...Array.from({ length: 18 }, (_, i) => make(`dense-${String(i).padStart(2, '0')}`, -4000, 2000, -10000))]
 const scanner = new Scanner(new CatalogIndex(bodies)), view = new ObservationCameraState({ yaw: 0, pitch: 0 })
 let observation: unknown
 Object.assign(window, { sensorSnapshot: () => structuredClone(observation) })
 function Scene() {
  const { gl, size } = useThree()
- useFrame(() => {
+ useFrame(({ camera }) => {
   const ctx = gl.getContext(), debug = ctx.getExtension('WEBGL_debug_renderer_info')
+  let pixels = null
+  if (stress) {
+   // preserveDrawingBuffer retains the previous completed GPU frame. No DOM
+   // marker can supply these pixels; retain the raw region, not only a score.
+   const x = Math.floor(gl.domElement.width / 2) - 12, y = Math.floor(gl.domElement.height / 2) - 12
+   const rgba = new Uint8Array(24 * 24 * 4)
+   ctx.readPixels(x, y, 24, 24, ctx.RGBA, ctx.UNSIGNED_BYTE, rgba)
+   let peakLuma = 0, litPixels = 0
+   for (let i = 0; i < rgba.length; i += 4) {
+    const luma = rgba[i] + rgba[i + 1] + rgba[i + 2]
+    peakLuma = Math.max(peakLuma, luma); if (luma > 0) litPixels++
+   }
+   pixels = { rect: { x, y, width: 24, height: 24 }, rgba: Array.from(rgba), peakLuma, litPixels, error: ctx.getError(), frame: gl.info.render.frame }
+  }
   observation = { tick, contacts: scanner.contacts.map(b => b.id), selected: scanner.selected, actions,
+   origin: { cell: origin.cell.map(String), offsetM: [...origin.offsetM] },
+   render: { fov: 'fov' in camera ? Number(camera.fov) : NaN, pixels },
    markers: perspectiveMarkers(currentContacts(scanner, origin), bodies, origin, view.snapshot(), size.width, size.height),
    view: view.snapshot(), canvas: { width: gl.domElement.width, height: gl.domElement.height }, renderer: debug ? ctx.getParameter(debug.UNMASKED_RENDERER_WEBGL) : null }
  }, 0)

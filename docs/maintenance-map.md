@@ -13,6 +13,10 @@ scanner-gated markers/actions to `PerspectiveContacts.tsx`/`contactCommands.ts`,
 and compact orientation UI to `OrientationCompass.tsx`. `App.tsx`,
 `CameraControls.tsx`, `ContinuousContacts.tsx` and `ShipVectorGuides.tsx` remain
 isolated orthographic flight fixture owners at `/?scene=radar`.
+Panoramic acceptance (#816) extends the existing navigation-captures project in
+`tests/panoramic-captures.spec.ts`, optical/sensor regressions and the existing
+negative scripts; `scripts/negative-panoramic.mjs` proves one expected-image
+mutation fails. References share the existing manifest and human-approval gate.
 See the [browser verification contract](../client/README.md#deterministic-navigation-regression-750).
 The shared 2D world is owned by `topDownRuntime.ts`/`topDownFrames.ts`, collision
 and reach by `topDownInteraction.ts`, doorway ownership/location snapshots by

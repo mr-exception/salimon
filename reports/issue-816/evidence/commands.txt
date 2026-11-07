@@ -1,0 +1,61 @@
+# Run from client unless marked otherwise. Sources are bound in ../README.md.
+# Setup (successful; Node/npm and native libraries reused)
+npm ci --no-audit --no-fund
+npx playwright install chromium
+
+# Actual WebGL preflight: PASS
+npm run build
+npx playwright test --project=optical --grep OPT-2
+
+# Historical iteration: initial writer used =1; final writer requires an
+# absolute external output directory and cannot write tracked references.
+# First capture attempt lost its reused server; serial retry completed.
+SALIMON_PANORAMIC_CANDIDATES=1 SALIMON_EVIDENCE_DIR=test-results/panoramic-candidates npx playwright test --project=navigation-captures --grep PANO-VIS
+npm run build
+npm test
+# Mixed iteration: HUD-2/SENSOR-3/PANO-VIS PASS; SENSOR-4 focus-decoration
+# mismatch and OPT-3 wall-clock timeout FAIL. Corrected before full validation.
+SALIMON_PANORAMIC_CANDIDATES=1 SALIMON_EVIDENCE_DIR=test-results/focused npx playwright test --project=optical --project=perspective --project=panoramic --project=navigation-captures --grep 'OPT-3|SENSOR-3|SENSOR-4|HUD-2|PANO-VIS'
+npm run build
+SALIMON_EVIDENCE_DIR=test-results/focused-corrected npx playwright test --project=perspective --project=optical --grep 'SENSOR-4|OPT-3'
+
+# Full run at 8e66660: 63 PASS, OPT-1 timeout FAIL, zero skips.
+SALIMON_EVIDENCE_DIR=test-results/full npm run test:browser
+
+# Recheck at b7224b7: both PASS, including complete corrected OPT-1.
+npx tsc -b
+SALIMON_EVIDENCE_DIR=test-results/final-focused npx playwright test --project=optical --project=perspective --grep 'OPT-1|SENSOR-4'
+
+# Repeat at cb5b87a: seven PASS, zero skips; 27 comparisons + NAV-1..4,
+# plus final non-vacuous GPU stress assertion. Earlier domain/build inputs
+# remain unchanged; final types are rechecked after final metadata edits.
+npx tsc -b
+SALIMON_EVIDENCE_DIR=test-results/visual-repeat npm run test:visual -- --project=deterministic --project=perspective --grep 'PANO-VIS|VIS-1/2|NAV-|SENSOR-4'
+
+# Final source a63c90e: strict typecheck PASS.
+npx tsc -b
+# Three controlled source failures detected: PASS.
+npm run test:browser:negative
+# Older visual negative component PASS; workspace reconnect interrupted only
+# the final panoramic child before a verdict. Preserve partial output.
+npm run test:visual:negative
+# First resume: INVALID_DEMONSTRATION / occupied port, not a detected defect.
+node scripts/negative-panoramic.mjs
+# Verified and stopped only owned Vite servers from the interrupted scratch
+# copy; observed all three test ports released. Final resume: PASS.
+node scripts/negative-panoramic.mjs
+
+# Guard checks (each invocation must exit 1 with its named error; wrapper
+# validation of the intended error exited 0, no browser run or source writes).
+SALIMON_PANORAMIC_CANDIDATES=/workspace/salimon/client/tests/navigation-baselines SALIMON_EVIDENCE_DIR=test-results/inplace-guard npx playwright test --list --project=navigation-captures --grep PANO-VIS
+# Expected: Use an absolute candidate directory outside tracked references
+CI=true SALIMON_PANORAMIC_CANDIDATES=/tmp/816-forbidden-candidate SALIMON_EVIDENCE_DIR=test-results/ci-guard npx playwright test --list --project=navigation-captures --grep PANO-VIS
+# Expected: Candidate generation is forbidden in CI
+SALIMON_BASE_SHA=15a6e73c36f6ac151434e583eb4d65d5d1c35871 npm run test:visual:approval
+# Expected: BASELINE_APPROVAL_REQUIRED; appearance approval remains UNVERIFIED.
+
+# Repository-root publication/package checks:
+git diff --check
+git diff --exit-code a63c90e HEAD -- client .github/workflows/navigation-client.yml docs/maintenance-map.md
+git merge-base --is-ancestor origin/main HEAD
+# No CI run/status/watch/poll commands executed.

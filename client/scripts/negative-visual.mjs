@@ -18,7 +18,7 @@ try {
  const before='[data-vector=velocity]{stroke:#b6f5a2;',after='[data-vector=velocity]{stroke:#ff0000;'
  if(original.split(before).length!==2)throw Error('Visual mutation must match exactly once')
  const changed=original.replace(before,after);await writeFile(target,changed)
- const child=spawnSync(process.execPath,[join(root,'node_modules/@playwright/test/cli.js'),'test','--project=navigation-captures'],{cwd:scratch,env:{...process.env,CI:'true',SALIMON_CAPTURE_CANDIDATES:'',SALIMON_EVIDENCE_DIR:output},encoding:'utf8',timeout:240000,maxBuffer:2e6})
+ const child=spawnSync(process.execPath,[join(root,'node_modules/@playwright/test/cli.js'),'test','--project=navigation-captures','--grep','VIS-1/2'],{cwd:scratch,env:{...process.env,CI:'true',SALIMON_CAPTURE_CANDIDATES:'',SALIMON_EVIDENCE_DIR:output},encoding:'utf8',timeout:240000,maxBuffer:2e6})
  await mkdir(output,{recursive:true});await writeFile(join(output,'command.log'),`${child.stdout??''}\n${child.stderr??''}`)
  const report=JSON.parse(await readFile(join(output,'results.json'),'utf8'))
  const specs=suite=>[...(suite.specs??[]),...(suite.suites??[]).flatMap(specs)]

@@ -38,6 +38,54 @@
     "zoom-out.png": "942f5b5d917fbb0b0f92bd63421b4998960c1293b469b31a826a59e7bd299c2e",
     "zoom-in.png": "56423893fcef74024858bde71e6f74cd20a4f74789df3a0e1a8a7364a301d8d3",
     "heading-velocity.png": "985971c0ce1d2a0a74c82b7439f1e9fa987944161fa01c58e54243dff9738252",
-    "opposite-vectors.png": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb"
+    "opposite-vectors.png": "280fb557af07a9d578ee7b5dd44e11d89f29c7498b9d9fb0390891a588b720fb",
+    "panoramic-wide.png": "dfe02f4efdb3361a535f70d4793bb388521beace7096673597319527e99d44d7",
+    "panoramic-telescope.png": "ccb5ce340a913b8190f4bb08a122d837b51918769bb3ca005e1a0f0721f6ebf9",
+    "panoramic-telescope-translated.png": "ccb5ce340a913b8190f4bb08a122d837b51918769bb3ca005e1a0f0721f6ebf9",
+    "panoramic-translated.png": "dfe02f4efdb3361a535f70d4793bb388521beace7096673597319527e99d44d7",
+    "panoramic-surface.png": "fe8aea09b5b57999406f4c1d0ddd18ca80dea4a5c0b73c32e8e8ae858e570a33",
+    "panoramic-below.png": "003be56fa8862bfa50ba3525edf88b9f872db8454dc0e02e6a674a12461921ec",
+    "panoramic-empty-scanner.png": "180a440d80ee5f7e1a7c2ce5c2059a932436ca510935b2b382a99749ab174351",
+    "panoramic-detected-occluded-rear.png": "b020bf839d5e2d3760487b67a75c6d42eeabecab4e636e2dd3747cccff667b6a",
+    "panoramic-overlap.png": "fbbf9cf577be81295879671fa07df4f40247664fab9209965f9245664e6dbb05",
+    "panoramic-pagination.png": "1b7c668ac49d5f7743fbe0bcf575ffff90cccccbcab1ee7bd0fcadd5328f2672",
+    "panoramic-sensor-telescope.png": "14ec881efcc7daadd9831a190243654c0e696eb0030a1585b1fe1de9d049b418",
+    "panoramic-lost-contact.png": "a86fa39b6bcb195693b11c59479fe5e22c641e804b588d9ada843ba50c0aa60a",
+    "panoramic-look-at-occluded.png": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
+    "panoramic-set-direction.png": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
+    "panoramic-compass-stationary.png": "512a2874ee8bb0bf6a649d33cec5dc204562f9800f26dcfc3605f07f73ae9b03",
+    "panoramic-compass-rear.png": "327f78175088fcffe933a314dc35bd691956a9dc62b980a98b37ea52d64541ba",
+    "panoramic-compass-overlap.png": "d79586117d1680d444bea741070ddd8ee15f3122428a1388dcbbc5b096854293",
+    "panoramic-small-warning.png": "d311c8298d9bad0b6d2da57d594e9fdf3466e9622d4ad1e439ebf0b1fc6cc111",
+    "panoramic-small-destroyed.png": "8ab35afa4b3a472b5960e5e4fcc0b6dbb8f1f8af39cc45deab603fc010e32902"
+  },
+  "panoramic": {
+    "environment": {
+      "platform": "linux",
+      "arch": "x64",
+      "browser": "156.0.8078.4",
+      "playwright": "1.64.1",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "dpr": 1,
+      "epoch": "2026-11-06T12:00:00.000Z",
+      "locale": "en-US",
+      "timezone": "UTC",
+      "policy": {
+        "threshold": 0.1,
+        "maxDiffPixels": 0,
+        "includeAA": true,
+        "masks": []
+      },
+      "fonts": {
+        "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+        "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+        "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
+        "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab"
+      }
+    },
+    "status": "AWAITING_HUMAN_REVIEW"
   }
 }

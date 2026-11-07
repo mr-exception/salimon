@@ -1,0 +1,7 @@
+
+> salimon-navigation-client@0.1.0 test:browser:negative
+> node scripts/negative-navigation.mjs
+
+unscanned-optical-markers: expected assertion failure retained
+reversed-wasd: expected assertion failure retained
+wrong-heading-color: expected assertion failure retained

@@ -1,0 +1,12 @@
+
+> salimon-navigation-client@0.1.0 test:visual:approval
+> node --experimental-strip-types scripts/baseline-approval.ts
+
+file:///workspace/salimon/client/scripts/baseline-approval.ts:19
+ if(!pr||!/^\d+$/.test(pr)||!token)throw Error(`BASELINE_APPROVAL_REQUIRED: post human review "Approve navigation baselines: ${digest}" to this PR, then rerun the gate`)
+                                         ^
+
+Error: BASELINE_APPROVAL_REQUIRED: post human review "Approve navigation baselines: 83a51c49e9d88248dec0be8bf65af83b8eb9d20b0c6b44f791d4b7460c7ca369" to this PR, then rerun the gate
+    at file:///workspace/salimon/client/scripts/baseline-approval.ts:19:42
+
+Node.js v24.19.0

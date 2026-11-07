@@ -101,6 +101,14 @@ test('HUD-2 compass render states, ship rotation, zoom and responsive warning pr
  await page.getByRole('button', { name: 'Telemetry', exact: true }).click()
  await scenario(page, 'warning')
  await expect(page.getByLabel('Navigation warnings')).not.toBeEmpty()
+ for (const name of ['Reset view', 'Exit cockpit', 'Telemetry']) {
+  const control = page.getByRole('button', { name, exact: true })
+  await expect(control).toBeInViewport()
+  expect(await control.evaluate(el => {
+   const r = el.getBoundingClientRect()
+   return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2))
+  }), `ESSENTIAL_CONTROL_OBSTRUCTED ${name}`).toBe(true)
+ }
  await capture(page, 'warning-960x600.png', info)
  await scenario(page, 'destroyed')
  await expect(page.getByText(/Journey ended/)).toBeVisible()

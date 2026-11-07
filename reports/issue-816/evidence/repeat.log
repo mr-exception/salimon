@@ -1,0 +1,39 @@
+
+> salimon-navigation-client@0.1.0 test:visual
+> playwright test --project=navigation-captures --project=deterministic --project=perspective --grep PANO-VIS|VIS-1/2|NAV-|SENSOR-4
+
+[WebServer] (node:6853) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:6885) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6923) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:6967) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [perspective] › tests/perspective.spec.ts:132:1 › SENSOR-4 telescope high-frequency input at huge origin preserves depth and authority (26.6s)
+(node:7045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [navigation-captures] › tests/navigation-captures.spec.ts:22:1 › VIS-1/2 eight navigation screens match reference pixels (15.2s)
+  ✓  3 [navigation-captures] › tests/panoramic-captures.spec.ts:17:1 › PANO-VIS panoramic optical, sensor, actions and HUD reference matrix (3.7m)
+(node:7168) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [deterministic] › tests/deterministic.spec.ts:4:1 › NAV-1 seeded replay: exact WASD direction, release and wheel zoom (13.0s)
+  ✓  5 [deterministic] › tests/deterministic.spec.ts:42:1 › NAV-2 fixed-clock scan: no discovery before tick 300, stable selection during continuous pan (21.2s)
+  ✓  6 [deterministic] › tests/deterministic.spec.ts:82:1 › NAV-3 heading and velocity retain approved colors and viewport edges (3.0s)
+  ✓  7 [deterministic] › tests/deterministic.spec.ts:99:1 › NAV-4 read-only fixture observers return detached state; production has no hooks (1.7s)
+
+  7 passed (5.2m)

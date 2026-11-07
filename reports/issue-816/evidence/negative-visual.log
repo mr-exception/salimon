@@ -1,0 +1,5 @@
+
+> salimon-navigation-client@0.1.0 test:visual:negative
+> node scripts/negative-visual.mjs && node scripts/negative-panoramic.mjs
+
+VIS-1 PASS: red velocity fails two real browser screenshots; six unchanged screens pass; originals/diffs/trace retained

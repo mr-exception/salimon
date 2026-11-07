@@ -9,16 +9,17 @@ import { startingScoutLocation } from '../src/scoutLocation.ts'
 import { SAMPLE_BODIES, type Body } from '../src/sampleUniverse.ts'
 import { CatalogIndex, Scanner } from '../src/scanner.ts'
 const scenario = new URLSearchParams(location.search).get('scenario') ?? 'wide'
-const origin = scenario === 'translated' ? { cell: [10n ** 24n, -(10n ** 24n), 10n ** 30n] as const, offsetM: [0, 0, 0] as const } : ORIGIN
+const origin = scenario.includes('translated') ? { cell: [10n ** 24n, -(10n ** 24n), 10n ** 30n] as const, offsetM: [0, 0, 0] as const } : ORIGIN
 const make = (id: string, position: readonly [number, number, number], radiusKm: number, kind: Body['kind'] = 'moon'): Body =>
- ({ id, name: `Secret ${id}`, kind, radiusKm, position: translate(origin, position) })
+ ({ id, name: `Secret ${id}`, kind, radiusKm: radiusKm * scale, position: translate(origin, position.map(v => v * scale) as [number, number, number]) })
+const scale = scenario === 'near-depth' ? 1e-6 : scenario === 'far-depth' ? 1e16 : 1
 const calibration = [make('foreground', [0, 0, -10000], 1), make('light', [-1e8, 1e8, 0], 500, 'star'),
  make('tiny', [60000, 0, -1e8], 1.4), make('hidden', [0, 0, -1e8], 40)]
 const surface = scenario === 'surface' || scenario === 'below', site = startingScoutLocation()
-const bodies = surface ? SAMPLE_BODIES : scenario === 'telescope' ? calibration.slice(1) : scenario === 'clear' ? calibration.filter(b => b.id !== 'hidden') : calibration
+const bodies = surface ? SAMPLE_BODIES : scenario.startsWith('telescope') ? calibration.slice(1) : scenario === 'clear' ? calibration.filter(b => b.id !== 'hidden') : calibration
 const shipOrigin = surface ? site.ship.position : origin
 const view = new ObservationCameraState({ yaw: 0, pitch: 0 })
-if (scenario === 'telescope') view.restore({ quaternion: [0, 0, 0, 1], fov: 0.1 })
+if (scenario.startsWith('telescope')) view.restore({ quaternion: [0, 0, 0, 1], fov: 0.1 })
 if (scenario === 'below') view.reset({ yaw: 0, pitch: -Math.PI / 2 })
 const scanner = new Scanner(new CatalogIndex(bodies))
 let observation: unknown

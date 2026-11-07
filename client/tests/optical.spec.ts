@@ -11,6 +11,7 @@ async function boot(page: Page, scenario: string) {
 }
 const brightness = (png: PNG, x: number, y: number) => { const i = (y * png.width + x) * 4; return png.data[i] + png.data[i + 1] + png.data[i + 2] }
 test('OPT-1 optical disks before scanning, repeat, occultation and far origin invariance', async ({ page }, info) => {
+ test.setTimeout(240000) // Four full-resolution software-WebGL scene boots.
  const errors: string[] = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if(m.type() === 'error') errors.push(m.text()) })
  await boot(page, 'wide')
  const initial = await snapshot(page)
@@ -60,4 +61,24 @@ test('OPT-2 telescope tiny moon and grounded horizon with below-surface occlusio
  expect(below.equals(telescope)).toBe(false)
  expect(errors).toEqual([])
  await info.attach('measurements.json', { body: json({ telescope: state, below: await snapshot(page), errors }), contentType: 'application/json' })
+})
+
+test('OPT-3 near/far physical depths and huge-origin telescope preserve optical pixels', async ({ page }, info) => {
+ test.setTimeout(240000) // Five full-resolution software-WebGL scene boots.
+ const measurements = []
+ await boot(page, 'wide')
+ const wide = await capture(page)
+ for (const scenario of ['near-depth', 'far-depth']) {
+  await boot(page, scenario)
+  const actual = await capture(page), state = await snapshot(page)
+  expect(actual.equals(wide), `DEPTH_CLIPPING ${scenario}`).toBe(true)
+  expect(state.camera).toEqual([0, 0, 0]); expect(state.calls).toBe(1)
+  await info.attach(`${scenario}.png`, { body: actual, contentType: 'image/png' })
+  measurements.push(state)
+ }
+ await boot(page, 'telescope'); const telescope = await capture(page)
+ await boot(page, 'telescope-translated')
+ expect((await capture(page)).equals(telescope), 'TELESCOPE_SPLIT_PRECISION').toBe(true)
+ measurements.push(await snapshot(page))
+ await info.attach('depth-precision.json', { body: json({ measurements, nearScale: 1e-6, farScale: 1e16, depthRangeM: [0.01, 1e24] }), contentType: 'application/json' })
 })

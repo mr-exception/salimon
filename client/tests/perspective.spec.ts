@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { PNG } from 'pngjs'
-type State = { tick: number; contacts: string[]; selected: string | null; actions: number; renderer: string; view: { fov: number; quaternion: number[] }; markers: { id: string; ids: string[]; x: number; y: number }[] }
+type State = { origin: { cell: string[]; offsetM: number[] }; render: { fov: number; pixels: { peakLuma: number; litPixels: number; error: number; frame: number } | null }; tick: number; contacts: string[]; selected: string | null; actions: number; renderer: string; view: { fov: number; quaternion: number[] }; markers: { id: string; ids: string[]; x: number; y: number }[] }
 const state = (page: Page) => page.evaluate(() => (window as unknown as { sensorSnapshot(): State }).sensorSnapshot())
 const sceneMarkers = (page: Page) => page.getByRole('button', { name: /^Sensor contact / })
 async function boot(page: Page, translated = false) {
@@ -103,4 +103,84 @@ test('SENSOR-2 repeat/translated pixels, telescope motion and stale group suppre
  expect((await state(page)).tick).toBe(300)
  await info.attach('telescope.png', { body: await page.screenshot(), contentType: 'image/png' })
  await info.attach('measurements.json', { body: JSON.stringify({ initial, motion, moved: await state(page), repeat: 'byte-identical', translated: 'byte-identical' }, null, 2), contentType: 'application/json' })
+})
+
+test('SENSOR-3 adversarial optical leak and stale marker click-through', async ({ page }, info) => {
+ await boot(page)
+ await expect(sceneMarkers(page), 'UNSCANNED_OPTICAL_MARKER_LEAK').toHaveCount(0)
+ await page.locator('canvas').click({ position: { x: 480, y: 300 } })
+ expect((await state(page)).selected, 'OPTICAL_SELECTION_LEAK').toBeNull()
+ await page.getByRole('button', { name: 'Pulse', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(3)
+ const planet = page.getByRole('button', { name: 'Sensor contact Detected planet', exact: true })
+ await planet.click()
+ expect((await state(page)).selected).toBe('planet')
+ for (const hidden of ['hidden', 'back', 'outside']) {
+  await expect(page.getByRole('button', { name: `Sensor contact Detected ${hidden}`, exact: true })).toHaveCount(0)
+ }
+ const detached = await planet.elementHandle()
+ await page.getByRole('button', { name: 'Leave range', exact: true }).click()
+ await expect(sceneMarkers(page)).toHaveCount(0)
+ // A captured pointer target must not resurrect a stale or occluded contact.
+ await detached!.evaluate(el => el.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+ await expect(page.getByRole('button', { name: 'Set direction', exact: true })).toHaveCount(0)
+ expect((await state(page)).selected).toBeNull()
+ expect((await state(page)).actions).toBe(0)
+ await info.attach('adversarial.json', { body: JSON.stringify(await state(page)), contentType: 'application/json' })
+})
+
+test('SENSOR-4 telescope high-frequency input at huge origin preserves depth and authority', async ({ page }, info) => {
+ test.setTimeout(180000)
+ const errors: string[] = []; page.on('pageerror', e => errors.push(e.message))
+ await page.clock.install({ time: new Date('2026-11-06T12:00:00Z') })
+ await page.clock.pauseAt(new Date('2026-11-06T12:00:01Z'))
+ await page.goto('/tests/perspective.html?low-resolution&translated&stress')
+ await expect.poll(async () => { await page.clock.runFor(32); return (await state(page))?.renderer }).toContain('SwiftShader')
+ await page.getByRole('button', { name: 'Pulse', exact: true }).click(); await page.clock.runFor(32)
+ await page.getByRole('button', { name: 'Telescope', exact: true }).click(); await page.clock.runFor(32)
+ await page.locator('canvas').focus()
+ await page.keyboard.press('Shift') // Match keyboard focus-visible decoration in both originals.
+ await page.clock.runFor(32)
+ const initial = await state(page)
+ const samples: { phase: string; state: State }[] = []
+ expect(initial.view.fov).toBe(0.1)
+ const first = await page.locator('canvas').screenshot()
+ expect(initial.origin.cell).toEqual([(10n ** 24n).toString(), (-(10n ** 24n)).toString(), (10n ** 30n).toString()])
+ const observe = (phase: string, next: State) => {
+  expect(next.view.quaternion.every(Number.isFinite)).toBe(true)
+  expect(Math.hypot(...next.view.quaternion)).toBeCloseTo(1, 12)
+  expect(next.render.fov).toBeCloseTo(next.view.fov, 12)
+  expect(next.markers).toHaveLength(1); expect(next.markers[0].ids).toEqual(['tiny'])
+  expect(next.markers.every(m => Number.isFinite(m.x) && Number.isFinite(m.y))).toBe(true)
+  expect(next.render.pixels!.error).toBe(0)
+  expect(next.render.pixels!.peakLuma, 'OPTICAL_GPU_BLANK_FRAME').toBeGreaterThan(10)
+  expect(next.render.pixels!.litPixels).toBeGreaterThan(0)
+  expect(next.contacts).toEqual(initial.contacts); expect(next.tick).toBe(initial.tick)
+  expect(next.origin).toEqual(initial.origin); expect(next.actions).toBe(0)
+  samples.push({ phase, state: next })
+ }
+ // Render both zoom states; never reverse a zoom before its frame is observed.
+ // The readback observes the previous completed frame, covering each phase.
+ for (let i = 0; i < 30; i++) {
+  await page.locator('canvas').dispatchEvent('wheel', { deltaY: 10, bubbles: true, cancelable: true })
+  await page.keyboard.down('KeyD'); await page.clock.runFor(16); await page.keyboard.up('KeyD')
+  const right = await state(page); expect(right.render.fov).toBeGreaterThan(0.1); observe('right-zoomed', right)
+  expect(Math.abs(right.markers[0].x - initial.markers[0].x), 'STRESS_MOVEMENT_NONVACUOUS').toBeGreaterThan(0.5)
+  await page.keyboard.down('KeyA'); await page.clock.runFor(16); await page.keyboard.up('KeyA')
+  observe('left-zoomed', await state(page))
+  await page.locator('canvas').dispatchEvent('wheel', { deltaY: -10, bubbles: true, cancelable: true })
+  await page.clock.runFor(16)
+  const next = await state(page); observe('telescope', next)
+  expect(next.view.fov).toBeCloseTo(0.1, 12)
+  expect(next.markers[0].x).toBeCloseTo(initial.markers[0].x, 7)
+  expect(next.markers[0].y).toBeCloseTo(initial.markers[0].y, 7)
+ }
+ expect(new Set(samples.map(s => s.state.render.pixels!.frame)).size).toBe(90)
+ await page.clock.runFor(32)
+ const final = await page.locator('canvas').screenshot()
+ await info.attach('stress-original.png', { body: first, contentType: 'image/png' })
+ await info.attach('stress-final.png', { body: final, contentType: 'image/png' })
+ await info.attach('stress.json', { body: JSON.stringify({ initial, final: await state(page), samples, errors, fixture: { targetRadiusM: 1, wheelEvents: 60, heldKeyIntervals: 60, requestedIntervalMs: 16 }, input: 'Playwright keyboard and synthetic DOM wheel; no physical input or FPS claim' }), contentType: 'application/json' })
+ expect(final.equals(first), 'STRESS_REPEAT_PIXELS').toBe(true)
+ expect(errors).toEqual([])
 })

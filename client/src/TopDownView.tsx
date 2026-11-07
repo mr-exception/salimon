@@ -69,6 +69,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     else if (restoreFocus) inventoryTrigger.current?.focus()
   }
   useEffect(() => { if (inventoryOpen) inventoryPanel.current?.focus({ preventScroll: true }) }, [inventoryOpen])
+  useEffect(() => { if (state.cockpit.view !== 'world') toggleInventory(false) }, [state.cockpit.view])
   const [saveStatus, setSaveStatus] = useState('Opening saved expedition…')
   useEffect(() => {
     if (!gameplay) return
@@ -211,6 +212,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <Button variant="secondary" onClick={() => setHelpOpen(true)}>Help</Button>
     </aside>}
     <Dialog open={helpOpen} title="Surface controls" onDismiss={() => setHelpOpen(false)}>
+      {warning && <p role="alert">{warning}</p>}
       <p>W A S D: walk · E: nearby action · Escape: close panel, then cancel interaction.</p>
       <p>I: inventory · P: pause active time. Menus do not pause time. Movement, Escape or stowing the tool interrupts gathering; partial work is saved.</p>
       <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>

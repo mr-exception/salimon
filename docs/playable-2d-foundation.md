@@ -77,10 +77,10 @@ reviewer or independent execution is claimed.
 | Exact spatial locations | `capturePlayerLocation` / `copyPlayerLocation` retain split cells, offsets, facing and frame | Validated durable local save envelope; atomic with inventory/depletion |
 | Ship-local / planet-fixed continuity | `crossScoutEntry`, `convertAnchor`; cockpit seat stays ship-local | Existing frame handoff preserved, payload counted once aboard |
 
-**Gathering (#757):** Equip the gathering tool in Field inventory, approach either
+**Gathering (#757):** Equip the gathering tool beside Field inventory, approach either
 source and use **E / Gather**. It collects up to 1 kg/s directly into the player's
 10 kg / 12-slot unified inventory. Movement, Escape or stowing the tool stops it;
-unfinished extraction progress is discarded. Weight and remaining source
+unfinished extraction work is saved per source. Weight and remaining source
 mass are shown in kg; there is no volume limit. Completed transfers, source depletion, capacities
 and frame-relative locations save together in this browser; reload never resumes
 gathering automatically. See [the resource contract](resource-inventory-and-gathering.md)

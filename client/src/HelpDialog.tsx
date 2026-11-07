@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
-export function HelpDialog({onClose,panoramic=false}:{onClose:()=>void;panoramic?:boolean}) {
+export function HelpDialog({onClose,panoramic=false, warnings}:{onClose:()=>void;panoramic?:boolean;warnings?:ReactNode}) {
   const dialog=useRef<HTMLDialogElement>(null)
   useEffect(()=>{
     dialog.current?.showModal()
@@ -8,8 +8,9 @@ export function HelpDialog({onClose,panoramic=false}:{onClose:()=>void;panoramic
     // would scroll the opening bindings out of view.
     if(panoramic)dialog.current?.querySelector('h2')?.focus()
   },[panoramic])
-  return <dialog ref={dialog} aria-labelledby="help-title" onClose={onClose}>
+  return <dialog className={panoramic ? "ui-dialog" : undefined} ref={dialog} aria-labelledby="help-title" onClose={onClose}>
     <h2 id="help-title" tabIndex={panoramic?-1:undefined}>Navigation help</h2>
+    {warnings}
     <dl>
       <dt>W / A / S / D</dt><dd>{panoramic?'Look up / left / down / right without turning the ship.':'Pan the camera up / left / down / right in the navigation view.'}</dd>
       <dt>Mouse</dt><dd>{panoramic?'Left-drag to observe in any direction. Wheel changes optical FOV from 75° to 0.1°.':'Left-drag empty space to orbit; right-drag to pan. Release to end the drag. Wheel zooms smoothly within the view limits.'}</dd>
@@ -21,6 +22,6 @@ export function HelpDialog({onClose,panoramic=false}:{onClose:()=>void;panoramic
       <dt>Reset camera</dt><dd>{panoramic?'Reset observation to current ship heading and 75° FOV.':'Restore the default camera view without changing the ship.'}</dd>
       <dt>Keyboard focus</dt><dd>Tab moves between controls; Enter activates buttons. Form fields keep their typing and slider keys. Escape or Close help dismisses this dialog.</dd>
     </dl>
-    <form method="dialog"><button autoFocus={!panoramic}>Close help</button></form>
+    <form method="dialog"><button className={panoramic ? "ui-button ui-button--secondary" : undefined} autoFocus={!panoramic}>Close help</button></form>
   </dialog>
 }

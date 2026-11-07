@@ -851,6 +851,8 @@ Follow the [reference guide](../client/tests/navigation-baselines/README.md).
 Chromium/SwiftShader, vendored fixture fonts and the screenshot-only Fontconfig policy. Retain originals, diffs, raw pixel
 counts, state/environment metadata and success/failure traces. Changed browser,
 fonts, renderer or reference hashes fail rather than regenerating baselines.
-CI requires explicit human approval of new manifest bytes; implementation agents
-must never approve their own candidates. Hardware/native qualification remains
+The human baseline-approval CI job was removed at the owner's request in PR #834;
+no approval comment or digest gate is required. The owner reviews the deployed
+version and creates follow-up issues for visual problems. Automated comparison,
+repeat and negative checks remain required. Hardware/native qualification remains
 unverified. These are browser layout/radar captures, separate from native GLBs.

@@ -1,0 +1,181 @@
+{
+  "source": "d716d840d9155af8341e4227e5a02b2f99e94f85",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "browser": "156.0.8078.4",
+    "playwright": "1.64.1",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "dpr": 1,
+    "epoch": "2026-11-06T12:00:00.000Z",
+    "locale": "en-US",
+    "timezone": "UTC",
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "fonts": {
+      "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
+      "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab"
+    }
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "dpr": 1,
+  "snapshot": {
+    "scenario": "surface",
+    "contacts": 0,
+    "selected": null,
+    "spheres": [
+      {
+        "direction": [
+          -0.9862447375540148,
+          0.14999159878409232,
+          0.06945385476130585
+        ],
+        "distanceM": 215821324136.9437,
+        "radiusRatio": 0.002363065846433196,
+        "surfaceTerm": 0.9999944159198053,
+        "angularRadius": 0.002363068045696921,
+        "lightDirection": [
+          0,
+          1,
+          0
+        ],
+        "color": [
+          1,
+          0.88,
+          0.68
+        ],
+        "emissive": true
+      },
+      {
+        "direction": [
+          -3.225803850157976e-7,
+          -0.999999999999935,
+          1.612901925078988e-7
+        ],
+        "distanceM": 6200005.000000403,
+        "radiusRatio": 0.9999991935489724,
+        "surfaceTerm": 0.0000016129014048003566,
+        "angularRadius": 1.5695263259003946,
+        "lightDirection": [
+          -0.9862404875621954,
+          0.1500196797981931,
+          0.06945355546212643
+        ],
+        "color": [
+          0.24,
+          0.36,
+          0.44
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          0.4964510337400617,
+          0.2914260729524912,
+          -0.8176840557953381
+        ],
+        "distanceM": 10265809591.7441,
+        "radiusRatio": 0.00013637502113090998,
+        "surfaceTerm": 0.9999999814018536,
+        "angularRadius": 0.0001363750215536304,
+        "lightDirection": [
+          -0.9854812345277026,
+          0.13284341263234506,
+          0.10573251209513178
+        ],
+        "color": [
+          0.48,
+          0.46,
+          0.42
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          0.6253938320077249,
+          0.18247076776171064,
+          0.7586744847423997
+        ],
+        "distanceM": 292413180332.9668,
+        "radiusRatio": 0.00003077836638468836,
+        "surfaceTerm": 0.9999999990526922,
+        "angularRadius": 0.000030778366389547786,
+        "lightDirection": [
+          -0.8852483593497379,
+          -0.04694498875339519,
+          -0.4627434605691812
+        ],
+        "color": [
+          0.24,
+          0.36,
+          0.44
+        ],
+        "emissive": false
+      },
+      {
+        "direction": [
+          -0.6291394783762081,
+          -0.0763644981214307,
+          0.7735321455344792
+        ],
+        "distanceM": 145336134251.1769,
+        "radiusRatio": 2.4082104688095883e-7,
+        "surfaceTerm": 0.999999999999942,
+        "angularRadius": 2.4082104688096116e-7,
+        "lightDirection": [
+          -0.7511923952098692,
+          0.26894542544550876,
+          -0.6028087122054506
+        ],
+        "color": [
+          0.35,
+          0.31,
+          0.28
+        ],
+        "emissive": false
+      }
+    ],
+    "origin": {
+      "cell": [
+        "0",
+        "0",
+        "0"
+      ],
+      "offsetM": [
+        53962642442,
+        -5390064239,
+        -77946039081
+      ]
+    },
+    "view": {
+      "quaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "fov": 75
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "calls": 1,
+    "triangles": 2,
+    "camera": [
+      0,
+      0,
+      0
+    ]
+  },
+  "errors": []
+}

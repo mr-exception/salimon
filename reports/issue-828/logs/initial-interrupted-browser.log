@@ -1,0 +1,64 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=panoramic
+
+[WebServer] (node:1204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1217) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1249) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1274) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:1286) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [panoramic] › tests/panoramic.spec.ts:13:1 › HUD-1 full viewport, scanner authority, keyboard browser and priority Escape (36.0s)
+  ✘  2 [panoramic] › tests/panoramic.spec.ts:71:1 › HUD-2 compass render states, ship rotation, zoom and responsive warning priority (28.3s)
+
+
+  1) [panoramic] › tests/panoramic.spec.ts:71:1 › HUD-2 compass render states, ship rotation, zoom and responsive warning priority 
+
+    Test was interrupted.
+
+    Error: locator.screenshot: Element is not attached to the DOM
+    Call log:
+      - taking element screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+      - attempting scroll into view action
+        - waiting for element to be stable
+
+
+      75 |  await scenario(page, 'rear')
+      76 |  await expect(page.locator('[data-compass=heading]')).toHaveAttribute('data-rear', 'true')
+    > 77 |  await expect(page.locator('[data-compass=velocity]')).toHaveAttribute('data-rear', 'true')
+         |                                                          ^
+      78 |  await capture(page, 'rear.png', info)
+      79 |  const rear = await page.locator('.orientation-compass').screenshot()
+      80 |  expect((await page.locator('.orientation-compass').screenshot()).equals(rear)).toBe(true)
+        at /workspace/salimon/client/tests/panoramic.spec.ts:77:58
+
+    Error Context: test-results/panoramic-HUD-2-compass-re-8cfc6-responsive-warning-priority-panoramic/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/panoramic-HUD-2-compass-re-8cfc6-responsive-warning-priority-panoramic/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/panoramic-HUD-2-compass-re-8cfc6-responsive-warning-priority-panoramic/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 interrupted
+    [panoramic] › tests/panoramic.spec.ts:71:1 › HUD-2 compass render states, ship rotation, zoom and responsive warning priority 
+  1 did not run
+  1 passed (1.3m)

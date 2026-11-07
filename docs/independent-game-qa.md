@@ -26,9 +26,11 @@ retired history and are not required acceptance checks.
 
 The existing Navigation client workflow continues to run locked installation,
 domain/integration tests, build/typecheck, browser gameplay and production WebGL,
-negative regression demonstrations, repeated visual comparisons and explicit
-approval for changed baselines. Failed or unrun mandatory functional checks still
-block acceptance. Never loosen pixel tolerances or promote candidate baselines
+negative regression demonstrations and repeated visual comparisons. The owner
+removed the human baseline-approval CI job in PR #834 and reviews appearance in
+the deployed version, filing separate issues for visual problems. No human
+approval comment or manifest digest approval is required. Failed or unrun mandatory
+functional checks still block acceptance. Never loosen pixel tolerances or promote candidate baselines
 to manufacture a pass. Reuse current-source CI and existing originals instead
 of repeating full campaigns merely to prepare a review record.
 

@@ -133,7 +133,9 @@ Future Core/Fabricator/Archive/suit-specific surfaces are **style application ta
 - **State gallery:** default, hover, focus-visible, disabled-with-reason, pending, accepted, rejected, hazard, terminal, empty inventory, capacity full, scanner zero contacts and selected/occluded/lost contact.
 - **Behavior:** focus lock, Escape hierarchy, pause versus menu, grounded cockpit, power interruption, manual observation versus ship steering, transaction interruption and authoritative HUD updates.
 - **Accessibility:** mouse, keyboard-only and reduced-motion passes; meaningful accessible names/live regions, no critical color-only signals.
-- **Regressions:** existing 2D collisions/navigation, scan permission/occlusion and save tests remain effective. Use the repository's Node/TypeScript tests, build, Playwright/Chromium and original screenshot captures with explicit baseline approval.
+- **Regressions:** existing 2D collisions/navigation, scan permission/occlusion and save tests remain effective. Use the repository's Node/TypeScript tests, build, Playwright/Chromium and original screenshot captures with retained diffs. The owner reviews appearance
+in the deployed version and files follow-up issues; no separate human baseline-approval
+CI job or approval comment is required (PR #834).
 - **Evidence:** each implementation issue reports precise commands, viewport/DPR, SHA, actual PASS/FAIL/NOT RUN and unresolved human/device qualification. Cloud software rendering cannot assert native GPU performance.
 
 ## Shared foundation implementation (#826)
@@ -173,3 +175,17 @@ human review**, not approved visual baselines. See the [#826 report](../reports/
 No new UI framework, physical 3D cockpit art, mobile interface, simulated machine operation, new game resource, gameplay balance change, authoritative backend, save migration, scanner discovery change, unscanned names, automatic pause, or photorealistic fidelity requirement.
 
 **Approval applies to design direction.** Each view's actual rendered result needs its own implementation PR, tests and screenshot review; one document cannot certify production styling. Existing #803 fullscreen 2D, #785 storage transfers, #814 panoramic compact HUD and #815 cockpit integration remain delivered as their own distinct feature scopes.
+
+
+## Panoramic adoption (#828)
+
+The delivered panoramic HUD now consumes the shared DOM token source and control,
+utility-panel and dialog skins. Its compact native controls preserve the existing
+disabled and keyboard contract. Opaque `--ui-void` surfaces isolate text contrast
+from celestial brightness; warning/terminal text uses mechanical/danger inks and
+the compass alone consumes heading/velocity inks. Seated survival remains available
+in its own bounded column above the compass, with expanded telemetry beside it.
+See the [panoramic contract](panoramic-navigation-design.md#shared-projected-instrumentation-828)
+and [original captures/results](../reports/issue-828/README.md). Styling acceptance
+in the deployed version remains separate from functional passes; no separate
+human reference-approval CI job is required.

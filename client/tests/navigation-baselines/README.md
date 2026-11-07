@@ -1,13 +1,14 @@
 # Navigation visual references (#751)
 
-These eight original #751 images are **corrected candidates pending explicit human approval**.
+These eight original #751 images are retained visual references.
 The initial proposal exposed a hidden native-select host-font dependency. The
 current proposal pins Fontconfig to the licensed vendored DejaVu files; the only
 image changes are the selected-value glyphs. See the [upgrade measurements](../../../reports/issue-751/candidate-upgrade.json)
 and [original candidates](../../../reports/issue-751/initial-candidates/manifest.json).
-Previous manifest approval does not approve this new digest.
-Pixel equality is separate from accepting a reference as correct. The CI approval
-gate must pass before QA acceptance. No implementation agent may post approval.
+Pixel equality is separate from subjective acceptance. At the owner's request in
+PR #834, CI no longer requires a human approval comment or manifest digest approval.
+The owner reviews the deployed version and files separate issues for visual
+problems. Automated functional, reference, repeat and negative checks remain required.
 
 | Original | Observable case |
 | --- | --- |
@@ -64,37 +65,28 @@ Only the two velocity-visible frames must fail, with >100 changed pixels each;
 the other six must pass. Timeout, startup error or unrelated visual failures do
 not count as detecting the defect. It never edits checkout references.
 
-## Propose and independently approve a baseline
+<a id="propose-and-independently-approve-a-baseline"></a>
 
-1. First investigate the unexpected difference. Never update references merely
-   because a check fails. Browser/OS upgrades are separate deliberate changes;
-   retain old and new originals, environment versions, metrics and upgrade reason.
-2. Generate *candidates* outside the tracked reference directory:
+## Update visual references
+
+1. Investigate unexpected differences. Do not update references merely because a
+   check fails. Retain old/new originals, environment versions, metrics and the
+   reason for an intentional appearance or environment change.
+2. Generate candidates outside the tracked reference directory:
    `SALIMON_CAPTURE_CANDIDATES=/tmp/navigation-candidates npm run test:visual`.
-   Candidate generation is forbidden in CI. `--update-snapshots` has no effect on
-   this custom comparator and cannot update these files.
-3. Copy reviewed candidates and their complete `manifest.json` into this directory
-   in a dedicated reviewable change. Run normal comparisons twice and the negative
-   driver; preserve the previous originals in git and expected/diff artifacts.
-4. A human repository OWNER/MEMBER/COLLABORATOR independently reviews every image,
-   environment/threshold change, functional tests and diff. Post exactly this on
-   the delivering PR, substituting the SHA-256 of the **manifest bytes**:
-   `Approve navigation baselines: <sha256>`.
-   Agents must never write this comment, impersonate the reviewer or count their
-   own image judgment as approval. The human can use the same GitHub account that
-   hosts an agent-authored PR; independence is from the implementing agent.
-5. Rerun the failed `baseline-approval` job (the successful browser/build job does
-   not need to run again). It validates image hashes and accepts only
-   that exact digest from a human collaborator (Bot/unaffiliated accounts fail).
-   Any changed manifest invalidates the approval. A byte-identical manifest
-   inherited from the PR base needs no repeat approval. Baseline approval does
-   not replace independent implementation QA or authorize merging.
+   Candidate generation is forbidden in CI; `--update-snapshots` cannot update
+   this custom comparator's references.
+3. Inspect candidates and copy their complete `manifest.json` and images here in
+   a reviewable change. Run normal comparisons twice and the negative driver;
+   retain previous originals in git and expected/diff artifacts.
+4. Publish the evidence with the implementation. No human approval comment,
+   manifest digest approval or separate `baseline-approval` CI job is required.
+   The owner reviews the deployed version and creates separate issues if needed.
+   This changes subjective review timing, not pixel thresholds or functional gates.
 
-GitHub branch protection must require the Navigation client check for enforcement
-at merge; this issue does not change repository administration settings. A repo
-maintainer can always alter workflow policy; ordinary implementation agents cannot
-waive it. Review comments are audit evidence, not a cryptographic proof of who
-operated an account. Required human decisions stay visible as BLOCKED until made.
+The former `npm run test:visual:approval` script remains a legacy optional tool;
+it is not invoked by CI or required for delivery. This PR does not change repository
+branch protection or merge/deployment authority.
 
 Software SwiftShader browser coverage does not qualify physical input, discrete
 GPUs, Metal, Windows rendering, native platforms, hardware FPS or subjective art.
@@ -102,10 +94,9 @@ Historical native mesh regression #228 is a distinct renderer/asset contract.
 
 ## Panoramic candidates (#816)
 
-The shared manifest adds **19 panoramic candidates awaiting human review**; the
-eight older PNGs and their environment/pixel policy are unchanged. The same
-baseline-approval job checks the complete manifest digest. A passing comparison
-does not approve either a new reference or its appearance.
+The shared manifest includes 19 panoramic references; the eight older PNGs and
+their environment/pixel policy are unchanged. A passing comparison demonstrates
+repeatability, not subjective appearance approval. No human approval job is required.
 
 | Originals | Case |
 | --- | --- |
@@ -125,4 +116,14 @@ Generate a complete proposal with
 inspect it, then copy the proposed PNGs/manifest here in a reviewable change.
 Normal comparisons run the shared pixel policy, and the negative driver retains
 a deliberately mutated expected telescope image, its isolated failure and trace.
-Human approval and merge authority remain separate from these local checks.
+Deployed-version review and merge authority remain with the owner.
+
+
+## Shared panoramic styling proposal (#828)
+
+Five HUD candidates now use the shared projected-instrument palette and controls:
+stationary/rear/overlap compass and small warning/terminal. The 14 optical/sensor
+panoramic and eight orthographic originals remain byte-identical. No environment
+or comparison policy changes. These five replacements are covered by automated
+comparisons; the owner reviews their appearance in the deployed version.
+See [originals, diffs, measurements and exact digest](../../../reports/issue-828/README.md).

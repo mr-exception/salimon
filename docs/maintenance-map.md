@@ -17,6 +17,10 @@ Panoramic acceptance (#816) extends the existing navigation-captures project in
 `tests/panoramic-captures.spec.ts`, optical/sensor regressions and the existing
 negative scripts; `scripts/negative-panoramic.mjs` proves one expected-image
 mutation fails. References share the existing manifest and human-approval gate.
+Panoramic styling consumes the shared `ui/tokens.css` and `ui/primitives.css`
+presentation classes; native control handlers and domain owners stay in place.
+`HUD-STYLE`/`HUD-BRIGHT` cover viewport contrast and focused warning summaries;
+see [#828](../reports/issue-828/README.md).
 See the [browser verification contract](../client/README.md#deterministic-navigation-regression-750).
 The shared 2D world is owned by `topDownRuntime.ts`/`topDownFrames.ts`, collision
 and reach by `topDownInteraction.ts`, doorway ownership/location snapshots by
@@ -958,11 +962,13 @@ Browser edge lines #738: `client/src/radar.ts` owns finite segment clipping, tru
 
 Browser visual QA #751: `client/tests/navigation-captures.spec.ts` captures the
 production App through the #750 deterministic fixture. `client/scripts/visual-comparison.ts`
-owns pixel policy and independent human approval matching; `baseline-approval.ts`
-validates baseline hashes and checks the PR's approval evidence. The
+owns pixel policy and legacy human approval matching; `baseline-approval.ts`
+is an optional legacy tool, no longer invoked by CI after PR #834. The
 [reference guide](../client/tests/navigation-baselines/README.md) owns candidate,
 review, environment upgrade and artifact retention procedures. Reference pixel
-comparisons and human baseline approval are separate required gates.
+comparisons, repeats and negative checks remain required. Subjective visual review
+happens in the deployed version with follow-up issues; no human baseline-approval
+CI job or approval comment is required.
 
 
 ## Top-down browser foundation (#761)

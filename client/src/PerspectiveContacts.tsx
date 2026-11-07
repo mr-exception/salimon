@@ -17,6 +17,8 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  getShip: () => ShipState; canPilot?: () => boolean
  onSetDirection?: (body: Body) => void
 }) {
+ // Preserve native disabled/tab behavior while consuming the shared control skin.
+ const buttonClass = compact ? 'ui-button ui-button--secondary' : undefined
  const root = useRef<HTMLDivElement>(null)
  const [, redraw] = useState(0)
  const [query, setQuery] = useState(''), [page, setPage] = useState(0)
@@ -39,7 +41,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  const choose = (id: string) => { selectContact(scanner, getOrigin(), id); redraw(n => n + 1) }
  return <div ref={root} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
   {markers.map(marker => <button key={marker.id} data-sensor-marker aria-label={`Sensor contact ${marker.ids.length === 1 ? contacts.find(b => b.id === marker.id)?.name : `group of ${marker.ids.length}`}`}
-   style={{ position: 'absolute', left: marker.x, top: marker.y, transform: 'translate(-50%, -50%)', width: 32, height: 32, borderRadius: '50%', color: '#9feaff', background: '#102431aa', border: '1px solid #9feaff', pointerEvents: 'auto' }}
+   style={{ position: 'absolute', left: marker.x, top: marker.y, transform: 'translate(-50%, -50%)', width: 32, height: 32, borderRadius: '50%', color: compact ? 'var(--ui-active)' : '#9feaff', background: compact ? 'var(--ui-void)' : '#102431aa', border: compact ? '1px solid var(--ui-active)' : '1px solid #9feaff', pointerEvents: 'auto' }}
    onClick={() => {
     const live = perspectiveMarkers(currentContacts(scanner, getOrigin()), geometry, getOrigin(), view.snapshot(), root.current!.clientWidth, root.current!.clientHeight).find(m => m.id === marker.id)
     if (!live) return
@@ -48,24 +50,24 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
    }}>{marker.ids.length === 1 ? '+' : marker.ids.length}</button>)}
   <section className={compact ? "panoramic-contacts" : undefined} aria-label="Detected contacts" style={compact ? undefined : { position: 'absolute', right: 8, top: 8, width: 240, padding: 12, color: 'white', background: '#102431ee', pointerEvents: 'auto' }}>
    {!compact && <details><summary>Observation help</summary><p>Look at turns only the camera once, preserving zoom and ship motion. Drag, W/A/S/D or wheel cancels it. Set direction turns only the ship without thrust; arrow keys cancel that turn. Grounded ships can observe other detected bodies, but cannot aim at their landing planet center. Typing and focused controls do not steer the view.</p></details>}
-   {compact && <button className="contacts-toggle" aria-expanded={browserOpen} aria-controls="scanned-browser" onClick={() => onBrowserChange?.(!browserOpen)}>Contacts (C) · {contacts.length}</button>}
-   {browserOpen && <div id="scanned-browser" className={compact ? "scanned-browser" : undefined}>
+   {compact && <button className={`${buttonClass} contacts-toggle`} aria-expanded={browserOpen} aria-controls="scanned-browser" onClick={() => onBrowserChange?.(!browserOpen)}>Contacts (C) · {contacts.length}</button>}
+   {browserOpen && <div id="scanned-browser" className={compact ? "scanned-browser ui-panel ui-panel--utility" : undefined}>
    <label>Search contacts <input value={query} onChange={e => { setQuery(e.target.value); setPage(0) }}/></label>
-   {group && <button onClick={() => { setGroup(null); setPage(0) }}>All contacts</button>}
+   {group && <button className={buttonClass} onClick={() => { setGroup(null); setPage(0) }}>All contacts</button>}
    {group && !activeGroup && <p>Group no longer visible</p>}
-   <ul>{entries.slice(currentPage * 8, currentPage * 8 + 8).map(body => <li key={body.id}><button aria-pressed={selected?.id === body.id} onClick={() => choose(body.id)}>{body.name}</button></li>)}</ul>
-   <button disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Previous</button>
+   <ul>{entries.slice(currentPage * 8, currentPage * 8 + 8).map(body => <li key={body.id}><button className={buttonClass} aria-pressed={selected?.id === body.id} onClick={() => choose(body.id)}>{body.name}</button></li>)}</ul>
+   <button className={buttonClass} disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Previous</button>
    <span> {currentPage + 1}/{last + 1} </span>
-   <button disabled={currentPage === last} onClick={() => setPage(currentPage + 1)}>Next</button>
+   <button className={buttonClass} disabled={currentPage === last} onClick={() => setPage(currentPage + 1)}>Next</button>
    </div>}
-   <div className="selected-contact"><p role="status">{selected ? `Selected: ${selected.name}` : 'No selection'}</p>
+   <div className={compact ? "selected-contact ui-panel ui-panel--utility" : "selected-contact"}><p role="status">{selected ? `Selected: ${selected.name}` : 'No selection'}</p>
    {selected && availability && <>
     {availability.currentPlanet && <p>Current landing planet: {selected.name}</p>}
-    <button disabled={!availability.lookAt} onClick={() => {
+    <button className={buttonClass} disabled={!availability.lookAt} onClick={() => {
      const live = selectedContact(scanner, getOrigin())
      if (live) lookAtContact(scanner, getShip(), view, live.id)
     }}>Look at</button>
-    {onSetDirection && <button disabled={!availability.setDirection} onClick={() => {
+    {onSetDirection && <button className={buttonClass} disabled={!availability.setDirection} onClick={() => {
      const live = selectedContact(scanner, getOrigin())
      if (live && contactCommandAvailability(getShip(), live, canPilot()).setDirection) onSetDirection(live)
     }}>Set direction</button>}

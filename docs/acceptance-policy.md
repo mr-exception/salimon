@@ -108,7 +108,7 @@ baselines is owned by #750–#752. It does not itself alter branch protection.
 The owner retired the automated #752 review/status gate on 2026-11-04.
 [Review in the active chat](independent-game-qa.md) replaces its handoff packets,
 status publication and scheduled invalidation. The Navigation client domain,
-build, browser, negative/repeat and baseline-approval checks remain required
+build, browser and negative/repeat checks remain required
 where applicable. No separate reviewer identity, machine review record or
 `salimon/independent-qa` status is required. A retired legacy status is historical;
 it does not replace the active review or grant merge authority.
@@ -117,8 +117,12 @@ Fix mandatory cloud failures or leave the task incomplete. Missing cloud tooling
 requires a repair attempt or a meaningful equivalent reviewed against the same
 criterion. An external outage remains BLOCKED; it cannot become a pass. Never
 weaken a threshold, add masks or regenerate approved baselines to get green tests.
-Baseline promotion needs explicit independent approval through the existing review
-workflow; a candidate image is not an approved reference.
+The owner removed the separate human baseline-approval CI job in PR #834.
+Intentional reference updates still need reviewable originals, diffs, hashes and
+passing automated comparisons/repeats/negative checks. No human approval comment
+or manifest digest approval is required. The owner reviews the deployed version
+and files separate issues for subjective visual regressions; this does not waive
+functional checks or authorize merge/deployment.
 
 Keep genuinely physical, hardware-specific, subjective or rights decisions in
 separately linked human-verification work with exact scope, owner and instructions

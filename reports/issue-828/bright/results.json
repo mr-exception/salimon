@@ -1,0 +1,476 @@
+{
+  "config": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "/workspace/salimon/client/node_modules/.bin/playwright",
+      "test",
+      "--project=panoramic",
+      "--grep",
+      "HUD-BRIGHT"
+    ],
+    "configFile": "/workspace/salimon/client/playwright.config.ts",
+    "rootDir": "/workspace/salimon/client/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "ui",
+        "name": "ui",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/ui\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "panoramic",
+        "name": "panoramic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/panoramic\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "look-at",
+        "name": "look-at",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/look-at\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "perspective",
+        "name": "perspective",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/perspective\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "optical",
+        "name": "optical",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/optical\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "observation",
+        "name": "observation",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/observation\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "cockpit",
+        "name": "cockpit",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(cockpit|playable-slice|gathering|storage|items|survival|hazards|viewport)\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "top-down",
+        "name": "top-down",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/top-down\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "navigation-captures",
+        "name": "navigation-captures",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(navigation|panoramic)-captures\\.spec\\.ts/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deterministic",
+        "name": "deterministic",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/deterministic\\.spec\\.ts/"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(desktop|visuals|edges|panning)\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "production",
+        "name": "production",
+        "testDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/production\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/workspace/salimon/reports/issue-828/bright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "panoramic",
+        "testDir": "/workspace/salimon/client/tests",
+        "snapshotDir": "/workspace/salimon/client/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5175",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "deviceScaleFactor": 1,
+          "locale": "en-US",
+          "timezoneId": "UTC",
+          "colorScheme": "dark",
+          "reducedMotion": "reduce",
+          "screenshot": "on",
+          "trace": {
+            "mode": "retain-on-failure",
+            "snapshots": false,
+            "screenshots": false,
+            "sources": true
+          },
+          "launchOptions": {
+            "args": [
+              "--use-angle=swiftshader",
+              "--enable-unsafe-swiftshader",
+              "--disable-lcd-text"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "panoramic"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../reports/issue-828/bright/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "panoramic.spec.ts",
+      "file": "panoramic.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "HUD-BRIGHT warning summaries survive focused help over a bright body at 960",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "panoramic",
+              "projectName": "panoramic",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4128,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T15:52:42.556Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "bright-body-warning.png",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-121f3-p-over-a-bright-body-at-960-panoramic/attachments/bright-body-warning-png-d1e338603c54e436a825b50b0b2247f67a30f602.png"
+                    },
+                    {
+                      "name": "bright-body.json",
+                      "contentType": "application/json",
+                      "body": "eyJ2aWV3cG9ydCI6eyJ3aWR0aCI6OTYwLCJoZWlnaHQiOjYwMH0sImJhY2tncm91bmQiOlsyNTUsMjI0LDE3M10sInN0YXRlIjp7InNoaXAiOnsicG9zaXRpb24iOnsiY2VsbCI6WyIwIiwiMCIsIjAiXSwib2Zmc2V0TSI6WzAsNTAwMCwtOTgwMTMuMzMzMzMzMzMzMzFdfSwidmVsb2NpdHlNcHMiOlswLDAsLTIwMF0sInlhdyI6MCwicGl0Y2giOjAsIm1hc3NLZyI6MTAwMDAwLCJ0aHJvdHRsZSI6MCwiYWxpZ25tZW50IjpudWxsLCJtb2RlIjoiZmx5aW5nIiwiY29udGFjdCI6bnVsbCwidGljayI6MzA3fSwidmlldyI6eyJxdWF0ZXJuaW9uIjpbMCwwLDAsMV0sImZvdiI6NzV9LCJjb250YWN0cyI6WyJjb250YWN0LTAiLCJjb250YWN0LTEiLCJjb250YWN0LTEwIiwiY29udGFjdC0xMSIsImNvbnRhY3QtMTIiLCJjb250YWN0LTEzIiwiY29udGFjdC0xNCIsImNvbnRhY3QtMTUiLCJjb250YWN0LTE2IiwiY29udGFjdC0xNyIsImNvbnRhY3QtMTgiLCJjb250YWN0LTE5IiwiY29udGFjdC0yIiwiY29udGFjdC0yMCIsImNvbnRhY3QtMjEiLCJjb250YWN0LTIyIiwiY29udGFjdC0yMyIsImNvbnRhY3QtMjQiLCJjb250YWN0LTI1IiwiY29udGFjdC0yNiIsImNvbnRhY3QtMjciLCJjb250YWN0LTI4IiwiY29udGFjdC0yOSIsImNvbnRhY3QtMyIsImNvbnRhY3QtMzAiLCJjb250YWN0LTMxIiwiY29udGFjdC0zMiIsImNvbnRhY3QtMzMiLCJjb250YWN0LTM0IiwiY29udGFjdC0zNSIsImNvbnRhY3QtMzYiLCJjb250YWN0LTM3IiwiY29udGFjdC0zOCIsImNvbnRhY3QtMzkiLCJjb250YWN0LTQiLCJjb250YWN0LTUiLCJjb250YWN0LTYiLCJjb250YWN0LTciLCJjb250YWN0LTgiLCJjb250YWN0LTkiXSwicmVuZGVyZXIiOiJBTkdMRSAoR29vZ2xlLCBWdWxrYW4gMS4zLjAgKFN3aWZ0U2hhZGVyIERldmljZSAoU3ViemVybykgKDB4MDAwMEMwREUpKSwgU3dpZnRTaGFkZXIgZHJpdmVyKSIsImV4aXRzIjowfX0="
+                    },
+                    {
+                      "name": "bright-body-focused-warning.png",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-121f3-p-over-a-bright-body-at-960-panoramic/attachments/bright-body-focused-warning-png-72c882cc8741f9214ca752bb2c7b34fab8084c7e.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-121f3-p-over-a-bright-body-at-960-panoramic/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "14c32449942346a2da4d-95d8ccbfc8cf1bed2663",
+          "file": "panoramic.spec.ts",
+          "line": 186,
+          "column": 2
+        },
+        {
+          "title": "HUD-BRIGHT warning summaries survive focused help over a bright body at 1280",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "panoramic",
+              "projectName": "panoramic",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5085,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T15:52:46.815Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "bright-body-warning.png",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-6763b--over-a-bright-body-at-1280-panoramic/attachments/bright-body-warning-png-cd7bc00ebd5848564d6c41d6921e7953ea5563c7.png"
+                    },
+                    {
+                      "name": "bright-body.json",
+                      "contentType": "application/json",
+                      "body": "eyJ2aWV3cG9ydCI6eyJ3aWR0aCI6MTI4MCwiaGVpZ2h0Ijo3MjB9LCJiYWNrZ3JvdW5kIjpbMjU1LDIyNCwxNzNdLCJzdGF0ZSI6eyJzaGlwIjp7InBvc2l0aW9uIjp7ImNlbGwiOlsiMCIsIjAiLCIwIl0sIm9mZnNldE0iOlswLDUwMDAsLTk4MDEzLjMzMzMzMzMzMzMxXX0sInZlbG9jaXR5TXBzIjpbMCwwLC0yMDBdLCJ5YXciOjAsInBpdGNoIjowLCJtYXNzS2ciOjEwMDAwMCwidGhyb3R0bGUiOjAsImFsaWdubWVudCI6bnVsbCwibW9kZSI6ImZseWluZyIsImNvbnRhY3QiOm51bGwsInRpY2siOjMwN30sInZpZXciOnsicXVhdGVybmlvbiI6WzAsMCwwLDFdLCJmb3YiOjc1fSwiY29udGFjdHMiOlsiY29udGFjdC0wIiwiY29udGFjdC0xIiwiY29udGFjdC0xMCIsImNvbnRhY3QtMTEiLCJjb250YWN0LTEyIiwiY29udGFjdC0xMyIsImNvbnRhY3QtMTQiLCJjb250YWN0LTE1IiwiY29udGFjdC0xNiIsImNvbnRhY3QtMTciLCJjb250YWN0LTE4IiwiY29udGFjdC0xOSIsImNvbnRhY3QtMiIsImNvbnRhY3QtMjAiLCJjb250YWN0LTIxIiwiY29udGFjdC0yMiIsImNvbnRhY3QtMjMiLCJjb250YWN0LTI0IiwiY29udGFjdC0yNSIsImNvbnRhY3QtMjYiLCJjb250YWN0LTI3IiwiY29udGFjdC0yOCIsImNvbnRhY3QtMjkiLCJjb250YWN0LTMiLCJjb250YWN0LTMwIiwiY29udGFjdC0zMSIsImNvbnRhY3QtMzIiLCJjb250YWN0LTMzIiwiY29udGFjdC0zNCIsImNvbnRhY3QtMzUiLCJjb250YWN0LTM2IiwiY29udGFjdC0zNyIsImNvbnRhY3QtMzgiLCJjb250YWN0LTM5IiwiY29udGFjdC00IiwiY29udGFjdC01IiwiY29udGFjdC02IiwiY29udGFjdC03IiwiY29udGFjdC04IiwiY29udGFjdC05Il0sInJlbmRlcmVyIjoiQU5HTEUgKEdvb2dsZSwgVnVsa2FuIDEuMy4wIChTd2lmdFNoYWRlciBEZXZpY2UgKFN1Ynplcm8pICgweDAwMDBDMERFKSksIFN3aWZ0U2hhZGVyIGRyaXZlcikiLCJleGl0cyI6MH19"
+                    },
+                    {
+                      "name": "bright-body-focused-warning.png",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-6763b--over-a-bright-body-at-1280-panoramic/attachments/bright-body-focused-warning-png-b72d3de8ab373c8bfdcedbaa726eaa2174223315.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-6763b--over-a-bright-body-at-1280-panoramic/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "14c32449942346a2da4d-85287bfe9cb337a70040",
+          "file": "panoramic.spec.ts",
+          "line": 186,
+          "column": 2
+        },
+        {
+          "title": "HUD-BRIGHT warning summaries survive focused help over a bright body at 1920",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "panoramic",
+              "projectName": "panoramic",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11627,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T15:52:51.919Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "bright-body-warning.png",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-fb431--over-a-bright-body-at-1920-panoramic/attachments/bright-body-warning-png-03bc7f7a96442cd4948c39e8ffff5fcef89f6290.png"
+                    },
+                    {
+                      "name": "bright-body.json",
+                      "contentType": "application/json",
+                      "body": "eyJ2aWV3cG9ydCI6eyJ3aWR0aCI6MTkyMCwiaGVpZ2h0IjoxMDgwfSwiYmFja2dyb3VuZCI6WzI1NSwyMjQsMTczXSwic3RhdGUiOnsic2hpcCI6eyJwb3NpdGlvbiI6eyJjZWxsIjpbIjAiLCIwIiwiMCJdLCJvZmZzZXRNIjpbMCw1MDAwLC05ODAxMy4zMzMzMzMzMzMzMV19LCJ2ZWxvY2l0eU1wcyI6WzAsMCwtMjAwXSwieWF3IjowLCJwaXRjaCI6MCwibWFzc0tnIjoxMDAwMDAsInRocm90dGxlIjowLCJhbGlnbm1lbnQiOm51bGwsIm1vZGUiOiJmbHlpbmciLCJjb250YWN0IjpudWxsLCJ0aWNrIjozMDd9LCJ2aWV3Ijp7InF1YXRlcm5pb24iOlswLDAsMCwxXSwiZm92Ijo3NX0sImNvbnRhY3RzIjpbImNvbnRhY3QtMCIsImNvbnRhY3QtMSIsImNvbnRhY3QtMTAiLCJjb250YWN0LTExIiwiY29udGFjdC0xMiIsImNvbnRhY3QtMTMiLCJjb250YWN0LTE0IiwiY29udGFjdC0xNSIsImNvbnRhY3QtMTYiLCJjb250YWN0LTE3IiwiY29udGFjdC0xOCIsImNvbnRhY3QtMTkiLCJjb250YWN0LTIiLCJjb250YWN0LTIwIiwiY29udGFjdC0yMSIsImNvbnRhY3QtMjIiLCJjb250YWN0LTIzIiwiY29udGFjdC0yNCIsImNvbnRhY3QtMjUiLCJjb250YWN0LTI2IiwiY29udGFjdC0yNyIsImNvbnRhY3QtMjgiLCJjb250YWN0LTI5IiwiY29udGFjdC0zIiwiY29udGFjdC0zMCIsImNvbnRhY3QtMzEiLCJjb250YWN0LTMyIiwiY29udGFjdC0zMyIsImNvbnRhY3QtMzQiLCJjb250YWN0LTM1IiwiY29udGFjdC0zNiIsImNvbnRhY3QtMzciLCJjb250YWN0LTM4IiwiY29udGFjdC0zOSIsImNvbnRhY3QtNCIsImNvbnRhY3QtNSIsImNvbnRhY3QtNiIsImNvbnRhY3QtNyIsImNvbnRhY3QtOCIsImNvbnRhY3QtOSJdLCJyZW5kZXJlciI6IkFOR0xFIChHb29nbGUsIFZ1bGthbiAxLjMuMCAoU3dpZnRTaGFkZXIgRGV2aWNlIChTdWJ6ZXJvKSAoMHgwMDAwQzBERSkpLCBTd2lmdFNoYWRlciBkcml2ZXIpIiwiZXhpdHMiOjB9fQ=="
+                    },
+                    {
+                      "name": "bright-body-focused-warning.png",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-fb431--over-a-bright-body-at-1920-panoramic/attachments/bright-body-focused-warning-png-54a745d162fe87b4375619e3d679f2e113664547.png"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/salimon/reports/issue-828/bright/panoramic-HUD-BRIGHT-warni-fb431--over-a-bright-body-at-1920-panoramic/test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "14c32449942346a2da4d-dd82113afcef0e7ad0ab",
+          "file": "panoramic.spec.ts",
+          "line": 186,
+          "column": 2
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T15:52:36.556Z",
+    "duration": 27100.264,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

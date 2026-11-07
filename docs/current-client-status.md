@@ -1,6 +1,6 @@
 # Current browser implementation and contract routing
 
-> **Shared UI foundation (#826) and compact 2D HUD (#827):** the [Expedition Interface HUD/equipment style guide](hud-ui-style-guide.md) specifies a future cross-view industrial/projected visual system. Scoped tokens and typed primitives now have a development-only light/dark gallery (`client/src/ui`, `tests/ui.html`); the production 2D HUD now consumes its tokens, meters, progress, inventory utility and help dialog. Production panoramic instruments and the storage dialog retain their existing implementation pending their own adoption; compact survival/help/pause remain available in the cockpit. No new gameplay mechanics follow from the style approval.
+> **Shared UI foundation (#826), compact 2D HUD (#827) and panoramic styling (#828):** the [Expedition Interface HUD/equipment style guide](hud-ui-style-guide.md) specifies the shared industrial/projected visual system. Scoped tokens and typed primitives now have a development-only light/dark gallery (`client/src/ui`, `tests/ui.html`); the production 2D HUD now consumes its tokens, meters, progress, inventory utility and help dialog. Production panoramic instruments now consume the shared control, utility-panel and dialog skins, with opaque readouts and warning summaries inside help; compact survival/help/pause remain available in the cockpit. The storage dialog awaits its separate adoption. See [#828 evidence](../reports/issue-828/README.md). No new gameplay mechanics follow from the style approval.
 
 > **Panoramic cockpit (#815):** Default `/` opens the shared grounded panoramic observation scene at the Scout desk. The isolated `/?scene=radar` keeps the orthographic free-flight engineering fixture. See [the delivered integration](../client/README.md#cockpit-gameplay-766).
 
@@ -54,7 +54,9 @@ precedence over incompatible native/earlier designs. No approved number changes 
 Use Node >=22.18, `cd client`, `npm ci`, `npm test`, `npm run build`,
 `npx playwright install --with-deps chromium`, and `npm run test:browser`.
 The [Navigation client workflow](../.github/workflows/navigation-client.yml) also
-runs negative mutations, repeat visual comparisons and baseline approval.
+runs negative mutations and repeat visual comparisons. The owner removed the
+human baseline-approval job in PR #834; deployed-version visual review and
+follow-up issues replace that gate.
 Use affected suites during iteration; honor each issue's mandatory matrix.
 Documentation-only changes require links/semantic checks; browser/runtime/E2E
 checks are N/A when behavior is unchanged. Native/M1/Metal checks do not gate
@@ -63,7 +65,7 @@ their actual context, not physical hardware performance.
 
 Review code, criteria and actual evidence in the active implementation chat;
 no independent reviewer or retired automated QA gate is required. Preserve failed
-and unrun checks. Human retains baseline approval and merge authority.
+and unrun checks. The owner retains deployed-version visual review and merge authority.
 
 The #810 perspective camera foundation is available in development fixture
 `/tests/observation.html`: inertial full-sphere observation, ship-relative origin,

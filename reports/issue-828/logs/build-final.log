@@ -1,0 +1,22 @@
+
+> salimon-navigation-client@0.1.0 build
+> tsc -b && vite build --outDir /tmp/issue-828-final-dist
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 109 modules transformed.
+
+(!) outDir /tmp/issue-828-final-dist is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../tmp/issue-828-final-dist/index.html                     0.37 kB │ gzip:   0.28 kB
+../../../tmp/issue-828-final-dist/assets/index-ZrqqcGVF.css     19.71 kB │ gzip:   4.77 kB
+../../../tmp/issue-828-final-dist/assets/index-DTah5g4T.js   1,461.49 kB │ gzip: 418.24 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 8.10s

@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
-export function HelpDialog({onClose,panoramic=false}:{onClose:()=>void;panoramic?:boolean}) {
+export function HelpDialog({onClose,panoramic=false, warnings}:{onClose:()=>void;panoramic?:boolean;warnings?:ReactNode}) {
   const dialog=useRef<HTMLDialogElement>(null)
   useEffect(()=>{
     dialog.current?.showModal()
@@ -10,6 +10,7 @@ export function HelpDialog({onClose,panoramic=false}:{onClose:()=>void;panoramic
   },[panoramic])
   return <dialog className={panoramic ? "ui-dialog" : undefined} ref={dialog} aria-labelledby="help-title" onClose={onClose}>
     <h2 id="help-title" tabIndex={panoramic?-1:undefined}>Navigation help</h2>
+    {warnings}
     <dl>
       <dt>W / A / S / D</dt><dd>{panoramic?'Look up / left / down / right without turning the ship.':'Pan the camera up / left / down / right in the navigation view.'}</dd>
       <dt>Mouse</dt><dd>{panoramic?'Left-drag to observe in any direction. Wheel changes optical FOV from 75° to 0.1°.':'Left-drag empty space to orbit; right-drag to pan. Release to end the drag. Wheel zooms smoothly within the view limits.'}</dd>

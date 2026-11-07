@@ -103,3 +103,31 @@ Implement on top of the existing React/TypeScript + Three.js + React Three Fiber
 Each implementation issue is separately scoped and blocked by the documentation PR #809 merge (plus its actual technical prerequisites). This document is not an implementation status report.
 
 These packages track implementation; see [code-checked status](current-client-status.md) for delivered scope and reports. Track actual prerequisites, scope and cloud verification in GitHub issues. Coordinate with historical radar tickets #737, #744, browser QA #750/#751 and shared location #802 rather than reopening already-delivered orthographic requirements.
+
+
+## Shared projected instrumentation (#828)
+
+The production `PanoramicNavigation` root consumes `.expedition-ui` tokens and
+shared `ui-button`, `ui-panel--utility` and `ui-dialog` presentation classes.
+The native buttons retain their existing disabled/tab behavior and command
+handlers; this adoption does not substitute the foundation Button's deliberately
+focusable `aria-disabled` policy. Search and throttle use the same palette,
+focus ring and typography. Opaque instrument surfaces preserve text contrast
+against both bright bodies and near-black sky without changing optical rendering.
+The compass consumes the reserved heading/velocity tokens, preserving its shapes,
+hemisphere calculation and stationary threshold; cyan remains the view axis.
+
+Contacts and telemetry stay collapsed by default. Expanded telemetry starts to
+the right of the seated survival column; survival has a bounded scroll region
+above the compass. Navigation warnings retain a separate top-left priority slot,
+with explicit terminal text and restart action. No permanent sidebar, simulated
+cockpit structure, extra scene effect or navigation authority is introduced.
+
+`HUD-STYLE` extends the panoramic browser fixture with 960×600, 1280×720 and
+1920×1080 grounded-horizon/dark-contact captures, focused help, keyboard isolation,
+viewport bounds and numerical contrast checks. `HUD-BRIGHT` adds an actual
+bright-star render at all three sizes, checks a bright background pixel and
+verifies navigation/survival warning summaries remain visible inside focused help. Existing `HUD`, `LOOK`, sensor,
+`COCKPIT-1` and PANO-VIS coverage still owns functional/camera/scanner/lifecycle
+acceptance. See [issue #828 evidence](../reports/issue-828/README.md). Changed
+reference images remain candidates requiring explicit human baseline approval.

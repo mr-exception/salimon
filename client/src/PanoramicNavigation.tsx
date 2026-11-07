@@ -19,8 +19,8 @@ import './panoramic.css'
 /** Reusable presentation. The cockpit lifecycle owner supplies the runtime and
  * local view; no simulation, discovery or view lifetime belongs to the camera.
  */
-export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true }: {
-  advanceSimulation?: boolean; navigation: NavigationRuntime; view: ObservationCameraState; canPilot?: () => boolean
+export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true, conditionWarning = '' }: {
+  conditionWarning?: string; advanceSimulation?: boolean; navigation: NavigationRuntime; view: ObservationCameraState; canPilot?: () => boolean
   opticalBodies?: readonly Body[]
   isPaused?: () => boolean; onExit?: () => void; onSceneReady?: (state: RootState) => void
 }) {
@@ -135,6 +135,10 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       {grounded && <p>Scout grounded. Takeoff and relocation unavailable; observation and scanner remain available.</p>}
       <p>Illustrative universe · unlimited energy. Impacts at 100 m/s or faster end the run.</p>
     </section>}
-    {help && <HelpDialog panoramic onClose={() => setHelp(false)}/>}
+    {help && <HelpDialog panoramic onClose={() => setHelp(false)} warnings={<>
+      {conditionWarning && <p className="ui-status ui-status--warning" role="alert">{conditionWarning}</p>}
+      {warnings.map(w => <p className="ui-status ui-status--warning" role="alert" key={w.id}>{w.message}</p>)}
+      {ship.mode === 'destroyed' && <p className="ui-status ui-status--error" role="alert">Journey ended — ship destroyed</p>}
+    </>}/>}
   </div>
 }

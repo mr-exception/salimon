@@ -173,3 +173,16 @@ human review**, not approved visual baselines. See the [#826 report](../reports/
 No new UI framework, physical 3D cockpit art, mobile interface, simulated machine operation, new game resource, gameplay balance change, authoritative backend, save migration, scanner discovery change, unscanned names, automatic pause, or photorealistic fidelity requirement.
 
 **Approval applies to design direction.** Each view's actual rendered result needs its own implementation PR, tests and screenshot review; one document cannot certify production styling. Existing #803 fullscreen 2D, #785 storage transfers, #814 panoramic compact HUD and #815 cockpit integration remain delivered as their own distinct feature scopes.
+
+
+## Panoramic adoption (#828)
+
+The delivered panoramic HUD now consumes the shared DOM token source and control,
+utility-panel and dialog skins. Its compact native controls preserve the existing
+disabled and keyboard contract. Opaque `--ui-void` surfaces isolate text contrast
+from celestial brightness; warning/terminal text uses mechanical/danger inks and
+the compass alone consumes heading/velocity inks. Seated survival remains available
+in its own bounded column above the compass, with expanded telemetry beside it.
+See the [panoramic contract](panoramic-navigation-design.md#shared-projected-instrumentation-828)
+and [original captures/results](../reports/issue-828/README.md). Styling acceptance
+and explicit human reference approval remain separate from functional passes.

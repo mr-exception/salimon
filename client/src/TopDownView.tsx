@@ -218,7 +218,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>
     </Dialog>
     {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
-      <PanoramicNavigation navigation={navigation} view={observation} advanceSimulation={false}
+      <PanoramicNavigation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         canPilot={() => false} onExit={() => update(leaveCockpit(current.current))} />
     </div>}

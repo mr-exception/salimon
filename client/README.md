@@ -685,3 +685,17 @@ reference captures at 960/1280/1920 desktop widths. Set `CHROMIUM_PATH` if reusi
 system browser. Gallery captures require human visual review; they are not
 automatically approved baselines. See [contract](../docs/hud-ui-style-guide.md#shared-foundation-implementation-826)
 and [evidence](../reports/issue-826/README.md). Existing screens are not restyled.
+
+
+### Shared panoramic styling (#828)
+
+The production cockpit uses the Expedition Interface tokens and shared control,
+utility and dialog presentation classes. Its native disabled controls, scanner,
+optical camera, compass calculation and navigation owners retain their contracts.
+`HUD-STYLE` in `tests/panoramic.spec.ts` checks grounded horizon and dark/dense
+contacts, focused help, contrast and edge-to-edge geometry at 960×600, 1280×720
+and 1920×1080. `HUD-BRIGHT` checks actual bright-star pixels and visible warning
+summaries in focused help at the same sizes. Use `npm run test:browser -- --project=panoramic` for focused checks;
+`LOOK`, `COCKPIT-1` and PANO-VIS retain command/lifecycle and visual coverage.
+See [the delivery evidence](../reports/issue-828/README.md); new image candidates
+need human approval of the complete manifest digest under the existing gate.

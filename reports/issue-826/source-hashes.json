@@ -1,0 +1,13 @@
+{
+  "client/package-lock.json": "4bc1b14d943722363dee6252b68d0224342e0a08f69489a862f5afd16c90f029",
+  "client/playwright.config.ts": "7d722a6643943c350574d5896588586384ffc001029ea129723de074b7954e99",
+  "client/src/ui/primitives.css": "67985f55f63670b194dd7b2059a671cfa9a360ec50b1d65c016b8397a7a91e14",
+  "client/src/ui/primitives.tsx": "9da5ec0ca19611f1c66e698c2572cddaee1b715d7207c80b78cb32f627bdfd0d",
+  "client/src/ui/tokens.css": "bab13f37abed6330beffa07e253bc990f52bd56c755566c0388ecac2b57c1d71",
+  "client/src/ui/values.ts": "41096f4bb44157fda611fec52387f56fccdf8b1acfe7b7fb79ed963dde522dba",
+  "client/src/uiValues.test.ts": "8c277a45280279127a576d7a0c268d4a3e1950b943d2663023b2bce672e30661",
+  "client/tests/ui-fixture.css": "d59d5a008dd7a7fec56070c706189cbb1bbf085ab24bd014333d7cc9d706449f",
+  "client/tests/ui.html": "8e9357e318a81af0f2814bf17e718a811a7d884e1d1678df3435659fa9a48f40",
+  "client/tests/ui.spec.ts": "3bcefba07221f7194519f9b7a62a931e119541db807f66498de301ce6aefeaa5",
+  "client/tests/ui.tsx": "f9a354f8a00d95c94591ad43b60ecee1a70b53edc73656b4f4ed8f3e7f17ac31"
+}

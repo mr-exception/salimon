@@ -1,0 +1,72 @@
+[WebServer] (node:1499) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1512) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1550) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1563) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1588) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:1632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [ui] › tests/ui.spec.ts:5:1 › shared components retain semantics, keyboard isolation and modal focus (12.5s)
+(node:1789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [ui] › tests/ui.spec.ts:39:40 › repeatable light/dark state references at 960 (3.7s)
+  ✓  3 [ui] › tests/ui.spec.ts:39:40 › repeatable light/dark state references at 1280 (3.3s)
+  ✓  4 [ui] › tests/ui.spec.ts:39:40 › repeatable light/dark state references at 1920 (5.3s)
+
+
+  1) [ui] › tests/ui.spec.ts:5:1 › shared components retain semantics, keyboard isolation and modal focus
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('dialog', { name: 'Equipment review' }).getByRole('button', { name: 'Close Equipment review' })
+    Expected: focused
+    Received: inactive
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('dialog', { name: 'Equipment review' }).getByRole('button', { name: 'Close Equipment review' }) with timeout 10000ms
+      - waiting for getByRole('dialog', { name: 'Equipment review' }).getByRole('button', { name: 'Close Equipment review' })
+        24 × locator resolved to <button type="button" class="ui-button ui-button--primary ">Close Equipment review</button>
+           - unexpected value "inactive"
+
+
+      24 |   await page.keyboard.press('w')
+      25 |   await page.keyboard.press('Shift+Tab')
+    > 26 |   await expect(dialog.getByRole('button', { name: 'Close Equipment review' })).toBeFocused()
+         |                                                                                ^
+      27 |   await page.keyboard.press('Tab')
+      28 |   await expect(dialog.getByRole('textbox')).toBeFocused()
+      29 |   await page.keyboard.press('w')
+        at /workspace/salimon/client/tests/ui.spec.ts:26:80
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-shared-components-retai-51c7f-d-isolation-and-modal-focus-ui/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-shared-components-retai-51c7f-d-isolation-and-modal-focus-ui/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-shared-components-retai-51c7f-d-isolation-and-modal-focus-ui/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-shared-components-retai-51c7f-d-isolation-and-modal-focus-ui/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [ui] › tests/ui.spec.ts:5:1 › shared components retain semantics, keyboard isolation and modal focus
+  3 passed (35.2s)

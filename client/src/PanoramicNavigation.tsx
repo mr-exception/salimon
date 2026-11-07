@@ -12,6 +12,8 @@ import { setThrottle } from './simulation.ts'
 import { navigationWarnings } from './contact.ts'
 import type { NavigationRuntime } from './navigationRuntime.ts'
 import type { Body } from './sampleUniverse.ts'
+import './ui/tokens.css'
+import './ui/primitives.css'
 import './panoramic.css'
 
 /** Reusable presentation. The cockpit lifecycle owner supplies the runtime and
@@ -100,20 +102,20 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     else if (onExit) { e.preventDefault(); e.stopPropagation(); onExit() }
   }
   escape.current = dismiss
-  return <div ref={root} className="panoramic" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDownCapture={dismiss}>
+  return <div ref={root} className="panoramic expedition-ui" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDownCapture={dismiss}>
     <Canvas onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
       <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position}/>
     </Canvas>
     <div className="observation-reticle" aria-hidden="true">+</div>
-    <header className="panoramic-status">
-      <strong>SALIMON · OBSERVATION</strong>
+    <header className="panoramic-status ui-panel ui-panel--utility">
+      <strong className="ui-eyebrow">SALIMON · OBSERVATION</strong>
       <p role="status">{navigation.scanner.pulse === 0 ? 'Scanner awaiting first 5-second pulse' : `Scanner pulse ${navigation.scanner.pulse} · ${navigation.scanner.contacts.length} contacts`}</p>
       <span>{ship.mode}{grounded ? ` · ${grounded.body.name}` : ''} · {speed.toFixed(1)} m/s · sample inertial frame</span>
     </header>
     <div className="panoramic-priority" aria-label="Navigation warnings" role="status">
       {warnings.map(w => <p key={w.id}>{w.message}</p>)}
       {ship.contact && <p>{ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact {ship.contact.impactSpeedMps.toFixed(1)} m/s</p>}
-      {!grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
+      {!grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
     </div>
     <PerspectiveContacts compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
       getOrigin={() => navigation.clock.state.position} getShip={() => navigation.clock.state} canPilot={canPilot}
@@ -121,12 +123,12 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     <div className="panoramic-instruments"><OrientationCompass ship={ship} view={snapshot}/></div>
     <footer className="panoramic-controls">
       <label>Throttle {ship.throttle}%<input aria-label="Throttle" type="range" min="-100" max="100" value={ship.throttle} disabled={ship.mode !== 'flying' || !canPilot()} onChange={e => throttle(Number(e.target.value))}/></label>
-      <button disabled={ship.mode !== 'flying' || !canPilot()} onClick={() => throttle(0)}>Zero throttle (Space)</button>
-      <button onClick={() => { view.reset(navigation.clock.state); redraw(n => n + 1) }}>Reset view</button>
-      <button className="telemetry-toggle" aria-expanded={telemetry} aria-controls="detailed-telemetry" onClick={() => setTelemetry(value => !value)}>Telemetry</button>
-      <button className="help-toggle" onClick={() => setHelp(true)}>Help</button>{onExit && <button onClick={onExit}>Exit cockpit</button>}
+      <button className="ui-button ui-button--secondary" disabled={ship.mode !== 'flying' || !canPilot()} onClick={() => throttle(0)}>Zero throttle (Space)</button>
+      <button className="ui-button ui-button--secondary" onClick={() => { view.reset(navigation.clock.state); redraw(n => n + 1) }}>Reset view</button>
+      <button className="ui-button ui-button--secondary telemetry-toggle" aria-expanded={telemetry} aria-controls="detailed-telemetry" onClick={() => setTelemetry(value => !value)}>Telemetry</button>
+      <button className="ui-button ui-button--secondary help-toggle" onClick={() => setHelp(true)}>Help</button>{onExit && <button className="ui-button ui-button--secondary" onClick={onExit}>Exit cockpit</button>}
     </footer>
-    {telemetry && <section id="detailed-telemetry" className="panoramic-telemetry" aria-label="Detailed telemetry">
+    {telemetry && <section id="detailed-telemetry" className="panoramic-telemetry ui-panel ui-panel--utility" aria-label="Detailed telemetry">
       <p>Mass {ship.massKg.toLocaleString()} kg · FOV {snapshot.fov.toFixed(2)}°</p>
       <p>Yaw {(ship.yaw * 180 / Math.PI).toFixed(1)}° · pitch {(ship.pitch * 180 / Math.PI).toFixed(1)}° · {ship.alignment ? 'Turning' : 'Manual'}</p>
       <p>Cell {ship.position.cell.map(String).join(' / ')} · local {ship.position.offsetM.map(v => v.toFixed(1)).join(' / ')} m</p>

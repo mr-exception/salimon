@@ -58,7 +58,7 @@ body:has(.panoramic) .power-fixture { bottom:82px; left:auto; right:12px }
 .gathering-status .ui-meter { margin:0 }
 .gathering-status p { margin:4px 0 }
 .expedition-ui .top-down-app footer { font-size:11px; padding:4px 10px }
-body:has(.panoramic) .expedition-ui .survival-hud { width:220px; top:220px; max-height:calc(100dvh - 420px); font-size:12px; line-height:16px }
+body:has(.panoramic) .expedition-ui .survival-hud { width:220px; top:220px; max-height:calc(100dvh - 470px); font-size:12px; line-height:16px }
 body:has(.panoramic) .vital-meters { gap:6px }
 @media(max-width:1000px) {
   .expedition-ui .survival-hud { width:260px }

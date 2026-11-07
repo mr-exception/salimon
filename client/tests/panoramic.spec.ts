@@ -8,7 +8,9 @@ async function boot(page: Page, grounded = false) {
  await expect.poll(async () => (await state(page))?.renderer).toContain('SwiftShader')
 }
 async function capture(page: Page, name: string, info: TestInfo) {
- await info.attach(name, { body: await page.screenshot(), contentType: 'image/png' })
+ const path = info.outputPath(name)
+ await page.screenshot({ path })
+ await info.attach(name, { path, contentType: 'image/png' })
 }
 test('HUD-1 full viewport, scanner authority, keyboard browser and priority Escape', async ({ page }, info) => {
  await boot(page)
@@ -133,3 +135,47 @@ test('HUD-3 grounded authority and no sidebar at smaller desktop size', async ({
  expect(await page.locator('aside').count()).toBe(0)
  expect(await page.locator('canvas').boundingBox()).toMatchObject({ x: 0, y: 0, width: 960, height: 600 })
 })
+
+for (const viewport of [{ width: 960, height: 600 }, { width: 1280, height: 720 }, { width: 1920, height: 1080 }]) {
+ test(`HUD-STYLE projected controls, contrast and focused help at ${viewport.width}`, async ({ page }, info) => {
+  await page.setViewportSize(viewport)
+  await page.clock.install({ time: new Date('2026-11-07T12:00:00Z') })
+  await page.clock.pauseAt(new Date('2026-11-07T12:00:01Z'))
+  const measurements = []
+  for (const grounded of [false, true]) {
+   await page.goto(`/tests/panoramic.html${grounded ? '?grounded' : ''}`)
+   await expect.poll(async () => { await page.clock.runFor(64); return (await state(page))?.renderer }).toContain('SwiftShader')
+   await acquireContacts(page); await page.clock.runFor(64)
+   expect(await page.locator('canvas').boundingBox()).toMatchObject({ x: 0, y: 0, ...viewport })
+   await page.getByRole('button', { name: /Contacts \(C\)/ }).click(); await page.clock.runFor(64)
+   await expect(page.getByLabel('Search contacts')).toBeFocused()
+   const context = grounded ? 'bright-horizon' : 'dark-dense'
+   await capture(page, `${context}.png`, info)
+   const contrast = await page.locator('.panoramic').evaluate(el => {
+    const style = getComputedStyle(el)
+    const luminance = (hex: string) => {
+     const c = hex.trim().slice(1).match(/../g)!.map(v => parseInt(v, 16) / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
+     return c[0] * .2126 + c[1] * .7152 + c[2] * .0722
+    }
+    const bg = luminance(style.getPropertyValue('--ui-void'))
+    return Object.fromEntries(['text', 'muted', 'active', 'mechanical', 'danger'].map(name => [name, (luminance(style.getPropertyValue(`--ui-${name}`)) + .05) / (bg + .05)]))
+   })
+   for (const ratio of Object.values(contrast)) expect(ratio).toBeGreaterThanOrEqual(4.5)
+   // Real computed panel surfaces must be opaque; the bright sky cannot change ink contrast.
+   expect(await page.locator('.panoramic-status').evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgb(9, 20, 28)')
+   await page.keyboard.press('Escape'); await page.clock.runFor(64)
+   await page.getByRole('button', { name: 'Help', exact: true }).click(); await page.clock.runFor(64)
+   await expect(page.getByRole('heading', { name: 'Navigation help' })).toBeFocused()
+   const before = await state(page)
+   await page.keyboard.press('w'); await page.keyboard.press('ArrowLeft'); await page.clock.runFor(64)
+   expect((await state(page)).view).toEqual(before.view)
+   expect((await state(page)).ship.yaw).toEqual(before.ship.yaw)
+   await capture(page, `focused-help-${context}.png`, info)
+   await page.keyboard.press('Escape'); await page.clock.runFor(64)
+   await expect(page.getByRole('button', { name: 'Help', exact: true })).toBeFocused()
+   expect(await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight }))).toEqual({ w: viewport.width, h: viewport.height })
+   measurements.push({ context, viewport, contrast, state: await state(page) })
+  }
+  await info.attach('readability.json', { body: JSON.stringify(measurements, (_, v) => typeof v === 'bigint' ? String(v) : v, 2), contentType: 'application/json' })
+ })
+}

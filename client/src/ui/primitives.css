@@ -1,0 +1,39 @@
+/* All selectors are scoped: importing a primitive cannot restyle a game view. */
+.expedition-ui .ui-button {
+  box-sizing: border-box; min-height: 44px; padding: var(--ui-space-2) var(--ui-space-4);
+  border: 1px solid var(--ui-active); border-radius: var(--ui-radius);
+  background: var(--ui-surface); color: var(--ui-text); font: inherit; cursor: pointer;
+  transition: background-color var(--ui-hover-time), transform var(--ui-press-time);
+}
+.expedition-ui .ui-button--secondary { background: var(--ui-panel); border-color: var(--ui-muted); }
+.expedition-ui .ui-button--danger { border-color: var(--ui-danger); color: var(--ui-danger); background: var(--ui-void); }
+.expedition-ui .ui-button:hover { background: var(--ui-void); }
+.expedition-ui .ui-button:active:not([aria-disabled=true]) { transform: translateY(1px); }
+.expedition-ui .ui-button[aria-pressed=true] { box-shadow: inset 0 -3px var(--ui-active); }
+.expedition-ui :focus-visible { outline: 2px solid var(--ui-active); outline-offset: 3px; }
+.expedition-ui .ui-button[aria-disabled=true] { border-style: dashed; cursor: default; color: var(--ui-muted); }
+.expedition-ui .ui-control { display: inline-flex; flex-direction: column; vertical-align: top; gap: var(--ui-space-1); }
+.expedition-ui .ui-reason { color: var(--ui-muted); font-size: var(--ui-small); max-width: 24ch; }
+.expedition-ui .ui-icon-button { min-width: 44px; }
+.expedition-ui .ui-panel, .expedition-ui .ui-dialog {
+  box-sizing: border-box; padding: var(--ui-space-4); border: 1px solid var(--ui-muted);
+  border-radius: var(--ui-radius); background: var(--ui-panel); color: var(--ui-text);
+}
+.expedition-ui .ui-panel--equipment { border-top: 2px solid var(--ui-mechanical); }
+.expedition-ui .ui-panel--utility { background: var(--ui-void); border-top: 2px solid var(--ui-active); }
+.expedition-ui .ui-panel h2, .expedition-ui .ui-dialog h2 { font-size: var(--ui-readout); margin: 0 0 var(--ui-space-3); }
+.expedition-ui .ui-eyebrow { color: var(--ui-mechanical); font-size: var(--ui-small); letter-spacing: .08em; text-transform: uppercase; margin: 0; }
+.expedition-ui .ui-dialog { width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow: auto; font: inherit; }
+.expedition-ui .ui-dialog::backdrop { background: #09141ccc; }
+.expedition-ui .ui-meter { display: grid; gap: var(--ui-space-1); margin-block: var(--ui-space-3); }
+.expedition-ui .ui-meter meter, .expedition-ui .ui-meter progress { width: 100%; accent-color: var(--ui-active); }
+.expedition-ui .ui-key { padding: var(--ui-space-1) var(--ui-space-2); border: 1px solid var(--ui-muted); border-radius: 4px; background: var(--ui-void); font-family: var(--ui-mono); }
+.expedition-ui .ui-status { border-left: 3px solid var(--ui-muted); padding-left: var(--ui-space-2); }
+.expedition-ui .ui-status--error { border-color: var(--ui-danger); color: var(--ui-danger); }
+.expedition-ui .ui-status--warning { border-color: var(--ui-mechanical); color: var(--ui-mechanical); }
+.expedition-ui .ui-status--confirmation, .expedition-ui .ui-status--pending { border-color: var(--ui-active); }
+.expedition-ui .ui-meter meter::-webkit-meter-bar { background: var(--ui-surface); }
+.expedition-ui .ui-meter meter::-webkit-meter-optimum-value,
+.expedition-ui .ui-meter meter::-webkit-meter-suboptimum-value,
+.expedition-ui .ui-meter meter::-webkit-meter-even-less-good-value { background: var(--ui-active); }
+.expedition-ui .ui-meter meter::-moz-meter-bar { background: var(--ui-active); }

@@ -1029,3 +1029,13 @@ retains scanner authority and adds a controlled collapsed browser. Pure tests ar
 keyboard, resize, warning/terminal and 40-ID checks are `tests/panoramic.spec.ts`.
 The reusable scene is exercised in `/tests/panoramic.html`; #815 owns production
 cockpit activation and view lifetime. See the client guide and issue report.
+
+## Expedition Interface shared foundation (#826)
+
+`client/src/ui/tokens.css` owns scoped sRGB semantic/type/spacing/motion tokens.
+`primitives.tsx`/`primitives.css` own reusable DOM controls and modal focus behavior;
+`values.ts` bounds presentation readings only. `tests/ui.html`/`ui.spec.ts` own the
+development state gallery, keyboard isolation and repeat reference captures.
+Use the [style contract](hud-ui-style-guide.md#shared-foundation-implementation-826).
+Existing 2D, panoramic and storage adapters retain gameplay/input ownership and
+styles until separately migrated; never import these tokens as shader materials.

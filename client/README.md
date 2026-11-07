@@ -657,3 +657,21 @@ a failure. Keep originals, diffs, JSON metadata and traces in `test-results/`
 and retain essential raw evidence with the issue report before artifacts expire.
 Software SwiftShader measurements do not establish target-device GPU/Metal FPS;
 physical input/platform and subjective qualification remain with #720–#722.
+
+## Expedition Interface foundation (#826)
+
+Import components from `src/ui/primitives.tsx` and wrap consumers in
+`<div className="expedition-ui">`. No root/body/world selectors are installed.
+Use `disabledReason` for an unavailable action, `pending` for work awaiting an
+authoritative result, and `StatusLabel` for event-driven feedback. A controlled
+`Dialog` requires `open`, `title`, `onDismiss` and children; it restores focus to
+its opener. Native modal inertness and keyboard handling supplement the existing
+view owner's shortcut/input-release gates. Widgets do not hold game state.
+
+`/tests/ui.html` is a development-only bright-planet/dark-space component gallery;
+it is absent from the production bundle. `npx playwright test --project=ui`
+checks modal focus, blocked activation, units, reduced motion and deterministic
+reference captures at 960/1280/1920 desktop widths. Set `CHROMIUM_PATH` if reusing a
+system browser. Gallery captures require human visual review; they are not
+automatically approved baselines. See [contract](../docs/hud-ui-style-guide.md#shared-foundation-implementation-826)
+and [evidence](../reports/issue-826/README.md). Existing screens are not restyled.

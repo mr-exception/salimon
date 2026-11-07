@@ -136,6 +136,38 @@ Future Core/Fabricator/Archive/suit-specific surfaces are **style application ta
 - **Regressions:** existing 2D collisions/navigation, scan permission/occlusion and save tests remain effective. Use the repository's Node/TypeScript tests, build, Playwright/Chromium and original screenshot captures with explicit baseline approval.
 - **Evidence:** each implementation issue reports precise commands, viewport/DPR, SHA, actual PASS/FAIL/NOT RUN and unresolved human/device qualification. Cloud software rendering cannot assert native GPU performance.
 
+## Shared foundation implementation (#826)
+
+`client/src/ui/tokens.css` is the single scoped DOM token source; `primitives.tsx`
+and `primitives.css` provide typed Button/IconButton, EquipmentPanel/UtilityPanel,
+Dialog, Meter/Progress, KeyHint/ContextPrompt and StatusLabel. Wrap consumers in
+`.expedition-ui` (including dialog ancestors); imports intentionally have no
+`:root`, body, canvas or scene selectors. The palette remains dark/opaque over
+both bright planet and dark space contexts. Heading/velocity tokens are reserved
+for compass consumers. These are sRGB display inks, never renderer materials.
+
+Buttons accept `variant`, `active`, `pending` and `disabledReason`; blocked controls
+remain keyboard reachable with a visible, associated explanation and cannot invoke
+the supplied click action. Native button labels and attributes remain available.
+Owners still validate every command. Status labels include explicit words; only
+meaningful event changes belong in live regions. Meter/progress display values,
+maxima and units, defensively bounding malformed readings without writing state.
+
+Dialog is controlled with `open`/`onDismiss`, uses native modal inertness, labelled
+initial focus, Tab wrapping, Escape dismissal, focus return and bubbling keyboard
+isolation. Mount it beneath the token wrapper. Keep critical warnings and the
+owner's input-release/focus gates when integrating it into a game screen; mounting
+a shell never pauses simulation or authorizes actions. No screen migration ships
+with this foundation. Input/Select/Slider, Tooltip and Notification concepts from
+section 3 remain future extensions, outside #826's requested primitive set.
+
+The development-only `/tests/ui.html` gallery contains illustrative states in both
+contexts. `tests/ui.spec.ts` verifies keyboard/blocked actions, readable names and
+units, reduced motion, viewport bounds and byte-identical repeated originals.
+Run `cd client && npm test && npm run build && npm run test:browser`; focused
+iteration uses `npx playwright test --project=ui`. Captures are **candidates for
+human review**, not approved visual baselines. See the [#826 report](../reports/issue-826/README.md).
+
 ## 10. Explicit non-goals and delivery state
 
 No new UI framework, physical 3D cockpit art, mobile interface, simulated machine operation, new game resource, gameplay balance change, authoritative backend, save migration, scanner discovery change, unscanned names, automatic pause, or photorealistic fidelity requirement.

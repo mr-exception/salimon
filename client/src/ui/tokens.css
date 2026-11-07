@@ -1,0 +1,35 @@
+/* sRGB DOM inks only. Never import into renderer material definitions. */
+.expedition-ui {
+  --ui-void: #09141c;
+  --ui-panel: #192b30;
+  --ui-surface: #314e52;
+  --ui-text: #e8e1d1;
+  --ui-muted: #afc2c8;
+  --ui-active: #69d3dd;
+  --ui-mechanical: #ebc076;
+  --ui-danger: #e77f73;
+  /* Reserved compass axes; never generic status/action inks. */
+  --ui-heading: #ffe36a;
+  --ui-velocity: #b6f5a2;
+  --ui-font: Inter, system-ui, sans-serif;
+  --ui-mono: ui-monospace, monospace;
+  --ui-body: 1rem;
+  --ui-small: .8125rem;
+  --ui-readout: 1.25rem;
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-6: 24px;
+  --ui-radius: 6px;
+  --ui-press-time: 90ms;
+  --ui-hover-time: 120ms;
+  --ui-panel-time: 180ms;
+  color: var(--ui-text);
+  font: var(--ui-body)/1.5 var(--ui-font);
+  font-variant-numeric: tabular-nums;
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) {
+  .expedition-ui { --ui-press-time: 0ms; --ui-hover-time: 0ms; --ui-panel-time: 0ms; }
+}

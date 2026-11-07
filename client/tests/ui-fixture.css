@@ -1,0 +1,14 @@
+/* Development fixture only: bright ground and near-black space surround opaque UI. */
+body { margin: 0; }
+.fixture { padding: 24px; box-sizing: border-box; }
+.fixture--planet { background: #d4c5a0; }
+.fixture--space { background: #02080f; }
+.fixture h1, .fixture > p { background: var(--ui-void); padding: 8px; margin: 0 0 12px; }
+.fixture h1 { font-size: 24px; }
+.fixture-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fixture-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: start; }
+.fixture label { display: grid; gap: 8px; }
+.fixture input { background: var(--ui-void); color: var(--ui-text); border: 1px solid var(--ui-muted); padding: 8px; font: inherit; }
+.fixture-axes span:first-child { color: var(--ui-heading); }
+.fixture-axes span:last-child { color: var(--ui-velocity); }
+@media(max-width: 700px) { .fixture-grid { grid-template-columns: 1fr; } }

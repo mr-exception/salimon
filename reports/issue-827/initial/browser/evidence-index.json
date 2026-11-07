@@ -1,0 +1,520 @@
+{
+  "stats": {
+    "startTime": "2026-11-07T08:29:23.457Z",
+    "duration": 259350.127,
+    "expected": 8,
+    "skipped": 13,
+    "unexpected": 3,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "file": "cockpit.spec.ts",
+      "title": "COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation",
+      "project": "cockpit",
+      "status": "unexpected",
+      "runs": [
+        {
+          "status": "failed",
+          "durationMs": 66730,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/test-failed-1.png"
+            },
+            {
+              "name": "error-context",
+              "contentType": "text/markdown",
+              "path": "cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/error-context.md"
+            },
+            {
+              "name": "trace",
+              "contentType": "application/zip",
+              "path": "cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip"
+            }
+          ],
+          "error": "Error: expect(locator).toHaveAttribute(expected) failed\n\nLocator:  locator('main')\nExpected: \"radar\"\nReceived: \"world\"\nTimeout:  10000ms\n\nCall log:\n  - Expect \"toHaveAttribute\" locator('main') with timeout 10000ms\n  - waiting for locator('main')\n    23 \u00d7 locator resolved to <main data-tick=\"9\" data-target=\"\" data-occupant=\"\" data-powered=\"true\" class=\"top-down-app\" data-cockpit-view=\"world\" data-player-mode=\"standing\" data-ship=\"{\"position\":{\"cell\":[\"0\",\"0\",\"0\"],\"offsetM\":[53962642442,-5390064239,-77946039081]},\"velocityMps\":[0,0,0],\"yaw\":-0.12,\"pitch\":0,\"massKg\":100000,\"throttle\":0,\"alignment\":null,\"mode\":\"grounded\",\"contact\":{\"bodyId\":\"vesper\",\"outcome\":\"safe-contact\",\"impactSpeedMps\":0,\"normal\":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],\"ageTi\u2026>\u2026</main>\n       - unexpected value \"world\"\n"
+        }
+      ]
+    },
+    {
+      "file": "gathering.spec.ts",
+      "title": "GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 31121,
+          "artifacts": [
+            {
+              "name": "gather-source-ready-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/gather-source-ready-repeat.json-cd7a39cea9.json",
+              "sha256": "cd7a39cea9f33ead7bd782560a60d484174cd8855eb0f93ed53b1c7a662f0c79"
+            },
+            {
+              "name": "gather-source-ready-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/gather-source-ready-diff.png-eaef05ecd5.png",
+              "sha256": "eaef05ecd57ed418737cf7574d3489be214e45142d509456eab7daa32a76af66"
+            },
+            {
+              "name": "gather-weight-full-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/gather-weight-full-repeat.json-3c4a35c58b.json",
+              "sha256": "3c4a35c58bcc762bde39eec389dcfaa01efc2f30841305712c5a4d334615cb60"
+            },
+            {
+              "name": "gather-weight-full-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/gather-weight-full-diff.png-015c4c822f.png",
+              "sha256": "015c4c822fecffdc062ff87803544f5476743d888a73d50f10156c752dd9d596"
+            },
+            {
+              "name": "gathering-records.json",
+              "contentType": "application/json",
+              "path": "measurements/gathering-records.json-f6bbc10fe7.json",
+              "sha256": "f6bbc10fe77c3666d567fb4c8767a5b63335a5585ef9039b2b6d502c1aa966ff"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "gathering.spec.ts",
+      "title": "GATHER-2 biological weight cap, movement interruption and competing browser tab",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 8551,
+          "artifacts": [
+            {
+              "name": "weight-save.json",
+              "contentType": "application/json",
+              "path": "measurements/weight-save.json-ba87e99f16.json",
+              "sha256": "ba87e99f16069f2e98ddf1a01052f306651fa7b8d65d0ed4d96e39330b098216"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "hazards.spec.ts",
+      "title": "HAZ-1\u20135 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure",
+      "project": "cockpit",
+      "status": "unexpected",
+      "runs": [
+        {
+          "status": "failed",
+          "durationMs": 37313,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "hazards-HAZ-1\u20135-built-non--7fe28-ery-pause-and-write-failure-cockpit/test-failed-1.png"
+            },
+            {
+              "name": "error-context",
+              "contentType": "text/markdown",
+              "path": "hazards-HAZ-1\u20135-built-non--7fe28-ery-pause-and-write-failure-cockpit/error-context.md"
+            },
+            {
+              "name": "trace",
+              "contentType": "application/zip",
+              "path": "hazards-HAZ-1\u20135-built-non--7fe28-ery-pause-and-write-failure-cockpit/trace.zip"
+            }
+          ],
+          "error": "Error: expect(locator).toHaveAttribute(expected) failed\n\nLocator:  getByRole('meter', { name: 'Health', exact: true })\nExpected: \"188.60333333333332\"\nReceived: \"189\"\nTimeout:  10000ms\n\nCall log:\n  - Expect \"toHaveAttribute\" getByRole('meter', { name: 'Health', exact: true }) with timeout 10000ms\n  - waiting for getByRole('meter', { name: 'Health', exact: true })\n    23 \u00d7 locator resolved to <meter min=\"0\" max=\"200\" value=\"189\" aria-label=\"Health\" aria-valuetext=\"189 / 200 HP\"></meter>\n       - unexpected value \"189\"\n"
+        }
+      ]
+    },
+    {
+      "file": "hazards.spec.ts",
+      "title": "normal built game exposes no hazard fixture, source sampling or module grants",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2061,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "hazards-normal-built-game--db121-e-sampling-or-module-grants-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "items.spec.ts",
+      "title": "ITEM-1\u20136 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice",
+      "project": "cockpit",
+      "status": "unexpected",
+      "runs": [
+        {
+          "status": "failed",
+          "durationMs": 21878,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/test-failed-1.png"
+            },
+            {
+              "name": "error-context",
+              "contentType": "text/markdown",
+              "path": "items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/error-context.md"
+            },
+            {
+              "name": "trace",
+              "contentType": "application/zip",
+              "path": "items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/trace.zip"
+            }
+          ],
+          "error": "Error: expect(locator).toHaveText(expected) failed\n\nLocator:  locator('[data-inventory-weight]')\nExpected: \"2.25 / 10 kg\"\nReceived: \"2.5 / 10 kg\"\nTimeout:  10000ms\n\nCall log:\n  - Expect \"toHaveText\" locator('[data-inventory-weight]') with timeout 10000ms\n  - waiting for locator('[data-inventory-weight]')\n    24 \u00d7 locator resolved to <p data-inventory-weight=\"true\">\u2026</p>\n       - unexpected value \"2.5 / 10 kg\"\n"
+        }
+      ]
+    },
+    {
+      "file": "items.spec.ts",
+      "title": "ordinary built game has no item fixture, grants or query backdoor",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1421,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "items-ordinary-built-game--c399b-re-grants-or-query-backdoor-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "playable-slice.spec.ts",
+      "title": "SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return",
+      "project": "cockpit",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "storage.spec.ts",
+      "title": "STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 54850,
+          "artifacts": [
+            {
+              "name": "storage-open-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-open-repeat.json-9610ec5377.json",
+              "sha256": "9610ec5377167227c12cc42fe546699e02f0caf05ad00b478009ca91b3a635e0"
+            },
+            {
+              "name": "storage-open-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/storage-open-diff.png-c9200aa6a0.png",
+              "sha256": "c9200aa6a08fc0faa1bb920344a4256eae0e9dac044c1e1cd91df4c9fbb8c77a"
+            },
+            {
+              "name": "storage-transferred-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-open-repeat.json-9610ec5377.json",
+              "sha256": "9610ec5377167227c12cc42fe546699e02f0caf05ad00b478009ca91b3a635e0"
+            },
+            {
+              "name": "storage-transferred-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/storage-transferred-diff.png-bc3682e44a.png",
+              "sha256": "bc3682e44a8528e9db170dbac6f816fbb47d05817c59eb6e08416812230633cc"
+            },
+            {
+              "name": "storage-error-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-error-repeat.json-93bafe4bac.json",
+              "sha256": "93bafe4bacccfee4ab8dc0824e5a1856110cec82976d52facd084fcd6e920a61"
+            },
+            {
+              "name": "storage-error-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/storage-error-diff.png-0626f09758.png",
+              "sha256": "0626f09758b0367382c5351f23c0c7b114f830825c2357f9da9e1986166a22f2"
+            },
+            {
+              "name": "storage-journeys.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-journeys.json-7d0d4195fb.json",
+              "sha256": "7d0d4195fb837d403c96b064b0fa0d39709d7daf043306c5f4abe83f6d4e9534"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "storage.spec.ts",
+      "title": "STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 5484,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "survival.spec.ts",
+      "title": "SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset",
+      "project": "cockpit",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "survival.spec.ts",
+      "title": "SURV-799 approved rates and partial interruption/reload preserve exact grams",
+      "project": "cockpit",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT production 1280x720 HUD, input, repeat and negative comparison",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 5317,
+          "artifacts": [
+            {
+              "name": "negative.json",
+              "contentType": "application/json",
+              "path": "measurements/negative.json-fef9f8dd0f.json",
+              "sha256": "fef9f8dd0f454d792fdf5fdde75614fc301961b819d63211256081e0f72875e4"
+            },
+            {
+              "name": "fresh-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-a23a727b02.json",
+              "sha256": "a23a727b0255c13b5522264048c3f3fd54f265ac7ad647b62979093a01673023"
+            },
+            {
+              "name": "repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-a23a727b02.json",
+              "sha256": "a23a727b0255c13b5522264048c3f3fd54f265ac7ad647b62979093a01673023"
+            },
+            {
+              "name": "layout.json",
+              "contentType": "application/json",
+              "path": "measurements/layout.json-6aeeaf5885.json",
+              "sha256": "6aeeaf58858c8af99376b4d297951192398be96aa8a56367ececcb8ed496b7c0"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT production 960x600 HUD, input, repeat and negative comparison",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 4625,
+          "artifacts": [
+            {
+              "name": "negative.json",
+              "contentType": "application/json",
+              "path": "measurements/negative.json-52f2d17f66.json",
+              "sha256": "52f2d17f6609f62629956739b4598fc1d155921fec11d98dccf331ab6d4b5e14"
+            },
+            {
+              "name": "fresh-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-7ec7d412ac.json",
+              "sha256": "7ec7d412ac85029f697318ff3651dcf524870d2122ca24dcdcb0cb4427c0e3d8"
+            },
+            {
+              "name": "repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-7ec7d412ac.json",
+              "sha256": "7ec7d412ac85029f697318ff3651dcf524870d2122ca24dcdcb0cb4427c0e3d8"
+            },
+            {
+              "name": "layout.json",
+              "contentType": "application/json",
+              "path": "measurements/layout.json-4cfa06ca61.json",
+              "sha256": "4cfa06ca61275da1ece07c9f752f725c110e027e1fb2f902190e6abdad9a488e"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT production 1920x1080 HUD, input, repeat and negative comparison",
+      "project": "cockpit",
+      "status": "skipped",
+      "runs": [
+        {
+          "status": "interrupted",
+          "durationMs": 3498,
+          "artifacts": [
+            {
+              "name": "negative.json",
+              "contentType": "application/json",
+              "path": "measurements/negative.json-1d1b27a432.json",
+              "sha256": "1d1b27a432d3e0cdd198300b0de0d55eec7b002b5b03a58c8e0c6fa2e0514b07"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/test-failed-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/test-failed-2.png"
+            },
+            {
+              "name": "trace",
+              "contentType": "application/zip",
+              "path": "viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/trace.zip"
+            }
+          ],
+          "error": "Error: page.goto: Test ended.\nCall log:\n  - navigating to \"http://127.0.0.1:4175/\", waiting until \"load\"\n"
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT DPR 2 and standalone development fixture preserve projection",
+      "project": "cockpit",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "HUD inventory/help focus isolates walking, mining and Escape; menus keep active time",
+      "project": "cockpit",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures",
+      "project": "top-down",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly",
+      "project": "top-down",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene",
+      "project": "top-down",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-5 explicit built radar entry retains standalone navigation",
+      "project": "top-down",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway",
+      "project": "top-down",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "PLANET-1 fixed outdoor journey, source footprints and repeat screenshots",
+      "project": "top-down",
+      "status": "skipped",
+      "runs": []
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world",
+      "project": "top-down",
+      "status": "skipped",
+      "runs": []
+    }
+  ]
+}

@@ -1,0 +1,313 @@
+{
+  "records": [
+    {
+      "viewport": {
+        "width": 960,
+        "height": 600
+      },
+      "dpr": 1,
+      "scroll": {
+        "width": 960,
+        "height": 600
+      },
+      "world": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "hud": [
+        {
+          "x": 12,
+          "y": 12,
+          "width": 260,
+          "height": 106
+        },
+        {
+          "x": 740,
+          "y": 12,
+          "width": 208,
+          "height": 138
+        },
+        {
+          "x": 12,
+          "y": 521.5,
+          "width": 318.03125,
+          "height": 66.5
+        }
+      ],
+      "projection": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600,
+        "scaleX": 0.8,
+        "scaleY": 0.8
+      }
+    },
+    {
+      "viewport": {
+        "width": 960,
+        "height": 600
+      },
+      "dpr": 1,
+      "scroll": {
+        "width": 960,
+        "height": 600
+      },
+      "world": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "hud": [
+        {
+          "x": 12,
+          "y": 12,
+          "width": 260,
+          "height": 136
+        },
+        {
+          "x": 740,
+          "y": 12,
+          "width": 208,
+          "height": 138
+        },
+        {
+          "x": 12,
+          "y": 521.5,
+          "width": 364.28125,
+          "height": 66.5
+        }
+      ],
+      "projection": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600,
+        "scaleX": 0.8,
+        "scaleY": 0.8
+      }
+    },
+    {
+      "viewport": {
+        "width": 960,
+        "height": 600
+      },
+      "dpr": 1,
+      "scroll": {
+        "width": 960,
+        "height": 600
+      },
+      "world": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "hud": [
+        {
+          "x": 12,
+          "y": 12,
+          "width": 260,
+          "height": 106
+        },
+        {
+          "x": 740,
+          "y": 12,
+          "width": 208,
+          "height": 138
+        },
+        {
+          "x": 12,
+          "y": 521.5,
+          "width": 318.03125,
+          "height": 66.5
+        }
+      ],
+      "projection": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600,
+        "scaleX": 0.8,
+        "scaleY": 0.8
+      }
+    },
+    {
+      "viewport": {
+        "width": 960,
+        "height": 600
+      },
+      "dpr": 1,
+      "scroll": {
+        "width": 960,
+        "height": 600
+      },
+      "world": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600
+      },
+      "hud": [
+        {
+          "x": 12,
+          "y": 12,
+          "width": 260,
+          "height": 136
+        },
+        {
+          "x": 740,
+          "y": 12,
+          "width": 208,
+          "height": 138
+        },
+        {
+          "x": 12,
+          "y": 521.5,
+          "width": 364.28125,
+          "height": 66.5
+        }
+      ],
+      "projection": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 600,
+        "scaleX": 0.8,
+        "scaleY": 0.8
+      }
+    },
+    {
+      "viewport": {
+        "width": 1100,
+        "height": 680
+      },
+      "dpr": 1,
+      "scroll": {
+        "width": 1100,
+        "height": 680
+      },
+      "world": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 680
+      },
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 680
+      },
+      "hud": [
+        {
+          "x": 12,
+          "y": 12,
+          "width": 280,
+          "height": 136
+        },
+        {
+          "x": 864,
+          "y": 12,
+          "width": 224,
+          "height": 138
+        },
+        {
+          "x": 12,
+          "y": 601.5,
+          "width": 364.28125,
+          "height": 66.5
+        }
+      ],
+      "projection": {
+        "x": 0,
+        "y": 0.000002543131529364473,
+        "width": 1100,
+        "height": 679.9999949137369,
+        "scaleX": 0.9166666666666666,
+        "scaleY": 0.9166666666666666
+      }
+    },
+    {
+      "viewport": {
+        "width": 1600,
+        "height": 700
+      },
+      "dpr": 1,
+      "scroll": {
+        "width": 1600,
+        "height": 700
+      },
+      "world": {
+        "x": 0,
+        "y": 0,
+        "width": 1600,
+        "height": 700
+      },
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 1600,
+        "height": 700
+      },
+      "hud": [
+        {
+          "x": 12,
+          "y": 12,
+          "width": 280,
+          "height": 136
+        },
+        {
+          "x": 1364,
+          "y": 12,
+          "width": 224,
+          "height": 138
+        },
+        {
+          "x": 12,
+          "y": 621.5,
+          "width": 364.28125,
+          "height": 66.5
+        }
+      ],
+      "projection": {
+        "x": 0,
+        "y": 0.000008344650041181012,
+        "width": 1600,
+        "height": 699.9999833106999,
+        "scaleX": 1.0937499739229686,
+        "scaleY": 1.0937499739229686
+      }
+    }
+  ],
+  "renderer": "Chromium SVG CPU rasterization",
+  "input": "Playwright keyboard/mouse",
+  "baseline": "same-run repeats; approved navigation references unchanged"
+}

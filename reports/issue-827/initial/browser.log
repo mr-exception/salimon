@@ -1,0 +1,208 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit --project=top-down
+
+[WebServer] (node:1445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1458) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1488) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1501) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1526) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1558) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 24 tests using 1 worker
+
+(node:1570) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [cockpit] › tests/cockpit.spec.ts:10:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation (1.1m)
+(node:1740) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [cockpit] › tests/gathering.spec.ts:7:1 › GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat (31.1s)
+  ✓   3 [cockpit] › tests/gathering.spec.ts:75:1 › GATHER-2 biological weight cap, movement interruption and competing browser tab (8.6s)
+  ✘   4 [cockpit] › tests/hazards.spec.ts:6:1 › HAZ-1–5 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure (37.3s)
+(node:2069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [cockpit] › tests/hazards.spec.ts:57:1 › normal built game exposes no hazard fixture, source sampling or module grants (2.1s)
+  ✘   6 [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice (21.9s)
+(node:2280) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 [cockpit] › tests/items.spec.ts:63:1 › ordinary built game has no item fixture, grants or query backdoor (1.4s)
+  ✓   8 [cockpit] › tests/storage.spec.ts:13:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (54.9s)
+  ✓   9 [cockpit] › tests/storage.spec.ts:105:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (5.5s)
+  ✓  10 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison (5.3s)
+  ✓  11 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison (4.6s)
+  ✘  12 [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1920x1080 HUD, input, repeat and negative comparison (3.5s)
+
+
+  1) [cockpit] › tests/cockpit.spec.ts:10:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('main')
+    Expected: "radar"
+    Received: "world"
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('main') with timeout 10000ms
+      - waiting for locator('main')
+        23 × locator resolved to <main data-tick="9" data-target="" data-occupant="" data-powered="true" class="top-down-app" data-cockpit-view="world" data-player-mode="standing" data-ship="{"position":{"cell":["0","0","0"],"offsetM":[53962642442,-5390064239,-77946039081]},"velocityMps":[0,0,0],"yaw":-0.12,"pitch":0,"massKg":100000,"throttle":0,"alignment":null,"mode":"grounded","contact":{"bodyId":"vesper","outcome":"safe-contact","impactSpeedMps":0,"normal":[3.2258038501581854e-7,0.9999999999999349,-1.6129019250790927e-7],"ageTi…>…</main>
+           - unexpected value "world"
+
+
+      67 |       for (let frame = 0; frame < 25; frame++) await page.clock.fastForward(50)
+      68 |       await page.keyboard.press('Escape') // dismiss browser before cockpit exit
+    > 69 |       await expect(main).toHaveAttribute('data-cockpit-view', 'radar')
+         |                          ^
+      70 |       await page.locator('canvas').focus()
+      71 |       await page.mouse.move(640, 400); await page.mouse.wheel(0, -400)
+      72 |       await expect.poll(async () => { await page.clock.runFor(32); return (await view()).fov }).toBeLessThan(75)
+        at /workspace/salimon/client/tests/cockpit.spec.ts:69:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-827/browser/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-827/browser/cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/hazards.spec.ts:6:1 › HAZ-1–5 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByRole('meter', { name: 'Health', exact: true })
+    Expected: "188.60333333333332"
+    Received: "189"
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByRole('meter', { name: 'Health', exact: true }) with timeout 10000ms
+      - waiting for getByRole('meter', { name: 'Health', exact: true })
+        23 × locator resolved to <meter min="0" max="200" value="189" aria-label="Health" aria-valuetext="189 / 200 HP"></meter>
+           - unexpected value "189"
+
+
+      49 |   await expect(page.getByLabel('Survival condition')).toContainText('Saving failed')
+      50 |   expect(await save()).toEqual(beforeFailure)
+    > 51 |   await page.reload(); await expect(page.getByRole('meter', { name: 'Health', exact: true })).toHaveAttribute('value', String(beforeFailure.survival.health))
+         |                                                                                               ^
+      52 |   await expect(page.getByLabel('Survival condition')).toContainText(`${Math.ceil(beforeFailure.survival.health)} / 200 HP`)
+      53 |   await expect.poll(async () => { await page.clock.runFor(32); return page.locator('.top-down-scene').getAttribute('data-render-ready') }).toBe('true')
+      54 |   await info.attach('hazard-records.json', { body: JSON.stringify({ browser: browser.version(), initial, partial, restored, full, exited, beforeFailure, final: await save(), input: 'Playwright synthetic buttons and controlled clock; separately built test-only sources/modules' }, null, 2), contentType: 'application/json' })
+        at /workspace/salimon/client/tests/hazards.spec.ts:51:95
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/hazards-HAZ-1–5-built-non--7fe28-ery-pause-and-write-failure-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-827/browser/hazards-HAZ-1–5-built-non--7fe28-ery-pause-and-write-failure-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/hazards-HAZ-1–5-built-non--7fe28-ery-pause-and-write-failure-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-827/browser/hazards-HAZ-1–5-built-non--7fe28-ery-pause-and-write-failure-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('[data-inventory-weight]')
+    Expected: "2.25 / 10 kg"
+    Received: "2.5 / 10 kg"
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" locator('[data-inventory-weight]') with timeout 10000ms
+      - waiting for locator('[data-inventory-weight]')
+        24 × locator resolved to <p data-inventory-weight="true">…</p>
+           - unexpected value "2.5 / 10 kg"
+
+
+      44 |       await page.reload(); await page.getByRole('button', { name: 'Field inventory' }).click(); await expect(page.locator('[data-inventory-weight]')).toHaveText('2.5 / 10 kg')
+      45 |       await page.getByRole('button', { name: 'Remove one stacked' }).click(); await page.clock.runFor(32)
+    > 46 |       await expect(page.locator('[data-inventory-weight]')).toHaveText('2.25 / 10 kg')
+         |                                                             ^
+      47 |       await expect(page.locator('[data-inventory-slots]')).toHaveText('4 / 12 slots')
+      48 |       const after = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
+      49 |       expect(after.inventory.items).toEqual({ 'fixture-single': 2, 'fixture-stack': 4 })
+        at /workspace/salimon/client/tests/items.spec.ts:46:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/items-ITEM-1–6-fixture-run-642ab-on-and-durable-reload-twice-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../reports/issue-827/browser/items-ITEM-1–6-fixture-run-642ab-on-and-durable-reload-twice-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/items-ITEM-1–6-fixture-run-642ab-on-and-durable-reload-twice-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-827/browser/items-ITEM-1–6-fixture-run-642ab-on-and-durable-reload-twice-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1920x1080 HUD, input, repeat and negative comparison 
+
+    Test was interrupted.
+
+    Error: page.goto: Test ended.
+    Call log:
+      - navigating to "http://127.0.0.1:4175/", waiting until "load"
+
+
+       at worldJourney.ts:9
+
+       7 |   await page.clock.install({ time: new Date('2026-11-04T00:00:00Z') })
+       8 |   await page.clock.pauseAt(new Date('2026-11-04T00:00:01Z'))
+    >  9 |   await page.goto(`${origin}/${view}`)
+         |              ^
+      10 |   // Advance the controlled clock while React commits the world adapter.
+      11 |   await expect.poll(async () => { await page.clock.runFor(50); return scene(page).count() }).toBe(1)
+      12 |   await expect(scene(page)).toBeVisible()
+        at boot (/workspace/salimon/client/tests/worldJourney.ts:9:14)
+        at /workspace/salimon/client/tests/viewport.spec.ts:74:9
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../reports/issue-827/browser/viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace ../reports/issue-827/browser/viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [cockpit] › tests/cockpit.spec.ts:10:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation 
+    [cockpit] › tests/hazards.spec.ts:6:1 › HAZ-1–5 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure 
+    [cockpit] › tests/items.spec.ts:6:1 › ITEM-1–6 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice 
+  1 interrupted
+    [cockpit] › tests/viewport.spec.ts:66:3 › VIEWPORT production 1920x1080 HUD, input, repeat and negative comparison 
+  12 did not run
+  8 passed (4.3m)

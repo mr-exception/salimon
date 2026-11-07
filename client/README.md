@@ -417,15 +417,25 @@ and 1,000 HP protection budgets without shipping hazard sources or equipment. Se
 builds a separate non-shipping hazard fixture on port 4275; ordinary `npm run build`
 includes only the normal game. Unit/integration coverage lives in `src/hazards.test.ts`.
 
-## Full-viewport 2D HUD (#803)
+## Full-viewport 2D HUD (#803, #827)
 
-The world fills the browser viewport, with survival top left, inventory/save
-status top right and nearby actions/key hints bottom left. Panels scroll their
-own overflowing content; the page stays fixed. Resize expands the SVG view
-without distorting world proportions. `tests/viewport.spec.ts` belongs to the
-cockpit project and verifies the built `/` at 1280×720/960×600, repeat/negative
-screenshots, DPR 2, focus, resize and the standalone dev fixture. See the
-[layout contract](../docs/playable-2d-foundation.md#viewport-and-hud-803).
+The world fills the browser viewport. Compact labelled survival meters, Pause
+and Help sit top left; carried kg, shared slots and the gathering tool sit top
+right. **Field inventory / I** opens raw/count item details and save information
+on demand. Escape closes that utility first, returning focus to its trigger;
+entering the cockpit closes it. Focused utility/help controls isolate gameplay
+keys and interrupt extraction while retaining exact partial work. Menus do not
+pause active time. Survival warnings remain explicit beside pause state and in
+open help. The contextual HUD shows an eligible nearby action, transaction/error
+feedback and exact mining progress/capacity while working.
+
+Panels scroll their own overflowing content; the page stays fixed. Resize
+expands the SVG view without distorting world proportions. The cockpit-project
+`tests/viewport.spec.ts` checks the built `/` at 960×600, 1280×720 and 1920×1080,
+repeat/negative screenshots, DPR 2, inventory/help/focus and partial-work safety,
+resize and the standalone dev fixture. See the
+[layout contract](../docs/playable-2d-foundation.md#viewport-and-hud-803) and
+[#827 evidence](../reports/issue-827/README.md).
 
 The 2D camera universally keeps the active ship vertical with its bow screen-up.
 All scene positions/facings and selection cues share that basis; W/A/S/D is

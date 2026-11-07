@@ -1,7 +1,7 @@
 # Salimon Expedition Interface — HUD and equipment UI art direction
 
 **Decision:** Owner-approved 2026-11-07, **hybrid industrial equipment + projected instrumentation**.
-**Status:** Approved **future presentation/style contract** for the active React/browser client; adoption in individual views and shared components is **not shipped by this documentation PR**. Existing production UI continues to operate until its own implementation issues are merged and verified.
+**Status:** Approved presentation/style contract for the active React/browser client. The #826 shared foundation supplies scoped tokens, typed primitives and development fixtures; **adoption in individual production views remains future work**. Existing production UI continues to operate until its own implementation issues are merged and verified. Screenshot generation does not approve a visual baseline.
 
 ## 1. Identity and authority
 

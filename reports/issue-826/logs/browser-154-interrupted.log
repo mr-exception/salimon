@@ -1,0 +1,79 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:2498) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2511) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:2564) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2577) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2634) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 68 tests using 1 worker
+
+(node:2647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [ui] › tests/ui.spec.ts:5:1 › shared components retain semantics, keyboard isolation and modal focus (3.2s)
+  ✓   2 [ui] › tests/ui.spec.ts:39:40 › repeatable light/dark state references at 960 (4.3s)
+  ✓   3 [ui] › tests/ui.spec.ts:39:40 › repeatable light/dark state references at 1280 (4.1s)
+  ✓   4 [ui] › tests/ui.spec.ts:39:40 › repeatable light/dark state references at 1920 (8.3s)
+(node:2920) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [panoramic] › tests/panoramic.spec.ts:13:1 › HUD-1 full viewport, scanner authority, keyboard browser and priority Escape (17.8s)
+  ✓   6 [panoramic] › tests/panoramic.spec.ts:71:1 › HUD-2 compass render states, ship rotation, zoom and responsive warning priority (32.5s)
+  ✓   7 [panoramic] › tests/panoramic.spec.ts:121:1 › HUD-3 grounded authority and no sidebar at smaller desktop size (5.8s)
+(node:3188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 [look-at] › tests/look-at.spec.ts:12:1 › LOOK-1 rear browser contact, opaque foreground, independent ship alignment and cancellation (27.4s)
+  ✘   9 [look-at] › tests/look-at.spec.ts:84:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled (14.0s)
+
+
+  1) [look-at] › tests/look-at.spec.ts:84:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled
+
+    Test was interrupted.
+
+    Error: page.screenshot: Test ended.
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+
+
+      101 |  const observed = await state(page)
+      102 |  expect(observed.ship).toEqual(initial.ship)
+    > 103 |  await info.attach('grounded-observation.png', { body: await page.screenshot(), contentType: 'image/png' })
+          |                                                                   ^
+      104 |  await info.attach('measurements.json', { body: JSON.stringify({ initial, observed }, (_, v) => typeof v === 'bigint' ? String(v) : v, 2), contentType: 'application/json' })
+      105 | })
+      106 |
+        at /workspace/salimon/client/tests/look-at.spec.ts:103:67
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/look-at-LOOK-2-shared-grou-e9ab3-per-actions-remain-disabled-look-at/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 interrupted
+    [look-at] › tests/look-at.spec.ts:84:1 › LOOK-2 shared grounded Scout observes other bodies, Vesper actions remain disabled
+  59 did not run
+  8 passed (2.2m)

@@ -1,0 +1,18 @@
+
+> salimon-navigation-client@0.1.0 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 105 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.37 kB │ gzip:   0.28 kB
+dist/assets/index-B5bgRJ8u.css     15.06 kB │ gzip:   3.85 kB
+dist/assets/index-CoTLVLat.js   1,455.02 kB │ gzip: 416.36 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.19s

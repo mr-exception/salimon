@@ -1,0 +1,73 @@
+{
+  "method": "WCAG sRGB relative luminance; opaque DOM surfaces, not world shaders",
+  "tokens": {
+    "void": "#09141c",
+    "panel": "#192b30",
+    "surface": "#314e52",
+    "text": "#e8e1d1",
+    "muted": "#afc2c8",
+    "active": "#69d3dd",
+    "mechanical": "#ebc076",
+    "danger": "#e77f73",
+    "heading": "#ffe36a",
+    "velocity": "#b6f5a2"
+  },
+  "pairs": [
+    {
+      "foreground": "text",
+      "background": "panel",
+      "contrast": 11.27750831351659,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "muted",
+      "background": "panel",
+      "contrast": 7.955937017569369,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "text",
+      "background": "surface",
+      "contrast": 6.883278733947772,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "muted",
+      "background": "surface",
+      "contrast": 4.855942514892878,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "danger",
+      "background": "panel",
+      "contrast": 5.3730275129478064,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "mechanical",
+      "background": "panel",
+      "contrast": 8.627719256034299,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "active",
+      "background": "panel",
+      "contrast": 8.367891989908909,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "active",
+      "background": "void",
+      "contrast": 10.600818717318774,
+      "minimum": 4.5,
+      "pass": true
+    }
+  ]
+}

@@ -30,6 +30,10 @@ represent the full default `/` gameplay entry.
 
 The former 3D low-poly art bible and first-person interior/environment camera contracts are legacy implementation references. Their mood, narrative and world-identity decisions remain useful, but incompatible camera, mesh and fragment-specific presentation rules are superseded.
 
+## Shared HUD art direction (future implementation)
+
+The owner-approved [Expedition Interface guide](hud-ui-style-guide.md) selects **hybrid industrial equipment surfaces + restrained projected instrumentation**, with an **adaptive compact** 2D survival/inventory/context HUD. This is a proposed presentation refinement, not a change to currently playable panels or their gameplay mechanics. Retain all authoritative survival, weight/slot, mining, resource and interaction values while consolidating visual primitives and preserving the full viewport.
+
 ## World viewport
 
 The playable 2D world fills the available browser viewport. Survival, inventory,

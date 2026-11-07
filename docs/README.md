@@ -3,6 +3,7 @@
 > **Start with the 2D client:** [Code-checked browser status](current-client-status.md) and the [complete documentation migration register](2d-migration-register.md). Each legacy 3D file is classified by implementation status and future overhead-view relevance; old Rust completion notes do not mean the feature is available in the current game.
 
 Follow the authoritative [visual style](visual-style.md) for art decisions.
+For the owner-approved **future shared browser HUD/equipment presentation**, use the [Expedition Interface style guide](hud-ui-style-guide.md); adoption per view is not claimed by documentation.
 
 GitHub issues are the task source of truth. Read each issue's **Blocked by** section before starting work. These documents capture the project specifications as migrated on 2026-09-29; historical phase wording does not override current issues.
 

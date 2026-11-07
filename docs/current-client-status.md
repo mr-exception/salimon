@@ -1,5 +1,7 @@
 # Current browser implementation and contract routing
 
+> **Approved UI styling, not yet delivered:** the [Expedition Interface HUD/equipment style guide](hud-ui-style-guide.md) specifies a future cross-view industrial/projected visual system. Current 2D meters/inventory panels, production panoramic HUD and storage dialog retain their existing implementation until separate source/browser acceptance verifies visual adoption. No new gameplay mechanics follow from the style approval.
+
 > **Panoramic cockpit (#815):** Default `/` opens the shared grounded panoramic observation scene at the Scout desk. The isolated `/?scene=radar` keeps the orthographic free-flight engineering fixture. See [the delivered integration](../client/README.md#cockpit-gameplay-766).
 
 The [full 2D migration register](2d-migration-register.md) classifies every documentation file, maps historical 3D concepts onto active 2D design, and identifies the unfinished browser adapters.

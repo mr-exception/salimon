@@ -1,13 +1,13 @@
 # 2D documentation migration register
 
-**Original audit on 2026-11-05:** 106 preexisting Markdown files were read and classified; backend documents originally expanded the register to 109 entries. **Register synchronization on 2026-11-06:** the main branch now contains two further browser survival/hazards documents, and this PR adds the Stasis Pod future specification: **112 rows** (GUIDE: 12, DESIGN: 25, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 8). This is a document classification, **not** a claim all designs run in the browser. Original source-status and native test evidence are retained.
+**Original audit on 2026-11-05:** 106 preexisting Markdown files were read and classified; backend documents expanded the register, and the 2026-11-06 synchronization reached **112 rows** (including Stasis Pod). **2026-11-07 UI style proposal:** one new approved-future HUD/equipment design entry brings the register to **113 rows** (GUIDE: 12, DESIGN: 26, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 8). Classification does **not** claim all designs run in the browser; historical implementation and verification evidence remain historical.
 
 **How to interpret status:** **PLAYABLE** means a current browser code owner/contract (individual future subsections remain future); **GUIDE** is active routing/policy; **DESIGN** is approved or proposed future gameplay, **not shipped**; **NATIVE** is revision-specific Rust/3D implementation evidence; **ARCHIVE** is evaluation/qualification or earlier discarded designs. A historical issue closing does not demonstrate browser functionality.
 
 ## Contract precedence and approved 2D interpretation
 
 1. **Current capability:** [browser implementation status](current-client-status.md), actual `client/src` implementation and its production tests. Never infer active functionality from a removed Rust module.
-2. **Future behavior:** latest owner-approved [2D art](top-down-art-direction.md), [Stasis Pod/login/transfer/death](stasis-pod-and-transfer.md), [cockpit/reconnect](cockpit-navigation-and-reconnect.md), [weight-only inventory](resource-inventory-and-gathering.md), [suits and hazards](spacesuit-and-hazards.md), [planet environment](planetary-environment-art-direction.md) and [narrative](narrative-and-lost-journey.md). Where rules are unresolved, keep explicit TBDs.
+2. **Future behavior:** latest owner-approved [2D art](top-down-art-direction.md), [shared HUD/equipment design](hud-ui-style-guide.md), [Stasis Pod/login/transfer/death](stasis-pod-and-transfer.md), [cockpit/reconnect](cockpit-navigation-and-reconnect.md), [weight-only inventory](resource-inventory-and-gathering.md), [suits and hazards](spacesuit-and-hazards.md), [planet environment](planetary-environment-art-direction.md) and [narrative](narrative-and-lost-journey.md). Where rules are unresolved, keep explicit TBDs.
 3. **Historical contracts:** native Rust source, models, 3D screen/camera, fragment, original build, reports and benchmarks in the [pinned pre-2D tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) provide evidence **for that revision**. Preserve useful numbers/identity; do not import superseded assumptions into current browser development.
 4. **Verification:** cloud browser/TS tests and captures are the routine gate; physical device, M1/Metal and subjective release review retain separate ownership.
 
@@ -67,6 +67,7 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`game-systems-overview.md`](game-systems-overview.md) | DESIGN | Product systems overview; native implementation claims must be checked against browser code. |
 | [`geological-materials.md`](geological-materials.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`hall-prototype.md`](hall-prototype.md) | NATIVE | Archived native gameplay/state; requires a distinct browser session implementation and acceptance. |
+| [`hud-ui-style-guide.md`](hud-ui-style-guide.md) | DESIGN | Owner-approved hybrid industrial equipment/projected HUD and adaptive compact cross-view presentation; not yet implemented as a shared browser system. |
 | [`independent-game-qa.md`](independent-game-qa.md) | GUIDE | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
 | [`jump-drive-and-interstellar-travel.md`](jump-drive-and-interstellar-travel.md) | DESIGN | Approved future Jump Drive/impulse, not browser-delivered. |
 | [`legacy-salimon-hub.md`](legacy-salimon-hub.md) | ARCHIVE | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |

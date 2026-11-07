@@ -60,6 +60,8 @@ Until compatible shared launch/return rules are implemented, propulsion, takeoff
 
 ## Compact full-viewport HUD
 
+**Shared presentation supplement (approved 2026-11-07, future styling):** the [Expedition Interface art direction](hud-ui-style-guide.md) defines consistent typography, semantic colors, buttons, equipment-versus-projected surfaces, motion and accessibility across 2D and cockpit. #814/#815 already delivered the functional compact panorama; this shared style pass is **not** assumed shipped and must not restore old vector lines, lattice or sidebar. The mechanics below remain authoritative.
+
 The 3D scene fills the available viewport in desktop cockpit mode: no permanent right sidebar, coordinate lattice, unused margins or normal body scrolling. All controls remain reachable through accessible HUD overlays, not hidden or sacrificed to appearance.
 
 - **Always visible:** Small cyan observation reticle, scanner status/contact count/pulse; current speed with explicit reference frame, throttle and flight/grounded status; compact **3D mini orientation compass**; critical warnings when present.

@@ -962,11 +962,13 @@ Browser edge lines #738: `client/src/radar.ts` owns finite segment clipping, tru
 
 Browser visual QA #751: `client/tests/navigation-captures.spec.ts` captures the
 production App through the #750 deterministic fixture. `client/scripts/visual-comparison.ts`
-owns pixel policy and independent human approval matching; `baseline-approval.ts`
-validates baseline hashes and checks the PR's approval evidence. The
+owns pixel policy and legacy human approval matching; `baseline-approval.ts`
+is an optional legacy tool, no longer invoked by CI after PR #834. The
 [reference guide](../client/tests/navigation-baselines/README.md) owns candidate,
 review, environment upgrade and artifact retention procedures. Reference pixel
-comparisons and human baseline approval are separate required gates.
+comparisons, repeats and negative checks remain required. Subjective visual review
+happens in the deployed version with follow-up issues; no human baseline-approval
+CI job or approval comment is required.
 
 
 ## Top-down browser foundation (#761)

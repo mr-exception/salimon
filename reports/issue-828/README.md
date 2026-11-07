@@ -1,5 +1,40 @@
 # Issue #828 — shared panoramic projected instruments
 
+## Current follow-up — remove human approval job (2026-11-08)
+
+The owner explicitly requested removal of the failing human baseline-approval
+check in this same PR, choosing to review the deployed version and create separate
+issues for visual problems. This supersedes the original approval requirement
+and pending-human-approval statements in the initial delivery record below.
+
+Removed `jobs.baseline-approval` from the Navigation client workflow and the
+issue/PR read permissions used only by that job. The complete `build` job is
+unchanged: domain tests, build/typecheck, full browser tests, negative mutations,
+repeated visual comparisons, visual negatives and evidence uploads remain in CI.
+Reference PNGs, manifest bytes, thresholds and functional test code are unchanged.
+The old manual approval script remains an optional legacy tool, unused by CI.
+Current canonical validation/reference/style guides now describe deployed-version
+review without requiring a human comment or manifest digest approval.
+
+Same-session local review: PASS. The YAML parses, contains only the original
+build job, and preserves that job's complete configuration/steps, triggers and
+concurrency. Permissions are now only `contents: read`. Runtime/test/reference
+inputs match the previous delivered revision; changed Markdown file links resolve
+and `git diff --check` passes. See [focused validation](logs/baseline-job-removal-validation.log).
+No new runtime/browser campaign was run for this workflow/docs-only change.
+
+[Run 42389102741](https://github.com/mr-exception/salimon/actions/runs/42389102741)
+passed the complete build/browser/repeat/negative job for original head
+`2be7458ff58c9c827f6fa3f94945f0c4a64a99b9`; only its now-removed approval job failed.
+This evidence was inspected after the user reported CI failure. The prior
+[follow-up review](https://github.com/mr-exception/salimon/pull/834#issuecomment-6713673723)
+is historical; its human-approval blocker is superseded by the owner's instruction.
+CI for the workflow revision awaits the user's report; no runs were started or
+monitored. No deployment, merge or branch-protection change was performed.
+Environment additions for this follow-up: **None**; PyYAML 6.0.3 was preinstalled.
+
+## Initial implementation record
+
 Implemented on `issue-828-projected-cockpit` from `main` at
 `7254ba929d86a9af5b427cd325de98dfec15dae5`. Both prerequisites (#825 and #826)
 are merged into this base; no active PR stack existed at discovery or publication
@@ -13,7 +48,7 @@ telemetry sits beside the seated survival column, above the footer. Help retains
 navigation and survival warning summaries instead of dimming every warning behind
 its modal backdrop. There is no navigation, simulation, save or optical shader change.
 
-## Local criterion review
+## Initial local criterion review
 
 This is the implementing agent's **same-session source/evidence review**, not
 independent execution or approval of visual references. Local criteria pass;

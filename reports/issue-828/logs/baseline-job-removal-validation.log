@@ -1,0 +1,8 @@
+PASS: workflow YAML parses; only build job remains.
+PASS: build job, all steps/commands/timeouts/artifact settings identical after YAML parsing.
+PASS: triggers, name and concurrency unchanged; permissions reduced to contents: read.
+PASS: runtime, functional tests, package/lockfile and visual reference bytes unchanged from passing CI build revision 2be7458ff58c9c827f6fa3f94945f0c4a64a99b9
+PASS: changed Markdown local file links resolve.
+PyYAML 6.0.3 (preinstalled); no dependency installation.
+Revised workflow SHA-256: 0dcdf662d4cc0c12bc9035244cb02c12b1727d8cba2e58a91ad5025e21a75ade
+Preserved build job SHA-256: 683cca822c9bedd641a95839f500d149d7beca42f01b483728b5c20e437e8d24

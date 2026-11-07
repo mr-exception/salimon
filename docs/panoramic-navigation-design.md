@@ -130,4 +130,6 @@ bright-star render at all three sizes, checks a bright background pixel and
 verifies navigation/survival warning summaries remain visible inside focused help. Existing `HUD`, `LOOK`, sensor,
 `COCKPIT-1` and PANO-VIS coverage still owns functional/camera/scanner/lifecycle
 acceptance. See [issue #828 evidence](../reports/issue-828/README.md). Changed
-reference images remain candidates requiring explicit human baseline approval.
+reference images retain their originals/diffs for review. The owner reviews
+appearance in the deployed version and files follow-up issues; no separate human
+baseline-approval CI job is required (PR #834).

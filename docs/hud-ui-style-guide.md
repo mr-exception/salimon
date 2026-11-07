@@ -133,7 +133,9 @@ Future Core/Fabricator/Archive/suit-specific surfaces are **style application ta
 - **State gallery:** default, hover, focus-visible, disabled-with-reason, pending, accepted, rejected, hazard, terminal, empty inventory, capacity full, scanner zero contacts and selected/occluded/lost contact.
 - **Behavior:** focus lock, Escape hierarchy, pause versus menu, grounded cockpit, power interruption, manual observation versus ship steering, transaction interruption and authoritative HUD updates.
 - **Accessibility:** mouse, keyboard-only and reduced-motion passes; meaningful accessible names/live regions, no critical color-only signals.
-- **Regressions:** existing 2D collisions/navigation, scan permission/occlusion and save tests remain effective. Use the repository's Node/TypeScript tests, build, Playwright/Chromium and original screenshot captures with explicit baseline approval.
+- **Regressions:** existing 2D collisions/navigation, scan permission/occlusion and save tests remain effective. Use the repository's Node/TypeScript tests, build, Playwright/Chromium and original screenshot captures with retained diffs. The owner reviews appearance
+in the deployed version and files follow-up issues; no separate human baseline-approval
+CI job or approval comment is required (PR #834).
 - **Evidence:** each implementation issue reports precise commands, viewport/DPR, SHA, actual PASS/FAIL/NOT RUN and unresolved human/device qualification. Cloud software rendering cannot assert native GPU performance.
 
 ## Shared foundation implementation (#826)
@@ -185,4 +187,5 @@ the compass alone consumes heading/velocity inks. Seated survival remains availa
 in its own bounded column above the compass, with expanded telemetry beside it.
 See the [panoramic contract](panoramic-navigation-design.md#shared-projected-instrumentation-828)
 and [original captures/results](../reports/issue-828/README.md). Styling acceptance
-and explicit human reference approval remain separate from functional passes.
+in the deployed version remains separate from functional passes; no separate
+human reference-approval CI job is required.

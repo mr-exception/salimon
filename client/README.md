@@ -313,8 +313,8 @@ summary. CI runs both the normal and negative suites; a successful negative
 demonstration means the intentionally broken copy failed, not that broken code
 passed. Set `SALIMON_EVIDENCE_DIR` / `SALIMON_NEGATIVE_DIR` to separate output paths.
 
-These captures are evidence, not approved pixel-regression baselines. Baseline
-approval/diffs are #751. Review changes and originals in the active Codex chat;
+These captures are evidence. Visual references/diffs are #751; the owner reviews
+appearance in the deployed version without a separate approval-comment CI job. Review changes and originals in the active Codex chat;
 the automated #752 review/status gate is retired.
 The fixed Ubuntu CI runner and lockfile-selected Chromium improve repeatability;
 a browser/OS update needs relevant revalidation. SwiftShader does not qualify
@@ -334,12 +334,14 @@ physical input, native platforms or hardware FPS.
 
 The [visual reference guide](tests/navigation-baselines/README.md) owns the eight
 frozen browser screens, fixed fonts/Fontconfig/browser/backend, pixel comparison policy,
-intentional visual defect demonstration and explicit independent baseline approval.
+intentional visual defect demonstration and retained image/diff evidence.
 `npm run test:visual` compares all screens; run it twice for determinism and run
 `npm run test:visual:negative` to prove the comparator rejects a real CSS defect.
 The ordinary `test:browser` suite includes these captures. Candidate generation
-never approves a baseline; CI blocks changed references until a human collaborator
-approves the exact manifest digest. Software WebGL does not qualify hardware GPUs.
+does not certify appearance. The owner removed the human baseline-approval CI job
+in PR #834; subjective review happens in the deployed version, with separate issues
+for regressions. Automated comparisons, repeats and negative checks remain required.
+Software WebGL does not qualify hardware GPUs.
 
 ## Scout container domain (#784)
 
@@ -375,13 +377,6 @@ checks a validated prior full-container save, overweight/stale-save errors and a
 narrow viewport. It is part of the existing cockpit project and full browser CI.
 The player-slot feedback helper is tested with validated synthetic usage; the
 current two-resource/empty-item catalog cannot fill all 12 slots in browser play.
-
-For stacked pull requests, the baseline-approval CI job fetches the declared
-parent SHA explicitly before comparing its manifest. GitHub's synthetic stacked
-merge ref can place the actual parent outside a depth-2 checkout. Missing history
-is repaired by fetching that exact commit; changed reference digests still require
-the existing explicit human approval. The gate itself and reference bytes are
-unchanged.
 
 The NAV-1 replay completes a 1,200 ms input window (75 × 16 ms RAF intervals,
 72 fixed 60 Hz ticks) before equality comparison, and asserts that exact tick
@@ -480,7 +475,7 @@ OBS-1–5 cover real WebGL, independent ship steering/motion, reset/remount,
 telescope sensitivity/pixels, focus cancellation, resize/DPR, spherical input,
 repeat captures and a deliberately wrong wide-versus-telescope comparison.
 These originals are evidence, not approved navigation baselines. Existing
-baseline approval and regression gates remain required in CI.
+automated regression gates remain required in CI.
 
 ## Physical optical sky foundation (#811)
 
@@ -510,7 +505,7 @@ OPT-1 checks pre-pulse disks/no selection, unchanged pixels after a real scanner
 pulse, occulted-body removal, repeat stability and a huge translated origin.
 OPT-2 captures telescope/tiny moon, the shared grounded horizon and downward
 occlusion. These captures are review candidates, not approved baselines. Existing
-CI baseline approval and negative/repeat regression gates remain unchanged.
+CI negative/repeat regression gates remain required; no human approval job runs.
 
 GPU ordering uses logarithmic physical ray distances, avoiding float overflow
 without exposing absolute galactic coordinates. The shader/material is disposed
@@ -659,10 +654,10 @@ npm run test:visual:negative
 Candidate generation writes a complete proposal outside the tracked references,
 retaining the older images and shared manifest fields. Review the originals and
 copy the proposed PNGs/manifest into a dedicated reviewable change before normal
-comparison. It rejects relative/in-place output and is forbidden in CI. These images are **awaiting
-human review** until the existing baseline-approval job finds the owner's
-explicit approval of the exact changed manifest digest; generating or matching
-candidates does not approve appearance. Never regenerate references to resolve
+comparison. It rejects relative/in-place output and is forbidden in CI. Generating
+or matching candidates does not certify appearance. No separate human-approval
+comment or digest gate is required; the owner reviews the deployed result and
+files follow-up issues for visual problems. Never regenerate references to resolve
 a failure. Keep originals, diffs, JSON metadata and traces in `test-results/`
 and retain essential raw evidence with the issue report before artifacts expire.
 Software SwiftShader measurements do not establish target-device GPU/Metal FPS;
@@ -698,4 +693,4 @@ and 1920×1080. `HUD-BRIGHT` checks actual bright-star pixels and visible warnin
 summaries in focused help at the same sizes. Use `npm run test:browser -- --project=panoramic` for focused checks;
 `LOOK`, `COCKPIT-1` and PANO-VIS retain command/lifecycle and visual coverage.
 See [the delivery evidence](../reports/issue-828/README.md); new image candidates
-need human approval of the complete manifest digest under the existing gate.
+remain reviewable evidence; there is no human baseline-approval CI gate.

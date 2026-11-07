@@ -1,5 +1,7 @@
 # Salimon visual style
 
+> **UI/HUD companion (approved future design, 2026-11-07):** [Expedition Interface style guide](hud-ui-style-guide.md) governs shared browser HUD, dialogs, buttons, equipment surfaces, semantic typography/colors and interaction feedback. It preserves this page's illustrated world-art identity and does **not** claim the style system is implemented.
+
 ## Active 2D visual language
 
 Render characters, tools, cargo fixtures and planetary features as **illustrated overhead sprites/layers** with deliberate silhouettes, consistent down-facing lighting logic, sparse readable marks and stable scale. Palette, warm/cool zoning and restrained material aging carry over from the previous stylized 3D work; polygon counts, bevel topology, PBR mesh budgets, first-person lens/camera and Blender export guidance below are **historical authoring examples**, not requirements for the active 2D client.

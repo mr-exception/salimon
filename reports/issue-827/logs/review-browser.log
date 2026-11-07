@@ -1,0 +1,40 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test --project=cockpit cockpit.spec.ts playable-slice.spec.ts viewport.spec.ts
+
+[WebServer] (node:5211) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5224) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:5243) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5313) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:5325) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/cockpit.spec.ts:10:1 › COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation (4.5m)
+(node:5579) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [cockpit] › tests/playable-slice.spec.ts:14:1 › SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return (2.9m)
+(node:5774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [cockpit] › tests/viewport.spec.ts:67:3 › VIEWPORT production 1280x720 HUD, input, repeat and negative comparison (6.0s)
+  ✓  4 [cockpit] › tests/viewport.spec.ts:67:3 › VIEWPORT production 960x600 HUD, input, repeat and negative comparison (5.5s)
+  ✓  5 [cockpit] › tests/viewport.spec.ts:67:3 › VIEWPORT production 1920x1080 HUD, input, repeat and negative comparison (6.7s)
+  ✓  6 [cockpit] › tests/viewport.spec.ts:136:1 › VIEWPORT DPR 2 and standalone development fixture preserve projection (2.9s)
+  ✓  7 [cockpit] › tests/viewport.spec.ts:149:1 › HUD inventory/help focus isolates walking, mining and Escape; menus keep active time (1.8s)
+  ✓  8 [cockpit] › tests/viewport.spec.ts:176:1 › HUD opening inventory interrupts extraction and preserves partial work without E leakage (3.7s)
+
+  8 passed (8.0m)

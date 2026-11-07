@@ -8,7 +8,9 @@ import { boot, scene, walkTo, walkTicks, position } from './worldJourney'
 test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: false, sources: true } })
 
 test('COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation', async ({ browser }, info) => {
-  test.setTimeout(360000)
+  // Two complete software-WebGL replays may exceed six wall-clock minutes;
+  // simulation intervals, assertions and image thresholds remain unchanged.
+  test.setTimeout(600000)
   const originals: Record<string, Buffer> = {}, measurements = []
   for (let replay = 0; replay < 2; replay++) {
     const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce' })
@@ -32,7 +34,11 @@ test('COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent sim
       for (const p of [[-2, 3], [-2, 7]]) await walkTo(page, p, 'planet:fixture', true)
       for (const p of [[0, 7], [0, 2], [0, .45], [1.35, .45], [1.35, -1.65], [0, -1.65], [0, -3.1]]) await walkTo(page, p, 'ship:scout', true)
       const before = await ship()
+      await page.keyboard.press('i'); await page.clock.runFor(32)
+      await expect(page.locator('#field-inventory')).toBeVisible()
+      await page.locator('body').click({ position: { x: 640, y: 400 } })
       await page.keyboard.press('e')
+      await expect(page.locator('[aria-controls=field-inventory]')).toHaveAttribute('aria-expanded', 'false')
       await expect(main).toHaveAttribute('data-player-mode', 'seated'); await expect(main).toHaveAttribute('data-occupant', 'player:local')
       await expect.poll(async () => { await page.clock.runFor(50); return page.getByLabel('Panoramic universe', { exact: true }).count() }).toBe(1)
       await expect(page.getByLabel('Panoramic universe', { exact: true })).toBeVisible()

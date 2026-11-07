@@ -1,0 +1,1075 @@
+{
+  "stats": {
+    "startTime": "2026-11-07T08:34:26.282Z",
+    "duration": 932786.435,
+    "expected": 23,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "file": "cockpit.spec.ts",
+      "title": "COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent simulation",
+      "project": "cockpit",
+      "status": "unexpected",
+      "runs": [
+        {
+          "status": "timedOut",
+          "durationMs": 365256,
+          "artifacts": [
+            {
+              "name": "panoramic-horizon-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/panoramic-horizon-repeat.json-8023a2edff.json",
+              "sha256": "8023a2edff66019e214a72e0477cc2cfd8fbb8e48c0db0db0f1aef98fdf79cab"
+            },
+            {
+              "name": "panoramic-horizon-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/panoramic-horizon-diff.png-a8903b00d1.png",
+              "sha256": "a8903b00d16c84b0d1ddb5432262190e867579da64eebc0a79d780cca67facc8"
+            },
+            {
+              "name": "external-body-observation-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/panoramic-horizon-repeat.json-8023a2edff.json",
+              "sha256": "8023a2edff66019e214a72e0477cc2cfd8fbb8e48c0db0db0f1aef98fdf79cab"
+            },
+            {
+              "name": "external-body-observation-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/external-body-observation-diff.png-546fce85aa.png",
+              "sha256": "546fce85aa86794685da438cf96b3b0e106f9da5ca2d4346367a2b1ac3071c7b"
+            },
+            {
+              "name": "standing-return-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/standing-return-repeat.json-57e3b01d6e.json",
+              "sha256": "57e3b01d6eae270781d0992704ae7c3a050cbaa3c6e15ade9892d04cdf955de5"
+            },
+            {
+              "name": "standing-return-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/standing-return-diff.png-a0d171d3c4.png",
+              "sha256": "a0d171d3c40e40b98d347c8cea0c0fc9b464c4195ad7f26a99f5f629884aaf4b"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/test-failed-2.png"
+            },
+            {
+              "name": "error-context",
+              "contentType": "text/markdown",
+              "path": "cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/error-context.md"
+            },
+            {
+              "name": "trace",
+              "contentType": "application/zip",
+              "path": "cockpit-COCKPIT-1-panorami-aeb94-t-and-persistent-simulation-cockpit/trace.zip"
+            }
+          ],
+          "error": "Test timeout of 360000ms exceeded."
+        }
+      ]
+    },
+    {
+      "file": "gathering.spec.ts",
+      "title": "GATHER-1 built mixed gathering, interruption, atomic reload and weight feedback repeat",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 36973,
+          "artifacts": [
+            {
+              "name": "gather-source-ready-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/gather-source-ready-repeat.json-9d0074dab5.json",
+              "sha256": "9d0074dab5b0052691707da3eda6bd162aab0d61bf3cd903b1b1f1ed28ebcb4a"
+            },
+            {
+              "name": "gather-source-ready-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/gather-source-ready-diff.png-5b3e093522.png",
+              "sha256": "5b3e09352286cc5c6fbe2b27807946470d79ad74cc7bae68999a27c2d31a8d55"
+            },
+            {
+              "name": "gather-weight-full-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/gather-weight-full-repeat.json-d908d1aa2c.json",
+              "sha256": "d908d1aa2c2bc780b6e0721446555e4c26ff1bcca20c2111a70f530a955d06fb"
+            },
+            {
+              "name": "gather-weight-full-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/gather-weight-full-diff.png-38aff42946.png",
+              "sha256": "38aff42946f3366791baa9600820a3cd2c7df73e419686cb9907ed35f2213321"
+            },
+            {
+              "name": "gathering-records.json",
+              "contentType": "application/json",
+              "path": "measurements/gathering-records.json-0f9c316b94.json",
+              "sha256": "0f9c316b9474a9a2e1e7426027805ea9d7a9a103f991512b94e3673932348ec1"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "gathering-GATHER-1-built-m-f0fa3--and-weight-feedback-repeat-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "gathering.spec.ts",
+      "title": "GATHER-2 biological weight cap, movement interruption and competing browser tab",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 8485,
+          "artifacts": [
+            {
+              "name": "weight-save.json",
+              "contentType": "application/json",
+              "path": "measurements/weight-save.json-12d5e59107.json",
+              "sha256": "12d5e59107ec47598ff6a3b29330381ebb03643c0c1510f8c6ca43e7b190662b"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "gathering-GATHER-2-biologi-006ae-n-and-competing-browser-tab-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "hazards.spec.ts",
+      "title": "HAZ-1\u20135 built non-shipping fixture uses production clock/save, exact reload/recovery, pause and write failure",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 41517,
+          "artifacts": [
+            {
+              "name": "hazard-records.json",
+              "contentType": "application/json",
+              "path": "measurements/hazard-records.json-73fac9cad1.json",
+              "sha256": "73fac9cad10dffe2b26074d41558a6b62ea484a5b1451123e8b8e5cb2e9275ce"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "hazards-HAZ-1\u20135-built-non--7fe28-ery-pause-and-write-failure-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "hazards.spec.ts",
+      "title": "normal built game exposes no hazard fixture, source sampling or module grants",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1736,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "hazards-normal-built-game--db121-e-sampling-or-module-grants-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "items.spec.ts",
+      "title": "ITEM-1\u20136 fixture runs production item adapter, HUD, gathering, rejection and durable reload twice",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 26231,
+          "artifacts": [
+            {
+              "name": "items-empty-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/panoramic-horizon-repeat.json-8023a2edff.json",
+              "sha256": "8023a2edff66019e214a72e0477cc2cfd8fbb8e48c0db0db0f1aef98fdf79cab"
+            },
+            {
+              "name": "items-raw-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/items-raw-repeat.json-a2bf4f2220.json",
+              "sha256": "a2bf4f222021d0c62e25c87bf4e0b84c4d1dbc92de4ea736d79663a5e5105320"
+            },
+            {
+              "name": "items-mixed-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/items-mixed-repeat.json-d57f430bc1.json",
+              "sha256": "d57f430bc18a2cccd62731d033d2fafb600afb81384e1a16f161541151b7354b"
+            },
+            {
+              "name": "items-overweight-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/items-overweight-repeat.json-247084beaa.json",
+              "sha256": "247084beaa5813438196b8ebf8071b521ef32e44ef29efca1f28b23690c55692"
+            },
+            {
+              "name": "items-journeys.json",
+              "contentType": "application/json",
+              "path": "measurements/items-journeys.json-2dc4ed84f9.json",
+              "sha256": "2dc4ed84f9b4c73afc48f42c9b8c6d314354c497bf50a61322706e716fb831f2"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "items-ITEM-1\u20136-fixture-run-642ab-on-and-durable-reload-twice-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "items.spec.ts",
+      "title": "ordinary built game has no item fixture, grants or query backdoor",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1471,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "items-ordinary-built-game--c399b-re-grants-or-query-backdoor-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "items.spec.ts",
+      "title": "HUD full-by-slots uses authoritative count items and never advertises Gather",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3237,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "items-HUD-full-by-slots-us-78809-and-never-advertises-Gather-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "playable-slice.spec.ts",
+      "title": "SLICE-1 built outdoor sources, doorway, cutaway, radar, standing exit and return",
+      "project": "cockpit",
+      "status": "unexpected",
+      "runs": [
+        {
+          "status": "failed",
+          "durationMs": 135508,
+          "artifacts": [
+            {
+              "name": "slice-outdoor-spawn-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/slice-outdoor-spawn-0-state.json-60bbc1d14b.json",
+              "sha256": "60bbc1d14b1d4b8c34510b4c8985c89713d14db966766b735e35b90d16017383"
+            },
+            {
+              "name": "slice-mineral-inspection-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/slice-mineral-inspection-0-state.json-69fbcad944.json",
+              "sha256": "69fbcad94443a5fa95d7685c88adf7c0348c51ebaed99b7646d371cc8d62780f"
+            },
+            {
+              "name": "slice-exterior-cutaway-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/slice-exterior-cutaway-0-state.json-b76885bcbc.json",
+              "sha256": "b76885bcbc903662d3babc2809955225308df1a11509daccf9632b0cec610885"
+            },
+            {
+              "name": "slice-grounded-panoramic-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/slice-grounded-panoramic-0-state.json-ec4227b470.json",
+              "sha256": "ec4227b470e6acfadc99f88a211f0de0a87e29daa03b0b7132efd883a6fe93b0"
+            },
+            {
+              "name": "slice-standing-return-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/slice-standing-return-0-state.json-0d72cabfad.json",
+              "sha256": "0d72cabfadca6e8969c4b45bb68301f228d4375b8f7ac38dd7c986bad76ae2e0"
+            },
+            {
+              "name": "slice-returned-outdoors-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/slice-returned-outdoors-0-state.json-ba261a742d.json",
+              "sha256": "ba261a742d703cad6719a8ba2d952ad990e29bb5c83ddb176c3ce52f3b883d95"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/test-failed-1.png"
+            },
+            {
+              "name": "error-context",
+              "contentType": "text/markdown",
+              "path": "playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/error-context.md"
+            },
+            {
+              "name": "trace",
+              "contentType": "application/zip",
+              "path": "playable-slice-SLICE-1-bui-0c1a6-ar-standing-exit-and-return-cockpit/trace.zip"
+            }
+          ],
+          "error": "Error: expect(locator).toBeVisible() failed\n\nLocator:  getByText('Expedition saves automatically on this browser.')\nExpected: visible\nReceived: hidden\nTimeout:  10000ms\n\nCall log:\n  - Expect \"toBeVisible\" getByText('Expedition saves automatically on this browser.') with timeout 10000ms\n  - waiting for getByText('Expedition saves automatically on this browser.')\n    23 \u00d7 locator resolved to <p class=\"resource-note\">Expedition saves automatically on this browser.</p>\n       - unexpected value \"hidden\"\n"
+        }
+      ]
+    },
+    {
+      "file": "storage.spec.ts",
+      "title": "STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 69805,
+          "artifacts": [
+            {
+              "name": "storage-open-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-open-repeat.json-b2855dfcb9.json",
+              "sha256": "b2855dfcb93afbd9111097b4d4192dbedfbbde6b4d6154a232b1cb0646e1cfcd"
+            },
+            {
+              "name": "storage-open-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/storage-open-diff.png-ce80564639.png",
+              "sha256": "ce80564639c562e8c9a7b96c47c75ad619e41e41a3e2f03ca5a29f2ff1d8d376"
+            },
+            {
+              "name": "storage-transferred-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-open-repeat.json-b2855dfcb9.json",
+              "sha256": "b2855dfcb93afbd9111097b4d4192dbedfbbde6b4d6154a232b1cb0646e1cfcd"
+            },
+            {
+              "name": "storage-transferred-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/storage-transferred-diff.png-814dbf3d0c.png",
+              "sha256": "814dbf3d0cd101d887044bb702fa79fffe020b7a9529d8d2b455c9b43503e496"
+            },
+            {
+              "name": "storage-error-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-error-repeat.json-c64263242a.json",
+              "sha256": "c64263242aa2e40cb4811d08b22b6e1ba31062781c01c99a96f207518ccd0d97"
+            },
+            {
+              "name": "storage-error-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/storage-error-diff.png-5869510e90.png",
+              "sha256": "5869510e90d11655d988a951fdabe66bef9406729aa0645ed847cefd43086efc"
+            },
+            {
+              "name": "storage-journeys.json",
+              "contentType": "application/json",
+              "path": "measurements/storage-journeys.json-241946d2f7.json",
+              "sha256": "241946d2f7bace69d62c42f984ad2aef3d78a15ee62be7dbacf7a36e3e40787e"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "storage-STORE-UI-1-built-m-fc472-cel-exit-and-reload-repeats-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "storage.spec.ts",
+      "title": "STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 5651,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "storage-STORE-UI-2-full-ov-816e5-llation-and-narrow-viewport-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "survival.spec.ts",
+      "title": "SURV built active/pause/reload, outdoor/interior/navigation-return and terminal reset",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 36264,
+          "artifacts": [
+            {
+              "name": "survival-records.json",
+              "contentType": "application/json",
+              "path": "measurements/survival-records.json-c9319fdca9.json",
+              "sha256": "c9319fdca9bdd5b3166de8b5ed6d3bf758ed1c8cb98838e0ca79493b7e53f1a1"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "survival-SURV-built-active-9de1a-n-return-and-terminal-reset-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "survival.spec.ts",
+      "title": "SURV-799 approved rates and partial interruption/reload preserve exact grams",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 12923,
+          "artifacts": [
+            {
+              "name": "mining-policy-records.json",
+              "contentType": "application/json",
+              "path": "measurements/mining-policy-records.json-e0d355e0bf.json",
+              "sha256": "e0d355e0bf476735b6438c1d4ea0f3601921b337e80b3b87eb9255dbc9ee787e"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "survival-SURV-799-approved-3a8be-reload-preserve-exact-grams-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "survival-SURV-799-approved-3a8be-reload-preserve-exact-grams-cockpit/test-finished-2.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "survival-SURV-799-approved-3a8be-reload-preserve-exact-grams-cockpit/test-finished-3.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT production 1280x720 HUD, input, repeat and negative comparison",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 13527,
+          "artifacts": [
+            {
+              "name": "negative.json",
+              "contentType": "application/json",
+              "path": "measurements/negative.json-d547d895b8.json",
+              "sha256": "d547d895b881194ed1046af766a280da83d70d93ddfba7db9e479b4adf849f86"
+            },
+            {
+              "name": "fresh-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-a23a727b02.json",
+              "sha256": "a23a727b0255c13b5522264048c3f3fd54f265ac7ad647b62979093a01673023"
+            },
+            {
+              "name": "repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-a23a727b02.json",
+              "sha256": "a23a727b0255c13b5522264048c3f3fd54f265ac7ad647b62979093a01673023"
+            },
+            {
+              "name": "layout.json",
+              "contentType": "application/json",
+              "path": "measurements/layout.json-2c74eec33a.json",
+              "sha256": "2c74eec33ae5e0eb332a0ab52b3e933797645559c4d8a0a762728e52c3f29602"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-83618-eat-and-negative-comparison-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT production 960x600 HUD, input, repeat and negative comparison",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 5743,
+          "artifacts": [
+            {
+              "name": "negative.json",
+              "contentType": "application/json",
+              "path": "measurements/negative.json-8fa71df276.json",
+              "sha256": "8fa71df27607f6c8fe501abdc8cc277e01eb766fb2d5578bafe62add13f21cf4"
+            },
+            {
+              "name": "fresh-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-7ec7d412ac.json",
+              "sha256": "7ec7d412ac85029f697318ff3651dcf524870d2122ca24dcdcb0cb4427c0e3d8"
+            },
+            {
+              "name": "repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-7ec7d412ac.json",
+              "sha256": "7ec7d412ac85029f697318ff3651dcf524870d2122ca24dcdcb0cb4427c0e3d8"
+            },
+            {
+              "name": "layout.json",
+              "contentType": "application/json",
+              "path": "measurements/layout.json-d94a6ee641.json",
+              "sha256": "d94a6ee64127b87308e11e58f68bd02dbfe1d28c9375a6f24240269f5cb11dd7"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-18de9-eat-and-negative-comparison-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT production 1920x1080 HUD, input, repeat and negative comparison",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 7187,
+          "artifacts": [
+            {
+              "name": "negative.json",
+              "contentType": "application/json",
+              "path": "measurements/negative.json-f01f689719.json",
+              "sha256": "f01f6897197c77b87043bd0782ca60f551d1adeb5c53e51428453ee1483754f8"
+            },
+            {
+              "name": "fresh-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-6b0a655b66.json",
+              "sha256": "6b0a655b66599e3062d133040df0fb224a79e7967b3e51a11168ae2a8870230d"
+            },
+            {
+              "name": "repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/fresh-repeat.json-6b0a655b66.json",
+              "sha256": "6b0a655b66599e3062d133040df0fb224a79e7967b3e51a11168ae2a8870230d"
+            },
+            {
+              "name": "layout.json",
+              "contentType": "application/json",
+              "path": "measurements/layout.json-dc16fd3e48.json",
+              "sha256": "dc16fd3e481ba0cda7d0a2810eaa3cae3d53e58a5559d3cbe2739c4ac6f150ef"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-producti-919fd-eat-and-negative-comparison-cockpit/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "VIEWPORT DPR 2 and standalone development fixture preserve projection",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2606,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-VIEWPORT-DPR-2-an-32fd0-fixture-preserve-projection-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "viewport.spec.ts",
+      "title": "HUD inventory/help focus isolates walking, mining and Escape; menus keep active time",
+      "project": "cockpit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1690,
+          "artifacts": [
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "viewport-HUD-inventory-hel-5b462-cape-menus-keep-active-time-cockpit/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-1/4 one scene, stable layers, visible interior and identical fresh-run baseline captures",
+      "project": "top-down",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3275,
+          "artifacts": [
+            {
+              "name": "top-down-baseline.png",
+              "contentType": "image/png",
+              "path": "top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/top-down-baseline-1.png",
+              "sha256": "82459521e77b5a7ddf6771a956b0b24d703f5eb77a199d9653b0a7d728e6f8ff"
+            },
+            {
+              "name": "top-down-observations.json",
+              "contentType": "application/json",
+              "path": "measurements/top-down-observations.json-005f619238.json",
+              "sha256": "005f61923847a5c071364bb70dc1f566c9ff007d3160df99bc0c4273370b2dc8"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-TD-1-4-one-scene--5f24a-fresh-run-baseline-captures-top-down/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-2 release/blur/hidden/resize/focus clear movement while camera settles smoothly",
+      "project": "top-down",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2509,
+          "artifacts": [
+            {
+              "name": "walk.json",
+              "contentType": "application/json",
+              "path": "measurements/walk.json-5dc4a50d69.json",
+              "sha256": "5dc4a50d69c0f9f83c27e7203210698869b051d26b7465109c2b2cfb8bfbd893"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-TD-2-release-blur-969ee-ile-camera-settles-smoothly-top-down/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-3 collisions, keyboard detour, selection and request/cancel use the continuous scene",
+      "project": "top-down",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 5792,
+          "artifacts": [
+            {
+              "name": "journey.json",
+              "contentType": "application/json",
+              "path": "measurements/journey.json-c72a1d0ea7.json",
+              "sha256": "c72a1d0ea7e92892c24e5d278df6ad80b199d90043978bb9f723e8ddc9f4352a"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-TD-3-collisions-k-0b12f-el-use-the-continuous-scene-top-down/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TD-5 explicit built radar entry retains standalone navigation",
+      "project": "top-down",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1605,
+          "artifacts": [
+            {
+              "name": "backend.json",
+              "contentType": "application/json",
+              "path": "measurements/backend.json-30bf794475.json",
+              "sha256": "30bf794475e4fa7e97e479ebb6c37baaae7a60f122c052e871d47da8a2c12194"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-TD-5-explicit-bui-24743-tains-standalone-navigation-top-down/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "SCOUT-1 wide cargo route, module anchors and exposed exterior cutaway",
+      "project": "top-down",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 4222,
+          "artifacts": [
+            {
+              "name": "exterior-cutaway.png",
+              "contentType": "image/png",
+              "path": "top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/planet-spawn-0.png",
+              "sha256": "873938e6f13e8c034ef6f8859684c4ce48893a08204e668e375e092321c80ebd"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-SCOUT-1-wide-carg-cdda4-nd-exposed-exterior-cutaway-top-down/test-finished-1.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "PLANET-1 fixed outdoor journey, source footprints and repeat screenshots",
+      "project": "top-down",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 31374,
+          "artifacts": [
+            {
+              "name": "planet-spawn-0.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-spawn-0.json-acd406b5c7.json",
+              "sha256": "acd406b5c7378132fb7f5b190008f28e1100c57af866840647a72c5c477d8af7"
+            },
+            {
+              "name": "planet-near-rock-0.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-rock-0.json-add3f9688f.json",
+              "sha256": "add3f9688f3e1f5e97f59b50aaba25a42c88a303eac15aac7ce13f01de9b7776"
+            },
+            {
+              "name": "planet-near-colony-0.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-colony-0.json-844bb35a14.json",
+              "sha256": "844bb35a14b4a5a95079ed5edfb725159ec46b0549969027c27b07ded016658e"
+            },
+            {
+              "name": "planet-near-scout-0.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-scout-0.json-dc410a6fb6.json",
+              "sha256": "dc410a6fb6ad03074b8206766c9af8e48ae9ecdb14847a99e6153afa19b6629f"
+            },
+            {
+              "name": "planet-spawn-1.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-spawn-0.json-acd406b5c7.json",
+              "sha256": "acd406b5c7378132fb7f5b190008f28e1100c57af866840647a72c5c477d8af7"
+            },
+            {
+              "name": "planet-spawn-comparison.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-spawn-comparison.json-42973032e3.json",
+              "sha256": "42973032e32536d1a0d12ca4d7a1a66de29de8efaf5391f2718379d156a7933b"
+            },
+            {
+              "name": "planet-spawn-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/planet-spawn-diff.png-b765b7aa4c.png",
+              "sha256": "b765b7aa4c8b0f75b5ca0f42ce6b4bd5d3589b5f0d1ed8546568a3661353ba18"
+            },
+            {
+              "name": "planet-near-rock-1.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-rock-0.json-add3f9688f.json",
+              "sha256": "add3f9688f3e1f5e97f59b50aaba25a42c88a303eac15aac7ce13f01de9b7776"
+            },
+            {
+              "name": "planet-near-rock-comparison.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-rock-comparison.json-5c8bf86b51.json",
+              "sha256": "5c8bf86b51050781cd05df9d45e6e888a8d95a098b19c899454ea2d2d3a5f6fa"
+            },
+            {
+              "name": "planet-near-rock-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/planet-near-rock-diff.png-6434f86646.png",
+              "sha256": "6434f86646f9d2caca672bf66b346f03a7a1b7a727de915940eb9b92ab8b09e9"
+            },
+            {
+              "name": "planet-near-colony-1.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-colony-0.json-844bb35a14.json",
+              "sha256": "844bb35a14b4a5a95079ed5edfb725159ec46b0549969027c27b07ded016658e"
+            },
+            {
+              "name": "planet-near-colony-comparison.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-colony-comparison.json-f6c71ca316.json",
+              "sha256": "f6c71ca31686063120e290e7a8e55b001d9c4bdc9255a400d30cd42cd5313c40"
+            },
+            {
+              "name": "planet-near-colony-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/planet-near-colony-diff.png-c6aaa72af8.png",
+              "sha256": "c6aaa72af8037ca3e6abcb79251055f9c048df26bdd5d534e9a51d7a213bfeec"
+            },
+            {
+              "name": "planet-near-scout-1.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-scout-1.json-228e1fff19.json",
+              "sha256": "228e1fff199d4325645a7bb3de6bf7ea89a923394897ed2ff17e12e17a0aa406"
+            },
+            {
+              "name": "planet-near-scout-comparison.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-near-scout-comparison.json-e9978e70fa.json",
+              "sha256": "e9978e70fa6f6523b3a11d6380e09ac55ec52222cda72b5db835addbdba5f798"
+            },
+            {
+              "name": "planet-near-scout-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/planet-near-scout-diff.png-5334fc678c.png",
+              "sha256": "5334fc678c495a43a38c5ebedd120c0361be21b59a0339504bbf91c9963d4554"
+            },
+            {
+              "name": "wrong-checkpoint-negative.json",
+              "contentType": "application/json",
+              "path": "measurements/wrong-checkpoint-negative.json-d4e18b87a0.json",
+              "sha256": "d4e18b87a0193c9660b64b974de0784d153fa3f070f8b16cba66e43d23032e54"
+            },
+            {
+              "name": "planet-sources.json",
+              "contentType": "application/json",
+              "path": "measurements/planet-sources.json-6cc1a90e37.json",
+              "sha256": "6cc1a90e37141ea8148a18cddba2ce3d045c0b7f35a77b813cf792877098ee2a"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-PLANET-1-fixed-ou-0049e-ints-and-repeat-screenshots-top-down/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "top-down.spec.ts",
+      "title": "TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and one visible world",
+      "project": "top-down",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 86265,
+          "artifacts": [
+            {
+              "name": "door-outside-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/door-outside-0-state.json-cf8e8e600a.json",
+              "sha256": "cf8e8e600ab3fa42d4c71d13b021afd08b33ecb21fd92e4a743a385d7076821a"
+            },
+            {
+              "name": "door-inside-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/door-inside-0-state.json-36d07fc741.json",
+              "sha256": "36d07fc741d461db640c1976650eb1cfe5286126fd7d0ca733266025d943d351"
+            },
+            {
+              "name": "cockpit-round-trip-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/cockpit-round-trip-0-state.json-d38e7c4902.json",
+              "sha256": "d38e7c49021a4c16e964f6286c55c3c4a478d74cf21a2baf301d956dd43373da"
+            },
+            {
+              "name": "returned-outdoors-0-state.json",
+              "contentType": "application/json",
+              "path": "measurements/returned-outdoors-0-state.json-7dc4b87233.json",
+              "sha256": "7dc4b87233a0b0f22e2b1ac2cc773d57944a5e7babfd23352861d7f14997224b"
+            },
+            {
+              "name": "door-outside-1-state.json",
+              "contentType": "application/json",
+              "path": "measurements/door-outside-0-state.json-cf8e8e600a.json",
+              "sha256": "cf8e8e600ab3fa42d4c71d13b021afd08b33ecb21fd92e4a743a385d7076821a"
+            },
+            {
+              "name": "door-outside-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/door-outside-repeat.json-29792c2547.json",
+              "sha256": "29792c2547075f91cdb8751bf8715d3e2cb86d0c4a44393f2f33878a5e933bec"
+            },
+            {
+              "name": "door-outside-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/door-outside-diff.png-5abbf69603.png",
+              "sha256": "5abbf69603833cf07041ca616a448f26450de0643c545805900c3354c5c9214c"
+            },
+            {
+              "name": "door-inside-1-state.json",
+              "contentType": "application/json",
+              "path": "measurements/door-inside-0-state.json-36d07fc741.json",
+              "sha256": "36d07fc741d461db640c1976650eb1cfe5286126fd7d0ca733266025d943d351"
+            },
+            {
+              "name": "door-inside-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/panoramic-horizon-repeat.json-8023a2edff.json",
+              "sha256": "8023a2edff66019e214a72e0477cc2cfd8fbb8e48c0db0db0f1aef98fdf79cab"
+            },
+            {
+              "name": "door-inside-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/door-inside-diff.png-3a93a17b88.png",
+              "sha256": "3a93a17b88f9b15c0dd4456c33d6c5763d64b3027ef5dea1cac254b7750e64ff"
+            },
+            {
+              "name": "cockpit-round-trip-1-state.json",
+              "contentType": "application/json",
+              "path": "measurements/cockpit-round-trip-0-state.json-d38e7c4902.json",
+              "sha256": "d38e7c49021a4c16e964f6286c55c3c4a478d74cf21a2baf301d956dd43373da"
+            },
+            {
+              "name": "cockpit-round-trip-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/cockpit-round-trip-repeat.json-d8eea5483f.json",
+              "sha256": "d8eea5483f893014dbe9173c266d6a63f7cd8d30aeeb89fda323d0cf6bbf3d39"
+            },
+            {
+              "name": "cockpit-round-trip-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/cockpit-round-trip-diff.png-f21b1345cf.png",
+              "sha256": "f21b1345cff15e9c58924786a78f9e21d90184bc6dfa12e8a47dba6c3b213445"
+            },
+            {
+              "name": "returned-outdoors-1-state.json",
+              "contentType": "application/json",
+              "path": "measurements/returned-outdoors-0-state.json-7dc4b87233.json",
+              "sha256": "7dc4b87233a0b0f22e2b1ac2cc773d57944a5e7babfd23352861d7f14997224b"
+            },
+            {
+              "name": "returned-outdoors-repeat.json",
+              "contentType": "application/json",
+              "path": "measurements/returned-outdoors-repeat.json-d4ee40d46e.json",
+              "sha256": "d4ee40d46ebf5cae6ef35289319beaebf3cb9d55daefe666f88203bc95951eba"
+            },
+            {
+              "name": "returned-outdoors-diff.png",
+              "contentType": "image/png",
+              "path": "measurements/returned-outdoors-diff.png-f17ae536da.png",
+              "sha256": "f17ae536da31fd4a3b33a2cd78bb357fad6b698e9bbc97180d7c2e85d0e78021"
+            },
+            {
+              "name": "traversal-journeys.json",
+              "contentType": "application/json",
+              "path": "measurements/traversal-journeys.json-aebb3efa98.json",
+              "sha256": "aebb3efa98b5571b3801b54973a7ac4ae379b146c34a0f02837dcf4445a6c2f9"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-finished-1.png"
+            },
+            {
+              "name": "screenshot",
+              "contentType": "image/png",
+              "path": "top-down-TRAVERSE-1-outdoo-a7a27-amera-and-one-visible-world-top-down/test-finished-2.png"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

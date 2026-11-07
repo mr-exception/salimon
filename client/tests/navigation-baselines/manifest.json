@@ -53,11 +53,11 @@
     "panoramic-lost-contact.png": "a86fa39b6bcb195693b11c59479fe5e22c641e804b588d9ada843ba50c0aa60a",
     "panoramic-look-at-occluded.png": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
     "panoramic-set-direction.png": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
-    "panoramic-compass-stationary.png": "512a2874ee8bb0bf6a649d33cec5dc204562f9800f26dcfc3605f07f73ae9b03",
-    "panoramic-compass-rear.png": "327f78175088fcffe933a314dc35bd691956a9dc62b980a98b37ea52d64541ba",
-    "panoramic-compass-overlap.png": "d79586117d1680d444bea741070ddd8ee15f3122428a1388dcbbc5b096854293",
-    "panoramic-small-warning.png": "d311c8298d9bad0b6d2da57d594e9fdf3466e9622d4ad1e439ebf0b1fc6cc111",
-    "panoramic-small-destroyed.png": "8ab35afa4b3a472b5960e5e4fcc0b6dbb8f1f8af39cc45deab603fc010e32902"
+    "panoramic-compass-stationary.png": "c37621dcfe497f75df403a1d3675a734f5733c40ccbc991cc1344c16bb2fd97b",
+    "panoramic-compass-rear.png": "91a3417cf44f78a848e55d06f80b41fbdfc9e23b5d7730d178b99e02919ced5e",
+    "panoramic-compass-overlap.png": "14833f8c895ee83d63e2dcbe3ae21fb3aee27925ba4d47f47791241592b8d290",
+    "panoramic-small-warning.png": "1dc807bc946605aa2ebf5b7342e8fbf546049c7b4f261a8a75148725fbbaf5f2",
+    "panoramic-small-destroyed.png": "145705af40897af0cce14d06056e5aac3d7a1d28dcaa3eeee46b651e4c7a1220"
   },
   "panoramic": {
     "environment": {

@@ -126,3 +126,13 @@ inspect it, then copy the proposed PNGs/manifest here in a reviewable change.
 Normal comparisons run the shared pixel policy, and the negative driver retains
 a deliberately mutated expected telescope image, its isolated failure and trace.
 Human approval and merge authority remain separate from these local checks.
+
+
+## Shared panoramic styling proposal (#828)
+
+Five HUD candidates now use the shared projected-instrument palette and controls:
+stationary/rear/overlap compass and small warning/terminal. The 14 optical/sensor
+panoramic and eight orthographic originals remain byte-identical. No environment
+or comparison policy changes. These five replacements still require explicit
+human approval of the complete manifest digest; they are not agent-approved.
+See [originals, diffs, measurements and exact digest](../../../reports/issue-828/README.md).

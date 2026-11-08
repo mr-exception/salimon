@@ -12,6 +12,8 @@ import { setThrottle } from './simulation.ts'
 import { navigationWarnings } from './contact.ts'
 import type { NavigationRuntime } from './navigationRuntime.ts'
 import type { Body } from './sampleUniverse.ts'
+import { useDismissLayer } from './ui/interaction.ts'
+import { FeedbackScope, StatusMessage } from './ui/Feedback.tsx'
 import './ui/tokens.css'
 import './ui/primitives.css'
 import './panoramic.css'
@@ -27,7 +29,6 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   const [, redraw] = useState(0)
   const [browser, setBrowser] = useState(false), [telemetry, setTelemetry] = useState(false), [help, setHelp] = useState(false)
   const root = useRef<HTMLDivElement>(null), contactsButton = useRef<HTMLButtonElement | null>(null)
-  const previousHelp = useRef(help)
   const input = useRef(new NavigationInput())
   const escape = useRef<(event: KeyboardEvent) => void>(() => {})
   // Read current callbacks without restarting the simulation clock on a render.
@@ -82,13 +83,9 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     contactsButton.current = root.current?.querySelector('.contacts-toggle') ?? null
     if (browser) root.current?.querySelector<HTMLInputElement>('#scanned-browser input')?.focus()
   }, [browser])
-  useEffect(() => {
-    // A modal's focus trap remains active until React unmounts it. Restore
-    // focus afterward so the next Escape still belongs to this cockpit.
-    if (!help && previousHelp.current) root.current?.querySelector<HTMLButtonElement>('.help-toggle')?.focus()
-    previousHelp.current = help
-  }, [help])
   const closeBrowser = () => { setBrowser(false); contactsButton.current?.focus() }
+  useDismissLayer(browser, closeBrowser)
+  useDismissLayer(telemetry, () => { setTelemetry(false); root.current?.querySelector<HTMLButtonElement>('.telemetry-toggle')?.focus() })
   const ship = navigation.clock.state, snapshot = view.snapshot()
   const warnings = navigationWarnings(ship, navigation.scanner.contacts)
   const grounded = navigation.surfaceLocation
@@ -96,25 +93,30 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   const throttle = (value: number) => { navigation.clock.state = setThrottle(navigation.clock.state, canPilot() ? value : 0); redraw(n => n + 1) }
   const dismiss = (e: { key: string; preventDefault(): void; stopPropagation(): void }) => {
     if (e.key !== 'Escape') return
+    if ('repeat' in e && e.repeat) { e.preventDefault(); e.stopPropagation(); return }
     if (help) { setHelp(false); root.current?.querySelector<HTMLButtonElement>('.help-toggle')?.focus(); e.preventDefault(); e.stopPropagation() }
     else if (browser) { closeBrowser(); e.preventDefault(); e.stopPropagation() }
     else if (telemetry) { setTelemetry(false); root.current?.querySelector<HTMLButtonElement>('.telemetry-toggle')?.focus(); e.preventDefault(); e.stopPropagation() }
     else if (onExit) { e.preventDefault(); e.stopPropagation(); onExit() }
   }
   escape.current = dismiss
-  return <div ref={root} className="panoramic expedition-ui" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDownCapture={dismiss}>
+  return <FeedbackScope messages={[
+    ...warnings.map(w => ({ id: w.id, text: w.message, priority: 'critical' as const })),
+    { id: 'terminal', text: ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : '', priority: 'critical' },
+    { id: 'condition', text: conditionWarning, priority: 'critical' },
+  ]}><div ref={root} className="panoramic expedition-ui" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDown={dismiss}>
     <Canvas onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
       <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position}/>
     </Canvas>
     <div className="observation-reticle" aria-hidden="true">+</div>
     <header className="panoramic-status ui-panel ui-panel--utility">
       <strong className="ui-eyebrow">SALIMON · OBSERVATION</strong>
-      <p role="status">{navigation.scanner.pulse === 0 ? 'Scanner awaiting first 5-second pulse' : `Scanner pulse ${navigation.scanner.pulse} · ${navigation.scanner.contacts.length} contacts`}</p>
-      <span>{ship.mode}{grounded ? ` · ${grounded.body.name}` : ''} · {speed.toFixed(1)} m/s · sample inertial frame</span>
+      <StatusMessage>{navigation.scanner.pulse === 0 ? 'Scanner awaiting first 5-second pulse' : `Scanner active · ${navigation.scanner.contacts.length} contacts`}</StatusMessage>
+      <span className="scanner-pulse" aria-live="off">Pulse {navigation.scanner.pulse} · </span><span>{ship.mode}{grounded ? ` · ${grounded.body.name}` : ''} · {speed.toFixed(1)} m/s · sample inertial frame</span>
     </header>
-    <div className="panoramic-priority" aria-label="Navigation warnings" role="status">
-      {warnings.map(w => <p key={w.id}>{w.message}</p>)}
-      {ship.contact && <p>{ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact {ship.contact.impactSpeedMps.toFixed(1)} m/s</p>}
+    <div className="panoramic-priority" aria-label="Navigation warnings">
+      {warnings.map(w => <StatusMessage key={w.id} priority="critical">{w.message}</StatusMessage>)}
+      {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${ship.contact.impactSpeedMps.toFixed(1)} m/s`}</StatusMessage>}
       {!grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
     </div>
     <PerspectiveContacts compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
@@ -128,17 +130,13 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       <button className="ui-button ui-button--secondary telemetry-toggle" aria-expanded={telemetry} aria-controls="detailed-telemetry" onClick={() => setTelemetry(value => !value)}>Telemetry</button>
       <button className="ui-button ui-button--secondary help-toggle" onClick={() => setHelp(true)}>Help</button>{onExit && <button className="ui-button ui-button--secondary" onClick={onExit}>Exit cockpit</button>}
     </footer>
-    {telemetry && <section id="detailed-telemetry" className="panoramic-telemetry ui-panel ui-panel--utility" aria-label="Detailed telemetry">
+    {telemetry && <section data-ui-utility id="detailed-telemetry" className="panoramic-telemetry ui-panel ui-panel--utility" aria-label="Detailed telemetry">
       <p>Mass {ship.massKg.toLocaleString()} kg · FOV {snapshot.fov.toFixed(2)}°</p>
       <p>Yaw {(ship.yaw * 180 / Math.PI).toFixed(1)}° · pitch {(ship.pitch * 180 / Math.PI).toFixed(1)}° · {ship.alignment ? 'Turning' : 'Manual'}</p>
       <p>Cell {ship.position.cell.map(String).join(' / ')} · local {ship.position.offsetM.map(v => v.toFixed(1)).join(' / ')} m</p>
       {grounded && <p>Scout grounded. Takeoff and relocation unavailable; observation and scanner remain available.</p>}
       <p>Illustrative universe · unlimited energy. Impacts at 100 m/s or faster end the run.</p>
     </section>}
-    {help && <HelpDialog panoramic onClose={() => setHelp(false)} warnings={<>
-      {conditionWarning && <p className="ui-status ui-status--warning" role="alert">{conditionWarning}</p>}
-      {warnings.map(w => <p className="ui-status ui-status--warning" role="alert" key={w.id}>{w.message}</p>)}
-      {ship.mode === 'destroyed' && <p className="ui-status ui-status--error" role="alert">Journey ended — ship destroyed</p>}
-    </>}/>}
-  </div>
+    {help && <HelpDialog panoramic onClose={() => setHelp(false)} />}
+  </div></FeedbackScope>
 }

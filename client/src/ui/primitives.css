@@ -46,3 +46,13 @@
 
 .expedition-ui .ui-dialog--equipment { max-width:calc(100vw - 32px); }
 .expedition-ui .ui-dialog--equipment h2 { color:var(--ui-text); text-transform:none; display:block; font-weight:600; }
+
+/* Priority is also conveyed in words, never just color. */
+.expedition-ui .ui-status:empty { display: none; }
+.expedition-ui .ui-status--critical { color: var(--ui-danger); border-color: var(--ui-danger); background: var(--ui-void); font-weight: 600; }
+.expedition-ui .ui-status--status { color: var(--ui-text); }
+.expedition-ui .ui-dialog .ui-status--critical { position: sticky; top: 0; z-index: 1; padding: var(--ui-space-2); }
+@media (prefers-reduced-motion: reduce) {
+  .expedition-ui .ui-dialog, .expedition-ui [data-ui-utility] { animation: none; transition: none; }
+}
+.expedition-ui .ui-warning-summary > p { margin: 0; }

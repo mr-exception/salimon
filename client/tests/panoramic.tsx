@@ -19,6 +19,7 @@ Object.assign(window, {
  },
  hudSnapshot: () => ({ ship: structuredClone(navigation.clock.state), view: view.snapshot(), contacts: navigation.scanner.contacts.map(b => b.id), renderer, exits }),
  hudScenario: (kind: string) => {
+  if (kind === 'lost-contact') navigation.clock.state = { ...navigation.clock.state, position: translate(ORIGIN, [1e20, 0, 0]) }
   if (kind === 'rear') navigation.clock.state = { ...navigation.clock.state, yaw: Math.PI, velocityMps: [0, 0, 10] }
   if (kind === 'overlap') navigation.clock.state = { ...navigation.clock.state, yaw: 0, velocityMps: [0, 0, -10] }
   if (kind === 'stationary') navigation.clock.state = { ...navigation.clock.state, velocityMps: [0, 0, 0] }

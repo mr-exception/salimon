@@ -57,7 +57,7 @@ test('SENSOR-1 scanner authority, hidden/browser contacts, group pagination and 
  await info.attach('tiny-telescope.png', { body: await page.screenshot(), contentType: 'image/png' })
  await expect(page.getByRole('status')).toHaveText('Selected: Detected tiny')
  await page.getByRole('button', { name: 'Leave range', exact: true }).click()
- await expect(page.getByRole('status')).toHaveText('No selection')
+ await expect(page.getByRole('status')).toHaveText('Error: Scanner contact lost · target actions unavailable.')
  await expect(page.getByRole('button', { name: 'Set direction', exact: true })).toHaveCount(0)
  await expect(sceneMarkers(page)).toHaveCount(0)
  expect((await state(page)).selected).toBeNull()

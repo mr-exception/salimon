@@ -20,7 +20,9 @@ and all five categories; N/A needs a reason. PASS requires actual execution.
 | --- | --- | --- | --- | --- |
 | | | | NOT RUN | |
 
-- Report: `reports/issue-N/README.md`
+- Validation: commands/results, tested head/base, criterion outcomes and limitations in this PR.
+- Originals/logs: ignored `client/test-results/` locally and existing CI artifacts (14-day retention); no new committed reports.
+- CI: awaiting user report in the active chat.
 - Environment, browser/adapter/backend, input, viewport/DPR/seed/clock as applicable:
 - Original screenshots, traces, raw measurements/logs and approved baseline/diffs:
 - Current-head CI links/results and actual required checks; explain absent path-filtered jobs:
@@ -29,11 +31,11 @@ and all five categories; N/A needs a reason. PASS requires actual execution.
 ## Documentation impact
 
 List updated canonical guides and map changed production/test paths to affected
-architecture/invariants/contracts, plus the report and link/path checks. If no
-behavior/ownership/usage changes, state the exact no-impact reason; a report alone
+architecture/invariants/contracts, plus validation evidence locations and link/path checks. If no
+behavior/ownership/usage changes, state the exact no-impact reason; a validation summary alone
 does not document a changed contract. Preserve historical evidence and future scope.
 
-## Review in the active chat (complete after publication)
+## Review in the active chat (local review before publication; CI from user report)
 
 - Reviewer identity/capability (same-session review; separate agent only if requested):
 - Exact reviewed head/base, criterion PASS/FAIL/UNVERIFIED with evidence, and verdict:

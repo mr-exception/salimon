@@ -13,6 +13,7 @@ window.addEventListener('keydown', event => {
 })
 function Gallery({ context }: { context: 'planet' | 'space' }) {
   const [open, setOpen] = useState(false)
+  const [nested, setNested] = useState(false)
   const [clicks, setClicks] = useState(0)
   return <main className={`expedition-ui fixture fixture--${context}`} aria-label={`${context} context`}>
     <h1>Expedition Interface / {context}</h1>
@@ -45,8 +46,10 @@ function Gallery({ context }: { context: 'planet' | 'space' }) {
       </UtilityPanel>
     </div>
     <Dialog open={open} title="Equipment review" onDismiss={() => setOpen(false)}>
+      <Dialog open={nested} title="Nested details" onDismiss={() => setNested(false)}><p>Nested utility details</p></Dialog>
       <p>Review the authoritative result before confirming an operation.</p>
       <label>Quantity (g) <input aria-label="Quantity (g)" defaultValue="250" /></label>
+      <Button onClick={() => setNested(true)}>Inspect nested details</Button>
       <StatusLabel tone="error">Rejected — example validation error</StatusLabel>
       <StatusLabel tone="confirmation">Confirmed — example committed result</StatusLabel>
       <Button pending>Waiting for result</Button>

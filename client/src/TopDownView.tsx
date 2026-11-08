@@ -16,6 +16,8 @@ import { ResourceContainerInteraction } from './resourceContainerInteraction.ts'
 import { ResourceContainerPanel } from './ResourceContainerPanel.tsx'
 import { SCOUT_RESOURCE_CONTAINER_ID } from './scoutResourceContainer.ts'
 import { Button, Dialog, KeyHint, Meter, Progress, UtilityPanel } from './ui/primitives.tsx'
+import { FeedbackScope, StatusMessage } from './ui/Feedback.tsx'
+import { useDismissLayer } from './ui/interaction.ts'
 import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
@@ -68,6 +70,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     if (open) session.current?.cancel()
     else if (restoreFocus) inventoryTrigger.current?.focus()
   }
+  useDismissLayer(inventoryOpen, () => toggleInventory(false, true))
   useEffect(() => { if (inventoryOpen) inventoryPanel.current?.focus({ preventScroll: true }) }, [inventoryOpen])
   useEffect(() => { if (state.cockpit.view !== 'world') toggleInventory(false) }, [state.cockpit.view])
   const [saveStatus, setSaveStatus] = useState('Opening saved expedition…')
@@ -99,7 +102,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   }, [gameplay])
   useEffect(() => {
     const input = new NavigationInput(), clock = new TopDownClock(), timer = new FrameTimer(performance.now())
-    let raf = 0
+    let raf = 0, publishedError = ''
     const release = () => { input.clear(); clock.reset(); timer.resume(performance.now()) }
     const clear = () => { release(); session.current?.cancel(); container.current?.close(); current.current = cancelInteraction(current.current); if (session.current) session.current.world = current.current; session.current?.checkpoint(); setState(current.current) }
     const keydown = (event: KeyboardEvent) => {
@@ -157,6 +160,10 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       }
       // One navigation clock across world/cockpit; the view only observes it.
       if (gameplay) navigation.advance(dt)
+      // Failed atomic saves roll the domain world back to the same object.
+      // Publish the changed error once even when React would bail out on identity.
+      const error = session.current?.error ?? ''
+      if (error !== publishedError) { current.current = { ...current.current }; publishedError = error }
       setState(current.current)
       raf = requestAnimationFrame(frame)
     }
@@ -198,21 +205,27 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   ].filter(Boolean).join(' ')
   const gatherBlocked = selectedSource && resourceSession?.equipped && usage && !resourceSession.activeSourceId ? selectedSource.remainingGrams === 0 ? 'Source depleted. No material remains.' : usage.grams >= resourceSession.snapshot.inventory.capacityGrams ? 'Inventory full: weight limit.' : !resourceSession.snapshot.inventory.quantities[selectedSource.resourceId] && usage.slots >= resourceSession.snapshot.inventory.capacitySlots ? 'Inventory full: slot limit.' : '' : ''
   const canAct = !(cockpitTarget && !state.cockpit.powered) && !gatherBlocked && !!selected?.interaction && !paused.current && !resourceSession?.error && vital?.health !== 0 && !(cockpitTarget && vital && !survivalPolicy(vital).canWork) && !(selectedSource && resourceSession?.equipped && vital && !survivalPolicy(vital).canWork)
-  return <div className="expedition-ui">
+  const persistentMessages = [
+    { id: 'survival', text: warning, priority: 'critical' as const },
+    { id: 'power', text: state.player.mode === 'seated' && !state.cockpit.powered ? 'Cockpit unpowered · observation unavailable. Stand up or restore power.' : '', priority: 'critical' as const },
+  ]
+  return <FeedbackScope messages={persistentMessages}><div className="expedition-ui">
     {gameplay && <aside className="survival-hud" aria-label="Survival condition">
-      {vital && !resourceSession.error ? <>
+      {vital ? <>
+        <StatusMessage priority={warning ? 'critical' : 'status'}>{[paused.current ? 'Paused · active time stopped' : '', warning].filter(Boolean).join(' · ')}</StatusMessage>
         <div className="vital-meters">
         <div className="ui-meter"><span>Health: {Math.ceil(vital.health)} / 200 HP</span><meter aria-label="Health" min={0} max={200} value={vital.health} aria-valuetext={`${vital.health} / 200 HP`} /></div>
         <Meter label="Hunger" value={Math.ceil(vital.hunger / METER * 100)} max={100} unit="" />
         <Meter label="Fatigue" value={Math.ceil(vital.fatigue / METER * 100)} max={100} unit="" />
         </div>
-        <p aria-live="polite">{[paused.current ? 'Paused · active time stopped' : '', warning].filter(Boolean).join(' · ')}</p>
         {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); if (resourceSession.freshRun()) observation.reset(navigation.clock.state); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
       </> : <p>{resourceSession?.error || saveStatus}</p>}
+      {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
+      {persistentMessages[1].text && <StatusMessage priority="critical">{persistentMessages[1].text}</StatusMessage>}
       <Button variant="secondary" onClick={() => setHelpOpen(true)}>Help</Button>
     </aside>}
     <Dialog open={helpOpen} title="Surface controls" onDismiss={() => setHelpOpen(false)}>
-      {warning && <p role="alert">{warning}</p>}
+      {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
       <p>W A S D: walk · E: nearby action · Escape: close panel, then cancel interaction.</p>
       <p>I: inventory · P: pause active time. Menus do not pause time. Movement, Escape or stowing the tool interrupts gathering; partial work is saved.</p>
       <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>
@@ -232,7 +245,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         {resourceSession && usage && <>
           <p data-inventory-weight><strong>{usage.grams / 1000}</strong> / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg</p>
           <p data-inventory-slots><strong>{usage.slots}</strong> / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
-          <div id="field-inventory" ref={inventoryPanel} className="hud-utility" hidden={!inventoryOpen} tabIndex={-1} onKeyDown={event => { if (event.code !== 'Escape') event.stopPropagation() }}>
+          <div id="field-inventory" ref={inventoryPanel} className="hud-utility" data-ui-utility hidden={!inventoryOpen} tabIndex={-1} onKeyDown={event => { if (event.code !== 'Escape') event.stopPropagation() }}>
           <UtilityPanel title="Carried resources and items">
           <ul aria-label="Raw resources">{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <li key={id}>{entry.name} <span data-resource={id}>{(resourceSession.snapshot.inventory.quantities[id] ?? 0) / 1000} kg</span></li>)}</ul>
           <p className="resource-note">Each carried raw type uses 1 slot.</p>
@@ -246,12 +259,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
           </UtilityPanel></div>
         </>}
         <button disabled={!resourceSession || !!resourceSession.error || resourceSession.survival.health === 0 || paused.current} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
-        {(!resourceSession || resourceSession.error) && <p role="status">{resourceSession?.error || saveStatus}</p>}
+        {(!resourceSession || resourceSession.error) && <StatusMessage announce={!resourceSession?.error}>{resourceSession?.error || saveStatus}</StatusMessage>}
       </aside>}
     </section>
     <div className="top-down-bottom">
     <aside className="top-down-interaction" aria-label="Nearby interaction">
-      <div><p data-prompt hidden={!canAct}>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : ''}</p><p role="status" aria-live="polite">{resourceSession?.error || resourceSession?.feedback || state.feedback}</p></div>
+      <div><p data-prompt hidden={!canAct}>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : ''}</p><StatusMessage announce={!resourceSession?.error} priority={resourceSession?.error ? 'error' : resourceSession?.activeSourceId ? 'pending' : 'status'}>{resourceSession?.error || resourceSession?.feedback || state.feedback}</StatusMessage></div>
       {canAct && <button onClick={event => { interact(); event.currentTarget.blur() }}>{selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>}
     </aside>
     {gatherBlocked && <p className="source-summary">{gatherBlocked}</p>}
@@ -264,5 +277,5 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
     <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p></footer>
     </div>
-  </main></div>
+  </main></div></FeedbackScope>
 }

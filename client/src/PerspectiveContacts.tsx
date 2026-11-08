@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { StatusMessage } from './ui/Feedback.tsx'
 import { contactCommandAvailability, lookAtContact } from './contactCommands.ts'
 import type { ShipState } from './simulation.ts'
 import type { Position } from './coordinates.ts'
@@ -31,6 +32,12 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  }, [])
  const origin = getOrigin(), contacts = currentContacts(scanner, origin)
  const selected = selectedContact(scanner, origin)
+ const previousSelection = useRef<string | null>(null)
+ const [contactLost, setContactLost] = useState(false)
+ useEffect(() => {
+  if (selected) { previousSelection.current = selected.id; setContactLost(false) }
+  else if (previousSelection.current) { setContactLost(true); previousSelection.current = null }
+ }, [selected?.id])
  const availability = selected && contactCommandAvailability(getShip(), selected, canPilot())
  const bounds = root.current?.getBoundingClientRect()
  const markers = perspectiveMarkers(contacts, geometry, origin, view.snapshot(), bounds?.width ?? 0, bounds?.height ?? 0)
@@ -51,7 +58,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
   <section className={compact ? "panoramic-contacts" : undefined} aria-label="Detected contacts" style={compact ? undefined : { position: 'absolute', right: 8, top: 8, width: 240, padding: 12, color: 'white', background: '#102431ee', pointerEvents: 'auto' }}>
    {!compact && <details><summary>Observation help</summary><p>Look at turns only the camera once, preserving zoom and ship motion. Drag, W/A/S/D or wheel cancels it. Set direction turns only the ship without thrust; arrow keys cancel that turn. Grounded ships can observe other detected bodies, but cannot aim at their landing planet center. Typing and focused controls do not steer the view.</p></details>}
    {compact && <button className={`${buttonClass} contacts-toggle`} aria-expanded={browserOpen} aria-controls="scanned-browser" onClick={() => onBrowserChange?.(!browserOpen)}>Contacts (C) · {contacts.length}</button>}
-   {browserOpen && <div id="scanned-browser" className={compact ? "scanned-browser ui-panel ui-panel--utility" : undefined}>
+   {browserOpen && <div data-ui-utility id="scanned-browser" className={compact ? "scanned-browser ui-panel ui-panel--utility" : undefined}>
    <label>Search contacts <input value={query} onChange={e => { setQuery(e.target.value); setPage(0) }}/></label>
    {group && <button className={buttonClass} onClick={() => { setGroup(null); setPage(0) }}>All contacts</button>}
    {group && !activeGroup && <p>Group no longer visible</p>}
@@ -60,7 +67,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
    <span> {currentPage + 1}/{last + 1} </span>
    <button className={buttonClass} disabled={currentPage === last} onClick={() => setPage(currentPage + 1)}>Next</button>
    </div>}
-   <div className={compact ? "selected-contact ui-panel ui-panel--utility" : "selected-contact"}><p role="status">{selected ? `Selected: ${selected.name}` : 'No selection'}</p>
+   <div className={compact ? "selected-contact ui-panel ui-panel--utility" : "selected-contact"}><StatusMessage priority={contactLost ? 'error' : 'status'}>{selected ? `Selected: ${selected.name}` : contactLost ? 'Scanner contact lost · target actions unavailable.' : 'No selection'}</StatusMessage>
    {selected && availability && <>
     {availability.currentPlanet && <p>Current landing planet: {selected.name}</p>}
     <button className={buttonClass} disabled={!availability.lookAt} onClick={() => {

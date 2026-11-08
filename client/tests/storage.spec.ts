@@ -9,7 +9,7 @@ import { point2 } from '../src/topDownFrames.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID as containerId } from '../src/scoutResourceContainer.ts'
 import { boot, position, walkTicks, walkTo } from './worldJourney'
 
-const directory = '../reports/issue-829/captures'
+const directory = 'test-results/storage-originals'
 const saved = (page: import('@playwright/test').Page) => page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
 const dialog = (page: import('@playwright/test').Page) => page.getByRole('dialog', { name: 'Resource Container', exact: true })
 
@@ -231,3 +231,42 @@ for (const [width, height] of [[960, 600], [1280, 720], [1920, 1080]]) {
     await info.attach('measurements', { path:`${directory}/measurements-${width}.json`, contentType:'application/json' })
   })
 }
+
+test('FEEDBACK persistent hazard survives rejection, draft and modal scroll without repeated announcements', async ({ page }, info) => {
+  const raw = JSON.parse(fullSave()); raw.survival.health = 20
+  await page.addInitScript(({ key, raw }) => localStorage.setItem(key, JSON.stringify(raw)), { key: RESOURCE_SAVE_KEY, raw })
+  await page.setViewportSize({ width: 960, height: 600 })
+  await boot(page, '', 'http://127.0.0.1:4175')
+  await page.keyboard.press('e')
+  const panel = dialog(page), warnings = panel.getByRole('status', { name: 'Persistent warnings' })
+  await expect(warnings).toContainText('Low health')
+  await expect(warnings).toHaveAttribute('aria-live', 'assertive')
+  const input = panel.getByRole('textbox', { name: 'Amount in grams' })
+  await input.fill('1'); await page.getByRole('button', { name: 'Review deposit' }).click()
+  await expect(page.getByRole('status', { name: 'Container feedback' })).toContainText('Container overweight')
+  await expect(warnings).toContainText('Low health')
+  await input.fill('333'); await page.getByRole('button', { name: 'Review withdrawal' }).click()
+  await expect(panel).toContainText('Pending draft · nothing has moved')
+  await expect(warnings).toContainText('Low health')
+  await page.getByRole('button', { name: 'Confirm withdraw' }).click()
+  await expect(page.getByRole('status', { name: 'Container feedback' })).toContainText('Saved: withdrew 333 g')
+  await expect(warnings).toContainText('Low health')
+  await warnings.evaluate(el => {
+    Object.assign(window, { warningMutations: 0 })
+    new MutationObserver(records => { (window as unknown as { warningMutations: number }).warningMutations += records.length }).observe(el, { subtree:true, childList:true, characterData:true })
+  })
+  await page.clock.runFor(1000)
+  expect(await page.evaluate(() => (window as unknown as {warningMutations:number}).warningMutations)).toBe(0)
+  await panel.evaluate(el => { el.scrollTop = el.scrollHeight })
+  await expect(warnings).toBeInViewport()
+  expect(await panel.evaluate(el => getComputedStyle(el).animationDuration)).toBe('0s')
+  await page.clock.runFor(50)
+  await page.screenshot({ path: info.outputPath('persistent-hazard-committed.png') })
+  const committed = await saved(page)
+  await input.fill('1'); await page.getByRole('button', { name: 'Review withdrawal' }).click()
+  await page.keyboard.press('Escape')
+  await expect(panel).toHaveCount(0)
+  expectSameResourceState(await saved(page), committed)
+  await expect(page.getByLabel('Survival condition')).toContainText('Low health')
+  await info.attach('committed-state.json', { body:JSON.stringify(committed), contentType:'application/json' })
+})

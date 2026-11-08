@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { useDismissLayer, restoreFocus } from './interaction.ts'
+import { WarningSummary } from './Feedback.tsx'
 import { meterValue } from './values.ts'
 import './tokens.css'
 import './primitives.css'
@@ -43,21 +45,25 @@ export const UtilityPanel = (props: PanelProps) => <Panel {...props} kind="utili
 
 // Native modal supplies inert background, focus containment and Escape semantics.
 // Render within .expedition-ui so the top-layer dialog inherits the same tokens.
-type DialogProps = { open: boolean; title: string; children: ReactNode; onDismiss: () => void; eyebrow?: string; status?: ReactNode; feedback?: ReactNode; actions?: ReactNode; className?: string }
-export function Dialog({ open, title, children, onDismiss, eyebrow, status, feedback, actions, className = '' }: DialogProps) {
+type DialogProps = { open: boolean; title: string; children: ReactNode; onDismiss: () => void; eyebrow?: string; status?: ReactNode; feedback?: ReactNode; actions?: ReactNode; className?: string; dismissLabel?: string; initialFocus?: 'dialog' | 'heading' | 'dismiss' }
+export function Dialog({ open, title, children, onDismiss, eyebrow, status, feedback, actions, className = '', dismissLabel, initialFocus = 'dialog' }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null)
   const titleId = useId()
+  const warningId = useId()
   const dismiss = useRef(onDismiss)
   dismiss.current = onDismiss
+  useDismissLayer(open, onDismiss, true)
   useEffect(() => {
     const dialog = ref.current!
     if (!open) return
     const previous = document.activeElement
     dialog.showModal()
-    dialog.focus()
-    return () => { dialog.close(); if (previous instanceof HTMLElement && previous.isConnected) previous.focus() }
-  }, [open])
-  return <dialog ref={ref} className={`ui-dialog ${className}`} tabIndex={-1} aria-labelledby={titleId}
+    if (initialFocus === 'heading') dialog.querySelector<HTMLElement>('h2')?.focus()
+    else if (initialFocus === 'dismiss') dialog.querySelector<HTMLElement>('[data-dialog-dismiss]')?.focus()
+    else dialog.focus()
+    return () => { dialog.close(); restoreFocus(previous) }
+  }, [open, initialFocus])
+  return <dialog ref={ref} className={`ui-dialog ${className}`} tabIndex={-1} aria-labelledby={titleId} aria-describedby={warningId}
     onCancel={event => { event.preventDefault(); dismiss.current() }}
     onKeyDown={event => {
       event.stopPropagation()
@@ -74,10 +80,10 @@ export function Dialog({ open, title, children, onDismiss, eyebrow, status, feed
       }
     }} onKeyUp={event => event.stopPropagation()}>
     <header className="ui-dialog-identity">{eyebrow && <p className="ui-eyebrow">{eyebrow}</p>}
-      <h2 id={titleId}>{title}</h2>{status}</header>
-    <div className="ui-dialog-content">{children}</div>
+      <h2 id={titleId} tabIndex={initialFocus === 'heading' ? -1 : undefined}>{title}</h2>{status}</header>
+    <WarningSummary id={warningId} /><div className="ui-dialog-content">{children}</div>
     {feedback && <div className="ui-dialog-feedback">{feedback}</div>}
-    <div className="ui-dialog-actions">{actions}<Button variant="secondary" onClick={onDismiss}>Close {title}</Button></div>
+    <div className="ui-dialog-actions">{actions}<Button data-dialog-dismiss variant="secondary" onClick={onDismiss}>{dismissLabel ?? `Close ${title}`}</Button></div>
   </dialog>
 }
 

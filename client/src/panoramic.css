@@ -46,3 +46,5 @@
   .orientation-compass { width:150px }
   .panoramic-telemetry { left:244px; max-width:calc(100% - 544px) }
 }
+/* Persistent warning text remains scrollable above ordinary utilities. */
+.panoramic-priority { pointer-events:auto; }

@@ -71,7 +71,7 @@ test('LOOK-1 rear browser contact, opaque foreground, independent ship alignment
  // Loss during a captured animation clears commands without retaining a ghost.
  await page.getByRole('button', { name: 'Look at', exact: true }).click()
  await page.getByRole('button', { name: 'Leave range', exact: true }).click()
- await expect(page.getByRole('status')).toHaveText('No selection')
+ await expect(page.getByRole('status')).toHaveText('Error: Scanner contact lost · target actions unavailable.')
  await expect(page.getByRole('button', { name: 'Look at', exact: true })).toHaveCount(0)
  await expect(page.getByRole('button', { name: 'Set direction', exact: true })).toHaveCount(0)
  await expect.poll(async () => (await state(page)).lookingAt).toBe(false)

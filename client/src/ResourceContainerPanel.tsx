@@ -5,6 +5,7 @@ import { resourceStoreMass } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID } from './scoutResourceContainer.ts'
 import type { ResourceContainerInteraction } from './resourceContainerInteraction.ts'
 import { Button, EquipmentDialog, Progress } from './ui/primitives.tsx'
+import { StatusMessage } from './ui/Feedback.tsx'
 import './resourceContainer.css'
 
 export function ResourceContainerPanel({ interaction, onClose, onChange }: { interaction: ResourceContainerInteraction; onClose: () => void; onChange: () => void }) {
@@ -18,7 +19,7 @@ export function ResourceContainerPanel({ interaction, onClose, onChange }: { int
   return <div className="expedition-ui resource-container">
     <EquipmentDialog open title="Resource Container" eyebrow="Scout / Cargo bay" onDismiss={onClose}
       status={<p className={`container-state container-state--${tone}`}>{tone === 'error' ? session.error ? 'Saving blocked · nothing moved' : 'Transfer rejected · nothing moved' : pending ? 'Pending review · not committed' : tone === 'confirmation' ? 'Transfer committed' : 'Raw storage · ready'}</p>}
-      feedback={<p className={`container-feedback container-feedback--${tone}`} role="status" aria-label="Container feedback" aria-live="polite" aria-atomic="true">{session.error || interaction.message || 'Choose a raw resource and amount. Committed transfers save immediately.'}</p>}>
+      feedback={<StatusMessage label="Container feedback" priority={tone === 'error' ? 'error' : pending ? 'pending' : tone === 'confirmation' ? 'confirmation' : 'status'}>{session.error || interaction.message || 'Choose a raw resource and amount. Committed transfers save immediately.'}</StatusMessage>}>
     <div className="container-capacities">
       <div><strong>Carried</strong><p data-carried-capacity>{used.grams / 1000} / {inventory.capacityGrams / 1000} kg</p><Progress label="Carried weight" value={used.grams} max={inventory.capacityGrams} unit="g" /><small>{used.slots} / {inventory.capacitySlots} slots · {(inventory.capacityGrams - used.grams) / 1000} kg free</small></div>
       <div><strong>Container</strong><p data-container-capacity>{stored / 1000} / {store.capacityGrams / 1000} kg</p><Progress label="Container weight" max={store.capacityGrams} value={stored} unit="g" /><small>{(store.capacityGrams - stored) / 1000} kg free</small></div>

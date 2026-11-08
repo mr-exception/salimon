@@ -1,0 +1,96 @@
+[WebServer] (node:1072) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1085) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1186) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:1198) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/storage.spec.ts:16:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (33.4s)
+  ✓  2 [cockpit] › tests/storage.spec.ts:108:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.2s)
+  ✓  3 [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 960x600 (2.0s)
+  ✘  4 [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1280x720 (1.8s)
+(node:1501) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1920x1080 (1.7s)
+
+
+  1) [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1280x720
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      187 |       await panel.evaluate(el => { el.scrollTop = 0 })
+      188 |       const first = await panel.screenshot({ animations:'disabled' })
+    > 189 |       expect((await panel.screenshot({ animations:'disabled' })).equals(first)).toBe(true)
+          |                                                                                 ^
+      190 |       const name = `industrial-${width}-${state}.png`
+      191 |       await writeFile(`${directory}/${name}`, first)
+      192 |       captures[name] = createHash('sha256').update(first).digest('hex')
+        at capture (/workspace/salimon/client/tests/storage.spec.ts:189:81)
+        at /workspace/salimon/client/tests/storage.spec.ts:205:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/storage-STORE-UI-3-industr-9049c-s-and-local-scroll-1280x720-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/storage-STORE-UI-3-industr-9049c-s-and-local-scroll-1280x720-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/storage-STORE-UI-3-industr-9049c-s-and-local-scroll-1280x720-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/storage-STORE-UI-3-industr-9049c-s-and-local-scroll-1280x720-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1920x1080
+
+    Error: VISUAL_DIMENSIONS: 520x808 vs 520x852
+
+       at ../scripts/visual-comparison.ts:11
+
+       9 | export function compareImages(expected:Buffer,actual:Buffer) {
+      10 |  const a=PNG.sync.read(expected),b=PNG.sync.read(actual)
+    > 11 |  if(a.width!==b.width||a.height!==b.height)throw Error(`VISUAL_DIMENSIONS: ${a.width}x${a.height} vs ${b.width}x${b.height}`)
+         |                                                  ^
+      12 |  const diff=new PNG({width:a.width,height:a.height})
+      13 |  const changedPixels=pixelmatch(a.data,b.data,diff.data,a.width,a.height,{threshold:POLICY.threshold,includeAA:POLICY.includeAA})
+      14 |  let rawChangedPixels=0
+        at compareImages (/workspace/salimon/client/scripts/visual-comparison.ts:11:50)
+        at /workspace/salimon/client/tests/storage.spec.ts:201:12
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1280x720
+    [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1920x1080
+  3 passed (50.5s)

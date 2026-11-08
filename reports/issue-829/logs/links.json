@@ -1,0 +1,12 @@
+{
+  "checkedFiles": [
+    "client/README.md",
+    "docs/hud-ui-style-guide.md",
+    "docs/resource-inventory-and-gathering.md",
+    "docs/maintenance-map.md",
+    "reports/issue-829/README.md"
+  ],
+  "checkedCrossGuideAnchors": 7,
+  "missing": [],
+  "result": "PASS"
+}

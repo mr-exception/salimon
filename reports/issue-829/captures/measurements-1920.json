@@ -1,0 +1,37 @@
+{
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "dpr": 1,
+  "measurements": {
+    "box": {
+      "x": 640,
+      "y": 159,
+      "width": 640,
+      "height": 762
+    },
+    "scrollHeight": 758,
+    "clientHeight": 758,
+    "overflow": "auto",
+    "animation": "0s",
+    "focus": "2px",
+    "bodyScroll": false,
+    "horizontalOverflow": false,
+    "contrast": {
+      "--ui-text": 11.277508313516593,
+      "--ui-muted": 7.9559370175693696,
+      "--ui-active": 8.36789198990891,
+      "--ui-mechanical": 8.627719256034302,
+      "--ui-danger": 5.373027512947807
+    }
+  },
+  "captures": {
+    "industrial-1920-ready.png": "95b4d71d2191d0d8448ab9db69741e952d392342a282ae5d832a7dd95dce5ef8",
+    "industrial-1920-pending.png": "9e9a2c3d4dc5928578c354b5ce810a2b0ed2949aa0a0d4087b8364ec14cbf6bf",
+    "industrial-1920-committed.png": "a586ea3d6b8ba6a2a9f77c369c5a90f8ee16ef9ff14f69b4341c5b8d2488d472",
+    "industrial-1920-rejected.png": "f70c19b3da03927f315ed014a66a3650b76dacb35223d058650262bf2bd7fc05"
+  },
+  "negativeCheckpoint": "ready versus pending rejected",
+  "browser": "154.0.8037.57"
+}

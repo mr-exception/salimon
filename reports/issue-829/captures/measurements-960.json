@@ -1,0 +1,39 @@
+{
+  "viewport": {
+    "width": 960,
+    "height": 600
+  },
+  "dpr": 1,
+  "measurements": {
+    "box": {
+      "x": 160,
+      "y": 24,
+      "width": 640,
+      "height": 552
+    },
+    "scrollHeight": 758,
+    "clientHeight": 548,
+    "overflow": "auto",
+    "animation": "0s",
+    "focus": "2px",
+    "bodyScroll": false,
+    "horizontalOverflow": false,
+    "contrast": {
+      "--ui-text": 11.277508313516593,
+      "--ui-muted": 7.9559370175693696,
+      "--ui-active": 8.36789198990891,
+      "--ui-mechanical": 8.627719256034302,
+      "--ui-danger": 5.373027512947807
+    }
+  },
+  "captures": {
+    "industrial-960-ready.png": "587cb788508b604b183624d853eb76b27e8e120073062c22f8f96357437c4c52",
+    "industrial-960-pending.png": "8c7ff66792a10848cb7041ce3fa57d0c77cbaa9d31a15e62fbbb959e01cd3dbd",
+    "industrial-960-pending-controls.png": "b41a7ced886ee91b92f3c9c912d42490ec1310e38c845d636935066bd6548eab",
+    "industrial-960-committed.png": "1b634fc26c8f032d486c7921e0dbbe200fee70f1d0d0071d3c16e43d655a108b",
+    "industrial-960-rejected.png": "dcdb49f0c7d35ad7bbacaa7b237af40e0406966e6efae1eb02713ab59b4c6b01",
+    "industrial-960-rejected-controls.png": "2117b8d1b932bbdc9b8bccc68f71cc81845ac147f8f10b2df0b7cbe041ebccb0"
+  },
+  "negativeCheckpoint": "ready versus pending rejected",
+  "browser": "154.0.8037.57"
+}

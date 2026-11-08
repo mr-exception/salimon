@@ -37,3 +37,12 @@
 .expedition-ui .ui-meter meter::-webkit-meter-suboptimum-value,
 .expedition-ui .ui-meter meter::-webkit-meter-even-less-good-value { background: var(--ui-active); }
 .expedition-ui .ui-meter meter::-moz-meter-bar { background: var(--ui-active); }
+/* Industrial shell regions carry no machine-specific state or mechanics. */
+.expedition-ui .ui-dialog--equipment { border-top: 3px solid var(--ui-mechanical); padding: var(--ui-space-6); animation: ui-equipment-enter var(--ui-panel-time) ease-out; }
+.expedition-ui .ui-dialog--equipment .ui-dialog-identity { border-bottom: 1px solid var(--ui-surface); margin-bottom: var(--ui-space-4); }
+.expedition-ui .ui-dialog--equipment .ui-dialog-identity h2 { margin-block: var(--ui-space-1); }
+.expedition-ui .ui-dialog-actions { display: flex; flex-wrap: wrap; gap: var(--ui-space-2); margin-top: var(--ui-space-4); }
+@keyframes ui-equipment-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.expedition-ui .ui-dialog--equipment { max-width:calc(100vw - 32px); }
+.expedition-ui .ui-dialog--equipment h2 { color:var(--ui-text); text-transform:none; display:block; font-weight:600; }

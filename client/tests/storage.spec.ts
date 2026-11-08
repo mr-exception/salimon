@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import { expectSameResourceState, expectSafeSurvivalReload } from './saveAssertions'
 import { test, expect } from '@playwright/test'
 import { compareImages, POLICY } from '../scripts/visual-comparison.ts'
@@ -7,6 +9,7 @@ import { point2 } from '../src/topDownFrames.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID as containerId } from '../src/scoutResourceContainer.ts'
 import { boot, position, walkTicks, walkTo } from './worldJourney'
 
+const directory = '../reports/issue-829/captures'
 const saved = (page: import('@playwright/test').Page) => page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
 const dialog = (page: import('@playwright/test').Page) => page.getByRole('dialog', { name: 'Resource Container', exact: true })
 
@@ -138,3 +141,93 @@ test('STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation 
   await page.getByRole('button', { name: 'Close Resource Container' }).click()
   await expect(dialog(page)).toHaveCount(0)
 })
+
+for (const [width, height] of [[960, 600], [1280, 720], [1920, 1080]]) {
+  test(`STORE-UI-3 industrial equipment states, focus and local scroll ${width}x${height}`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height })
+    await page.addInitScript(({ key, raw }) => localStorage.setItem(key, raw), { key: RESOURCE_SAVE_KEY, raw: fullSave() })
+    await boot(page, '', 'http://127.0.0.1:4175')
+    await page.keyboard.press('e')
+    const panel = dialog(page), input = page.getByRole('textbox', { name: 'Amount in grams' })
+    await expect(panel).toBeFocused()
+    await expect(panel).toHaveAccessibleName('Resource Container')
+    await expect(input).toHaveAccessibleDescription(/positive whole gram amount/)
+    const close = panel.getByRole('button', { name: 'Close Resource Container' })
+    await page.keyboard.press('Shift+Tab'); await expect(close).toBeFocused()
+    await page.keyboard.press('Tab'); await expect(panel.getByRole('combobox')).toBeFocused()
+    const before = await position(page)
+    await page.keyboard.press('w'); await page.keyboard.press('e'); await page.keyboard.press('p')
+    await walkTicks(page, [], 5); expect(await position(page)).toEqual(before)
+    await input.focus()
+    const measurements = await panel.evaluate(el => {
+      const box = el.getBoundingClientRect(), style = getComputedStyle(el)
+      const input = el.querySelector('input')!
+      // WCAG relative luminance, using opaque shared token inks/surfaces.
+      const luminance = (rgb: string) => rgb.match(/[\d.]+/g)!.slice(0, 3).map(Number).map(n => n / 255).map(n => n <= .04045 ? n / 12.92 : ((n + .055) / 1.055) ** 2.4).reduce((sum, n, i) => sum + n * [.2126, .7152, .0722][i]!, 0)
+      const contrast: Record<string, number> = {}
+      for (const token of ['--ui-text', '--ui-muted', '--ui-active', '--ui-mechanical', '--ui-danger']) {
+        const probe = document.createElement('span'); probe.style.color = `var(${token})`; el.append(probe)
+        const ink = luminance(getComputedStyle(probe).color); probe.remove()
+        const background = luminance(style.backgroundColor)
+        contrast[token] = (Math.max(ink, background) + .05) / (Math.min(ink, background) + .05)
+      }
+      return { box: { x:box.x, y:box.y, width:box.width, height:box.height }, scrollHeight:el.scrollHeight, clientHeight:el.clientHeight,
+        overflow:style.overflowY, animation:style.animationDuration, focus:getComputedStyle(input).outlineWidth,
+        bodyScroll:document.documentElement.scrollHeight > innerHeight, horizontalOverflow:el.scrollWidth > el.clientWidth, contrast }
+    })
+    expect(measurements.box.x).toBeGreaterThanOrEqual(0); expect(measurements.box.y).toBeGreaterThanOrEqual(0)
+    expect(measurements.box.x + measurements.box.width).toBeLessThanOrEqual(width)
+    expect(measurements.box.y + measurements.box.height).toBeLessThanOrEqual(height)
+    expect(measurements.bodyScroll).toBe(false); expect(measurements.horizontalOverflow).toBe(false)
+    expect(measurements.overflow).toBe('auto'); expect(measurements.animation).toBe('0s'); expect(measurements.focus).toBe('2px')
+    for (const ratio of Object.values(measurements.contrast)) expect(ratio).toBeGreaterThanOrEqual(4.5)
+    const captures: Record<string, string> = {}
+    const capture = async (state: string) => {
+      await panel.focus() // Keep the native blinking text caret out of repeat captures.
+      await page.mouse.move(0, 0)
+      await page.clock.runFor(250)
+      await panel.evaluate(el => { el.scrollTop = 0 })
+      const first = await panel.screenshot({ animations:'disabled' })
+      const repeat = await panel.screenshot({ animations:'disabled' })
+      await info.attach(`${state}-original`, { body:first, contentType:'image/png' })
+      await info.attach(`${state}-repeat`, { body:repeat, contentType:'image/png' })
+      expect(repeat.equals(first)).toBe(true)
+      const name = `industrial-${width}-${state}.png`
+      await writeFile(`${directory}/${name}`, first)
+      captures[name] = createHash('sha256').update(first).digest('hex')
+      if ((state === 'pending' || state === 'rejected') && await panel.evaluate(el => el.scrollHeight > el.clientHeight)) {
+        await panel.evaluate(el => { el.scrollTop = el.scrollHeight })
+        const lower = await panel.screenshot({ animations:'disabled' })
+        expect((await panel.screenshot({ animations:'disabled' })).equals(lower)).toBe(true)
+        const lowerName = `industrial-${width}-${state}-controls.png`
+        await writeFile(`${directory}/${lowerName}`, lower)
+        captures[lowerName] = createHash('sha256').update(lower).digest('hex')
+      }
+      return first
+    }
+    await mkdir(directory, { recursive:true })
+    const idle = await capture('ready')
+    await input.fill('333'); await panel.getByRole('button', { name:'Review withdrawal' }).click()
+    await expect(panel.locator('.container-state')).toHaveText('Pending review · not committed')
+    await expect(panel.locator('[data-container-capacity]')).toHaveText('50 / 50 kg')
+    const pending = await capture('pending')
+    expect(pending.equals(idle)).toBe(false)
+    await panel.getByRole('button', { name:'Confirm withdraw' }).click()
+    await expect(panel.locator('.container-state')).toHaveText('Transfer committed')
+    await expect(panel.locator('[data-container-capacity]')).toHaveText('49.667 / 50 kg')
+    await capture('committed')
+    await input.fill('0'); await panel.getByRole('button', { name:'Review deposit' }).click()
+    await expect(panel.locator('.container-state')).toHaveText('Transfer rejected · nothing moved')
+    await expect(panel.getByRole('status', { name:'Container feedback' })).toContainText('positive whole number of grams')
+    await capture('rejected')
+    await close.focus(); await expect(close).toBeInViewport()
+    await writeFile(`${directory}/measurements-${width}.json`, JSON.stringify({ viewport:{width,height}, dpr:1, measurements, captures, negativeCheckpoint:'ready versus pending rejected', browser:page.context().browser()!.version() }, null, 2) + '\n')
+    await page.keyboard.press('Escape'); await expect(panel).toHaveCount(0)
+    await expect(page.locator('[data-inventory-weight]')).toHaveText('1.333 / 10 kg')
+    await page.emulateMedia({ reducedMotion:'no-preference' })
+    await page.keyboard.press('e'); await expect(dialog(page)).toBeVisible()
+    expect(await dialog(page).evaluate(el => getComputedStyle(el).animationDuration)).toBe('0.18s')
+    await page.keyboard.press('Escape'); await expect(dialog(page)).toHaveCount(0)
+    await info.attach('measurements', { path:`${directory}/measurements-${width}.json`, contentType:'application/json' })
+  })
+}

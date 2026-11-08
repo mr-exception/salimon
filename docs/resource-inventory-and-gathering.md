@@ -139,6 +139,19 @@ state is retained. Invalid amount/resource, balance, weight/slots, revision and
 save errors remain readable and non-destructive. Actual count-item content and
 machine processing/transfers are still future work.
 
+### Industrial equipment presentation (#829)
+
+The production container uses the shared `EquipmentDialog` shell and scoped
+Expedition Interface tokens. Paired carried/container capacity instruments show
+kg, exact g and free capacity; the raw-resource table and whole-gram form remain
+machine-specific. Pending review explicitly says nothing moved; committed feedback
+appears only after the session publishes a saved transfer. Rejected/save-blocked
+states explain failure in the live feedback region. Keyboard focus wraps within
+the native modal, buttons include disabled reasons, and small desktop windows
+scroll within the panel. Reduced motion removes the entry fade. Domain/save,
+source depletion, interruption and all-or-nothing rules above are unchanged.
+See [verification and original captures](../reports/issue-829/README.md).
+
 ## Generic count-item integration (#786)
 
 `registerCountItems` validates every definition, even unused types, and freezes a

@@ -1,0 +1,203 @@
+{
+  "source": "6a6de074e2b88412d4615c3a57263b68e644aaa1",
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "browser": "156.0.8078.4",
+    "playwright": "1.64.1",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "dpr": 1,
+    "epoch": "2026-11-06T12:00:00.000Z",
+    "locale": "en-US",
+    "timezone": "UTC",
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    },
+    "fonts": {
+      "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872",
+      "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab"
+    }
+  },
+  "results": [
+    {
+      "id": "wide",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "dfe02f4efdb3361a535f70d4793bb388521beace7096673597319527e99d44d7",
+      "actual": "dfe02f4efdb3361a535f70d4793bb388521beace7096673597319527e99d44d7"
+    },
+    {
+      "id": "telescope",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "ccb5ce340a913b8190f4bb08a122d837b51918769bb3ca005e1a0f0721f6ebf9",
+      "actual": "ccb5ce340a913b8190f4bb08a122d837b51918769bb3ca005e1a0f0721f6ebf9"
+    },
+    {
+      "id": "telescope-translated",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "ccb5ce340a913b8190f4bb08a122d837b51918769bb3ca005e1a0f0721f6ebf9",
+      "actual": "ccb5ce340a913b8190f4bb08a122d837b51918769bb3ca005e1a0f0721f6ebf9"
+    },
+    {
+      "id": "translated",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "dfe02f4efdb3361a535f70d4793bb388521beace7096673597319527e99d44d7",
+      "actual": "dfe02f4efdb3361a535f70d4793bb388521beace7096673597319527e99d44d7"
+    },
+    {
+      "id": "surface",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "fe8aea09b5b57999406f4c1d0ddd18ca80dea4a5c0b73c32e8e8ae858e570a33",
+      "actual": "fe8aea09b5b57999406f4c1d0ddd18ca80dea4a5c0b73c32e8e8ae858e570a33"
+    },
+    {
+      "id": "below",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "003be56fa8862bfa50ba3525edf88b9f872db8454dc0e02e6a674a12461921ec",
+      "actual": "003be56fa8862bfa50ba3525edf88b9f872db8454dc0e02e6a674a12461921ec"
+    },
+    {
+      "id": "empty-scanner",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "180a440d80ee5f7e1a7c2ce5c2059a932436ca510935b2b382a99749ab174351",
+      "actual": "180a440d80ee5f7e1a7c2ce5c2059a932436ca510935b2b382a99749ab174351"
+    },
+    {
+      "id": "detected-occluded-rear",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "b020bf839d5e2d3760487b67a75c6d42eeabecab4e636e2dd3747cccff667b6a",
+      "actual": "b020bf839d5e2d3760487b67a75c6d42eeabecab4e636e2dd3747cccff667b6a"
+    },
+    {
+      "id": "overlap",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "fbbf9cf577be81295879671fa07df4f40247664fab9209965f9245664e6dbb05",
+      "actual": "fbbf9cf577be81295879671fa07df4f40247664fab9209965f9245664e6dbb05"
+    },
+    {
+      "id": "pagination",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "1b7c668ac49d5f7743fbe0bcf575ffff90cccccbcab1ee7bd0fcadd5328f2672",
+      "actual": "1b7c668ac49d5f7743fbe0bcf575ffff90cccccbcab1ee7bd0fcadd5328f2672"
+    },
+    {
+      "id": "sensor-telescope",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "14ec881efcc7daadd9831a190243654c0e696eb0030a1585b1fe1de9d049b418",
+      "actual": "14ec881efcc7daadd9831a190243654c0e696eb0030a1585b1fe1de9d049b418"
+    },
+    {
+      "id": "lost-contact",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "a86fa39b6bcb195693b11c59479fe5e22c641e804b588d9ada843ba50c0aa60a",
+      "actual": "a86fa39b6bcb195693b11c59479fe5e22c641e804b588d9ada843ba50c0aa60a"
+    },
+    {
+      "id": "look-at-occluded",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
+      "actual": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c"
+    },
+    {
+      "id": "set-direction",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
+      "actual": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c"
+    },
+    {
+      "id": "compass-stationary",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "c37621dcfe497f75df403a1d3675a734f5733c40ccbc991cc1344c16bb2fd97b",
+      "actual": "c37621dcfe497f75df403a1d3675a734f5733c40ccbc991cc1344c16bb2fd97b"
+    },
+    {
+      "id": "compass-rear",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "91a3417cf44f78a848e55d06f80b41fbdfc9e23b5d7730d178b99e02919ced5e",
+      "actual": "91a3417cf44f78a848e55d06f80b41fbdfc9e23b5d7730d178b99e02919ced5e"
+    },
+    {
+      "id": "compass-overlap",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 1024000,
+      "expected": "14833f8c895ee83d63e2dcbe3ae21fb3aee27925ba4d47f47791241592b8d290",
+      "actual": "14833f8c895ee83d63e2dcbe3ae21fb3aee27925ba4d47f47791241592b8d290"
+    },
+    {
+      "id": "small-warning",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 576000,
+      "expected": "1dc807bc946605aa2ebf5b7342e8fbf546049c7b4f261a8a75148725fbbaf5f2",
+      "actual": "1dc807bc946605aa2ebf5b7342e8fbf546049c7b4f261a8a75148725fbbaf5f2"
+    },
+    {
+      "id": "small-destroyed",
+      "pass": true,
+      "changedPixels": 0,
+      "rawChangedPixels": 0,
+      "totalPixels": 576000,
+      "expected": "145705af40897af0cce14d06056e5aac3d7a1d28dcaa3eeee46b651e4c7a1220",
+      "actual": "145705af40897af0cce14d06056e5aac3d7a1d28dcaa3eeee46b651e4c7a1220"
+    }
+  ],
+  "errors": []
+}

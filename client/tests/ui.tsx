@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Button, IconButton, EquipmentPanel, UtilityPanel, Dialog, Meter, Progress, ContextPrompt, StatusLabel } from '../src/ui/primitives.tsx'
 import { acceptsFlightShortcut } from '../src/input.ts'
+import { StatusMessage } from '../src/ui/Feedback.tsx'
+import './assets/fonts.css'
 import './ui-fixture.css'
 
 // A bubbling game shortcut sentinel verifies that modal/input events never escape.
@@ -42,6 +44,9 @@ function Gallery({ context }: { context: 'planet' | 'space' }) {
         <ContextPrompt binding="E">Inspect nearby equipment</ContextPrompt>
         <label>Instrument label <input aria-label="Instrument label" defaultValue="Scout" /></label>
         <StatusLabel>Empty — no scanned contacts</StatusLabel>
+        <Meter label="Inventory empty" value={0} max={10} unit="kg" />
+        <Meter label="Inventory full" value={10} max={10} unit="kg" />
+        <StatusMessage priority="critical" label="Terminal condition">Terminal — zero health; start fresh character</StatusMessage>
         <p className="fixture-axes">Reserved compass: <span>Heading</span> / <span>Velocity</span></p>
       </UtilityPanel>
     </div>
@@ -57,4 +62,5 @@ function Gallery({ context }: { context: 'planet' | 'space' }) {
     </Dialog>
   </main>
 }
-createRoot(document.getElementById('root')!).render(<><Gallery context="planet" /><Gallery context="space" /></>)
+const context = new URLSearchParams(location.search).get('context')
+createRoot(document.getElementById('root')!).render(context === 'planet' || context === 'space' ? <Gallery context={context} /> : <><Gallery context="planet" /><Gallery context="space" /></>)

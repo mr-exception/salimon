@@ -232,3 +232,19 @@ cockpit browser routes plus shared component tests. Originals/logs remain under
 ignored `client/test-results/`; completion and exact evidence belong in the
 implementing PR (`Closes #830`), with CI awaiting user report. Visual candidates
 are not automatically approved baselines.
+
+## Deterministic cross-view acceptance (#831)
+
+The [client verification guide](../client/README.md#cross-view-expedition-interface-visual-regression-831)
+owns the reproducible gallery and full desktop screenshot/state matrix. It uses
+production styles/components, built surface/cockpit/storage routes and existing
+scanner/bright-scene fixtures rather than another QA runtime. References live in
+`client/tests/expedition-baselines/`; missing/corrupt references, pixel changes,
+focus loss, clipping, overlap or body scroll fail explicitly. Deliberate visual
+and focus defects must fail the corresponding browser assertions.
+
+Intentional new/changed references remain pending owner review; automated passes
+do not grant appearance approval. Preserve original/repeat/expected/diff images
+and canonical per-scenario state in ignored `client/test-results/` and existing
+14-day CI artifacts. The delivering PR records revisions, commands, criteria,
+environment and unverified qualifications; do not add new committed reports.

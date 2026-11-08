@@ -10,6 +10,15 @@ originals/logs use ignored `client/test-results/`; new delivery summaries belong
 in the PR and existing CI artifacts, not committed report folders.
 
 
+Browser shared UI visual QA (#831): `tests/expedition-captures.spec.ts` extends the
+existing Playwright setup with gallery, built cross-view and sensor/bright-context
+captures. `scripts/ui-reference.ts` enforces registered, hash-bound reference
+comparisons using the existing pixel policy; `scripts/negative-ui.mjs` proves real
+CSS and focus defects fail. `tests/expedition-baselines/` owns reviewable reference
+fixtures, while original/repeat/diff/state evidence stays in ignored test output.
+See the [client command and reference workflow](../client/README.md#cross-view-expedition-interface-visual-regression-831).
+
+
 [Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
 
 The production cockpit presentation is `PanoramicNavigation.tsx`, composed by

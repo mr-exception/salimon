@@ -58,6 +58,14 @@ jobs:
       - name: Prove a real visual defect fails comparison
         working-directory: client
         run: npm run test:visual:negative
+      - name: Repeat cross-view Expedition Interface references
+        working-directory: client
+        env:
+          SALIMON_EVIDENCE_DIR: test-results/ui-repeat
+        run: npm run test:ui
+      - name: Prove shared UI visual and focus defects fail
+        working-directory: client
+        run: npm run test:ui:negative
       - uses: actions/upload-artifact@v4
         if: always()
         with:

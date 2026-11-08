@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "review": "PENDING_OWNER_REVIEW",
+  "environment": {
+    "browser": "156.0.8078.4",
+    "playwright": "1.64.1",
+    "platform": "linux",
+    "arch": "x64",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "dpr": 1,
+    "locale": "en-US",
+    "timezone": "UTC",
+    "reducedMotion": "reduce",
+    "epoch": "2026-11-04T00:00:00Z",
+    "fonts": {
+      "DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "fonts.conf": "d81fff372d145259a9115a70e2f8e60d3c746862e57dfb46175e821185a3b6ab",
+      "fonts.css": "04722b09ce2283ebdfb48cbca1e74067e972914360c63d97195addede8645872"
+    },
+    "policy": {
+      "threshold": 0.1,
+      "maxDiffPixels": 0,
+      "includeAA": true,
+      "masks": []
+    }
+  },
+  "images": {
+    "gallery-planet-default-1280.png": "89ebc3c7edfafb68a256871a6f640011e08686b1770eed4414768ee4f8027d0c",
+    "gallery-planet-hover-1280.png": "afd6ff1e96dd8cfcc245e962d82e89b3bdc9a76cc4c2d87cff8d0d0e77e46cb2",
+    "gallery-planet-focus-1280.png": "8e6dafe630d207af267e0d269309839a15febdbd79e725e0b7eca591421c9eec",
+    "gallery-planet-confirmation-1280.png": "7b90de1b7c2a41c47540c39b8ac89489e82826675d1257a914f86256af5bb38a",
+    "gallery-space-default-1280.png": "3e4068385802f5fff07e18ae137480ad18e7f19f76ed529be68352ae819761d4",
+    "gallery-space-hover-1280.png": "61b7cfec3145106fd3a13bb04a93e9bff555fc57cae9f8515f0bf1ed3dbcaaa2",
+    "gallery-space-focus-1280.png": "6b656953c170d4546f3a335d866401db912f780038341de23d030c41e7024110",
+    "gallery-space-confirmation-1280.png": "275799a783c701515764f17e0d9897acbee21ea61d88f610f3f410e15c6c3b86",
+    "surface-context-1280.png": "1a9c796b0e9963459abe75b3392c1ba8eb8f904896cbe4978e1b8adad7c4fdd1",
+    "inventory-empty-1280.png": "6e7d8d08cec3350694a1301ba16c6db6e578b939e51e89b353e744ff1cde39c5",
+    "surface-gathering-1280.png": "5289303d283ea9783b1062823bcabefb90a14c83c7de0a772fc5d1b9e25e57af",
+    "inventory-full-1280.png": "efe9c6622c7d5cfcf7e71ef5b58809a1a00231efc80570e2f6cf0282c517c69a",
+    "critical-help-1280.png": "05f31345651d877524e3530b32aeae30a89ed05043cabb3f172464871e8aa9b4",
+    "terminal-1280.png": "98a249ca7908955db865022bf13b4f4e21493ed5671ff0b2760400b94e9290e2",
+    "cabin-context-1280.png": "ecd444441f253be23da5d40fb0515a9d827d4e4da806f55da88bf78aa660c8cf",
+    "storage-review-1280.png": "0fe621eaf31597804425a77302c006f3b622cec7efa2527a66a1da9bbaf4a777",
+    "storage-review-controls-1280.png": "66f62ba992c35b1c28a452ab41991b4e90cf09ffe5ee465d8924b2f8a0e46141",
+    "storage-error-1280.png": "aca5b7ad1442270d320b080f03faa01222538c3f806a0389d9c983d22b1abd13",
+    "storage-error-controls-1280.png": "010a2f0ad482fcab9fcc4b36560b693876b9e70da8bdc762684e357a659bc8c6",
+    "cockpit-horizon-1280.png": "9c57645e3df6be57a1f04e701464adcb57e91972eb1d4d623da6e4d05aece1af",
+    "cockpit-selected-dark-1280.png": "42953f96513661798425ca60ed37439869dba297b14c932f580f97e1eb58c434",
+    "surface-return-1280.png": "1a38ec381f8ec84e477f41bda162f7a14e5f2819eda4174eb405bd0f11eb40bc",
+    "contacts-unscanned-1280.png": "d70fa08da1263454145596ed98f09a2dee089728fbfac8825741b564f1db3116",
+    "contacts-selected-occluded-1280.png": "ae46fac42954290a74d200314ab352367becd8d6dbe7c88d0de4dccdf8f9b209",
+    "contacts-lost-1280.png": "745a9ad57804d8d9d8501e77af8f21a671601bd9c68f4b998787fdea040b2a42",
+    "cockpit-bright-warning-1280.png": "3c84b734068d3fc7ba1fa64dd96df432ad8fdec0512324987c675d5f4b170a0f",
+    "cockpit-bright-focused-warning-1280.png": "6b487121093571954882c636f532e632277c56a996af4622d9db47a627b7b660"
+  }
+}

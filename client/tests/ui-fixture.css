@@ -12,3 +12,11 @@ body { margin: 0; }
 .fixture-axes span:first-child { color: var(--ui-heading); }
 .fixture-axes span:last-child { color: var(--ui-velocity); }
 @media(max-width: 700px) { .fixture-grid { grid-template-columns: 1fr; } }
+/* Isolated review route fits a desktop viewport; production primitive CSS is
+   unchanged. The two-context scrolling overview remains available without query. */
+#root > .fixture:only-child { min-height:100vh; padding:12px; font-size:13px; line-height:1.25; }
+#root > .fixture:only-child h1 { font-size:18px; }
+#root > .fixture:only-child .ui-panel { padding:12px; }
+#root > .fixture:only-child .ui-panel p { margin:6px 0; }
+#root > .fixture:only-child .ui-meter { margin:6px 0; }
+#root > .fixture:only-child .fixture-actions { gap:8px; }

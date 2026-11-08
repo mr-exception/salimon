@@ -707,3 +707,64 @@ summaries in focused help at the same sizes. Use `npm run test:browser -- --proj
 `LOOK`, `COCKPIT-1` and PANO-VIS retain command/lifecycle and visual coverage.
 See [the delivery evidence](../reports/issue-828/README.md); new image candidates
 remain reviewable evidence; there is no human baseline-approval CI gate.
+
+## Cross-view Expedition Interface visual regression (#831)
+
+The development gallery `/tests/ui.html` imports production tokens, primitives
+and feedback components. `?context=planet` or `?context=space` isolates a desktop
+state board: idle/active/hover/focus, disabled-with-reason, pending, confirmation,
+error, warning, terminal and empty/full inventory. The query-free overview remains
+scrollable. Fixture readings are illustrative; they cannot issue gameplay commands.
+
+`npm run test:ui` uses the existing Playwright configuration, vendored fonts,
+fixed clock, DPR 1 and strict unmasked pixel comparator at **960×600, 1280×720 and
+1920×1080**. It covers the built `/` surface/gathering/inventory, critical modal,
+terminal, cabin, container review/error (top and controls), grounded cockpit,
+contact selection and return. Existing production sensor/bright-star composition
+fixtures add unscanned/occluded/lost contact and bright-background warning frames;
+these are fixture compositions, not new playable flight/optical mechanics.
+Readouts are checked against domain-created prior-expedition saves and exact
+transactions. Geometry assertions reject body scroll, clipped/horizontally
+scrolling panels, HUD overlap and world interception at the player. Browser
+keyboard checks exercise focus containment/return, input isolation, modal/utility
+Escape ordering and grounded ship guards. The broader scanner, transactions,
+reduced-motion and focus tests remain in their owning existing suites.
+
+Run after `npm ci && npx playwright install chromium && npm run build`:
+
+```sh
+npm test
+npm run test:ui
+npm run test:ui:negative
+# A fresh browser run, preserving the first run's originals:
+SALIMON_EVIDENCE_DIR=test-results/ui-repeat npm run test:ui
+```
+
+`npm run test:browser` includes this project. The existing Navigation client CI
+runs it, repeats it, and runs the two deliberate CSS mutations. Negative success
+requires the **specific visual or focus assertion** to fail; setup errors, missing
+references and timeouts are invalid demonstrations. Node tests also reject absent
+manifest entries/files, corrupt hashes and changed pixels. Normal runs never
+write reference images; absent references fail instead of bootstrapping a pass.
+
+To propose intentional reference changes locally:
+
+```sh
+SALIMON_UI_CANDIDATES="$PWD/test-results/ui-candidates" npm run test:ui
+```
+
+Candidate generation is forbidden in CI and outside an absolute ignored
+`client/test-results/` path. Review originals, repeats and metadata, then explicitly
+copy the proposed PNGs and per-width manifests to `tests/expedition-baselines/` in
+the reviewed change. Their `PENDING_OWNER_REVIEW` marker does not grant visual
+approval; route intentional reference changes to the owner. References are test
+fixtures, not completion reports. Existing navigation/panoramic references and
+pixel tolerances are unchanged. No extra approval/status CI system is introduced.
+
+Canonical scenario JSON includes tested SHA, source-input digest, viewport/DPR,
+font hashes, clock, browser/backend, readouts, geometry and comparison hashes.
+Original/expected/repeat/diff PNGs, negative failures and logs use ignored
+`test-results/`; the existing CI artifact retains them for 14 days. Put delivery
+results and limitations in the PR, not new committed `reports/` files. Synthetic
+browser input and SwiftShader results do not qualify physical input, target
+hardware FPS or native Metal rendering. No timing claim is inferred from captures.

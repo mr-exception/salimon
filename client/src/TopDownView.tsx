@@ -102,7 +102,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   }, [gameplay])
   useEffect(() => {
     const input = new NavigationInput(), clock = new TopDownClock(), timer = new FrameTimer(performance.now())
-    let raf = 0
+    let raf = 0, publishedError = ''
     const release = () => { input.clear(); clock.reset(); timer.resume(performance.now()) }
     const clear = () => { release(); session.current?.cancel(); container.current?.close(); current.current = cancelInteraction(current.current); if (session.current) session.current.world = current.current; session.current?.checkpoint(); setState(current.current) }
     const keydown = (event: KeyboardEvent) => {
@@ -160,6 +160,10 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       }
       // One navigation clock across world/cockpit; the view only observes it.
       if (gameplay) navigation.advance(dt)
+      // Failed atomic saves roll the domain world back to the same object.
+      // Publish the changed error once even when React would bail out on identity.
+      const error = session.current?.error ?? ''
+      if (error !== publishedError) { current.current = { ...current.current }; publishedError = error }
       setState(current.current)
       raf = requestAnimationFrame(frame)
     }

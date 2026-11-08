@@ -127,3 +127,16 @@ panoramic and eight orthographic originals remain byte-identical. No environment
 or comparison policy changes. These five replacements are covered by automated
 comparisons; the owner reviews their appearance in the deployed version.
 See [originals, diffs, measurements and exact digest](../../../reports/issue-828/README.md).
+
+## Cross-view feedback reference proposal (#830)
+
+Six proposed replacements cover explicit scanner contact loss, quiet scanner status
+with a separately readable pulse counter, shared status styling and persistent
+Warning text (stationary/rear/overlap HUD and small warning/terminal views).
+The other 13 panoramic and eight orthographic references stay byte-identical.
+The replacements originate from the matching Chromium 156.0.8078.4 CI capture
+for PR #836, run 42437273206, merge revision
+`3a758470fc84e34b95bb9cbb6a634967d977b944` (implementation head `ebfbc472`).
+The PR records original/diff metrics and subsequent normal/repeat/negative checks.
+Pixel policy, environment and `AWAITING_HUMAN_REVIEW` status are unchanged;
+this proposal does not grant appearance approval or merge authority.

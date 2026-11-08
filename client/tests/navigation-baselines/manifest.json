@@ -50,14 +50,14 @@
     "panoramic-overlap.png": "fbbf9cf577be81295879671fa07df4f40247664fab9209965f9245664e6dbb05",
     "panoramic-pagination.png": "1b7c668ac49d5f7743fbe0bcf575ffff90cccccbcab1ee7bd0fcadd5328f2672",
     "panoramic-sensor-telescope.png": "14ec881efcc7daadd9831a190243654c0e696eb0030a1585b1fe1de9d049b418",
-    "panoramic-lost-contact.png": "a86fa39b6bcb195693b11c59479fe5e22c641e804b588d9ada843ba50c0aa60a",
+    "panoramic-lost-contact.png": "923c06e5a00cf069d91784155812a73baa817f36dfb2c6ad1e5f741047886c6c",
     "panoramic-look-at-occluded.png": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
     "panoramic-set-direction.png": "bf3f169c8d4d7c9794f27d46ce264f10ec2da986286749b733244ba63ea9aa8c",
-    "panoramic-compass-stationary.png": "c37621dcfe497f75df403a1d3675a734f5733c40ccbc991cc1344c16bb2fd97b",
-    "panoramic-compass-rear.png": "91a3417cf44f78a848e55d06f80b41fbdfc9e23b5d7730d178b99e02919ced5e",
-    "panoramic-compass-overlap.png": "14833f8c895ee83d63e2dcbe3ae21fb3aee27925ba4d47f47791241592b8d290",
-    "panoramic-small-warning.png": "1dc807bc946605aa2ebf5b7342e8fbf546049c7b4f261a8a75148725fbbaf5f2",
-    "panoramic-small-destroyed.png": "145705af40897af0cce14d06056e5aac3d7a1d28dcaa3eeee46b651e4c7a1220"
+    "panoramic-compass-stationary.png": "4b07fd01c163cfe81878414aec7568d5443a8ea60a82c4edc54071d8886cbb81",
+    "panoramic-compass-rear.png": "604fd98e46084a4989bf52a38e42ad7bfe0ff0fde558a96ad286364e6ca02dd1",
+    "panoramic-compass-overlap.png": "49309b389615ba16b31a35731f6ee0298531bfec00eafb41508dcd0cb4df3e4f",
+    "panoramic-small-warning.png": "9a00770fcb40ce1692f0f3fa2920ead7ad54dc6f4efc4c112db21441313a7bb9",
+    "panoramic-small-destroyed.png": "c48419623e0d530ca7f28750e3426b0c538929a93a7bb069e59ab2eb9c65a608"
   },
   "panoramic": {
     "environment": {

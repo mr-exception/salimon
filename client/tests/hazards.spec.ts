@@ -47,6 +47,7 @@ test('HAZ-1–5 built non-shipping fixture uses production clock/save, exact rel
   await page.getByRole('button', { name: 'Resume [P]', exact: true }).click()
   await page.clock.runFor(1000)
   await expect(page.getByLabel('Survival condition')).toContainText('Saving failed')
+  await expect(page.getByLabel('Survival condition').locator('.ui-status--error')).toHaveAttribute('aria-live', 'assertive')
   expect(await save()).toEqual(beforeFailure)
   await page.reload(); await expect(page.getByRole('meter', { name: 'Health', exact: true })).toHaveAttribute('value', String(beforeFailure.survival.health))
   await expect(page.getByLabel('Survival condition')).toContainText(`${Math.ceil(beforeFailure.survival.health)} / 200 HP`)

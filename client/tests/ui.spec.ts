@@ -40,7 +40,7 @@ for (const width of [960, 1280, 1920]) test(`repeatable light/dark state referen
   await page.setViewportSize({ width, height: width === 960 ? 600 : width === 1280 ? 720 : 1080 })
   await page.goto('/tests/ui.html')
   await page.evaluate(() => document.fonts.ready)
-  const directory = '../reports/issue-826/captures'
+  const directory = testInfo.outputPath('captures')
   await mkdir(directory, { recursive: true })
   const hashes: Record<string, string> = {}
   for (const context of ['planet', 'space']) {
@@ -79,4 +79,23 @@ for (const width of [960, 1280, 1920]) test(`repeatable light/dark state referen
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await writeFile(`${directory}/hashes-${width}.json`, JSON.stringify(hashes, null, 2) + '\n')
+})
+
+test('nested dialogs close topmost, consume repeat Escape and safely restore the origin', async ({ page }) => {
+  await page.goto('/tests/ui.html')
+  const planet = page.getByRole('main', { name:'planet context' })
+  const origin = planet.getByRole('button', { name:'Inspect equipment' })
+  await origin.click()
+  const parent = page.getByRole('dialog', { name:'Equipment review', exact:true })
+  const nestedOrigin = parent.getByRole('button', { name:'Inspect nested details' })
+  await nestedOrigin.click()
+  await expect(page.getByRole('dialog', { name:'Nested details' })).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name:'Nested details' })).toBeHidden()
+  await expect(parent).toBeVisible(); await expect(nestedOrigin).toBeFocused()
+  await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', code:'Escape', repeat:true, bubbles:true, cancelable:true })))
+  await expect(parent).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(parent).toBeHidden(); await expect(origin).toBeFocused()
+  expect(await page.evaluate(() => (window as unknown as {shortcutCount:number}).shortcutCount)).toBe(0)
 })

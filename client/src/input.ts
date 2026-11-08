@@ -13,7 +13,7 @@ export class NavigationInput {
  get controls():Controls {const controls=idleControls();for(const axis of this.held.values())controls[axis]=true;return controls}
 }
 export function acceptsFlightShortcut(target:EventTarget|null):boolean {
- return !(target instanceof Element && target.closest('input,textarea,select,button,summary,a,dialog,[contenteditable]:not([contenteditable="false"])'))
+ return !document.querySelector('dialog[open]') && !(target instanceof Element && target.closest('input,textarea,select,button,summary,a,dialog,[data-ui-utility],[contenteditable]:not([contenteditable="false"])'))
 }
 export class FrameTimer {
  private previous:number

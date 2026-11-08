@@ -275,8 +275,9 @@ fixtures, dense groups, help, focus/release cleanup and production WebGL.
 TypeScript checks test/configuration files. CI uses Node 22, an npm lockfile
 cache, `npm ci`, domain tests, build, installed Chromium and the same suite.
 `test-results/` contains JSON results, original screenshots and failure traces;
-CI retains these as a revision-named artifact for 14 days. Task reports retain
-selected original evidence permanently.
+CI retains these as a revision-named artifact for 14 days. New completion records
+belong in the PR description/comment; keep local originals in ignored output and
+do not commit new report/evidence archives. CI tracking belongs to the user.
 
 ### Deterministic navigation regression (#750)
 

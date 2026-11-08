@@ -57,6 +57,11 @@ test('HUD-1 full viewport, scanner authority, keyboard browser and priority Esca
  await expect(page.getByRole('button', { name: /Contacts \(C\)/ })).toBeFocused()
  expect((await state(page)).exits).toBe(0)
  await page.getByRole('button', { name: 'Telemetry', exact: true }).click()
+ // Open contacts after telemetry: most recently opened utility closes first.
+ await page.getByRole('button', { name: /Contacts \(C\)/ }).click()
+ await page.keyboard.press('Escape')
+ await expect(page.getByLabel('Search contacts')).toHaveCount(0)
+ await expect(page.getByRole('region', { name: 'Detailed telemetry' })).toBeVisible()
  await page.getByRole('button', { name: 'Help', exact: true }).click()
  await expect(page.getByRole('dialog')).toBeVisible()
  await expect(page.getByRole('heading', { name: 'Navigation help', exact: true })).toBeFocused()
@@ -207,3 +212,21 @@ for (const viewport of [{ width: 960, height: 600 }, { width: 1280, height: 720 
   await expect(page.getByLabel('Navigation warnings')).not.toBeEmpty()
  })
 }
+
+test('FEEDBACK scanner pulse is quiet; lost contact removes authoritative actions', async ({ page }, info) => {
+ await boot(page)
+ await acquireContacts(page)
+ await page.getByRole('button', { name: /Contacts \(C\)/ }).click()
+ await page.getByRole('button', { name: 'Contact 00', exact:true }).click()
+ await expect(page.getByRole('button', { name: 'Look at', exact:true })).toBeVisible()
+ const status = page.locator('.panoramic-status [role=status]')
+ await expect(status).toHaveText('Scanner active · 40 contacts')
+ const text = await status.textContent()
+ await acquireContacts(page)
+ await expect(status).toHaveText(text!)
+ await scenario(page, 'lost-contact'); await acquireContacts(page)
+ await expect(page.locator('.selected-contact')).toContainText('Scanner contact lost')
+ await expect(page.getByRole('button', { name: 'Look at', exact:true })).toHaveCount(0)
+ await expect(page.getByRole('button', { name: 'Set direction', exact:true })).toHaveCount(0)
+ await capture(page, 'scanner-contact-lost.png', info)
+})

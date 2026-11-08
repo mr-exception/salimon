@@ -60,24 +60,24 @@ reuse unchanged source-bound evidence and stop when remaining blockers require
 external action. Do not create review handoff packets, automated review statuses,
 scheduled scans or extra review CI jobs.
 
-## Revision-bound evidence and report
+## Revision-bound evidence and PR validation record
 
-Write `reports/issue-N/README.md` in the delivering PR (or
-`reports/task-ID/README.md` for authorized work without an issue). Include:
+Put completion and validation in the delivering PR description or one maintained
+PR comment. Do not add new committed report files or evidence-only directories.
+Keep historical reports and their links intact. Include:
 
 - Outcome, criterion matrix, changed production/test paths and documentation impact.
-- Exact tested source SHA and PR head/base SHAs and branches, commands, results,
-  tool/OS versions, browser/backend, viewport/DPR, seed/clock and input method as applicable.
-- Durable links to original screenshots, traces, logs, raw measurements and diffs;
-  failures, skips, unrun checks, limits and separately owned qualifications.
-- Active-session reviewer, verdict and evidence, plus delivering PR and follow-ups.
+- Exact tested source SHA/input hashes and PR head/base SHAs and branches, commands,
+  results, tool/OS versions, browser/backend, viewport/DPR, seed/clock and input method.
+- Original screenshots, traces, logs, raw measurements and diffs under ignored
+  `client/test-results/` locally and existing CI artifacts; retain failures and limits.
+- Same-session implementing-agent review, findings and outstanding checks.
 
-A report cannot embed the SHA of its own commit. Record the tested source commit
-in the report and bind the final head/base, CI and reviewer verdict in a PR comment
-or check after publication. For report-only commits, explicitly verify unchanged
-source/test/asset/configuration hashes and let the reviewer assess that reuse;
-never relabel old-head CI as a new-head pass. Record any check that does not run
-at the final head and why. Review the final published diff, including report edits.
+Finish affected local checks before publication. The user tracks CI and reports
+results in the active chat; do not query or poll CI by default. Mark required CI
+UNVERIFIED and final acceptance pending until the user reports results bound to
+the unchanged delivered head. Exact input hashes justify reuse of unchanged local
+evidence across documentation-only commits; never relabel old-head CI as current.
 
 A head update, rebase or parent change invalidates acceptance until the reviewer
 checks ancestry, unique diff and evidence again. Rerun affected checks; exact
@@ -89,8 +89,9 @@ until the delivering changes reach default; after parent merges, retarget and
 revalidate descendants as needed. Check that the source issue actually closes.
 
 CI artifacts may expire (the navigation workflow currently retains them for 14
-days). Keep essential originals/raw evidence beside the report or in a durable
-accessible archive, with hashes and run links; preserve failure evidence as well.
+days). Record availability and expiry honestly in the PR; local originals stay
+ignored. Missing required evidence is UNVERIFIED, not a reason to commit archives.
+Preserve failure evidence as well.
 The [PR template](../.github/PULL_REQUEST_TEMPLATE.md) collects this record.
 
 ## CI, exceptions and closure

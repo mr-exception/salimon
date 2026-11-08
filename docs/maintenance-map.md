@@ -2,6 +2,14 @@
 
 > **Current browser scope:** Start with [code-checked implementation and validation routing](current-client-status.md). Native crate, tooling and build sections below are historical; they require the archived revision and do not gate routine 2D work.
 
+Browser cross-view interaction/feedback (#830): `ui/interaction.ts` owns utility
+and modal Escape ordering and safe focus return; `ui/Feedback.tsx` and
+`ui/feedback.ts` own accessible priority/deduplication and modal warning mirrors.
+Domain owners still provide authoritative condition/transaction state. Local
+originals/logs use ignored `client/test-results/`; new delivery summaries belong
+in the PR and existing CI artifacts, not committed report folders.
+
+
 [Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
 
 The production cockpit presentation is `PanoramicNavigation.tsx`, composed by

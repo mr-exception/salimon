@@ -37,7 +37,9 @@ with a reason. Mark mandatory checks before implementation; never mark an unrun 
 
 Record tested SHA, final PR head/base and parent, environment/backend/input,
 viewport/DPR/seed/clock as applicable, exact commands/results and original
-screenshots/traces/raw logs in `reports/issue-N/README.md`. Retain failures and
+screenshots/traces/raw logs in ignored `client/test-results/` and existing CI artifacts.
+Put the completion/check matrix in the PR description or maintained validation comment;
+do not commit new reports. CI tracking belongs to the user in the active chat. Retain failures and
 unverified limits. Link separately owned release qualification with exact scope.
 
 Status: implementation in progress / QA pending / changes requested / QA accepted

@@ -201,3 +201,34 @@ See the [panoramic contract](panoramic-navigation-design.md#shared-projected-ins
 and [original captures/results](../reports/issue-828/README.md). Styling acceptance
 in the deployed version remains separate from functional passes; no separate
 human reference-approval CI job is required.
+
+## Cross-view interaction and feedback (#830)
+
+`ui/interaction.ts` registers open utility layers in opening order; native modal
+layers always take priority. Escape dismisses one layer and consumes the event
+before scene handlers. Repeated Escape cannot dismiss multiple layers. Dialog
+focus returns only to a connected, visible, enabled origin. Help uses the same
+shell with heading focus; inventory, contacts and telemetry block gameplay keys
+while focused. Ordinary menus still advance active time; explicit pause and the
+cockpit power/occupancy owners keep their existing authority.
+
+`ui/Feedback.tsx` exposes StatusMessage and persistent FeedbackScope warnings.
+Priority is critical > error > pending work > ordinary status > confirmation.
+Warnings are deduplicated by text, ordered, and mirrored inside each native modal
+because its background is inert. State and transaction owners supply messages;
+progress and scanner pulse counters are not live announcements. Unchanged text
+does not mutate live regions on frame renders. Errors/critical conditions use
+assertive announcements and explicit Error/Warning words; other changes are polite.
+Container review remains pending until its real save succeeds. Scanner contact
+loss explicitly removes target actions and reports loss. Critical conditions stay
+readable with ordinary panels and within modal scroll. Reduced motion removes
+entry animation without removing state changes. No high-contrast preference is
+introduced; existing opaque surfaces and semantic ink remain in use.
+
+There is no browser audio playback/mixer infrastructure. Adjustable UI sounds are
+a separate future audio follow-up; #830 adds no playback or simulated audio events.
+Verification uses unit priority tests, production surface/storage/survival and
+cockpit browser routes plus shared component tests. Originals/logs remain under
+ignored `client/test-results/`; completion and exact evidence belong in the
+implementing PR (`Closes #830`), with CI awaiting user report. Visual candidates
+are not automatically approved baselines.

@@ -56,6 +56,21 @@ test('COCKPIT-1 panoramic round trip, reserved seat, blackout and persistent sim
         const gl = (c as HTMLCanvasElement).getContext('webgl2')!, ext = gl.getExtension('WEBGL_debug_renderer_info')!
         return { renderer: gl.getParameter(ext.UNMASKED_RENDERER_WEBGL), version: gl.getParameter(gl.VERSION) }
       })
+      // A dialog owned by the survival HUD still outranks cockpit Escape.
+      const surfaceHelp = page.getByLabel('Survival condition').getByRole('button', { name: 'Help', exact: true })
+      await surfaceHelp.click()
+      await expect(page.getByRole('dialog', { name: 'Surface controls' })).toBeVisible()
+      const protectedShip = await ship(), protectedView = await view()
+      await page.keyboard.press('e'); await page.keyboard.press('p')
+      await page.keyboard.down('w'); await page.keyboard.down('ArrowLeft'); await page.clock.runFor(200)
+      await page.keyboard.up('w'); await page.keyboard.up('ArrowLeft')
+      expect((await ship()).position).toEqual(protectedShip.position)
+      expect((await ship()).yaw).toEqual(protectedShip.yaw)
+      expect(await view()).toEqual(protectedView)
+      await page.keyboard.press('Escape')
+      await expect(page.getByRole('dialog', { name: 'Surface controls' })).toBeHidden()
+      await expect(main).toHaveAttribute('data-cockpit-view', 'radar')
+      await expect(surfaceHelp).toBeFocused()
       await capture('panoramic-horizon')
       const horizon = PNG.sync.read(originals['panoramic-horizon'])
       const rgb = (x: number, y: number) => [...horizon.data.subarray((y * horizon.width + x) * 4, (y * horizon.width + x) * 4 + 3)]

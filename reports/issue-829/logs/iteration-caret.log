@@ -1,0 +1,67 @@
+
+> salimon-navigation-client@0.1.0 test:browser
+> playwright test storage.spec.ts --project=cockpit
+
+[WebServer] (node:1738) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1751) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1770) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1783) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:1840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:1852) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [cockpit] › tests/storage.spec.ts:16:1 › STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and reload repeats (33.1s)
+  ✓  2 [cockpit] › tests/storage.spec.ts:108:1 › STORE-UI-2 full/overweight, stale-save failure, confirmation cancellation and narrow viewport (4.3s)
+  ✓  3 [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 960x600 (2.1s)
+  ✓  4 [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1280x720 (2.1s)
+  ✘  5 [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1920x1080 (1.2s)
+
+
+  1) [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1920x1080
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      191 |       await info.attach(`${state}-original`, { body:first, contentType:'image/png' })
+      192 |       await info.attach(`${state}-repeat`, { body:repeat, contentType:'image/png' })
+    > 193 |       expect(repeat.equals(first)).toBe(true)
+          |                                    ^
+      194 |       const name = `industrial-${width}-${state}.png`
+      195 |       await writeFile(`${directory}/${name}`, first)
+      196 |       captures[name] = createHash('sha256').update(first).digest('hex')
+        at capture (/workspace/salimon/client/tests/storage.spec.ts:193:36)
+        at /workspace/salimon/client/tests/storage.spec.ts:200:18
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/storage-STORE-UI-3-industr-574fb--and-local-scroll-1920x1080-cockpit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [cockpit] › tests/storage.spec.ts:146:3 › STORE-UI-3 industrial equipment states, focus and local scroll 1920x1080
+  4 passed (48.4s)

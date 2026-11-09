@@ -1,7 +1,9 @@
+import { NavigationRuntime } from '../src/navigationRuntime.ts'
+import { SAMPLE_BODIES } from '../src/sampleUniverse.ts'
 import { test, expect } from '@playwright/test'
 import { boot, walkTo, walkTicks } from './worldJourney'
 
-test('FLIGHT-838 production lifecycle, disconnected interior, save/reload and validated return', async ({page},info)=>{
+test('FLIGHT-840 production launch survives cockpit exit and focus loss, then saves flight', async ({page},info)=>{
  test.setTimeout(240000)
  await boot(page,'?flightFixture=1')
  const main=page.locator('main'), ship=async()=>JSON.parse((await main.getAttribute('data-ship'))!)
@@ -26,11 +28,14 @@ test('FLIGHT-838 production lifecycle, disconnected interior, save/reload and va
  await page.screenshot({path:info.outputPath('grounded-cockpit.png')})
  await page.getByRole('button',{name:'begin-takeoff',exact:true}).click()
  await page.getByRole('button',{name:'finish-takeoff',exact:true}).click()
- await page.clock.runFor(64)
- expect((await ship()).mode).toBe('flying');expect((await ship()).position).toEqual(before.position)
+ expect((await ship()).mode).toBe('taking-off')
  expect(await page.locator('.panoramic').getAttribute('data-observation')).toBe(view)
+ await page.getByRole('button',{name:'Exit cockpit'}).click()
+ await page.keyboard.press('ArrowUp')
+ await page.evaluate(()=>window.dispatchEvent(new Event('blur')))
+ await page.clock.runFor(6500)
+ expect((await ship()).mode).toBe('flying');expect((await ship()).position).not.toEqual(before.position)
  await page.screenshot({path:info.outputPath('flight-cockpit.png')})
- await page.getByRole('button',{name:'Exit cockpit'}).click();await page.clock.runFor(64)
  await expect(page.locator('[data-entity][data-frame="planet:fixture"]')).toHaveCount(0)
  for(const p of [[0,-1.65],[1.35,-1.65],[1.35,.45],[0,.45],[0,2],[0,4.85]])await walkTo(page,p,'ship:scout',true)
  await page.keyboard.press('e');await page.clock.runFor(32)
@@ -46,18 +51,11 @@ test('FLIGHT-838 production lifecycle, disconnected interior, save/reload and va
  expect(saved.version).toBe(10);expect(saved.scout.binding).toBeNull()
  await page.reload();await page.clock.runFor(64)
  await expect(main).toHaveAttribute('data-player-mode','standing')
- expect((await ship()).mode).toBe('flying');expect((await ship()).position).toEqual(saved.scout.ship.position)
+ expect((await ship()).mode).toBe('flying');expect((await ship()).velocityMps).toEqual(saved.scout.ship.velocityMps)
  await expect(page.locator('[data-entity][data-frame="planet:fixture"]')).toHaveCount(0)
- // A reset/scene mount never reattaches the old site. A real live seat is required.
+ // Landing cannot fabricate a return to the launch anchor.
  await page.getByRole('button',{name:'begin-landing',exact:true}).click()
  expect((await ship()).mode).toBe('flying')
- for(const p of [[0,2],[0,.45],[1.35,.45],[1.35,-1.65],[0,-1.65],[0,-3.1]])await walkTo(page,p,'ship:scout',true)
- await page.keyboard.press('e');await page.clock.runFor(64)
- await page.getByRole('button',{name:'begin-landing',exact:true}).click()
- await page.getByRole('button',{name:'finish-landing',exact:true}).click()
- await page.getByRole('button',{name:'Exit cockpit'}).click();await page.clock.runFor(64)
- expect((await ship()).mode).toBe('grounded')
- await expect(page.locator('[data-entity][data-frame="planet:fixture"]').first()).toBeVisible()
  const built=await page.context().newPage()
  await boot(built,'','http://127.0.0.1:4175')
  await built.evaluate(value=>localStorage.setItem('salimon:expedition:v1',JSON.stringify(value)),saved)
@@ -86,7 +84,8 @@ test('FLIGHT-838 built save restores a rendered interior and usable inventory',a
  world=enterCockpit({...world,selectedId:'scout:chair'})
  const session=new ResourceSession({getItem:()=>raw,setItem:(_,value)=>{raw=value}},world)
  expect(session.transfer({revision:0,from:{kind:'source',id:'source:landing:mineral:01'},to:{kind:'player'},resourceId:'mineral',grams:1000})).toBe(true)
- for(const kind of ['begin-takeoff','finish-takeoff'] as const)expect(session.transitionScout({kind},session.snapshot.revision,session.world.cockpit)).toBe(true)
+ expect(session.transitionScout({kind:'begin-takeoff'},session.snapshot.revision,session.world.cockpit)).toBe(true)
+ const navigation=new NavigationRuntime(SAMPLE_BODIES,session.world.scoutLocation);navigation.advance(4);navigation.advance(2)
  session.world=leaveCockpit(session.world);session.checkpoint()
  await page.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:RESOURCE_SAVE_KEY,raw:raw!})
  await page.clock.install({time:new Date('2026-11-04T00:00:00Z')});await page.clock.pauseAt(new Date('2026-11-04T00:00:01Z'))

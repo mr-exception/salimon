@@ -1,3 +1,5 @@
+import { sampleTakeoff, TAKEOFF_TICKS } from './takeoff.ts'
+import { startingScoutLocation } from './scoutLocation.ts'
 import type { ScoutLocation } from './scoutLocation.ts'
 import { resolveContacts } from './contact.ts'
 import { CatalogIndex, Scanner } from './scanner.ts'
@@ -22,6 +24,13 @@ export class NavigationRuntime {
  advance(seconds:number,controls:Controls=idleControls()) {
   if (this.location?.scanner && this.location.scanner !== this.scanRecord) this.scanner.restore(this.location.scanner, this.bodies)
   const result = this.clock.advance(seconds,controls,(before,after)=>{
+   if (this.location?.launch && before.mode === 'taking-off') {
+    const plan = this.location.launch
+    const next = sampleTakeoff(startingScoutLocation().ship, this.location.body, plan, after.tick)
+    if (after.tick >= plan.startTick + TAKEOFF_TICKS) { this.location.launch = null; this.location.maneuver = null }
+    this.scanner.update(next.tick,next.position)
+    return next
+   }
    // Contact remains physical in flight, but cannot invent a playable site.
    const contact = this.location && !this.location.binding ? resolveContacts(before,after,this.bodies) : null
    let next=this.surfaceLocation

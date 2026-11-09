@@ -9,6 +9,7 @@ import { point2, convertAnchor } from './topDownFrames.ts'
 import { requestInteraction, createTopDownState, drawList, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
 import { captureScout, decodeScout } from './scoutSave.ts'
 import { STARTING_SITE } from './planetarySite.ts'
+import { startingScoutLocation } from './scoutLocation.ts'
 import type { ScoutAction } from './scoutLocation.ts'
 function setup() {
  let raw:string|null=null, fail=false
@@ -27,9 +28,9 @@ test('explicit flight preserves one pose and scanner; interior works and the ext
  const {session:s,navigation:n,action,storage}=setup()
  n.advance(4);n.advance(2);n.scanner.select('vesper')
  const pose=n.clock.state.position,scan=n.scanner.snapshot(),camera=s.world.camera
- assert.equal(action({kind:'begin-takeoff'}),true);assert.equal(action({kind:'finish-takeoff'}),true)
+ assert.equal(action({kind:'begin-takeoff'}),true);n.advance(4);n.advance(2)
  assert.equal(n.clock.state,s.world.scoutLocation.ship);assert.equal(n.clock.state.mode,'flying')
- assert.deepEqual(n.clock.state.position,pose);assert.deepEqual(n.scanner.snapshot(),scan);assert.equal(s.world.camera,camera)
+ assert.notDeepEqual(n.clock.state.position,pose);assert.equal(n.scanner.snapshot().lastTick,scan.lastTick+360);assert.equal(s.world.camera,camera)
  assert.throws(()=>convertAnchor({frame:'ship:scout',point:point2(0,0)},'planet:fixture',s.world.frames),/unavailable/)
  s.world=leaveCockpit(s.world)
  assert.ok(drawList(s.world).every(e=>e.entity.anchor.frame==='ship:scout'))
@@ -45,7 +46,8 @@ test('explicit flight preserves one pose and scanner; interior works and the ext
 test('each maneuver round trips; validated landing restores stable exterior and resources',()=>{
  const {session:s,navigation:n,action,storage}=setup(),entities=s.world.entities,sources=s.snapshot.sources
  for(const a of [{kind:'begin-takeoff'},{kind:'finish-takeoff'},{kind:'begin-landing',siteId:STARTING_SITE.id,bodyId:'vesper'},{kind:'finish-landing'}] as const){
-  assert.equal(action(a),true)
+  if(a.kind==='finish-takeoff'){n.advance(4);n.advance(2);s.checkpoint()}
+  else {if(a.kind==='finish-landing') n.clock.state={...n.clock.state,position:startingScoutLocation().ship.position};assert.equal(action(a),true)}
   const restored=new ResourceSession(storage,createTopDownState())
   assert.equal(restored.error,'');assert.deepEqual(restored.world.scoutLocation.ship,n.clock.state);assert.deepEqual(restored.world.frames,s.world.frames)
  }
@@ -53,13 +55,13 @@ test('each maneuver round trips; validated landing restores stable exterior and 
  assert.ok(drawList(s.world).some(e=>e.entity.anchor.frame==='planet:fixture'))
 })
 test('unauthorized/stale actions, invalid sites and failed saves cannot publish transitions',()=>{
- const {session:s,action,fail}=setup(),before=captureScout(s.world.scoutLocation)
+ const {session:s,navigation:n,action,fail}=setup(),before=captureScout(s.world.scoutLocation)
  assert.equal(s.transitionScout({kind:'begin-takeoff'},s.snapshot.revision,s.world.cockpit,'intruder'),false)
  assert.equal(s.transitionScout({kind:'begin-takeoff'},s.snapshot.revision+1,s.world.cockpit),false)
  s.world=setCockpitPower(s.world,false);assert.equal(action({kind:'begin-takeoff'}),false)
  s.world=setCockpitPower(s.world,true);s.world={...s.world,cockpit:{...s.world.cockpit,view:'radar'}}
  assert.deepEqual(captureScout(s.world.scoutLocation),before)
- assert.equal(action({kind:'begin-takeoff'}),true);assert.equal(action({kind:'finish-takeoff'}),true)
+ assert.equal(action({kind:'begin-takeoff'}),true);n.advance(4);n.advance(2)
  assert.equal(action({kind:'begin-landing',siteId:'missing',bodyId:'vesper'}),false)
  const flight=captureScout(s.world.scoutLocation),world=s.world
  fail();assert.equal(action({kind:'begin-landing',siteId:STARTING_SITE.id,bodyId:'vesper'}),false)
@@ -78,8 +80,8 @@ test('inconsistent snapshots fail closed; legacy v8 migrates without fabricating
 
 test('physical contact never fabricates a site, and landing cannot teleport a distant ship',()=>{
  const {session:s,navigation:n,action}=setup()
- assert.equal(action({kind:'begin-takeoff'}),true);assert.equal(action({kind:'finish-takeoff'}),true)
- n.clock.state={...n.clock.state,position:translate(n.clock.state.position,[0,-1,0]),velocityMps:[0,-1,0]}
+ assert.equal(action({kind:'begin-takeoff'}),true);n.advance(4);n.advance(2)
+ n.clock.state={...n.clock.state,position:translate(startingScoutLocation().ship.position,[0,-1,0]),velocityMps:[0,-1,0]}
  n.advance(1/60)
  assert.equal(n.clock.state.mode,'recovering');assert.equal(s.world.scoutLocation.binding,null)
  assert.ok(drawList(s.world).every(e=>e.entity.anchor.frame==='ship:scout'))
@@ -102,8 +104,8 @@ test('a retired cockpit session stays unauthorized after the same owner re-enter
 
 test('saved physical contact cannot teleport a ship from an inconsistent galactic pose',()=>{
  const {session:s,navigation:n,action}=setup()
- action({kind:'begin-takeoff'});action({kind:'finish-takeoff'})
- n.clock.state={...n.clock.state,position:translate(n.clock.state.position,[0,-1,0]),velocityMps:[0,-1,0]}
+ action({kind:'begin-takeoff'});n.advance(4);n.advance(2)
+ n.clock.state={...n.clock.state,position:translate(startingScoutLocation().ship.position,[0,-1,0]),velocityMps:[0,-1,0]}
  n.advance(1/60)
  const save=captureScout(s.world.scoutLocation),json=(v:unknown)=>JSON.parse(JSON.stringify(v,(_,v)=>typeof v==='bigint'?String(v):v))
  assert.doesNotThrow(()=>decodeScout(json(save)))

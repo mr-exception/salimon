@@ -31,9 +31,30 @@ forward to the cockpit chair. **E / Use cockpit** seats the owner and opens the
 full-viewport panoramic observation scene. **Exit cockpit** returns standing beside the
 chair in one action. Ship position, velocity, orientation, throttle and scanner
 continue in the same `NavigationRuntime` while walking or observing the universe.
-Both views share the grounded Scout/Vesper surface anchor (#802). Unsupported
-propulsion, turning, alignment, takeoff and relocation are gated; scanner/time
-continue while the ship stays at the same authored site.
+Both views share the grounded Scout/Vesper surface anchor (#802). Grounded manual propulsion, turning and alignment remain gated. An authorized
+`ResourceSession.transitionScout({kind: 'begin-takeoff'}, revision, liveSeat)`
+starts the assisted launch only after the aft door is closed and all occupants
+are inside. L04 supplies the pilot command/progress presentation; the development
+`?flightFixture=1` command harness is excluded from the shipping build.
+
+The #840 launch lifts 50 m over 360 fixed ticks (6 simulation seconds), with
+nonnegative radial acceleration `2H/T² × (1 − cos(2πt/T))`. Peak acceleration is
+5.56 m/s² and final outward speed is 16.67 m/s plus inherited inertial surface
+velocity; acceleration vanishes at both endpoints. The conservative 50 MN
+thruster budget admits at most 9,000 t loaded mass for this profile. No mass,
+impulse law or Core balance is changed. `TAKEOFF_FUNDING` marks the future funding
+adapter seam; the current prototype supplies unlimited energy. Admission sweeps
+the complete fixed-step path against conservative hull/body spheres before any
+state change. Only the registered Vesper site is supported; planetary ephemerides,
+gravity and arbitrary surface sites remain outside this prototype.
+
+Manual inputs, Set direction, other assists and `finish-takeoff` cannot override
+an admitted launch. The world clock continues through cockpit exit/observation
+unmount and blur, and pauses normally while hidden or explicitly paused. Saves
+retain the plan and validate its pose/velocity before resuming. Old grounded and
+flying snapshots migrate with no launch plan; old synthetic taking-off snapshots
+without a plan fail safely rather than fabricating motion. Completion clears the
+plan and selects throttle zero without changing the terminal pose/velocity.
 
 
 `TopDownView` owns one `NavigationRuntime`, one `ObservationCameraState` and the

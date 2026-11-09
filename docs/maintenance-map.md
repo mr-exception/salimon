@@ -47,6 +47,13 @@ revision-bound commands and publishes them only with an atomic resource save.
 The 2D fixed-step adapter advances navigation once per world tick. Detached frames
 reject cross-frame conversion and filter planetary rendering, reach and collision.
 `scoutFlight.test.ts` and `tests/flight.spec.ts` exercise the lifecycle and reload.
+`takeoff.ts` owns the deterministic 360-tick launch profile, finite thrust/mass
+admission and swept collision preflight (#840). `ScoutLocation.launch` persists
+its admitted tick and mass; `scoutSave.ts` validates the sampled pose on reload.
+`NavigationRuntime` samples the trajectory on its existing sole clock and hands
+off automatically; pilot `finish-takeoff` is rejected. Domain tests live in
+`takeoff.test.ts`; `tests/flight.spec.ts` exercises the production tick after an
+authorized domain command, cockpit exit and blur. Command/progress UI is L04.
 `scoutDoor.ts` owns the saved aft door projection, operation and threshold guard
 (#839); `scoutLocation.takeoffDenial` owns physical launch admission, and
 `ResourceSession` adds live cockpit/revision/survival/occupant/work authorization.

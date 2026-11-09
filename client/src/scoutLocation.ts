@@ -1,3 +1,4 @@
+import { planTakeoff, type TakeoffPlan } from './takeoff.ts'
 import { physicalRadiusM, surfaceVelocity } from './contact.ts'
 import { ORIGIN, relativeM, translate } from './coordinates.ts'
 import { normal } from './math.ts'
@@ -26,10 +27,11 @@ export function startingScoutLocation(): ScoutLocation {
     yaw: STARTING_SITE.shipAngle, mode: 'grounded', velocityMps: surfaceVelocity(body, radial).map(v => v === 0 ? 0 : v) as [number, number, number],
     contact: { bodyId: body.id, outcome: 'safe-contact', impactSpeedMps: 0, normal: normal(radial), ageTicks: 60 },
   }
-  return { siteId: STARTING_SITE.id, body, frames, ship, binding: STARTING_SITE.id, maneuver: null, scanner: null, boardingDoor: 'open' }
+  return { siteId: STARTING_SITE.id, body, frames, ship, binding: STARTING_SITE.id, maneuver: null, scanner: null, boardingDoor: 'open', launch: null }
 }
 // One live object is shared by world and navigation. Save records clone it.
 export interface ScoutLocation {
+  launch: TakeoffPlan | null
   boardingDoor: 'open' | 'closed'
   siteId: string
   body: typeof SAMPLE_BODIES[number]
@@ -46,11 +48,9 @@ export function transitionScout(location: ScoutLocation, action: ScoutAction): S
   if (action.kind === 'begin-takeoff') {
     const denial = takeoffDenial(location)
     if (denial) throw new Error(denial)
-    return { ...location, frames: detached, binding: null, maneuver: 'takeoff', ship: { ...ship, mode: 'taking-off', contact: null, throttle: 0, alignment: null } }
+    return { ...location, frames: detached, binding: null, launch: planTakeoff(ship, location.body, SAMPLE_BODIES), maneuver: 'takeoff', ship: { ...ship, mode: 'taking-off', contact: null, throttle: 0, alignment: null } }
   }
-  if (action.kind === 'finish-takeoff' && ship.mode === 'taking-off' && location.maneuver === 'takeoff') {
-    return { ...location, maneuver: null, ship: { ...ship, mode: 'flying' } }
-  }
+  if (action.kind === 'finish-takeoff') throw new Error('Takeoff completes automatically; pilot override is locked.')
   if (action.kind === 'begin-landing' && (ship.mode === 'flying' || ship.mode === 'recovering' && ship.contact?.outcome === 'safe-contact') && action.siteId === STARTING_SITE.id && action.bodyId === location.body.id) {
     return { ...location, maneuver: 'landing', ship: { ...ship, mode: 'landing', contact: null, throttle: 0, alignment: null } }
   }
@@ -66,9 +66,10 @@ export function transitionScout(location: ScoutLocation, action: ScoutAction): S
 export function takeoffDenial(location: ScoutLocation): string | null {
   if (!Number.isFinite(location.ship.massKg) || location.ship.massKg < DRY_MASS_KG || !Number.isSafeInteger(location.ship.tick) || location.ship.tick < 0) return 'Scout state is invalid.'
   if (location.ship.mode === 'destroyed') return 'Ship is destroyed.'
-  if (location.maneuver !== null) return 'A Scout maneuver is already running.'
+  if (location.maneuver !== null || location.launch !== null) return 'A Scout maneuver is already running.'
   if (location.ship.mode !== 'grounded') return 'Scout must be grounded before takeoff.'
   const site = startingScoutLocation()
+  if (location.body !== site.body || !location.ship.position.offsetM.every(Number.isFinite) || !location.ship.velocityMps.every(Number.isFinite) || ![location.ship.yaw, location.ship.pitch].every(Number.isFinite)) return 'Scout is not at a validated supported surface site.'
   if (location.frames.ship.id !== site.frames.ship.id || location.frames.planet.id !== site.frames.planet.id
     || location.binding !== site.binding || location.siteId !== site.siteId || location.body.id !== site.body.id
     || location.frames.ship.parent !== site.frames.ship.parent || location.frames.ship.angle !== site.frames.ship.angle
@@ -77,6 +78,7 @@ export function takeoffDenial(location: ScoutLocation): string | null {
     || location.ship.yaw !== site.ship.yaw || location.ship.pitch !== 0
     || location.frames.planet.angle !== site.frames.planet.angle
     || !(Math.hypot(...relativeM(location.frames.planet.universeOrigin, site.frames.planet.universeOrigin)) <= 1e-6)
+    || JSON.stringify(location.ship.contact) !== JSON.stringify(site.ship.contact)
     || location.ship.contact?.bodyId !== site.body.id || location.ship.contact.outcome !== 'safe-contact'
     || location.ship.velocityMps.some((v, i) => v !== site.ship.velocityMps[i])) return 'Scout is not at a validated supported surface site.'
   if (location.ship.alignment !== null || location.ship.throttle !== 0) return 'Stop the active ship operation before takeoff.'

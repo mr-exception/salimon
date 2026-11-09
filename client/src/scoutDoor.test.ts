@@ -1,3 +1,6 @@
+import { NavigationRuntime } from './navigationRuntime.ts'
+import { SAMPLE_BODIES } from './sampleUniverse.ts'
+import { startingScoutLocation } from './scoutLocation.ts'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { enterCockpit, leaveCockpit } from './cockpit.ts'
@@ -104,9 +107,10 @@ test('board, close, pilot, fly and land never auto-opens or auto-closes the door
   assert.equal(s.toggleBoardingDoor(s.snapshot.revision),false);assert.match(s.feedback,/Airlock locked/);assert.equal(s.snapshot,snapshot)
   assert.equal(s.world.scoutLocation.boardingDoor,'closed')
   s.world=seatState
-  if(kind==='taking-off')assert.equal(command('finish-takeoff'),true)
+  if(kind==='taking-off'){const n=new NavigationRuntime(SAMPLE_BODIES,s.world.scoutLocation);n.advance(4);n.advance(2)}
   if(kind==='flying')assert.equal(command('begin-landing'),true)
  }
+ s.world.scoutLocation.ship={...s.world.scoutLocation.ship,position:startingScoutLocation().ship.position}
  assert.equal(command('finish-landing'),true);assert.equal(s.world.scoutLocation.boardingDoor,'closed')
  s.world=place(leaveCockpit(s.world),0,4.7);assert.equal(s.toggleBoardingDoor(s.snapshot.revision),true)
 })

@@ -825,3 +825,34 @@ CI automation contracts can be checked with
 full-project coverage, retained checks, PR smoke selection, permissions, duplicate
 bug handling and repository/event boundaries. After publishing a change, the owner
 still tracks CI and brings results to the implementation chat.
+
+### Aft boarding door and launch admission (#839)
+
+Approach the aft threshold on either side and press **E** or click **Close door** /
+**Open door**. The nearby label shows the current state, and the closed panel
+blocks swept walking on both sides. Step clear of the threshold to close it.
+The closed-state HUD remains visible at the cockpit; flight adds a lock indicator.
+An open-top cutaway drawing does not imply an open exterior door.
+
+The v10 resource save preserves this state atomically with player/resource/Scout
+source. Grounded v1–v9 saves migrate open; airborne v9 saves migrate closed to
+preserve the previous exit lock. Malformed/inconsistent saves fail safely and keep
+their bytes. Landing preserves the door's closed state until explicitly opened.
+
+`ResourceSession.transitionScout` admits launch only with the current revision,
+a live enabled powered owner seat, a nonterminal eligible pilot and ship, a
+validated supported grounded site, every occupant aboard, a closed aft door,
+no active gathering/ship operation and no already-started maneuver. Rejections
+explain the reason without moving the ship, advancing time or charging resources.
+There is no automatic door closure. The development-only `?flightFixture=1`
+exercises explicit lifecycle endpoints; production launch trajectories/controls
+remain future work. Cockpit power is still a fixture, not a Core simulation.
+
+Affected verification: `npm test`, `npm run build`, and
+`npm run test:browser -- --project=cockpit tests/boarding-door.spec.ts tests/flight.spec.ts tests/cockpit.spec.ts tests/storage.spec.ts tests/gathering.spec.ts`.
+The door test repeats the built `/` journey through real keyboard/mouse input,
+retains original open/closed/occupied screenshots and unchanged-policy repeat
+diffs. Flight tests cover visible open-door launch denial, closed airborne
+interaction/traversal rejection, reload and return. Evidence goes to ignored
+`test-results/` and the existing CI uploads (14-day retention); delivery summaries
+belong in the PR. Existing visual references must not be silently rewritten.

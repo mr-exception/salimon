@@ -1,10 +1,11 @@
+import { BOARDING_DOOR_ID, BOARDING_DOOR_HALF_DEPTH_M, synchronizeDoor, toggleDoor } from './scoutDoor.ts'
 import { startingScoutLocation, type ScoutLocation } from './scoutLocation.ts'
 import { initialCockpit, enterCockpit, isCockpitTarget, type CockpitState } from './cockpit.ts'
 import { planetaryEntities, STARTING_SITE, type SourceIdentity } from './planetarySite.ts'
 import { scoutEntities } from './scoutLayout.ts'
 import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
 import { translate } from './coordinates.ts'
-import { allowedMove, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
+import { allowedMove, PLAYER_RADIUS_M, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
 import { convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
@@ -60,8 +61,8 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
     const fraction = allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames)
     anchor = { ...anchor, point: translate(anchor.point, [delta[0] * fraction, delta[1] * fraction, 0]) }
   }
-  const crossed = crossScoutEntry(player.anchor, anchor, state.frames)
-  const doorBlocked = state.frames.ship.parent === null && anchor.point.offsetM[1] > 5.5
+  const crossed = crossScoutEntry(player.anchor, anchor, state.frames, state.scoutLocation.boardingDoor === 'open')
+  const doorBlocked = state.frames.ship.parent === null && (anchor.point.offsetM[1] > 5.5 || (state.scoutLocation.boardingDoor === 'closed' && length > 0 && player.anchor.point.offsetM[1] >= 5.5 - BOARDING_DOOR_HALF_DEPTH_M - PLAYER_RADIUS_M - 1e-6 && local[1] > 0))
   anchor = doorBlocked ? player.anchor : crossed
   const entities = state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e)
   const selectedId = nearbyObject(anchor, entities, state.frames)?.id ?? null
@@ -92,6 +93,7 @@ export function capturePlayerLocation(state: TopDownState): PlayerLocation {
   return copyPlayerLocation({ anchor: state.entities.find(e => e.id === PLAYER_ID)!.anchor, facing: state.player.facing })
 }
 export function requestInteraction(state: TopDownState, id: string | null = state.selectedId): TopDownState {
+  if (id === BOARDING_DOOR_ID) return toggleDoor(state)
   if (state.cockpit.enabled && isCockpitTarget(id)) return enterCockpit({ ...state, selectedId: id })
   const player = state.entities.find(e => e.id === PLAYER_ID)!, target = state.entities.find(e => e.id === id)
   if (!target || !interactionInReach(player.anchor, target, state.frames)) {
@@ -127,6 +129,7 @@ export class TopDownClock {
 // Called when the shared lifecycle changes. Preserve camera lag by translating
 // it to ship-local coordinates before invalidating the planetary transform.
 export function synchronizeScout(state: TopDownState): TopDownState {
+  state = synchronizeDoor(state)
   if (state.frames === state.scoutLocation.frames) return state
   const camera = state.camera.anchor.frame === 'planet:fixture' && state.scoutLocation.binding === null
     ? { ...state.camera, anchor: convertAnchor(state.camera.anchor, 'ship:scout', state.frames) } : state.camera

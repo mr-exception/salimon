@@ -139,7 +139,7 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   assert.deepEqual(migrated.snapshot.sources, v5.sources)
   assert.deepEqual(migrated.snapshot.stores, v5.stores)
   migrated.advance(stepTopDown(migrated.world, [0, 0])); migrated.checkpoint()
-  assert.equal(JSON.parse(raw!).version, 9)
+  assert.equal(JSON.parse(raw!).version, 10)
   assert.equal(new ResourceSession(storage, world, undefined, undefined, () => 21_601_000).survival.activeTicks, 1)
 })
 

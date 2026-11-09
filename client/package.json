@@ -14,7 +14,8 @@
     "test:visual:negative": "node scripts/negative-visual.mjs && node scripts/negative-panoramic.mjs",
     "test:visual:approval": "node --experimental-strip-types scripts/baseline-approval.ts",
     "test:ui": "playwright test --project=expedition",
-    "test:ui:negative": "node scripts/negative-ui.mjs"
+    "test:ui:negative": "node scripts/negative-ui.mjs",
+    "test:browser:smoke": "playwright test --project=production --project=deterministic --project=cockpit tests/production.spec.ts tests/deterministic.spec.ts tests/flight.spec.ts --grep \"built production|NAV-2|FLIGHT-838\""
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",

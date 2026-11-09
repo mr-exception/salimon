@@ -24,9 +24,12 @@ retired history and are not required acceptance checks.
 
 ## Checks and evidence that remain
 
-The existing Navigation client workflow continues to run locked installation,
-domain/integration tests, build/typecheck, browser gameplay and production WebGL,
-negative regression demonstrations and repeated visual comparisons. The owner
+The PR Navigation client workflow runs locked installation, domain/integration
+tests, build/typecheck and a small browser smoke set. The daily/manual full
+Navigation client workflow retains all browser gameplay/WebGL projects, negative
+regression demonstrations and repeated visual comparisons in parallel groups.
+Full-run failures open or update a bug per failing group; this is failure reporting,
+not the retired reviewer/status gate. Smoke green alone is not full QA acceptance. The owner
 removed the human baseline-approval CI job in PR #834 and reviews appearance in
 the deployed version, filing separate issues for visual problems. No human
 approval comment or manifest digest approval is required. Failed or unrun mandatory

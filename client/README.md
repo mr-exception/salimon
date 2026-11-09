@@ -273,7 +273,8 @@ Playwright starts isolated dev (:5175) and built-preview (:4175) servers. Deskto
 routes cover camera/ship independence, every-frame pan/body/pixel continuity, actual camera/frustum behavior, contact
 fixtures, dense groups, help, focus/release cleanup and production WebGL.
 TypeScript checks test/configuration files. CI uses Node 22, an npm lockfile
-cache, `npm ci`, domain tests, build, installed Chromium and the same suite.
+cache, `npm ci`, domain tests, build and installed Chromium. PRs run the focused
+`npm run test:browser:smoke` selection; daily/manual full runs retain the entire suite.
 `test-results/` contains JSON results, original screenshots and failure traces;
 CI retains these as a revision-named artifact for 14 days. New completion records
 belong in the PR description/comment; keep local originals in ignored output and
@@ -790,3 +791,37 @@ Run `npm test`, `npm run build`, and
 `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=cockpit tests/flight.spec.ts tests/cockpit.spec.ts`.
 New originals and traces stay in ignored `test-results/`; CI uploads that output.
 Observation direction/FOV remain local to the active session, independent of pose.
+
+### Fast PR checks and daily full regression
+
+The existing **Navigation client / build** check keeps all domain tests and
+build/typecheck, plus `npm run test:browser:smoke`: the built radar/WebGL check,
+fixed-clock scanner check, complete flight journey, and built in-flight save
+restore/inventory check. Its job limit is 15 minutes. Docker smoke stays in its
+existing workflow. A passing smoke run does not qualify every full-suite scenario.
+
+[Navigation client full regression](../.github/workflows/navigation-client-full.yml)
+runs daily at 03:17 UTC on the default branch (GitHub may delay dispatch), or via
+**Run workflow** on demand. The schedule starts after this workflow is merged to
+the default branch. It runs domain/build checks once and shares the built client
+with five independent browser jobs: world, navigation, perspective, visual, and
+expedition. Every Playwright project runs once, plus the existing visual/UI repeat
+and negative campaigns. Failed groups do not cancel others; remaining repeat and
+negative steps still run after normal assertion failures. No pixel policy or
+reference is changed by the split.
+
+The isolated reporting job has `issues: write` and `actions: read`; test jobs keep
+read-only repository access. A failed/timed-out group opens a `bug` issue with its
+commit, ref, run/attempt, job logs and artifact link (14-day retention when produced).
+Further failures comment on that group's existing open bug, preserving human
+edits, labels and assignees. Same-attempt report retries are idempotent. Successful
+runs stay quiet and never auto-close bugs. Reporting is restricted to this repo's
+scheduled/manual full runs; PR jobs cannot write issues. No extra credentials or
+external service is needed. Cancelling an entire workflow can prevent its reporter
+from running; ordinary test failures/timeouts are handled by the downstream job.
+
+CI automation contracts can be checked with
+`node .github/scripts/navigation-ci.test.cjs` from the repository root. They cover
+full-project coverage, retained checks, PR smoke selection, permissions, duplicate
+bug handling and repository/event boundaries. After publishing a change, the owner
+still tracks CI and brings results to the implementation chat.

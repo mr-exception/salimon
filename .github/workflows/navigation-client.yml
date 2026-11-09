@@ -5,11 +5,15 @@ on:
     paths:
       - 'client/**'
       - '.github/workflows/navigation-client.yml'
+      - '.github/workflows/navigation-client-full.yml'
+      - '.github/scripts/**'
   push:
     branches: [main]
     paths:
       - 'client/**'
       - '.github/workflows/navigation-client.yml'
+      - '.github/workflows/navigation-client-full.yml'
+      - '.github/scripts/**'
 
 concurrency:
   group: navigation-${{ github.ref }}
@@ -21,8 +25,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    # Full browser regression plus panoramic reference/repeat/negative runs.
-    timeout-minutes: 45
+    # Keep the established build check name; exhaustive regression is scheduled.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +39,8 @@ jobs:
       - name: Install locked dependencies
         working-directory: client
         run: npm ci --no-audit --no-fund
+      - name: Validate CI automation contracts
+        run: node .github/scripts/navigation-ci.test.cjs
       - name: Domain and integration tests
         working-directory: client
         run: npm test
@@ -44,31 +50,12 @@ jobs:
       - name: Install Chromium
         working-directory: client
         run: npx playwright install --with-deps chromium
-      - name: Deterministic navigation, desktop and production WebGL checks
+      - name: Production, scanner and flight browser smoke
         working-directory: client
-        run: npm run test:browser
-      - name: Prove intentional navigation regressions fail
-        working-directory: client
-        run: npm run test:browser:negative
-      - name: Repeat visual comparisons for determinism
-        working-directory: client
-        env:
-          SALIMON_EVIDENCE_DIR: test-results/visual-repeat
-        run: npm run test:visual
-      - name: Prove a real visual defect fails comparison
-        working-directory: client
-        run: npm run test:visual:negative
-      - name: Repeat cross-view Expedition Interface references
-        working-directory: client
-        env:
-          SALIMON_EVIDENCE_DIR: test-results/ui-repeat
-        run: npm run test:ui
-      - name: Prove shared UI visual and focus defects fail
-        working-directory: client
-        run: npm run test:ui:negative
+        run: npm run test:browser:smoke
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: navigation-evidence-${{ github.sha }}
+          name: navigation-evidence-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: client/test-results/
           retention-days: 14

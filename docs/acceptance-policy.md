@@ -98,7 +98,14 @@ The [PR template](../.github/PULL_REQUEST_TEMPLATE.md) collects this record.
 
 Run the affected existing checks in the validation matrix. For client changes,
 the current [Navigation client workflow](../.github/workflows/navigation-client.yml)
-runs domain tests, build/typecheck and browser tests. It is path-filtered:
+runs domain tests, build/typecheck and a bounded production/scanner/flight browser
+smoke set. By owner request (2026-11-09), exhaustive browser, negative and repeat
+checks run in the [daily/manual full workflow](../.github/workflows/navigation-client-full.yml),
+partitioned into five groups. Every Playwright project remains covered; references
+and thresholds are unchanged. A failing full group creates or updates its open bug
+with the checked revision and run evidence. PR smoke green does not certify full
+regression or close these bugs; issue-specific mandatory evidence still applies.
+The PR workflow is path-filtered:
 documentation-only PRs may have no run. Record that as NOT RUN / not applicable
 to runtime validation, and perform the planned documentation checks. Do not claim
 a passing workflow from an empty check list. Branch protection/rulesets may impose

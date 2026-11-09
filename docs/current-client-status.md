@@ -53,8 +53,12 @@ precedence over incompatible native/earlier designs. No approved number changes 
 
 Use Node >=22.18, `cd client`, `npm ci`, `npm test`, `npm run build`,
 `npx playwright install --with-deps chromium`, and `npm run test:browser`.
-The [Navigation client workflow](../.github/workflows/navigation-client.yml) also
-runs negative mutations and repeat visual comparisons. The owner removed the
+The [PR Navigation client workflow](../.github/workflows/navigation-client.yml)
+runs domain tests, build/typecheck and four focused browser smoke cases. The
+[daily full workflow](../.github/workflows/navigation-client-full.yml) preserves
+every browser project, negative mutation and repeated visual comparison in five
+parallel groups. Scheduled/manual failures create or update a bug per failing
+group, with revision and run/artifact links; smoke green is not full-suite acceptance. The owner removed the
 human baseline-approval job in PR #834; deployed-version visual review and
 follow-up issues replace that gate.
 Use affected suites during iteration; honor each issue's mandatory matrix.

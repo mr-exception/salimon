@@ -72,7 +72,7 @@ export function resolveContacts(before:ShipState,after:ShipState,bodies:readonly
  return {...after,position:translate(body.position,scale(n,physicalRadiusM(body))),velocityMps:outcome==='destroyed'?[0,0,0]:surfaceVelocity(body,scale(n,body.radiusKm*1000)),throttle:0,alignment:null,mode:outcome==='destroyed'?'destroyed':'recovering',contact:{bodyId:body.id,outcome,impactSpeedMps:speed,normal:n,ageTicks:0}}
 }
 export function navigationWarnings(state:ShipState,contacts:readonly Body[]):Warning[] {
- if(state.mode!=='flying')return []
+ if(state.mode!=='flying' && state.mode!=='taking-off')return []
  const warnings=new Map<string,Warning>()
  for(const body of contacts) {
   const d=distances(state,body)

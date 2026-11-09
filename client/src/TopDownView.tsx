@@ -156,10 +156,10 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       current.current = clock.advance(current.current, dt, viewToWorld([Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], current.current.frames), (world, direction) => {
         if (!session.current) return stepTopDown(world, direction)
         if (session.current.error || session.current.survival.health === 0) return world
-        const ship = navigation.clock.state, scanner = world.scoutLocation.scanner
+        const ship = navigation.clock.state, scanner = world.scoutLocation.scanner, launch = world.scoutLocation.launch, maneuver = world.scoutLocation.maneuver
         if (gameplay) navigation.advance(1 / 60)
         const next = session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
-        if (next.tick === world.tick) { navigation.clock.state = ship; world.scoutLocation.scanner = scanner }
+        if (next.tick === world.tick) { navigation.clock.state = ship; world.scoutLocation.scanner = scanner; world.scoutLocation.launch = launch; world.scoutLocation.maneuver = maneuver }
         return next
       })
       if (session.current) {

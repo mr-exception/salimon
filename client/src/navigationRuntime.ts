@@ -6,27 +6,33 @@ import { type Body } from './sampleUniverse.ts'
 // Single production composition path for fixed-step motion, contact and scanning.
 export class NavigationRuntime {
  readonly bodies:readonly Body[]
- readonly surfaceLocation?: ScoutLocation
+ readonly location?: ScoutLocation
+ get surfaceLocation() { return this.location?.binding ? this.location : undefined }
+ private scanRecord: ScoutLocation['scanner'] = null
  readonly clock=new NavigationClock()
  private readonly index:CatalogIndex
  scanner:Scanner
  constructor(bodies:readonly Body[], surfaceLocation?: ScoutLocation) {
   if(surfaceLocation && !bodies.includes(surfaceLocation.body)) throw new Error('Surface body must belong to the navigation catalog')
-  this.surfaceLocation=surfaceLocation
-  this.bodies=bodies;this.index=new CatalogIndex(bodies);this.scanner=new Scanner(this.index)
+  this.location=surfaceLocation
+  if (surfaceLocation) Object.defineProperty(this.clock, 'state', { get: () => surfaceLocation.ship, set: value => { surfaceLocation.ship = value } })
+  this.bodies=bodies;this.index=new CatalogIndex(bodies);this.scanner=new Scanner(this.index, snapshot => { if(this.location) { this.location.scanner=snapshot;this.scanRecord=snapshot } })
   if(surfaceLocation) this.clock.reset(surfaceLocation.ship)
  }
  advance(seconds:number,controls:Controls=idleControls()) {
-  return this.clock.advance(seconds,controls,(before,after)=>{
-   // The 2D world currently supports only this immutable landed location.
-   // Reassert it at the domain boundary, including orientation and contact;
-   // camera/scanner input and even a restart cannot launch or relocate it.
-   const next=this.surfaceLocation
+  if (this.location?.scanner && this.location.scanner !== this.scanRecord) this.scanner.restore(this.location.scanner, this.bodies)
+  const result = this.clock.advance(seconds,controls,(before,after)=>{
+   // Contact remains physical in flight, but cannot invent a playable site.
+   const contact = this.location && !this.location.binding ? resolveContacts(before,after,this.bodies) : null
+   let next=this.surfaceLocation
     ? {...this.surfaceLocation.ship, tick:after.tick, massKg:after.massKg}
-    : resolveContacts(before,after,this.bodies)
+    : contact ?? resolveContacts(before,after,this.bodies)
+   if (this.location && !this.location.binding && next.mode === 'grounded') next={...next,mode:'recovering'}
    this.scanner.update(next.tick,next.position)
    return next
   })
+  if (this.location) { this.location.scanner=this.scanner.snapshot(); this.scanRecord=this.location.scanner }
+  return result
  }
- reset() {if(this.surfaceLocation)return;this.clock.reset(initialShip());this.scanner=new Scanner(this.index)}
+ reset() {if(this.location)return;this.clock.reset(initialShip());this.scanner=new Scanner(this.index)}
 }

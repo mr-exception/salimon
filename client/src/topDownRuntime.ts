@@ -60,11 +60,13 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
     const fraction = allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames)
     anchor = { ...anchor, point: translate(anchor.point, [delta[0] * fraction, delta[1] * fraction, 0]) }
   }
-  anchor = crossScoutEntry(player.anchor, anchor, state.frames)
+  const crossed = crossScoutEntry(player.anchor, anchor, state.frames)
+  const doorBlocked = state.frames.ship.parent === null && anchor.point.offsetM[1] > 5.5
+  anchor = doorBlocked ? player.anchor : crossed
   const entities = state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e)
   const selectedId = nearbyObject(anchor, entities, state.frames)?.id ?? null
   let activity = state.player
-  let feedback = state.feedback
+  let feedback = doorBlocked ? 'Airlock locked in flight. Land at a validated surface site before leaving the Scout.' : state.feedback
   if (length > 0) {
     activity = { facing: Math.atan2(x, -y), mode: 'walking', targetId: null }
     if (state.player.mode === 'interacting') feedback = 'Inspection cancelled by movement.'
@@ -103,7 +105,7 @@ export function cancelInteraction(state: TopDownState): TopDownState {
 }
 export interface DrawItem { readonly entity: Entity2D; readonly positionM: Point2; readonly angle: number }
 export function drawList(state: TopDownState): DrawItem[] {
-  return state.entities.map(e => e.id === PLAYER_ID && state.player.mode === 'seated' ? { ...e, layer: 'cues' as const } : e).sort((a, b) => LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer)
+  return state.entities.filter(e => state.frames.ship.parent !== null || e.anchor.frame === state.frames.ship.id).map(e => e.id === PLAYER_ID && state.player.mode === 'seated' ? { ...e, layer: 'cues' as const } : e).sort((a, b) => LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer)
     || Number(b.appearance === 'ground') - Number(a.appearance === 'ground')
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
     .map(entity => ({ entity, positionM: worldToView(relativeAnchor(entity.anchor, state.camera.anchor, state.frames), state.frames), angle: ( entity.id === PLAYER_ID ? state.player.facing : entity.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0) - state.frames.ship.angle }))
@@ -120,4 +122,13 @@ export class TopDownClock {
     return state
   }
   reset() { this.remainder = 0 }
+}
+
+// Called when the shared lifecycle changes. Preserve camera lag by translating
+// it to ship-local coordinates before invalidating the planetary transform.
+export function synchronizeScout(state: TopDownState): TopDownState {
+  if (state.frames === state.scoutLocation.frames) return state
+  const camera = state.camera.anchor.frame === 'planet:fixture' && state.scoutLocation.binding === null
+    ? { ...state.camera, anchor: convertAnchor(state.camera.anchor, 'ship:scout', state.frames) } : state.camera
+  return { ...state, frames: state.scoutLocation.frames, camera, selectedId: null }
 }

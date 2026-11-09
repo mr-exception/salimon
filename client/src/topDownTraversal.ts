@@ -6,6 +6,7 @@ import { PLAYER_RADIUS_M } from './topDownInteraction.ts'
 // Ownership changes only across the open aft threshold, after collision sweeps.
 // Merely approaching another hull edge must never board the ship.
 export function crossScoutEntry(before: Anchor, after: Anchor, frames: WorldFrames): Anchor {
+  if (frames.ship.parent === null) return after
   const localBefore = convertAnchor(before, frames.ship.id, frames)
   const localAfter = convertAnchor(after, frames.ship.id, frames)
   const [ax, rawAy] = relativeM(localBefore.point, SCOUT_ANCHORS.entry!.point)

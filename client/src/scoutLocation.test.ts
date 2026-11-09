@@ -45,7 +45,8 @@ test('ticks, steering, throttle, alignment, reset and repeated cockpit entry can
     assert.ok(runtime.scanner.contacts.some(b => b.id === 'vesper'))
     world = stepTopDown(leaveCockpit(world), [0, 0])
     assert.equal(world.frames, world.scoutLocation.frames)
-    assert.equal(world.scoutLocation.ship, original)
+    assert.equal(world.scoutLocation.ship, runtime.clock.state)
+    assert.deepEqual(world.scoutLocation.ship.position, original.position)
     assert.equal(world.player.mode, 'standing')
   }
 })

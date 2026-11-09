@@ -1,15 +1,17 @@
+import { captureScout, decodeScout, type ScoutSave } from './scoutSave.ts'
+import { startingScoutLocation, transitionScout, type ScoutAction } from './scoutLocation.ts'
 import { freshHazards, validateHazards, hazardRates, stepHazards, type HazardState, type HazardSource, type HazardEvent, type ProtectionModule } from './hazards.ts'
 import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
 import { CELL_SIZE_M } from './coordinates.ts'
-import { leaveCockpit } from './cockpit.ts'
+import { controlsCockpit, LOCAL_PLAYER, leaveCockpit, type CockpitState } from './cockpit.ts'
 import { STARTING_SITE } from './planetarySite.ts'
 import { addCountItem, removeCountItem, registerCountItems, type CountItemCatalog, increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
 import { DRY_MASS_KG, setMass, type ShipState } from './simulation.ts'
 import { relativeAnchor, rotate2, type Anchor } from './topDownFrames.ts'
 import { interactionInReach, PLAYER_RADIUS_M } from './topDownInteraction.ts'
-import { capturePlayerLocation, PLAYER_ID, type TopDownState } from './topDownRuntime.ts'
+import { capturePlayerLocation, synchronizeScout, PLAYER_ID, type TopDownState } from './topDownRuntime.ts'
 import type { PlayerLocation } from './topDownTraversal.ts'
 
 export const RESOURCE_SAVE_KEY = 'salimon:expedition:v1'
@@ -28,7 +30,8 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
-  readonly version: 8
+  readonly version: 9
+  readonly scout: ScoutSave
   readonly miningWork: Readonly<Record<string, number>>
   readonly hazards: HazardState
   readonly survival: SurvivalState
@@ -41,6 +44,8 @@ export interface ResourceSave extends ResourceLedger {
   readonly location: PlayerLocation
 }
 export interface ResourceStorage { getItem(key: string): string | null; setItem(key: string, value: string): void }
+const startingLocationForMigration = startingScoutLocation
+const serializeForDecode = (value: unknown) => JSON.parse(serialize(value))
 const serialize = (value: unknown) => JSON.stringify(value, (_, v) => typeof v === 'bigint' ? v.toString() : v)
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Expected object')
@@ -64,8 +69,9 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
   }) as [number, number, number]
   if (cell[2] !== 0n || offsetM[2] !== 0 || typeof location.facing !== 'number' || !Number.isFinite(location.facing)) throw new Error('Invalid planar location')
   const parsed: Anchor = { frame: anchor.frame, point: { cell, offsetM } }
+  if (world.frames.ship.parent === null && (parsed.frame !== 'ship:scout' || cell.some(v=>v!==0n) || offsetM[1]>5.5 || offsetM[1]<-5.5 || Math.abs(offsetM[0])>2.2)) throw new Error('Unsafe airborne location')
   for (const entity of world.entities) {
-    if (!entity.footprint) continue
+    if (!entity.footprint || world.frames.ship.parent === null && entity.anchor.frame !== parsed.frame) continue
     const [x, y] = rotate2(relativeAnchor(parsed, entity.anchor, world.frames), entity.anchor.frame === world.frames.ship.id ? -world.frames.ship.angle : 0)
     if (![x, y].every(Number.isFinite) || (Math.abs(x) < entity.footprint.halfWidth + PLAYER_RADIUS_M - 1e-8 && Math.abs(y) < entity.footprint.halfHeight + PLAYER_RADIUS_M - 1e-8)) throw new Error('Unsafe saved location')
   }
@@ -84,16 +90,16 @@ function validateMiningWork(value: unknown): Record<string, number> {
 export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
-  const hasStores = [3, 4, 5, 6, 7, 8].includes(data.version as number)
-  const hasItems = [5, 6, 7, 8].includes(data.version as number)
-  const hasSurvival = data.version === 6 || data.version === 7 || data.version === 8
-  const allowed = ['version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(data.version === 7 || data.version === 8 ? ['hazards'] : []), ...(data.version === 8 ? ['miningWork'] : [])]
+  const hasStores = [3, 4, 5, 6, 7, 8, 9].includes(data.version as number)
+  const hasItems = [5, 6, 7, 8, 9].includes(data.version as number)
+  const hasSurvival = data.version === 6 || data.version === 7 || (data.version === 8 || data.version === 9)
+  const allowed = [...(data.version === 9 ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(data.version === 7 || (data.version === 8 || data.version === 9) ? ['hazards'] : []), ...((data.version === 8 || data.version === 9) ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
+  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -140,8 +146,12 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
     stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
   }
-  const miningWork = data.version === 8 ? validateMiningWork(data.miningWork) : {}
-  const save: ResourceSave = { version: 8, miningWork, hazards: data.version === 7 || data.version === 8 ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location: parseLocation(data.location, world) }
+  const miningWork = (data.version === 8 || data.version === 9) ? validateMiningWork(data.miningWork) : {}
+  const scout = data.version === 9 ? decodeScout(data.scout) : startingLocationForMigration()
+  const restoredWorld = { ...world, scoutLocation: scout, frames: scout.frames }
+  const location = parseLocation(data.location, restoredWorld)
+  if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
+  const save: ResourceSave = { version: 9, scout: captureScout(scout), miningWork, hazards: data.version === 7 || (data.version === 8 || data.version === 9) ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }
@@ -188,7 +198,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 8, miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 9, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -197,6 +207,9 @@ export class ResourceSession {
         this.survival = this.snapshot.survival
         this.miningWork = { ...this.snapshot.miningWork }
         this.hazards = this.snapshot.hazards
+        const restored = decodeScout(serializeForDecode(this.snapshot.scout))
+        Object.assign(world.scoutLocation, restored)
+        world = { ...world, frames: restored.frames, tick: restored.ship.tick }
         const location = this.snapshot.location
         this.world = { ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
           camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' }
@@ -217,7 +230,7 @@ export class ResourceSession {
     if (this.error) return false
     try {
       if (this.storage.getItem(RESOURCE_SAVE_KEY) !== this.persisted) throw new Error('Save changed in another session')
-      const candidate = { ...next, miningWork: validateMiningWork(this.miningWork), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
+      const candidate = { ...next, scout: captureScout(this.world.scoutLocation), miningWork: validateMiningWork(this.miningWork), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
       validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       validateSurvival(candidate.survival)
       validateHazards(candidate.hazards)
@@ -238,6 +251,21 @@ export class ResourceSession {
       this.error = 'Saving failed or the save changed elsewhere. Gathering paused; reload after resolving storage access.'
       return false
     }
+  }
+  /** Explicit commands are revision-bound and authorized against the live seat. */
+  transitionScout(action: ScoutAction, revision: number, cockpitSession: CockpitState, actorId = LOCAL_PLAYER): boolean {
+    if (this.error || cockpitSession !== this.world.cockpit || !this.world.cockpit.enabled || this.world.player.mode !== 'seated' || this.world.entities.find(e => e.id === PLAYER_ID)?.anchor.frame !== 'ship:scout' || revision !== this.snapshot.revision || !controlsCockpit(this.world.cockpit, actorId) || !survivalPolicy(this.survival).canWork) return false
+    const previous = this.world, location = this.world.scoutLocation, before = { ...location }
+    try {
+      const next = transitionScout(location, action)
+      this.cancel()
+      Object.assign(location, next)
+      this.world = synchronizeScout(this.world)
+      if (!this.commit(this.snapshot)) { Object.assign(location, before); this.world = previous; return false }
+      this.feedback = ''
+      this.world = { ...this.world, feedback: `Scout: ${location.ship.mode}.` }
+      return true
+    } catch { Object.assign(location, before); this.world = previous; this.feedback = 'Scout transition rejected. Check mode and validated surface site.'; return false }
   }
   /** Future environment adapter boundary. Sources are sampled, never restored as live planet data. */
   setHazardSources(sources: readonly HazardSource[]): void {
@@ -297,7 +325,7 @@ export class ResourceSession {
       this.world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === this.world.frames.ship.id, RESOURCE_CATALOG, this.itemCatalog)
   }
   checkpoint(): void {
-    if (serialize(this.miningWork) !== serialize(this.snapshot.miningWork) || serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival) || serialize(this.hazards) !== serialize(this.snapshot.hazards)) this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival })
+    if (serialize(captureScout(this.world.scoutLocation)) !== serialize(this.snapshot.scout) || serialize(this.miningWork) !== serialize(this.snapshot.miningWork) || serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival) || serialize(this.hazards) !== serialize(this.snapshot.hazards)) this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival })
   }
   upgrade(capacityGrams: number, capacitySlots: number): boolean {
     if (this.error || this.survival.health === 0) return false

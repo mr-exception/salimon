@@ -768,3 +768,25 @@ Original/expected/repeat/diff PNGs, negative failures and logs use ignored
 results and limitations in the PR, not new committed `reports/` files. Synthetic
 browser input and SwiftShader results do not qualify physical input, target
 hardware FPS or native Metal rendering. No timing claim is inferred from captures.
+
+### Shared Scout lifecycle (#838)
+
+`ResourceSession.transitionScout(action, revision, cockpitSession, actorId)` admits explicit
+`begin-takeoff`, `finish-takeoff`, `begin-landing` (registered `siteId` and `bodyId`),
+and `finish-landing` commands through the live powered owner seat. The caller must provide that exact
+live cockpit-state token; an old seat token remains invalid after re-entry. These endpoints
+establish state ownership for future trajectories; production has no launch UI.
+The development-only `/?flightFixture=1` buttons call the same domain actions for
+browser acceptance. They are removed from the production build.
+
+Schema v9 persists ship pose/velocity/mode, active maneuver and scanner state in
+the resource transaction; v1–v8 migrate to the known site. `ScoutLocation.body`
+and `siteId` identify the supported authored site registry, while `binding` alone
+indicates an active exterior. Airborne `frames.ship.parent === null` prevents
+exterior conversion, reach, drawing and collision. Contact without a registered
+site remains physically recovering and cannot silently open an exterior.
+
+Run `npm test`, `npm run build`, and
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=cockpit tests/flight.spec.ts tests/cockpit.spec.ts`.
+New originals and traces stay in ignored `test-results/`; CI uploads that output.
+Observation direction/FOV remain local to the active session, independent of pose.

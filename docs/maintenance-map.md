@@ -47,6 +47,12 @@ revision-bound commands and publishes them only with an atomic resource save.
 The 2D fixed-step adapter advances navigation once per world tick. Detached frames
 reject cross-frame conversion and filter planetary rendering, reach and collision.
 `scoutFlight.test.ts` and `tests/flight.spec.ts` exercise the lifecycle and reload.
+`scoutDoor.ts` owns the saved aft door projection, operation and threshold guard
+(#839); `scoutLocation.takeoffDenial` owns physical launch admission, and
+`ResourceSession` adds live cockpit/revision/survival/occupant/work authorization.
+`scoutDoor.test.ts` covers denials, atomicity and migration;
+`tests/boarding-door.spec.ts` repeats the built keyboard/mouse journey and captures
+open/closed/occupied feedback. Original artifacts stay in ignored test output.
 The shared 2D world is owned by `topDownRuntime.ts`/`topDownFrames.ts`, collision
 and reach by `topDownInteraction.ts`, doorway ownership/location snapshots by
 `topDownTraversal.ts`, Scout anchors/footprints by `scoutLayout.ts`,
@@ -60,7 +66,7 @@ sprite caching by `topDownSprites.tsx`, and SVG/input/gameplay composition by
 `planetarySite.test.ts`, `topDownTraversal.test.ts`, `cockpit.test.ts`,
 `resourceInventory.test.ts`, `resourceSession.test.ts`, `tests/gathering.spec.ts`,
 `tests/top-down.spec.ts` and `tests/cockpit.spec.ts`. See the client guide for fixture boundaries.
-`survival.ts` owns active ticks, meter bounds, starvation, recovery and movement/action policy; `ResourceSession` persists schema v9 and launch credit. `TopDownView` owns pause/HUD. See [browser survival](browser-survival.md), `survival.test.ts` and `tests/survival.spec.ts`.
+`survival.ts` owns active ticks, meter bounds, starvation, recovery and movement/action policy; `ResourceSession` persists schema v10 and launch credit. `TopDownView` owns pause/HUD. See [browser survival](browser-survival.md), `survival.test.ts` and `tests/survival.spec.ts`.
 
 `hazards.ts` owns temperature/exposure/protection arithmetic and events; `exact.ts`
 owns reduced rational state. `survival.ts` advances hazard damage on its sole
@@ -69,7 +75,7 @@ See [browser hazards](browser-hazards.md), `hazards.test.ts` and the separately
 built non-shipping `tests/hazards.spec.ts` fixture.
 Resource conservation is owned by `resourceLedger.ts` (validated graph, exact
 transfer, store mass); `resourceInventory.ts` owns shared player constraints;
-`resourceSession.ts` owns schema v9, trusted count-item registration/transactions, lossless v1–v5 migration and atomic publication.
+`resourceSession.ts` owns schema v10, trusted count-item registration/transactions, lossless v1–v5 migration and atomic publication.
 `scoutResourceContainer.ts` declares the stable Scout store; its domain tests cover
 50 kg capacity, migration and production transfers. `resourceContainerInteraction.ts`
 owns shared-world admission, draft/confirmation and cancellation;

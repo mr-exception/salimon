@@ -62,7 +62,7 @@ test('v3 missing-container migration preserves mass/location/revision and bytes 
   const prior = session.snapshot
   const old = JSON.parse(storage.raw!); old.version = 3; delete old.itemDefinitions; delete old.survival; delete old.miningWork; delete old.scout; delete old.hazards; old.stores = {}; storage.raw = JSON.stringify(old)
   const original = storage.raw, migrated = new ResourceSession(storage, session.world)
-  assert.equal(migrated.error, ''); assert.equal(migrated.snapshot.version, 9)
+  assert.equal(migrated.error, ''); assert.equal(migrated.snapshot.version, 10)
   assert.deepEqual(migrated.snapshot.inventory, prior.inventory); assert.deepEqual(migrated.snapshot.sources, prior.sources)
   assert.deepEqual(migrated.snapshot.location, prior.location); assert.equal(migrated.snapshot.revision, prior.revision)
   assert.equal(storage.raw, original); storage.fail = true
@@ -70,7 +70,7 @@ test('v3 missing-container migration preserves mass/location/revision and bytes 
   storage.fail = false
   const retry = new ResourceSession(storage, session.world)
   assert.equal(retry.deposit('mineral', 333, prior.revision), true)
-  assert.equal(JSON.parse(storage.raw!).version, 9)
+  assert.equal(JSON.parse(storage.raw!).version, 10)
   assert.equal(new ResourceSession(storage, session.world).snapshot.stores[id]!.quantities.mineral, 333)
 })
 test('corrupt current saves and failed/stale transfers preserve bytes and published state', () => {

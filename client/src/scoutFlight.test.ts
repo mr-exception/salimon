@@ -6,7 +6,7 @@ import { NavigationRuntime } from './navigationRuntime.ts'
 import { ResourceSession } from './resourceSession.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { point2, convertAnchor } from './topDownFrames.ts'
-import { createTopDownState, drawList, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
+import { requestInteraction, createTopDownState, drawList, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
 import { captureScout, decodeScout } from './scoutSave.ts'
 import { STARTING_SITE } from './planetarySite.ts'
 import type { ScoutAction } from './scoutLocation.ts'
@@ -14,6 +14,8 @@ function setup() {
  let raw:string|null=null, fail=false
  const storage={getItem:()=>raw,setItem:(_:string,v:string)=>{if(fail)throw Error('quota');raw=v}}
  let world=createTopDownState('interior',true)
+ world={...world,entities:world.entities.map(e=>e.id===PLAYER_ID?{...e,anchor:{frame:'ship:scout',point:point2(0,4.7)}}:e)}
+ world=requestInteraction(world,'scout:entry')
  world={...world,entities:world.entities.map(e=>e.id===PLAYER_ID?{...e,anchor:{frame:'ship:scout',point:point2(0,-3.1)}}:e)}
  world=enterCockpit({...world,selectedId:'scout:chair'})
  const session=new ResourceSession(storage,world),navigation=new NavigationRuntime(SAMPLE_BODIES,world.scoutLocation)
@@ -31,9 +33,9 @@ test('explicit flight preserves one pose and scanner; interior works and the ext
  assert.throws(()=>convertAnchor({frame:'ship:scout',point:point2(0,0)},'planet:fixture',s.world.frames),/unavailable/)
  s.world=leaveCockpit(s.world)
  assert.ok(drawList(s.world).every(e=>e.entity.anchor.frame==='ship:scout'))
- s.world={...s.world,entities:s.world.entities.map(e=>e.id===PLAYER_ID?{...e,anchor:{frame:'ship:scout',point:point2(0,5.49)}}:e)}
+ s.world={...s.world,entities:s.world.entities.map(e=>e.id===PLAYER_ID?{...e,anchor:{frame:'ship:scout',point:point2(0,4.89)}}:e)}
  s.world=stepTopDown(s.world,[Math.sin(.12),Math.cos(.12)])
- assert.equal(s.world.entities.find(e=>e.id===PLAYER_ID)!.anchor.point.offsetM[1],5.49);assert.match(s.world.feedback,/Airlock locked/)
+ assert.equal(s.world.entities.find(e=>e.id===PLAYER_ID)!.anchor.point.offsetM[1],4.89);assert.match(s.world.feedback,/Airlock locked/)
  s.checkpoint()
  const restored=new ResourceSession(storage,createTopDownState())
  assert.equal(restored.error,'');assert.deepEqual(captureScout(restored.world.scoutLocation),captureScout(s.world.scoutLocation))
@@ -71,7 +73,7 @@ test('inconsistent snapshots fail closed; legacy v8 migrates without fabricating
  }
  const {session,storage,corrupt}=setup();session.upgrade(10000,12);corrupt(s=>{s.version=8;delete s.scout})
  const legacy=new ResourceSession(storage,createTopDownState())
- assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,9)
+ assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,10)
 })
 
 test('physical contact never fabricates a site, and landing cannot teleport a distant ship',()=>{

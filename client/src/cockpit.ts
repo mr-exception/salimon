@@ -14,7 +14,7 @@ export interface CockpitState {
 }
 export const LOCAL_PLAYER = 'player:local'
 export const initialCockpit = (enabled = false): CockpitState => ({ enabled, powered: true, occupantId: null, ownerId: LOCAL_PLAYER, view: 'world' })
-export const controlsCockpit = (seat: CockpitState, actorId: string) => seat.powered && seat.occupantId === actorId && seat.ownerId === actorId && seat.view === 'radar'
+export const controlsCockpit = (seat: CockpitState, actorId: string) => seat.enabled && seat.powered && seat.occupantId === actorId && seat.ownerId === actorId && seat.view === 'radar'
 export const isCockpitTarget = (id: string | null) => id === 'scout:desk' || id === 'scout:chair'
 function place(state: TopDownState, anchor: Anchor, seated: boolean): TopDownState {
   return { ...state, entities: state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e),

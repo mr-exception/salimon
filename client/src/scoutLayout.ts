@@ -17,6 +17,9 @@ export const SCOUT_ANCHORS: Readonly<Record<string, Anchor>> = {
   entry: { frame: 'ship:scout', point: point2(0, 5.5) },
 }
 export const STORAGE_CAPACITY = { massG: 50_000 } as const
+// Keep the center-operated door local to the threshold so it does not steal
+// the existing nearby Resource Container action in the cargo bay.
+export const SCOUT_ENTRY_REACH_M = 1.3
 export const SCOUT_ENTRY_HALF_WIDTH_M = 1.5
 export function scoutEntities(): Entity2D[] {
   return [
@@ -36,8 +39,8 @@ export function scoutEntities(): Entity2D[] {
       ['wall:aft-port', -2, 5.5, .5, .15], ['wall:aft-starboard', 2, 5.5, .5, .15],
       ['wall:partition-left', -1.9, 2.7, .6, .12], ['wall:partition-right', 1.9, 2.7, .6, .12],
     ].map(([id, x, y, hw, hh]) => prop(id as string, x as number, y as number, 'wall', hw as number, hh as number)),
-    // Permanently open 2.6 m cargo passage and 3 m aft entry. Door jambs above
-    // remain physical; the painted threshold has no hidden collision box.
-    { id: 'scout:entry', anchor: SCOUT_ANCHORS.entry!, layer: 'interior', appearance: 'threshold' },
+    // The interior cargo passage remains open. scoutDoor.ts projects the aft
+    // door state onto this threshold and its collision footprint.
+    { id: 'scout:entry', anchor: SCOUT_ANCHORS.entry!, layer: 'interior', appearance: 'threshold', interaction: { label: 'Aft boarding door · open', action: 'Close door', reachM: SCOUT_ENTRY_REACH_M } },
   ]
 }

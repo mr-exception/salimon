@@ -20,6 +20,13 @@ authoritative save or multiplayer state.
 poses, avoiding astronomical Number cancellation. `topDownRuntime.ts` owns stable
 IDs, fixed-step walking/facing, camera follow and layered draw lists.
 `topDownTraversal.ts` owns doorway handoff and detached exact location snapshots.
+`scoutDoor.ts` projects the authoritative `ScoutLocation.boardingDoor` onto its
+interaction, illustrated threshold/closed panel and swept collision footprint.
+`ResourceSession.toggleBoardingDoor` commits the door and player location atomically;
+flight commands reuse physical admission plus live seat/revision/survival and
+exterior-occupant/conflicting-work checks. Neither failed admission nor door operation
+advances the clock. Opening requires a validated grounded site; flight and maneuvers
+retain the sealed barrier. Open-top cutaway artwork has no pressure meaning.
 `topDownInteraction.ts` owns swept collision and stable-ID nearby selection/reach;
 entity-local footprints match the artwork. `cockpit.ts` owns local owner control,
 one-chair reservation and power/view transitions. Other interactions inspect

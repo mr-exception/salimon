@@ -157,7 +157,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         if (!session.current) return stepTopDown(world, direction)
         if (session.current.error || session.current.survival.health === 0) return world
         const ship = navigation.clock.state, scanner = world.scoutLocation.scanner, launch = world.scoutLocation.launch, maneuver = world.scoutLocation.maneuver
-        if (gameplay) navigation.advance(1 / 60)
+        if (gameplay) navigation.advance(1 / 60, controlsCockpit(world.cockpit, LOCAL_PLAYER) && survivalPolicy(session.current.survival).canWork ? navigation.pilotInput.controls : undefined)
         const next = session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
         if (next.tick === world.tick) { navigation.clock.state = ship; world.scoutLocation.scanner = scanner; world.scoutLocation.launch = launch; world.scoutLocation.maneuver = maneuver }
         return next
@@ -244,7 +244,8 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
       <PanoramicNavigation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
-        canPilot={() => false} onExit={() => update(leaveCockpit(current.current))} />
+        canPilot={() => !paused.current && !!session.current && !session.current.error && survivalPolicy(session.current.survival).canWork && controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
+        takeoff={{ denial: () => paused.current ? 'Resume the expedition before takeoff.' : session.current?.scoutCommandDenial() ?? (session.current ? null : 'Expedition unavailable.'), activate: () => { if (!session.current || paused.current) return; session.current.world = current.current; session.current.transitionScout({ kind: 'begin-takeoff' }, session.current.snapshot.revision, current.current.cockpit); update(session.current.world) } }} onExit={() => update(leaveCockpit(current.current))} />
     </div>}
     {flightFixture && <div className="power-fixture">{(['begin-takeoff', 'finish-takeoff', 'begin-landing', 'finish-landing'] as const).map(kind => <button key={kind} onClick={event => { event.currentTarget.blur(); if (session.current) { session.current.world = current.current; session.current.transitionScout(kind === 'begin-landing' ? { kind, siteId: current.current.scoutLocation.siteId, bodyId: current.current.scoutLocation.body.id } : { kind }, session.current.snapshot.revision, current.current.cockpit); update({ ...session.current.world }) } }}>{kind}</button>)}</div>}
     {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}

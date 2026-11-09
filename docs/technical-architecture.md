@@ -47,9 +47,11 @@ mask or approved navigation reference changes.
 
 The isolated development inspection fixture remains `/?scene=top-down`;
 `/?scene=radar` runs standalone navigation. `scoutLocation.ts` owns the shared site/body/frame/physical grounded anchor.
-The world and cockpit runtime consume that same value. The production runtime
-rejects flight/relocation and preserves orientation, contact and position on every
-step; reset is inert. Ticks, scanner and payload mass remain live. This pure
+The world and cockpit runtime consume that same value. The production runtime preserves the grounded anchor until an authorized launch
+enters its deterministic maneuver, then integrates physical free flight.
+`NavigationRuntime.pilotInput` holds only transient steering; the world consumes
+it on the sole fixed clock. Panoramic observation never zeroes selected throttle
+or ticks a second simulation. Reset is inert for the production ship. Ticks, scanner and payload mass remain live. This pure
 TypeScript boundary is separate from React and can later consume server state. See [the client guide](../client/README.md)
 for controls, fixtures and cloud checks. The native sections below are historical
 contracts, not a claim of migrated native gameplay. The

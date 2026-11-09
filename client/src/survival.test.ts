@@ -1,3 +1,5 @@
+import { NavigationRuntime } from './navigationRuntime.ts'
+import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { advanceSurvival, freshSurvival, METER, recoverOffline, survivalPolicy, validateSurvival } from './survival.ts'
@@ -113,6 +115,7 @@ test('lethal production tick commits immediately and reload cannot resurrect or 
   const storage = { getItem: () => raw, setItem: (_: string, value: string) => { raw = value } }
   const session = new ResourceSession(storage, createTopDownState('exterior', true), undefined, undefined, () => 1000)
   session.survival = { ...freshSurvival(1000), hunger: 0, health: 1, starvationTicks: 599 }
+  new NavigationRuntime(SAMPLE_BODIES, session.world.scoutLocation).advance(1 / 60)
   session.advance(stepTopDown(session.world, [0, 0]))
   assert.equal(session.snapshot.survival.health, 0)
   const reload = new ResourceSession(storage, session.world, undefined, undefined, () => 1000)
@@ -127,7 +130,7 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   const world = createTopDownState('exterior', true)
   const old = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   old.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 333 })
-  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.survival; delete v5.miningWork; delete v5.hazards
+  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.survival; delete v5.miningWork; delete v5.scout; delete v5.hazards
   raw = JSON.stringify(v5); const bytes = raw
   const migrated = new ResourceSession(storage, world, undefined, undefined, () => 21_601_000)
   assert.equal(migrated.error, ''); assert.equal(raw, bytes)
@@ -136,7 +139,7 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   assert.deepEqual(migrated.snapshot.sources, v5.sources)
   assert.deepEqual(migrated.snapshot.stores, v5.stores)
   migrated.advance(stepTopDown(migrated.world, [0, 0])); migrated.checkpoint()
-  assert.equal(JSON.parse(raw!).version, 8)
+  assert.equal(JSON.parse(raw!).version, 9)
   assert.equal(new ResourceSession(storage, world, undefined, undefined, () => 21_601_000).survival.activeTicks, 1)
 })
 

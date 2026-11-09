@@ -31,14 +31,21 @@ export class CatalogIndex {
   return result.sort((a,b)=>a.id.localeCompare(b.id))
  }
 }
+export interface ScannerSnapshot { lastTick: number; pulse: number; selected: string | null; contactIds: string[] }
 export class Scanner {
  readonly index:CatalogIndex
  contacts:readonly Body[]=[]
  selected:string|null=null
  pulse=0
  private lastTick=0
- constructor(index:CatalogIndex) {this.index=index}
- select(id:string) {if(this.contacts.some(b=>b.id===id))this.selected=id}
+ private readonly onSelect?: (snapshot: ScannerSnapshot) => void
+ constructor(index:CatalogIndex, onSelect?: (snapshot: ScannerSnapshot) => void) {this.index=index;this.onSelect=onSelect}
+ snapshot(): ScannerSnapshot { return { lastTick: this.lastTick, pulse: this.pulse, selected: this.selected, contactIds: this.contacts.map(b=>b.id) } }
+ restore(value: ScannerSnapshot, bodies: readonly Body[]) {
+  if (!Number.isSafeInteger(value.lastTick) || value.lastTick < 0 || value.pulse !== Math.floor(value.lastTick / SCAN_TICKS) || !Array.isArray(value.contactIds) || new Set(value.contactIds).size !== value.contactIds.length || value.contactIds.some(id=>!bodies.some(b=>b.id===id)) || value.selected !== null && !value.contactIds.includes(value.selected)) throw new Error('Invalid saved scanner')
+  this.lastTick=value.lastTick; this.pulse=value.pulse; this.selected=value.selected; this.contacts=value.contactIds.map(id=>bodies.find(b=>b.id===id)!)
+ }
+ select(id:string) {if(this.contacts.some(b=>b.id===id)){this.selected=id;this.onSelect?.(this.snapshot())}}
  update(tick:number,position:Position) {
   if(!Number.isSafeInteger(tick)||tick<this.lastTick)throw new RangeError('Scanner requires monotonic simulation ticks')
   // Runtime calls on every fixed step; no detection before the first five seconds.

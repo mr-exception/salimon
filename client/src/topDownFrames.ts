@@ -5,7 +5,7 @@ export type FrameId = 'planet:fixture' | 'ship:scout'
 export interface Anchor { readonly frame: FrameId; readonly point: Position }
 export interface WorldFrames {
   readonly planet: { readonly id: 'planet:fixture'; readonly universeOrigin: Position; readonly angle: number }
-  readonly ship: { readonly id: 'ship:scout'; readonly parent: 'planet:fixture'; readonly origin: Position; readonly angle: number }
+  readonly ship: { readonly id: 'ship:scout'; readonly parent: 'planet:fixture' | null; readonly origin: Position; readonly angle: number }
 }
 export const point2 = (x: number, y: number): Position => translate(ORIGIN, [x, y, 0])
 export function rotate2([x, y]: Point2, angle: number): Point2 {
@@ -21,11 +21,13 @@ function planar(point: Position): Point2 {
 // origin to small local coordinates, or rotate flattened astronomical Numbers.
 export function inPlanet(anchor: Anchor, frames: WorldFrames): Position {
   if (anchor.frame === frames.planet.id) return anchor.point
+  if (frames.ship.parent === null) throw new Error('Planetary frame unavailable in flight')
   const [x, y] = rotate2(planar(anchor.point), frames.ship.angle)
   return translate(frames.ship.origin, [x, y, 0])
 }
 export function convertAnchor(anchor: Anchor, frame: FrameId, frames: WorldFrames): Anchor {
   if (anchor.frame === frame) return anchor
+  if (frames.ship.parent === null) throw new Error('Planetary frame unavailable in flight')
   const planetPoint = inPlanet(anchor, frames)
   if (frame === frames.planet.id) return { frame, point: planetPoint }
   const [x, y] = relativeM(planetPoint, frames.ship.origin)

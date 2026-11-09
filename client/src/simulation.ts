@@ -12,7 +12,7 @@ export interface ShipState {
   readonly massKg: number
   readonly throttle: number
   readonly alignment: Alignment | null
-  readonly mode: 'flying'|'recovering'|'grounded'|'destroyed'
+  readonly mode: 'flying'|'taking-off'|'landing'|'recovering'|'grounded'|'destroyed'
   readonly contact: ContactState|null
   readonly tick: number
 }

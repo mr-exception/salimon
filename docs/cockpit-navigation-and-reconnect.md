@@ -6,10 +6,12 @@ explicit development power fixture in `client/`. The default entry is the 2D
 landing site; ship simulation survives radar presentation changes. This is
 single-player local state, with no multiplayer backend, shared persistence,
 authoritative reconnect or Core power model. #802 binds world and cockpit to one
-grounded Scout on sample Vesper. Until 2D relocation is implemented, takeoff,
-steering, propulsion, alignment and restart-to-flight are unavailable. Radar time,
-scanner and camera remain active. Existing site-bound local saves restore the
-same location/lifecycle; they contain no independent free-flight state.
+grounded Scout on sample Vesper. #838 adds explicit, authorized lifecycle APIs
+and schema-v9 ship/scanner persistence shared with the 2D world. An airborne Scout
+keeps its functional 2D interior and has no connected planetary exterior. Only an
+explicit validated landing restores the authored site. Physical contact cannot
+invent a site binding. Production propulsion/steering and maneuver trajectories
+remain future work; mounting/resetting a view never launches or relocates the ship.
 See [client guide](../client/README.md#cockpit-gameplay-766). The remaining
 multiplayer/reconnect/death rules below are future contracts.
 

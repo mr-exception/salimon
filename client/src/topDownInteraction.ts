@@ -30,7 +30,7 @@ function hitFraction(origin: Point2, delta: Point2, box: Footprint): number {
 export function allowedMove(anchor: Anchor, deltaPlanet: Point2, objects: readonly WorldObject[], frames: WorldFrames): number {
   let fraction = 1
   for (const object of objects) {
-    if (!object.footprint) continue
+    if (!object.footprint || frames.ship.parent === null && object.anchor.frame !== anchor.frame) continue
     const angle = -angleOf(object.anchor, frames)
     const origin = rotate2(relativeAnchor(anchor, object.anchor, frames), angle)
     fraction = Math.min(fraction, hitFraction(origin, rotate2(deltaPlanet, angle), object.footprint))
@@ -38,7 +38,7 @@ export function allowedMove(anchor: Anchor, deltaPlanet: Point2, objects: readon
   return fraction
 }
 export function interactionInReach(player: Anchor, object: WorldObject, frames: WorldFrames): boolean {
-  return !!object.interaction && object.interaction.enabled !== false
+  return !(frames.ship.parent === null && player.frame !== object.anchor.frame) && !!object.interaction && object.interaction.enabled !== false
     && Math.hypot(...relativeAnchor(object.anchor, player, frames)) <= object.interaction.reachM + 1e-9
 }
 export function nearbyObject(player: Anchor, objects: readonly WorldObject[], frames: WorldFrames): WorldObject | undefined {

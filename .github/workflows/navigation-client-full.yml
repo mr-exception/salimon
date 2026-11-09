@@ -1,0 +1,146 @@
+name: Navigation client full regression
+
+on:
+  # GitHub may delay scheduled starts; manual dispatch is also available.
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: navigation-full-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Domain and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Validate CI automation contracts
+        run: node .github/scripts/navigation-ci.test.cjs
+      - name: Install locked dependencies
+        working-directory: client
+        run: npm ci --no-audit --no-fund
+      - name: Domain and integration tests
+        working-directory: client
+        run: npm test
+      - name: Build and typecheck
+        working-directory: client
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: navigation-full-build-${{ github.run_id }}
+          path: client/dist/
+          overwrite: true
+          if-no-files-found: error
+          retention-days: 14
+
+  full:
+    name: Full regression / ${{ matrix.group }}
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - group: world
+            projects: '--project=cockpit --project=top-down --project=ui'
+          - group: navigation
+            projects: '--project=deterministic --project=desktop --project=production'
+          - group: perspective
+            projects: '--project=panoramic --project=look-at --project=perspective --project=optical --project=observation'
+          - group: visual
+            projects: '--project=navigation-captures'
+          - group: expedition
+            projects: '--project=expedition'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install locked dependencies
+        working-directory: client
+        run: npm ci --no-audit --no-fund
+      - uses: actions/download-artifact@v4
+        with:
+          name: navigation-full-build-${{ github.run_id }}
+          path: client/dist/
+      - name: Install Chromium
+        working-directory: client
+        run: npx playwright install --with-deps chromium
+      - name: Full browser group
+        working-directory: client
+        env:
+          SALIMON_EVIDENCE_DIR: test-results/full-${{ matrix.group }}
+        run: npm run test:browser -- ${{ matrix.projects }}
+      # Continue the remaining checks after an assertion failure. Their exit
+      # codes still fail this job; other matrix groups are never cancelled.
+      - name: Prove intentional navigation regressions fail
+        if: ${{ !cancelled() && matrix.group == 'navigation' }}
+        working-directory: client
+        run: npm run test:browser:negative
+      - name: Repeat visual comparisons for determinism
+        if: ${{ !cancelled() && matrix.group == 'visual' }}
+        working-directory: client
+        env:
+          SALIMON_EVIDENCE_DIR: test-results/visual-repeat
+        run: npm run test:visual
+      - name: Prove a real visual defect fails comparison
+        if: ${{ !cancelled() && matrix.group == 'visual' }}
+        working-directory: client
+        run: npm run test:visual:negative
+      - name: Repeat cross-view Expedition Interface references
+        if: ${{ !cancelled() && matrix.group == 'expedition' }}
+        working-directory: client
+        env:
+          SALIMON_EVIDENCE_DIR: test-results/ui-repeat
+        run: npm run test:ui
+      - name: Prove shared UI visual and focus defects fail
+        if: ${{ !cancelled() && matrix.group == 'expedition' }}
+        working-directory: client
+        run: npm run test:ui:negative
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: navigation-full-${{ matrix.group }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: client/test-results/
+          retention-days: 14
+
+  report:
+    name: Report full regression failures
+    concurrency:
+      group: navigation-full-issue-report
+      cancel-in-progress: false
+    needs: [build, full]
+    if: ${{ always() && (needs.build.result == 'failure' || needs.build.result == 'cancelled' || needs.full.result == 'failure' || needs.full.result == 'cancelled') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { reportFailures } = require('./.github/scripts/navigation-ci.cjs');
+            await reportFailures({ github, context, core });

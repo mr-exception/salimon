@@ -65,3 +65,5 @@ body:has(.panoramic) .vital-meters { gap:6px }
   .expedition-ui .resource-hud { width:208px }
 }
 .expedition-ui .survival-hud .ui-status--critical { color:var(--ui-danger); position:sticky; top:0; z-index:1; }
+
+.top-down-app[data-surface-bound="false"] .top-down-stage { background:var(--ui-void, #0b151b) }

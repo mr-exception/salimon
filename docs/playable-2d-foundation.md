@@ -97,12 +97,23 @@ full planetary generation. Visible Core/Fabricator objects are inspection
 placeholders; the Resource Container supports confirmed gram transfers. Gathering reuses this same world and resource-source IDs, with
 integer grams and atomic local persistence; no independent scene was added.
 
-The panoramic cockpit shares the authored Scout location on sample Vesper. Time and
-scanner pulses continue, but the Scout stays grounded: throttle, turning, alignment,
-takeoff and relocation cannot change its surface anchor. There is no restart-to-flight
-action in the cockpit. The separate `/?scene=radar` fixture retains sample free flight.
-Existing local saves bind to the versioned site and restore the same grounded ship;
-scanner contacts, selection and elapsed radar ticks are session-only. Synthetic desktop input and
+The panoramic cockpit and 2D world share one live `ScoutLocation` (#838).
+Fresh runs remain grounded on Vesper. `ResourceSession.transitionScout` provides
+revision-bound, powered-owner-seat actions for grounded → taking-off → flying →
+landing → grounded. Landing resolves an explicit registered body/site pair; only
+the authored starting site is supported. These lifecycle endpoints do not provide
+maneuver trajectories or player-facing launch controls. Throttle/steering remain
+disabled in production; `/?scene=radar` is still an isolated free-flight fixture.
+While airborne, the ship frame has no planet parent: exterior drawing, collision,
+interaction and doorway conversion are unavailable. The same ship-local player,
+interior and stores remain usable; the locked aft exit explains how to leave.
+Schema v9 atomically saves split ship pose, lifecycle/maneuver, scanner cadence,
+contacts/selection, player location and the resource ledger. Versions 1–8 migrate
+to the known grounded binding; inconsistent flight snapshots retain their original
+bytes and stop writes. Reload restores standing inside the ship, with no active
+cockpit reservation. Observation direction/FOV stay session-local and survive
+lifecycle actions and cockpit exits; they are not ship authority or a durable save.
+Synthetic desktop input and
 SwiftShader WebGL qualify the existing cloud path; physical input, hardware GPU,
 mobile/touch, M1/Metal and native performance are unverified separately.
 

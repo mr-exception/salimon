@@ -270,3 +270,29 @@ test('FEEDBACK persistent hazard survives rejection, draft and modal scroll with
   await expect(page.getByLabel('Survival condition')).toContainText('Low health')
   await info.attach('committed-state.json', { body:JSON.stringify(committed), contentType:'application/json' })
 })
+
+test('SAVE-ASSERT accepts clock/scan progression and rejects resource, pose and scanner regressions', async () => {
+  const { decodeScout, captureScout } = await import('../src/scoutSave.ts')
+  const { NavigationRuntime } = await import('../src/navigationRuntime.ts')
+  const { SAMPLE_BODIES } = await import('../src/sampleUniverse.ts')
+  const { advanceSurvival } = await import('../src/survival.ts')
+  const before = JSON.parse(fullSave()), location = decodeScout(before.scout)
+  const navigation = new NavigationRuntime(SAMPLE_BODIES, location)
+  navigation.advance(4); navigation.advance(1)
+  const actual = JSON.parse(JSON.stringify({ ...before, revision: before.revision + 1,
+    scout: captureScout(location), survival: advanceSurvival(before.survival, 300) }, (_, value) => typeof value === 'bigint' ? String(value) : value))
+  expectSameResourceState(actual, before)
+  for (const mutate of [
+    (s: any) => { s.inventory.quantities.mineral++ },
+    (s: any) => { s.sources['source:landing:mineral:01'].remainingGrams-- },
+    (s: any) => { s.scout.ship.position.offsetM[0]++ },
+    (s: any) => { s.scout.binding = null },
+    (s: any) => { s.scout.ship.tick-- },
+    (s: any) => { s.scout.scanner.pulse-- },
+    (s: any) => { s.scout.scanner.contactIds = [] },
+    (s: any) => { s.scout.scanner.selected = 'vesper' },
+  ]) {
+    const broken = structuredClone(actual); mutate(broken)
+    expect(() => expectSameResourceState(broken, before)).toThrow()
+  }
+})

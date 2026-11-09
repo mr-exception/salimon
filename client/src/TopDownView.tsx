@@ -38,7 +38,7 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
   const height = Math.max(640, 1200 * size.height / size.width)
   const items = drawList(state)
   const sprites = useWorldSprites(state.entities)
-  return <svg ref={viewport} className="top-down-scene" viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label="Strict overhead Scout and planetary test site" data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
+  return <svg ref={viewport} className="top-down-scene" viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {items.filter(item => item.entity.layer === layer).map(({ entity, positionM: [x, y], angle }) =>
         <g key={entity.id} data-entity={entity.id} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.snapshot.sources[entity.id]?.remainingGrams} data-depleted={session?.snapshot.sources[entity.id]?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
@@ -51,6 +51,7 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
 
 const openResourceSession = (storage: ResourceStorage, world: TopDownState) => new ResourceSession(storage, world)
 export function TopDownView({ gameplay = false, createResourceSession = openResourceSession }: { gameplay?: boolean; createResourceSession?: typeof openResourceSession }) {
+  const flightFixture = import.meta.env.DEV && gameplay && new URLSearchParams(location.search).has('flightFixture')
   const powerFixture = import.meta.env.DEV && gameplay && new URLSearchParams(location.search).has('powerFixture')
   const [state, setState] = useState(() => createTopDownState(import.meta.env.DEV && new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior', gameplay))
   const [navigation] = useState(() => new NavigationRuntime(SAMPLE_BODIES, gameplay ? state.scoutLocation : undefined))
@@ -150,7 +151,11 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       current.current = clock.advance(current.current, dt, viewToWorld([Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], current.current.frames), (world, direction) => {
         if (!session.current) return stepTopDown(world, direction)
         if (session.current.error || session.current.survival.health === 0) return world
-        return session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
+        const ship = navigation.clock.state, scanner = world.scoutLocation.scanner
+        if (gameplay) navigation.advance(1 / 60)
+        const next = session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
+        if (next.tick === world.tick) { navigation.clock.state = ship; world.scoutLocation.scanner = scanner }
+        return next
       })
       if (session.current) {
         session.current.world = current.current
@@ -158,8 +163,6 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         current.current = session.current.world
         navigation.clock.state = setMass(navigation.clock.state, DRY_MASS_KG + session.current.payload().shipGrams / 1000)
       }
-      // One navigation clock across world/cockpit; the view only observes it.
-      if (gameplay) navigation.advance(dt)
       // Failed atomic saves roll the domain world back to the same object.
       // Publish the changed error once even when React would bail out on identity.
       const error = session.current?.error ?? ''
@@ -235,9 +238,10 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         canPilot={() => false} onExit={() => update(leaveCockpit(current.current))} />
     </div>}
+    {flightFixture && <div className="power-fixture">{(['begin-takeoff', 'finish-takeoff', 'begin-landing', 'finish-landing'] as const).map(kind => <button key={kind} onClick={event => { event.currentTarget.blur(); if (session.current) { session.current.world = current.current; session.current.transitionScout(kind === 'begin-landing' ? { kind, siteId: current.current.scoutLocation.siteId, bodyId: current.current.scoutLocation.body.id } : { kind }, session.current.snapshot.revision, current.current.cockpit); update(session.current.world) } }}>{kind}</button>)}</div>}
     {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
-    <main data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
+    <main data-surface-bound={String(state.scoutLocation.binding !== null)} data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
     <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} />
       {gameplay && <aside className="resource-hud" aria-label="Resource inventory" data-gathering={resourceSession?.activeSourceId ?? ''}>

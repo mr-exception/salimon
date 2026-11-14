@@ -48,3 +48,8 @@
 }
 /* Persistent warning text remains scrollable above ordinary utilities. */
 .panoramic-priority { pointer-events:auto; }
+
+/* Launch status shares the compact control strip and wraps at narrow widths. */
+.panoramic-controls { flex-wrap:wrap }
+.launch-control { display:flex; align-items:center; gap:var(--ui-space-2); flex:1 1 100%; font-size:12px }
+.panoramic:has(.launch-control) .panoramic-instruments { bottom:132px }

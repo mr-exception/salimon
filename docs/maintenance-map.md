@@ -24,7 +24,11 @@ See the [client command and reference workflow](../client/README.md#cross-view-e
 The production cockpit presentation is `PanoramicNavigation.tsx`, composed by
 `TopDownView.tsx` with a shared `NavigationRuntime` and session-local
 `ObservationCameraState`. The 2D owner runs the sole production navigation clock;
-the panoramic component receives `advanceSimulation={false}`. Observation input
+the panoramic component receives `advanceSimulation={false}`. Production flight
+(#841) consumes `NavigationRuntime.pilotInput` from that world clock; cockpit
+Take off admission reads `ResourceSession.scoutCommandDenial` and dispatches its
+revision-bound transition. Observation unmount releases held steering, preserving
+selected throttle and the trajectory. Observation input
 belongs to `ObservationCamera.tsx`, physical sky to `OpticalSky.tsx`/`opticalSky.ts`,
 scanner-gated markers/actions to `PerspectiveContacts.tsx`/`contactCommands.ts`,
 and compact orientation UI to `OrientationCompass.tsx`. `App.tsx`,

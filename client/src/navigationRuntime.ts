@@ -1,3 +1,4 @@
+import { NavigationInput } from './input.ts'
 import { sampleTakeoff, TAKEOFF_TICKS } from './takeoff.ts'
 import { startingScoutLocation } from './scoutLocation.ts'
 import type { ScoutLocation } from './scoutLocation.ts'
@@ -11,6 +12,7 @@ export class NavigationRuntime {
  readonly location?: ScoutLocation
  get surfaceLocation() { return this.location?.binding ? this.location : undefined }
  private scanRecord: ScoutLocation['scanner'] = null
+ readonly pilotInput = new NavigationInput()
  readonly clock=new NavigationClock()
  private readonly index:CatalogIndex
  scanner:Scanner

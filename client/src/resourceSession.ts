@@ -256,21 +256,22 @@ export class ResourceSession {
       return false
     }
   }
+  scoutCommandDenial(revision = this.snapshot.revision, cockpitSession = this.world.cockpit, actorId = LOCAL_PLAYER, takeoff = true): string | null {
+    if (this.error) return this.error
+    if (revision !== this.snapshot.revision) return 'Expedition changed. Retry with the current revision.'
+    if (this.world.entities.some(e => (e.id === PLAYER_ID || e.layer === 'people') && e.anchor.frame !== 'ship:scout')) return 'All occupants must board the Scout before launch.'
+    if (cockpitSession !== this.world.cockpit) return 'Cockpit session expired. Re-enter the cockpit.'
+    if (!this.world.cockpit.powered) return 'Cockpit has no power.'
+    if (!this.world.cockpit.enabled || this.world.player.mode !== 'seated' || !controlsCockpit(this.world.cockpit, actorId)) return 'An authorized owner must pilot from the cockpit seat.'
+    if (!survivalPolicy(this.survival).canWork) return 'Pilot cannot work in the current survival condition.'
+    if (this.activeSourceId !== null) return 'Stop gathering before starting a Scout maneuver.'
+    return takeoff ? takeoffDenial(this.world.scoutLocation) : null
+  }
   /** Explicit commands are revision-bound and authorized against the live seat. */
   transitionScout(action: ScoutAction, revision: number, cockpitSession: CockpitState, actorId = LOCAL_PLAYER): boolean {
     const deny = (reason: string) => { this.feedback = reason; return false }
-    if (this.error) return deny(this.error)
-    if (revision !== this.snapshot.revision) return deny('Expedition changed. Retry with the current revision.')
-    if (this.world.entities.some(e => (e.id === PLAYER_ID || e.layer === 'people') && e.anchor.frame !== 'ship:scout')) return deny('All occupants must board the Scout before launch.')
-    if (cockpitSession !== this.world.cockpit) return deny('Cockpit session expired. Re-enter the cockpit.')
-    if (!this.world.cockpit.powered) return deny('Cockpit has no power.')
-    if (!this.world.cockpit.enabled || this.world.player.mode !== 'seated' || !controlsCockpit(this.world.cockpit, actorId)) return deny('An authorized owner must pilot from the cockpit seat.')
-    if (!survivalPolicy(this.survival).canWork) return deny('Pilot cannot work in the current survival condition.')
-    if (this.activeSourceId !== null) return deny('Stop gathering before starting a Scout maneuver.')
-    if (action.kind === 'begin-takeoff') {
-      const denial = takeoffDenial(this.world.scoutLocation)
-      if (denial) return deny(denial)
-    }
+    const admission = this.scoutCommandDenial(revision, cockpitSession, actorId, action.kind === 'begin-takeoff')
+    if (admission) return deny(admission)
     const previous = this.world, location = this.world.scoutLocation, before = { ...location }
     try {
       const next = transitionScout(location, action)

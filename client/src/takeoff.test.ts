@@ -51,3 +51,19 @@ test('loaded mass, inherited velocity, nonfinite and unsafe path admission',()=>
  const inherited={...anchor.ship,velocityMps:[2,0,0] as const},plan=planTakeoff(inherited,anchor.body,[anchor.body]),end=sampleTakeoff(inherited,anchor.body,plan,360)
  assert.ok(end.velocityMps[0]>1.9);assert.ok(Math.hypot(...relativeM(end.position,anchor.ship.position))>50)
 })
+
+test('world-owned held controls steer after launch, release without zeroing selected thrust',()=>{
+ const {l,n}=launch();n.advance(4);n.advance(2)
+ n.clock.state=setThrottle(n.clock.state,1)
+ const before=n.clock.state
+ n.pilotInput.press('ArrowLeft','left')
+ n.advance(1,n.pilotInput.controls)
+ assert.equal(l.ship.tick,before.tick+60)
+ assert.ok(Math.abs(l.ship.yaw-before.yaw-5*Math.PI/180)<1e-12)
+ assert.equal(l.ship.throttle,1)
+ n.pilotInput.clear();const released=l.ship
+ n.advance(1,n.pilotInput.controls)
+ assert.equal(l.ship.yaw,released.yaw);assert.equal(l.ship.throttle,1)
+ assert.notDeepEqual(l.ship.velocityMps,released.velocityMps)
+ assert.equal(l.scanner?.lastTick,l.ship.tick)
+})

@@ -34,7 +34,7 @@ continue in the same `NavigationRuntime` while walking or observing the universe
 Both views share the grounded Scout/Vesper surface anchor (#802). Grounded manual propulsion, turning and alignment remain gated. An authorized
 `ResourceSession.transitionScout({kind: 'begin-takeoff'}, revision, liveSeat)`
 starts the assisted launch only after the aft door is closed and all occupants
-are inside. L04 supplies the pilot command/progress presentation; the development
+are inside. The production Take off button shows admission/progress (#841); the development
 `?flightFixture=1` command harness is excluded from the shipping build.
 
 The #840 launch lifts 50 m over 360 fixed ticks (6 simulation seconds), with
@@ -68,8 +68,9 @@ Wheel over a hovered sensor marker shares canvas zoom; panels keep native
 scrolling and focused forms do not steer observation.
 The optical origin is the exact shared `scoutLocation.ts` ship position: Vesper
 occludes the lower hemisphere; no screen-space horizon or independent ship is
-created. Other scanned bodies support Look at; Vesper self-body actions,
-throttle, steering and takeoff stay disabled. Survival/pause remains available.
+created. Other scanned bodies support Look at; grounded Vesper self-body actions
+remain disabled. Manual throttle/steering require flying mode; Take off starts
+the authorized launch. Survival/pause remains available.
 
 `cockpit.ts` owns one local chair reservation, owner-control admission and power
 transitions. `TopDownView` keeps the 2D world mounted; only panoramic presentation is
@@ -274,10 +275,10 @@ The first scanner pulse arrives after five simulation seconds. `scanner.ts` owns
 
 `navigationRuntime.ts` composes motion, physical contact and scanning. `contact.ts` uses a conservative 5 m ship sphere and physical body radii, including rotating surface velocity. Impacts >=100 m/s end the run. Lower-speed contacts rebound/settle with zero thrust; <=20 m/s on a planet/moon is safe contact, separate from assisted landing. Nonplanetary contacts always recover as crashes. Restart navigation clears the standalone sample run. In the production cockpit,
 `scoutLocation.ts` binds the 2D site and radar to the same grounded Scout on
-Vesper. Takeoff/relocation, steering, alignment and propulsion are gated; the
-cockpit has no restart-to-flight action. Scanner/camera and simulation ticks
-continue. Local site-bound saves restore that same anchor; radar ticks/contacts
-are session-only. Warnings observe scanned contacts without steering.
+Vesper until an authorized Take off detaches the ship interior and enters the
+automatic launch. Manual steering, alignment and propulsion require flying mode;
+the cockpit has no restart-to-flight action. Scanner/camera and simulation ticks
+continue across cockpit exit and re-entry; ship and scanner snapshots persist. Warnings observe scanned contacts without steering.
 
 ## Verification and accessibility
 
@@ -877,3 +878,25 @@ diffs. Flight tests cover visible open-door launch denial, closed airborne
 interaction/traversal rejection, reload and return. Evidence goes to ignored
 `test-results/` and the existing CI uploads (14-day retention); delivery summaries
 belong in the PR. Existing visual references must not be silently rewritten.
+
+### Production Scout takeoff and flight (#841)
+
+On `/`, board the Scout, close its aft boarding door with E/Use, approach the
+cockpit and sit. **Take off** displays the live admission reason until eligible.
+Launch runs automatically for six seconds and cannot be cancelled by steering,
+focus loss or cockpit exit. The compact HUD shows phase/progress. Once flying,
+arrows steer the ship, Set direction aligns it, signed throttle selects thrust
+and Space selects zero. WASD/left-drag affect only the independent camera.
+Dialogs, text/control focus and unauthorized seats cannot issue flight shortcuts.
+
+The world advances navigation exactly once per fixed tick; the mounted cockpit
+only publishes held input. Exit cockpit returns to the ship-local 2D interior;
+flight, scanner and selected throttle continue, while held steering is cleared.
+Re-entry preserves trajectory and observation. The aft door remains locked in
+flight pending EVA; no planetary exterior is presented. Landing is separate work.
+The isolated `/?scene=radar` engineering fixture remains independently clocked.
+
+Focused verification: `npm test`, `npm run build`, and
+`npm run test:browser -- --project=cockpit flight.spec.ts cockpit.spec.ts playable-slice.spec.ts boarding-door.spec.ts`.
+Original captures/traces and state records use ignored `test-results/`; existing
+CI artifacts retain them for 14 days. Validation summaries belong in the PR.

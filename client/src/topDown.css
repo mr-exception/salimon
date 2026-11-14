@@ -67,3 +67,5 @@ body:has(.panoramic) .vital-meters { gap:6px }
 .expedition-ui .survival-hud .ui-status--critical { color:var(--ui-danger); position:sticky; top:0; z-index:1; }
 
 .top-down-app[data-surface-bound="false"] .top-down-stage { background:var(--ui-void, #0b151b) }
+/* Reserve the launch row and compass before sizing the scrollable survival HUD. */
+body:has(.launch-control) .expedition-ui .survival-hud { max-height:calc(100dvh - 530px) }

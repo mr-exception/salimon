@@ -50,6 +50,8 @@ export function transitionScout(location: ScoutLocation, action: ScoutAction, bo
   }
   if (action.kind === 'finish-takeoff') throw new Error('Takeoff completes automatically; pilot override is locked.')
   if (action.kind === 'begin-landing') {
+    if (ship.mode === 'destroyed') throw Error('Journey ended — whole ship destroyed.')
+    if (location.maneuver !== null || location.launch !== null || location.landing !== null) throw Error('A Scout maneuver is already running.')
     if (!location.scanner?.contactIds.includes(action.bodyId) || location.scanner.lastTick !== ship.tick) throw Error('Scan the target planet or moon before requesting landing.')
     const body = bodies.find(b => b.id === action.bodyId)
     if (!body) throw Error('Unknown landing body.')

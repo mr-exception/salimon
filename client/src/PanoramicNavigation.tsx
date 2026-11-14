@@ -8,6 +8,7 @@ import { OrientationCompass } from './OrientationCompass.tsx'
 import { HelpDialog } from './HelpDialog.tsx'
 import { FrameTimer, acceptsFlightShortcut, axisForCode } from './input.ts'
 import { setContactDirection } from './contactCommands.ts'
+import { landingReadout, landingProgress } from './landingHud.ts'
 import { TAKEOFF_TICKS } from './takeoff.ts'
 import { setThrottle } from './simulation.ts'
 import { navigationWarnings } from './contact.ts'
@@ -22,7 +23,8 @@ import './panoramic.css'
 /** Reusable presentation. The cockpit lifecycle owner supplies the runtime and
  * local view; no simulation, discovery or view lifetime belongs to the camera.
  */
-export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true, conditionWarning = '', takeoff }: {
+export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true, conditionWarning = '', takeoff, landing }: {
+  landing?: { denial: (bodyId: string) => string | null; activate: (bodyId: string) => void }
   takeoff?: { denial: () => string | null; activate: () => void }; conditionWarning?: string; advanceSimulation?: boolean; navigation: NavigationRuntime; view: ObservationCameraState; canPilot?: () => boolean
   opticalBodies?: readonly Body[]
   isPaused?: () => boolean; onExit?: () => void; onSceneReady?: (state: RootState) => void
@@ -88,6 +90,11 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   const warnings = navigationWarnings(ship, navigation.scanner.contacts)
   const grounded = navigation.surfaceLocation
   const speed = Math.hypot(...ship.velocityMps)
+  const approach = landingReadout(navigation)
+  const landingDenial = !canPilot() ? 'An authorized owner must pilot from the cockpit seat.'
+    : isPaused() ? 'Resume the expedition before landing.'
+    : approach.body ? landing?.denial(approach.body.id) ?? null : 'Scan a target planet or moon before requesting landing.'
+  const progress = landingProgress(navigation)
   const throttle = (value: number) => { if (canPilot() && !isPaused() && ship.mode === 'flying' && !document.querySelector('dialog[open]')) navigation.clock.state = setThrottle(navigation.clock.state, value); redraw(n => n + 1) }
   const dismiss = (e: { key: string; preventDefault(): void; stopPropagation(): void }) => {
     if (e.key !== 'Escape') return
@@ -116,16 +123,26 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     <div className="panoramic-priority" aria-label="Navigation warnings">
       {warnings.map(w => <StatusMessage key={w.id} priority="critical">{w.message}</StatusMessage>)}
       {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${ship.contact.impactSpeedMps.toFixed(1)} m/s`}</StatusMessage>}
-      {!grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
+      {!navigation.location && !grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
     </div>
     <PerspectiveContacts compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
       getOrigin={() => navigation.clock.state.position} getShip={() => navigation.clock.state} canPilot={canPilot}
       onSetDirection={body => { navigation.clock.state = setContactDirection(navigation.scanner, navigation.clock.state, body.id, canPilot() && !isPaused() && !document.querySelector('dialog[open]')) }}/>
     <div className="panoramic-instruments"><OrientationCompass ship={ship} view={snapshot}/></div>
     <footer className="panoramic-controls">
-      {takeoff && <div className="launch-control">
+      {takeoff && (!landing || ship.mode === 'grounded' || ship.mode === 'taking-off') && <div className="launch-control">
         <button className="ui-button" disabled={!!takeoff.denial()} aria-describedby="takeoff-status" onClick={() => { if (!isPaused() && !document.querySelector('dialog[open]') && !takeoff.denial()) { input.current.clear(); takeoff.activate(); redraw(n => n + 1) } }}>Take off</button>
         <span id="takeoff-status" role="status">{navigation.location?.launch ? `Taking off · ${Math.min(100, Math.floor((ship.tick - navigation.location.launch.startTick) / TAKEOFF_TICKS * 100))}% · automatic launch` : ship.mode === 'flying' ? 'Flying · manual controls available' : takeoff.denial() ?? 'Ready for takeoff'}</span>
+      </div>}
+      {landing && ship.mode !== 'grounded' && ship.mode !== 'taking-off' && <div className="launch-control landing-control">
+        <button className="ui-button" disabled={!!landingDenial} aria-describedby="landing-status landing-readings" onClick={() => {
+          const target = landingReadout(navigation).body
+          if (target && canPilot() && !isPaused() && !document.querySelector('dialog[open]') && !landing.denial(target.id)) {
+            input.current.clear(); landing.activate(target.id); redraw(n => n + 1)
+          }
+        }}>Land</button>
+        <div><span id="landing-readings">{approach.body ? `${approach.body.name} · altitude ${approach.altitudeM!.toFixed(1)} m · full relative speed ${approach.relativeSpeedMps!.toFixed(3)} m/s` : 'No scanned landing target'}</span>
+          <span id="landing-status" role="status">{ship.mode === 'destroyed' ? 'Journey ended — whole ship destroyed. No surface access.' : progress ?? landingDenial ?? 'Ready to land · no heading requirement'}</span></div>
       </div>}
       <label>Throttle {ship.throttle}%<input aria-label="Throttle" type="range" min="-100" max="100" value={ship.throttle} disabled={ship.mode !== 'flying' || !canPilot()} onChange={e => throttle(Number(e.target.value))}/></label>
       <button className="ui-button ui-button--secondary" disabled={ship.mode !== 'flying' || !canPilot()} onClick={() => throttle(0)}>Zero throttle (Space)</button>

@@ -301,10 +301,25 @@ export class ResourceSession {
     if (this.activeSourceId !== null) return 'Stop gathering before starting a Scout maneuver.'
     return takeoff ? takeoffDenial(this.world.scoutLocation) : null
   }
+  /** Read-only admission uses the command's domain/site validation, including saved obstacles. */
+  scoutActionDenial(action: ScoutAction, revision = this.snapshot.revision, cockpitSession = this.world.cockpit, actorId = LOCAL_PLAYER): string | null {
+    const denial = this.scoutCommandDenial(revision, cockpitSession, actorId, action.kind === 'begin-takeoff')
+    if (denial) return denial
+    try {
+      const location = this.world.scoutLocation
+      const sites = this.captureSites(this.snapshot.sites)
+      const next = transitionScout(location, action)
+      if (action.kind === 'begin-landing' || action.kind === 'begin-takeoff') {
+        const site = resolveSurface(action.kind === 'begin-takeoff' ? location.surface : next.surface)
+        validateSurfaceClearance(site, siteEntities(site, sites[site.id]))
+      }
+      return null
+    } catch (error) { return error instanceof Error ? error.message : 'Scout transition rejected.' }
+  }
   /** Explicit commands are revision-bound and authorized against the live seat. */
   transitionScout(action: ScoutAction, revision: number, cockpitSession: CockpitState, actorId = LOCAL_PLAYER): boolean {
     const deny = (reason: string) => { this.feedback = reason; return false }
-    const admission = this.scoutCommandDenial(revision, cockpitSession, actorId, action.kind === 'begin-takeoff')
+    const admission = this.scoutActionDenial(action, revision, cockpitSession, actorId)
     if (admission) return deny(admission)
     const previous = this.world, location = this.world.scoutLocation, before = { ...location }
     try {
@@ -456,6 +471,17 @@ export class ResourceSession {
     this.world = next.frames === next.scoutLocation.frames ? next
       : next.frames.ship === next.scoutLocation.frames.ship ? { ...next, frames: next.scoutLocation.frames }
       : materializeSite(synchronizeScout(next), this.snapshot.sites)
+    // A verified touchdown returns the pilot to the existing ship-local interior.
+    // A power interruption keeps its seated/world semantics instead.
+    const touchdown = previousWorld.frames.ship.parent === null && this.world.scoutLocation.binding !== null
+    if (touchdown && this.world.cockpit.view === 'radar') {
+      this.world = leaveCockpit(this.world)
+      this.feedback = 'Touchdown verified. Open the aft door to explore this surface site.'
+    }
+    if (touchdown) {
+      this.checkpoint()
+      if (this.error) { this.world = previousWorld; return this.world }
+    }
     // Publish hazard progress only after the whole health/exposure/budget transaction is durable.
     if (elapsed > 0 && needsHazards) {
       if (!this.commit({ ...this.snapshot, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }

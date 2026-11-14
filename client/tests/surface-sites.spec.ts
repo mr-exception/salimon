@@ -84,7 +84,8 @@ test('SURFACE-842 production interior, moon/Caligo exterior, relaunch and author
     expect((await ship()).contact.bodyId).toBe(target.bodyId)
     await expect(main).toHaveAttribute('data-surface-bound', 'true')
     await expect(page.locator('[data-entity="ship:scout"]')).toHaveCount(1)
-    await page.getByRole('button', { name: 'Exit cockpit' }).click(); await page.clock.runFor(64)
+    await expect(main).toHaveAttribute('data-cockpit-view', 'world')
+    await expect(main).toHaveAttribute('data-player-mode', 'standing')
     expect(await page.locator('[data-entity="person:player"]').getAttribute('data-position')).toBe(playerAnchor)
     if (name !== 'authored') await expect(page.locator('[data-source-kind]')).toHaveCount(0)
     else {

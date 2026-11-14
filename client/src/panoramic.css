@@ -53,3 +53,8 @@
 .panoramic-controls { flex-wrap:wrap }
 .launch-control { display:flex; align-items:center; gap:var(--ui-space-2); flex:1 1 100%; font-size:12px }
 .panoramic:has(.launch-control) .panoramic-instruments { bottom:132px }
+
+.landing-control > div { min-width:0; overflow-wrap:anywhere }
+.landing-control span { display:block }
+#landing-readings { font-family:var(--ui-mono); color:var(--ui-text) }
+#landing-status { color:var(--ui-active) }

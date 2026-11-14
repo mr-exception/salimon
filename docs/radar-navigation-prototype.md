@@ -2,24 +2,17 @@
 
 # Navigation-only React radar prototype (2026-11-03)
 
-**Production cockpit (#802):** The default `/` starts outside the Scout, grounded
-at the authored site on sample Vesper. `scoutLocation.ts` owns a deterministic
-site/body binding and both the 2D frame pose and radar physical anchor. The
-site's local X/Y maps to sample X/Z near Vesper's +Y pole; the ship center rests
-on the physical radius (planet radius + 5 m conservative ship sphere). This is an
-illustrative mapping, with no canonical generation, ephemerides or surface rotation.
-The cockpit gates takeoff/relocation, turning, throttle and alignment; radar
-camera, scanner pulses, payload mass and time remain active. Reset cannot create
-a separate flying ship and the cockpit exposes no restart-to-flight control.
-Existing site-versioned local saves restore player/inventory in the same frames
-and reconstruct this fixed grounded anchor without a schema change. Radar time,
-contacts and selection are transient. A future launch/return transition must update
-the common domain owner and 2D world together before enabling flight.
+**Production cockpit:** The default `/` now implements shared launch, manual
+flight and assisted landing through #838–#844. Read the [active browser
+launch/landing contract](browser-launch-landing.md). The fixed grounded anchor
+was the historical #802 starting point; ship/scanner/site persistence now uses
+schema v11. This page's orthographic view and restart rules apply only to the
+isolated fixture, not the production panoramic cockpit.
 
 The free-flight behavior below applies to the isolated `/?scene=radar` sample.
 
 
-> **Current browser cockpit access (2026-11-05):** The 3D holographic radar opens **only from the in-world powered cockpit desk** in the default strict-top-down 2D Scout. Local owner and single-seat admission, seated representation, normal exit-to-standing and forced power-fixture return-to-seated are implemented in `client/src/cockpit.ts` and `TopDownView.tsx`. **Other players seeing the pilot seated, authoritative power failures, reconnect and backend multiplayer are still future contracts.** See [cockpit and reconnect](cockpit-navigation-and-reconnect.md).
+> **Current browser cockpit access (2026-11-05):** The production 3D panoramic view opens **only from the in-world powered cockpit desk** in the default strict-top-down 2D Scout. Local owner and single-seat admission, seated representation, normal exit-to-standing and forced power-fixture return-to-seated are implemented in `client/src/cockpit.ts` and `TopDownView.tsx`. **Other players seeing the pilot seated, authoritative power failures, reconnect and backend multiplayer are still future contracts.** See [cockpit and reconnect](cockpit-navigation-and-reconnect.md).
 
 > **Current world view:** Scout interiors and the illustrated landing area **are already strict top-down 2D**. The radar remains a separate 3D instrument. [Weight-only gathering and inventory](resource-inventory-and-gathering.md) are playable in the 2D world, not inside the radar.
 
@@ -29,7 +22,7 @@ Status: approved navigation design and prototype scope. This is **not** a claim 
 
 This section scopes the **radar subsystem**, not the entire browser game. Implement a 3D holographic navigation *view*, built with React, TypeScript, Three.js and React Three Fiber under `client/`. Ship energy is **infinite in this prototype only**. No Energy Core UI, depletion, resources, 2D planetary surfaces, interior, survival, crafting, or detailed ship meshes. The deterministic **sample universe** is illustrative test data, not the production Gaia catalog.
 
-The active browser app now mounts the same radar from its 2D cockpit; `/?scene=radar` remains the isolated navigation fixture. The radar does not imply that historical Rust gameplay or canonical universe systems have been ported.
+The active browser app mounts the panoramic view from its 2D cockpit; `/?scene=radar` remains the isolated navigation fixture. The radar does not imply that historical Rust gameplay or canonical universe systems have been ported.
 
 ## Approved navigation interaction
 

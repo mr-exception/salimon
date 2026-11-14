@@ -9,13 +9,17 @@ import {createHash} from 'node:crypto'
 const root=process.cwd(),output=resolve(process.env.SALIMON_NEGATIVE_DIR??'test-results/negative')
 await mkdir(output,{recursive:true})
 const mutations=[
+ {id:'missing-launch-handoff',file:'src/navigationRuntime.ts',before:'return next\n   }\n   if (this.location?.landing',after:'return {...next, mode: \'taking-off\' as const}\n   }\n   if (this.location?.landing',project:'cockpit',test:'LOOP-845',assertion:'LOOP_TAKEOFF_COMPLETES',build:true},
+ {id:'missing-touchdown-handoff',file:'src/navigationRuntime.ts',before:'next = { ...landed.ship, tick: after.tick, massKg: after.massKg }',after:'next = { ...landed.ship, mode: \'landing\' as const, tick: after.tick, massKg: after.massKg }',project:'cockpit',test:'LOOP-845',assertion:'LOOP_TOUCHDOWN_COMPLETES',build:true},
  {id:'unscanned-optical-markers',file:'src/perspectiveContacts.ts',before:'for (const body of contacts) {',after:'for (const body of geometry) {',project:'perspective',test:'SENSOR-3 adversarial',assertion:'UNSCANNED_OPTICAL_MARKER_LEAK'},
  {id:'reversed-wasd',file:'src/CameraControls.tsx',before:'multiplyScalar(x*step)',after:'multiplyScalar(-x*step)',test:'NAV-1 seeded replay',assertion:'NAV-1 a moves the correct screen direction'},
  {id:'wrong-heading-color',file:'src/styles.css',before:'[data-vector=heading]{stroke:#ffe36a;',after:'[data-vector=heading]{stroke:#ff0000;',test:'NAV-3 heading and velocity',assertion:'NAV-3 heading is yellow'}
 ]
 const hash=s=>createHash('sha256').update(s).digest('hex')
 const records=[]
-for(const mutation of mutations) {
+const selected=mutations.filter(m=>!process.env.SALIMON_MUTATION||m.id===process.env.SALIMON_MUTATION)
+if(!selected.length)throw Error('Unknown SALIMON_MUTATION; no regression was tested')
+for(const mutation of selected) {
  const scratch=await mkdtemp(join(tmpdir(),'salimon-negative-'))
  try {
   await cp(root,scratch,{recursive:true,filter:path=>!['node_modules','test-results','playwright-report','.git'].includes(basename(path))})
@@ -25,7 +29,13 @@ for(const mutation of mutations) {
   const changed=original.replace(mutation.before,mutation.after)
   await writeFile(target,changed)
   const evidence=join(output,mutation.id)
-  const child=spawnSync(process.execPath,[join(root,'node_modules/@playwright/test/cli.js'),'test',`--project=${mutation.project??'deterministic'}`,'--grep',mutation.test],{cwd:scratch,env:{...process.env,CI:'true',SALIMON_EVIDENCE_DIR:evidence},encoding:'utf8',timeout:180000,maxBuffer:2e6})
+  if(mutation.build) {
+   const build=spawnSync('npm',['run','build'],{cwd:scratch,encoding:'utf8',timeout:120000,maxBuffer:2e6})
+   await mkdir(evidence,{recursive:true})
+   await writeFile(join(evidence,'build.log'),`${build.stdout??''}\n${build.stderr??''}`)
+   if(build.status!==0)throw Error(`Mutation build failed: ${mutation.id}`)
+  }
+  const child=spawnSync(process.execPath,[join(root,'node_modules/@playwright/test/cli.js'),'test',`--project=${mutation.project??'deterministic'}`,'--grep',mutation.test],{cwd:scratch,env:{...process.env,CI:'true',SALIMON_EVIDENCE_DIR:evidence},encoding:'utf8',timeout:mutation.build?360000:180000,maxBuffer:2e6})
   await mkdir(evidence,{recursive:true})
   await writeFile(join(evidence,'command.log'),`${child.stdout??''}\n${child.stderr??''}`)
   const report=JSON.parse(await readFile(join(evidence,'results.json'),'utf8'))

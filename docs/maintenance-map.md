@@ -1,5 +1,10 @@
 # Feature maintenance map
 
+Cross-phase browser flight QA (#845): `tests/flight-loop.spec.ts` owns the fresh
+built-route loop; `tests/landing.spec.ts` owns synthetic approach negatives and
+sample-body revisit. `scripts/negative-navigation.mjs` verifies broken launch and
+touchdown transitions fail the real loop. See the [active contract](browser-launch-landing.md).
+
 > **Current browser scope:** Start with [code-checked implementation and validation routing](current-client-status.md). Native crate, tooling and build sections below are historical; they require the archived revision and do not gate routine 2D work.
 
 Production landing presentation (#844) belongs to `landingHud.ts` (scanner-only

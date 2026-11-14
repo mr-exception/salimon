@@ -1,7 +1,10 @@
 # Playable Scout / planet foundation (#767)
 
-The browser's default `/` is a single authored 2D landing site with a permanently
-exposed Scout interior. Walking, collisions, source inspection, automatic doorway
+See the [active browser launch/landing contract](browser-launch-landing.md) for the delivered
+production loop, supported sample sites, safety/save boundaries and QA coverage.
+
+The browser's default `/` starts at the authored Vesper 2D site with a cutaway
+Scout interior and an operable aft boarding door. Walking, collisions, source inspection, automatic doorway
 frame handoff and panoramic cockpit entry/exit share the existing runtime. The observation scene
 is the existing Three/R3F navigation interface; it does not replace the world.
 
@@ -20,7 +23,13 @@ outcrop west of the ship or the purple plate colony southwest; **E** inspects,
 **Escape** cancels. Walk around the hull to the wide aft doorway, north through
 cargo, then around the cabin crate on its starboard side and forward through the
 partition to the chair. **E / Use cockpit** opens panoramic observation. Use its labelled controls;
-**Exit cockpit** returns standing in one action. Walk back outside.
+**Exit cockpit** returns standing in one action. To fly, first return to the aft
+threshold inside, close the door with **E**, and re-enter the cockpit. **Take off**
+starts the six-second automatic ascent; arrows and signed throttle control flying
+mode. **Land** requires a scanned supported body, clear site, altitude within
+0.15 body radii and full relative speed <=20 m/s. After automatic touchdown you
+stand in the matching ship interior; open the door to walk onto that site's
+surface. During flight only the cabin is reachable; opening the door is blocked.
 
 For a built run: `npm run build && npm run preview`. The default built `/` has the
 same gameplay. `/?scene=radar` isolates legacy navigation. Development-only

@@ -2,6 +2,11 @@
 
 **Original audit on 2026-11-05:** 106 preexisting Markdown files were read and classified; backend documents expanded the register, and the 2026-11-06 synchronization reached **112 rows** (including Stasis Pod). **2026-11-07 UI style proposal:** one new approved-future HUD/equipment design entry brings the register to **113 rows** (GUIDE: 12, DESIGN: 26, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 8). The #826 shared DOM foundation has scoped tokens/primitives and a development gallery; view migration remains future, so the HUD guide stays DESIGN. Classification does **not** claim all designs run in the browser; historical implementation and verification evidence remain historical.
 
+**2026-11-14 flight QA routing:** the active browser launch/landing contract adds
+one GUIDE row, bringing this register to 114 rows (GUIDE: 13, DESIGN: 26,
+NATIVE: 61, ARCHIVE: 6, PLAYABLE: 8). #838–#844 browser flight delivery does not
+reclassify historical native flight/gravity documents as active code.
+
 **How to interpret status:** **PLAYABLE** means a current browser code owner/contract (individual future subsections remain future); **GUIDE** is active routing/policy; **DESIGN** is approved or proposed future gameplay, **not shipped**; **NATIVE** is revision-specific Rust/3D implementation evidence; **ARCHIVE** is evaluation/qualification or earlier discarded designs. A historical issue closing does not demonstrate browser functionality.
 
 ## Contract precedence and approved 2D interpretation
@@ -14,7 +19,7 @@
 | Historical 3D concept | Current 2D treatment |
 | --- | --- |
 | First-person player, room/terrain meshes, skybox | **Strict overhead illustrated 2D** world. Layered sprites, persistent IDs, actual 2D collision footprints/interaction anchors and intentional tall-object occlusion. Canonical world can still be physically 3D. |
-| 3D game-wide navigation | **3D panoramic observation only at cockpit desk** (#815), shared grounded Vesper origin, session-local camera/FOV and compact HUD. Isolated orthographic free-flight fixture at `/?scene=radar`; no relocation of the authored 2D site. |
+| 3D game-wide navigation | **3D panoramic observation only at cockpit desk** (#815), shared Scout lifecycle, session-local camera/FOV and compact HUD. Authorized takeoff, manual flight and validated landing are delivered through #844; exterior frames follow the actual site. Isolated orthographic fixture remains `/?scene=radar`. |
 | Mineable physical fragments and two volume/weight limits | Direct raw-resource credit in **integer grams**. Initial inventory: **10 kg and 12 slots**, raw type stacking, per-item count stacks/weights, **no volume**. Source debit equals credit. |
 | Cargo racks and fabrication/fuel intakes | The **50 kg Resource Container** has confirmed raw-resource transfers (#784/#785). Separate **50 kg Fabricator/Core raw buffers** and processing remain approved future work. |
 | First-person Scout interior, physical modules | Continuous visible **top-down Scout cutaway**, ship-local frames, fixture footprints and concise contextual UI; preserve cozy habitation identity and build constraints when porting. |
@@ -22,7 +27,7 @@
 | Physical suits, hazards and upgrades | Future **tierless** basic suit with two module slots, drawer tiers **4/8/12**, module-store tiers **12/16/24**, **200 HP** character health, independent exposure and **1,000 HP** absorption per module. Exact gear masses/recipes remain TBD. |
 | Native localized room/module hull damage | Current 2D **combat damage** remains ship-wide; localized combat detachment deferred. Deliberate future construction **dismantles eligible parts individually**, including Stasis Pods; **offline death follows loss of the assigned pod**, not blanket loss of the last occupied ship. |
 | Native Gaia, terrain, gravity, streaming | Retain reproducible canonical data, IDs and physics as future port inputs; authoritative overhead surface sprites/colliders and cockpit radar proxies need independent browser/backend integration. |
-| Native whole-session save or network state | Browser-local `ResourceSession` **v4** gram ledger (after #783/#784) is **not** native schema 29+, multiplayer authority or cloud sync. |
+| Native whole-session save or network state | Browser-local `ResourceSession` **v11** resource/Scout/site ledger is **not** native schema 29+, multiplayer authority or cloud sync. |
 | Rust QA and native screenshot evidence | Historical; use Node/TypeScript and real browser Playwright capture for new feature delivery. Native hardware signoff is not a default browser blocker. |
 
 ## Development sequence (not a new gameplay approval)
@@ -49,9 +54,10 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`biological-signature-sites.md`](biological-signature-sites.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`browser-hazards.md`](browser-hazards.md) | PLAYABLE | Active browser hazard arithmetic/fixture contract; specific authored hazard sources and gear remain future. |
 | [`browser-survival.md`](browser-survival.md) | PLAYABLE | Active 2D survival state/tuning, but server authority and Stasis Pod mechanics not implemented. |
+| [`browser-launch-landing.md`](browser-launch-landing.md) | GUIDE | Active #838–#844 flight/site contract, cross-phase browser QA, supported samples and remaining limits. |
 | [`cabin-mechanisms.md`](cabin-mechanisms.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`canonical-planet-generation.md`](canonical-planet-generation.md) | DESIGN | Historical contract or approved intent; do not claim code migration without new issue and browser tests. |
-| [`cockpit-navigation-and-reconnect.md`](cockpit-navigation-and-reconnect.md) | PLAYABLE | Local chair/cockpit transitions playable; future multiplayer **Stasis Pod spawn and pod-loss death** supersede old exact-location policy. |
+| [`cockpit-navigation-and-reconnect.md`](cockpit-navigation-and-reconnect.md) | PLAYABLE | Local chair/cockpit transitions, launch, flying controls and assisted landing playable; future multiplayer **Stasis Pod spawn and pod-loss death** supersede old exact-location policy. |
 | [`coding-conventions.md`](coding-conventions.md) | GUIDE | TypeScript/React domain conventions should govern active edits; Rust sections archival. |
 | [`construction-damage.md`](construction-damage.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
 | [`construction-flight-safety.md`](construction-flight-safety.md) | NATIVE | Archived native Scout module. Preserve functional design; use cutaway, ship-local interaction footprints and gram-based transfers in 2D. |
@@ -151,4 +157,4 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 
 ## Maintaining these contracts
 
-When a 2D issue actually ships, update the affected owner guide, this register row, [current browser status](current-client-status.md) and its evidence report **in the same PR**. Preserve revision-specific Rust test results and approved mechanics. Do not rewrite a documented number, fabricate a catalog/recipe or promote a visual baseline just to declare migration complete.
+When a 2D issue actually ships, update the affected owner guide, this register row, [current browser status](current-client-status.md) and its PR validation record **in the same PR**. Preserve revision-specific Rust test results and approved mechanics. Do not rewrite a documented number, fabricate a catalog/recipe or promote a visual baseline just to declare migration complete.

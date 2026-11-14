@@ -1,7 +1,7 @@
-# Ship-centered 360° panoramic navigation — design and grounded implementation
+# Ship-centered 360° panoramic navigation — design and browser flight implementation
 
 **Decision date:** 2026-11-06  
-**Status:** Grounded production cockpit implemented through #815; full flight and final qualification remain future.
+**Status:** Production cockpit, takeoff, manual flight and assisted landing delivered through #844; final cross-phase QA results remain revision-specific.
 **Scope:** The 3D cockpit observation/navigation presentation in `client/`; the playable planetary surface and Scout interior remain strict-overhead illustrated 2D.
 
 This specification supersedes the **presentation and camera requirements** in [the current orthographic radar contract](radar-navigation-prototype.md) **in the production grounded cockpit (#815)**. `radar-navigation-prototype.md` describes the isolated orthographic flight fixture and its regression tests. Preserve the existing simulation, scanner, cockpit authority, collision rules, and 2D/3D shared location unless an explicitly separate feature authorizes a change. The standalone `/?scene=radar` fixture remains useful for isolated development.
@@ -56,11 +56,15 @@ Do not reintroduce previous off-screen celestial arrows/lines. Scanned off-scree
 
 The default `/` journey starts outside the **grounded Scout on Vesper**. `scoutLocation.ts` owns the sample site, planet binding, ship position and physical anchor; 2D and 3D must read the **same** location/lifecycle. The browser sample uses Vesper's spherical physical radius plus conservative 5 m ship bound. In the 3D navigation scene, a simplified local globe/surface must occlude below-horizon views. Horizon and sky update from the ship's actual pose; do not place a fixed cosmetic horizon or independently spawn the ship in free space.
 
-Until compatible shared launch/return rules are implemented, propulsion, takeoff, turning and Set direction remain disabled in the actual grounded cockpit; the observation camera, scanner, contact browser and Look at (except grounded self-body) operate normally. The isolated `/?scene=radar` fixture may continue testing free flight. Later takeoff/landing should keep the same observation mode and move it continuously with ship state, not switch camera architectures.
+Grounded manual propulsion, turning and Set direction remain disabled. The
+production **Take off** and **Land** controls now move the same ship continuously
+through ascent, flight, descent and matching 2D surface handoff (#840–#844).
+See the [active browser launch/landing contract](browser-launch-landing.md) for
+admission, supported sites, persistence, regression ownership and prototype limits.
 
 ## Compact full-viewport HUD
 
-**Shared presentation supplement (approved 2026-11-07, future styling):** the [Expedition Interface art direction](hud-ui-style-guide.md) defines consistent typography, semantic colors, buttons, equipment-versus-projected surfaces, motion and accessibility across 2D and cockpit. #814/#815 already delivered the functional compact panorama; this shared style pass is **not** assumed shipped and must not restore old vector lines, lattice or sidebar. The mechanics below remain authoritative.
+**Shared presentation supplement (approved 2026-11-07, delivered #828):** the [Expedition Interface art direction](hud-ui-style-guide.md) defines consistent typography, semantic colors, buttons, equipment-versus-projected surfaces, motion and accessibility across 2D and cockpit. #814/#815 already delivered the functional compact panorama; the shared tokens and compact projected styling are shipped and must not restore old vector lines, lattice or sidebar. The mechanics below remain authoritative.
 
 The 3D scene fills the available viewport in desktop cockpit mode: no permanent right sidebar, coordinate lattice, unused margins or normal body scrolling. All controls remain reachable through accessible HUD overlays, not hidden or sacrificed to appearance.
 
@@ -90,7 +94,7 @@ Implement on top of the existing React/TypeScript + Three.js + React Three Fiber
 4. One-time Look at plus mini-compass and compact cockpit HUD.
 5. 2D/cockpit lifecycle integration, persistence, accessibility and complete browser verification.
 
-## GitHub implementation tracking (not delivered)
+## GitHub implementation tracking
 
 - [#810 — Inertial perspective camera and 0.1° zoom](https://github.com/mr-exception/salimon/issues/810)
 - [#811 — Physical sky, angular-scale bodies and grounded horizon](https://github.com/mr-exception/salimon/issues/811)

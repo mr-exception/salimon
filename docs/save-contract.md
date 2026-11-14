@@ -2,14 +2,14 @@
 
 ## Browser 2D save boundary (not native schema 29+)
 
-The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked schema-v10 inventory/source/store/location/survival/hazard/Scout envelope, with lossless resource migration from v1–v9. [Browser survival](browser-survival.md) specifies active ticks, 200 HP, launch-only fatigue credit, failure handling and explicit terminal reset. It is scoped to the authored sample site and local browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
+The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked schema-v11 inventory/source/store/location/survival/hazard/Scout/site envelope, with lossless resource migration from v1–v10. [Browser survival](browser-survival.md) specifies active ticks, 200 HP, launch-only fatigue credit, failure handling and explicit terminal reset. It is scoped to sample planet/moon local sites and browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
 
 Future browser progression must specify new versioned state for equipped suit modules, new machine stores, hazard exposure, Core/Fabricator, moved ships, planet-fixed locations and server actor authority separately; it cannot serialize old Rust `.rs` types or assume native migration scripts run in the browser. Preserve this contract as historical design evidence and do not silently copy its native payload fields or reset incompatible saves.
 
 
 ## Browser boarding-door continuity (#839)
 
-The active TypeScript resource envelope is **v10**. `scout.boardingDoor` is required
+The active TypeScript resource envelope is **v11** (door state was introduced in v10). `scout.boardingDoor` is required
 and strictly `open` or `closed`; the same field drives interaction, collision and
 visible state. Door writes and flight transitions are revision-bound atomic
 resource saves, with rollback on storage failure. Reload validates the derived
@@ -23,6 +23,27 @@ player location embedded in the closed door rejects safely and preserves source
 bytes. Migration advances no time and grants no resources. Boarding-door state
 survives landing without automatically opening it. Cockpit seat/view reservations
 remain transient and must be re-established after reload.
+
+## Browser surface-region continuity (#842)
+
+Schema v11 requires `scout.surface` (sample body ID, body-fixed radial metres and
+local tangent yaw) and a `sites` registry keyed by deterministic versioned region
+ID. `siteId` agrees with the Scout mapping even when its `binding` is null in flight.
+A new landing target may be unmapped in the visited registry until approval;
+a grounded binding requires its saved site state. Launch resumes from its saved
+surface rather than an assumed Vesper origin. See the [surface mapping contract](../client/README.md#deterministic-surface-sites-842)
+for exact region bounds, physical 5 m hull radius and tangent-frame conventions.
+
+Each visited site stores trusted entity IDs with local planar anchors/removals;
+source definitions, collider geometry and artwork are never accepted from saved
+bytes. Ground/source IDs are mandatory, and active landing clearance and restored
+player collision are validated. The original Vesper source ledger and partial
+work remain global unique IDs; empty generated sites contain no copies or loot.
+Old v1–v10 saves reconstruct the original site state, keeping source depletion,
+resources, stores, capacities, location, survival, hazards and valid Scout state.
+Migration is in-memory until a successful atomic write. Invalid body/region,
+missing surface mapping, fabricated entity IDs and blocked footprints fail closed
+with original storage preserved. This does not migrate the historical native save.
 
 > **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
 

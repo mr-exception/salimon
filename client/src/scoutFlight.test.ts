@@ -47,11 +47,11 @@ test('each maneuver round trips; validated landing restores stable exterior and 
  const {session:s,navigation:n,action,storage}=setup(),entities=s.world.entities,sources=s.snapshot.sources
  for(const a of [{kind:'begin-takeoff'},{kind:'finish-takeoff'},{kind:'begin-landing',siteId:STARTING_SITE.id,bodyId:'vesper'},{kind:'finish-landing'}] as const){
   if(a.kind==='finish-takeoff'){n.advance(4);n.advance(2);s.checkpoint()}
-  else {if(a.kind==='finish-landing') n.clock.state={...n.clock.state,position:startingScoutLocation().ship.position};assert.equal(action(a),true)}
+  else {if(a.kind==='finish-landing') n.clock.state={...n.clock.state,position:startingScoutLocation().ship.position,velocityMps:startingScoutLocation().ship.velocityMps};assert.equal(action(a),true)}
   const restored=new ResourceSession(storage,createTopDownState())
   assert.equal(restored.error,'');assert.deepEqual(restored.world.scoutLocation.ship,n.clock.state);assert.deepEqual(restored.world.frames,s.world.frames)
  }
- assert.equal(s.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(s.world.entities,entities);assert.equal(s.snapshot.sources,sources)
+ assert.equal(s.world.scoutLocation.binding,STARTING_SITE.id);assert.deepEqual(s.world.entities.filter(e=>e.anchor.frame==='ship:scout'),entities.filter(e=>e.anchor.frame==='ship:scout'));assert.deepEqual(s.world.entities.filter(e=>e.anchor.frame==='planet:fixture'),entities.filter(e=>e.anchor.frame==='planet:fixture'));assert.equal(s.snapshot.sources,sources)
  assert.ok(drawList(s.world).some(e=>e.entity.anchor.frame==='planet:fixture'))
 })
 test('unauthorized/stale actions, invalid sites and failed saves cannot publish transitions',()=>{
@@ -73,9 +73,9 @@ test('inconsistent snapshots fail closed; legacy v8 migrates without fabricating
   const raw=storage.getItem(),restored=new ResourceSession(storage,createTopDownState())
   assert.match(restored.error,/safely/);restored.checkpoint();assert.equal(storage.getItem(),raw)
  }
- const {session,storage,corrupt}=setup();session.upgrade(10000,12);corrupt(s=>{s.version=8;delete s.scout})
+ const {session,storage,corrupt}=setup();session.upgrade(10000,12);corrupt(s=>{s.version=8;delete s.sites;delete s.scout})
  const legacy=new ResourceSession(storage,createTopDownState())
- assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,10)
+ assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,11)
 })
 
 test('physical contact never fabricates a site, and landing cannot teleport a distant ship',()=>{

@@ -1,3 +1,4 @@
+import { captureSite, resolveSurface, siteEntities, validateSurfaceClearance, type SiteStates, type SiteState, type SurfaceAddress } from './surfaceSite.ts'
 import { toggleDoor, synchronizeDoor } from './scoutDoor.ts'
 import { captureScout, decodeScout, type ScoutSave } from './scoutSave.ts'
 import { startingScoutLocation, transitionScout, takeoffDenial, type ScoutAction } from './scoutLocation.ts'
@@ -31,14 +32,15 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
-  readonly version: 10
+  readonly version: 11
+  readonly sites: SiteStates
   readonly scout: ScoutSave
   readonly miningWork: Readonly<Record<string, number>>
   readonly hazards: HazardState
   readonly survival: SurvivalState
   readonly itemDefinitions: CountItemCatalog
   readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
-  readonly siteId: typeof STARTING_SITE.id
+  readonly siteId: string
   readonly revision: number
   readonly inventory: ResourceInventory
   readonly sources: Readonly<Record<string, ResourceSource>>
@@ -78,6 +80,26 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
   }
   return { anchor: parsed, facing: location.facing }
 }
+function decodeSites(value: unknown): SiteStates {
+  const states = object(value), sites: Record<string, SiteState> = {}
+  if (!Object.hasOwn(states, STARTING_SITE.id)) throw Error('Missing original world state')
+  for (const [id, raw] of Object.entries(states)) {
+    const state = object(raw)
+    if (Object.keys(state).sort().join() !== 'address,anchors') throw Error('Invalid site fields')
+    const site = resolveSurface(state.address as SurfaceAddress)
+    if (site.id !== id) throw Error('Saved site/body mismatch')
+    const saved = state as unknown as SiteState
+    siteEntities(site, saved)
+    sites[id] = saved
+  }
+  return sites
+}
+function materializeSite(world: TopDownState, sites: SiteStates): TopDownState {
+  const location = world.scoutLocation
+  const terrain = location.binding ? siteEntities(resolveSurface(location.surface), sites[location.siteId]) : []
+  if (location.binding) validateSurfaceClearance(resolveSurface(location.surface), terrain)
+  return synchronizeDoor({ ...world, entities: [...world.entities.filter(e => e.anchor.frame !== 'planet:fixture' || e.layer !== 'terrain'), ...terrain] })
+}
 /** Work is source-bound, canonical and strictly below one 960-unit extraction. */
 function validateMiningWork(value: unknown): Record<string, number> {
   const work: Record<string, number> = {}
@@ -91,19 +113,20 @@ function validateMiningWork(value: unknown): Record<string, number> {
 export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
-  const hasStores = [3, 4, 5, 6, 7, 8, 9, 10].includes(data.version as number)
-  const hasItems = [5, 6, 7, 8, 9, 10].includes(data.version as number)
-  const hasSurvival = [6, 7, 8, 9, 10].includes(data.version as number)
-  const hasHazards = [7, 8, 9, 10].includes(data.version as number)
-  const hasWork = [8, 9, 10].includes(data.version as number)
-  const hasScout = data.version === 9 || data.version === 10
-  const allowed = [...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const hasStores = [3, 4, 5, 6, 7, 8, 9, 10, 11].includes(data.version as number)
+  const hasItems = [5, 6, 7, 8, 9, 10, 11].includes(data.version as number)
+  const hasSurvival = [6, 7, 8, 9, 10, 11].includes(data.version as number)
+  const hasHazards = [7, 8, 9, 10, 11].includes(data.version as number)
+  const hasWork = [8, 9, 10, 11].includes(data.version as number)
+  const hasScout = data.version === 9 || data.version === 10 || data.version === 11
+  const hasSites = data.version === 11
+  const allowed = [...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || data.siteId !== STARTING_SITE.id) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
+  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -152,10 +175,15 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   }
   const miningWork = hasWork ? validateMiningWork(data.miningWork) : {}
   const scout = hasScout ? decodeScout(data.scout, data.version === 9) : startingLocationForMigration()
-  const restoredWorld = synchronizeDoor({ ...world, scoutLocation: scout, frames: scout.frames })
+  if (!hasSites && scout.siteId !== STARTING_SITE.id) throw Error('Legacy save cannot bind a generated site')
+  if (hasSites && !object(data.scout).surface) throw Error('Missing saved surface mapping')
+  const initialSite = resolveSurface(startingLocationForMigration().surface)
+  const sites: SiteStates = hasSites ? decodeSites(data.sites) : { [STARTING_SITE.id]: captureSite(initialSite, siteEntities(initialSite)) }
+  if (hasSites && (data.siteId !== scout.siteId || scout.binding && !Object.hasOwn(sites, scout.siteId))) throw Error('Missing active site state')
+  const restoredWorld = materializeSite({ ...world, scoutLocation: scout, frames: scout.frames }, sites)
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
-  const save: ResourceSave = { version: 10, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 11, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }
@@ -202,7 +230,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 10, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: STARTING_SITE.id, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 11, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingLocationForMigration().surface), siteEntities(resolveSurface(startingLocationForMigration().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -215,8 +243,8 @@ export class ResourceSession {
         Object.assign(world.scoutLocation, restored)
         world = { ...world, frames: restored.frames, tick: restored.ship.tick }
         const location = this.snapshot.location
-        this.world = synchronizeDoor({ ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
-          camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' })
+        this.world = materializeSite(synchronizeDoor({ ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
+          camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' }), this.snapshot.sites)
       }
       if (this.persisted !== null && JSON.parse(this.persisted).version >= 6) {
         const recovered = recoverOffline(this.survival, now())
@@ -230,11 +258,17 @@ export class ResourceSession {
       this.error = 'Saved expedition could not be loaded safely. Existing data kept; gathering paused.'
     }
   }
+  private captureSites(sites: SiteStates): SiteStates {
+    const location = this.world.scoutLocation
+    return location.binding ? { ...sites, [location.siteId]: captureSite(resolveSurface(location.surface), this.world.entities) } : sites
+  }
   private commit(next: ResourceSave): boolean {
     if (this.error) return false
     try {
       if (this.storage.getItem(RESOURCE_SAVE_KEY) !== this.persisted) throw new Error('Save changed in another session')
-      const candidate = { ...next, scout: captureScout(this.world.scoutLocation), miningWork: validateMiningWork(this.miningWork), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
+      const sites = this.captureSites(next.sites)
+      if (this.world.scoutLocation.binding) validateSurfaceClearance(resolveSurface(this.world.scoutLocation.surface), this.world.entities.filter(e => e.layer === 'terrain'))
+      const candidate = { ...next, sites, siteId: this.world.scoutLocation.siteId, scout: captureScout(this.world.scoutLocation), miningWork: validateMiningWork(this.miningWork), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
       validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       validateSurvival(candidate.survival)
       validateHazards(candidate.hazards)
@@ -274,11 +308,13 @@ export class ResourceSession {
     if (admission) return deny(admission)
     const previous = this.world, location = this.world.scoutLocation, before = { ...location }
     try {
+      const sites = this.captureSites(this.snapshot.sites)
+      if (action.kind === 'begin-takeoff') validateSurfaceClearance(resolveSurface(location.surface), siteEntities(resolveSurface(location.surface), sites[location.siteId]))
       const next = transitionScout(location, action)
       this.cancel()
       Object.assign(location, next)
-      this.world = synchronizeScout(this.world)
-      if (!this.commit(this.snapshot)) { Object.assign(location, before); this.world = previous; return false }
+      this.world = materializeSite(synchronizeScout(this.world), sites)
+      if (!this.commit({ ...this.snapshot, sites })) { Object.assign(location, before); this.world = previous; return false }
       this.feedback = ''
       this.world = { ...this.world, feedback: `Scout: ${location.ship.mode}.` }
       return true
@@ -313,6 +349,8 @@ export class ResourceSession {
   transfer(request: ResourceTransfer): boolean {
     if (this.error || this.survival.health === 0) return false
     try {
+      const sourceId = request.from.kind === 'source' ? request.from.id : null
+      if (sourceId !== null && (!this.world.scoutLocation.binding || this.world.scoutLocation.siteId !== STARTING_SITE.id || !this.world.entities.some(e => e.id === sourceId && e.source))) throw Error('Source is unavailable at this surface site.')
       const next = transferResource(this.snapshot, request, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       return this.commit({ ...this.snapshot, ...next, hazards: this.hazards, survival: this.survival })
     } catch (error) {
@@ -356,7 +394,7 @@ export class ResourceSession {
       this.world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === this.world.frames.ship.id, RESOURCE_CATALOG, this.itemCatalog)
   }
   checkpoint(): void {
-    if (serialize(captureScout(this.world.scoutLocation)) !== serialize(this.snapshot.scout) || serialize(this.miningWork) !== serialize(this.snapshot.miningWork) || serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival) || serialize(this.hazards) !== serialize(this.snapshot.hazards)) this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival })
+    if (serialize(this.captureSites(this.snapshot.sites)) !== serialize(this.snapshot.sites) || serialize(captureScout(this.world.scoutLocation)) !== serialize(this.snapshot.scout) || serialize(this.miningWork) !== serialize(this.snapshot.miningWork) || serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival) || serialize(this.hazards) !== serialize(this.snapshot.hazards)) this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival })
   }
   upgrade(capacityGrams: number, capacitySlots: number): boolean {
     if (this.error || this.survival.health === 0) return false
@@ -386,7 +424,7 @@ export class ResourceSession {
     if (this.activeSourceId) { this.cancel(); return }
     if (this.error || !survivalPolicy(this.survival).canWork || !this.equipped) return
     const target = this.world.entities.find(e => e.id === id), player = this.world.entities.find(e => e.id === PLAYER_ID)!
-    if (!target?.source || !id || this.world.player.mode === 'seated' || this.world.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, this.world.frames)) {
+    if (!this.world.scoutLocation.binding || target?.source?.siteId !== this.world.scoutLocation.siteId || !target?.source || !id || this.world.player.mode === 'seated' || this.world.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, this.world.frames)) {
       this.feedback = 'No resource source in reach.'; return
     }
     const blocked = this.blocked(id)

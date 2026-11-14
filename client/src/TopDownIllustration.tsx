@@ -2,6 +2,7 @@ import type { Appearance, Entity2D } from './topDownRuntime.ts'
 
 export function Illustration({ appearance, footprint }: { appearance: Appearance; footprint?: Entity2D['footprint'] }) {
   switch (appearance) {
+    case 'surface': return <g><rect x="-200" y="-200" width="400" height="400" fill="#b5a58b" /><path d="M-18 -12l1 .15m22 24l.8 -.1m-20 5l.5 .1m28 -26l.6 .2" stroke="#c7b69b" strokeWidth=".12" /></g>
     case 'ground': return <g><rect x="-200" y="-200" width="400" height="400" fill="#b5a58b" />
       <path d="M-28 -12Q-14 -3 -11 12L-17 19 -33 8ZM-4 -18Q12 -8 22 -12L29 -5Q11 0 -4 -8Z" fill="#a69580" />
       <path d="M-27 -10Q-16 -1 -14 12M-26 -8Q-18 0 -16 10M-3 -16Q12 -6 23 -10M-4 -14Q11 -4 24 -8" fill="none" stroke="#c7b69b" strokeWidth=".18" />

@@ -100,16 +100,15 @@ integer grams and atomic local persistence; no independent scene was added.
 The panoramic cockpit and 2D world share one live `ScoutLocation` (#838).
 Fresh runs remain grounded on Vesper. `ResourceSession.transitionScout` provides
 revision-bound, powered-owner-seat actions for grounded → taking-off → flying →
-landing → grounded. Landing resolves an explicit registered body/site pair; only
-the authored starting site is supported. These lifecycle endpoints do not provide
-maneuver trajectories or player-facing launch controls. Throttle/steering remain
-disabled in production; `/?scene=radar` is still an isolated free-flight fixture.
+landing → grounded. Landing resolves validated body-fixed coordinates to a deterministic planet/moon
+site (#842), restoring actual original Vesper depletion only in its known region.
+Generated regions are sparse and empty. Landing trajectories/controls remain future
+work; production Take off and manual flight are delivered (#841); `/?scene=radar` is still an isolated free-flight fixture.
 While airborne, the ship frame has no planet parent: exterior drawing, collision,
 interaction and doorway conversion are unavailable. The same ship-local player,
 interior and stores remain usable; the locked aft exit explains how to leave.
-Schema v9 atomically saves split ship pose, lifecycle/maneuver, scanner cadence,
-contacts/selection, player location and the resource ledger. Versions 1–8 migrate
-to the known grounded binding; inconsistent flight snapshots retain their original
+Schema v11 atomically saves visited surface sites, physical target/departure address, split ship pose, lifecycle/maneuver, scanner cadence,
+contacts/selection, player location and the resource ledger. Versions 1–10 migrate losslessly; inconsistent flight snapshots retain their original
 bytes and stop writes. Reload restores standing inside the ship, with no active
 cockpit reservation. Observation direction/FOV stay session-local and survive
 lifecycle actions and cockpit exits; they are not ship authority or a durable save.

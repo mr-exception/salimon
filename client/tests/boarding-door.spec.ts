@@ -32,7 +32,7 @@ test('DOOR-839 built boarding interaction, blocked crossing, reload and cockpit 
    await expect(player).toHaveAttribute('data-frame','ship:scout')
    await page.evaluate(()=>window.dispatchEvent(new Event('pagehide')))
    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('salimon:expedition:v1')!))
-   expect(saved.scout.boardingDoor).toBe('closed');expect(saved.version).toBe(10)
+   expect(saved.scout.boardingDoor).toBe('closed');expect(saved.version).toBe(11)
    await page.reload();await page.clock.runFor(64)
    await expect.poll(async()=>{await page.clock.runFor(50);return door.getAttribute('data-door-state')}).toBe('closed')
    await page.getByRole('button',{name:'Open door',exact:true}).click();await page.clock.runFor(32)

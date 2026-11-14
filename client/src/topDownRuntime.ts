@@ -1,6 +1,7 @@
 import { BOARDING_DOOR_ID, BOARDING_DOOR_HALF_DEPTH_M, synchronizeDoor, toggleDoor } from './scoutDoor.ts'
 import { startingScoutLocation, type ScoutLocation } from './scoutLocation.ts'
 import { initialCockpit, enterCockpit, isCockpitTarget, type CockpitState } from './cockpit.ts'
+import { siteEntities, resolveSurface } from './surfaceSite.ts'
 import { planetaryEntities, STARTING_SITE, type SourceIdentity } from './planetarySite.ts'
 import { scoutEntities } from './scoutLayout.ts'
 import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
@@ -10,7 +11,7 @@ import { convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Ancho
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
 export type Layer = typeof LAYERS[number]
-export type Appearance = 'ground' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold' | 'mineral' | 'flora' | 'stones'
+export type Appearance = 'ground' | 'surface' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold' | 'mineral' | 'flora' | 'stones'
 export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance; readonly source?: SourceIdentity }
 export interface TopDownState {
   readonly scoutLocation: ScoutLocation
@@ -133,5 +134,9 @@ export function synchronizeScout(state: TopDownState): TopDownState {
   if (state.frames === state.scoutLocation.frames) return state
   const camera = state.camera.anchor.frame === 'planet:fixture' && state.scoutLocation.binding === null
     ? { ...state.camera, anchor: convertAnchor(state.camera.anchor, 'ship:scout', state.frames) } : state.camera
-  return { ...state, frames: state.scoutLocation.frames, camera, selectedId: null }
+  const entities = [
+    ...state.entities.filter(e => e.anchor.frame === 'ship:scout' || e.layer !== 'terrain'),
+    ...(state.scoutLocation.binding ? siteEntities(resolveSurface(state.scoutLocation.surface)) : []),
+  ]
+  return { ...state, entities, frames: state.scoutLocation.frames, camera, selectedId: null }
 }

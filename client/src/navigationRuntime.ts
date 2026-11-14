@@ -1,6 +1,6 @@
 import { NavigationInput } from './input.ts'
 import { sampleTakeoff, TAKEOFF_TICKS } from './takeoff.ts'
-import { startingScoutLocation } from './scoutLocation.ts'
+import { surfaceScoutLocation } from './scoutLocation.ts'
 import type { ScoutLocation } from './scoutLocation.ts'
 import { resolveContacts } from './contact.ts'
 import { CatalogIndex, Scanner } from './scanner.ts'
@@ -28,7 +28,7 @@ export class NavigationRuntime {
   const result = this.clock.advance(seconds,controls,(before,after)=>{
    if (this.location?.launch && before.mode === 'taking-off') {
     const plan = this.location.launch
-    const next = sampleTakeoff(startingScoutLocation().ship, this.location.body, plan, after.tick)
+    const next = sampleTakeoff(surfaceScoutLocation(this.location.surface).ship, this.location.body, plan, after.tick)
     if (after.tick >= plan.startTick + TAKEOFF_TICKS) { this.location.launch = null; this.location.maneuver = null }
     this.scanner.update(next.tick,next.position)
     return next

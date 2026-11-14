@@ -708,3 +708,13 @@ unknown digests and byte-exact slot preservation.
 ## Narrative inspections — schema 31 (#470)
 
 Current saves require `state.narrative` version 1, two optional first-inspection UTC-millisecond values bounded by the scanner clock, and no transient reader state. Schemas 1–30 without this source migrate to no inspections. Recovered `salimon-site` chart entries must match the exact versioned packet source/position/uncertainty and completed paid work; invalid combinations fail before publication. See [source/interaction ownership](opening-and-investigations.md).
+
+### Verified cockpit touchdown (#844)
+
+The observing pilot returns standing beside the cockpit on verified touchdown;
+a pilot already in the unpowered interior retains the existing seated state.
+The session immediately checkpoints the matching surface binding and local site
+state through the existing v11 save. A storage failure stops publication through
+the existing world-clock rollback/error boundary. No new save schema or resource
+identity is introduced. A flight collision never creates a surface binding;
+whole-ship destruction is terminal across cockpit exit and reload.

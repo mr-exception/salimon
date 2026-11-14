@@ -2,6 +2,15 @@
 
 > **Current browser scope:** Start with [code-checked implementation and validation routing](current-client-status.md). Native crate, tooling and build sections below are historical; they require the archived revision and do not gate routine 2D work.
 
+Production landing presentation (#844) belongs to `landingHud.ts` (scanner-only
+identity, surface-relative telemetry and real-plan progress), `PanoramicNavigation.tsx`
+(compact accessible control), and the `TopDownView.tsx` session command adapter.
+`ResourceSession.scoutActionDenial` shares domain/site checks without mutation;
+verified touchdown returns the observing pilot to the ship interior and saves the
+matching surface. Whole-ship destruction blocks walking and interaction.
+See `landingHud.test.ts` and `tests/landing.spec.ts`; the domain planner and
+2D destination/door owners remain below.
+
 Assisted landing (#843) belongs to `client/src/landing.ts`: scanner/speed/range
 admission, captured rotating-frame trajectory and continuous analytic safety
 bounds. `scoutLocation.ts` supplies validated sites, `navigationRuntime.ts` owns
@@ -9,7 +18,7 @@ sampling/automatic touchdown on the sole clock, `scoutSave.ts` validates resume,
 and `resourceSession.ts` restores saved local terrain on arrival. See the
 [landing contract](../client/README.md#assisted-landing-domain-843).
 `landing.test.ts` and `tests/flight.spec.ts` LANDING-843 cover the domain and
-production interruptions/reload; L07 owns future landing presentation.
+production interruptions/reload; #844 owns landing presentation.
 
 Surface-site mapping (#842) belongs to `client/src/surfaceSite.ts` (body-fixed
 metres, versioned physical regions, tangent basis, sparse patch and safe footprint).

@@ -52,7 +52,8 @@ test('each maneuver round trips; validated landing restores stable exterior and 
   const restored=new ResourceSession(storage,createTopDownState())
   assert.equal(restored.error,'');assert.deepEqual(restored.world.scoutLocation.ship,n.clock.state);assert.deepEqual(restored.world.frames,s.world.frames)
  }
- assert.equal(s.world.scoutLocation.binding,STARTING_SITE.id);assert.deepEqual(s.world.entities.filter(e=>e.anchor.frame==='ship:scout'),entities.filter(e=>e.anchor.frame==='ship:scout'));assert.deepEqual(s.world.entities.filter(e=>e.anchor.frame==='planet:fixture'),entities.filter(e=>e.anchor.frame==='planet:fixture'));assert.equal(s.snapshot.sources,sources)
+ assert.equal(s.world.scoutLocation.binding,STARTING_SITE.id);assert.deepEqual(s.world.entities.filter(e=>e.anchor.frame==='ship:scout'&&e.id!==PLAYER_ID),entities.filter(e=>e.anchor.frame==='ship:scout'&&e.id!==PLAYER_ID));assert.deepEqual(s.world.entities.filter(e=>e.anchor.frame==='planet:fixture'),entities.filter(e=>e.anchor.frame==='planet:fixture'));assert.equal(s.snapshot.sources,sources)
+ assert.equal(s.world.player.mode,'standing');assert.equal(s.world.cockpit.view,'world')
  assert.ok(drawList(s.world).some(e=>e.entity.anchor.frame==='planet:fixture'))
 })
 test('unauthorized/stale actions, invalid sites and failed saves cannot publish transitions',()=>{

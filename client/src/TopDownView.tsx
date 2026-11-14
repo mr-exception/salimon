@@ -118,7 +118,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (event.code === 'KeyP' && !event.repeat && acceptsFlightShortcut(event.target)) {
         paused.current = !paused.current; clear(); return
       }
-      if (paused.current || session.current?.survival.health === 0) return
+      if (paused.current || session.current?.survival.health === 0 || current.current.scoutLocation.ship.mode === 'destroyed' && event.code !== 'Escape') return
       if (event.code === 'KeyE' && isCockpitTarget(current.current.selectedId) && session.current && (!!session.current.error || !survivalPolicy(session.current.survival).canWork)) return
       if (current.current.cockpit.view === 'radar') return
       if (container.current?.opened && event.code === 'KeyE') return
@@ -198,7 +198,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const closeContainer = () => { container.current?.close(); current.current = session.current?.world ?? current.current; (document.activeElement as HTMLElement | null)?.blur(); setState({ ...current.current }) }
   const selectedSource = resourceSession && selected && resourceSession.snapshot.sources[selected.id]
   const interact = () => {
-    if (paused.current || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && (!!resourceSession.error || !survivalPolicy(resourceSession.survival).canWork)) return
+    if (current.current.scoutLocation.ship.mode === 'destroyed' || paused.current || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && (!!resourceSession.error || !survivalPolicy(resourceSession.survival).canWork)) return
     if (selectedContainer && container.current?.open(current.current)) current.current = container.current.session.world
     else if (selected?.id === BOARDING_DOOR_ID && resourceSession) { resourceSession.world = current.current; resourceSession.toggleBoardingDoor(resourceSession.snapshot.revision); current.current = resourceSession.world }
     else if (resourceSession?.equipped && selectedSource) { resourceSession.start(selected!.id); current.current = resourceSession.world }
@@ -206,14 +206,14 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     setState(current.current)
   }
   const vital = resourceSession?.survival
-  const warning = vital?.health === 0 ? 'Run ended · zero health. Start a fresh character to continue.' : [
+  const warning = state.scoutLocation.ship.mode === 'destroyed' ? 'Journey ended — whole ship destroyed. No surface access.' : vital?.health === 0 ? 'Run ended · zero health. Start a fresh character to continue.' : [
     vital && vital.health <= 40 ? 'Low health · critical condition.' : '',
     vital?.fatigue === 0 ? 'Exhausted · gathering and piloting unavailable.' : '',
     vital && vital.hunger < METER * .2 ? 'Low hunger · starvation at zero. Movement and mining reduced.' : '',
     vital && vital.fatigue > 0 && vital.fatigue <= METER * .5 ? 'Low fatigue · movement reduced; mining reduced at 20 or below.' : '',
   ].filter(Boolean).join(' ')
   const gatherBlocked = selectedSource && resourceSession?.equipped && usage && !resourceSession.activeSourceId ? selectedSource.remainingGrams === 0 ? 'Source depleted. No material remains.' : usage.grams >= resourceSession.snapshot.inventory.capacityGrams ? 'Inventory full: weight limit.' : !resourceSession.snapshot.inventory.quantities[selectedSource.resourceId] && usage.slots >= resourceSession.snapshot.inventory.capacitySlots ? 'Inventory full: slot limit.' : '' : ''
-  const canAct = !(cockpitTarget && !state.cockpit.powered) && !gatherBlocked && !!selected?.interaction && !paused.current && !resourceSession?.error && vital?.health !== 0 && !(cockpitTarget && vital && !survivalPolicy(vital).canWork) && !(selectedSource && resourceSession?.equipped && vital && !survivalPolicy(vital).canWork)
+  const canAct = state.scoutLocation.ship.mode !== 'destroyed' && !(cockpitTarget && !state.cockpit.powered) && !gatherBlocked && !!selected?.interaction && !paused.current && !resourceSession?.error && vital?.health !== 0 && !(cockpitTarget && vital && !survivalPolicy(vital).canWork) && !(selectedSource && resourceSession?.equipped && vital && !survivalPolicy(vital).canWork)
   const persistentMessages = [
     { id: 'survival', text: warning, priority: 'critical' as const },
     { id: 'power', text: state.player.mode === 'seated' && !state.cockpit.powered ? 'Cockpit unpowered · observation unavailable. Stand up or restore power.' : '', priority: 'critical' as const },
@@ -245,6 +245,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <PanoramicNavigation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         canPilot={() => !paused.current && !!session.current && !session.current.error && survivalPolicy(session.current.survival).canWork && controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
+        landing={{ denial: bodyId => session.current?.scoutActionDenial({ kind: 'begin-landing', bodyId }) ?? (session.current ? null : 'Expedition unavailable.'), activate: bodyId => {
+          if (!session.current || paused.current) return
+          session.current.world = current.current
+          session.current.transitionScout({ kind: 'begin-landing', bodyId }, session.current.snapshot.revision, current.current.cockpit)
+          update(session.current.world)
+        } }}
         takeoff={{ denial: () => paused.current ? 'Resume the expedition before takeoff.' : session.current?.scoutCommandDenial() ?? (session.current ? null : 'Expedition unavailable.'), activate: () => { if (!session.current || paused.current) return; session.current.world = current.current; session.current.transitionScout({ kind: 'begin-takeoff' }, session.current.snapshot.revision, current.current.cockpit); update(session.current.world) } }} onExit={() => update(leaveCockpit(current.current))} />
     </div>}
     {flightFixture && <div className="power-fixture">{(['begin-takeoff', 'finish-takeoff', 'begin-landing', 'finish-landing'] as const).map(kind => <button key={kind} onClick={event => { event.currentTarget.blur(); if (session.current) { session.current.world = current.current; session.current.transitionScout(kind === 'begin-landing' ? { kind, siteId: current.current.scoutLocation.siteId, bodyId: current.current.scoutLocation.body.id } : { kind }, session.current.snapshot.revision, current.current.cockpit); update({ ...session.current.world }) } }}>{kind}</button>)}</div>}

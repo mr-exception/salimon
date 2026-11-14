@@ -800,7 +800,7 @@ commands through the live powered owner seat. Both maneuvers complete automatica
 `finish-takeoff` and `finish-landing` pilot overrides are rejected. The caller must provide that exact
 live cockpit-state token; an old seat token remains invalid after re-entry. These commands
 start the saved domain trajectories; production Take off starts the launch profile.
-Player-facing landing presentation is separate L07 work (#844).
+Player-facing landing presentation is delivered by [the production cockpit landing adapter](#production-cockpit-landing-844).
 The development-only `/?flightFixture=1` buttons call the same domain actions for
 browser acceptance. They are removed from the production build.
 
@@ -994,4 +994,35 @@ tampered or old endpoint-only landing snapshots fail safely instead of teleporti
 rotation, automatic contact-safe arrival and unsafe/terminal negatives.
 `tests/flight.spec.ts` LANDING-843 and `tests/surface-sites.spec.ts` exercise
 production domain admission, the sole tick, interruptions and built save/resume.
-HUD/landing-command presentation is deferred to #844; no visual references change.
+HUD/landing-command presentation is integrated by [#844](#production-cockpit-landing-844); this domain planner retains its separate ownership.
+
+### Production cockpit landing (#844)
+
+The production panoramic cockpit offers **Land** in free flight. A scanner-selected
+contact is the landing target; without a selection, the nearest detected solid
+body is offered. Camera **Look at** never chooses a landing target. The compact
+readout shows scanner-known identity, physical hull altitude, full surface-relative
+speed (including tangential/rotational motion), and the actual admission reason.
+Admission is read-only through `ResourceSession.scoutActionDenial`, using the same
+planner and saved footprint checks as the revision-bound command. No landing
+shortcut captures typing or modal input; the native button supports keyboard
+activation. The runtime, rather than the camera, owns the maneuver clock.
+
+During the admitted trajectory the HUD reports descent/flare/touchdown approach
+and actual tick progress; manual flight input is locked and camera observation
+remains independent. Leaving the cockpit, power loss and reload preserve the
+admitted plan. Verified touchdown alone binds the matching 2D site, returns an
+observing pilot standing beside the cockpit, and checkpoints the destination.
+An unpowered pilot remains seated in the existing interior view. The aft door
+still requires explicit operation after touchdown. Cargo, source depletion and
+site snapshots retain their existing identities. A destructive collision ends
+the whole-ship journey: no fabricated surface access, walking or navigation reset.
+Unlimited energy remains a prototype assumption.
+
+`landingHud.test.ts` checks readout/admission/nonmutation/handoff and terminal
+behavior. `tests/landing.spec.ts` exercises the built Land control on a real
+launch-derived Vesper approach and a synthetic moon approach, exterior walking,
+reload, cargo and departure, plus production denials/power interruption/impact.
+Original/repeat/negative screenshots and state use ignored `test-results/` and
+existing CI artifact uploads (14-day retention); references are never silently
+updated. Native hardware qualification remains separate from cloud SwiftShader.

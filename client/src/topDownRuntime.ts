@@ -50,7 +50,7 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'exterior', c
 }
 // One continuous scene. Crossing changes ownership, never world position.
 export function stepTopDown(state: TopDownState, direction: Point2, speedMultiplier = 1): TopDownState {
-  const [x, y] = state.player.mode === 'seated' ? [0, 0] : direction
+  const [x, y] = state.player.mode === 'seated' || state.scoutLocation.ship.mode === 'destroyed' ? [0, 0] : direction
   if (![x, y].every(Number.isFinite)) throw new RangeError('Expected finite movement')
   const length = Math.hypot(x, y), scale = length > 0 ? PLAYER_SPEED_MPS * speedMultiplier * STEP_2D / Math.max(1, length) : 0
   const player = state.entities.find(e => e.id === PLAYER_ID)!
@@ -94,6 +94,7 @@ export function capturePlayerLocation(state: TopDownState): PlayerLocation {
   return copyPlayerLocation({ anchor: state.entities.find(e => e.id === PLAYER_ID)!.anchor, facing: state.player.facing })
 }
 export function requestInteraction(state: TopDownState, id: string | null = state.selectedId): TopDownState {
+  if (state.scoutLocation.ship.mode === 'destroyed') return { ...state, feedback: 'Journey ended — whole ship destroyed.' }
   if (id === BOARDING_DOOR_ID) return toggleDoor(state)
   if (state.cockpit.enabled && isCockpitTarget(id)) return enterCockpit({ ...state, selectedId: id })
   const player = state.entities.find(e => e.id === PLAYER_ID)!, target = state.entities.find(e => e.id === id)

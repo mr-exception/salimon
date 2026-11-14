@@ -52,7 +52,7 @@ test('FLIGHT-840 production launch survives cockpit exit and focus loss, then sa
  await page.screenshot({path:info.outputPath('flight-interior.png')})
  await page.evaluate(()=>window.dispatchEvent(new Event('pagehide')))
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('salimon:expedition:v1')!))
- expect(saved.version).toBe(10);expect(saved.scout.binding).toBeNull()
+ expect(saved.version).toBe(11);expect(saved.scout.binding).toBeNull()
  await page.reload();await page.clock.runFor(64)
  await expect(main).toHaveAttribute('data-player-mode','standing')
  expect((await ship()).mode).toBe('flying');expect((await ship()).velocityMps).toEqual(saved.scout.ship.velocityMps)

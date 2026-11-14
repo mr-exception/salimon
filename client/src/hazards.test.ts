@@ -116,7 +116,7 @@ test('HAZ-4 v6 migration preserves existing health/ledger and malformed v7 saves
   const storage = { getItem: () => raw, setItem: (_: string, v: string) => { raw = v } }, world = createTopDownState('exterior', true)
   const session = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   session.upgrade(10000, 12)
-  const old = JSON.parse(raw!); old.version = 6; delete old.scout; delete old.miningWork; delete old.hazards; old.survival.health = 167
+  const old = JSON.parse(raw!); old.version = 6; delete old.sites; delete old.scout; delete old.miningWork; delete old.hazards; old.survival.health = 167
   raw = JSON.stringify(old)
   const migrated = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   assert.equal(migrated.survival.health, 167); assert.deepEqual(migrated.hazards, freshHazards()); assert.deepEqual(migrated.snapshot.inventory, old.inventory)

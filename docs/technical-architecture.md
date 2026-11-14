@@ -46,7 +46,11 @@ serializing immutable image assets into DOM snapshots. No screenshot threshold,
 mask or approved navigation reference changes.
 
 The isolated development inspection fixture remains `/?scene=top-down`;
-`/?scene=radar` runs standalone navigation. `scoutLocation.ts` owns the shared site/body/frame/physical grounded anchor.
+`/?scene=radar` runs standalone navigation. `surfaceSite.ts` owns physical body-fixed address → stable region identity, local
+tangent basis, sparse non-resource patches, saved trusted terrain anchors and
+landing clearance. `planetarySite.ts` retains the original Vesper entities and
+unique sources; `ResourceSession` owns v11 visited site snapshots and the one
+global resource ledger. `scoutLocation.ts` owns the shared site/body/frame/physical grounded anchor.
 The world and cockpit runtime consume that same value. The production runtime preserves the grounded anchor until an authorized launch
 enters its deterministic maneuver, then integrates physical free flight.
 `NavigationRuntime.pilotInput` holds only transient steering; the world consumes

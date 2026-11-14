@@ -2,6 +2,14 @@
 
 > **Current browser scope:** Start with [code-checked implementation and validation routing](current-client-status.md). Native crate, tooling and build sections below are historical; they require the archived revision and do not gate routine 2D work.
 
+Surface-site mapping (#842) belongs to `client/src/surfaceSite.ts` (body-fixed
+metres, versioned physical regions, tangent basis, sparse patch and safe footprint).
+`planetarySite.ts` remains the authored Vesper source owner. `scoutLocation.ts` /
+`scoutSave.ts` / `navigationRuntime.ts` share the saved target/departure address;
+`resourceSession.ts` owns v11 site snapshots and unique resource depletion.
+See the [surface contract](../client/README.md#deterministic-surface-sites-842)
+and [save continuity](save-contract.md#browser-surface-region-continuity-842).
+
 Browser cross-view interaction/feedback (#830): `ui/interaction.ts` owns utility
 and modal Escape ordering and safe focus return; `ui/Feedback.tsx` and
 `ui/feedback.ts` own accessible priority/deduplication and modal warning mirrors.

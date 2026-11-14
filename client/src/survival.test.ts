@@ -130,7 +130,7 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   const world = createTopDownState('exterior', true)
   const old = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   old.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 333 })
-  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.survival; delete v5.miningWork; delete v5.scout; delete v5.hazards
+  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.survival; delete v5.miningWork; delete v5.sites; delete v5.scout; delete v5.hazards
   raw = JSON.stringify(v5); const bytes = raw
   const migrated = new ResourceSession(storage, world, undefined, undefined, () => 21_601_000)
   assert.equal(migrated.error, ''); assert.equal(raw, bytes)
@@ -139,7 +139,7 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   assert.deepEqual(migrated.snapshot.sources, v5.sources)
   assert.deepEqual(migrated.snapshot.stores, v5.stores)
   migrated.advance(stepTopDown(migrated.world, [0, 0])); migrated.checkpoint()
-  assert.equal(JSON.parse(raw!).version, 10)
+  assert.equal(JSON.parse(raw!).version, 11)
   assert.equal(new ResourceSession(storage, world, undefined, undefined, () => 21_601_000).survival.activeTicks, 1)
 })
 

@@ -2,7 +2,7 @@
 
 Use the [2D documentation migration register](../docs/2d-migration-register.md) to distinguish the current browser implementation, approved future mechanics and archived native source contracts.
 
-**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **up to 1 kg/s integer-gram** sample gathering with approved survival penalties with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v8 resource/item/survival/hazard ledger and migrates valid v1
+**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **up to 1 kg/s integer-gram** sample gathering with approved survival penalties with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v11 resource/item/survival/hazard/Scout/site ledger and migrates valid v1
 litre / v2 gram saves without loss. `resourceLedger.ts` validates exact transfers
 and store mass; future stores require trusted ID/ship/capacity declarations.
 The default world enables the 50 kg Scout Resource Container and deposit/withdraw panel (#784/#785). See [resource design](../docs/resource-inventory-and-gathering.md).
@@ -45,8 +45,8 @@ thruster budget admits at most 9,000 t loaded mass for this profile. No mass,
 impulse law or Core balance is changed. `TAKEOFF_FUNDING` marks the future funding
 adapter seam; the current prototype supplies unlimited energy. Admission sweeps
 the complete fixed-step path against conservative hull/body spheres before any
-state change. Only the registered Vesper site is supported; planetary ephemerides,
-gravity and arbitrary surface sites remain outside this prototype.
+state change. Launch reuses the validated saved surface mapping on Vesper, its moon or Caligo;
+planetary ephemerides and gravity remain outside this prototype. See the surface-site contract below.
 
 Manual inputs, Set direction, other assists and `finish-takeoff` cannot override
 an admitted launch. The world clock continues through cockpit exit/observation
@@ -798,13 +798,13 @@ hardware FPS or native Metal rendering. No timing claim is inferred from capture
 `begin-takeoff`, `finish-takeoff`, `begin-landing` (registered `siteId` and `bodyId`),
 and `finish-landing` commands through the live powered owner seat. The caller must provide that exact
 live cockpit-state token; an old seat token remains invalid after re-entry. These endpoints
-establish state ownership for future trajectories; production has no launch UI.
+establish state ownership for landing trajectories; production Take off starts the delivered launch profile.
 The development-only `/?flightFixture=1` buttons call the same domain actions for
 browser acceptance. They are removed from the production build.
 
-Schema v9 persists ship pose/velocity/mode, active maneuver and scanner state in
-the resource transaction; v1–v8 migrate to the known site. `ScoutLocation.body`
-and `siteId` identify the supported authored site registry, while `binding` alone
+Schema v11 persists ship pose/velocity/mode, surface address, visited site state,
+active maneuver and scanner state in the resource transaction; v1–v10 migrate
+losslessly. `ScoutLocation.body` and `siteId` identify the current/target physical region, while `binding` alone
 indicates an active exterior. Airborne `frames.ship.parent === null` prevents
 exterior conversion, reach, drawing and collision. Contact without a registered
 site remains physically recovering and cannot silently open an exterior.
@@ -856,7 +856,7 @@ blocks swept walking on both sides. Step clear of the threshold to close it.
 The closed-state HUD remains visible at the cockpit; flight adds a lock indicator.
 An open-top cutaway drawing does not imply an open exterior door.
 
-The v10 resource save preserves this state atomically with player/resource/Scout
+The v11 resource save preserves this state (introduced in v10) atomically with player/resource/Scout
 source. Grounded v1–v9 saves migrate open; airborne v9 saves migrate closed to
 preserve the previous exit lock. Malformed/inconsistent saves fail safely and keep
 their bytes. Landing preserves the door's closed state until explicitly opened.
@@ -900,3 +900,57 @@ Focused verification: `npm test`, `npm run build`, and
 `npm run test:browser -- --project=cockpit flight.spec.ts cockpit.spec.ts playable-slice.spec.ts boarding-door.spec.ts`.
 Original captures/traces and state records use ignored `test-results/`; existing
 CI artifacts retain them for 14 days. Validation summaries belong in the PR.
+
+
+### Deterministic surface sites (#842)
+
+`surfaceSite.ts` resolves an explicit `SurfaceAddress { bodyId, radialM, yaw }`:
+body-fixed metres from the body centre at `body.radiusKm * 1000 + 5` (the unchanged
+physical hull bound), with yaw in radians in `[-π, π]`. Split galactic positions
+are derived by translating the catalog body; camera/screen offsets never enter
+identity. `resolveSurface` provides a planet-fixed tangent origin and orthonormal
+east/north/up basis plus the ship-local planar origin and angle. Stable cubed-sphere
+ratio cells of approximately 64 m use versioned `site:surface:v1:...` identities;
+orientation changes the ship transform, not the region's saved world identity.
+Axis ties/poles use deterministic rules. These are local illustrated patches,
+not canonical geology, full-sphere walking, ephemerides or global terrain.
+
+The original Vesper region is the +Y hemisphere with radial x within ±18 m and
+z within ±14 m. Only that region resolves to `site:illustrated-landing:v1` and its
+actual authored IDs. Other Vesper regions, Vesper Moon and Caligo contain one
+sparse ground illustration, no mineral/biology sources, loot or detailed geography.
+The validated physical 5 m bound, illustrated hull with player clearance, and
+aft access apron must be clear. Unsupported bodies, off-surface coordinates,
+body/site mismatches and obstructed footprints reject with a reason.
+
+`ResourceSession.transitionScout({ kind: 'begin-landing', bodyId, surface }, ... )`
+maps a target while retaining the detached interior. An optional `siteId` must
+match the mapping. The legacy explicit original `siteId` + `bodyId` action remains
+supported. `finish-landing` requires the ship at the mapped physical anchor with
+matching orientation and stopped relative to the surface. It preserves cabin
+occupants and the sealed door; a collision/crash never creates a traversable site.
+The landing trajectory and player-facing landing command belong to future work;
+this change supplies the real surface adapter for that maneuver. Tests explicitly
+supply synthetic trajectory endpoints rather than claiming autopilot coverage.
+
+The same localStorage key now writes schema v11. `scout.surface` retains the
+body/coordinates/orientation in flight and across mid-launch/mid-landing restores.
+`sites` stores visited region addresses and existing terrain anchors/removals.
+Only trusted original entity definitions can be restored: no saved artwork,
+collider or fabricated source definitions. Required ground/source IDs cannot be
+removed. The single global gram ledger retains original source depletion, player
+cargo, Scout stores and partial mining work; new sites never duplicate it or
+permit remote extraction. Local terrain edits stay in their owning region.
+Versions 1–10 migrate without changing original bytes until a successful write.
+Missing/inconsistent mappings, stale writes and failed storage preserve old data.
+Exterior entities are removed during flight and restored only after validation;
+ship-local furniture, occupants and inventory persist without changing frames.
+
+Verification: `npm test`, `npm run build`, and
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=cockpit tests/surface-sites.spec.ts tests/flight.spec.ts tests/boarding-door.spec.ts`.
+The surface journey uses production React/keyboard input, landing endpoint saves,
+moon/Caligo exterior walking, launch/reload and a return to depleted authored
+Vesper. Originals, repeat comparisons and canonical state JSON stay in ignored
+`test-results/` and existing full-world CI artifacts (14-day retention). Existing
+visual references and tolerances are unchanged; run the affected `UI-WORLD` case
+in the `expedition` project to compare the original site/cabin/cockpit.

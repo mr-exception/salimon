@@ -18,7 +18,7 @@ function boundsFor(entity: Entity2D, selected: boolean): Bounds {
     return [-hw, -hh, hw * 2, hh * 2]
   }
   switch (entity.appearance) {
-    case 'ground': return [-36, -24, 72, 48]
+    case 'surface': case 'ground': return [-36, -24, 72, 48]
     case 'hull': return [-4, -7.3, 8, 14.1]
     case 'floor': return [-3, -6.8, 6, 13.2]
     case 'rock': return [-1.9, -1.6, 3.8, 3]
@@ -50,7 +50,7 @@ function loadSprite(entity: Entity2D, selected = false): CachedSprite {
 }
 async function createSprite(entity: Entity2D, selected: boolean): Promise<Sprite> {
   await document.fonts.ready
-  const density = entity.appearance === 'ground' ? 32 : 64
+  const density = (entity.appearance === 'ground' || entity.appearance === 'surface') ? 32 : 64
   const [x, y, width, height] = boundsFor(entity, selected)
   // Align the asset itself to a fixed integer backing grid, independent of the
   // world camera, render cadence, view switching and screenshot readback.

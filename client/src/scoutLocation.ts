@@ -1,8 +1,8 @@
 import { planTakeoff, type TakeoffPlan } from './takeoff.ts'
-import { physicalRadiusM, surfaceVelocity } from './contact.ts'
-import { ORIGIN, relativeM, translate } from './coordinates.ts'
+import { surfaceVelocity } from './contact.ts'
+import { ORIGIN, relativeM } from './coordinates.ts'
 import { normal } from './math.ts'
-import { STARTING_SITE } from './planetarySite.ts'
+import { resolveSurface, startingSurface, surfacePosition, validateSurfaceClearance, type SurfaceAddress } from './surfaceSite.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { DRY_MASS_KG, initialShip, type ShipState } from './simulation.ts'
 import type { WorldFrames } from './topDownFrames.ts'
@@ -12,25 +12,20 @@ import type { WorldFrames } from './topDownFrames.ts'
 // This is a deterministic illustrative binding, not canonical planet generation.
 // Both presentations consume this domain value; only explicit domain actions
 // may replace the surface binding.
-export function startingScoutLocation(): ScoutLocation {
-  const body = SAMPLE_BODIES.find(body => body.id === 'vesper')!
-  const [x, z] = relativeM(STARTING_SITE.shipOrigin, ORIGIN)
-  const radius = physicalRadiusM(body)
-  const radial = [x, Math.sqrt(radius * radius - x * x - z * z), z] as const
-  const planetOrigin = translate(body.position, [0, radius, 0])
-  const frames: WorldFrames = {
-    planet: { id: 'planet:fixture', universeOrigin: planetOrigin, angle: 0 },
-    ship: { id: 'ship:scout', parent: 'planet:fixture', origin: STARTING_SITE.shipOrigin, angle: STARTING_SITE.shipAngle },
-  }
+export function startingScoutLocation(): ScoutLocation { return surfaceScoutLocation(startingSurface()) }
+export function surfaceScoutLocation(address: SurfaceAddress): ScoutLocation {
+  const site = resolveSurface(address)
+  validateSurfaceClearance(site)
   const ship: ShipState = {
-    ...initialShip(), position: translate(body.position, radial),
-    yaw: STARTING_SITE.shipAngle, mode: 'grounded', velocityMps: surfaceVelocity(body, radial).map(v => v === 0 ? 0 : v) as [number, number, number],
-    contact: { bodyId: body.id, outcome: 'safe-contact', impactSpeedMps: 0, normal: normal(radial), ageTicks: 60 },
+    ...initialShip(), position: surfacePosition(site), yaw: address.yaw, mode: 'grounded',
+    velocityMps: surfaceVelocity(site.body, address.radialM).map(v => v === 0 ? 0 : v) as [number, number, number],
+    contact: { bodyId: site.body.id, outcome: 'safe-contact', impactSpeedMps: 0, normal: normal(address.radialM), ageTicks: 60 },
   }
-  return { siteId: STARTING_SITE.id, body, frames, ship, binding: STARTING_SITE.id, maneuver: null, scanner: null, boardingDoor: 'open', launch: null }
+  return { siteId: site.id, surface: site.address, body: site.body, frames: site.frames, ship, binding: site.id, maneuver: null, scanner: null, boardingDoor: 'open', launch: null }
 }
 // One live object is shared by world and navigation. Save records clone it.
 export interface ScoutLocation {
+  surface: SurfaceAddress
   launch: TakeoffPlan | null
   boardingDoor: 'open' | 'closed'
   siteId: string
@@ -41,7 +36,7 @@ export interface ScoutLocation {
   maneuver: 'takeoff' | 'landing' | null
   scanner: import('./scanner.ts').ScannerSnapshot | null
 }
-export type ScoutAction = { kind: 'begin-takeoff' } | { kind: 'finish-takeoff' } | { kind: 'begin-landing'; siteId: string; bodyId: string } | { kind: 'finish-landing' }
+export type ScoutAction = { kind: 'begin-takeoff' } | { kind: 'finish-takeoff' } | { kind: 'begin-landing'; siteId?: string; bodyId: string; surface?: SurfaceAddress } | { kind: 'finish-landing' }
 export function transitionScout(location: ScoutLocation, action: ScoutAction): ScoutLocation {
   const ship = location.ship
   const detached = { ...location.frames, ship: { ...location.frames.ship, parent: null, origin: ORIGIN } }
@@ -51,13 +46,20 @@ export function transitionScout(location: ScoutLocation, action: ScoutAction): S
     return { ...location, frames: detached, binding: null, launch: planTakeoff(ship, location.body, SAMPLE_BODIES), maneuver: 'takeoff', ship: { ...ship, mode: 'taking-off', contact: null, throttle: 0, alignment: null } }
   }
   if (action.kind === 'finish-takeoff') throw new Error('Takeoff completes automatically; pilot override is locked.')
-  if (action.kind === 'begin-landing' && (ship.mode === 'flying' || ship.mode === 'recovering' && ship.contact?.outcome === 'safe-contact') && action.siteId === STARTING_SITE.id && action.bodyId === location.body.id) {
-    return { ...location, maneuver: 'landing', ship: { ...ship, mode: 'landing', contact: null, throttle: 0, alignment: null } }
+  if (action.kind === 'begin-landing' && (ship.mode === 'flying' || ship.mode === 'recovering' && ship.contact?.outcome === 'safe-contact')) {
+    if (!action.surface && action.siteId !== 'site:illustrated-landing:v1') throw Error('Incomplete site mapping: supply body-fixed coordinates and orientation.')
+    const target = surfaceScoutLocation(action.surface ?? startingSurface())
+    if (action.bodyId !== target.body.id || action.siteId !== undefined && action.siteId !== target.siteId) throw Error('Planet/body mismatch or incomplete site mapping.')
+    if (location.boardingDoor !== 'closed' || location.maneuver !== null || location.launch !== null) throw Error('Seal the door and finish the active maneuver before landing.')
+    return { ...location, surface: target.surface, siteId: target.siteId, body: target.body,
+      frames: { ...target.frames, ship: { ...target.frames.ship, parent: null, origin: ORIGIN } },
+      maneuver: 'landing', ship: { ...ship, mode: 'landing', contact: null, throttle: 0, alignment: null } }
   }
   if (action.kind === 'finish-landing' && ship.mode === 'landing' && location.maneuver === 'landing') {
-    const landed = startingScoutLocation()
-    if (Math.hypot(...relativeM(ship.position, landed.ship.position)) > .001) throw new Error('Ship must reach the validated surface anchor before landing completes')
-    return { ...landed, boardingDoor: location.boardingDoor, scanner: location.scanner, ship: { ...landed.ship, tick: ship.tick, massKg: ship.massKg } }
+    const landed = surfaceScoutLocation(location.surface)
+    if (!ship.position.offsetM.every(Number.isFinite) || !ship.velocityMps.every(Number.isFinite) || Math.hypot(...relativeM(ship.position, landed.ship.position)) > 1e-6 || ship.yaw !== landed.ship.yaw || ship.pitch !== 0
+      || Math.hypot(...ship.velocityMps.map((v, i) => v - landed.ship.velocityMps[i]!)) > .001 || ship.contact !== null) throw new Error('Ship must reach the validated surface anchor and stop before landing completes')
+    return { ...landed, boardingDoor: location.boardingDoor, scanner: location.scanner, ship: { ...landed.ship, position: ship.position, tick: ship.tick, massKg: ship.massKg } }
   }
   throw new Error('Invalid Scout transition or unsupported surface site')
 }
@@ -68,7 +70,8 @@ export function takeoffDenial(location: ScoutLocation): string | null {
   if (location.ship.mode === 'destroyed') return 'Ship is destroyed.'
   if (location.maneuver !== null || location.launch !== null) return 'A Scout maneuver is already running.'
   if (location.ship.mode !== 'grounded') return 'Scout must be grounded before takeoff.'
-  const site = startingScoutLocation()
+  let site: ScoutLocation
+  try { site = surfaceScoutLocation(location.surface) } catch { return 'Scout is not at a validated supported surface site.' }
   if (location.body !== site.body || !location.ship.position.offsetM.every(Number.isFinite) || !location.ship.velocityMps.every(Number.isFinite) || ![location.ship.yaw, location.ship.pitch].every(Number.isFinite)) return 'Scout is not at a validated supported surface site.'
   if (location.frames.ship.id !== site.frames.ship.id || location.frames.planet.id !== site.frames.planet.id
     || location.binding !== site.binding || location.siteId !== site.siteId || location.body.id !== site.body.id
@@ -76,7 +79,7 @@ export function takeoffDenial(location: ScoutLocation): string | null {
     || !(Math.hypot(...relativeM(location.frames.ship.origin, site.frames.ship.origin)) <= 1e-6)
     || !(Math.hypot(...relativeM(location.ship.position, site.ship.position)) <= 1e-6)
     || location.ship.yaw !== site.ship.yaw || location.ship.pitch !== 0
-    || location.frames.planet.angle !== site.frames.planet.angle
+    || JSON.stringify(location.frames.planet.basis) !== JSON.stringify(site.frames.planet.basis) || location.frames.planet.angle !== site.frames.planet.angle
     || !(Math.hypot(...relativeM(location.frames.planet.universeOrigin, site.frames.planet.universeOrigin)) <= 1e-6)
     || JSON.stringify(location.ship.contact) !== JSON.stringify(site.ship.contact)
     || location.ship.contact?.bodyId !== site.body.id || location.ship.contact.outcome !== 'safe-contact'

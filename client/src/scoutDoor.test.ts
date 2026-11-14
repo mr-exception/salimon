@@ -110,7 +110,7 @@ test('board, close, pilot, fly and land never auto-opens or auto-closes the door
   if(kind==='taking-off'){const n=new NavigationRuntime(SAMPLE_BODIES,s.world.scoutLocation);n.advance(4);n.advance(2)}
   if(kind==='flying')assert.equal(command('begin-landing'),true)
  }
- s.world.scoutLocation.ship={...s.world.scoutLocation.ship,position:startingScoutLocation().ship.position}
+ s.world.scoutLocation.ship={...s.world.scoutLocation.ship,position:startingScoutLocation().ship.position,velocityMps:startingScoutLocation().ship.velocityMps}
  assert.equal(command('finish-landing'),true);assert.equal(s.world.scoutLocation.boardingDoor,'closed')
  s.world=place(leaveCockpit(s.world),0,4.7);assert.equal(s.toggleBoardingDoor(s.snapshot.revision),true)
 })
@@ -118,9 +118,9 @@ test('v9 grounded/airborne migration is explicit; malformed v10 door and embedde
  for(const airborne of [false,true]) {
   const {session:s,storage,seat,action}=setup();s.toggleBoardingDoor(s.snapshot.revision)
   if(airborne){seat();action()}
-  const data=JSON.parse(storage.getItem()!);data.version=9;delete data.scout.boardingDoor
+  const data=JSON.parse(storage.getItem()!);data.version=9;delete data.sites;delete data.scout.surface;delete data.scout.boardingDoor
   const migrated=decodeResourceSave(JSON.stringify(data),createTopDownState())
-  assert.equal(migrated.version,10);assert.equal(migrated.scout.boardingDoor,airborne?'closed':'open')
+  assert.equal(migrated.version,11);assert.equal(migrated.scout.boardingDoor,airborne?'closed':'open')
  }
  const {session:s,storage}=setup();s.toggleBoardingDoor(s.snapshot.revision)
  const raw=JSON.parse(storage.getItem()!)
@@ -133,7 +133,7 @@ test('v9 grounded/airborne migration is explicit; malformed v10 door and embedde
  const {session:flight,seat,action,storage:flightStorage}=setup();flight.toggleBoardingDoor(0);seat();action()
  const openFlight=JSON.parse(flightStorage.getItem()!);openFlight.scout.boardingDoor='open'
  assert.throws(()=>decodeResourceSave(JSON.stringify(openFlight),createTopDownState()),/Open airborne boarding door/)
- const forgedLegacy=structuredClone(raw);forgedLegacy.version=9
+ const forgedLegacy=structuredClone(raw);forgedLegacy.version=9;delete forgedLegacy.sites
  assert.throws(()=>decodeResourceSave(JSON.stringify(forgedLegacy),createTopDownState()),/Invalid Scout snapshot/)
  assert.throws(()=>transitionScout({...flight.world.scoutLocation,boardingDoor:'open',ship:{...flight.world.scoutLocation.ship,mode:'grounded'}},{kind:'begin-takeoff'}))
 })

@@ -4,7 +4,7 @@ export type Point2 = readonly [number, number]
 export type FrameId = 'planet:fixture' | 'ship:scout'
 export interface Anchor { readonly frame: FrameId; readonly point: Position }
 export interface WorldFrames {
-  readonly planet: { readonly id: 'planet:fixture'; readonly universeOrigin: Position; readonly angle: number }
+  readonly planet: { readonly id: 'planet:fixture'; readonly universeOrigin: Position; readonly angle: number; readonly basis?: { readonly east: import('./math.ts').Vec3; readonly north: import('./math.ts').Vec3; readonly up: import('./math.ts').Vec3 } }
   readonly ship: { readonly id: 'ship:scout'; readonly parent: 'planet:fixture' | null; readonly origin: Position; readonly angle: number }
 }
 export const point2 = (x: number, y: number): Position => translate(ORIGIN, [x, y, 0])
@@ -20,12 +20,14 @@ function planar(point: Position): Point2 {
 // Resolve only to the common planet frame. Never add the astronomical universe
 // origin to small local coordinates, or rotate flattened astronomical Numbers.
 export function inPlanet(anchor: Anchor, frames: WorldFrames): Position {
+  if (frames.ship.parent === null && anchor.frame === frames.planet.id) throw new Error('Planetary frame unavailable in flight')
   if (anchor.frame === frames.planet.id) return anchor.point
   if (frames.ship.parent === null) throw new Error('Planetary frame unavailable in flight')
   const [x, y] = rotate2(planar(anchor.point), frames.ship.angle)
   return translate(frames.ship.origin, [x, y, 0])
 }
 export function convertAnchor(anchor: Anchor, frame: FrameId, frames: WorldFrames): Anchor {
+  if (frames.ship.parent === null && (anchor.frame === frames.planet.id || frame === frames.planet.id)) throw new Error('Planetary frame unavailable in flight')
   if (anchor.frame === frame) return anchor
   if (frames.ship.parent === null) throw new Error('Planetary frame unavailable in flight')
   const planetPoint = inPlanet(anchor, frames)
@@ -36,6 +38,7 @@ export function convertAnchor(anchor: Anchor, frame: FrameId, frames: WorldFrame
 }
 // Returns planet-axis metres, including when both points are ship-local.
 export function relativeAnchor(target: Anchor, origin: Anchor, frames: WorldFrames): Point2 {
+  if (frames.ship.parent === null && (target.frame === frames.planet.id || origin.frame === frames.planet.id)) throw new Error('Planetary frame unavailable in flight')
   if (target.frame === origin.frame) {
     const [x, y] = relativeM(target.point, origin.point)
     return target.frame === frames.ship.id ? rotate2([x, y], frames.ship.angle) : [x, y]

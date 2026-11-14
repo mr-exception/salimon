@@ -795,10 +795,12 @@ hardware FPS or native Metal rendering. No timing claim is inferred from capture
 ### Shared Scout lifecycle (#838)
 
 `ResourceSession.transitionScout(action, revision, cockpitSession, actorId)` admits explicit
-`begin-takeoff`, `finish-takeoff`, `begin-landing` (registered `siteId` and `bodyId`),
-and `finish-landing` commands through the live powered owner seat. The caller must provide that exact
-live cockpit-state token; an old seat token remains invalid after re-entry. These endpoints
-establish state ownership for landing trajectories; production Take off starts the delivered launch profile.
+`begin-takeoff` and `begin-landing` (`bodyId`, optional validated `surface`/`siteId`)
+commands through the live powered owner seat. Both maneuvers complete automatically;
+`finish-takeoff` and `finish-landing` pilot overrides are rejected. The caller must provide that exact
+live cockpit-state token; an old seat token remains invalid after re-entry. These commands
+start the saved domain trajectories; production Take off starts the launch profile.
+Player-facing landing presentation is separate L07 work (#844).
 The development-only `/?flightFixture=1` buttons call the same domain actions for
 browser acceptance. They are removed from the production build.
 
@@ -924,14 +926,12 @@ aft access apron must be clear. Unsupported bodies, off-surface coordinates,
 body/site mismatches and obstructed footprints reject with a reason.
 
 `ResourceSession.transitionScout({ kind: 'begin-landing', bodyId, surface }, ... )`
-maps a target while retaining the detached interior. An optional `siteId` must
-match the mapping. The legacy explicit original `siteId` + `bodyId` action remains
-supported. `finish-landing` requires the ship at the mapped physical anchor with
-matching orientation and stopped relative to the surface. It preserves cabin
-occupants and the sealed door; a collision/crash never creates a traversable site.
-The landing trajectory and player-facing landing command belong to future work;
-this change supplies the real surface adapter for that maneuver. Tests explicitly
-supply synthetic trajectory endpoints rather than claiming autopilot coverage.
+admits a validated target while retaining the detached interior. An optional
+`siteId` must match; the legacy original `siteId` + `bodyId` action remains supported.
+Without explicit coordinates the planner chooses the point below the ship in the
+body-fixed frame. Automatic touchdown preserves cabin occupants and the sealed
+door, then restores the matching saved local terrain. A collision/crash never
+creates a traversable site or becomes landing admission.
 
 The same localStorage key now writes schema v11. `scout.surface` retains the
 body/coordinates/orientation in flight and across mid-launch/mid-landing restores.
@@ -948,9 +948,50 @@ ship-local furniture, occupants and inventory persist without changing frames.
 
 Verification: `npm test`, `npm run build`, and
 `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser -- --project=cockpit tests/surface-sites.spec.ts tests/flight.spec.ts tests/boarding-door.spec.ts`.
-The surface journey uses production React/keyboard input, landing endpoint saves,
+The surface journey uses production React/keyboard input, admitted landing-plan saves,
 moon/Caligo exterior walking, launch/reload and a return to depleted authored
 Vesper. Originals, repeat comparisons and canonical state JSON stay in ignored
 `test-results/` and existing full-world CI artifacts (14-day retention). Existing
 visual references and tolerances are unchanged; run the affected `UI-WORLD` case
 in the `expedition` project to compare the original site/cabin/cockpit.
+
+### Assisted landing domain (#843)
+
+`landing.ts` owns deterministic powered-style prototype landing. Admission requires
+free flight, a closed door, no other assist, a currently scanner-detected sampled
+planet/moon, centre altitude within 0.15 body radii after the 5 m hull allowance,
+and full surface-relative speed <=20 m/s (including tangential/spin velocity).
+There is no heading gate. The live powered owner-seat/revision checks stay in
+`ResourceSession`; saved terrain hull/apron clearance is checked before admission.
+Low-speed safe contact remains physical recovery and cannot bypass this contract.
+
+The saved `LandingPlan` captures the initial ship, target, start tick and dynamic
+duration. A cubic Bezier in the rotating surface frame preserves initial position
+and velocity and finishes with zero body-relative motion. Orientation follows a
+bounded smooth shortest turn. Continuous convex-hull/tangent-plane clearance and
+analytic velocity/acceleration bounds reject unsafe braking or interfering bodies
+before any motion. The budget is <=100 m/s surface-relative speed, <=10 m/s² and
+<=50 MN / loaded mass acceleration, with <=12 simulated hours and a site within
+1 km of the point below the ship. The 930 km Vesper limit therefore takes hours,
+not eight seconds. Conservative bounds can reject a technically possible path;
+feedback asks the pilot to stop farther above a clear site and retry.
+
+`NavigationRuntime` samples the plan on its sole 60 Hz clock before incidental
+contact resolution, advances the same scanner, and publishes the validated
+surface binding automatically. Steering, throttle, Set direction, duplicate/new
+assists, cockpit exit, blur and cockpit power loss do not cancel admission.
+The body-fixed address/region remains stable on rotating fixtures; grounded
+physical position keeps following the moving surface with nonzero inertial
+velocity. Catalog centres stay fixed: linear ephemerides, gravity, atmosphere
+and true terrain are future adapters. The sample production bodies have no spin.
+`LANDING_FUNDING` explicitly supplies unlimited prototype energy and the existing
+1 N·s/J conversion seam; it neither reserves Core energy nor drains fuel.
+
+Schema v11 adds optional `scout.landing` (missing means null for older non-landing
+saves). Decode revalidates the plan and its exact sampled pose/velocity; malformed,
+tampered or old endpoint-only landing snapshots fail safely instead of teleporting.
+`landing.test.ts` covers boundaries, derivatives, large descent, partitions,
+rotation, automatic contact-safe arrival and unsafe/terminal negatives.
+`tests/flight.spec.ts` LANDING-843 and `tests/surface-sites.spec.ts` exercise
+production domain admission, the sole tick, interruptions and built save/resume.
+HUD/landing-command presentation is deferred to #844; no visual references change.

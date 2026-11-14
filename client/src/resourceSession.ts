@@ -311,6 +311,7 @@ export class ResourceSession {
       const sites = this.captureSites(this.snapshot.sites)
       if (action.kind === 'begin-takeoff') validateSurfaceClearance(resolveSurface(location.surface), siteEntities(resolveSurface(location.surface), sites[location.siteId]))
       const next = transitionScout(location, action)
+      if (action.kind === 'begin-landing') validateSurfaceClearance(resolveSurface(next.surface), siteEntities(resolveSurface(next.surface), sites[next.siteId]))
       this.cancel()
       Object.assign(location, next)
       this.world = materializeSite(synchronizeScout(this.world), sites)
@@ -452,7 +453,9 @@ export class ResourceSession {
       this.hazards = result.state
       this.hazardEvents.push(...result.events)
     } : undefined)
-    this.world = next
+    this.world = next.frames === next.scoutLocation.frames ? next
+      : next.frames.ship === next.scoutLocation.frames.ship ? { ...next, frames: next.scoutLocation.frames }
+      : materializeSite(synchronizeScout(next), this.snapshot.sites)
     // Publish hazard progress only after the whole health/exposure/budget transaction is durable.
     if (elapsed > 0 && needsHazards) {
       if (!this.commit({ ...this.snapshot, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }

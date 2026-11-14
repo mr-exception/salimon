@@ -51,7 +51,13 @@ tangent basis, sparse non-resource patches, saved trusted terrain anchors and
 landing clearance. `planetarySite.ts` retains the original Vesper entities and
 unique sources; `ResourceSession` owns v11 visited site snapshots and the one
 global resource ledger. `scoutLocation.ts` owns the shared site/body/frame/physical grounded anchor.
-The world and cockpit runtime consume that same value. The production runtime preserves the grounded anchor until an authorized launch
+The world and cockpit runtime consume that same value. `landing.ts` admits
+scanner-detected, <=20 m/s surface-relative approaches and captures a bounded
+rotating-frame trajectory. The sole navigation clock samples it and publishes
+validated automatic touchdown; `ResourceSession.advance` materializes the saved
+site on that same tick. `scoutSave.ts` validates the optional landing plan and
+sampled state before resume. See the [landing domain contract](../client/README.md#assisted-landing-domain-843).
+The production runtime preserves the grounded anchor until an authorized launch
 enters its deterministic maneuver, then integrates physical free flight.
 `NavigationRuntime.pilotInput` holds only transient steering; the world consumes
 it on the sole fixed clock. Panoramic observation never zeroes selected throttle

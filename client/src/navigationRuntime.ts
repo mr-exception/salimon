@@ -1,3 +1,4 @@
+import { sampleLanding } from './landing.ts'
 import { NavigationInput } from './input.ts'
 import { sampleTakeoff, TAKEOFF_TICKS } from './takeoff.ts'
 import { surfaceScoutLocation } from './scoutLocation.ts'
@@ -31,6 +32,26 @@ export class NavigationRuntime {
     const next = sampleTakeoff(surfaceScoutLocation(this.location.surface).ship, this.location.body, plan, after.tick)
     if (after.tick >= plan.startTick + TAKEOFF_TICKS) { this.location.launch = null; this.location.maneuver = null }
     this.scanner.update(next.tick,next.position)
+    return next
+   }
+   if (this.location?.landing && before.mode === 'landing') {
+    const plan = this.location.landing, body = this.location.body
+    let next = sampleLanding(plan, body, after.tick)
+    if (after.tick >= plan.startTick + plan.durationTicks) {
+     const landed = surfaceScoutLocation(plan.surface, this.bodies, after.tick)
+     Object.assign(this.location, landed, { scanner: this.location.scanner, boardingDoor: this.location.boardingDoor })
+     next = { ...landed.ship, tick: after.tick, massKg: after.massKg }
+    }
+    this.scanner.update(next.tick, next.position)
+    return next
+   }
+   if (this.surfaceLocation && this.location!.body.angularVelocityRadps?.some(v => v !== 0)) {
+    const projected = surfaceScoutLocation(this.location!.surface, this.bodies, after.tick)
+    // Local surface identity/2D anchors remain body-fixed while the physical
+    // ship follows the rotating surface with the derivative of its position.
+    this.location!.frames = { ...this.location!.frames, planet: projected.frames.planet }
+    const next = { ...projected.ship, massKg: after.massKg }
+    this.scanner.update(next.tick, next.position)
     return next
    }
    // Contact remains physical in flight, but cannot invent a playable site.

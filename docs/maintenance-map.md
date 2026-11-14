@@ -2,6 +2,15 @@
 
 > **Current browser scope:** Start with [code-checked implementation and validation routing](current-client-status.md). Native crate, tooling and build sections below are historical; they require the archived revision and do not gate routine 2D work.
 
+Assisted landing (#843) belongs to `client/src/landing.ts`: scanner/speed/range
+admission, captured rotating-frame trajectory and continuous analytic safety
+bounds. `scoutLocation.ts` supplies validated sites, `navigationRuntime.ts` owns
+sampling/automatic touchdown on the sole clock, `scoutSave.ts` validates resume,
+and `resourceSession.ts` restores saved local terrain on arrival. See the
+[landing contract](../client/README.md#assisted-landing-domain-843).
+`landing.test.ts` and `tests/flight.spec.ts` LANDING-843 cover the domain and
+production interruptions/reload; L07 owns future landing presentation.
+
 Surface-site mapping (#842) belongs to `client/src/surfaceSite.ts` (body-fixed
 metres, versioned physical regions, tangent basis, sparse patch and safe footprint).
 `planetarySite.ts` remains the authored Vesper source owner. `scoutLocation.ts` /

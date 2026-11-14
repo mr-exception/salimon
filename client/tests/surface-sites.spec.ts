@@ -5,16 +5,18 @@ import { enterCockpit } from '../src/cockpit.ts'
 import { NavigationRuntime } from '../src/navigationRuntime.ts'
 import { SAMPLE_BODIES } from '../src/sampleUniverse.ts'
 import { physicalRadiusM } from '../src/contact.ts'
+import { translate } from '../src/coordinates.ts'
+import { normal, scale } from '../src/math.ts'
 import { surfaceScoutLocation } from '../src/scoutLocation.ts'
 import { startingSurface, type SurfaceAddress } from '../src/surfaceSite.ts'
 import { point2 } from '../src/topDownFrames.ts'
 import { compareImages } from '../scripts/visual-comparison.ts'
 import { boot, walkTo, walkTicks } from './worldJourney'
 
-// Source production/session APIs supply an explicit synthetic trajectory endpoint;
-// the future landing autopilot is outside #842. Every rendered transfer, doorway,
-// cockpit and relaunch below uses the actual production React/keyboard adapter.
-function landingEndpoint(raw: string | null, surface: SurfaceAddress): string {
+// Synthetic interplanetary approaches use the actual authorized domain planner.
+// Save the admitted trajectory shortly before automatic touchdown; browser input
+// then exercises production frame/materialization, doorway and relaunch paths.
+function landingApproachSave(raw: string | null, surface: SurfaceAddress): string {
   let saved = raw
   const storage = { getItem: () => saved, setItem: (_: string, value: string) => { saved = value } }
   let world = createTopDownState('interior', true)
@@ -31,9 +33,13 @@ function landingEndpoint(raw: string | null, surface: SurfaceAddress): string {
     const navigation = new NavigationRuntime(SAMPLE_BODIES, world.scoutLocation)
     navigation.advance(4); navigation.advance(2)
   }
-  expect(command({ kind: 'begin-landing', bodyId: surface.bodyId, surface })).toBe(true)
   const target = surfaceScoutLocation(surface).ship
-  world.scoutLocation.ship = { ...world.scoutLocation.ship, position: target.position, velocityMps: target.velocityMps, yaw: target.yaw, pitch: 0 }
+  world.scoutLocation.ship = { ...world.scoutLocation.ship, mode: 'flying', contact: null,
+    position: translate(target.position, scale(normal(surface.radialM), 100)), velocityMps: target.velocityMps }
+  world.scoutLocation.scanner = { lastTick: world.scoutLocation.ship.tick, pulse: Math.floor(world.scoutLocation.ship.tick / 300), selected: surface.bodyId, contactIds: [surface.bodyId] }
+  expect(command({ kind: 'begin-landing', bodyId: surface.bodyId, surface })).toBe(true)
+  const navigation = new NavigationRuntime(SAMPLE_BODIES, world.scoutLocation), plan = world.scoutLocation.landing!
+  while (navigation.clock.state.tick < plan.startTick + plan.durationTicks - 180) navigation.advance(1 / 60)
   session.checkpoint()
   expect(session.error).toBe('')
   return saved!
@@ -54,7 +60,7 @@ test('SURFACE-842 production interior, moon/Caligo exterior, relaunch and author
   }
   const moon: SurfaceAddress = { bodyId: 'vesper-moon', radialM: [physicalRadiusM(SAMPLE_BODIES[2]!), 0, 0], yaw: -.12 }
   const caligo: SurfaceAddress = { bodyId: 'caligo', radialM: [0, 0, -physicalRadiusM(SAMPLE_BODIES[3]!)], yaw: -.12 }
-  const initial = landingEndpoint(null, moon)
+  const initial = landingApproachSave(null, moon)
   await page.addInitScript(({ key, value }) => { if (!localStorage.getItem(key)) localStorage.setItem(key, value) }, { key: RESOURCE_SAVE_KEY, value: initial })
   await page.clock.install({ time: new Date('2026-11-04T00:00:00Z') }); await page.clock.pauseAt(new Date('2026-11-04T00:00:01Z'))
   await page.goto('/?flightFixture=1')
@@ -62,7 +68,7 @@ test('SURFACE-842 production interior, moon/Caligo exterior, relaunch and author
   let launchRaw = initial
   for (const [name, target] of [['moon', moon], ['caligo', caligo], ['authored', startingSurface()]] as const) {
     if (name !== 'moon') {
-      launchRaw = landingEndpoint(launchRaw, target)
+      launchRaw = landingApproachSave(launchRaw, target)
       await page.evaluate(({ key, value }) => localStorage.setItem(key, value), { key: RESOURCE_SAVE_KEY, value: launchRaw })
       await page.reload(); await page.clock.runFor(64)
     }
@@ -72,6 +78,8 @@ test('SURFACE-842 production interior, moon/Caligo exterior, relaunch and author
     const playerAnchor = await page.locator('[data-entity="person:player"]').getAttribute('data-position')
     await page.keyboard.press('e'); await page.clock.runFor(64)
     await page.getByRole('button', { name: 'finish-landing', exact: true }).click(); await page.clock.runFor(64)
+    expect((await ship()).mode).toBe('landing')
+    for (let i = 0; i < 35; i++) await page.clock.fastForward(100)
     expect((await ship()).mode).toBe('grounded')
     expect((await ship()).contact.bodyId).toBe(target.bodyId)
     await expect(main).toHaveAttribute('data-surface-bound', 'true')
@@ -118,5 +126,5 @@ test('SURFACE-842 production interior, moon/Caligo exterior, relaunch and author
   await expect(built.locator('[data-entity="person:player"]')).toHaveAttribute('data-frame', 'planet:fixture')
   await built.screenshot({ path: info.outputPath('built-moon-exterior.png') })
   await built.close()
-  await info.attach('journey.json', { body: JSON.stringify({ captures, viewport: { width: 1280, height: 800 }, dpr: 1, epoch: '2026-11-04T00:00:00Z', input: 'Playwright keyboard/click; explicit source-session synthetic trajectory endpoints', seed: 'sampleUniverse / surface:v1' }), contentType: 'application/json' })
+  await info.attach('journey.json', { body: JSON.stringify({ captures, viewport: { width: 1280, height: 800 }, dpr: 1, epoch: '2026-11-04T00:00:00Z', input: 'Playwright keyboard/click; source-session admitted landing plans from synthetic approaches', seed: 'sampleUniverse / surface:v1' }), contentType: 'application/json' })
 })

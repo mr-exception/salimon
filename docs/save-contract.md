@@ -45,6 +45,19 @@ Migration is in-memory until a successful atomic write. Invalid body/region,
 missing surface mapping, fabricated entity IDs and blocked footprints fail closed
 with original storage preserved. This does not migrate the historical native save.
 
+## Browser admitted landing plan (#843)
+
+Schema v11 adds optional `scout.landing`, containing the captured flying anchor,
+body-fixed surface target, start tick and duration ticks. Missing fields migrate
+to null for pre-existing non-landing saves. Decode reconstructs split anchor
+coordinates, recomputes feasible planning bounds, and compares current pose,
+velocity, orientation, mass and tick to the trajectory sample. Landing without
+an admitted plan (including historical synthetic endpoint saves) fails safely;
+it cannot invent a playable site. The sole runtime clock finishes admission
+automatically and restores the existing visited site's local state. The sealed
+door, scanner clock, cabin occupants and resource ledger survive save/resume.
+See the [landing contract](../client/README.md#assisted-landing-domain-843).
+
 > **Corpus migration status (#791): Historical native implementation.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep historical mechanics and balance evidence as input; reimplement in the browser with integer-gram inventory and its own versioned saves. The approved 2D hazard health maximum is 200 HP, not a migrated legacy health implementation. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 

@@ -1,3 +1,4 @@
+import { planLanding, sampleLanding, type LandingPlan } from './landing.ts'
 import { sampleTakeoff, TAKEOFF_TICKS, TAKEOFF_PEAK_ACCELERATION } from './takeoff.ts'
 import { physicalRadiusM } from './contact.ts'
 import { CELL_SIZE_M, relativeM } from './coordinates.ts'
@@ -6,16 +7,16 @@ import { CatalogIndex, Scanner } from './scanner.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { DRY_MASS_KG, type ShipState } from './simulation.ts'
 
-export type ScoutSave = Pick<ScoutLocation, 'surface' | 'ship' | 'binding' | 'maneuver' | 'scanner' | 'boardingDoor' | 'launch'>
-export const captureScout = (location: ScoutLocation): ScoutSave => structuredClone({ surface: location.surface, ship: location.ship, binding: location.binding, maneuver: location.maneuver, scanner: location.scanner, boardingDoor: location.boardingDoor, launch: location.launch })
+export type ScoutSave = Pick<ScoutLocation, 'surface' | 'ship' | 'binding' | 'maneuver' | 'scanner' | 'boardingDoor' | 'launch' | 'landing'>
+export const captureScout = (location: ScoutLocation): ScoutSave => structuredClone({ surface: location.surface, ship: location.ship, binding: location.binding, maneuver: location.maneuver, scanner: location.scanner, boardingDoor: location.boardingDoor, launch: location.launch, landing: location.landing })
 export function decodeScout(value: unknown, legacy = false): ScoutLocation {
   let data = value as ScoutSave
-  if (!data || typeof data !== 'object' || Object.keys(data).filter(k=>k!=='launch' && k!=='surface').sort().join() !== (legacy ? 'binding,maneuver,scanner,ship' : 'binding,boardingDoor,maneuver,scanner,ship')) throw new Error('Invalid Scout snapshot')
+  if (!data || typeof data !== 'object' || Object.keys(data).filter(k=>k!=='launch' && k!=='surface' && k!=='landing').sort().join() !== (legacy ? 'binding,maneuver,scanner,ship' : 'binding,boardingDoor,maneuver,scanner,ship')) throw new Error('Invalid Scout snapshot')
   if (legacy) data = { ...data, boardingDoor: data.binding === null ? 'closed' : 'open' }
   if (data.boardingDoor !== 'open' && data.boardingDoor !== 'closed') throw new Error('Invalid boarding door')
   if (data.binding === null && data.boardingDoor !== 'closed') throw new Error('Open airborne boarding door')
-  data = { ...data, launch: data.launch ?? null }
-  const base = data.surface ? surfaceScoutLocation(data.surface) : startingScoutLocation(), ship = data.ship as ShipState
+  data = { ...data, launch: data.launch ?? null, landing: data.landing ?? null }
+  const base = data.surface ? surfaceScoutLocation(data.surface, SAMPLE_BODIES, data.ship?.tick ?? 0) : startingScoutLocation(), ship = data.ship as ShipState
   if (!ship || Object.keys(ship).sort().join() !== Object.keys(base.ship).sort().join()) throw new Error('Invalid ship fields')
   const vector = (v: unknown): v is [number, number, number] => Array.isArray(v) && v.length === 3 && v.every(x=>typeof x === 'number' && Number.isFinite(x))
   if (!ship.position || !Array.isArray(ship.position.cell) || ship.position.cell.length !== 3 || !vector(ship.position.offsetM) || ship.position.offsetM.some(v=>v < -CELL_SIZE_M/2 || v >= CELL_SIZE_M/2)) throw new Error('Invalid ship position')
@@ -49,6 +50,22 @@ export function decodeScout(value: unknown, legacy = false): ScoutLocation {
     const expected = sampleTakeoff(surfaceScoutLocation(base.surface).ship, base.body, plan, ship.tick)
     if (Math.hypot(...relativeM(parsed.position,expected.position)) > 1e-6 || ship.velocityMps.some((v,i)=>Math.abs(v-expected.velocityMps[i])>1e-9) || ship.yaw !== expected.yaw || ship.pitch !== expected.pitch) throw new Error('Inconsistent takeoff trajectory')
   } else if (data.launch !== null) throw new Error('Unexpected takeoff plan')
+  if (ship.mode === 'landing') {
+    const saved = data.landing
+    if (!saved || Object.keys(saved).sort().join() !== 'anchor,durationTicks,startTick,surface'
+      || JSON.stringify(saved.surface) !== JSON.stringify(base.surface)) throw Error('Invalid landing plan')
+    const anchor = decodeScout({ ...data, ship: saved.anchor, maneuver: null, landing: null, launch: null,
+      scanner: { lastTick: saved.startTick, pulse: Math.floor(saved.startTick / 300), selected: null, contactIds: [] } }).ship
+    if (anchor.mode !== 'flying' || anchor.tick !== saved.startTick) throw Error('Invalid landing anchor')
+    const plan: LandingPlan = { ...saved, anchor }
+    const validated = planLanding(anchor, base.body, plan.surface, SAMPLE_BODIES)
+    if (plan.durationTicks !== validated.durationTicks || ship.tick < plan.startTick || ship.tick >= plan.startTick + plan.durationTicks) throw Error('Invalid landing duration')
+    const expected = sampleLanding(plan, base.body, ship.tick)
+    if (Math.hypot(...relativeM(parsed.position, expected.position)) > 1e-6 || ship.massKg !== anchor.massKg
+      || ship.velocityMps.some((v, i) => Math.abs(v - expected.velocityMps[i]) > 1e-9)
+      || ship.yaw !== expected.yaw || ship.pitch !== expected.pitch) throw Error('Inconsistent landing trajectory')
+    data = { ...data, landing: plan }
+  } else if (data.landing !== null) throw Error('Unexpected landing plan')
   if (data.scanner !== null) {
     const scanner = new Scanner(new CatalogIndex(SAMPLE_BODIES))
     scanner.restore(data.scanner,SAMPLE_BODIES)

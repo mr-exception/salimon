@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { relativeM } from './coordinates.ts'
+import { relativeM, translate } from './coordinates.ts'
 import { physicalRadiusM } from './contact.ts'
 import { dot, length, normal, scale } from './math.ts'
 import { enterCockpit, leaveCockpit } from './cockpit.ts'
@@ -9,7 +9,7 @@ import { STARTING_SITE } from './planetarySite.ts'
 import { ResourceSession } from './resourceSession.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { captureScout } from './scoutSave.ts'
-import { startingScoutLocation, surfaceScoutLocation, transitionScout, type ScoutAction } from './scoutLocation.ts'
+import { surfaceScoutLocation, transitionScout, type ScoutAction } from './scoutLocation.ts'
 import { resolveSurface, siteEntities, startingSurface, surfacePosition, validateSurfaceClearance, type SurfaceAddress } from './surfaceSite.ts'
 import { convertAnchor, point2, type Anchor } from './topDownFrames.ts'
 import { capturePlayerLocation, createTopDownState, drawList, PLAYER_ID, stepTopDown, type TopDownState } from './topDownRuntime.ts'
@@ -24,15 +24,19 @@ function setup() {
   const s = new ResourceSession(storage, world, undefined, undefined, () => 0), n = new NavigationRuntime(SAMPLE_BODIES, s.world.scoutLocation)
   const action = (a: ScoutAction) => s.transitionScout(a, s.snapshot.revision, s.world.cockpit)
   const launch = () => { assert.equal(action({ kind: 'begin-takeoff' }), true, s.feedback); n.advance(4); n.advance(2) }
-  const arrive = (surface: SurfaceAddress) => {
-    assert.equal(action({ kind: 'begin-landing', bodyId: surface.bodyId, surface }), true, s.feedback)
-    // Explicit synthetic trajectory endpoint. This issue maps sites; the future
-    // assisted landing trajectory must supply this same validated physical pose.
+  // Synthetic interplanetary approach; admission and touchdown use the real planner.
+  const approach = (surface: SurfaceAddress) => {
     const target = surfaceScoutLocation(surface).ship
-    n.clock.state = { ...n.clock.state, position: target.position, velocityMps: target.velocityMps, yaw: target.yaw, pitch: 0 }
-    assert.equal(action({ kind: 'finish-landing' }), true, s.feedback)
+    n.clock.state = { ...n.clock.state, mode: 'flying', contact: null, position: translate(target.position, scale(normal(surface.radialM), 100)), velocityMps: target.velocityMps }
+    s.world.scoutLocation.scanner = { lastTick: n.clock.state.tick, pulse: Math.floor(n.clock.state.tick / 300), selected: surface.bodyId, contactIds: [surface.bodyId] }
   }
-  return { s, n, storage, action, launch, arrive, fail: () => { fail = true }, corrupt: (change: (v: any) => void) => { const data = JSON.parse(raw!); change(data); raw = JSON.stringify(data) } }
+  const arrive = (surface: SurfaceAddress) => {
+    approach(surface)
+    assert.equal(action({ kind: 'begin-landing', bodyId: surface.bodyId, surface }), true, s.feedback)
+    while (s.world.scoutLocation.landing) n.advance(.1)
+    s.advance({ ...s.world, tick: s.world.tick + 1 }); s.checkpoint()
+  }
+  return { s, n, storage, action, launch, arrive, approach, fail: () => { fail = true }, corrupt: (change: (v: any) => void) => { const data = JSON.parse(raw!); change(data); raw = JSON.stringify(data) } }
 }
 test('AC-1 deterministic physical regions on planets/moon have orthonormal tangent frames, sparse art and no sources', () => {
   const ids = new Set<string>()
@@ -98,7 +102,7 @@ test('AC-2/3/4 original depletion, local modifications and ship-local passengers
   assert.equal(new ResourceSession(storage, createTopDownState(), undefined, undefined, () => 0).error, '')
 })
 test('AC-4 generated-site mid-launch and landing snapshots restore; legacy v10 migrates without changing bytes or ledger', () => {
-  const { s, n, storage, launch, arrive, action } = setup()
+  const { s, n, storage, launch, arrive, approach, action } = setup()
   launch(); arrive(addressFor('vesper-moon', [0, -1, 0]))
   assert.equal(action({ kind: 'begin-takeoff' }), true); n.advance(2); s.checkpoint()
   const restored = new ResourceSession(storage, createTopDownState(), undefined, undefined, () => 0)
@@ -106,7 +110,7 @@ test('AC-4 generated-site mid-launch and landing snapshots restore; legacy v10 m
   n.advance(4); new NavigationRuntime(SAMPLE_BODIES, restored.world.scoutLocation).advance(4)
   assert.deepEqual(restored.world.scoutLocation.ship, s.world.scoutLocation.ship)
   assert.ok(Math.hypot(...relativeM(n.clock.state.position, surfacePosition(resolveSurface(s.world.scoutLocation.surface)))) > 49)
-  assert.equal(action({ kind: 'begin-landing', bodyId: 'caligo', surface: addressFor('caligo', [1, 1, 0]) }), true)
+  approach(addressFor('caligo', [1, 1, 0])); assert.equal(action({ kind: 'begin-landing', bodyId: 'caligo', surface: addressFor('caligo', [1, 1, 0]) }), true)
   assert.equal(new ResourceSession(storage, createTopDownState(), undefined, undefined, () => 0).error, '')
   const old = setup(); old.s.upgrade(12000, 15)
   old.corrupt(v => { v.version = 10; delete v.sites; delete v.scout.surface })
@@ -121,7 +125,7 @@ test('AC-5 malformed/unsupported surfaces, unsafe footprints, crash and incomple
   const unsafe = { ...startingSurface(), radialM: [-9, Math.sqrt(physicalRadiusM(SAMPLE_BODIES[1]!) ** 2 - 81), 0] as const }
   assert.throws(() => surfaceScoutLocation(unsafe), /Unsafe landing/)
   const { s, n, launch, action, fail, storage } = setup(); launch()
-  for (const command of [{ kind: 'begin-landing', bodyId: 'vesper' }, { kind: 'begin-landing', bodyId: 'caligo', surface: startingSurface() }, { kind: 'begin-landing', bodyId: 'vesper', siteId: 'missing', surface: startingSurface() }] as const) {
+  for (const command of [{ kind: 'begin-landing', bodyId: 'relay' }, { kind: 'begin-landing', bodyId: 'caligo', surface: startingSurface() }, { kind: 'begin-landing', bodyId: 'vesper', siteId: 'missing', surface: startingSurface() }] as const) {
     const before = captureScout(s.world.scoutLocation), raw = storage.getItem()
     assert.equal(action(command), false); assert.deepEqual(captureScout(s.world.scoutLocation), before); assert.equal(storage.getItem(), raw)
   }
@@ -131,7 +135,7 @@ test('AC-5 malformed/unsupported surfaces, unsafe footprints, crash and incomple
   const crash = { ...s.world.scoutLocation, ship: { ...n.clock.state, mode: 'recovering' as const, contact: { bodyId: 'vesper', outcome: 'crash' as const, impactSpeedMps: 30, normal: [0, 1, 0] as const, ageTicks: 60 } } }
   assert.throws(() => transitionScout(crash, { kind: 'begin-landing', bodyId: 'vesper', surface: startingSurface() }))
 })
-test('AC-5 saved site tampering, missing mapping, blocked restored footprint and distant/fast landing are rejected', () => {
+test('AC-5 saved site tampering, missing mapping and blocked restored footprints are rejected', () => {
   for (const change of [
     (v: any) => { delete v.scout.surface }, (v: any) => { v.siteId = 'other' },
     (v: any) => { v.sites[STARTING_SITE.id].address.bodyId = 'caligo' },
@@ -143,12 +147,7 @@ test('AC-5 saved site tampering, missing mapping, blocked restored footprint and
     const raw = storage.getItem(), restored = new ResourceSession(storage, createTopDownState())
     assert.match(restored.error, /safely/); restored.checkpoint(); assert.equal(storage.getItem(), raw)
   }
-  const { s, n, launch, action } = setup(); launch()
-  action({ kind: 'begin-landing', bodyId: 'vesper', surface: startingSurface() })
-  assert.equal(action({ kind: 'finish-landing' }), false)
-  n.clock.state = { ...n.clock.state, position: startingScoutLocation().ship.position }
-  assert.equal(action({ kind: 'finish-landing' }), false, 'correct location with unsafe velocity is not approval')
-  assert.equal(s.world.scoutLocation.binding, null)
+
 })
 
 test('AC-3 detached planet-frame operations reject even stale same-frame anchors; ship-local movement remains live', () => {
@@ -157,23 +156,19 @@ test('AC-3 detached planet-frame operations reject even stale same-frame anchors
   assert.throws(() => convertAnchor(planet, 'planet:fixture', s.world.frames), /unavailable/)
   assert.doesNotThrow(() => convertAnchor({ frame: 'ship:scout', point: point2(0, 2) }, 'ship:scout', s.world.frames))
 })
-test('AC-5 nonfinite landing pose/velocity never publishes a surface; saved obstacles reject a revisit atomically', () => {
+test('AC-5 nonfinite admission and saved obstacles reject before publishing a landing plan', () => {
   for (const part of ['position', 'velocity'] as const) {
     const { s, n, launch, action } = setup(); launch()
-    action({ kind: 'begin-landing', bodyId: 'vesper', surface: startingSurface() })
-    const target = startingScoutLocation().ship
-    n.clock.state = { ...n.clock.state, position: target.position, velocityMps: target.velocityMps }
-    n.clock.state = part === 'velocity' ? { ...n.clock.state, velocityMps: [NaN, 0, 0] } : { ...n.clock.state, position: { ...target.position, offsetM: [NaN, 0, 0] } }
-    assert.equal(action({ kind: 'finish-landing' }), false)
-    assert.equal(s.world.scoutLocation.binding, null)
+    n.clock.state = part === 'velocity' ? { ...n.clock.state, velocityMps: [NaN, 0, 0] }
+      : { ...n.clock.state, position: { ...n.clock.state.position, offsetM: [NaN, 0, 0] } }
+    assert.equal(action({ kind: 'begin-landing', bodyId: 'vesper', surface: startingSurface() }), false)
+    assert.equal(s.world.scoutLocation.binding, null); assert.equal(s.world.scoutLocation.landing, null)
   }
-  const { s, n, launch, action } = setup(); launch()
+  const { s, launch, action } = setup(); launch()
   const original = s.snapshot.sites[STARTING_SITE.id]!
   s.snapshot = { ...s.snapshot, sites: { ...s.snapshot.sites, [STARTING_SITE.id]: { ...original, anchors: { ...original.anchors, 'rock:west': [2, -1] } } } }
-  action({ kind: 'begin-landing', bodyId: 'vesper', surface: startingSurface() })
-  const target = startingScoutLocation().ship
-  n.clock.state = { ...n.clock.state, position: target.position, velocityMps: target.velocityMps }
-  const world = s.world
-  assert.equal(action({ kind: 'finish-landing' }), false)
-  assert.match(s.feedback, /Unsafe landing/); assert.equal(s.world, world); assert.equal(s.world.scoutLocation.binding, null)
+  const world = s.world, ship = s.world.scoutLocation.ship
+  assert.equal(action({ kind: 'begin-landing', bodyId: 'vesper', surface: startingSurface() }), false)
+  assert.match(s.feedback, /Unsafe landing/); assert.equal(s.world, world); assert.equal(s.world.scoutLocation.ship, ship)
+  assert.equal(s.world.scoutLocation.binding, null); assert.equal(s.world.scoutLocation.landing, null)
 })

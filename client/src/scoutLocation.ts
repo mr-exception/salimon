@@ -1,10 +1,11 @@
+import { rotateLanding, planLanding, type LandingPlan } from './landing.ts'
 import { planTakeoff, type TakeoffPlan } from './takeoff.ts'
-import { surfaceVelocity } from './contact.ts'
+import { physicalRadiusM, surfaceVelocity } from './contact.ts'
 import { ORIGIN, relativeM } from './coordinates.ts'
-import { normal } from './math.ts'
+import { normal, scale } from './math.ts'
 import { resolveSurface, startingSurface, surfacePosition, validateSurfaceClearance, type SurfaceAddress } from './surfaceSite.ts'
-import { SAMPLE_BODIES } from './sampleUniverse.ts'
-import { DRY_MASS_KG, initialShip, type ShipState } from './simulation.ts'
+import { SAMPLE_BODIES, type Body } from './sampleUniverse.ts'
+import { DRY_MASS_KG, initialShip, STEP_SECONDS, type ShipState } from './simulation.ts'
 import type { WorldFrames } from './topDownFrames.ts'
 
 // The authored site's tangent origin is the +Y surface of sample Vesper.
@@ -13,20 +14,22 @@ import type { WorldFrames } from './topDownFrames.ts'
 // Both presentations consume this domain value; only explicit domain actions
 // may replace the surface binding.
 export function startingScoutLocation(): ScoutLocation { return surfaceScoutLocation(startingSurface()) }
-export function surfaceScoutLocation(address: SurfaceAddress): ScoutLocation {
-  const site = resolveSurface(address)
+export function surfaceScoutLocation(address: SurfaceAddress, bodies: readonly Body[] = SAMPLE_BODIES, tick = 0): ScoutLocation {
+  const site = resolveSurface(address, bodies, tick)
   validateSurfaceClearance(site)
+  const position = surfacePosition(site, tick), radial = relativeM(position, site.body.position)
   const ship: ShipState = {
-    ...initialShip(), position: surfacePosition(site), yaw: address.yaw, mode: 'grounded',
-    velocityMps: surfaceVelocity(site.body, address.radialM).map(v => v === 0 ? 0 : v) as [number, number, number],
-    contact: { bodyId: site.body.id, outcome: 'safe-contact', impactSpeedMps: 0, normal: normal(address.radialM), ageTicks: 60 },
+    ...initialShip(), tick, position, yaw: address.yaw, mode: 'grounded',
+    velocityMps: surfaceVelocity(site.body, radial).map(v => v === 0 ? 0 : v) as [number, number, number],
+    contact: { bodyId: site.body.id, outcome: 'safe-contact', impactSpeedMps: 0, normal: normal(radial), ageTicks: 60 },
   }
-  return { siteId: site.id, surface: site.address, body: site.body, frames: site.frames, ship, binding: site.id, maneuver: null, scanner: null, boardingDoor: 'open', launch: null }
+  return { siteId: site.id, surface: site.address, body: site.body, frames: site.frames, ship, binding: site.id, maneuver: null, scanner: null, boardingDoor: 'open', launch: null, landing: null }
 }
 // One live object is shared by world and navigation. Save records clone it.
 export interface ScoutLocation {
   surface: SurfaceAddress
   launch: TakeoffPlan | null
+  landing: LandingPlan | null
   boardingDoor: 'open' | 'closed'
   siteId: string
   body: typeof SAMPLE_BODIES[number]
@@ -37,7 +40,7 @@ export interface ScoutLocation {
   scanner: import('./scanner.ts').ScannerSnapshot | null
 }
 export type ScoutAction = { kind: 'begin-takeoff' } | { kind: 'finish-takeoff' } | { kind: 'begin-landing'; siteId?: string; bodyId: string; surface?: SurfaceAddress } | { kind: 'finish-landing' }
-export function transitionScout(location: ScoutLocation, action: ScoutAction): ScoutLocation {
+export function transitionScout(location: ScoutLocation, action: ScoutAction, bodies: readonly Body[] = SAMPLE_BODIES): ScoutLocation {
   const ship = location.ship
   const detached = { ...location.frames, ship: { ...location.frames.ship, parent: null, origin: ORIGIN } }
   if (action.kind === 'begin-takeoff') {
@@ -46,21 +49,22 @@ export function transitionScout(location: ScoutLocation, action: ScoutAction): S
     return { ...location, frames: detached, binding: null, launch: planTakeoff(ship, location.body, SAMPLE_BODIES), maneuver: 'takeoff', ship: { ...ship, mode: 'taking-off', contact: null, throttle: 0, alignment: null } }
   }
   if (action.kind === 'finish-takeoff') throw new Error('Takeoff completes automatically; pilot override is locked.')
-  if (action.kind === 'begin-landing' && (ship.mode === 'flying' || ship.mode === 'recovering' && ship.contact?.outcome === 'safe-contact')) {
-    if (!action.surface && action.siteId !== 'site:illustrated-landing:v1') throw Error('Incomplete site mapping: supply body-fixed coordinates and orientation.')
-    const target = surfaceScoutLocation(action.surface ?? startingSurface())
+  if (action.kind === 'begin-landing') {
+    if (!location.scanner?.contactIds.includes(action.bodyId) || location.scanner.lastTick !== ship.tick) throw Error('Scan the target planet or moon before requesting landing.')
+    const body = bodies.find(b => b.id === action.bodyId)
+    if (!body) throw Error('Unknown landing body.')
+    const surface = action.surface ?? (action.siteId === 'site:illustrated-landing:v1' ? startingSurface() : {
+      bodyId: body.id, radialM: rotateLanding(scale(normal(relativeM(ship.position, body.position)), physicalRadiusM(body)), body, -ship.tick * STEP_SECONDS), yaw: Math.atan2(Math.sin(ship.yaw), Math.cos(ship.yaw)),
+    })
+    const target = surfaceScoutLocation(surface, bodies, ship.tick)
     if (action.bodyId !== target.body.id || action.siteId !== undefined && action.siteId !== target.siteId) throw Error('Planet/body mismatch or incomplete site mapping.')
-    if (location.boardingDoor !== 'closed' || location.maneuver !== null || location.launch !== null) throw Error('Seal the door and finish the active maneuver before landing.')
-    return { ...location, surface: target.surface, siteId: target.siteId, body: target.body,
+    if (location.binding !== null || location.boardingDoor !== 'closed' || location.maneuver !== null || location.launch !== null || location.landing !== null) throw Error('Seal the door and finish the active maneuver before landing.')
+    const landing = planLanding(ship, target.body, target.surface, bodies)
+    return { ...location, landing, surface: target.surface, siteId: target.siteId, body: target.body,
       frames: { ...target.frames, ship: { ...target.frames.ship, parent: null, origin: ORIGIN } },
       maneuver: 'landing', ship: { ...ship, mode: 'landing', contact: null, throttle: 0, alignment: null } }
   }
-  if (action.kind === 'finish-landing' && ship.mode === 'landing' && location.maneuver === 'landing') {
-    const landed = surfaceScoutLocation(location.surface)
-    if (!ship.position.offsetM.every(Number.isFinite) || !ship.velocityMps.every(Number.isFinite) || Math.hypot(...relativeM(ship.position, landed.ship.position)) > 1e-6 || ship.yaw !== landed.ship.yaw || ship.pitch !== 0
-      || Math.hypot(...ship.velocityMps.map((v, i) => v - landed.ship.velocityMps[i]!)) > .001 || ship.contact !== null) throw new Error('Ship must reach the validated surface anchor and stop before landing completes')
-    return { ...landed, boardingDoor: location.boardingDoor, scanner: location.scanner, ship: { ...landed.ship, position: ship.position, tick: ship.tick, massKg: ship.massKg } }
-  }
+  if (action.kind === 'finish-landing') throw Error('Landing completes automatically; pilot override is locked.')
   throw new Error('Invalid Scout transition or unsupported surface site')
 }
 
@@ -68,7 +72,7 @@ export function transitionScout(location: ScoutLocation, action: ScoutAction): S
 export function takeoffDenial(location: ScoutLocation): string | null {
   if (!Number.isFinite(location.ship.massKg) || location.ship.massKg < DRY_MASS_KG || !Number.isSafeInteger(location.ship.tick) || location.ship.tick < 0) return 'Scout state is invalid.'
   if (location.ship.mode === 'destroyed') return 'Ship is destroyed.'
-  if (location.maneuver !== null || location.launch !== null) return 'A Scout maneuver is already running.'
+  if (location.maneuver !== null || location.launch !== null || location.landing !== null) return 'A Scout maneuver is already running.'
   if (location.ship.mode !== 'grounded') return 'Scout must be grounded before takeoff.'
   let site: ScoutLocation
   try { site = surfaceScoutLocation(location.surface) } catch { return 'Scout is not at a validated supported surface site.' }

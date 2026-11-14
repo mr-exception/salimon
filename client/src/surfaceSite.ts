@@ -1,9 +1,10 @@
 import { physicalRadiusM } from './contact.ts'
 import { ORIGIN, relativeM, translate, type Position } from './coordinates.ts'
-import { cross, dot, normal, scale, sub, type Vec3 } from './math.ts'
+import { cross, dot, normal, rotateVector, scale, sub, type Vec3 } from './math.ts'
 import { planetaryEntities, STARTING_SITE } from './planetarySite.ts'
 import { SAMPLE_BODIES, type Body } from './sampleUniverse.ts'
 import { point2, rotate2, type WorldFrames } from './topDownFrames.ts'
+import { STEP_SECONDS } from './simulation.ts'
 import type { Entity2D } from './topDownRuntime.ts'
 
 /** Body-fixed metres from the body's centre, at physicalRadiusM (includes 5 m hull bound).
@@ -23,9 +24,9 @@ export function startingSurface(): SurfaceAddress {
   const body = SAMPLE_BODIES.find(b => b.id === 'vesper')!, radius = physicalRadiusM(body)
   return { bodyId: body.id, radialM: [2, Math.sqrt(radius * radius - 5), -1], yaw: STARTING_SITE.shipAngle }
 }
-export function resolveSurface(address: SurfaceAddress): SurfaceSite {
+export function resolveSurface(address: SurfaceAddress, bodies: readonly Body[] = SAMPLE_BODIES, tick = 0): SurfaceSite {
   if (!address || Object.keys(address).sort().join() !== 'bodyId,radialM,yaw') throw Error('Incomplete surface mapping.')
-  const body = SAMPLE_BODIES.find(b => b.id === address.bodyId)
+  const body = bodies.find(b => b.id === address.bodyId)
   if (!body || (body.kind !== 'planet' && body.kind !== 'moon')) throw Error('Unsupported surface: choose a sampled planet or moon; stars and asteroids have no walking site.')
   const radial = address.radialM, radius = physicalRadiusM(body)
   if (!Array.isArray(radial) || radial.length !== 3 || !radial.every(Number.isFinite) || !Number.isFinite(address.yaw) || Math.abs(address.yaw) > Math.PI
@@ -50,13 +51,14 @@ export function resolveSurface(address: SurfaceAddress): SurfaceSite {
     id = `site:surface:v1:${body.id}:${axis}:${sign}:${i}:${j}`
   }
   const delta = sub(radial, centre)
+  const project = (v: Vec3) => rotateVector(v, body.angularVelocityRadps ?? [0, 0, 0], tick * STEP_SECONDS)
   const frames: WorldFrames = {
-    planet: { id: 'planet:fixture', universeOrigin: translate(body.position, centre), angle: 0, basis: { east, north, up: normal(centre) } },
+    planet: { id: 'planet:fixture', universeOrigin: translate(body.position, project(centre)), angle: 0, basis: { east: project(east), north: project(north), up: project(normal(centre)) } },
     ship: { id: 'ship:scout', parent: 'planet:fixture', origin: point2(dot(delta, east), dot(delta, north)), angle: address.yaw },
   }
   return { id, body, address: structuredClone(address), frames }
 }
-export function surfacePosition(site: SurfaceSite): Position { return translate(site.body.position, site.address.radialM) }
+export function surfacePosition(site: SurfaceSite, tick = 0): Position { return translate(site.body.position, rotateVector(site.address.radialM, site.body.angularVelocityRadps ?? [0, 0, 0], tick * STEP_SECONDS)) }
 export function siteEntities(site: SurfaceSite, saved?: SiteState): Entity2D[] {
   const template: Entity2D[] = site.id === STARTING_SITE.id ? planetaryEntities() : [
     { id: `terrain:${site.id}`, anchor: { frame: 'planet:fixture', point: ORIGIN }, layer: 'terrain', appearance: 'surface' },

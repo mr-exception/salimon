@@ -1,6 +1,5 @@
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
-import { startingScoutLocation } from './scoutLocation.ts'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { enterCockpit, leaveCockpit } from './cockpit.ts'
@@ -110,8 +109,10 @@ test('board, close, pilot, fly and land never auto-opens or auto-closes the door
   if(kind==='taking-off'){const n=new NavigationRuntime(SAMPLE_BODIES,s.world.scoutLocation);n.advance(4);n.advance(2)}
   if(kind==='flying')assert.equal(command('begin-landing'),true)
  }
- s.world.scoutLocation.ship={...s.world.scoutLocation.ship,position:startingScoutLocation().ship.position,velocityMps:startingScoutLocation().ship.velocityMps}
- assert.equal(command('finish-landing'),true);assert.equal(s.world.scoutLocation.boardingDoor,'closed')
+ const n=new NavigationRuntime(SAMPLE_BODIES,s.world.scoutLocation)
+ while(s.world.scoutLocation.landing)n.advance(.1)
+ s.advance({...s.world,tick:s.world.tick+1})
+ assert.equal(command('finish-landing'),false);assert.equal(s.world.scoutLocation.boardingDoor,'closed')
  s.world=place(leaveCockpit(s.world),0,4.7);assert.equal(s.toggleBoardingDoor(s.snapshot.revision),true)
 })
 test('v9 grounded/airborne migration is explicit; malformed v10 door and embedded player reject',()=>{

@@ -156,10 +156,10 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       current.current = clock.advance(current.current, dt, viewToWorld([Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], current.current.frames), (world, direction) => {
         if (!session.current) return stepTopDown(world, direction)
         if (session.current.error || session.current.survival.health === 0) return world
-        const ship = navigation.clock.state, scanner = world.scoutLocation.scanner, launch = world.scoutLocation.launch, maneuver = world.scoutLocation.maneuver
+        const locationBefore = { ...world.scoutLocation }
         if (gameplay) navigation.advance(1 / 60, controlsCockpit(world.cockpit, LOCAL_PLAYER) && survivalPolicy(session.current.survival).canWork ? navigation.pilotInput.controls : undefined)
         const next = session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
-        if (next.tick === world.tick) { navigation.clock.state = ship; world.scoutLocation.scanner = scanner; world.scoutLocation.launch = launch; world.scoutLocation.maneuver = maneuver }
+        if (next.tick === world.tick) Object.assign(world.scoutLocation, locationBefore)
         return next
       })
       if (session.current) {
@@ -248,7 +248,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         takeoff={{ denial: () => paused.current ? 'Resume the expedition before takeoff.' : session.current?.scoutCommandDenial() ?? (session.current ? null : 'Expedition unavailable.'), activate: () => { if (!session.current || paused.current) return; session.current.world = current.current; session.current.transitionScout({ kind: 'begin-takeoff' }, session.current.snapshot.revision, current.current.cockpit); update(session.current.world) } }} onExit={() => update(leaveCockpit(current.current))} />
     </div>}
     {flightFixture && <div className="power-fixture">{(['begin-takeoff', 'finish-takeoff', 'begin-landing', 'finish-landing'] as const).map(kind => <button key={kind} onClick={event => { event.currentTarget.blur(); if (session.current) { session.current.world = current.current; session.current.transitionScout(kind === 'begin-landing' ? { kind, siteId: current.current.scoutLocation.siteId, bodyId: current.current.scoutLocation.body.id } : { kind }, session.current.snapshot.revision, current.current.cockpit); update({ ...session.current.world }) } }}>{kind}</button>)}</div>}
-    {powerFixture && <div className="power-fixture"><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
+    {powerFixture && <div className="power-fixture" style={flightFixture ? { transform: 'translateY(-50px)' } : undefined}><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     <main data-surface-bound={String(state.scoutLocation.binding !== null)} data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>

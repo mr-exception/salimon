@@ -47,7 +47,8 @@ test('each maneuver round trips; validated landing restores stable exterior and 
  const {session:s,navigation:n,action,storage}=setup(),entities=s.world.entities,sources=s.snapshot.sources
  for(const a of [{kind:'begin-takeoff'},{kind:'finish-takeoff'},{kind:'begin-landing',siteId:STARTING_SITE.id,bodyId:'vesper'},{kind:'finish-landing'}] as const){
   if(a.kind==='finish-takeoff'){n.advance(4);n.advance(2);s.checkpoint()}
-  else {if(a.kind==='finish-landing') n.clock.state={...n.clock.state,position:startingScoutLocation().ship.position,velocityMps:startingScoutLocation().ship.velocityMps};assert.equal(action(a),true)}
+  else if(a.kind==='finish-landing') { while(s.world.scoutLocation.landing) n.advance(.1); s.advance({...s.world,tick:s.world.tick+1}); s.checkpoint() }
+  else assert.equal(action(a),true,s.feedback)
   const restored=new ResourceSession(storage,createTopDownState())
   assert.equal(restored.error,'');assert.deepEqual(restored.world.scoutLocation.ship,n.clock.state);assert.deepEqual(restored.world.frames,s.world.frames)
  }
@@ -87,7 +88,7 @@ test('physical contact never fabricates a site, and landing cannot teleport a di
  assert.ok(drawList(s.world).every(e=>e.entity.anchor.frame==='ship:scout'))
  n.advance(1);n.advance(1)
  assert.equal(n.clock.state.mode,'recovering')
- assert.equal(action({kind:'begin-landing',siteId:STARTING_SITE.id,bodyId:'vesper'}),true)
+ assert.equal(action({kind:'begin-landing',siteId:STARTING_SITE.id,bodyId:'vesper'}),false)
  n.clock.state={...n.clock.state,position:translate(n.clock.state.position,[1000,0,0])}
  const pose=n.clock.state.position
  assert.equal(action({kind:'finish-landing'}),false);assert.deepEqual(n.clock.state.position,pose)

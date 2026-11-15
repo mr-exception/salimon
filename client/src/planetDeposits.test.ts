@@ -137,6 +137,11 @@ test('P05 fresh process, body differentiation, seams and bounded immutable neigh
 })
 
 test('P05 generated work obeys survival limits and a failed gram write rolls back both sides', () => {
+  const registration=fixture(11)
+  ticks(registration.session,59)
+  const liveSurvival=registration.session.survival
+  registration.session.toggleTool();registration.session.start(registration.deposit.initial.id)
+  assert.deepEqual(registration.session.snapshot.survival,liveSurvival,'registering a new source preserves live survival progress')
   const {session,deposit}=fixture(11),id=deposit.initial.id
   session.survival={...session.survival,fatigue:388800}
   session.snapshot={...session.snapshot,survival:session.survival}

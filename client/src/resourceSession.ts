@@ -546,7 +546,7 @@ export class ResourceSession {
     }
     const initial = this.source(id)
     if (!initial) { this.feedback = 'No resource source in reach.'; return }
-    if (!this.snapshot.sources[id] && !this.commit({ ...this.snapshot, sources: { ...this.snapshot.sources, [id]: initial } })) return
+    if (!this.snapshot.sources[id] && !this.commit({ ...this.snapshot, survival: this.survival, hazards: this.hazards, sources: { ...this.snapshot.sources, [id]: initial } })) return
     const blocked = this.blocked(id)
     if (blocked) { this.feedback = blocked; return }
     this.activeSourceId = id

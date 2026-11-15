@@ -121,7 +121,7 @@ test('v9 grounded/airborne migration is explicit; malformed v10 door and embedde
   if(airborne){seat();action()}
   const data=JSON.parse(storage.getItem()!);data.version=9;delete data.sites;delete data.scout.surface;delete data.scout.boardingDoor
   const migrated=decodeResourceSave(JSON.stringify(data),createTopDownState())
-  assert.equal(migrated.version,11);assert.equal(migrated.scout.boardingDoor,airborne?'closed':'open')
+  assert.equal(migrated.version,12);assert.equal(migrated.scout.boardingDoor,airborne?'closed':'open')
  }
  const {session:s,storage}=setup();s.toggleBoardingDoor(s.snapshot.revision)
  const raw=JSON.parse(storage.getItem()!)

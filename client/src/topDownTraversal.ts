@@ -29,5 +29,5 @@ export interface PlayerLocation { readonly anchor: Anchor; readonly facing: numb
 export function copyPlayerLocation(location: PlayerLocation): PlayerLocation {
   return { anchor: { frame: location.anchor.frame, point: {
     cell: [...location.anchor.point.cell], offsetM: [...location.anchor.point.offsetM],
-  } }, facing: location.facing }
+  }, ...(location.anchor.chart ? {chart: structuredClone(location.anchor.chart)} : {}) }, facing: location.facing }
 }

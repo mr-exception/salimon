@@ -4,7 +4,7 @@ The browser owns three **illustrative packaged fixtures**, not observed scientif
 bodies: `vesper` (6,200,000 m), `vesper-moon` (1,400,000 m) and `caligo`
 (9,000,000 m). They retain the shipped sample catalog IDs. There is no archived
 Rust import or scientific satellite ephemeris. P02 adds deterministic geological
-terrain and a minimal physical ground preview; illustrated streaming art is P03/P04.
+terrain and a minimal physical ground preview; P03 adds continuous regional walking and a bounded baseline cache; full illustrated terrain remains P04.
 
 ## Publication and compatibility
 
@@ -56,8 +56,7 @@ neighbor, preserving the existing special site ID.
 Local coordinates are orthographic projections onto a region's deterministic
 orthonormal east/north basis. The inverse reconstructs the front sphere hemisphere
 with a positive radial component. Back-side, non-finite, zero-radial, wrong-body,
-forged-frame and out-of-chart coordinates throw. Use another region before the
-hemisphere horizon; these are local charts, not a promise of whole-sphere walking.
+forged-frame and out-of-chart coordinates throw. The P03 walking runtime changes charts before the hemisphere horizon; individual charts remain local.
 Re-express a physical location through both charts when crossing a boundary;
 never reinterpret the same local x/y as another region's coordinates.
 
@@ -201,3 +200,56 @@ height-bound contact, invalid definitions and workload limits.
 path, captures original/repeat images and compares displayed slope/material with
 the domain. It runs in the cockpit project and bounded PR smoke; existing
 surface-site/gathering browser journeys protect the authored opening site.
+
+## Continuous regional walking and cache (#849)
+
+`topDownRuntime.rechartWalking` preserves body-fixed player/camera positions while
+changing the working tangent chart at 256 m. It uses canonical `surfaceRegion`
+keys on every face, including poles and the antimeridian, without clamping domain
+movement to authored map edges. The nearby Scout restores the original landing
+chart within 128 m, preserving exact authored collision and doorway transforms.
+Physical motion, collision and reach use these charts; camera/viewport changes
+cannot select different terrain truth. Screen input and presentation transport their heading locally between charts,
+avoiding remote heading-vector singularities. The view aligns gradually before
+the Scout becomes visible on return, keeping its actual bow up without a snap.
+
+`topDownFrames.walkingFrames` projects the actual landed Scout and existing
+landmarks into the working chart. Back-side landmarks remain distant and drawing
+culls distant objects rather than cloning a Scout in each region. The Scout's
+original surface address, ship-local cabin and flight lifecycle are unchanged.
+When airborne the planet frame remains unavailable. `Anchor.chart` is an optional
+canonical, publication-bound chart on walking player/camera anchors; untagged
+anchors retain the original landing chart. Save v12 retains this chart
+metadata and rejects forged axes, another body or an incompatible publication.
+Legacy v1–v11 saves migrate losslessly, preserving anchor meaning; older clients reject v12 rather than silently discarding its chart. Reopen restores the physical
+coordinate and working chart, not the camera or a newly selected landing site.
+
+`regionStream.ts` owns a disposable immutable terrain cache, separate from site
+anchor journals, stable source IDs, depletion and player saves. A physical-player
+neighbourhood of three cardinal rings prefetches nearby region centres and retains
+regions behind the player for hysteresis. On each request batch stale work is
+replaced synchronously; no outstanding asynchronous generator can publish an old
+body or neighbourhood. Lexical keys and last-use sequence break eviction ties.
+At most 32 regions × 2,048 samples are retained, with at most 2,048 new samples
+per batch. Exact physical query keys preserve the sampled field across chart,
+viewport and load-order changes. A changed body/publication clears the baseline
+cache, never mutable journals. No planet-wide array is allocated.
+
+`GeneratedGround` requests its existing 1,600-cell physical preview through that
+cache when the 8 m render origin changes, then prewarms neighbours within the
+remaining budget. Cache generation/hit/eviction/residency counters are exposed
+as `data-stream` for measurement. The world background extends across the
+viewport, so ordinary boundaries expose no finite authored canvas edge or loading
+screen. This retains P02's material/slope preview; it does not introduce P04 art,
+P05 collectible generation or P07 wider persistence transactions.
+
+`regionStream.test.ts` covers four-direction out/back routes through multiple
+regions and chart changes, actual Scout visibility, face/pole/winding routes,
+deterministic cache stress/budget rejection, save replay and forged-chart
+rejection. `tests/streaming.spec.ts` exercises the built production route with
+real keyboard input in all four directions, original/repeat/negative captures,
+chart handoff and reload. `tests/terrain.spec.ts` retains the v2 shared
+collision/render route; existing gathering/traversal/flight tests protect source,
+door and detached cabin semantics. Full world CI includes streaming in the
+existing cockpit project and uploads ignored `client/test-results/` artifacts
+with 14-day retention. CI acceptance awaits the user's report in this chat.

@@ -1042,3 +1042,21 @@ compatible. Unknown definitions and version/hash/geometry mismatches reject.
 round-trips, neighbors, collision and legacy-save scenarios; `npm run build`
 checks browser bundling. Use affected surface-site/gathering/top-down Chromium
 routes for production regression; retain output in ignored `test-results/`.
+
+### Continuous planetary walking (#849)
+
+Walk across adjacent physical regions without a loading screen. The player/camera
+change canonical tangent charts at 256 m; the actual Scout and source journals
+stay at their physical locations. Near the Scout the original frame restores
+exact door/collision behavior. Saves retain validated player chart metadata, and
+legacy anchors keep their meaning. The physical ground preview uses a bounded
+32-region immutable cache with neighbour prefetch, hysteresis, deterministic
+work/eviction counters and a 2,048-sample generation budget per batch. No terrain
+cache enters persistent source/depletion state. Full illustration remains P04.
+
+Run `npm test`, `npm run build`, and
+`npm run test:browser -- --project=cockpit tests/streaming.spec.ts tests/terrain.spec.ts`.
+Streaming's four-direction built keyboard journey and chart/reload scenario run
+in the daily full cockpit project; terrain remains in PR smoke. Original/repeat
+captures, negative comparison and state records stay in ignored test output and
+existing CI artifacts. See [coordinate/cache/save contracts](../docs/browser-planet-surface.md#continuous-regional-walking-and-cache-849).

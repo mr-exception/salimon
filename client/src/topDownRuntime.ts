@@ -1,5 +1,5 @@
 import { probeGeology } from './planetGeology.ts'
-import { surfaceRegion, localToSurface } from './surfaceCoordinates.ts'
+import { surfaceRegion, surfaceToLocal, localToSurface } from './surfaceCoordinates.ts'
 import { BOARDING_DOOR_ID, BOARDING_DOOR_HALF_DEPTH_M, synchronizeDoor, toggleDoor } from './scoutDoor.ts'
 import { startingScoutLocation, type ScoutLocation } from './scoutLocation.ts'
 import { initialCockpit, enterCockpit, isCockpitTarget, type CockpitState } from './cockpit.ts'
@@ -9,7 +9,7 @@ import { scoutEntities } from './scoutLayout.ts'
 import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
 import { relativeM, ORIGIN, translate } from './coordinates.ts'
 import { allowedMove, PLAYER_RADIUS_M, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
-import { convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
+import { walkingFrames, inPlanet, convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
 export type Layer = typeof LAYERS[number]
@@ -52,6 +52,9 @@ export function createTopDownState(view: 'interior' | 'exterior' = 'exterior', c
 }
 // One continuous scene. Crossing changes ownership, never world position.
 export function stepTopDown(state: TopDownState, direction: Point2, speedMultiplier = 1): TopDownState {
+  const previousAngle = state.frames.ship.angle
+  state = rechartWalking(state)
+  direction = rotate2(direction, state.frames.ship.angle - previousAngle)
   const [x, y] = state.player.mode === 'seated' || state.scoutLocation.ship.mode === 'destroyed' ? [0, 0] : direction
   if (![x, y].every(Number.isFinite)) throw new RangeError('Expected finite movement')
   const length = Math.hypot(x, y), scale = length > 0 ? PLAYER_SPEED_MPS * speedMultiplier * STEP_2D / Math.max(1, length) : 0
@@ -64,15 +67,16 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   for (const delta of [[local[0], 0], [0, local[1]]] as const) {
     let fraction = allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames)
     if (anchor.frame === 'planet:fixture' && state.scoutLocation.binding && state.scoutLocation.surface.definition?.version === 2) {
-      const address = state.scoutLocation.surface, region = surfaceRegion(address, address.definition)
-      const [px, py] = relativeM(anchor.point, ORIGIN)
+      const address = state.scoutLocation.surface, region = state.frames.surface?.chart ?? surfaceRegion(address, address.definition)
+      const [px, py] = relativeM(inPlanet(anchor, state.frames), ORIGIN)
       const sample = probeGeology(localToSurface(region, [px, py]), address.definition!, PLAYER_RADIUS_M, rotate2(delta, angle), undefined, region)
       terrainBlocked ||= sample.moveFraction < 1
       fraction = Math.min(fraction, sample.moveFraction)
     }
     anchor = { ...anchor, point: translate(anchor.point, [delta[0] * fraction, delta[1] * fraction, 0]) }
   }
-  const crossed = crossScoutEntry(player.anchor, anchor, state.frames, state.scoutLocation.boardingDoor === 'open')
+  const nearShip = Math.hypot(...relativeAnchor(anchor, {frame: 'ship:scout', point: point2(0,0)}, state.frames)) < 64
+  const crossed = nearShip ? crossScoutEntry(player.anchor, anchor, state.frames, state.scoutLocation.boardingDoor === 'open') : anchor
   const doorBlocked = state.frames.ship.parent === null && (anchor.point.offsetM[1] > 5.5 || (state.scoutLocation.boardingDoor === 'closed' && length > 0 && player.anchor.point.offsetM[1] >= 5.5 - BOARDING_DOOR_HALF_DEPTH_M - PLAYER_RADIUS_M - 1e-6 && local[1] > 0))
   anchor = doorBlocked ? player.anchor : crossed
   const entities = state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e)
@@ -123,6 +127,7 @@ export function drawList(state: TopDownState): DrawItem[] {
     || Number(b.appearance === 'ground') - Number(a.appearance === 'ground')
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
     .map(entity => ({ entity, positionM: worldToView(relativeAnchor(entity.anchor, state.camera.anchor, state.frames), state.frames), angle: ( entity.id === PLAYER_ID ? state.player.facing : entity.anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0) - state.frames.ship.angle }))
+    .filter(item => item.entity.id === PLAYER_ID || Math.hypot(...item.positionM) < (item.entity.appearance === 'ground' || item.entity.appearance === 'surface' ? 300 : 100))
 }
 export class TopDownClock {
   private remainder = 0
@@ -142,7 +147,7 @@ export class TopDownClock {
 // it to ship-local coordinates before invalidating the planetary transform.
 export function synchronizeScout(state: TopDownState): TopDownState {
   state = synchronizeDoor(state)
-  if (state.frames === state.scoutLocation.frames) return state
+  if ((state.frames.surface?.source ?? state.frames) === state.scoutLocation.frames) return state
   const camera = state.camera.anchor.frame === 'planet:fixture' && state.scoutLocation.binding === null
     ? { ...state.camera, anchor: convertAnchor(state.camera.anchor, 'ship:scout', state.frames) } : state.camera
   const entities = [
@@ -150,4 +155,35 @@ export function synchronizeScout(state: TopDownState): TopDownState {
     ...(state.scoutLocation.binding ? siteEntities(resolveSurface(state.scoutLocation.surface)) : []),
   ]
   return { ...state, entities, frames: state.scoutLocation.frames, camera, selectedId: null }
+}
+
+/** Change charts before precision/horizon limits, preserving physical positions.
+ * Keep the original landing chart nearby for exact authored collision/door art. */
+export function rechartWalking(state: TopDownState): TopDownState {
+  const player = state.entities.find(e=>e.id===PLAYER_ID)!
+  if (!state.scoutLocation.binding || player.anchor.frame !== 'planet:fixture') return state
+  const address = state.scoutLocation.surface, landing = surfaceRegion(address,address.definition)
+  const old = player.anchor.chart ?? landing
+  const position = localToSurface(old, relativeM(player.anchor.point,ORIGIN).slice(0,2) as [number,number])
+  const current = state.frames.surface?.chart ?? landing
+  const local = surfaceToLocal(position,current)
+  const homeDistance = Math.hypot(...position.radialM.map((n,i)=>n-address.radialM[i]!))
+  const home = homeDistance < 128
+  // Align the remote transported view gradually before the Scout is visible.
+  // This removes loop holonomy without a camera snap on returning home.
+  if (state.frames.surface && homeDistance < 512) {
+    const desired = walkingFrames(state.scoutLocation.frames,landing,current).ship.angle
+    const difference = Math.atan2(Math.sin(desired-state.frames.ship.angle),Math.cos(desired-state.frames.ship.angle))
+    if (Math.abs(difference)>1e-12) state={...state,frames:{...state.frames,ship:{...state.frames.ship,angle:state.frames.ship.angle+Math.max(-.005,Math.min(.005,difference))}}}
+  }
+  if (Math.hypot(...local) < 256 && (!home || current.id === landing.id)) return state
+  const chart = home ? landing : surfaceRegion(position,address.definition)
+  if (chart.id === current.id) return state
+  const frames = walkingFrames(state.scoutLocation.frames,landing,chart,state.frames)
+  const project = (anchor: Anchor): Anchor => {
+    if (anchor.frame !== 'planet:fixture') return anchor
+    const physical = localToSurface(anchor.chart ?? landing, relativeM(anchor.point,ORIGIN).slice(0,2) as [number,number])
+    return {frame:anchor.frame,point:point2(...surfaceToLocal(physical,chart)),chart}
+  }
+  return {...state,frames,entities:state.entities.map(e=>e.id===PLAYER_ID ? {...e,anchor:project(e.anchor)} : e),camera:{...state.camera,anchor:project(state.camera.anchor)}}
 }

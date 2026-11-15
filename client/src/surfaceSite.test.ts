@@ -122,7 +122,7 @@ test('AC-4 generated-site mid-launch and landing snapshots restore; legacy v10 m
   assert.equal(migrated.error, ''); assert.equal(old.storage.getItem(), raw)
   assert.deepEqual(migrated.snapshot.sources, old.s.snapshot.sources); assert.deepEqual(migrated.snapshot.inventory, old.s.snapshot.inventory)
   migrated.checkpoint(); assert.equal(old.storage.getItem(), raw, 'unchanged migration needs no write')
-  migrated.upgrade(13000, 16); assert.equal(JSON.parse(old.storage.getItem()!).version, 11)
+  migrated.upgrade(13000, 16); assert.equal(JSON.parse(old.storage.getItem()!).version, 12)
 })
 test('AC-5 malformed/unsupported surfaces, unsafe footprints, crash and incomplete/mismatched mapping fail atomically', () => {
   for (const surface of [addressFor('nacre', [1, 0, 0]), addressFor('relay', [0, 1, 0]), { ...startingSurface(), bodyId: 'missing' }, { ...startingSurface(), radialM: [0, 0, 0] }, { ...startingSurface(), yaw: NaN }, { ...startingSurface(), radialM: [Infinity, 0, 0] }, { ...startingSurface(), radialM: [2, 3] }]) assert.throws(() => resolveSurface(surface as SurfaceAddress))

@@ -1,3 +1,5 @@
+import { probeGeology } from './planetGeology.ts'
+import { surfaceRegion, localToSurface } from './surfaceCoordinates.ts'
 import { BOARDING_DOOR_ID, BOARDING_DOOR_HALF_DEPTH_M, synchronizeDoor, toggleDoor } from './scoutDoor.ts'
 import { startingScoutLocation, type ScoutLocation } from './scoutLocation.ts'
 import { initialCockpit, enterCockpit, isCockpitTarget, type CockpitState } from './cockpit.ts'
@@ -5,7 +7,7 @@ import { siteEntities, resolveSurface } from './surfaceSite.ts'
 import { planetaryEntities, STARTING_SITE, type SourceIdentity } from './planetarySite.ts'
 import { scoutEntities } from './scoutLayout.ts'
 import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
-import { translate } from './coordinates.ts'
+import { relativeM, ORIGIN, translate } from './coordinates.ts'
 import { allowedMove, PLAYER_RADIUS_M, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
 import { convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
@@ -55,11 +57,19 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   const length = Math.hypot(x, y), scale = length > 0 ? PLAYER_SPEED_MPS * speedMultiplier * STEP_2D / Math.max(1, length) : 0
   const player = state.entities.find(e => e.id === PLAYER_ID)!
   let anchor = player.anchor
+  let terrainBlocked = false
   const angle = anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0
   const local = rotate2([x * scale, y * scale], -angle)
   // Independent local axes provide sliding along walls without tunnelling.
   for (const delta of [[local[0], 0], [0, local[1]]] as const) {
-    const fraction = allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames)
+    let fraction = allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames)
+    if (anchor.frame === 'planet:fixture' && state.scoutLocation.binding && state.scoutLocation.surface.definition?.version === 2) {
+      const address = state.scoutLocation.surface, region = surfaceRegion(address, address.definition)
+      const [px, py] = relativeM(anchor.point, ORIGIN)
+      const sample = probeGeology(localToSurface(region, [px, py]), address.definition!, PLAYER_RADIUS_M, rotate2(delta, angle), undefined, region)
+      terrainBlocked ||= sample.moveFraction < 1
+      fraction = Math.min(fraction, sample.moveFraction)
+    }
     anchor = { ...anchor, point: translate(anchor.point, [delta[0] * fraction, delta[1] * fraction, 0]) }
   }
   const crossed = crossScoutEntry(player.anchor, anchor, state.frames, state.scoutLocation.boardingDoor === 'open')
@@ -68,7 +78,7 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   const entities = state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e)
   const selectedId = nearbyObject(anchor, entities, state.frames)?.id ?? null
   let activity = state.player
-  let feedback = doorBlocked ? 'Airlock locked in flight. Land at a validated surface site before leaving the Scout.' : state.feedback
+  let feedback = doorBlocked ? 'Airlock locked in flight. Land at a validated surface site before leaving the Scout.' : terrainBlocked ? 'Ground too steep for walking. Follow the gentler terrain.' : state.feedback
   if (length > 0) {
     activity = { facing: Math.atan2(x, -y), mode: 'walking', targetId: null }
     if (state.player.mode === 'interacting') feedback = 'Inspection cancelled by movement.'

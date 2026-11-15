@@ -176,3 +176,44 @@ test('AC-5 nonfinite admission and saved obstacles reject before publishing a la
   assert.match(s.feedback, /Unsafe landing/); assert.equal(s.world, world); assert.equal(s.world.scoutLocation.ship, ship)
   assert.equal(s.world.scoutLocation.binding, null); assert.equal(s.world.scoutLocation.landing, null)
 })
+
+test('P02 controlled migration preserves visited v1 clearances and binds new v2 sites across flight/reload', async () => {
+  const { geologicalDefinition } = await import('./planetDefinition.ts')
+  const fixture = setup(), legacy = addressFor('caligo', [1, 0, 0], 0)
+  fixture.launch(); fixture.arrive(legacy)
+  const oldSite = resolveSurface(legacy).id
+  assert.equal(fixture.s.snapshot.sites[oldSite]!.address.definition, undefined)
+  fixture.s.world = enterCockpit({ ...fixture.s.world, selectedId: 'scout:chair' })
+  fixture.launch(); fixture.approach(addressFor('caligo',[1,0,.0001],0))
+  // Production implicit destination selection would choose v2; the session
+  // consults the visited-region binding before performing physical admission.
+  assert.equal(fixture.action({ kind: 'begin-landing', bodyId: 'caligo' }), true, fixture.s.feedback)
+  assert.equal(fixture.s.world.scoutLocation.surface.definition, undefined)
+  assert.notEqual(fixture.s.world.scoutLocation.siteId,oldSite,'unvisited neighbor uses the same body revision')
+  while (fixture.s.world.scoutLocation.landing) fixture.n.advance(.1)
+  fixture.s.advance({ ...fixture.s.world, tick: fixture.s.world.tick+1 }); fixture.s.checkpoint()
+  fixture.s.world = enterCockpit({ ...fixture.s.world, selectedId: 'scout:chair' })
+  fixture.launch()
+  const {bodyId,version,digest} = geologicalDefinition('vesper-moon')
+  const fresh = {...addressFor(bodyId,[1,1,1],0),definition:{bodyId,version,digest}}
+  fixture.arrive(fresh)
+  assert.deepEqual(fixture.s.world.scoutLocation.surface.definition,fresh.definition)
+  const restored = new ResourceSession(fixture.storage,createTopDownState('interior',true),undefined,undefined,()=>0)
+  assert.equal(restored.error,'')
+  assert.deepEqual(restored.world.scoutLocation.surface.definition,fresh.definition)
+  assert.deepEqual(restored.snapshot.sources,fixture.s.snapshot.sources)
+  fixture.s.world = enterCockpit({ ...fixture.s.world, selectedId: 'scout:chair' })
+  fixture.launch();fixture.approach(fresh)
+  assert.equal(fixture.action({kind:'begin-landing',bodyId}),true,fixture.s.feedback)
+  fixture.s.checkpoint()
+  const landingReload = new ResourceSession(fixture.storage,createTopDownState('interior',true),undefined,undefined,()=>0)
+  assert.equal(landingReload.error,'')
+  assert.deepEqual(landingReload.world.scoutLocation.surface.definition,fresh.definition)
+  fixture.corrupt(v => {
+    const caligo = Object.values(v.sites).filter((s:any) => s.address.bodyId === 'caligo') as any[]
+    assert.equal(caligo.length,2)
+    const {bodyId,version,digest}=geologicalDefinition('caligo')
+    caligo[0].address.definition={bodyId,version,digest}
+  })
+  assert.notEqual(new ResourceSession(fixture.storage,createTopDownState()).error,'','mixed revisions of one body fail closed')
+})

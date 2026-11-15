@@ -1,3 +1,4 @@
+import { GeneratedGround } from './GeneratedGround.tsx'
 import { BOARDING_DOOR_ID } from './scoutDoor.ts'
 import { viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
@@ -45,6 +46,7 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
         <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.snapshot.sources[entity.id]?.remainingGrams} data-depleted={session?.snapshot.sources[entity.id]?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
           <WorldSprite entity={entity} />
         </g>)}
+      {layer === 'terrain' && <GeneratedGround state={state} />}
       {layer === 'cues' && items.filter(item => item.entity.id === state.selectedId).map(({ entity, positionM: [x, y], angle }) => <g key={entity.id} data-selection={entity.id} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={entity} selected /></g>)}
     </g>)}
   </svg>

@@ -1,7 +1,10 @@
+import { planetDefinition } from './planetDefinition.ts'
+import { SAMPLE_BODIES } from './sampleUniverse.ts'
+import { scoutLandingSurface } from './scoutLocation.ts'
 import { captureSite, resolveSurface, siteEntities, validateSurfaceClearance, type SiteStates, type SiteState, type SurfaceAddress } from './surfaceSite.ts'
 import { toggleDoor, synchronizeDoor } from './scoutDoor.ts'
 import { captureScout, decodeScout, type ScoutSave } from './scoutSave.ts'
-import { startingScoutLocation, transitionScout, takeoffDenial, type ScoutAction } from './scoutLocation.ts'
+import { surfaceScoutLocation, startingScoutLocation, transitionScout, takeoffDenial, type ScoutAction } from './scoutLocation.ts'
 import { freshHazards, validateHazards, hazardRates, stepHazards, type HazardState, type HazardSource, type HazardEvent, type ProtectionModule } from './hazards.ts'
 import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
@@ -47,7 +50,10 @@ export interface ResourceSave extends ResourceLedger {
   readonly location: PlayerLocation
 }
 export interface ResourceStorage { getItem(key: string): string | null; setItem(key: string, value: string): void }
-const startingLocationForMigration = startingScoutLocation
+const startingLocationForMigration = () => {
+  const { definition: _reference, ...address } = startingScoutLocation().surface
+  return surfaceScoutLocation(address)
+}
 const serializeForDecode = (value: unknown) => JSON.parse(serialize(value))
 const serialize = (value: unknown) => JSON.stringify(value, (_, v) => typeof v === 'bigint' ? v.toString() : v)
 function object(value: unknown): Record<string, unknown> {
@@ -81,6 +87,7 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
   return { anchor: parsed, facing: location.facing }
 }
 function decodeSites(value: unknown): SiteStates {
+  const bodyRevisions = new Map<string, string>()
   const states = object(value), sites: Record<string, SiteState> = {}
   if (!Object.hasOwn(states, STARTING_SITE.id)) throw Error('Missing original world state')
   for (const [id, raw] of Object.entries(states)) {
@@ -89,6 +96,9 @@ function decodeSites(value: unknown): SiteStates {
     const site = resolveSurface(state.address as SurfaceAddress)
     if (site.id !== id) throw Error('Saved site/body mismatch')
     const saved = state as unknown as SiteState
+    const digest = planetDefinition(site.body.id, saved.address.definition).digest
+    if (bodyRevisions.has(site.body.id) && bodyRevisions.get(site.body.id) !== digest) throw Error('Conflicting saved body revisions')
+    bodyRevisions.set(site.body.id, digest)
     siteEntities(site, saved)
     sites[id] = saved
   }
@@ -230,7 +240,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 11, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingLocationForMigration().surface), siteEntities(resolveSurface(startingLocationForMigration().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 11, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -301,6 +311,18 @@ export class ResourceSession {
     if (this.activeSourceId !== null) return 'Stop gathering before starting a Scout maneuver.'
     return takeoff ? takeoffDenial(this.world.scoutLocation) : null
   }
+  /** Approved controlled migration: absent ref is legacy v1. A body's first
+   * binding wins for the whole save, preventing seams between visited regions. */
+  private bindLandingRevision(action: ScoutAction): ScoutAction {
+    if (action.kind !== 'begin-landing') return action
+    const body = SAMPLE_BODIES.find(b => b.id === action.bodyId)
+    if (!body) return action
+    const surface = scoutLandingSurface(this.world.scoutLocation, action, body)
+    const saved = Object.values(this.snapshot.sites).find(s => s.address.bodyId === body.id)
+    if (!saved) return action
+    const { definition: _reference, ...coordinates } = surface
+    return { ...action, surface: { ...coordinates, ...(saved.address.definition ? { definition: saved.address.definition } : {}) } }
+  }
   /** Read-only admission uses the command's domain/site validation, including saved obstacles. */
   scoutActionDenial(action: ScoutAction, revision = this.snapshot.revision, cockpitSession = this.world.cockpit, actorId = LOCAL_PLAYER): string | null {
     const denial = this.scoutCommandDenial(revision, cockpitSession, actorId, action.kind === 'begin-takeoff')
@@ -308,7 +330,7 @@ export class ResourceSession {
     try {
       const location = this.world.scoutLocation
       const sites = this.captureSites(this.snapshot.sites)
-      const next = transitionScout(location, action)
+      const next = transitionScout(location, this.bindLandingRevision(action))
       if (action.kind === 'begin-landing' || action.kind === 'begin-takeoff') {
         const site = resolveSurface(action.kind === 'begin-takeoff' ? location.surface : next.surface)
         validateSurfaceClearance(site, siteEntities(site, sites[site.id]))
@@ -325,7 +347,7 @@ export class ResourceSession {
     try {
       const sites = this.captureSites(this.snapshot.sites)
       if (action.kind === 'begin-takeoff') validateSurfaceClearance(resolveSurface(location.surface), siteEntities(resolveSurface(location.surface), sites[location.siteId]))
-      const next = transitionScout(location, action)
+      const next = transitionScout(location, this.bindLandingRevision(action))
       if (action.kind === 'begin-landing') validateSurfaceClearance(resolveSurface(next.surface), siteEntities(resolveSurface(next.surface), sites[next.siteId]))
       this.cancel()
       Object.assign(location, next)

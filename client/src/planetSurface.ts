@@ -1,3 +1,4 @@
+import { probeGeology } from './planetGeology.ts'
 import { dot, add, scale } from './math.ts'
 import { AUTHORED_SURFACE } from './authoredSurface.ts'
 import { planetDefinition, type PlanetReference } from './planetDefinition.ts'
@@ -25,12 +26,15 @@ export function authoredObstacles(delta?: SurfaceDelta) {
   })
 }
 /** One surface truth for renderer/collision/gathering/landing consumers. The
- * published flat terrain has no generated deposits away from authored Vesper.
+ * legacy flat terrain has no generated deposits away from authored Vesper.
  * Probe positions/deltas use this body's canonical region, never screen space. */
 export function samplePlanetSurface(location: SurfaceLocation, reference?: PlanetReference, probe: Omit<SurfaceProbe, 'x' | 'y'> = {}, delta?: SurfaceDelta) {
   if (probe.motion !== undefined && (!Array.isArray(probe.motion) || probe.motion.length !== 2 || !probe.motion.every(Number.isFinite))) throw Error('Invalid physical surface motion')
   const region = surfaceRegion(location, reference)
-  if (delta) planetDefinition(location.bodyId, delta.definition)
+  if (delta) {
+    planetDefinition(location.bodyId, delta.definition)
+    if (delta.definition.version !== region.definition.version || delta.definition.digest !== region.definition.digest) throw Error('Surface delta revision mismatch')
+  }
   // Authored obstacles also affect probes just beyond the inset boundary. Use
   // its physical tangent chart, not region membership, to avoid a collision seam.
   let physicalProbe = probe
@@ -49,8 +53,12 @@ export function samplePlanetSurface(location: SurfaceLocation, reference?: Plane
       landingYaw: probe.landingYaw === undefined ? undefined : Math.atan2(heading[1], heading[0]) }
   } else if (delta) throw Error('Surface delta does not belong to this surface')
   const result = samplePhysicalSurface({ ...physicalProbe, x: local[0], y: local[1] }, obstacles)
-  return { ...result, bodyId: location.bodyId, definition: region.definition, regionId: region.id, siteId: region.id,
-    terrainId: `${location.bodyId}:terrain:v1:${planetDefinition(location.bodyId).domains.terrain.digest}`,
+  const definition = planetDefinition(location.bodyId, reference)
+  const geology = definition.version === 2 ? probeGeology(location, definition, probe.radiusM, probe.motion, probe.landingYaw) : undefined
+  return { ...result, ...geology, collision: result.collision || !!geology?.collision,
+    moveFraction: Math.min(result.moveFraction, geology?.moveFraction ?? 1),
+    landingClear: result.landingClear === null ? null : result.landingClear && (geology?.landingClear ?? true), bodyId: location.bodyId, definition: region.definition, regionId: region.id, siteId: region.id,
+    terrainId: `${location.bodyId}:terrain:v${definition.version}:${definition.domains.terrain.digest}`,
     sourceIds: obstacles.filter(o => o.id.startsWith('source:') && Math.abs(o.x - local[0]) <= o.halfWidth && Math.abs(o.y - local[1]) <= o.halfHeight).map(o => o.id),
   }
 }

@@ -1,8 +1,9 @@
 import { planLanding, sampleLanding, type LandingPlan } from './landing.ts'
 import { sampleTakeoff, TAKEOFF_TICKS, TAKEOFF_PEAK_ACCELERATION } from './takeoff.ts'
+import { startingSurface } from './surfaceSite.ts'
 import { physicalRadiusM } from './contact.ts'
 import { CELL_SIZE_M, relativeM } from './coordinates.ts'
-import { startingScoutLocation, surfaceScoutLocation, type ScoutLocation } from './scoutLocation.ts'
+import { surfaceScoutLocation, type ScoutLocation } from './scoutLocation.ts'
 import { CatalogIndex, Scanner } from './scanner.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { DRY_MASS_KG, type ShipState } from './simulation.ts'
@@ -16,7 +17,7 @@ export function decodeScout(value: unknown, legacy = false): ScoutLocation {
   if (data.boardingDoor !== 'open' && data.boardingDoor !== 'closed') throw new Error('Invalid boarding door')
   if (data.binding === null && data.boardingDoor !== 'closed') throw new Error('Open airborne boarding door')
   data = { ...data, launch: data.launch ?? null, landing: data.landing ?? null }
-  const base = data.surface ? surfaceScoutLocation(data.surface, SAMPLE_BODIES, data.ship?.tick ?? 0) : startingScoutLocation(), ship = data.ship as ShipState
+  const base = data.surface ? surfaceScoutLocation(data.surface, SAMPLE_BODIES, data.ship?.tick ?? 0) : (() => { const { definition: _reference, ...address } = startingSurface(); return surfaceScoutLocation(address) })(), ship = data.ship as ShipState
   if (!ship || Object.keys(ship).sort().join() !== Object.keys(base.ship).sort().join()) throw new Error('Invalid ship fields')
   const vector = (v: unknown): v is [number, number, number] => Array.isArray(v) && v.length === 3 && v.every(x=>typeof x === 'number' && Number.isFinite(x))
   if (!ship.position || !Array.isArray(ship.position.cell) || ship.position.cell.length !== 3 || !vector(ship.position.offsetM) || ship.position.offsetM.some(v=>v < -CELL_SIZE_M/2 || v >= CELL_SIZE_M/2)) throw new Error('Invalid ship position')
@@ -28,7 +29,7 @@ export function decodeScout(value: unknown, legacy = false): ScoutLocation {
   if (ship.alignment !== null && (!ship.alignment || !Number.isFinite(ship.alignment.yaw) || !Number.isFinite(ship.alignment.pitch) || Math.abs(ship.alignment.pitch)>Math.PI/2)) throw new Error('Invalid alignment')
   if (ship.contact !== null && (!ship.contact || !SAMPLE_BODIES.some(b=>b.id===ship.contact!.bodyId) || !['safe-contact','crash','destroyed'].includes(ship.contact.outcome) || !vector(ship.contact.normal) || Math.abs(Math.hypot(...ship.contact.normal)-1)>1e-6 || !Number.isFinite(ship.contact.impactSpeedMps) || ship.contact.impactSpeedMps<0 || !Number.isSafeInteger(ship.contact.ageTicks) || ship.contact.ageTicks<0)) throw new Error('Invalid contact')
   const parsed = { ...ship, position: { cell, offsetM: ship.position.offsetM } }
-  if (ship.contact) {
+  if (ship.contact && data.binding !== base.binding) {
     const body = SAMPLE_BODIES.find(b => b.id === ship.contact!.bodyId)!
     const radial = relativeM(parsed.position, body.position), radius = Math.hypot(...radial)
     // Recovery rebounds are bounded to two metres; a forged contact must not

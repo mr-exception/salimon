@@ -1,9 +1,10 @@
+import { authoredGradeBound } from './planetGeology.ts'
 import { physicalRadiusM, SAFE_LANDING_MPS, surfaceVelocity } from './contact.ts'
 import { relativeM, translate } from './coordinates.ts'
 import { add, dot, length, normal, rotateVector, scale, sub, type Vec3 } from './math.ts'
 import type { Body } from './sampleUniverse.ts'
 import { ANGULAR_SPEED, angleDifference, DRY_MASS_KG, STEP_SECONDS, type ShipState } from './simulation.ts'
-import type { SurfaceAddress } from './surfaceSite.ts'
+import { surfaceContactRadial, type SurfaceAddress } from './surfaceSite.ts'
 
 export const LANDING_FUNDING = { kind: 'unlimited-prototype', impulsePerJoule: 1 } as const
 export const LANDING_MAX_SECONDS = 12 * 3600
@@ -23,7 +24,7 @@ export function rotateLanding(v: Vec3, body: Body, seconds: number): Vec3 {
 function geometry(plan: LandingPlan, body: Body) {
   const start = relativeM(plan.anchor.position, body.position), seconds = plan.durationTicks * STEP_SECONDS
   const velocity = sub(plan.anchor.velocityMps, surfaceVelocity(body, start))
-  return { start, seconds, control: add(start, scale(velocity, seconds / 3)), target: rotateLanding(plan.surface.radialM, body, plan.startTick * STEP_SECONDS) }
+  return { start, seconds, control: add(start, scale(velocity, seconds / 3)), target: rotateLanding(surfaceContactRadial(plan.surface), body, plan.startTick * STEP_SECONDS) }
 }
 /** Cubic Bezier in the rotating frame, with exact position/velocity endpoints.
  * Its convex hull provides continuous clearance and derivative bounds, rather
@@ -51,7 +52,7 @@ export function planLanding(anchor: ShipState, body: Body, surface: SurfaceAddre
   if (distance < radius - 1e-7 || distance > radius + .15 * body.radiusKm * 1000 + .0001) throw Error('Move within 0.15 body radii above the surface before landing.')
   const relative = sub(anchor.velocityMps, surfaceVelocity(body, scale(normal(start), radius)))
   if (length(relative) > SAFE_LANDING_MPS) throw Error('Reduce full surface-relative speed to 20 m/s or less, including sideways motion.')
-  const target = rotateLanding(surface.radialM, body, anchor.tick * STEP_SECONDS)
+  const target = rotateLanding(surfaceContactRadial(surface), body, anchor.tick * STEP_SECONDS)
   const delta = sub(target, start), n = normal(target)
   if (length(sub(start, scale(n, dot(start, n)))) > 1000) throw Error('Choose a landing site within 1 km of the point below the ship.')
   const acceleration = Math.min(LANDING_MAX_ACCELERATION, 50e6 / anchor.massKg)
@@ -65,7 +66,14 @@ export function planLanding(anchor: ShipState, body: Body, surface: SurfaceAddre
     const { control } = geometry(plan, body)
     // All four controls must lie above the target tangent plane. This proves
     // no point of the entire continuous curve enters the physical hull sphere.
-    if (Math.min(dot(start, n), dot(control, n)) < radius - 1e-7) continue
+    if (Math.min(dot(start, n), dot(control, n)) < length(target) - 1e-7) continue
+    // v2 relief is globally <= 2 m/m, including the authored blend.
+    // This convex cone dominates terrain for the whole Bezier between ticks.
+    const fixedControls = [start, control, target].map(p => rotateLanding(p, body, -anchor.tick * STEP_SECONDS))
+    const gradeBound = surface.bodyId === 'vesper' && fixedControls.every(p => p[1] > 0)
+      ? authoredGradeBound(Math.max(...fixedControls.map(p => Math.hypot(p[0],p[2])))) : 2
+    if (surface.definition?.version === 2 && [start, control].some(p =>
+      dot(p, n) - length(target) < gradeBound * length(sub(p, scale(n, dot(p, n)))) - 1e-7)) continue
     const speedBound = 3 / seconds * Math.max(length(sub(control, start)), length(sub(target, control)))
     const frameAcceleration = 6 / seconds ** 2 * Math.max(length(add(sub(target, scale(control, 2)), start)), length(sub(control, target)))
     const radialBound = Math.max(length(start), length(control), radius), omega = length(body.angularVelocityRadps ?? [0, 0, 0])

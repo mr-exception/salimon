@@ -1,3 +1,4 @@
+import { geologicalDefinition } from './planetDefinition.ts'
 import { rotateLanding, planLanding, type LandingPlan } from './landing.ts'
 import { planTakeoff, type TakeoffPlan } from './takeoff.ts'
 import { physicalRadiusM, surfaceVelocity } from './contact.ts'
@@ -14,9 +15,17 @@ import type { WorldFrames } from './topDownFrames.ts'
 // Both presentations consume this domain value; only explicit domain actions
 // may replace the surface binding.
 export function startingScoutLocation(): ScoutLocation { return surfaceScoutLocation(startingSurface()) }
+// Only immutable baseline clearance is memoized. ResourceSession still checks
+// mutable authored anchors on every transition/load. Bound cache, no planet map.
+const baselineClearances = new Map<string, true>()
 export function surfaceScoutLocation(address: SurfaceAddress, bodies: readonly Body[] = SAMPLE_BODIES, tick = 0): ScoutLocation {
   const site = resolveSurface(address, bodies, tick)
-  validateSurfaceClearance(site)
+  const key = JSON.stringify(address)
+  if (!baselineClearances.has(key)) {
+    validateSurfaceClearance(site)
+    if (baselineClearances.size === 32) baselineClearances.delete(baselineClearances.keys().next().value!)
+    baselineClearances.set(key, true)
+  }
   const position = surfacePosition(site, tick), radial = relativeM(position, site.body.position)
   const ship: ShipState = {
     ...initialShip(), tick, position, yaw: address.yaw, mode: 'grounded',
@@ -40,6 +49,17 @@ export interface ScoutLocation {
   scanner: import('./scanner.ts').ScannerSnapshot | null
 }
 export type ScoutAction = { kind: 'begin-takeoff' } | { kind: 'finish-takeoff' } | { kind: 'begin-landing'; siteId?: string; bodyId: string; surface?: SurfaceAddress } | { kind: 'finish-landing' }
+
+/** Session resolves legacy visited-region revisions before physical admission. */
+export function scoutLandingSurface(location: ScoutLocation, action: Extract<ScoutAction, {kind: 'begin-landing'}>, body: Body): SurfaceAddress {
+  if (body.kind !== 'planet' && body.kind !== 'moon') throw Error('Unsupported surface: choose a sampled planet or moon.')
+  const ship = location.ship
+  const { bodyId, version, digest } = geologicalDefinition(body.id)
+  return action.surface ?? (action.siteId === 'site:illustrated-landing:v1' ? startingSurface() : {
+      bodyId: body.id, definition: { bodyId, version, digest }, radialM: rotateLanding(scale(normal(relativeM(ship.position, body.position)), physicalRadiusM(body)), body, -ship.tick * STEP_SECONDS), yaw: Math.atan2(Math.sin(ship.yaw), Math.cos(ship.yaw)),
+    })
+}
+
 export function transitionScout(location: ScoutLocation, action: ScoutAction, bodies: readonly Body[] = SAMPLE_BODIES): ScoutLocation {
   const ship = location.ship
   const detached = { ...location.frames, ship: { ...location.frames.ship, parent: null, origin: ORIGIN } }
@@ -55,9 +75,7 @@ export function transitionScout(location: ScoutLocation, action: ScoutAction, bo
     if (!location.scanner?.contactIds.includes(action.bodyId) || location.scanner.lastTick !== ship.tick) throw Error('Scan the target planet or moon before requesting landing.')
     const body = bodies.find(b => b.id === action.bodyId)
     if (!body) throw Error('Unknown landing body.')
-    const surface = action.surface ?? (action.siteId === 'site:illustrated-landing:v1' ? startingSurface() : {
-      bodyId: body.id, radialM: rotateLanding(scale(normal(relativeM(ship.position, body.position)), physicalRadiusM(body)), body, -ship.tick * STEP_SECONDS), yaw: Math.atan2(Math.sin(ship.yaw), Math.cos(ship.yaw)),
-    })
+    const surface = scoutLandingSurface(location, action, body)
     const target = surfaceScoutLocation(surface, bodies, ship.tick)
     if (action.bodyId !== target.body.id || action.siteId !== undefined && action.siteId !== target.siteId) throw Error('Planet/body mismatch or incomplete site mapping.')
     if (location.binding !== null || location.boardingDoor !== 'closed' || location.maneuver !== null || location.launch !== null || location.landing !== null) throw Error('Seal the door and finish the active maneuver before landing.')

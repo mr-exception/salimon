@@ -77,7 +77,7 @@ test('inconsistent snapshots fail closed; legacy v8 migrates without fabricating
  }
  const {session,storage,corrupt}=setup();session.upgrade(10000,12);corrupt(s=>{s.version=8;delete s.sites;delete s.scout})
  const legacy=new ResourceSession(storage,createTopDownState())
- assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,11)
+ assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,12)
 })
 
 test('physical contact never fabricates a site, and landing cannot teleport a distant ship',()=>{

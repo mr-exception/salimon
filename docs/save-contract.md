@@ -2,14 +2,14 @@
 
 ## Browser 2D save boundary (not native schema 29+)
 
-The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked schema-v11 inventory/source/store/location/survival/hazard/Scout/site envelope, with lossless resource migration from v1–v10. [Browser survival](browser-survival.md) specifies active ticks, 200 HP, launch-only fatigue credit, failure handling and explicit terminal reset. It is scoped to sample planet/moon local sites and browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
+The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked schema-v12 inventory/source/store/location/survival/hazard/Scout/site envelope, with lossless resource migration from v1–v11. [Browser survival](browser-survival.md) specifies active ticks, 200 HP, launch-only fatigue credit, failure handling and explicit terminal reset. It is scoped to sample planet/moon local sites and browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
 
 Future browser progression must specify new versioned state for equipped suit modules, new machine stores, hazard exposure, Core/Fabricator, moved ships, planet-fixed locations and server actor authority separately; it cannot serialize old Rust `.rs` types or assume native migration scripts run in the browser. Preserve this contract as historical design evidence and do not silently copy its native payload fields or reset incompatible saves.
 
 
 ## Browser boarding-door continuity (#839)
 
-The active TypeScript resource envelope is **v11** (door state was introduced in v10). `scout.boardingDoor` is required
+The active TypeScript resource envelope is **v12** (door state was introduced in v10). `scout.boardingDoor` is required
 and strictly `open` or `closed`; the same field drives interaction, collision and
 visible state. Door writes and flight transitions are revision-bound atomic
 resource saves, with rollback on storage failure. Reload validates the derived
@@ -718,3 +718,14 @@ state through the existing v11 save. A storage failure stops publication through
 the existing world-clock rollback/error boundary. No new save schema or resource
 identity is introduced. A flight collision never creates a surface binding;
 whole-ship destruction is terminal across cockpit exit and reload.
+
+### Continuous walking charts (#849)
+
+Browser v12 player anchors may additionally carry `chart`, the canonical region
+frame/publication for their local point. The decoder validates its body, digest,
+axes and physical coordinate before collision checks; reopening uses that chart.
+Old clients reject the new v12 envelope instead of ignoring the chart. V1–v11 saves migrate losslessly; legacy untagged anchors remain in the landed site's original frame. Scout surface
+addresses and saved site anchors remain in their original frames, so working-chart
+handoff and baseline-cache eviction cannot move a ship or erase source depletion.
+The immutable region/sample cache is never serialized. See the
+[continuous surface contract](browser-planet-surface.md#continuous-regional-walking-and-cache-849).

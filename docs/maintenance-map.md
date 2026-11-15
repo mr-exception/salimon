@@ -40,6 +40,13 @@ and compatibility; `authoredSurface.ts` owns physical Vesper overrides;
 collision. `surfaceSite.ts` adapts #842 landing and legacy saves without rekeying.
 P02 `planetGeology.ts` owns revision-2 relief/provinces and bounded swept slope/landing probes; `GeneratedGround.tsx` reads that same data for a bounded physical preview. `resourceSession.ts` binds one revision per body/save. See [browser planet surface](browser-planet-surface.md), `planetGeology.test.ts`, `planetSurface.test.ts` and `tests/terrain.spec.ts`.
 
+Browser continuous walking (#849): `regionStream.ts` owns bounded immutable
+region/sample residency, prefetch and counters; `topDownRuntime.rechartWalking`
+and `topDownFrames.walkingFrames` own physical chart handoff and Scout projection.
+`resourceSession.ts` preserves/validates optional player chart metadata without
+putting baseline caches into saves. `tests/streaming.spec.ts` owns built keyboard
+out/back/reopen evidence; see [surface contracts](browser-planet-surface.md#continuous-regional-walking-and-cache-849).
+
 Browser cross-view interaction/feedback (#830): `ui/interaction.ts` owns utility
 and modal Escape ordering and safe focus return; `ui/Feedback.tsx` and
 `ui/feedback.ts` own accessible priority/deduplication and modal warning mirrors.

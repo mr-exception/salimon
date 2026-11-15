@@ -33,6 +33,11 @@ function terrainSave() {
 test('TERRAIN-848 built movement stops at sampled steep rock, renders shared truth and reloads',async({page},info)=>{
   test.setTimeout(240000)
   const fixture=terrainSave(),errors:string[]=[]
+  const physicalPosition=async()=>{
+    const p=await position(page)
+    const chart=await page.locator('[data-entity="person:player"]').getAttribute('data-surface-chart')
+    return [...surfaceToLocal(localToSurface(chart ? JSON.parse(chart) : fixture.region,[p[0]!,p[1]!]),fixture.region)]
+  }
   page.on('pageerror',e=>errors.push(e.message))
   await page.addInitScript(({key,value})=>{if(!localStorage.getItem(key))localStorage.setItem(key,value)},{key:RESOURCE_SAVE_KEY,value:fixture.raw})
   await boot(page,'','http://127.0.0.1:4175')
@@ -47,23 +52,26 @@ test('TERRAIN-848 built movement stops at sampled steep rock, renders shared tru
   }
   await capture('generated-before')
   await walkTicks(page,'d',480)
-  const stopped=await position(page)
+  const stopped=await physicalPosition()
   expect(stopped[0]-fixture.start[0]).toBeGreaterThan(10)
   expect(stopped[0]-fixture.start[0]).toBeLessThan(17)
   expect(probeGeology(localToSurface(fixture.region,[stopped[0],stopped[1]]),fixture.definition,.46).collision).toBe(false)
-  await walkTicks(page,'d',60);expect(await position(page)).toEqual(stopped)
+  await walkTicks(page,'d',60);expect(await physicalPosition()).toEqual(stopped)
   // Renderer samples agree with domain material/slope; image-only art cannot
   // invent collision. Conservative hatching includes the footprint margin.
   const shown=await page.locator('[data-ground-position]').first().evaluate(el=>({point:el.getAttribute('data-ground-position')!.split(',').map(Number),slope:Number(el.getAttribute('data-ground-slope')),type:el.getAttribute('data-ground-type')}))
-  const sampled=samplePlanetSurface(localToSurface(fixture.region,shown.point as [number,number]),fixture.definition)
+  const groundChart=JSON.parse((await page.locator('[data-ground-chart]').getAttribute('data-ground-chart'))!)
+  const stream=JSON.parse((await page.locator('[data-stream]').getAttribute('data-stream'))!)
+  expect(stream.regions).toBeLessThanOrEqual(32);expect(stream.samples).toBeLessThanOrEqual(32*2048);expect(stream.frameGenerated).toBeLessThanOrEqual(2048)
+  const sampled=samplePlanetSurface(localToSurface(groundChart,shown.point as [number,number]),fixture.definition)
   expect(shown.slope).toBe(sampled.slopeRadians);expect(shown.type).toBe(sampled.groundType)
   await page.clock.runFor(1600);await capture('generated-blocked')
   await page.evaluate(()=>window.dispatchEvent(new Event('pagehide')))
   const saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RESOURCE_SAVE_KEY)
   expect(saved.scout.surface.definition).toEqual(fixture.definition)
   await page.reload();await page.clock.runFor(200)
-  await expect.poll(()=>position(page)).toEqual(stopped)
-  await walkTicks(page,'a',40);expect((await position(page))[0]).toBeLessThan(stopped[0]-1)
+  await expect.poll(()=>physicalPosition()).toEqual(stopped)
+  await walkTicks(page,'a',40);expect((await physicalPosition())[0]).toBeLessThan(stopped[0]-1)
   expect(errors).toEqual([])
-  await info.attach('terrain-state.json',{body:JSON.stringify({start:fixture.start,stopped,shown,definition:fixture.definition,viewport:{width:1280,height:800},dpr:1,clock:'2026-11-04T00:00:00Z',input:'Playwright keyboard',backend:'Chromium SVG/Canvas CPU; GPU disabled',saved}),contentType:'application/json'})
+  await info.attach('terrain-state.json',{body:JSON.stringify({start:fixture.start,stopped,shown,groundChart,stream,definition:fixture.definition,viewport:{width:1280,height:800},dpr:1,clock:'2026-11-04T00:00:00Z',input:'Playwright keyboard',backend:'Chromium SVG/Canvas CPU; GPU disabled',saved}),contentType:'application/json'})
 })

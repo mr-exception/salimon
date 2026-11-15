@@ -15,7 +15,7 @@
     "test:visual:approval": "node --experimental-strip-types scripts/baseline-approval.ts",
     "test:ui": "playwright test --project=expedition",
     "test:ui:negative": "node scripts/negative-ui.mjs",
-    "test:browser:smoke": "playwright test --project=production --project=deterministic --project=cockpit tests/production.spec.ts tests/deterministic.spec.ts tests/flight.spec.ts tests/terrain.spec.ts --grep \"built production|NAV-2|FLIGHT-838|TERRAIN-848\""
+    "test:browser:smoke": "playwright test --project=production --project=deterministic --project=cockpit tests/production.spec.ts tests/deterministic.spec.ts tests/flight.spec.ts tests/terrain.spec.ts tests/terrain-art.spec.ts --grep \"built production|NAV-2|FLIGHT-838|TERRAIN-848|ART-850 .*production\""
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",

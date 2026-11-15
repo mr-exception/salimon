@@ -43,7 +43,8 @@ test('TERRAIN-848 built movement stops at sampled steep rock, renders shared tru
   await boot(page,'','http://127.0.0.1:4175')
   await expect(page.locator('[data-source-kind]')).toHaveCount(0)
   await expect(page.locator('[data-generated-ground]')).toHaveAttribute('data-generated-ground',fixture.definition.digest)
-  await expect(page.locator('[data-ground-steep="true"]').first()).toBeVisible()
+  await expect(page.locator('[data-terrain-footprint="steep"]')).toBeVisible()
+  expect(await page.locator('[data-terrain-footprint="steep"]').getAttribute('d')).not.toBe('')
   const capture=async(name:string)=>{
     const a=await page.screenshot({path:info.outputPath(`${name}.png`)}),b=await page.screenshot({path:info.outputPath(`${name}-repeat.png`)})
     const diff=compareImages(a,b);expect(diff.pass).toBe(true)

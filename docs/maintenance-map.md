@@ -1133,3 +1133,12 @@ development state gallery, keyboard isolation and repeat reference captures.
 Use the [style contract](hud-ui-style-guide.md#shared-foundation-implementation-826).
 Existing 2D, panoramic and storage adapters retain gameplay/input ownership and
 styles until separately migrated; never import these tokens as shader materials.
+
+Browser illustrated geology (#850): `terrainIllustration.ts` owns continuous
+seeded pigments, shared-edge contour interpolation, physical grade clipping and
+bounded viewport coverage; `GeneratedGround.tsx` composes these in the existing
+SVG scene from `RegionStream`. Geology/collision/publication ownership remains
+`planetGeology.ts`/`planetSurface.ts`. `terrain-art.spec.ts` owns fixed built-world
+art fixtures, repeat/negative captures and generated border journeys;
+`terrain.spec.ts` retains production collision approach and reload. See the
+[client guide](../client/README.md#illustrated-streamed-geology-850).

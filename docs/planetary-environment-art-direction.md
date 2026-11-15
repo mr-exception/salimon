@@ -229,3 +229,16 @@ handoff and cockpit integration remain #765/#766. Automated browser comparisons
 cover repeated spawn, near-outcrop, near-colony and near-Scout captures plus a
 continuous outdoor route with fixed source IDs. Historical native environmental
 reports above retain their original revision/platform scope.
+
+## Illustrated browser geological regions (#850)
+
+P02's immutable v2 terrain and P03's continuous region stream now feed
+`client/src/GeneratedGround.tsx`: continuously blended substrate pigments,
+physical height contours, clipped steep-rock footprints and supported polar-ice
+ink. Flat seeded albedo veins add sparse surface detail without invented
+colliders, deposits or landmarks. Presentation stays strictly overhead and below
+player/Scout layers. The original authored Vesper patch and resource silhouettes
+remain recognizable; a transparent opening blends into the generated layer.
+This is browser geology presentation only. Climate, weather, ecology and wider
+resource/landmark generation retain their separate owners.
+See [the client verification and limits](../client/README.md#illustrated-streamed-geology-850).

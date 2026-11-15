@@ -1,3 +1,4 @@
+import { geologicalDefinition } from '../src/planetDefinition.ts'
 import { test, expect } from '@playwright/test'
 import { ResourceSession, RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
 import { NavigationRuntime } from '../src/navigationRuntime.ts'
@@ -25,7 +26,9 @@ function approach(bodyId = 'vesper') {
  if (bodyId !== 'vesper') {
   // Synthetic interplanetary approach only; browser must admit and fly the real
   // landing, not load an already-landed/generated exterior or pre-admitted plan.
-  const body = SAMPLE_BODIES.find(b => b.id === bodyId)!, target = surfaceScoutLocation({ bodyId, radialM: [0, physicalRadiusM(body), 0], yaw: -.12 })
+  const body = SAMPLE_BODIES.find(b => b.id === bodyId)!
+  const {version,digest}=geologicalDefinition(bodyId)
+  const target = surfaceScoutLocation({ bodyId, radialM: [0, physicalRadiusM(body), 0], yaw: -.12, definition:{bodyId,version,digest} })
   n.clock.state = { ...n.clock.state, position: translate(target.ship.position, [0, 100, 0]), velocityMps: [0, 0, 0] }
   session.world.scoutLocation.scanner = { lastTick: n.clock.state.tick, pulse: Math.floor(n.clock.state.tick / 300), selected: bodyId, contactIds: [bodyId] }
  }
@@ -35,7 +38,7 @@ function approach(bodyId = 'vesper') {
 const epoch = new Date('2026-11-04T00:00:00Z')
 
 test('LANDING-844 built Land control completes Vesper/moon walk, reload, cargo and relaunch journeys', async ({ page }, info) => {
- test.setTimeout(420000)
+ test.setTimeout(process.env.SALIMON_SLOW_BROWSER === '1' ? 900000 : 420000)
  const states: Record<string, unknown> = {}, main = page.locator('main'), pano = page.locator('.panoramic')
  const ship = async () => JSON.parse((await main.getAttribute('data-ship'))!)
  const advance = async (ms: number) => { for (let t = 0; t < ms; t += 100) await page.clock.fastForward(Math.min(100, ms - t)) }

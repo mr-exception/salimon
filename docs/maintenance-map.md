@@ -38,7 +38,7 @@ and compatibility; `authoredSurface.ts` owns physical Vesper overrides;
 `surfaceCoordinates.ts` owns body-fixed regions, tangent charts and neighbors;
 `planetSurface.ts`/`surfacePhysics.ts` own authoritative samples and shared
 collision. `surfaceSite.ts` adapts #842 landing and legacy saves without rekeying.
-See [browser planet surface](browser-planet-surface.md) and `planetSurface.test.ts`.
+P02 `planetGeology.ts` owns revision-2 relief/provinces and bounded swept slope/landing probes; `GeneratedGround.tsx` reads that same data for a bounded physical preview. `resourceSession.ts` binds one revision per body/save. See [browser planet surface](browser-planet-surface.md), `planetGeology.test.ts`, `planetSurface.test.ts` and `tests/terrain.spec.ts`.
 
 Browser cross-view interaction/feedback (#830): `ui/interaction.ts` owns utility
 and modal Escape ordering and safe focus return; `ui/Feedback.tsx` and

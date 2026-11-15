@@ -1,3 +1,7 @@
+import { geologicalDefinition } from './planetDefinition.ts'
+import { rotateLanding } from './landing.ts'
+import { samplePlanetSurface } from './planetSurface.ts'
+import { STEP_SECONDS } from './simulation.ts'
 import { physicalRadiusM, surfaceVelocity } from './contact.ts'
 import { relativeM } from './coordinates.ts'
 import { length, normal, scale, sub } from './math.ts'
@@ -12,7 +16,15 @@ export function landingReadout(navigation: NavigationRuntime) {
     ?? (selected === null ? scanner.contacts.filter(b => b.kind === 'planet' || b.kind === 'moon')
       .sort((a, b) => length(relativeM(ship.position, a.position)) - length(relativeM(ship.position, b.position)))[0] : undefined)
   if (!body) return { body: undefined, altitudeM: null, relativeSpeedMps: null }
-  const radial = relativeM(ship.position, body.position), radius = physicalRadiusM(body)
+  const radial = relativeM(ship.position, body.position)
+  const solid = body.kind === 'planet' || body.kind === 'moon'
+  const reference = solid ? navigation.surfaceDefinitionForBody?.(body.id)
+    ?? (navigation.location?.surface.bodyId === body.id ? navigation.location.surface.definition
+      : navigation.location ? geologicalDefinition(body.id) : undefined) : undefined
+  const baseRadius = physicalRadiusM(body)
+  const height = reference?.version === 2 ? samplePlanetSurface({ bodyId: body.id,
+    radialM: rotateLanding(scale(normal(radial), baseRadius), body, -ship.tick * STEP_SECONDS) }, reference).heightM : 0
+  const radius = baseRadius + height
   return { body, altitudeM: length(radial) - radius,
     relativeSpeedMps: length(sub(ship.velocityMps, surfaceVelocity(body, scale(normal(radial), radius)))) }
 }

@@ -46,7 +46,9 @@ function landingApproachSave(raw: string | null, surface: SurfaceAddress): strin
 }
 
 test('SURFACE-842 production interior, moon/Caligo exterior, relaunch and authored depleted return', async ({ page }, info) => {
-  test.setTimeout(300000)
+  // Local software-browser capture can exceed five wall-clock minutes while
+  // all deterministic ticks/paths/assertions remain unchanged. CI keeps 300 s.
+  test.setTimeout(process.env.SALIMON_SLOW_BROWSER === '1' ? 600000 : 300000)
   const captures: Record<string, unknown> = {}, main = page.locator('main')
   const ship = async () => JSON.parse((await main.getAttribute('data-ship'))!)
   const saved = async () => { await page.evaluate(() => window.dispatchEvent(new Event('pagehide'))); return page.evaluate(key => localStorage.getItem(key)!, RESOURCE_SAVE_KEY) }

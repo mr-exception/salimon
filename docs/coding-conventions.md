@@ -166,26 +166,14 @@ gate still blocks acceptance; a follow-up cannot waive it.
 
 ## Task completion reports
 
-Except for the evidence-only human closure above, every completed task must write/update `reports/issue-<number>/README.md`, or
-`reports/task-<id>/README.md` for a task without an issue. Record:
-
-- Outcome and meaningful changes, including the affected ownership/contracts.
-- Tested source SHA, final head/base binding, independent reviewer/cycle/verdict
-  and criterion evidence under the acceptance policy.
-- Exact validation commands and results, relevant environment/tool versions,
-  skipped checks and the reason; distinguish not run, failed and passed.
-- Limitations and remaining blockers, with links to the follow-up issues that
-  own unresolved work under the [completion workflow](#issue-completion-and-follow-up).
-- Applicable result screenshots/images beside the report, linked relatively;
-  include structured state/logs when they establish behavior. Do not invent
-  screenshots for a documentation-only task.
-
-Link the report from the GitHub issue completion update alongside commits/PR.
-Future task-result reports/images must not go in `docs/`; it holds maintained
-specifications and development guides. Reusable asset previews remain with the
-asset. Keep disposable build/E2E output in ignored `artifacts/`, promoting only
-useful evidence into the task report. Redact unrelated desktop/private content
-before committing screenshots. See [reports layout](../reports/README.md).
+Put new completion/validation records in the delivering PR description or one
+maintained PR comment, following [acceptance policy](acceptance-policy.md).
+Record tested SHA/head/base, criteria, commands/results, same-session review,
+limitations and documentation impact. Link the issue to this PR record. Do not
+add new committed reports or evidence-only folders; retain historical reports.
+Original logs/captures belong in ignored `client/test-results/` and existing CI
+artifacts (14-day retention). Required tests, fixtures and approved baselines
+remain versioned with their owning source. CI tracking belongs to the user.
 
 ## Universe documentation impact (#440)
 

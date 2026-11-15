@@ -55,7 +55,7 @@ test('PR build check keeps domain/build coverage and selects only bounded browse
   assert.doesNotMatch(pr, /run: npm run test:(?:ui|visual|browser:negative)\b/);
   assert.doesNotMatch(pr, /issues: write/);
   const smoke = JSON.parse(read('client/package.json')).scripts['test:browser:smoke'];
-  for (const selector of ['production.spec.ts', 'deterministic.spec.ts', 'flight.spec.ts', '--project=production', '--project=deterministic', '--project=cockpit', 'built production|NAV-2|FLIGHT-838']) assert.ok(smoke.includes(selector), selector);
+  for (const selector of ['production.spec.ts', 'deterministic.spec.ts', 'flight.spec.ts', 'terrain.spec.ts', 'TERRAIN-848', '--project=production', '--project=deterministic', '--project=cockpit', 'built production|NAV-2|FLIGHT-838']) assert.ok(smoke.includes(selector), selector);
   assert.match(pr, /name: navigation-evidence-.*github.run_attempt/);
 });
 

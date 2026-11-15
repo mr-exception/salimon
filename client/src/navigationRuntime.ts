@@ -1,3 +1,4 @@
+import type { PlanetReference } from './planetDefinition.ts'
 import { sampleLanding } from './landing.ts'
 import { NavigationInput } from './input.ts'
 import { sampleTakeoff, TAKEOFF_TICKS } from './takeoff.ts'
@@ -11,6 +12,7 @@ import { type Body } from './sampleUniverse.ts'
 export class NavigationRuntime {
  readonly bodies:readonly Body[]
  readonly location?: ScoutLocation
+ surfaceDefinitionForBody?: (bodyId: string) => PlanetReference
  get surfaceLocation() { return this.location?.binding ? this.location : undefined }
  private scanRecord: ScoutLocation['scanner'] = null
  readonly pilotInput = new NavigationInput()

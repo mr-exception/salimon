@@ -1,19 +1,21 @@
-# Canonical browser planet surface (#847)
+# Canonical browser planet surface (#847 / #848)
 
 The browser owns three **illustrative packaged fixtures**, not observed scientific
 bodies: `vesper` (6,200,000 m), `vesper-moon` (1,400,000 m) and `caligo`
 (9,000,000 m). They retain the shipped sample catalog IDs. There is no archived
-Rust import, procedural geology, satellite ephemeris or new exploration artwork.
+Rust import or scientific satellite ephemeris. P02 adds deterministic geological
+terrain and a minimal physical ground preview; illustrated streaming art is P03/P04.
 
 ## Publication and compatibility
 
 `client/src/planetDefinition.ts` publishes schema/record version 1, spherical
 geometry, `surface:v1` coordinates and independent terrain, geology, resources and
 visual domain versions, explicit 64-bit hexadecimal seeds, algorithms, parameters
-and content digests. Terrain is a flat sphere; geology is unspecified; resources
-are authored-only; visual parameters are illustrative palette identities. None
-selects random content. No domain currently consumes another domain's generated
-output. Future upstream dependencies must be explicit in a new publication.
+and content digests. Revision 1 remains the original flat sphere. Revision 2
+publishes `geological-sphere:v2` consuming `provinces:v2` inputs; resources remain
+authored-only and visual parameters remain palette identities. `planetDefinition`
+without a reference deliberately resolves legacy v1; `geologicalDefinition`
+selects the separately pinned v2 record. No runtime seed selection occurs.
 
 Digests use sorted-key compact JSON, UTF-8 and unsigned FNV-1a-64, displayed as
 16 lowercase hex digits. Full-record hashing includes all domain digests; the
@@ -70,8 +72,9 @@ publication and returns definition/body/region/site/terrain identity, height,
 slope, solid ground, collision, swept walking fraction, optional landing clearance
 and original source IDs at the queried source footprint. Landing clearance is
 `null` until `landingYaw` is supplied. Probe motion/yaw are in the canonical
-region's basis. The current terrain is flat, solid and undeformed; other positions
-and bodies receive no invented resources.
+region's basis. Revision 2 also returns `normalBody` (unit body-fixed normal),
+`grade`, `groundType`, continuous province `weights` and a geological domain ID.
+No query invents collectible sources.
 
 `authoredSurface.ts` owns immutable physical positions and boxes. Artwork in
 `planetarySite.ts` reads them instead of choosing collision from sprites.
@@ -95,17 +98,24 @@ overlay to another body. Resource quantities/depletion remain exclusively in
 uses its sample for touchdown clearance. It retains the original Vesper
 `site:illustrated-landing:v1`, outdoor spawn `[-6, 3]`, Scout pose `[2, -1, -.12]`,
 `source:landing:mineral:01` and `source:landing:biology:01`. Site-state restoration
-still uses the existing validated entity anchors/removals; no new save schema or
-write-on-read migration is introduced. Legacy v1–v11 saves remain bound to this
-exact `surface:v1` publication and its pinned definitions. They must never be
-silently assigned a future default publication. A future save schema should store
-`PlanetReference` explicitly; any transition from the legacy binding requires an
-approved migration and preservation of the resource ledger.
+still uses the existing validated entity anchors/removals. The approved P02
+migration keeps absent `SurfaceAddress.definition` references bound to v1;
+pre-v11 saves also explicitly follow the legacy starting binding. New expeditions
+start with a compact `{bodyId, version, digest}` v2 reference. Geometry, original
+anchors/IDs and depletion do not move, and migration does not rewrite on read.
+
+The first saved binding for a **body** governs all subsequent landing regions in
+that save, including previously unseen neighbors. This prevents a v1/v2 border
+seam. Old saves keep existing bodies at v1; first visits to other bodies adopt v2.
+Conflicting body revisions, unknown hashes and changed complete records fail
+closed. There is no automatic upgrade of a previously visited body's geography;
+a later such upgrade needs a separately approved physical migration. New v2
+sites persist their reference across takeoff, landing, depletion and reload.
 
 A renderer-independent consumer can use the adapter directly:
 
 ```ts
-const definition = planetDefinition('vesper-moon')
+const definition = geologicalDefinition('vesper-moon')
 const location = { bodyId: definition.bodyId, radialM: [definition.radiusM + 5, 0, 0] as const }
 const region = surfaceRegion(location, definition)
 const nextLocation = localToSurface(region, [12, -3])
@@ -136,3 +146,58 @@ reference images are changed. New execution logs/captures belong in ignored
 `client/test-results/` and existing CI artifacts, with the criterion matrix in
 the delivering PR. CI results and final acceptance await the owner's report in
 the active chat. No physical M1/Metal performance claim is made.
+
+## P02 geological field and prototype movement
+
+`planetGeology.ts` evaluates smooth global Cartesian waves in body-fixed metres.
+Kilometre-scale provinces drive relief, closed impact bowls/rims, highlands and
+fractured ridges. Fixed seeds and body-specific relief produce distinct Vesper,
+moon and Caligo fixtures. Only the packaged cold moon enables polar surface ice;
+these are illustrative geology parameters, not measured climate claims. Barren
+areas have no mandatory organisms. Province weights and height blend continuously;
+material labels discretize those weights. Region IDs, chart ownership and visual
+LOD never enter the field. Normals use a fixed 0.125 m central difference, not
+renderer mesh normals. A flat authored disk of radius 200 m protects every
+original footprint and blends smoothly into relief over the next 1,800 m.
+
+Initial prototype movement is overhead walking: a 0.46 m player disk, maximum
+32 degree grade, and swept 0.25 m query intervals with a conservative 0.2 m/m²
+curvature bound and 0.25 m sweep margin. Existing box collision still owns ship
+fixtures and authored objects; slope collision composes with it in `stepTopDown`.
+Movement uses the world's chart across region boundaries, never reinterprets its
+axes as the next region's. No jumping, platforming, caves or vertical character
+simulation is introduced. Generated obstacles are steep rock/ridge footprints,
+not independently randomized collectible boulders.
+
+Scout landing requires at most 8 degree grade throughout the conservative
+10 × 17 m enclosing hull/access box, sampled at 0.5 m with a half-diagonal
+curvature margin, and no more than 0.5 m height variation from its centre. The
+existing authored-box clearance remains authoritative too. `surfaceContactRadial`
+adds sampled height to the canonical navigation shell for actual Scout placement
+and the landing endpoint; the stored coordinate and tangent basis do not change.
+The continuous landing Bezier must remain above a conservative 2 m/m terrain
+cone (with an analytical tighter bound inside the authored blend), rejecting
+obstructed lateral approaches instead of clipping an intermediate ridge. The
+landing HUD subtracts the same sampled ground height, using the session’s
+body binding even before a landing plan is admitted. Contact departure tolerates
+0.1 mm of split-position rounding, matching takeoff preflight. Existing flight funding and timing rules remain intact.
+
+Single probes reject radius >4 m and motion >64 m; the special landing probe
+has its fixed bounded grid. `sampleGeologyBatch` accepts at most 2,048 queries.
+There is no planetary heightfield allocation. Immutable baseline landing
+clearance has a 32-entry cache; mutable authored save deltas are still checked on
+load/commands. `GeneratedGround.tsx` displays at most 1,600 2 m cells, cached by
+8 m camera shifts. Its material and conservative steep-rock cracks/shading sample the
+same field; the rock marking includes footprint/subcell margins and is not an exact
+walk boundary. It creates neither collision nor source entities. This is a
+bounded physical preview for P03 streaming/P04 illustration, not new approved
+art baselines.
+
+`planetGeology.test.ts` covers publication, fresh-process/order/batch stability,
+seams, coherent transitions, normal/slope, physical sweep/landing negatives,
+height-bound contact, invalid definitions and workload limits.
+`surfaceSite.test.ts` covers body-wide legacy binding and new-v2 flight/reload.
+`tests/terrain.spec.ts` runs the built production keyboard/collision/render/save
+path, captures original/repeat images and compares displayed slope/material with
+the domain. It runs in the cockpit project and bounded PR smoke; existing
+surface-site/gathering browser journeys protect the authored opening site.

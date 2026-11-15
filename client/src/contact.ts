@@ -63,7 +63,9 @@ export function resolveContacts(before:ShipState,after:ShipState,bodies:readonly
   const velocity=add(before.velocityMps,scale(sub(after.velocityMps,before.velocityMps),t))
   const relative=sub(velocity,surfaceVelocity(body,scale(n,body.radiusKm*1000)))
   // A touching ship that departs or travels tangent is not an impact.
-  if(length(start)>=physicalRadiusM(body)-1e-7 && dot(relative,n)>=0)continue
+  // Split astronomical offsets can round metre-scale additions by <0.1 mm;
+  // use the same contact tolerance as takeoff preflight, not a 0.1 µm test.
+  if(length(start)>=physicalRadiusM(body)-.0001 && dot(relative,n)>=0)continue
   if(!hit || t<hit.t || (t===hit.t&&body.id<hit.body.id))hit={body,t,n,speed:length(relative)}
  }
  if(!hit)return after

@@ -30,7 +30,7 @@ export function GeneratedGround({state}: {state: TopDownState}) {
       return <g key={`${x}:${y}`} data-ground-position={`${x+1},${y+1}`} data-ground-slope={sample.slopeRadians} data-ground-type={sample.groundType} data-ground-steep={String(steep)} transform={`translate(${vx*state.camera.pixelsPerM} ${vy*state.camera.pixelsPerM}) rotate(${-state.frames.ship.angle*180/Math.PI}) scale(${state.camera.pixelsPerM})`}>
         <rect width="2.01" height="2.01" fill={colors[sample.groundType]} />
         <rect width="2.01" height="2.01" fill="#28342f" opacity={Math.min(.28,sample.grade*.32)} />
-        <path d={steep ? 'M.3 1.8l.35-.6-.2-.35.65-.6m-.45.95.65.15.45-.35' : 'M.2 1.6L1.2 1.4'} stroke={steep ? '#383d3b' : '#c5baa4'} strokeWidth={steep ? '.055' : '.04'} opacity={steep ? .8 : .35} />
+        <path fill="none" d={steep ? 'M.3 1.8l.35-.6-.2-.35.65-.6m-.45.95.65.15.45-.35' : 'M.2 1.6L1.2 1.4'} stroke={steep ? '#383d3b' : '#c5baa4'} strokeWidth={steep ? '.055' : '.04'} opacity={steep ? .8 : .35} />
       </g>
     })}
   </g>

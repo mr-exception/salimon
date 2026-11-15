@@ -1,3 +1,5 @@
+import { probeGeology } from './planetGeology.ts'
+import { surfaceRegion, localToSurface } from './surfaceCoordinates.ts'
 import { planetDefinition, geologicalDefinition } from './planetDefinition.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { scoutLandingSurface } from './scoutLocation.ts'
@@ -9,7 +11,7 @@ import { freshHazards, validateHazards, hazardRates, stepHazards, type HazardSta
 import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
-import { CELL_SIZE_M } from './coordinates.ts'
+import { CELL_SIZE_M, ORIGIN, relativeM } from './coordinates.ts'
 import { controlsCockpit, LOCAL_PLAYER, leaveCockpit, type CockpitState } from './cockpit.ts'
 import { STARTING_SITE } from './planetarySite.ts'
 import { addCountItem, removeCountItem, registerCountItems, type CountItemCatalog, increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
@@ -83,6 +85,11 @@ function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
     if (!entity.footprint || world.frames.ship.parent === null && entity.anchor.frame !== parsed.frame) continue
     const [x, y] = rotate2(relativeAnchor(parsed, entity.anchor, world.frames), entity.anchor.frame === world.frames.ship.id ? -world.frames.ship.angle : 0)
     if (![x, y].every(Number.isFinite) || (Math.abs(x) < entity.footprint.halfWidth + PLAYER_RADIUS_M - 1e-8 && Math.abs(y) < entity.footprint.halfHeight + PLAYER_RADIUS_M - 1e-8)) throw new Error('Unsafe saved location')
+  }
+  const surface = world.scoutLocation.surface
+  if (parsed.frame === 'planet:fixture' && surface.definition?.version === 2) {
+    const region = surfaceRegion(surface, surface.definition), [x,y] = relativeM(parsed.point, ORIGIN)
+    if (probeGeology(localToSurface(region,[x,y]), surface.definition, PLAYER_RADIUS_M).collision) throw Error('Unsafe saved terrain location')
   }
   return { anchor: parsed, facing: location.facing }
 }

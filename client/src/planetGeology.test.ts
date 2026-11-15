@@ -91,6 +91,13 @@ test('AC-3/5 steep ground is swept without tunnelling; player and Scout share bl
   const [x,y]=relativeM(world.entities[0]!.anchor.point,ORIGIN)
   assert.ok(x<pair.x+48);assert.equal(probeGeology(localToSurface(region,[x,y]),definition,.46).collision,false)
   for(let i=1;i<points.length;i++) assert.ok(Math.abs(points[i]!.s.grade-points[i-1]!.s.grade)<TERRAIN_CURVATURE_BOUND)
+  const safeSite=resolveSurface(scout.surface),safeRegion=surfaceRegion(scout.surface,definition)
+  const invalidAnchor={frame:'planet:fixture' as const,point:point2(...surfaceToLocal(blocked.location,safeRegion))}
+  const initial=createTopDownState()
+  const saveWorld={...initial,scoutLocation:scout,frames:safeSite.frames,entities:[...initial.entities.filter(e=>e.layer!=='terrain').map(e=>e.id===PLAYER_ID?{...e,anchor:invalidAnchor}:e),...siteEntities(safeSite)]}
+  const invalid=new ResourceSession({getItem:()=>null,setItem:()=>{}},saveWorld)
+  const raw=JSON.stringify(invalid.snapshot,(_,v)=>typeof v==='bigint'?String(v):v)
+  assert.notEqual(new ResourceSession({getItem:()=>raw,setItem:()=>{}},createTopDownState()).error,'','reload cannot place a player inside generated blocked ground')
 })
 
 test('AC-3/4 elevated Scout contact, continuous landing endpoint and revision-bound reload',()=>{

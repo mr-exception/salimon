@@ -110,7 +110,9 @@ test('AC-3/4 elevated Scout contact, continuous landing endpoint and revision-bo
   const telemetrySession=new ResourceSession({getItem:()=>null,setItem:()=>{}},createTopDownState())
   targetTelemetry.surfaceDefinitionForBody=id=>telemetrySession.bodyDefinition(id)
   close(landingReadout(targetTelemetry).altitudeM!,100,.001)
-  targetTelemetry.surfaceDefinitionForBody=id=>planetDefinition(id)
+  // An imported v1 first-visit landing plan is authoritative before that body
+  // has any completed site; telemetry must not silently adopt the v2 default.
+  telemetrySession.world.scoutLocation.landing={...plan,surface:{...address,definition:undefined}}
   close(landingReadout(targetTelemetry).altitudeM!,100+sample.heightM,.001)
   const encoded=JSON.parse(JSON.stringify(captureScout(scout),(_,v)=>typeof v==='bigint'?String(v):v))
   assert.deepEqual(decodeScout(encoded),scout)

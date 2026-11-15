@@ -313,6 +313,8 @@ export class ResourceSession {
   }
   /** Read-only publication for both target telemetry and physical admission. */
   bodyDefinition(bodyId: string) {
+    const plan = this.world.scoutLocation.landing
+    if (plan?.surface.bodyId === bodyId) return planetDefinition(bodyId, plan.surface.definition)
     const saved = Object.values(this.snapshot.sites).find(s => s.address.bodyId === bodyId)
     return saved ? planetDefinition(bodyId, saved.address.definition) : geologicalDefinition(bodyId)
   }

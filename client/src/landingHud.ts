@@ -1,3 +1,4 @@
+import { geologicalDefinition } from './planetDefinition.ts'
 import { rotateLanding } from './landing.ts'
 import { samplePlanetSurface } from './planetSurface.ts'
 import { STEP_SECONDS } from './simulation.ts'
@@ -16,7 +17,10 @@ export function landingReadout(navigation: NavigationRuntime) {
       .sort((a, b) => length(relativeM(ship.position, a.position)) - length(relativeM(ship.position, b.position)))[0] : undefined)
   if (!body) return { body: undefined, altitudeM: null, relativeSpeedMps: null }
   const radial = relativeM(ship.position, body.position)
-  const reference = navigation.location?.surface.bodyId === body.id ? navigation.location.surface.definition : undefined
+  const solid = body.kind === 'planet' || body.kind === 'moon'
+  const reference = solid ? navigation.surfaceDefinitionForBody?.(body.id)
+    ?? (navigation.location?.surface.bodyId === body.id ? navigation.location.surface.definition
+      : navigation.location ? geologicalDefinition(body.id) : undefined) : undefined
   const baseRadius = physicalRadiusM(body)
   const height = reference?.version === 2 ? samplePlanetSurface({ bodyId: body.id,
     radialM: rotateLanding(scale(normal(radial), baseRadius), body, -ship.tick * STEP_SECONDS) }, reference).heightM : 0

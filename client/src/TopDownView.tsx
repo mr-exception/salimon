@@ -87,6 +87,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (!lock) { setSaveStatus('Another tab has this expedition open. Close it and reload to gather.'); return }
       try {
         session.current = createResourceSession(localStorage, current.current)
+        navigation.surfaceDefinitionForBody = id => session.current!.bodyDefinition(id)
         container.current = new ResourceContainerInteraction(session.current)
         current.current = session.current.world
         setState(current.current)
@@ -100,6 +101,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       session.current?.checkpoint()
       container.current?.close()
       container.current = null
+      navigation.surfaceDefinitionForBody = undefined
       session.current = null
       unlock?.()
     }

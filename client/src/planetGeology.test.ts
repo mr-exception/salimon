@@ -104,6 +104,14 @@ test('AC-3/4 elevated Scout contact, continuous landing endpoint and revision-bo
   assert.ok(Math.hypot(...relativeM(landed.position,scout.ship.position))<1e-6)
   const navigation=new NavigationRuntime(SAMPLE_BODIES,scout);navigation.advance(1/60)
   close(landingReadout(navigation).altitudeM!,0,.001)
+  const targetTelemetry=new NavigationRuntime(SAMPLE_BODIES,createTopDownState().scoutLocation)
+  targetTelemetry.clock.state={...anchor,position:anchor.position}
+  targetTelemetry.scanner.contacts=[body];targetTelemetry.scanner.selected=body.id
+  const telemetrySession=new ResourceSession({getItem:()=>null,setItem:()=>{}},createTopDownState())
+  targetTelemetry.surfaceDefinitionForBody=id=>telemetrySession.bodyDefinition(id)
+  close(landingReadout(targetTelemetry).altitudeM!,100,.001)
+  targetTelemetry.surfaceDefinitionForBody=id=>planetDefinition(id)
+  close(landingReadout(targetTelemetry).altitudeM!,100+sample.heightM,.001)
   const encoded=JSON.parse(JSON.stringify(captureScout(scout),(_,v)=>typeof v==='bigint'?String(v):v))
   assert.deepEqual(decodeScout(encoded),scout)
   encoded.surface.definition.digest='wrong';assert.throws(()=>decodeScout(encoded),/mismatch/)

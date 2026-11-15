@@ -178,7 +178,8 @@ and the landing endpoint; the stored coordinate and tangent basis do not change.
 The continuous landing Bezier must remain above a conservative 2 m/m terrain
 cone (with an analytical tighter bound inside the authored blend), rejecting
 obstructed lateral approaches instead of clipping an intermediate ridge. The
-landing HUD subtracts the same sampled ground height. Contact departure tolerates
+landing HUD subtracts the same sampled ground height, using the session’s
+body binding even before a landing plan is admitted. Contact departure tolerates
 0.1 mm of split-position rounding, matching takeoff preflight. Existing flight funding and timing rules remain intact.
 
 Single probes reject radius >4 m and motion >64 m; the special landing probe

@@ -1,4 +1,4 @@
-import { planetDefinition } from './planetDefinition.ts'
+import { planetDefinition, geologicalDefinition } from './planetDefinition.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { scoutLandingSurface } from './scoutLocation.ts'
 import { captureSite, resolveSurface, siteEntities, validateSurfaceClearance, type SiteStates, type SiteState, type SurfaceAddress } from './surfaceSite.ts'
@@ -310,6 +310,11 @@ export class ResourceSession {
     if (!survivalPolicy(this.survival).canWork) return 'Pilot cannot work in the current survival condition.'
     if (this.activeSourceId !== null) return 'Stop gathering before starting a Scout maneuver.'
     return takeoff ? takeoffDenial(this.world.scoutLocation) : null
+  }
+  /** Read-only publication for both target telemetry and physical admission. */
+  bodyDefinition(bodyId: string) {
+    const saved = Object.values(this.snapshot.sites).find(s => s.address.bodyId === bodyId)
+    return saved ? planetDefinition(bodyId, saved.address.definition) : geologicalDefinition(bodyId)
   }
   /** Approved controlled migration: absent ref is legacy v1. A body's first
    * binding wins for the whole save, preventing seams between visited regions. */

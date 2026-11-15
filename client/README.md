@@ -1030,3 +1030,15 @@ reload, cargo and departure, plus production denials/power interruption/impact.
 Original/repeat/negative screenshots and state use ignored `test-results/` and
 existing CI artifact uploads (14-day retention); references are never silently
 updated. Native hardware qualification remains separate from cloud SwiftShader.
+
+## Canonical planet surface (#847)
+
+The renderer-independent `planetDefinition.ts`, `surfaceCoordinates.ts`,
+`planetSurface.ts` and `surfacePhysics.ts` publish and sample three illustrative
+flat bodies. See the [coordinate, definition and #842 integration contract](../docs/browser-planet-surface.md).
+The shipped Vesper source IDs, spawn, Scout pose and save/depletion ledger remain
+compatible. Unknown definitions and version/hash/geometry mismatches reject.
+`npm test` includes golden publications, cross-process identity, seam/pole
+round-trips, neighbors, collision and legacy-save scenarios; `npm run build`
+checks browser bundling. Use affected surface-site/gathering/top-down Chromium
+routes for production regression; retain output in ignored `test-results/`.

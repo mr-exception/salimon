@@ -33,6 +33,13 @@ metres, versioned physical regions, tangent basis, sparse patch and safe footpri
 See the [surface contract](../client/README.md#deterministic-surface-sites-842)
 and [save continuity](save-contract.md#browser-surface-region-continuity-842).
 
+Browser canonical surface (#847): `planetDefinition.ts` owns frozen publications
+and compatibility; `authoredSurface.ts` owns physical Vesper overrides;
+`surfaceCoordinates.ts` owns body-fixed regions, tangent charts and neighbors;
+`planetSurface.ts`/`surfacePhysics.ts` own authoritative samples and shared
+collision. `surfaceSite.ts` adapts #842 landing and legacy saves without rekeying.
+See [browser planet surface](browser-planet-surface.md) and `planetSurface.test.ts`.
+
 Browser cross-view interaction/feedback (#830): `ui/interaction.ts` owns utility
 and modal Escape ordering and safe focus return; `ui/Feedback.tsx` and
 `ui/feedback.ts` own accessible priority/deduplication and modal warning mirrors.

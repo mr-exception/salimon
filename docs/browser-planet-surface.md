@@ -12,8 +12,9 @@ terrain and a minimal physical ground preview; P03 adds continuous regional walk
 geometry, `surface:v1` coordinates and independent terrain, geology, resources and
 visual domain versions, explicit 64-bit hexadecimal seeds, algorithms, parameters
 and content digests. Revision 1 remains the original flat sphere. Revision 2
-publishes `geological-sphere:v2` consuming `provinces:v2` inputs; resources remain
-authored-only and visual parameters remain palette identities. `planetDefinition`
+publishes `geological-sphere:v2` consuming `provinces:v2` inputs; its original
+resource record remains authored-only, extended by the separately pinned P05
+publication below. Visual parameters remain palette identities. `planetDefinition`
 without a reference deliberately resolves legacy v1; `geologicalDefinition`
 selects the separately pinned v2 record. No runtime seed selection occurs.
 
@@ -253,3 +254,55 @@ collision/render route; existing gathering/traversal/flight tests protect source
 door and detached cabin semantics. Full world CI includes streaming in the
 existing cockpit project and uploads ignored `client/test-results/` artifacts
 with 14-day retention. CI acceptance awaits the user's report in this chat.
+
+## Geology-driven mineral deposits (#851)
+
+`planetDeposits.ts` publishes the supplemental `geological-deposits:v1` resource
+rules (`DEPOSIT_RULES`, digest `d703783c21cc35a6`). This extends the authored-only
+resource domain of **geological v2** bodies without changing any published terrain,
+coordinate or visual record. Legacy flat v1 bodies remain authored-only. Reading
+an older save adopts this additive resource publication in memory; the next
+successful transaction writes `depositPublication` alongside the existing v12
+schema. Unknown publication hashes fail closed; original sources, quantities,
+anchors and work remain unchanged. No physical geography is migrated.
+
+Four bounded candidates per canonical ratio-grid cell use the body's resource
+seed, publication, cell coordinates and slot. Canonical ownership rejects seam
+duplicates. A mixed 64-bit deterministic hash chooses subcell position, presence,
+rarity and integer grams. Highlands and fractured provinces raise the probability;
+polar ice, unsafe solid-ground footprints and the original 200 m Vesper inset
+are excluded. The prototype only generates existing `mineral`, never biomass:
+common deposits contain 2,000–12,000 g; rare deposits contain 30,000–60,000 g at
+4% of accepted candidates. These are illustrative prototype material rules,
+not a chemical/economic simulation. Barren cells are valid. Camera, player identity,
+LOD, neighboring query order and cache residency do not enter candidate identity.
+
+`ResourceSession` retains only the current two-ring immutable deposit neighborhood
+(at most 17 cells / 68 candidates, rebuilt on region change). Ship-footprint
+exclusion is a visit overlay: deposits within the Scout's conservative 12×20 m
+clearance rectangle are suppressed, never moved or rekeyed. The same entity anchor,
+0.65 m half-box and 2.3 m reach drive collision, selection and the scaled mineral
+illustration above the ground raster. Depleted silhouettes keep their collider
+and existing dimmed cue. The active world frame reprojects neighboring source
+anchors; sources are absent in flight and on other bodies.
+
+Only starting work registers a procedural source in the existing atomic ledger.
+Initial mass is regenerated from the canonical ID on validation/reload, never
+trusted from saved metadata. Source IDs must bind a visited body's exact v2
+publication. Unworked baselines are disposable and do not accumulate in saves.
+Worked sources and fractional work survive eviction/revisit/reload; the same
+1 kg/s baseline, survival modifiers, partial weight/slot capacity, interruptions
+and 50 kg Scout container apply. No fragments, volume storage or new item types
+are created. `sourceDeltas()` exposes exact cumulative debited grams by source
+(including authored sources, omitting zero deltas) for P07 aggregate persistence.
+
+`planetDeposits.test.ts` owns fixed barren/common/dense/rare vectors, fresh-process
+replay, body/seam validation, bounded queries, conservation, survival/capacity,
+interruption, failed writes and eviction/reload. `tests/deposits.spec.ts` exercises
+built Chromium input, source originals/repeats, missing-source negative comparison,
+depletion and a 240 m out/back eviction-and-reload journey. The gathering, surface-site
+and terrain-art suites retain their authored-source and physical/art checks;
+old assertions that all generated regions contain zero resources now prohibit
+copied authored sources and generated biology instead. New originals remain in
+ignored `client/test-results/`, with the validation record in the PR. Hardware
+and subjective art qualification remain separate from Chromium CPU/SVG evidence.

@@ -11,7 +11,7 @@ for(const fixture of ART_FIXTURES)test(`ART-850 ${fixture.name} production illus
   await page.addInitScript(({key,raw})=>{if(!localStorage.getItem(key))localStorage.setItem(key,raw)},{key:RESOURCE_SAVE_KEY,raw})
   await boot(page,'','http://127.0.0.1:4175')
   await expect(page.locator('[data-art-samples]')).toHaveAttribute('data-art-samples','1681')
-  await expect(page.locator('[data-source-kind]')).toHaveCount(0)
+  await expect(page.locator('[data-source-kind="biological"]')).toHaveCount(0)
   const ground=page.locator('[data-generated-ground]'),url=await ground.locator('image').getAttribute('href')
   expect(url!.length).toBeGreaterThan(1000)
   const original=await page.screenshot({path:info.outputPath('original.png')})
@@ -51,7 +51,7 @@ for(const fixture of ART_FIXTURES)test(`ART-850 ${fixture.name} production illus
 
 test('ART-850 generated four-direction borders retain continuous albedo and physical state',async({page},info)=>{
   test.setTimeout(600000)
-  const raw=terrainArtSave('caligo',[1,0,0],[10,10])
+  const raw=terrainArtSave('caligo',[1,0,0],[0,0])
   await page.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:RESOURCE_SAVE_KEY,raw})
   await boot(page,'','http://127.0.0.1:4175')
   const ground=page.locator('[data-generated-ground]'),before=await position(page),routes:unknown[]=[]

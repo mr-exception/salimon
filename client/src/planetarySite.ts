@@ -10,7 +10,7 @@ export const STARTING_SITE = {
   shipOrigin: point2(AUTHORED_SURFACE.ship[0], AUTHORED_SURFACE.ship[1]), shipAngle: AUTHORED_SURFACE.ship[2],
 } as const
 export interface SourceIdentity {
-  readonly siteId: typeof STARTING_SITE.id
+  readonly siteId: string
   readonly kind: 'mineral' | 'biological'
   readonly archetype: 'banded-outcrop' | 'plate-colony'
 }

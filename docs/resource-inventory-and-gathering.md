@@ -21,6 +21,11 @@ transfers are playable through #785. The older native physical-fragment system i
 - Existing interaction reaches are 2.3 m mineral and 1.9 m biological. Movement, Escape, stowing the tool, leaving reach, losing focus/visibility and cockpit entry interrupt gathering. Partial work is checkpointed per source and retained across interruptions/reload; gathering itself requires explicit restart. See [approved tuning](browser-survival.md#approved-work-and-action-tuning-799). Completed mass and work debit share the atomic source/inventory transaction.
 - A full-weight or full-slot message explains why collection stopped. Depleted sources preserve their stable IDs and collider identities and remain visibly depleted. Gathering tool upgrades and additional source types are **TBD**.
 
+Geological v2 planetary regions also expose deterministic mineral outcrops through
+#851. They use this same work/slot/gram/container path and keep depletion by
+canonical source ID across streaming and reload. Original Vesper sources remain
+unchanged; no procedural biomass is added. See [deposit publication and persistence](browser-planet-surface.md#geology-driven-mineral-deposits-851).
+
 ## Ship storage and equipment storage
 
 | Destination/module | Weight capacity | Slots | Permitted contents |

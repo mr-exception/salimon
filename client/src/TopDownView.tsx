@@ -40,14 +40,16 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
   const height = Math.max(640, 1200 * size.height / size.width)
   const items = drawList(state)
   const sprites = useWorldSprites(state.entities)
+  const renderItems = (list: typeof items) => list.map(({ entity, positionM: [x, y], angle }) =>
+        <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
+          <WorldSprite entity={entity} />
+        </g>)
   return <svg ref={viewport} className="top-down-scene" viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {layer === 'terrain' && state.scoutLocation.binding && <rect x={-width/2} y={-height/2} width={width} height={height} fill="#b5a58b" />}
-      {items.filter(item => item.entity.layer === layer).map(({ entity, positionM: [x, y], angle }) =>
-        <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.snapshot.sources[entity.id]?.remainingGrams} data-depleted={session?.snapshot.sources[entity.id]?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
-          <WorldSprite entity={entity} />
-        </g>)}
+      {renderItems(items.filter(item => item.entity.layer === layer && ['ground', 'surface'].includes(item.entity.appearance)))}
       {layer === 'terrain' && <GeneratedGround state={state} width={width} height={height} />}
+      {renderItems(items.filter(item => item.entity.layer === layer && !['ground', 'surface'].includes(item.entity.appearance)))}
       {layer === 'cues' && items.filter(item => item.entity.id === state.selectedId).map(({ entity, positionM: [x, y], angle }) => <g key={entity.id} data-selection={entity.id} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={entity} selected /></g>)}
     </g>)}
   </svg>
@@ -201,7 +203,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const usage = resourceSession && resourceInventoryUsage(resourceSession.snapshot.inventory, RESOURCE_CATALOG, resourceSession.itemCatalog)
   const selectedContainer = resourceSession && selected?.id === SCOUT_RESOURCE_CONTAINER_ID
   const closeContainer = () => { container.current?.close(); current.current = session.current?.world ?? current.current; (document.activeElement as HTMLElement | null)?.blur(); setState({ ...current.current }) }
-  const selectedSource = resourceSession && selected && resourceSession.snapshot.sources[selected.id]
+  const selectedSource = resourceSession && selected && resourceSession.source(selected.id)
   const interact = () => {
     if (current.current.scoutLocation.ship.mode === 'destroyed' || paused.current || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && (!!resourceSession.error || !survivalPolicy(resourceSession.survival).canWork)) return
     if (selectedContainer && container.current?.open(current.current)) current.current = container.current.session.world

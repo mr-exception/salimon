@@ -1,3 +1,4 @@
+import { samplePhysicalSurface, WALK_RADIUS_M } from './surfacePhysics.ts'
 import { relativeAnchor, rotate2, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
 // Footprints are in metres in the entity's own frame and rendered from this data.
@@ -9,31 +10,19 @@ export interface WorldObject {
   readonly footprint?: Footprint
   readonly interaction?: Interaction
 }
-export const PLAYER_RADIUS_M = .46
+export const PLAYER_RADIUS_M = WALK_RADIUS_M
 const angleOf = (anchor: Anchor, frames: WorldFrames) => anchor.frame === frames.ship.id ? frames.ship.angle : 0
 
-// Swept point versus a conservatively expanded box. It cannot tunnel even if a
-// caller requests a long move. Tangent/away motion at a boundary remains legal.
-function hitFraction(origin: Point2, delta: Point2, box: Footprint): number {
-  let enter = -Infinity, leave = Infinity
-  for (let axis = 0; axis < 2; axis++) {
-    const extent = (axis === 0 ? box.halfWidth : box.halfHeight) + PLAYER_RADIUS_M
-    if (Math.abs(delta[axis]) < 1e-12) {
-      if (Math.abs(origin[axis]) >= extent - 1e-10) return 1
-    } else {
-      const a = (-extent - origin[axis]) / delta[axis], b = (extent - origin[axis]) / delta[axis]
-      enter = Math.max(enter, Math.min(a, b)); leave = Math.min(leave, Math.max(a, b))
-    }
-  }
-  return enter < leave && leave > 1e-10 && enter >= -1e-10 && enter < 1 ? Math.max(0, enter - 1e-9) : 1
-}
 export function allowedMove(anchor: Anchor, deltaPlanet: Point2, objects: readonly WorldObject[], frames: WorldFrames): number {
   let fraction = 1
   for (const object of objects) {
     if (!object.footprint || frames.ship.parent === null && object.anchor.frame !== anchor.frame) continue
     const angle = -angleOf(object.anchor, frames)
     const origin = rotate2(relativeAnchor(anchor, object.anchor, frames), angle)
-    fraction = Math.min(fraction, hitFraction(origin, rotate2(deltaPlanet, angle), object.footprint))
+    const result = samplePhysicalSurface({ x: origin[0], y: origin[1], radiusM: PLAYER_RADIUS_M, motion: rotate2(deltaPlanet, angle) }, [
+      { id: object.id, x: 0, y: 0, ...object.footprint },
+    ])
+    fraction = Math.min(fraction, result.moveFraction)
   }
   return fraction
 }

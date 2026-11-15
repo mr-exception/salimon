@@ -125,7 +125,9 @@ test('AC-4/5 unsafe near-contact braking, invalid sites, other bodies and termin
 })
 
 test('AC-2/4 runtime rotating-body touchdown keeps the body-fixed site and continues surface motion', () => {
-  const body: Body = { id: 'spin', name: 'Spin', kind: 'moon', position: ORIGIN, radiusKm: 10, angularVelocityRadps: [0, 0, .0002] }
+  // Retain the rotation scenario on a published body: unversioned bodies
+  // are deliberately rejected by the canonical surface adapter.
+  const body: Body = { ...SAMPLE_BODIES.find(b => b.id === 'vesper-moon')!, position: ORIGIN, angularVelocityRadps: [0, 0, .00002] }
   const surface = { bodyId: body.id, radialM: [physicalRadiusM(body), 0, 0] as const, yaw: .3 }
   const l = surfaceScoutLocation(surface, [body], 300)
   l.binding = null; l.boardingDoor = 'closed'

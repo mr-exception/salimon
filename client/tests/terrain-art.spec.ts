@@ -51,7 +51,7 @@ for(const fixture of ART_FIXTURES)test(`ART-850 ${fixture.name} production illus
 
 test('ART-850 generated four-direction borders retain continuous albedo and physical state',async({page},info)=>{
   test.setTimeout(600000)
-  const raw=terrainArtSave('caligo',[1,0,0],[1,1])
+  const raw=terrainArtSave('caligo',[1,0,0],[3.5,3.5])
   await page.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:RESOURCE_SAVE_KEY,raw})
   await boot(page,'','http://127.0.0.1:4175')
   const ground=page.locator('[data-generated-ground]'),before=await position(page),routes:unknown[]=[]
@@ -75,6 +75,9 @@ test('ART-850 generated four-direction borders retain continuous albedo and phys
     await move(back!)
     const returned=await position(page)
     expect(Math.hypot(returned[0]!-before[0]!,returned[1]!-before[1]!)).toBeLessThan(.001)
+    // Compare the same settled camera patch, rather than the transient follow
+    // lag immediately after reversing a 170 m walk. No pixel tolerance changes.
+    await walkTicks(page,[],180)
     // The exact same albedo bytes return after region eviction/backtracking.
     expect(await ground.locator('image').getAttribute('href')).toBe(firstUrl)
     routes.push({out,far,returned,stats})

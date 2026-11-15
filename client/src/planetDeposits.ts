@@ -50,7 +50,7 @@ export function regionDeposits(region: SurfaceRegion): readonly PlanetDeposit[] 
       + Math.floor(random(key + ':grams') * (rare ? DEPOSIT_RULES.rareRangeGrams : DEPOSIT_RULES.commonRangeGrams))
     result.push({ initial: { id, resourceId: DEPOSIT_RULES.resourceId, remainingGrams }, rare,
       entity: { id, anchor: { frame: 'planet:fixture', chart: region, point: point2(x, y) }, layer: 'terrain', appearance: 'mineral',
-        footprint: { halfWidth: DEPOSIT_RULES.halfExtentM, halfHeight: DEPOSIT_RULES.halfExtentM },
+        footprint: { halfWidth: DEPOSIT_RULES.halfExtentM, halfHeight: DEPOSIT_RULES.halfExtentM, surfaceEast: region.east },
         source: { siteId: region.id, kind: 'mineral', archetype: 'banded-outcrop' },
         interaction: { label: rare ? 'Rich banded mineral outcrop' : 'Banded mineral outcrop', action: 'Inspect', reachM: DEPOSIT_RULES.reachM } } })
   }

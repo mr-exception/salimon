@@ -1,3 +1,6 @@
+import { dot, normal, scale } from './math.ts'
+import { allowedMove, objectAngle } from './topDownInteraction.ts'
+import { ORIGIN } from './coordinates.ts'
 import { test } from 'node:test'
 import { execFileSync } from 'node:child_process'
 import assert from 'node:assert/strict'
@@ -8,7 +11,7 @@ import { probeGeology } from './planetGeology.ts'
 import { samplePlanetSurface } from './planetSurface.ts'
 import { ResourceSession, RESOURCE_SOURCES } from './resourceSession.ts'
 import { createTopDownState, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
-import { point2, walkingFrames } from './topDownFrames.ts'
+import { point2, walkingFrames, type WorldFrames } from './topDownFrames.ts'
 import { resolveSurface, siteEntities } from './surfaceSite.ts'
 import { surfaceScoutLocation } from './scoutLocation.ts'
 
@@ -160,4 +163,21 @@ test('P05 generated work obeys survival limits and a failed gram write rolls bac
   assert.notEqual(working.error,'')
   const restored=new ResourceSession(store,base,undefined,undefined,()=>0)
   assert.equal(restored.error,'')
+})
+
+
+test('P05 physical footprint and illustrated direction survive a cube-face chart handoff', () => {
+  const d=geologicalDefinition('vesper')
+  const corner=surfaceRegion({bodyId:d.bodyId,radialM:scale(normal([1,1,1]),d.radiusM+5)},d)
+  const regions=depositNeighborhood(corner),deposit=regions.flatMap(regionDeposits)[0]!,source=deposit.entity,original=source.anchor.chart!
+  const target=regions.find(r=>r.cell.axis===1)!
+  const base:WorldFrames={planet:{id:'planet:fixture',universeOrigin:ORIGIN,angle:0},ship:{id:'ship:scout',parent:'planet:fixture',origin:point2(0,0),angle:0}}
+  const frames=walkingFrames(base,original,target)
+  const [x,y]=source.anchor.point.offsetM
+  const player={frame:'planet:fixture' as const,chart:original,point:point2(x+1.5,y)}
+  const direction=[-dot(original.east,target.east),-dot(original.east,target.north)] as const
+  const before=allowedMove(player,[-1,0],[source],base),after=allowedMove(player,direction,[source],frames)
+  assert.ok(Math.abs(before-.39)<1e-8)
+  assert.ok(Math.abs(after-before)<1e-5,`same physical contact across charts: ${before} vs ${after}`)
+  assert.ok(Math.abs(objectAngle(source,frames)-2*Math.PI/3)<1e-4,'source retains its body-space east across the differently oriented face')
 })

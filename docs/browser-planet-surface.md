@@ -282,7 +282,9 @@ LOD, neighboring query order and cache residency do not enter candidate identity
 exclusion is a visit overlay: deposits within the Scout's conservative 12×20 m
 clearance rectangle are suppressed, never moved or rekeyed. The same entity anchor,
 0.65 m half-box and 2.3 m reach drive collision, selection and the scaled mineral
-illustration above the ground raster. Depleted silhouettes keep their collider
+illustration above the ground raster. A body-fixed east direction rotates both
+collision and illustration together when walking charts change, including cube-face
+seams. Depleted silhouettes keep their collider
 and existing dimmed cue. The active world frame reprojects neighboring source
 anchors; sources are absent in flight and on other bodies.
 

@@ -35,7 +35,7 @@ function approach(bodyId = 'vesper') {
 const epoch = new Date('2026-11-04T00:00:00Z')
 
 test('LANDING-844 built Land control completes Vesper/moon walk, reload, cargo and relaunch journeys', async ({ page }, info) => {
- test.setTimeout(300000)
+ test.setTimeout(420000)
  const states: Record<string, unknown> = {}, main = page.locator('main'), pano = page.locator('.panoramic')
  const ship = async () => JSON.parse((await main.getAttribute('data-ship'))!)
  const advance = async (ms: number) => { for (let t = 0; t < ms; t += 100) await page.clock.fastForward(Math.min(100, ms - t)) }
@@ -112,7 +112,19 @@ test('LANDING-844 built Land control completes Vesper/moon walk, reload, cargo a
   expect((await ship()).mode).toBe('flying')
   await page.getByRole('button', { name: 'Exit cockpit' }).click(); await page.clock.runFor(64)
   await expect(page.locator('[data-entity][data-frame="planet:fixture"]')).toHaveCount(0)
-  states[bodyId] = { before, during, saved, departed: await ship() }
+  const departed = await ship()
+  // Revisit the same physical region through the production control, without
+  // replacing the save or installing another approach fixture.
+  await page.getByRole('button', { name: 'Use cockpit', exact: true }).click(); await page.clock.runFor(64)
+  await page.getByRole('button', { name: 'Land', exact: true }).click()
+  for (let i = 0; i < 300 && (await ship()).mode === 'landing'; i++) await advance(100)
+  expect((await ship()).mode).toBe('grounded')
+  const revisited = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
+  expect(revisited.scout.binding).toBe(saved.scout.binding)
+  expect(revisited.sources).toEqual(saved.sources); expect(revisited.stores).toEqual(saved.stores)
+  if (bodyId !== 'vesper') await expect(page.locator('[data-source-kind]')).toHaveCount(0)
+  await capture(`${bodyId}-revisited`)
+  states[bodyId] = { before, during, saved, departed, revisited }
  }
  await info.attach('journey.json', { body: JSON.stringify({ states, viewport: { width: 1280, height: 800 }, dpr: 1, epoch, seed: 'sampleUniverse / surface:v1', inputs: 'Playwright native keyboard/mouse; actual launch-derived Vesper save and synthetic moon approach; no pre-admitted landings' }), contentType: 'application/json' })
 })
@@ -122,8 +134,10 @@ test('LANDING-844 production disabled causes, terminal impact and power-loss res
  const main = page.locator('main'), ship = async () => JSON.parse((await main.getAttribute('data-ship'))!)
  await page.clock.install({ time: epoch }); await page.clock.pauseAt(new Date(epoch.getTime() + 1000))
  await page.goto('/?powerFixture=1')
- for (const reason of ['speed', 'range', 'undetected', 'blocked', 'impact', 'valid']) {
-  const initial = approach()
+ for (const reason of ['speed', 'tangential', 'range', 'undetected', 'blocked', 'impact', 'valid']) {
+  // A sparse moon patch isolates sideways speed from Vesper's nearby rocks.
+  const initial = approach(reason === 'tangential' ? 'vesper-moon' : 'vesper')
+  if (reason === 'tangential') initial.scout.ship.velocityMps = [20.01, 0, 0]
   if (reason === 'speed') initial.scout.ship.velocityMps = [0, 20.01, 0]
   if (reason === 'range') initial.scout.ship.position.offsetM[1] += 1e6
   if (reason === 'undetected') { initial.scout.scanner.contactIds = []; initial.scout.scanner.selected = null }
@@ -158,7 +172,7 @@ test('LANDING-844 production disabled causes, terminal impact and power-loss res
    await expect(main).toHaveAttribute('data-player-mode', 'standing')
   } else {
    await expect(page.getByRole('button', { name: 'Land', exact: true })).toBeDisabled()
-   await expect(page.locator('#landing-status')).toContainText(({ speed: '20 m/s', range: '0.15', undetected: 'Scan', blocked: 'footprint', unauthorized: 'Seal the door' } as Record<string, string>)[reason]!)
+   await expect(page.locator('#landing-status')).toContainText(({ speed: '20 m/s', tangential: '20 m/s', range: '0.15', undetected: 'Scan', blocked: 'footprint', unauthorized: 'Seal the door' } as Record<string, string>)[reason]!)
    if (reason === 'undetected') await expect(page.locator('#landing-readings')).not.toContainText('Vesper')
    const before = await ship(); await page.keyboard.press('l'); expect(await ship()).toEqual(before)
    await page.screenshot({ path: info.outputPath(`${reason}-denied.png`) })

@@ -1,5 +1,8 @@
 # Salimon browser prototypes
 
+See the [active browser launch/landing contract](../docs/browser-launch-landing.md) for the delivered
+production loop, supported sample sites, safety/save boundaries and QA coverage.
+
 Use the [2D documentation migration register](../docs/2d-migration-register.md) to distinguish the current browser implementation, approved future mechanics and archived native source contracts.
 
 **2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **up to 1 kg/s integer-gram** sample gathering with approved survival penalties with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v11 resource/item/survival/hazard/Scout/site ledger and migrates valid v1
@@ -162,7 +165,7 @@ split anchor (bigint cells, metre offsets, frame ID) and facing. Ship-local
 locations follow later ship pose changes; planet-fixed locations stay on the
 surface. This is a hook for a future authoritative reconnect adapter, which must
 validate spawn/collision and serialize the snapshot; the default entry serializes it in local `ResourceSession` saves, while
-multiplayer reconnect remains future work. Simulated relocation is tested without adding flight controls.
+multiplayer reconnect remains future work. The production flight controls and automatic surface handoff use this same frame authority.
 `topDownTraversal.test.ts` covers rotated handoffs, boundary/blocked paths,
 world/camera continuity and location retention. Browser `TRAVERSE-1` walks the
 outdoor-to-cockpit round trip twice, measures both handoffs, keeps the same scene,
@@ -233,7 +236,7 @@ both source archetypes, continuous doorway/camera handoffs, actual radar control
 standing return and walking back outside, twice in fresh browser contexts.
 Original screenshots and raw frame/source measurements are retained in the issue report.
 This proves foundation playability. #757 adds gathering and local saves below;
-Core, Fabricator, multiplayer and ship damage remain future features.
+Core processing, Fabricator, multiplayer and localized damage remain future features; whole-ship destructive flight collision is delivered.
 
 ## Gathering and saved expeditions (#757)
 
@@ -895,7 +898,8 @@ The world advances navigation exactly once per fixed tick; the mounted cockpit
 only publishes held input. Exit cockpit returns to the ship-local 2D interior;
 flight, scanner and selected throttle continue, while held steering is cleared.
 Re-entry preserves trajectory and observation. The aft door remains locked in
-flight pending EVA; no planetary exterior is presented. Landing is separate work.
+flight pending EVA; no planetary exterior is presented. The production Land
+control now completes the matching surface handoff (#844).
 The isolated `/?scene=radar` engineering fixture remains independently clocked.
 
 Focused verification: `npm test`, `npm run build`, and

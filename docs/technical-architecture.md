@@ -1,5 +1,8 @@
 # Technical architecture and AI maintenance
 
+See the [active browser launch/landing contract](browser-launch-landing.md) for the delivered
+production loop, supported sample sites, safety/save boundaries and QA coverage.
+
 ## Active browser world and navigation
 
 The default browser `/` starts outside the Scout in one continuous 2D world.

@@ -1,8 +1,11 @@
 # Current browser implementation and contract routing
 
+See the [active browser launch/landing contract](browser-launch-landing.md) for the delivered
+production loop, supported sample sites, safety/save boundaries and QA coverage.
+
 > **Shared UI foundation (#826), compact 2D HUD (#827) and panoramic styling (#828):** the [Expedition Interface HUD/equipment style guide](hud-ui-style-guide.md) specifies the shared industrial/projected visual system. Scoped tokens and typed primitives now have a development-only light/dark gallery (`client/src/ui`, `tests/ui.html`); the production 2D HUD now consumes its tokens, meters, progress, inventory utility and help dialog. Production panoramic instruments now consume the shared control, utility-panel and dialog skins, with opaque readouts and warning summaries inside help; compact survival/help/pause remain available in the cockpit. The storage dialog uses the shared industrial shell (#829), and cross-view focus/feedback uses shared priority and Escape owners (#830). The deterministic gallery and cross-view screenshot matrix (#831) extend existing Playwright coverage; see the [verification guide](../client/README.md#cross-view-expedition-interface-visual-regression-831). See [#828 evidence](../reports/issue-828/README.md). No new gameplay mechanics follow from the style approval.
 
-> **Panoramic cockpit (#815):** Default `/` opens the shared grounded panoramic observation scene at the Scout desk. The isolated `/?scene=radar` keeps the orthographic free-flight engineering fixture. See [the delivered integration](../client/README.md#cockpit-gameplay-766).
+> **Panoramic cockpit (#815):** Default `/` opens shared panoramic observation at the Scout desk, with authorized takeoff, manual flight and assisted landing. The isolated `/?scene=radar` keeps the orthographic free-flight engineering fixture. See [the delivered integration](../client/README.md#cockpit-gameplay-766).
 
 The [full 2D migration register](2d-migration-register.md) classifies every documentation file, maps historical 3D concepts onto active 2D design, and identifies the unfinished browser adapters.
 

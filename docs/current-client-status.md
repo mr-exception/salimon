@@ -114,3 +114,14 @@ The development-only `/tests/look-at.html` verifies flying and shared grounded
 composition; #815 also integrates this into the default grounded cockpit.
 See [API/help](../client/README.md#one-time-contact-observation-813) and
 [local evidence](../reports/issue-813/README.md); CI awaits the user's report.
+
+### Illustrated geological terrain (#850)
+
+The shared P02/P03 geological field now feeds blended illustrated ground,
+physical height contours and steep-rock footprints in the production SVG world.
+Supported icy bodies receive a distinct substrate; flat seeded pigment detail
+adds no resource IDs or collision. The authored Vesper opening, fixed HUD and
+Scout/player cutaway layers retain their ownership. Fixed art, repeat/negative,
+region-walk and obstacle approach coverage is documented in the
+[client guide](../client/README.md#illustrated-streamed-geology-850). This does
+not implement climate, weather, organisms or geological resource generation.

@@ -1060,3 +1060,38 @@ Streaming's four-direction built keyboard journey and chart/reload scenario run
 in the daily full cockpit project; terrain remains in PR smoke. Original/repeat
 captures, negative comparison and state records stay in ignored test output and
 existing CI artifacts. See [coordinate/cache/save contracts](../docs/browser-planet-surface.md#continuous-regional-walking-and-cache-849).
+
+### Illustrated streamed geology (#850)
+
+`GeneratedGround.tsx` consumes P02 geology through P03 `RegionStream`. Continuous
+province weights blend regolith, highland/fractured rock and supported polar ice;
+physical height isolines and a clipped walking-grade band draw overhead relief.
+Flat seeded pigment veins are albedo only, with no sources or collision. All
+layers stay beneath the Scout cutaway and player. Vesper's original 190 m opening
+stays transparent and blends into generated ground over 40 m. Publication hashes,
+collision, landing clearance, source IDs and journals are unchanged.
+
+The camera patch has 41 × 41 physical samples (1,681), a 320 × 320 interpolated
+albedo raster and bounded SVG paths. Diagonal coverage expands the sample spacing
+by powers of two for extreme aspect/zoom, retaining the existing 2,048 generation
+budget and 32-region cache limit. Normal walking shifts only the scene transform;
+8 m patch steps at normal scale refresh outside the visible region. Distant
+charts resample the same body-fixed field. Contour geometry is a 2 m display
+approximation at normal scale; movement/landing still query the continuous field.
+There are no upright caps or offset shadows that can cover the player.
+
+Run `npm run test:browser -- --project=cockpit tests/terrain-art.spec.ts tests/terrain.spec.ts`
+for fixed barren/crater-highland/icy/fractured fixtures, actual wrong-material
+negative comparisons, repeat/reload captures, several region borders, viewport
+changes and a real keyboard approach to blocked terrain. `terrainArtFixtures.ts`
+configures body, direction and physical offset using valid versioned saved state;
+there is no production debug API. `terrainIllustration.test.ts` covers color
+continuity, shared-edge contours, physical footprint clipping and aspect/zoom
+coverage. Existing viewport, planet and traversal suites retain authored Vesper,
+HUD/focus, source inspection and cutaway checks. The four short art fixtures join
+PR smoke; the long border route runs in the existing full world suite.
+
+Original captures, negative diffs and state JSON stay in ignored `test-results/`
+and the existing CI artifact upload (14-day retention). New frames are review
+candidates and same-run regression checks; no approved references are replaced.
+SVG/Canvas CPU evidence does not establish physical GPU/M1/Metal performance.

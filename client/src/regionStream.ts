@@ -5,7 +5,7 @@ import { neighboringRegions, surfaceRegion, type SurfaceLocation, type SurfaceRe
 export const STREAM_REGION_LIMIT = 32
 export const STREAM_SAMPLE_LIMIT = 2048
 export const STREAM_FRAME_BUDGET = 2048
-export type GroundSample = Pick<ReturnType<typeof sampleGeology>, 'groundType' | 'grade' | 'slopeRadians' | 'heightM'>
+export type GroundSample = Pick<ReturnType<typeof sampleGeology>, 'groundType' | 'grade' | 'slopeRadians' | 'heightM' | 'weights'>
 const keyOrder = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
 interface Entry {region: SurfaceRegion; samples: Map<string, GroundSample>; used: number}
 /** Disposable immutable baseline only: source journals and saves never enter
@@ -56,7 +56,7 @@ export class RegionStream {
     const cached=entry.samples.get(key)
     if(cached) {this.stats.hits++;return cached}
     if(this.stats.frameGenerated>=STREAM_FRAME_BUDGET) throw Error('Streaming frame budget exceeded')
-    const sample:GroundSample=this.reference.version===2 ? sampleGeology(location,this.reference) : {groundType:'authored-ground',grade:0,slopeRadians:0,heightM:0}
+    const sample:GroundSample=this.reference.version===2 ? sampleGeology(location,this.reference) : {groundType:'authored-ground',grade:0,slopeRadians:0,heightM:0,weights:{impact:0,basin:0,highland:0,fracture:0,ice:0}}
     if(entry.samples.size>=STREAM_SAMPLE_LIMIT) entry.samples.delete(entry.samples.keys().next().value!)
     entry.samples.set(key,Object.freeze(sample));this.stats.generated++;this.stats.frameGenerated++
     return sample

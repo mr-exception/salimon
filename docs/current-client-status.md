@@ -9,7 +9,12 @@ production loop, supported sample sites, safety/save boundaries and QA coverage.
 
 The [full 2D migration register](2d-migration-register.md) classifies every documentation file, maps historical 3D concepts onto active 2D design, and identifies the unfinished browser adapters.
 
-Checked against `client/src` on 2026-11-14. The default `/` is the playable
+Geology-driven mineral deposits (#851) now join the authored starting sources
+on geological v2 bodies, with bounded region candidates, source-bound fractional
+work and atomic integer-gram depletion across eviction and reload. Legacy flat
+bodies retain their authored-only resource behavior. See [resource contracts](browser-planet-surface.md#geology-driven-mineral-deposits-851).
+
+Checked against `client/src` on 2026-11-15. The default `/` is the playable
 React/TypeScript 2D Scout/planet world. The 3D panoramic scene opens at its cockpit and shares the grounded Scout / Vesper surface
 anchor with the 2D world. Authorized pilots can close the aft door and start an uncancellable six-second takeoff, then steer and use signed thrust in the same panoramic scene (#841). Deterministic planet/moon surface mapping and durable local sites are delivered (#842); the saved speed-gated landing trajectory and automatic touchdown are delivered (#843); the production Land control, live admission/progress readout and automatic return to the matching 2D ship interior are delivered (#844).
 
@@ -27,7 +32,7 @@ requirements, not playable behavior. “Decision pending” identifies missing r
 | System | Browser-delivered evidence | Approved future / decision pending / legacy boundary |
 | --- | --- | --- |
 | 2D navigation and cockpit | `topDownRuntime.ts`, `topDownTraversal.ts`, `cockpit.ts`, `TopDownView.tsx`: continuous walking, collision, doorway frames, owner chair, panoramic entry/exit, session-local observation persistence; `scoutLocation.ts` binds world frames and radar physical state; `navigationRuntime.ts` continues time/scans while grounded | Local power fixture is not Core power. Explicit lifecycle endpoints and ship/scanner saves are delivered (#838); airborne interior detaches the exterior. The aft boarding door is a real E/mouse interaction with a saved v10 open/closed state, matching collision/art and flight lock (#839). Launch requires a live authorized powered seat, a validated grounded site, all occupants aboard, a closed door and no conflicting work/maneuver. The deterministic uncancellable 360-tick takeoff trajectory is delivered (#840), including thrust/mass feasibility, swept admission and validated save/resume; production Take off admission/progress and flying-only controls are wired (#841). `landing.ts` adds scanner-gated <=20 m/s full surface-relative admission, bounded dynamic descent and automatic validated touchdown (#843); production landing HUD/command presentation and verified-touchdown interior handoff are delivered (#844). The world owns the only clock, including held cockpit steering; exit to the detached 2D interior preserves flight and selected throttle. [Cockpit/reconnect contract](cockpit-navigation-and-reconnect.md) separates future authority |
-| Mining | `resourceSession.ts`, `planetarySite.ts`: two fixed sources, up to 1,000 g per completed work interval, approved survival work-rate penalties and persisted partial work | Full catalog, tools and balancing pending; native physical fragments are legacy-only |
+| Mining | `resourceSession.ts`, `planetarySite.ts`, `planetDeposits.ts`: two preserved authored sources plus deterministic geological v2 mineral deposits, up to 1,000 g per completed work interval, approved survival work-rate penalties and persisted partial work | Full catalog, tools and balancing pending; native physical fragments are legacy-only |
 | Inventory | `resourceInventory.ts`: 10,000 g / 12 shared slots, one raw stack per type, count-item mass/stack validation; `resourceSession.ts`: v12 ledger/item-definition/survival/hazard/Scout/site/chart save, lossless v1–v11 migration | Generic item transactions and unified count/mass/slot UI are delivered; production item content, equipment UI and upgrades remain pending. [Weight-only contract](resource-inventory-and-gathering.md) supersedes volume limits |
 | Ship storage | `scoutResourceContainer.ts` declares the 50 kg raw-only `scout:storage`; `resourceContainerInteraction.ts` + `ResourceContainerPanel.tsx` provide E/Use, exact-gram review/confirmation and capacity/save feedback | Atomic domain transactions and schema-v12 saves persist both endpoints. Focus/Escape/reach/scene cancellation preserves commits; no container slot cap, count-item content or machine buffers |
 | Suits | No suit/equipment UI or production gear catalog in `client/src` | [Approved tierless suits and hazard design](spacesuit-and-hazards.md): initial basic suit is a requirement, not a shipped grant; exact masses, recipes and switching rules pending |
@@ -123,5 +128,5 @@ Supported icy bodies receive a distinct substrate; flat seeded pigment detail
 adds no resource IDs or collision. The authored Vesper opening, fixed HUD and
 Scout/player cutaway layers retain their ownership. Fixed art, repeat/negative,
 region-walk and obstacle approach coverage is documented in the
-[client guide](../client/README.md#illustrated-streamed-geology-850). This does
-not implement climate, weather, organisms or geological resource generation.
+[client guide](../client/README.md#illustrated-streamed-geology-850). P04 itself adds no climate, weather or organisms; geological mineral sources
+now come from the separate #851 resource publication.

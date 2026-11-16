@@ -1,5 +1,6 @@
+import { DEPOSIT_PUBLICATION, depositFromId, depositNeighborhood, isDepositId, regionDeposits, type PlanetDeposit } from './planetDeposits.ts'
 import { probeGeology } from './planetGeology.ts'
-import { surfaceRegion, localToSurface } from './surfaceCoordinates.ts'
+import { surfaceRegion, surfaceToLocal, localToSurface } from './surfaceCoordinates.ts'
 import { planetDefinition, geologicalDefinition } from './planetDefinition.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { scoutLandingSurface } from './scoutLocation.ts'
@@ -16,7 +17,7 @@ import { controlsCockpit, LOCAL_PLAYER, leaveCockpit, type CockpitState } from '
 import { STARTING_SITE } from './planetarySite.ts'
 import { addCountItem, removeCountItem, registerCountItems, type CountItemCatalog, increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
 import { DRY_MASS_KG, setMass, type ShipState } from './simulation.ts'
-import { walkingFrames, relativeAnchor, rotate2, type Anchor } from './topDownFrames.ts'
+import { point2, walkingFrames, relativeAnchor, rotate2, type Anchor } from './topDownFrames.ts'
 import { interactionInReach, PLAYER_RADIUS_M } from './topDownInteraction.ts'
 import { capturePlayerLocation, synchronizeScout, PLAYER_ID, type TopDownState } from './topDownRuntime.ts'
 import type { PlayerLocation } from './topDownTraversal.ts'
@@ -37,6 +38,7 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
+  readonly depositPublication: typeof DEPOSIT_PUBLICATION
   readonly version: 12
   readonly sites: SiteStates
   readonly scout: ScoutSave
@@ -131,13 +133,18 @@ function materializeSite(world: TopDownState, sites: SiteStates): TopDownState {
   return synchronizeDoor({ ...world, entities: [...world.entities.filter(e => e.anchor.frame !== 'planet:fixture' || e.layer !== 'terrain'), ...terrain] })
 }
 /** Work is source-bound, canonical and strictly below one 960-unit extraction. */
-function validateMiningWork(value: unknown): Record<string, number> {
+function validateMiningWork(value: unknown, sources: Readonly<Record<string, ResourceSource>> = RESOURCE_SOURCES): Record<string, number> {
   const work: Record<string, number> = {}
   for (const [id, units] of Object.entries(object(value))) {
-    if (!Object.hasOwn(RESOURCE_SOURCES, id) || integer(units, 1) >= 960) throw new Error('Invalid mining work')
+    if (!Object.hasOwn(sources, id) || integer(units, 1) >= 960) throw new Error('Invalid mining work')
     work[id] = units as number
   }
   return work
+}
+function sourceDefinitions(sources: Readonly<Record<string, ResourceSource>>): Readonly<Record<string, ResourceSource>> {
+  const definitions = { ...RESOURCE_SOURCES }
+  for (const id of Object.keys(sources)) if (!Object.hasOwn(definitions, id)) definitions[id] = depositFromId(id).initial
+  return definitions
 }
 /** Reject inconsistent saves, and migrate whole-litre v1 saves to exact grams without loss. */
 export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
@@ -150,8 +157,9 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const hasWork = [8, 9, 10, 11, 12].includes(data.version as number)
   const hasScout = data.version === 9 || data.version === 10 || data.version === 11 || data.version === 12
   const hasSites = data.version === 11 || data.version === 12
-  const allowed = [...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const allowed = ['depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
+  if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
   if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && data.version !== 12) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
     throw new Error('Unsupported save version')
@@ -189,8 +197,10 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     if (litres > capacityLitres) throw new Error('Legacy volume capacity exceeded')
   }
   const savedSources = object(data.sources), sources: Record<string, ResourceSource> = {}
-  if (Object.keys(savedSources).length !== Object.keys(RESOURCE_SOURCES).length) throw new Error('Wrong source set')
-  for (const [id, initial] of Object.entries(RESOURCE_SOURCES)) {
+  if (Object.keys(savedSources).some(isDepositId) && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Missing resource publication')
+  const definitions = sourceDefinitions(savedSources as unknown as Record<string, ResourceSource>)
+  if (Object.keys(savedSources).length !== Object.keys(definitions).length) throw new Error('Wrong source set')
+  for (const [id, initial] of Object.entries(definitions)) {
     const source = object(savedSources[id])
     const previous = integer(legacy ? source.remainingLitres : source.remainingGrams)
     const remainingGrams = legacy ? integer(previous * LEGACY_GRAMS_PER_LITRE[initial.resourceId as keyof typeof LEGACY_GRAMS_PER_LITRE]) : previous
@@ -203,19 +213,23 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
     stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
   }
-  const miningWork = hasWork ? validateMiningWork(data.miningWork) : {}
+  const miningWork = hasWork ? validateMiningWork(data.miningWork, sources) : {}
   const scout = hasScout ? decodeScout(data.scout, data.version === 9) : startingLocationForMigration()
   if (!hasSites && scout.siteId !== STARTING_SITE.id) throw Error('Legacy save cannot bind a generated site')
   if (hasSites && !object(data.scout).surface) throw Error('Missing saved surface mapping')
   const initialSite = resolveSurface(startingLocationForMigration().surface)
   const sites: SiteStates = hasSites ? decodeSites(data.sites) : { [STARTING_SITE.id]: captureSite(initialSite, siteEntities(initialSite)) }
+  for (const id of Object.keys(sources).filter(isDepositId)) {
+    const chart = depositFromId(id).entity.anchor.chart!
+    if (!Object.values(sites).some(site => site.address.bodyId === chart.bodyId && site.address.definition?.digest === chart.definition.digest)) throw Error('Deposit body/publication was not visited')
+  }
   if (hasSites && (data.siteId !== scout.siteId || scout.binding && !Object.hasOwn(sites, scout.siteId))) throw Error('Missing active site state')
   const restoredWorld = materializeSite({ ...world, scoutLocation: scout, frames: scout.frames }, sites)
   if (data.version !== 12 && object(object(data.location).anchor).chart !== undefined) throw Error('Walking chart requires schema v12')
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
-  const save: ResourceSave = { version: 12, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
-  validateResourceLedger(save, RESOURCE_SOURCES, storeDefinitions, RESOURCE_CATALOG, catalog)
+  const save: ResourceSave = { version: 12, depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }
 export function resourcePayload(inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG) {
@@ -261,7 +275,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 12, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 12, depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -285,13 +299,49 @@ export class ResourceSession {
         this.survival = freshSurvival(now())
         this.snapshot = { ...this.snapshot, hazards: this.hazards, survival: this.survival }
       }
+      this.syncDeposits()
     } catch {
       this.error = 'Saved expedition could not be loaded safely. Existing data kept; gathering paused.'
     }
   }
+  private depositKey = ''
+  private deposits: readonly PlanetDeposit[] = []
+  /** Unmodified baselines remain disposable. Only worked sources enter saves. */
+  source(id: string): ResourceSource | undefined {
+    return this.snapshot.sources[id] ?? this.deposits.find(p => p.initial.id === id)?.initial
+  }
+  /** Exact per-source debit journal for the aggregate save adapter (P07). */
+  sourceDeltas(): Readonly<Record<string, number>> {
+    const definitions = sourceDefinitions(this.snapshot.sources)
+    return Object.fromEntries(Object.entries(this.snapshot.sources).map(([id, source]) => [id, definitions[id]!.remainingGrams - source.remainingGrams]).filter(([, grams]) => grams !== 0))
+  }
+  private syncDeposits(): void {
+    const world = this.world, binding = world.scoutLocation.binding
+    const player = world.entities.find(e => e.id === PLAYER_ID)!
+    const landing = binding ? surfaceRegion(world.scoutLocation.surface, world.scoutLocation.surface.definition) : null
+    const chart = player.anchor.chart ?? landing
+    const centre = chart && player.anchor.frame === 'planet:fixture'
+      ? surfaceRegion(localToSurface(chart, relativeM(player.anchor.point, ORIGIN).slice(0, 2) as [number, number]), chart.definition) : landing
+    const key = centre ? `${centre.definition.digest}:${centre.id}` : ''
+    if (key !== this.depositKey) {
+      this.depositKey = key
+      this.deposits = centre ? depositNeighborhood(centre).flatMap(regionDeposits) : []
+    }
+    // Ship exclusion is a visit overlay: it never rekeys or changes initial mass.
+    const entities = this.deposits.map(p => {
+      const e = p.entity
+      if (world.frames.surface || !landing) return e
+      const location = localToSurface(e.anchor.chart!, e.anchor.point.offsetM.slice(0, 2) as [number, number])
+      return { ...e, anchor: { ...e.anchor, chart: landing, point: point2(...surfaceToLocal(location, landing)) } }
+    }).filter(e => {
+      const [x, y] = rotate2(relativeAnchor(e.anchor, { frame: 'ship:scout', point: ORIGIN }, world.frames), -world.frames.ship.angle)
+      return Math.abs(x) > 6 || Math.abs(y) > 10
+    })
+    this.world = { ...world, entities: [...world.entities.filter(e => !isDepositId(e.id)), ...entities] }
+  }
   private captureSites(sites: SiteStates): SiteStates {
     const location = this.world.scoutLocation
-    return location.binding ? { ...sites, [location.siteId]: captureSite(resolveSurface(location.surface), this.world.entities) } : sites
+    return location.binding ? { ...sites, [location.siteId]: captureSite(resolveSurface(location.surface), this.world.entities.filter(e => !isDepositId(e.id))) } : sites
   }
   private commit(next: ResourceSave): boolean {
     if (this.error) return false
@@ -299,8 +349,8 @@ export class ResourceSession {
       if (this.storage.getItem(RESOURCE_SAVE_KEY) !== this.persisted) throw new Error('Save changed in another session')
       const sites = this.captureSites(next.sites)
       if (this.world.scoutLocation.binding) validateSurfaceClearance(resolveSurface(this.world.scoutLocation.surface), this.world.entities.filter(e => e.layer === 'terrain'))
-      const candidate = { ...next, sites, siteId: this.world.scoutLocation.siteId, scout: captureScout(this.world.scoutLocation), miningWork: validateMiningWork(this.miningWork), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
-      validateResourceLedger(candidate, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
+      const candidate = { ...next, sites, siteId: this.world.scoutLocation.siteId, scout: captureScout(this.world.scoutLocation), miningWork: validateMiningWork(this.miningWork, next.sources), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
+      validateResourceLedger(candidate, sourceDefinitions(candidate.sources), this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       validateSurvival(candidate.survival)
       validateHazards(candidate.hazards)
       const raw = serialize(candidate)
@@ -380,6 +430,7 @@ export class ResourceSession {
       this.cancel()
       Object.assign(location, next)
       this.world = materializeSite(synchronizeScout(this.world), sites)
+      this.syncDeposits()
       if (!this.commit({ ...this.snapshot, sites })) { Object.assign(location, before); this.world = previous; return false }
       this.feedback = ''
       this.world = { ...this.world, feedback: `Scout: ${location.ship.mode}.` }
@@ -416,8 +467,8 @@ export class ResourceSession {
     if (this.error || this.survival.health === 0) return false
     try {
       const sourceId = request.from.kind === 'source' ? request.from.id : null
-      if (sourceId !== null && (!this.world.scoutLocation.binding || this.world.scoutLocation.siteId !== STARTING_SITE.id || !this.world.entities.some(e => e.id === sourceId && e.source))) throw Error('Source is unavailable at this surface site.')
-      const next = transferResource(this.snapshot, request, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
+      if (sourceId !== null && (!this.world.scoutLocation.binding || !this.world.entities.some(e => e.id === sourceId && e.source))) throw Error('Source is unavailable at this surface site.')
+      const next = transferResource(this.snapshot, request, sourceDefinitions(this.snapshot.sources), this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       return this.commit({ ...this.snapshot, ...next, hazards: this.hazards, survival: this.survival })
     } catch (error) {
       this.feedback = error instanceof Error ? error.message : 'Invalid transfer'
@@ -490,9 +541,12 @@ export class ResourceSession {
     if (this.activeSourceId) { this.cancel(); return }
     if (this.error || !survivalPolicy(this.survival).canWork || !this.equipped) return
     const target = this.world.entities.find(e => e.id === id), player = this.world.entities.find(e => e.id === PLAYER_ID)!
-    if (!this.world.scoutLocation.binding || target?.source?.siteId !== this.world.scoutLocation.siteId || !target?.source || !id || this.world.player.mode === 'seated' || this.world.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, this.world.frames)) {
+    if (!this.world.scoutLocation.binding || !target?.source || !id || this.world.player.mode === 'seated' || this.world.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, this.world.frames)) {
       this.feedback = 'No resource source in reach.'; return
     }
+    const initial = this.source(id)
+    if (!initial) { this.feedback = 'No resource source in reach.'; return }
+    if (!this.snapshot.sources[id] && !this.commit({ ...this.snapshot, survival: this.survival, hazards: this.hazards, sources: { ...this.snapshot.sources, [id]: initial } })) return
     const blocked = this.blocked(id)
     if (blocked) { this.feedback = blocked; return }
     this.activeSourceId = id
@@ -521,6 +575,7 @@ export class ResourceSession {
     this.world = (next.frames.surface?.source ?? next.frames) === next.scoutLocation.frames ? next
       : next.frames.ship === next.scoutLocation.frames.ship ? { ...next, frames: next.scoutLocation.frames }
       : materializeSite(synchronizeScout(next), this.snapshot.sites)
+    this.syncDeposits()
     // A verified touchdown returns the pilot to the existing ship-local interior.
     // A power interruption keeps its seated/world semantics instead.
     const touchdown = previousWorld.frames.ship.parent === null && this.world.scoutLocation.binding !== null

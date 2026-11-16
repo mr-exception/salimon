@@ -89,7 +89,10 @@ test('SURFACE-842 production interior, moon/Caligo exterior, relaunch and author
     await expect(main).toHaveAttribute('data-cockpit-view', 'world')
     await expect(main).toHaveAttribute('data-player-mode', 'standing')
     expect(await page.locator('[data-entity="person:player"]').getAttribute('data-position')).toBe(playerAnchor)
-    if (name !== 'authored') await expect(page.locator('[data-source-kind]')).toHaveCount(0)
+    if (name !== 'authored') {
+      await expect(page.locator('[data-source-kind="biological"]')).toHaveCount(0)
+      await expect(page.locator('[data-entity^="source:landing:"]')).toHaveCount(0)
+    }
     else {
       await expect(page.locator('[data-source-kind]')).toHaveCount(2)
       await expect(page.locator('[data-entity="source:landing:mineral:01"]')).toHaveAttribute('data-remaining-grams', '59000')

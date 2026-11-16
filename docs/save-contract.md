@@ -729,3 +729,18 @@ addresses and saved site anchors remain in their original frames, so working-cha
 handoff and baseline-cache eviction cannot move a ship or erase source depletion.
 The immutable region/sample cache is never serialized. See the
 [continuous surface contract](browser-planet-surface.md#continuous-regional-walking-and-cache-849).
+
+
+## Browser procedural resource journal (#851)
+
+The v12 browser save accepts the additive `depositPublication` digest, pinned to
+`geological-deposits:v1`. Older saves without it retain original source bytes and
+adopt the publication in memory; no automatic write occurs. Legacy flat body
+bindings remain authored-only. Generated source entries are sparse: only worked
+sources join `sources` and `miningWork`. Their trusted initial mineral mass is
+regenerated from the stable ID and visited-body reference; changed/unknown
+publication hashes, ungenerated IDs, body mismatches and nonconserved grams reject
+loading. Entity anchors and immutable region candidates are never journaled as
+site decorations. The same atomic save replaces completed work, source debit and
+inventory credit. `ResourceSession.sourceDeltas()` supplies exact cumulative grams
+for P07; this does not add a second save transaction or wider aggregate journal.

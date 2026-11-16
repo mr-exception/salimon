@@ -7,6 +7,7 @@ import {surfaceRegion,localToSurface,surfaceToLocal} from '../src/surfaceCoordin
 import {geologicalDefinition} from '../src/planetDefinition.ts'
 import {samplePlanetSurface} from '../src/planetSurface.ts'
 import {probeGeology} from '../src/planetGeology.ts'
+import {depositFromId} from '../src/planetDeposits.ts'
 import {normal,scale} from '../src/math.ts'
 import {point2} from '../src/topDownFrames.ts'
 import {compareImages} from '../scripts/visual-comparison.ts'
@@ -41,7 +42,17 @@ test('TERRAIN-848 built movement stops at sampled steep rock, renders shared tru
   page.on('pageerror',e=>errors.push(e.message))
   await page.addInitScript(({key,value})=>{if(!localStorage.getItem(key))localStorage.setItem(key,value)},{key:RESOURCE_SAVE_KEY,value:fixture.raw})
   await boot(page,'','http://127.0.0.1:4175')
-  await expect(page.locator('[data-source-kind]')).toHaveCount(0)
+  // P05 adds mineable minerals to this fixed geological fixture. Validate the
+  // actual browser sources against their canonical IDs and initial gram mass.
+  const sources=page.locator('[data-source-kind]')
+  await expect(sources).toHaveCount(4)
+  const sourceRecords=await sources.evaluateAll(elements=>elements.map(el=>({id:el.getAttribute('data-entity')!,kind:el.getAttribute('data-source-kind'),grams:Number(el.getAttribute('data-remaining-grams'))})))
+  for(const source of sourceRecords) {
+    const deposit=depositFromId(source.id)
+    expect(source.kind).toBe('mineral')
+    expect(deposit.entity.anchor.chart!.bodyId).toBe(fixture.definition.bodyId)
+    expect(source.grams).toBe(deposit.initial.remainingGrams)
+  }
   await expect(page.locator('[data-generated-ground]')).toHaveAttribute('data-generated-ground',fixture.definition.digest)
   await expect(page.locator('[data-terrain-footprint="steep"]')).toBeVisible()
   expect(await page.locator('[data-terrain-footprint="steep"]').getAttribute('d')).not.toBe('')
@@ -57,6 +68,7 @@ test('TERRAIN-848 built movement stops at sampled steep rock, renders shared tru
   expect(stopped[0]-fixture.start[0]).toBeGreaterThan(10)
   expect(stopped[0]-fixture.start[0]).toBeLessThan(17)
   expect(probeGeology(localToSurface(fixture.region,[stopped[0],stopped[1]]),fixture.definition,.46).collision).toBe(false)
+  expect(probeGeology(localToSurface(fixture.region,[stopped[0],stopped[1]]),fixture.definition,.46,[.04,0],undefined,fixture.region).moveFraction).toBeLessThan(1)
   await walkTicks(page,'d',60);expect(await physicalPosition()).toEqual(stopped)
   // Renderer samples agree with domain material/slope; image-only art cannot
   // invent collision. Conservative hatching includes the footprint margin.

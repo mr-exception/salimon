@@ -40,6 +40,12 @@ and compatibility; `authoredSurface.ts` owns physical Vesper overrides;
 collision. `surfaceSite.ts` adapts #842 landing and legacy saves without rekeying.
 P02 `planetGeology.ts` owns revision-2 relief/provinces and bounded swept slope/landing probes; `GeneratedGround.tsx` reads that same data for a bounded physical preview. `resourceSession.ts` binds one revision per body/save. See [browser planet surface](browser-planet-surface.md), `planetGeology.test.ts`, `planetSurface.test.ts` and `tests/terrain.spec.ts`.
 
+Browser mineable deposits (#851): `planetDeposits.ts` owns the supplemental
+resource publication and bounded immutable candidates; `resourceSession.ts` owns
+source registration, canonical initial-mass validation, exact depletion deltas
+and the existing atomic ledger/work loop. `tests/deposits.spec.ts` covers generated
+source cues, mining, eviction and reload. See [surface resource contracts](browser-planet-surface.md#geology-driven-mineral-deposits-851).
+
 Browser continuous walking (#849): `regionStream.ts` owns bounded immutable
 region/sample residency, prefetch and counters; `topDownRuntime.rechartWalking`
 and `topDownFrames.walkingFrames` own physical chart handoff and Scout projection.

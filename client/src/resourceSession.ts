@@ -1,3 +1,4 @@
+import { createFieldMark, recordFieldMark, updateWalkingFix, type WalkingFix, type FieldMark } from './exploration.ts'
 import { DEPOSIT_PUBLICATION, depositFromId, depositNeighborhood, isDepositId, regionDeposits, type PlanetDeposit } from './planetDeposits.ts'
 import { probeGeology } from './planetGeology.ts'
 import { surfaceRegion, surfaceToLocal, localToSurface } from './surfaceCoordinates.ts'
@@ -250,6 +251,18 @@ function safeLocation(world: TopDownState): PlayerLocation {
  * Publish only after it succeeds; a failed/stale write stops gathering.
  */
 export class ResourceSession {
+  /** Session-local command payloads for P07. No second storage writer. */
+  fieldMarks: readonly FieldMark[] = []
+  walkingFix: WalkingFix | null = null
+  markField(name: string, note: string, landmarkId?: string): boolean {
+    if (this.error || this.survival.health === 0) return false
+    try {
+      this.fieldMarks = recordFieldMark(this.fieldMarks, createFieldMark(this.world, name, note, landmarkId))
+      this.feedback = 'Field mark recorded for this session.'
+      return true
+    } catch (error) { this.feedback = (error as Error).message; return false }
+  }
+
   world: TopDownState
   snapshot: ResourceSave
   survival: SurvivalState
@@ -575,6 +588,7 @@ export class ResourceSession {
     this.world = (next.frames.surface?.source ?? next.frames) === next.scoutLocation.frames ? next
       : next.frames.ship === next.scoutLocation.frames.ship ? { ...next, frames: next.scoutLocation.frames }
       : materializeSite(synchronizeScout(next), this.snapshot.sites)
+    this.walkingFix = updateWalkingFix(previousWorld, this.world, this.walkingFix)
     this.syncDeposits()
     // A verified touchdown returns the pilot to the existing ship-local interior.
     // A power interruption keeps its seated/world semantics instead.

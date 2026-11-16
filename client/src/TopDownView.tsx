@@ -1,3 +1,4 @@
+import { ExplorationHud, FieldMarkCues } from './ExplorationHud.tsx'
 import { GeneratedGround } from './GeneratedGround.tsx'
 import { BOARDING_DOOR_ID } from './scoutDoor.ts'
 import { viewToWorld } from './topDownFrames.ts'
@@ -50,6 +51,7 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
       {renderItems(items.filter(item => item.entity.layer === layer && ['ground', 'surface'].includes(item.entity.appearance)))}
       {layer === 'terrain' && <GeneratedGround state={state} width={width} height={height} />}
       {renderItems(items.filter(item => item.entity.layer === layer && !['ground', 'surface'].includes(item.entity.appearance)))}
+      {layer === 'cues' && <FieldMarkCues state={state} session={session} />}
       {layer === 'cues' && items.filter(item => item.entity.id === state.selectedId).map(({ entity, positionM: [x, y], angle }) => <g key={entity.id} data-selection={entity.id} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={entity} selected /></g>)}
     </g>)}
   </svg>
@@ -72,6 +74,13 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const inventoryTrigger = useRef<HTMLButtonElement>(null)
   const inventoryPanel = useRef<HTMLDivElement>(null)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [notebookOpen, setNotebookOpen] = useState(false)
+  const [scoutGuiding, setScoutGuiding] = useState(false)
+  const notebookWasOpen = useRef(false)
+  useEffect(() => {
+    if (notebookWasOpen.current && !notebookOpen) document.querySelector<HTMLButtonElement>('[data-field-help]')?.focus()
+    notebookWasOpen.current = notebookOpen
+  }, [notebookOpen])
   const toggleInventory = (open: boolean, restoreFocus = false) => {
     inventoryExpanded.current = open; setInventoryOpen(open)
     if (open) session.current?.cancel()
@@ -121,6 +130,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       }
       if (event.code === 'KeyI' && !event.repeat && acceptsFlightShortcut(event.target) && current.current.cockpit.view === 'world' && !container.current?.opened) {
         event.preventDefault(); release(); toggleInventory(!inventoryExpanded.current); return
+      }
+      if (gameplay && !event.repeat && (event.code === 'KeyM' || event.code === 'KeyG') && acceptsFlightShortcut(event.target) && current.current.cockpit.view === 'world') {
+        event.preventDefault(); release()
+        if (event.code === 'KeyM') { session.current?.cancel(); setNotebookOpen(true) }
+        else setScoutGuiding(value => !value)
+        return
       }
       if (event.code === 'KeyP' && !event.repeat && acceptsFlightShortcut(event.target)) {
         paused.current = !paused.current; clear(); return
@@ -240,12 +255,15 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       {persistentMessages[1].text && <StatusMessage priority="critical">{persistentMessages[1].text}</StatusMessage>}
       {state.scoutLocation.boardingDoor === 'closed' && <p data-boarding-door-status>Aft door: closed{state.scoutLocation.binding === null ? ' · flight lock' : ''}</p>}
       {state.cockpit.view === 'radar' && resourceSession?.feedback && <StatusMessage>{resourceSession.feedback}</StatusMessage>}
-      <Button variant="secondary" onClick={() => setHelpOpen(true)}>Help</Button>
+      <Button data-field-help variant="secondary" onClick={() => setHelpOpen(true)}>Help</Button>
     </aside>}
     <Dialog open={helpOpen} title="Surface controls" onDismiss={() => setHelpOpen(false)}>
       {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
       <p>W A S D: walk · E: nearby action · Escape: close panel, then cancel interaction.</p>
       <p>I: inventory · P: pause active time. Menus do not pause time. Movement, Escape or stowing the tool interrupts gathering; partial work is saved.</p>
+      <p>M: inspect / mark a field location · G: toggle local Scout guidance. Notes currently last for this session.</p>
+      <button onClick={() => {setHelpOpen(false);session.current?.cancel();setNotebookOpen(true)}}>Inspect / mark</button>
+      <button onClick={() => {setHelpOpen(false);setScoutGuiding(value => !value)}}>Return to Scout</button>
       <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>
     </Dialog>
     {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
@@ -266,6 +284,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     <main data-surface-bound={String(state.scoutLocation.binding !== null)} data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
     <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} />
+      {gameplay && resourceSession && <ExplorationHud state={state} session={resourceSession} blocked={paused.current || !!resourceSession.error || resourceSession.survival.health === 0 || state.scoutLocation.ship.mode === 'destroyed'} onChange={() => setState({...current.current})} open={notebookOpen} guiding={scoutGuiding} onDismiss={() => setNotebookOpen(false)} onGuidanceChange={() => setScoutGuiding(value => !value)} />}
       {gameplay && <aside className="resource-hud" aria-label="Resource inventory" data-gathering={resourceSession?.activeSourceId ?? ''}>
         <button ref={inventoryTrigger} aria-expanded={inventoryOpen} aria-controls="field-inventory" onClick={() => toggleInventory(!inventoryOpen)}>Field inventory <KeyHint>I</KeyHint></button>
         {resourceSession && usage && <>

@@ -37,7 +37,7 @@ export function ExplorationHud({state,session,blocked,onChange,open,guiding,onDi
     {guidance && <p data-scout-guidance data-fix={String(guidance.available)}>{guidance.text}</p>}
     <Dialog open={open} title="Field notebook" onDismiss={onDismiss}>
       <p>Inspect a nearby physical feature or mark where you stand. Knowledge is added only by your action.</p>
-      <p>Session notes only; notes across reload arrive with planetary persistence.</p>
+      <p>Field notes save with your expedition. Up to 256 deliberate marks are retained.</p>
       <label>Name (optional)<input value={name} maxLength={48} onChange={event=>setName(event.target.value)} /></label>
       <label>Short note (optional)<input value={note} maxLength={160} onChange={event=>setNote(event.target.value)} /></label>
       <button disabled={blocked} onClick={()=>mark()}>Mark current location</button>

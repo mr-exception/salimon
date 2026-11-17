@@ -59,9 +59,9 @@ test('EXPLORE-852 deliberate discovery, notes, focus, projected physical cues an
   await page.screenshot({path:info.outputPath('notebook-original.png')})
   await info.attach('marks.json',{body:JSON.stringify({id,known:await dialog.getByLabel('Known places').innerText(),initial,position:await position(page),renderer:'Chromium SVG/Canvas CPU',viewport:info.project.use.viewport,dpr:1}),contentType:'application/json'})
   await page.keyboard.press('Escape')
-  // Durable mark writes deliberately belong to P07; geometry does survive reload.
+  // Durable notes and the same physical landmark survive reload.
   await page.reload();await page.clock.runFor(200)
-  await expect(page.locator('[data-field-mark]')).toHaveCount(0)
+  await expect(page.locator('[data-field-mark]')).toHaveCount(2)
   await page.locator('main').click({position:{x:640,y:350}}); await page.keyboard.press('m')
   await expect(dialog.locator(`[data-landmark="landmark:authored:v1:vesper:rock:west"]`)).toHaveCount(1)
   expect(errors).toEqual([])

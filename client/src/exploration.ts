@@ -74,8 +74,8 @@ export function surfaceAnchor(location: SurfaceLocation, state: TopDownState): A
   const chart = state.frames.surface?.chart ?? surfaceRegion(state.scoutLocation.surface, state.scoutLocation.surface.definition)
   return { frame: 'planet:fixture', chart, point: point2(...surfaceToLocal(location, chart)) }
 }
-/** Explicit commands only. This bounded session payload is P07's durable-write
- * input; loading/rendering a region never calls it or creates known places. */
+/** Explicit commands only. This bounded payload enters the sole expedition
+ * transaction; loading/rendering a region never calls it or creates known places. */
 export function createFieldMark(state: TopDownState, name: string, note: string, landmarkId?: string): FieldMark {
   const location = playerSurface(state)
   if (!location || state.scoutLocation.ship.mode === 'destroyed') throw Error('Field marking requires a living surface expedition.')
@@ -98,7 +98,7 @@ export interface WalkingFix { readonly home: string; readonly travelledM: number
 const homeKey = (state: TopDownState) => `${state.scoutLocation.siteId}:${JSON.stringify(state.scoutLocation.surface)}`
 /** Visual reacquisition near the hull starts a new local dead-reckoning budget.
  * Reload away from home has no fix; neither proximity nor loading distant data
- * silently restores a spent walking estimate. P07 may later persist its inputs. */
+ * silently restores a spent walking estimate. Durable observations do not grant a walking fix. */
 export function updateWalkingFix(before: TopDownState, after: TopDownState, fix: WalkingFix | null): WalkingFix | null {
   const current = playerSurface(after)
   if (!current) return null

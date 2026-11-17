@@ -2,14 +2,14 @@
 
 ## Browser 2D save boundary (not native schema 29+)
 
-The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked schema-v12 inventory/source/store/location/survival/hazard/Scout/site envelope, with lossless resource migration from v1–v11. [Browser survival](browser-survival.md) specifies active ticks, 200 HP, launch-only fatigue credit, failure handling and explicit terminal reset. It is scoped to sample planet/moon local sites and browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
+The **active** browser's `client/src/resourceSession.ts` owns a local, revision-checked schema-v13 inventory/source/store/location/survival/hazard/Scout/site/observation envelope, with lossless resource migration from v1–v12. [Browser survival](browser-survival.md) specifies active ticks, 200 HP, launch-only fatigue credit, failure handling and explicit terminal reset. It is scoped to sample planet/moon local sites and browser storage. It is **not** this document's archived Rust whole-game `schema 29` / later extension chain, nor evidence of multiplayer authority or canonical universe persistence.
 
 Future browser progression must specify new versioned state for equipped suit modules, new machine stores, hazard exposure, Core/Fabricator, moved ships, planet-fixed locations and server actor authority separately; it cannot serialize old Rust `.rs` types or assume native migration scripts run in the browser. Preserve this contract as historical design evidence and do not silently copy its native payload fields or reset incompatible saves.
 
 
 ## Browser boarding-door continuity (#839)
 
-The active TypeScript resource envelope is **v12** (door state was introduced in v10). `scout.boardingDoor` is required
+The active TypeScript resource envelope is **v13** (door state was introduced in v10). `scout.boardingDoor` is required
 and strictly `open` or `closed`; the same field drives interaction, collision and
 visible state. Door writes and flight transitions are revision-bound atomic
 resource saves, with rollback on storage failure. Reload validates the derived
@@ -753,8 +753,59 @@ body-fixed location, nullable landmark ID, provenance, name (48 characters) and
 note (160 characters). Same-landmark commands update idempotently;
 free-location IDs quantize body-fixed coordinates to decimetres to avoid chart
 round-off creating duplicate identities; 256 records
-is the admission bound. These session-local payloads survive region eviction but
-are deliberately absent from the current v12 durable envelope. P07 owns atomic
-encoding/migration/replay and appropriate walking-fix persistence. No new writer,
+is the admission bound. These payloads now survive region eviction and reload through the schema-v13
+journal below. Walking-fix uncertainty remains session-local. No new writer,
 localStorage key, generated terrain cache or independently writable ship pose
 is introduced by field exploration.
+
+
+## Browser expedition journal (#853)
+
+The existing `salimon:expedition:v1` key now contains explicit **schema v13**.
+`ResourceSession` remains the sole revision-checked writer under the browser Web
+Lock. One synchronous replacement includes `journal`, player `location` (planet
+chart or ship-local frame), `sites` with body/publication bindings, `scout` from
+the shared flight owner, partial mining work, depleted sources, both inventories,
+and survival/hazard state. No independently writable ship pose or generated
+terrain/sprite/sample cache enters this envelope.
+
+`expeditionJournal.ts` owns validation and bounded observation history:
+
+- `journal.marks`: up to 256 deliberate notes/observations; stable IDs, published
+  definitions, physical coordinates, provenance and text limits are validated.
+  Records sort by stable ID; repeating a mark updates the same identity.
+- `journal.visits`: up to 128 distinct recent physically occupied surface regions,
+  oldest to newest, with one actual observed coordinate and publication per region.
+  Checkpoints/explicit transactions sample the player, never the render/cache
+  neighborhood. Consecutive samples in the same region are no-ops; reentering a
+  region moves it to the end, and only the oldest history record is evicted.
+  History eviction never removes depletion, partial work or deliberate marks.
+- Generated source records retain changed remaining grams, source-bound partial
+  work. An active pristine source may be registered in the live ledger, but its
+  generated baseline is never serialized. Subsequent transactions compact
+  canceled pristine records from memory as well. Immutable initial masses regenerate from
+  stable body/publication/region/source IDs. The two legacy authored sources and
+  their exact IDs/balances remain in the resource ledger. Source entries sort by ID.
+  Storage scales with actual resource/site changes plus fixed history/note bounds,
+  rather than the number of generated or rendered regions.
+
+All v1–v12 migrations are lazy: they add an empty journal in memory and preserve
+legacy resources, stores, survival, hazards, physical charts and Scout state. The
+original bytes remain until a successful normal transaction. V13 is rejected by
+older clients rather than silently dropping observations. Repeated decode/replay
+or unchanged checkpoints do not increment the revision or duplicate records.
+
+Before replacement the candidate is checked through the full save decoder,
+including publication/body, active site, collision, player frame, Scout and ledger
+consistency. Invalid/corrupt snapshots and unsupported versions/hashes keep their
+original bytes and stop writes with recovery feedback. Quota/stale-writer failures
+retain the last committed snapshot, marks and balances; flight commands roll back
+the proposed live transition. Existing mining, cockpit, landing/takeoff and
+visibility/pagehide checkpoints use this same transaction boundary. A new body
+never inherits another body's terrain, source IDs or observation cues.
+
+Tests: `expeditionJournal.test.ts`, migration/ledger tests in the existing owners,
+`planetDeposits.test.ts` and built exploration/deposit/landing/flight/storage
+suites. The deposit out/back journey mines, marks, evicts, reloads away from home
+and returns with the same depleted mass and observations. Evidence stays in
+ignored local output and the existing CI uploads; no report files are committed.

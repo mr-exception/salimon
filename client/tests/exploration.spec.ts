@@ -150,3 +150,29 @@ test('EXPLORE-852 generated ridge inspection, physical alignment and readable gu
   }
   await info.attach('physical-landmark.json',{body:JSON.stringify({landmark,physical,sample:probeGeology(landmark.location,d),renderer:'Chromium SVG/Canvas CPU',seed:d.domains.geology.seed}),contentType:'application/json'})
 })
+
+test('PERSIST-853 notebook write failure keeps durable note and shows recovery inside the modal',async({page},info)=>{
+  await boot(page,'','http://127.0.0.1:4175')
+  await page.keyboard.press('m')
+  const dialog=page.getByRole('dialog',{name:'Field notebook'})
+  await dialog.getByLabel('Name (optional)',{exact:true}).fill('Retained note')
+  await dialog.getByRole('button',{name:'Mark current location'}).click()
+  await expect(dialog.getByLabel('Known places')).toContainText('Retained note')
+  const before=await page.evaluate(key=>localStorage.getItem(key),RESOURCE_SAVE_KEY)
+  await page.evaluate(key=>{
+    const original=Storage.prototype.setItem
+    Storage.prototype.setItem=function(name,value){
+      if(name===key)throw new DOMException('Storage quota exceeded','QuotaExceededError')
+      return original.call(this,name,value)
+    }
+  },RESOURCE_SAVE_KEY)
+  await dialog.getByLabel('Name (optional)',{exact:true}).fill('Rejected replacement')
+  await dialog.getByRole('button',{name:'Mark current location'}).click()
+  await expect(dialog.getByRole('status').filter({hasText:'Saving failed'})).toContainText('reload after resolving storage access')
+  await expect(dialog.getByLabel('Known places')).toContainText('Retained note')
+  await expect(dialog.getByLabel('Known places')).not.toContainText('Rejected replacement')
+  await expect(dialog.getByRole('button',{name:'Mark current location'})).toBeDisabled()
+  expect(await page.evaluate(key=>localStorage.getItem(key),RESOURCE_SAVE_KEY)).toBe(before)
+  await page.screenshot({path:info.outputPath('notebook-quota-error.png')})
+  await info.attach('retained-save.json',{body:before!,contentType:'application/json'})
+})

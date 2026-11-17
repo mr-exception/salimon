@@ -46,7 +46,7 @@ export function ExplorationHud({state,session,blocked,onChange,open,guiding,onDi
         <small>Nearby geological feature · personally inspected when recorded</small>
       </li>)}</ul>
       {!landmarks.length && <p>No geological feature within the 12 m inspection range.</p>}
-      <p role="status">{session.feedback}</p>
+      <p role="status">{session.error || session.feedback}</p>
       <h3>Deliberately recorded places ({session.fieldMarks.length})</h3>
       <ul aria-label="Known places">{session.fieldMarks.map(m=><li key={m.id} data-known-mark={m.id}>
         <strong>{m.name}</strong> · {m.provenance.replaceAll('-', ' ')}<p>{m.note}</p><small>Body: {m.location.bodyId}</small>

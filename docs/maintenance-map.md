@@ -1,5 +1,13 @@
 # Feature maintenance map
 
+Browser field exploration (#852): `exploration.ts` owns physical landmark identity,
+explicit versioned field-mark commands and local walking-fix policy;
+`ExplorationHud.tsx` owns the notebook, projected known-place cues and on-demand
+Scout guidance. `ResourceSession.fieldMarks`/`walkingFix` remain session-local;
+#853 owns durable observation writes. Tests: `exploration.test.ts` and built
+`tests/exploration.spec.ts`. See [surface contract](browser-planet-surface.md#field-exploration-and-local-scout-guidance-852).
+
+
 Cross-phase browser flight QA (#845): `tests/flight-loop.spec.ts` owns the fresh
 built-route loop; `tests/landing.spec.ts` owns synthetic approach negatives and
 sample-body revisit. `scripts/negative-navigation.mjs` verifies broken launch and

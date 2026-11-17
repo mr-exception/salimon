@@ -744,3 +744,17 @@ loading. Entity anchors and immutable region candidates are never journaled as
 site decorations. The same atomic save replaces completed work, source debit and
 inventory credit. `ResourceSession.sourceDeltas()` supplies exact cumulative grams
 for P07; this does not add a second save transaction or wider aggregate journal.
+
+## Field-mark payload boundary (#852 → #853)
+
+`ResourceSession.fieldMarks` accepts explicit validated `FieldMark` commands from
+`exploration.ts`: version 1, stable `mark:v1:*` ID, canonical definition reference,
+body-fixed location, nullable landmark ID, provenance, name (48 characters) and
+note (160 characters). Same-landmark commands update idempotently;
+free-location IDs quantize body-fixed coordinates to decimetres to avoid chart
+round-off creating duplicate identities; 256 records
+is the admission bound. These session-local payloads survive region eviction but
+are deliberately absent from the current v12 durable envelope. P07 owns atomic
+encoding/migration/replay and appropriate walking-fix persistence. No new writer,
+localStorage key, generated terrain cache or independently writable ship pose
+is introduced by field exploration.

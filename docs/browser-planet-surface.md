@@ -308,3 +308,56 @@ old assertions that all generated regions contain zero resources now prohibit
 copied authored sources and generated biology instead. New originals remain in
 ignored `client/test-results/`, with the validation record in the PR. Hardware
 and subjective art qualification remain separate from Chromium CPU/SVG evidence.
+
+## Field exploration and local Scout guidance (#852)
+
+`exploration.ts` interprets existing authored boulders and isolated pronounced
+fractured grades in the published v2 physical sampler as geological landmarks.
+Canonical cell ownership, body/publication IDs and a versioned rule identify
+these places; no collision, resource, biological population or quest reward is
+added. Flat legacy regions and unsuitable terrain have no generated landmarks.
+The ridge footprint is a 3 m half-extent inspection area on the existing relief,
+not a new rectangular obstacle; physical slope collision remains authoritative.
+Authored boulder footprints and saved positions/removals come from actual entities.
+The bounded neighboring-cell query is shared with deposit residency; it never
+allocates a planet-wide landmark list. Rendering fidelity does not enter identity.
+
+Help exposes **Inspect / mark** and **Return to Scout**; M opens the notebook
+and G toggles guidance from world focus. The **Inspect / mark** notebook lists only features within 12 m of the surface
+player. Loading or seeing a region never adds a known place. Explicit inspection
+records a stable physical-source ID; **Mark current location** records the player's
+body-fixed coordinate. Optional 48-character names and 160-character notes are
+plain text. Records distinguish known physical sources, personal position estimates
+and user notes. Re-inspecting the same landmark updates its record; the notebook
+admits at most 256 records and reports capacity failure without evicting old notes.
+Diamond-and-cross cues project only deliberately recorded local marks, retain
+contrast against terrain and cannot intercept world input. The native modal uses
+the existing focus/keyboard/Escape stack; closing returns focus to Help. The closed
+HUD leaves walking, gathering, doors and cockpit interaction with their owners.
+
+`ResourceSession.fieldMarks` is a bounded session-local collection of version-1
+`FieldMark` command payloads (stable ID, definition, body-fixed location, optional
+landmark ID, provenance, name and note). **P07 / #853 owns durable writes and save
+migration**; marks currently survive streaming/eviction in the open session, but
+not reload. No second localStorage key, writer or resource ledger is introduced.
+This limitation is shown in the notebook. Baseline landmarks regenerate unchanged
+after reload, and resource/Scout/player saves continue through the existing owner.
+
+**Return to Scout** enables an on-demand local walking estimate; it never moves
+the player. A nearby hull (within 24 m) reacquires a fix. The estimate's uncertainty
+starts at 5 m, grows with accumulated walking distance and expires after 384 m of
+travel or beyond that range. The screen-relative eight-sector direction uses the
+actual landed Scout transform, including transported walking charts; range is
+rounded to 10 m. A reload away from the hull has no position fix. Returning within
+24 m can reacquire it; simply loading a distant region cannot. Detached flight,
+cabin-only position, changed landing identity and exhausted/absent fixes give an
+explicit unavailable message. This prototype dead-reckoning policy is not a
+scanner, GPS, chart, route planner or claim of hardware capability. P07 can later
+persist appropriate knowledge inputs; exact world coordinates alone do not grant
+an available fix.
+
+`exploration.test.ts` covers identity, terrain agreement, command admission,
+capacity, chart handoff and fix loss. `tests/exploration.spec.ts` owns built real
+keyboard discovery, focus, non-color marker originals/repeats/negative comparisons
+and a bounded multi-region out/back route. Evidence stays in ignored test output
+and existing CI uploads; no approved visual references are silently replaced.

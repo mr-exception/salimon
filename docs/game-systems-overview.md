@@ -9,7 +9,7 @@
 The active sample is **not** the completed native Rust game. A closed native issue proves only its historical revision, not a TypeScript port. Preserve long-term ship/world systems as design sources, but plan small browser-integrated deliverables with real unit and Playwright paths. See [current status](current-client-status.md), [document register](2d-migration-register.md) and [project phases](project-phases.md).
 
 
-> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses a separate **cockpit-only 3D radar**. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
+> **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses **cockpit-only panoramic observation**; the orthographic radar is an isolated engineering fixture at `/?scene=radar`. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Reuse conceptual design only after explicit browser implementation and checks; previous native code, commands and completion notes do not certify any current 2D feature. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 
 > **Current direction (2026-11-05):** Browser gameplay includes the strict top-down 2D Scout/planet slice and [weight-only resource gathering](resource-inventory-and-gathering.md): 10 kg / 12 shared slots, no inventory/storage volume limits. Tierless modular suits and hazards are [approved future gameplay](spacesuit-and-hazards.md); previous native first-person and fragment systems are historical.
@@ -22,7 +22,7 @@ The approved future starting state is the unknown alien homeworld, not Earth. Pl
 
 ## Long-term system areas
 
-This list mostly describes long-term direction. The browser client currently supports 2D movement, cockpit radar, and weight-based raw gathering/local saves, but not ship crafting, playable suits/hazards, multiplayer or the historical native fragment systems. See [playable slice](playable-2d-foundation.md).
+This list mostly describes long-term direction. The browser client currently supports continuous illustrated planetary movement, panoramic cockpit, deposits/marks and weight-based raw gathering/local saves, but not ship crafting, playable suits/hazards, multiplayer or the historical native fragment systems. See [playable slice](playable-2d-foundation.md).
 
 1. **Exploration & navigation** — realistic-distance travel through a universe-scale world, seamless space-to-surface movement, long-term travel toward Absenat.
 2. **Player character** — strict top-down 2D walking, future EVA, planetary exploration, physical interaction, health and survival state.

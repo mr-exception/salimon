@@ -2,7 +2,7 @@
 
 **Status: owner-approved art direction (2026-11-04), delivered as the default
 browser world.** The Scout cutaway, fixed landing area, outdoor walking, source
-inspection/gathering, doorway frame handoff and cockpit radar are playable.
+inspection/gathering, doorway frame handoff and panoramic cockpit are playable.
 See [current scope and source owners](current-client-status.md). The isolated
 `/?scene=top-down` development fixture remains inspection-only; it does not
 represent the full default `/` gameplay entry.
@@ -24,9 +24,9 @@ represent the full default `/` gameplay entry.
 
 ## 3D navigation consistency
 
-- **Strict 2D is the default world view.** The navigation mode remains a **simple orthographic 3D holographic radar** opened by interacting with the **cockpit desk**, not a global view toggle. Other connected players see the active pilot seated at the desk in 2D. See [cockpit states and multiplayer reconnect](cockpit-navigation-and-reconnect.md).
-- The radar retains faceted contact proxies and a sparse galactic lattice; it is not a realistic 3D spaceship scene.
-- Share instrument typography, functional accent colors, visual warning language, restrained animation and material sensibility between navigation and 2D exploration. The navigation heading/velocity rays and scanner rules remain unchanged.
+- **Strict 2D is the default world view.** The production cockpit opens **360° panoramic observation** at the **cockpit desk**, with independent inertial camera, compact instruments and shared physical ship location. The local player remains seated at the desk in 2D; multiplayer presence remains future work. See [cockpit states and multiplayer reconnect](cockpit-navigation-and-reconnect.md).
+- The isolated `/?scene=radar` engineering fixture retains faceted contact proxies and a sparse galactic lattice; it is not the production cockpit.
+- Share instrument typography, functional accent colors, visual warning language, restrained animation and material sensibility between navigation and 2D exploration. The production cockpit uses optical sky and scanner-gated contacts without legacy heading/velocity rays. The single five-second scanner pulse remains unchanged.
 
 The former 3D low-poly art bible and first-person interior/environment camera contracts are legacy implementation references. Their mood, narrative and world-identity decisions remain useful, but incompatible camera, mesh and fragment-specific presentation rules are superseded.
 

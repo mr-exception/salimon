@@ -74,6 +74,7 @@ test('DEPOSIT-851 real walking evicts worked source and returns without replenis
   await page.locator('main').click({position:{x:640,y:350}})
   await page.getByRole('button',{name:'Equip gathering tool'}).click()
   await page.keyboard.press('e');await walkTicks(page,[],60);await page.keyboard.press('Escape')
+  const mark=marks[0].id
   const before=await position(page)
   const move=async(key:string)=>{
     const tick=async()=>Number(await page.locator('main').getAttribute('data-tick')),target=await tick()+6000
@@ -101,6 +102,12 @@ test('DEPOSIT-851 real walking evicts worked source and returns without replenis
   expect(Math.hypot(returned[0]!-before[0]!,returned[1]!-before[1]!)).toBeLessThan(.001)
   await expect(page.locator(`[data-entity="${id}"]`)).toHaveAttribute('data-remaining-grams',String(deposit!.initial.remainingGrams-1000))
   await expect(page.locator('[data-field-mark]')).toHaveCount(1)
+  await expect(page.locator('[data-field-mark]')).toHaveAttribute('data-field-mark',mark!)
+  await page.evaluate(()=>window.dispatchEvent(new Event('pagehide')))
+  const returnedSave=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RESOURCE_SAVE_KEY)
+  expect(returnedSave.inventory.quantities.mineral+returnedSave.sources[id].remainingGrams).toBe(deposit!.initial.remainingGrams)
+  expect(returnedSave.journal.marks).toEqual(farSave.journal.marks)
+  expect(returnedSave.scout.ship.position).toEqual(farSave.scout.ship.position)
   await page.screenshot({path:info.outputPath('revisited-region.png')})
-  await info.attach('eviction-state.json',{body:JSON.stringify({id,before,returned,farSave,input:'Playwright keyboard; 240 m out and back through region eviction and reload'}),contentType:'application/json'})
+  await info.attach('eviction-state.json',{body:JSON.stringify({id,before,returned,farSave,returnedSave,mark,input:'Playwright keyboard; 240 m out and back through region eviction and reload'}),contentType:'application/json'})
 })

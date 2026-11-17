@@ -1,5 +1,14 @@
 # Current browser implementation and contract routing
 
+Planetary exploration V1 (#847–#853) delivers versioned canonical geology,
+continuous illustrated regional walking, mineral deposits, deliberate landmarks/marks
+and schema-v13 sparse persistence in the React/TypeScript browser.
+[Combined acceptance and current limits](browser-planetary-qa.md) cover #854.
+Production cockpit presentation is panoramic; `/?scene=radar` is an isolated
+orthographic engineering fixture. Historical Rust systems do not establish
+browser delivery. Climate, ecology, underground, water, procedural resource types,
+full planetary chart, Core and multiplayer remain deferred.
+
 See the [active browser launch/landing contract](browser-launch-landing.md) for the delivered
 production loop, supported sample sites, safety/save boundaries and QA coverage.
 
@@ -42,7 +51,7 @@ requirements, not playable behavior. “Decision pending” identifies missing r
 | Fabricator | Visible inspection fixture | Approved queue/power/tray design remains future browser integration; recipes and count-item content are not implemented |
 | Survival | [Browser survival](browser-survival.md): active hunger/fatigue, starvation, passive regen, offline fatigue, persisted HUD and explicit terminal reset | Historical Rust survival implementations are legacy-only; suit/hazard requirements govern future 2D work |
 | Multiplayer | `cockpit.ts` is explicitly local; `TopDownView.tsx` uses a Web Lock for one local save writer | Server authority, presence, reconnect and offline death are future; no backend sync/anti-cheat claim |
-| Universe | `sampleUniverse.ts`, `scanner.ts`, `contact.ts`: illustrative radar catalog, scanning, conservative contact; `planetarySite.ts`: original authored site; `surfaceSite.ts`: deterministic sparse planet/moon patches, tangent frames, clearance and saved local site state | [Versioned canonical surface and P02 geology](browser-planet-surface.md) are delivered (#847/#848): deterministic provinces/relief, swept slope collision, landing footprints, body-wide revision binding and bounded physical ground preview. Continuous regional walking and bounded baseline streaming are delivered by `regionStream.ts` and the chart handoff in `topDownRuntime.ts` (#849). Full planetary illustration, scientific catalogs, travel/opening narrative and full universe integration remain future browser work; native catalog claims are historical |
+| Universe | `sampleUniverse.ts`, `scanner.ts`, `contact.ts`: illustrative radar catalog, scanning, conservative contact; `planetarySite.ts`: original authored site; `surfaceSite.ts`: deterministic sparse planet/moon patches, tangent frames, clearance and saved local site state | [Versioned canonical surface and P02 geology](browser-planet-surface.md) are delivered (#847/#848): deterministic provinces/relief, swept slope collision, landing footprints, body-wide revision binding and bounded physical ground preview. Continuous regional walking and bounded baseline streaming are delivered by `regionStream.ts` and the chart handoff in `topDownRuntime.ts` (#849). Scientific catalogs, travel/opening narrative and full universe integration remain future browser work; native catalog claims are historical |
 | Ship damage | `contact.ts` supplies terminal whole-ship flight impacts; `TopDownView.tsx` and `topDownRuntime.ts` expose terminal status and block walking/interaction without a landed site (#844) | [Approved 2D damage](cockpit-navigation-and-reconnect.md#current-ship-damage-scope-simplification) is **ship-wide**. Localized room/module damage is legacy/deferred, never silently restored |
 
 ## Legacy contracts and supersession

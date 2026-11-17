@@ -1,6 +1,6 @@
 # Backend architecture: authoritative simulation and networking
 
-**Status:** Approved design baseline, **not implemented** (2026-11-05). This is a future server specification for the active browser-first 2D Salimon. It does not claim that a NestJS service, online authentication, MongoDB state, client prediction, or multiplayer gameplay is already running. The 3D holographic radar remains a cockpit-only view, not a replacement for the overhead world.
+**Status:** Approved design baseline, **not implemented** (2026-11-05). This is a future server specification for the active browser-first 2D Salimon. It does not claim that a NestJS service, online authentication, MongoDB state, client prediction, or multiplayer gameplay is already running. Production 3D panoramic observation remains cockpit-only; the orthographic radar is an isolated engineering fixture.
 
 **Decisions recorded:** NestJS + TypeScript + MongoDB; a modular monolith running simulation **inside the single NestJS Node.js process initially**; **fully server-authoritative** gameplay with client-side input prediction; one canonical persistent universe; and checkpoint-based crash recovery with strict staleness suspension. The companion [persistence/recovery contract](backend-persistence-recovery.md) owns durability, write ordering, failure modes, and restart behavior.
 
@@ -43,7 +43,7 @@ Do **not** introduce Kafka, Redis, Kubernetes or microservices for the first ver
 ### Proposed repository layout (future, not created)
 
 ```text
-client/                         # Existing 2D React client and cockpit radar
+client/                         # Existing 2D React client and panoramic cockpit
 server/
   src/
     main.ts
@@ -116,7 +116,7 @@ These are proposals, not shipped API signatures. Validate at the server edge; cl
 - Remote entities interpolate from interest-filtered server snapshots and never use remote client claims.
 - Discard/reinitialize the prediction buffer across reconnect, epoch/catalog mismatch, incompatible snapshot versions, and authoritative frame changes.
 - 2D world coordinates and body/ship-local anchors retain split large-integer cells and local offsets. Wire codecs must preserve full precision (for example decimal strings for large integer cells), never flatten galactic positions into JS `Number`.
-- A cockpit user still exists as a seated player in the 2D world. The cockpit-only 3D radar is local presentation; spectators receive seated state, not a 3D camera stream.
+- A cockpit user still exists as a seated player in the 2D world. Cockpit-only panoramic observation is local presentation; spectators receive seated state, not a 3D camera stream.
 
 ## 4. Interest management and single-universe ownership
 

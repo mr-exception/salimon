@@ -138,3 +138,27 @@ test('P03 distant heading poles transport the camera without an orientation snap
     before=next
   }
 })
+
+test('P08 rapid direction/publication changes discard stale queued regions and reject unknown publications atomically',()=>{
+  const stream=new RegionStream(),d=geologicalDefinition('vesper-moon')
+  const origin=surfaceRegion({bodyId:d.bodyId,radialM:[d.radiusM+5,0,0]},d),home=localToSurface(origin,[0,0])
+  stream.select(home,d);const baseline=stream.sample(home)
+  for(let i=0;i<200;i++) {
+    const sign=i%2?1:-1,point=localToSurface(origin,[sign*i*128,(i%3-1)*i*128])
+    stream.select(point,d)
+    // Replace pending work again before prefetch: no old destination may leak.
+    stream.select(home,d);stream.prefetch()
+    assert.deepEqual(stream.sample(home),baseline)
+    assert.ok(stream.stats.regions<=STREAM_REGION_LIMIT)
+    assert.ok(stream.stats.samples<=STREAM_REGION_LIMIT*STREAM_SAMPLE_LIMIT)
+    assert.ok(stream.stats.frameGenerated<=STREAM_FRAME_BUDGET)
+    assert.equal(stream.stats.pending,0)
+  }
+  const flat=planetDefinition(d.bodyId)
+  stream.select(home,flat);assert.equal(stream.sample(home).groundType,'authored-ground')
+  stream.select(home,d);assert.deepEqual(stream.sample(home),baseline)
+  for(const reference of [{...d,digest:'unknown'},{...d,bodyId:'caligo'},{...d,version:99}]) {
+    assert.throws(()=>stream.select(home,reference))
+    assert.deepEqual(stream.sample(home),baseline,'rejected selection preserves valid publication')
+  }
+})

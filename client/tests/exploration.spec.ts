@@ -59,9 +59,9 @@ test('EXPLORE-852 deliberate discovery, notes, focus, projected physical cues an
   await page.screenshot({path:info.outputPath('notebook-original.png')})
   await info.attach('marks.json',{body:JSON.stringify({id,known:await dialog.getByLabel('Known places').innerText(),initial,position:await position(page),renderer:'Chromium SVG/Canvas CPU',viewport:info.project.use.viewport,dpr:1}),contentType:'application/json'})
   await page.keyboard.press('Escape')
-  // Durable mark writes deliberately belong to P07; geometry does survive reload.
+  // Durable notes and the same physical landmark survive reload.
   await page.reload();await page.clock.runFor(200)
-  await expect(page.locator('[data-field-mark]')).toHaveCount(0)
+  await expect(page.locator('[data-field-mark]')).toHaveCount(2)
   await page.locator('main').click({position:{x:640,y:350}}); await page.keyboard.press('m')
   await expect(dialog.locator(`[data-landmark="landmark:authored:v1:vesper:rock:west"]`)).toHaveCount(1)
   expect(errors).toEqual([])
@@ -149,4 +149,30 @@ test('EXPLORE-852 generated ridge inspection, physical alignment and readable gu
     for(const other of boxes.slice(0,-1))expect(panel.x+panel.width<=other.x || other.x+other.width<=panel.x || panel.y+panel.height<=other.y || other.y+other.height<=panel.y).toBe(true)
   }
   await info.attach('physical-landmark.json',{body:JSON.stringify({landmark,physical,sample:probeGeology(landmark.location,d),renderer:'Chromium SVG/Canvas CPU',seed:d.domains.geology.seed}),contentType:'application/json'})
+})
+
+test('PERSIST-853 notebook write failure keeps durable note and shows recovery inside the modal',async({page},info)=>{
+  await boot(page,'','http://127.0.0.1:4175')
+  await page.keyboard.press('m')
+  const dialog=page.getByRole('dialog',{name:'Field notebook'})
+  await dialog.getByLabel('Name (optional)',{exact:true}).fill('Retained note')
+  await dialog.getByRole('button',{name:'Mark current location'}).click()
+  await expect(dialog.getByLabel('Known places')).toContainText('Retained note')
+  const before=await page.evaluate(key=>localStorage.getItem(key),RESOURCE_SAVE_KEY)
+  await page.evaluate(key=>{
+    const original=Storage.prototype.setItem
+    Storage.prototype.setItem=function(name,value){
+      if(name===key)throw new DOMException('Storage quota exceeded','QuotaExceededError')
+      return original.call(this,name,value)
+    }
+  },RESOURCE_SAVE_KEY)
+  await dialog.getByLabel('Name (optional)',{exact:true}).fill('Rejected replacement')
+  await dialog.getByRole('button',{name:'Mark current location'}).click()
+  await expect(dialog.getByRole('status').filter({hasText:'Saving failed'})).toContainText('reload after resolving storage access')
+  await expect(dialog.getByLabel('Known places')).toContainText('Retained note')
+  await expect(dialog.getByLabel('Known places')).not.toContainText('Rejected replacement')
+  await expect(dialog.getByRole('button',{name:'Mark current location'})).toBeDisabled()
+  expect(await page.evaluate(key=>localStorage.getItem(key),RESOURCE_SAVE_KEY)).toBe(before)
+  await page.screenshot({path:info.outputPath('notebook-quota-error.png')})
+  await info.attach('retained-save.json',{body:before!,contentType:'application/json'})
 })

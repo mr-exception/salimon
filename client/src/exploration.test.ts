@@ -10,10 +10,11 @@ import { ResourceSession } from './resourceSession.ts'
 import { probeGeology } from './planetGeology.ts'
 import { samplePlanetSurface } from './planetSurface.ts'
 
+const storage = () => { let raw: string | null = null; return { getItem: () => raw, setItem: (_: string, value: string) => { raw = value } } }
 const at = (x:number,y:number, base=createTopDownState()) => ({...base,entities:base.entities.map(e=>e.id===PLAYER_ID?{...e,anchor:{frame:'planet:fixture' as const,point:point2(x,y)}}:e)})
 
-test('explicit inspect and mark preserve physical source identity, optional text and bounded session events',()=>{
-  const world=createTopDownState(),session=new ResourceSession({getItem:()=>null,setItem:()=>{}},world)
+test('explicit inspect and mark preserve physical source identity, optional text and bounded durable events',()=>{
+  const world=createTopDownState(),session=new ResourceSession(storage(),world)
   const before=structuredClone(session.snapshot),landmarks=localLandmarks(world)
   assert.ok(landmarks.length>0);assert.equal(session.fieldMarks.length,0)
   const rock=landmarks.find(l=>l.physicalSource==='rock:west')!
@@ -21,7 +22,7 @@ test('explicit inspect and mark preserve physical source identity, optional text
   assert.ok(session.markField('West marker','Return around this boulder',rock.id))
   assert.equal(session.fieldMarks[0]!.landmarkId,rock.id)
   assert.equal(session.fieldMarks[0]!.provenance,'known-physical-source')
-  assert.deepEqual(session.snapshot,before)
+  assert.equal(session.snapshot.revision,before.revision+1);assert.deepEqual(session.snapshot.inventory,before.inventory)
   assert.ok(session.markField('Renamed','',rock.id));assert.equal(session.fieldMarks.length,1)
   assert.equal(session.fieldMarks[0]!.name,'Renamed')
   assert.equal(session.markField('x'.repeat(49),''),false)
@@ -95,7 +96,7 @@ test('marks and Scout retain physical identity through chart handoff; commands n
   const nearby=at(-.000000001,0)
   assert.equal(createFieldMark(nearby,'','').id,createFieldMark(at(0,0),'','').id)
   // Marks live in the existing session, outside immutable terrain cache residency.
-  const session=new ResourceSession({getItem:()=>null,setItem:()=>{}},initial)
+  const session=new ResourceSession(storage(),initial)
   session.markField('Start','')
   for(let i=0;i<60;i++)session.advance(stepTopDown(session.world,[0,1]))
   assert.equal(session.fieldMarks[0]!.id,mark.id)

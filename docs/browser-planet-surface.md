@@ -335,13 +335,11 @@ contrast against terrain and cannot intercept world input. The native modal uses
 the existing focus/keyboard/Escape stack; closing returns focus to Help. The closed
 HUD leaves walking, gathering, doors and cockpit interaction with their owners.
 
-`ResourceSession.fieldMarks` is a bounded session-local collection of version-1
-`FieldMark` command payloads (stable ID, definition, body-fixed location, optional
-landmark ID, provenance, name and note). **P07 / #853 owns durable writes and save
-migration**; marks currently survive streaming/eviction in the open session, but
-not reload. No second localStorage key, writer or resource ledger is introduced.
-This limitation is shown in the notebook. Baseline landmarks regenerate unchanged
-after reload, and resource/Scout/player saves continue through the existing owner.
+`ResourceSession.fieldMarks` reads the schema-v13 expedition journal. Explicit
+marks save immediately with source balances, inventory, survival, player frame
+and the shared Scout state. Reload and cache eviction retain notes; failed or
+stale writes publish no new mark. No second storage key or writer is introduced.
+See [the expedition save contract](save-contract.md#browser-expedition-journal-853).
 
 **Return to Scout** enables an on-demand local walking estimate; it never moves
 the player. A nearby hull (within 24 m) reacquires a fix. The estimate's uncertainty
@@ -352,9 +350,10 @@ rounded to 10 m. A reload away from the hull has no position fix. Returning with
 24 m can reacquire it; simply loading a distant region cannot. Detached flight,
 cabin-only position, changed landing identity and exhausted/absent fixes give an
 explicit unavailable message. This prototype dead-reckoning policy is not a
-scanner, GPS, chart, route planner or claim of hardware capability. P07 can later
-persist appropriate knowledge inputs; exact world coordinates alone do not grant
-an available fix.
+scanner, GPS, chart, route planner or claim of hardware capability. The durable
+journal preserves observations and coordinates, while the walking
+fix intentionally remains session-local: exact world coordinates alone do not
+grant a reliable local dead-reckoning fix after reload.
 
 `exploration.test.ts` covers identity, terrain agreement, command admission,
 capacity, chart handoff and fix loss. `tests/exploration.spec.ts` owns built real

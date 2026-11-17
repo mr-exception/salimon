@@ -37,7 +37,7 @@ export function ExplorationHud({state,session,blocked,onChange,open,guiding,onDi
     {guidance && <p data-scout-guidance data-fix={String(guidance.available)}>{guidance.text}</p>}
     <Dialog open={open} title="Field notebook" onDismiss={onDismiss}>
       <p>Inspect a nearby physical feature or mark where you stand. Knowledge is added only by your action.</p>
-      <p>Session notes only; notes across reload arrive with planetary persistence.</p>
+      <p>Field notes save with your expedition. Up to 256 deliberate marks are retained.</p>
       <label>Name (optional)<input value={name} maxLength={48} onChange={event=>setName(event.target.value)} /></label>
       <label>Short note (optional)<input value={note} maxLength={160} onChange={event=>setNote(event.target.value)} /></label>
       <button disabled={blocked} onClick={()=>mark()}>Mark current location</button>
@@ -46,7 +46,7 @@ export function ExplorationHud({state,session,blocked,onChange,open,guiding,onDi
         <small>Nearby geological feature · personally inspected when recorded</small>
       </li>)}</ul>
       {!landmarks.length && <p>No geological feature within the 12 m inspection range.</p>}
-      <p role="status">{session.feedback}</p>
+      <p role="status">{session.error || session.feedback}</p>
       <h3>Deliberately recorded places ({session.fieldMarks.length})</h3>
       <ul aria-label="Known places">{session.fieldMarks.map(m=><li key={m.id} data-known-mark={m.id}>
         <strong>{m.name}</strong> · {m.provenance.replaceAll('-', ' ')}<p>{m.note}</p><small>Body: {m.location.bodyId}</small>

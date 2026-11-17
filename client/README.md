@@ -1095,3 +1095,24 @@ Original captures, negative diffs and state JSON stay in ignored `test-results/`
 and the existing CI artifact upload (14-day retention). New frames are review
 candidates and same-run regression checks; no approved references are replaced.
 SVG/Canvas CPU evidence does not establish physical GPU/M1/Metal performance.
+
+
+### Atomic expedition observations (#853)
+
+Schema v13 adds durable field marks and up to 128 recent physically visited
+regions to the existing ResourceSession save. Use **Inspect / mark** (M) to save
+an optional name/note immediately. Notes survive reload and cache eviction; up to
+256 deliberate marks are retained. The local Scout walking estimate still needs
+visual reacquisition after reloading away from the hull.
+
+ResourceSession preserves the single Web Lock/revision writer, generated source
+depletion/partial work, legacy authored IDs, ship/player frames and inventory in
+one snapshot. Loading/rendering neighboring regions never creates visits or
+source records. Unknown publications, corruption, stale writers and write failure
+preserve the last durable save and pause writes. See the
+[save contract](../docs/save-contract.md#browser-expedition-journal-853) for bounds,
+migration and validation. Focused domain checks:
+`node --experimental-strip-types --test src/expeditionJournal.test.ts src/planetDeposits.test.ts`.
+Built persistence checks use `npm run test:browser -- --project=cockpit tests/deposits.spec.ts tests/exploration.spec.ts`
+and the affected flight/landing/storage suites. Originals and raw state remain in
+ignored `test-results/` and existing CI artifacts.

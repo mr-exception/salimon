@@ -749,6 +749,9 @@ terminal, cabin, container review/error (top and controls), grounded cockpit,
 contact selection and return. Existing production sensor/bright-star composition
 fixtures add unscanned/occluded/lost contact and bright-background warning frames;
 these are fixture compositions, not new playable flight/optical mechanics.
+The 1920px focused bright-warning reference includes the takeoff help: close the
+aft boarding door and use Take off from the authorized powered seat. Smaller
+viewports place that paragraph below the initial visible dialog area.
 Readouts are checked against domain-created prior-expedition saves and exact
 transactions. Geometry assertions reject body scroll, clipped/horizontally
 scrolling panels, HUD overlap and world interception at the player. Browser

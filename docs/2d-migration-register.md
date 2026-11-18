@@ -1,5 +1,14 @@
 # 2D documentation migration register
 
+Planetary exploration V1 (#847–#853) delivers versioned canonical geology,
+continuous illustrated regional walking, mineral deposits, deliberate landmarks/marks
+and schema-v13 sparse persistence in the React/TypeScript browser.
+[Combined acceptance and current limits](browser-planetary-qa.md) cover #854.
+Production cockpit presentation is panoramic; `/?scene=radar` is an isolated
+orthographic engineering fixture. Historical Rust systems do not establish
+browser delivery. Climate, ecology, underground, water, procedural resource types,
+full planetary chart, Core and multiplayer remain deferred.
+
 **Original audit on 2026-11-05:** 106 preexisting Markdown files were read and classified; backend documents expanded the register, and the 2026-11-06 synchronization reached **112 rows** (including Stasis Pod). **2026-11-07 UI style proposal:** one new approved-future HUD/equipment design entry brings the register to **113 rows** (GUIDE: 12, DESIGN: 26, NATIVE: 61, ARCHIVE: 6, PLAYABLE: 8). The #826 shared DOM foundation has scoped tokens/primitives and a development gallery; view migration remains future, so the HUD guide stays DESIGN. Classification does **not** claim all designs run in the browser; historical implementation and verification evidence remain historical.
 
 **2026-11-14 flight QA routing:** the active browser launch/landing contract adds
@@ -23,11 +32,11 @@ reclassify historical native flight/gravity documents as active code.
 | Mineable physical fragments and two volume/weight limits | Direct raw-resource credit in **integer grams**. Initial inventory: **10 kg and 12 slots**, raw type stacking, per-item count stacks/weights, **no volume**. Source debit equals credit. |
 | Cargo racks and fabrication/fuel intakes | The **50 kg Resource Container** has confirmed raw-resource transfers (#784/#785). Separate **50 kg Fabricator/Core raw buffers** and processing remain approved future work. |
 | First-person Scout interior, physical modules | Continuous visible **top-down Scout cutaway**, ship-local frames, fixture footprints and concise contextual UI; preserve cozy habitation identity and build constraints when porting. |
-| Aft exterior door / launch interlocks | **Playable boarding door** (#839): grounded E/mouse open/close, occupied-threshold guard, shared collision/art, v10 save with explicit legacy migration, powered-owner cockpit launch admission and airborne lock. Open-top cutaway art never represents an open exterior door. Trajectories, EVA/pressure, construction and Core power remain future work. |
+| Aft exterior door / launch interlocks | **Playable boarding door** (#839): grounded E/mouse open/close, occupied-threshold guard, shared collision/art, v10 save with explicit legacy migration, powered-owner cockpit launch admission and airborne lock. Open-top cutaway art never represents an open exterior door. Takeoff/assisted landing are delivered through #844; EVA/pressure, construction and Core power remain future work. |
 | Physical suits, hazards and upgrades | Future **tierless** basic suit with two module slots, drawer tiers **4/8/12**, module-store tiers **12/16/24**, **200 HP** character health, independent exposure and **1,000 HP** absorption per module. Exact gear masses/recipes remain TBD. |
 | Native localized room/module hull damage | Current 2D **combat damage** remains ship-wide; localized combat detachment deferred. Deliberate future construction **dismantles eligible parts individually**, including Stasis Pods; **offline death follows loss of the assigned pod**, not blanket loss of the last occupied ship. |
-| Native Gaia, terrain, gravity, streaming | Retain reproducible canonical data, IDs and physics as future port inputs; authoritative overhead surface sprites/colliders and cockpit radar proxies need independent browser/backend integration. |
-| Native whole-session save or network state | Browser-local `ResourceSession` **v11** resource/Scout/site ledger is **not** native schema 29+, multiplayer authority or cloud sync. |
+| Native Gaia, terrain, gravity, streaming | Retain reproducible canonical data, IDs and physics as future port inputs; browser surface geology, regional streaming and footprint collision are delivered in #847–#853. Panoramic optical contacts replace production radar proxies; wider native systems still need browser/backend integration. |
+| Native whole-session save or network state | Browser-local `ResourceSession` **v13** resource/Scout/site/expedition ledger is **not** native schema 29+, multiplayer authority or cloud sync. |
 | Rust QA and native screenshot evidence | Historical; use Node/TypeScript and real browser Playwright capture for new feature delivery. Native hardware signoff is not a default browser blocker. |
 
 ## Development sequence (not a new gameplay approval)
@@ -94,10 +103,11 @@ One row for every `docs/*.md` file in this revision. `reports/` is kept as histo
 | [`physical-organisms.md`](physical-organisms.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`planetary-atmosphere.md`](planetary-atmosphere.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`planetary-audio.md`](planetary-audio.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
+| [`browser-planetary-qa.md`](browser-planetary-qa.md) | PLAYABLE | Combined browser V1 acceptance routes, bounds and evidence limitations (#854). |
 | [`planetary-chart.md`](planetary-chart.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`planetary-climate.md`](planetary-climate.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`planetary-ecology.md`](planetary-ecology.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
-| [`planetary-environment-art-direction.md`](planetary-environment-art-direction.md) | DESIGN | Approved deterministic geology/weather/ecology/landmarks; adapt to overhead illustrated layers. |
+| [`planetary-environment-art-direction.md`](planetary-environment-art-direction.md) | PLAYABLE / DESIGN | Browser geology, deposits and local landmarks/marks delivered; weather/ecology/full chart remain future design. |
 | [`planetary-geology.md`](planetary-geology.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`planetary-landmarks.md`](planetary-landmarks.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |
 | [`planetary-organisms.md`](planetary-organisms.md) | NATIVE | Archived native environment. Translate published identities, effects and sources into illustrated overhead layers and 2D footprints. |

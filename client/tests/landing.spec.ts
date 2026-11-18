@@ -39,6 +39,7 @@ const epoch = new Date('2026-11-04T00:00:00Z')
 
 test('LANDING-844 built Land control completes Vesper/moon walk, reload, cargo and relaunch journeys', async ({ page }, info) => {
  test.setTimeout(process.env.SALIMON_SLOW_BROWSER === '1' ? 900000 : 420000)
+ const surfaceArt: Record<string, string> = {}
  const states: Record<string, unknown> = {}, main = page.locator('main'), pano = page.locator('.panoramic')
  const ship = async () => JSON.parse((await main.getAttribute('data-ship'))!)
  const advance = async (ms: number) => { for (let t = 0; t < ms; t += 100) await page.clock.fastForward(Math.min(100, ms - t)) }
@@ -101,6 +102,19 @@ test('LANDING-844 built Land control completes Vesper/moon walk, reload, cargo a
   await page.keyboard.press('e'); await page.clock.runFor(32); await walkTicks(page, 's', 70)
   await expect(page.locator('[data-entity="person:player"]')).toHaveAttribute('data-frame', 'planet:fixture')
   await page.clock.runFor(1600); await capture(`${bodyId}-exterior`)
+  surfaceArt[bodyId] = (await page.locator('[data-generated-ground] image').getAttribute('href'))!
+  expect(surfaceArt[bodyId].length).toBeGreaterThan(1000)
+  await expect(page.locator('[data-entity="ship:scout"]')).toHaveCount(1)
+  if(bodyId==='vesper-moon') expect(surfaceArt[bodyId]).not.toBe(surfaceArt.vesper)
+  // P08 deliberately records the actual destination before departure; a
+  // re-landing must preserve this observation with the depleted source/cargo.
+  await page.keyboard.press('m')
+  const notebook=page.getByRole('dialog',{name:'Field notebook'})
+  await notebook.getByLabel('Name (optional)',{exact:true}).fill(`${bodyId} landing observation`)
+  await notebook.getByRole('button',{name:'Mark current location'}).click()
+  await expect(notebook.getByLabel('Known places')).toContainText(`${bodyId} landing observation`)
+  await page.keyboard.press('Escape')
+  await page.locator('main').click({position:{x:640,y:350}})
   await page.evaluate(() => window.dispatchEvent(new Event('pagehide')))
   const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
   expect(saved.stores).toEqual(initial.stores); expect(saved.sources).toEqual(initial.sources); expect(saved.inventory).toEqual(initial.inventory)
@@ -125,6 +139,8 @@ test('LANDING-844 built Land control completes Vesper/moon walk, reload, cargo a
   const revisited = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
   expect(revisited.scout.binding).toBe(saved.scout.binding)
   expect(revisited.sources).toEqual(saved.sources); expect(revisited.stores).toEqual(saved.stores)
+  expect(saved.journal.marks).toHaveLength(1)
+  expect(revisited.journal.marks).toEqual(saved.journal.marks)
   if (bodyId !== 'vesper') await expect(page.locator('[data-source-kind]')).toHaveCount(0)
   await capture(`${bodyId}-revisited`)
   states[bodyId] = { before, during, saved, departed, revisited }

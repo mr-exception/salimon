@@ -5,7 +5,7 @@ production loop, supported sample sites, safety/save boundaries and QA coverage.
 
 Use the [2D documentation migration register](../docs/2d-migration-register.md) to distinguish the current browser implementation, approved future mechanics and archived native source contracts.
 
-**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **up to 1 kg/s integer-gram** sample gathering with approved survival penalties with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v11 resource/item/survival/hazard/Scout/site ledger and migrates valid v1
+**2D gathering (#757; weight-only revision):** The continuous Scout/planet browser world uses one **10 kg** weight cap, **12 shared inventory slots**, and **up to 1 kg/s integer-gram** sample gathering with approved survival penalties with atomic local saves. `resourceInventory.ts` also models count-based items with mass and per-type stack sizes (future content). `resourceSession.ts` saves a schema-v13 resource/item/survival/hazard/Scout/site/expedition ledger and migrates valid v1
 litre / v2 gram saves without loss. `resourceLedger.ts` validates exact transfers
 and store mass; future stores require trusted ID/ship/capacity declarations.
 The default world enables the 50 kg Scout Resource Container and deposit/withdraw panel (#784/#785). See [resource design](../docs/resource-inventory-and-gathering.md).
@@ -1116,3 +1116,18 @@ migration and validation. Focused domain checks:
 Built persistence checks use `npm run test:browser -- --project=cockpit tests/deposits.spec.ts tests/exploration.spec.ts`
 and the affected flight/landing/storage suites. Originals and raw state remain in
 ignored `test-results/` and existing CI artifacts.
+
+## Combined planetary exploration acceptance (#854)
+
+Run `npm test`, `npm run build`, then `npm run test:planetary`. The bounded
+acceptance selection uses the built production route for restored Vesper
+exploration, generated deposits, notebook persistence, collision, illustrated
+regions and Vesper/moon landing/revisit. It reuses #845 flight ownership instead
+of adding another flight safety campaign. See the [criterion/check matrix and
+limits](../docs/browser-planetary-qa.md). Set `CHROMIUM_PATH` only when reusing a
+compatible installed Chromium. Preserve originals/traces and failures in ignored
+`test-results/`; `SALIMON_EVIDENCE_DIR` can separate runs. Existing full world CI
+includes these suites and uploads that directory for 14 days. Three Help reference
+images intentionally propose the corrected durable-notes wording, with retained
+originals/diffs and unchanged pixel thresholds; appearance review remains with the
+owner. No new monitoring is introduced. CI acceptance awaits the owner's report.

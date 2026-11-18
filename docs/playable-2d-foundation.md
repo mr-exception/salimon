@@ -1,5 +1,14 @@
 # Playable Scout / planet foundation (#767)
 
+Planetary exploration V1 (#847–#853) delivers versioned canonical geology,
+continuous illustrated regional walking, mineral deposits, deliberate landmarks/marks
+and schema-v13 sparse persistence in the React/TypeScript browser.
+[Combined acceptance and current limits](browser-planetary-qa.md) cover #854.
+Production cockpit presentation is panoramic; `/?scene=radar` is an isolated
+orthographic engineering fixture. Historical Rust systems do not establish
+browser delivery. Climate, ecology, underground, water, procedural resource types,
+full planetary chart, Core and multiplayer remain deferred.
+
 See the [active browser launch/landing contract](browser-launch-landing.md) for the delivered
 production loop, supported sample sites, safety/save boundaries and QA coverage.
 

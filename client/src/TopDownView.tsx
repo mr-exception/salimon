@@ -261,7 +261,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
       <p>W A S D: walk · E: nearby action · Escape: close panel, then cancel interaction.</p>
       <p>I: inventory · P: pause active time. Menus do not pause time. Movement, Escape or stowing the tool interrupts gathering; partial work is saved.</p>
-      <p>M: inspect / mark a field location · G: toggle local Scout guidance. Notes currently last for this session.</p>
+      <p>M: inspect / mark a field location · G: toggle local Scout guidance. Field notes save with your expedition.</p>
       <button onClick={() => {setHelpOpen(false);session.current?.cancel();setNotebookOpen(true)}}>Inspect / mark</button>
       <button onClick={() => {setHelpOpen(false);setScoutGuiding(value => !value)}}>Return to Scout</button>
       <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>

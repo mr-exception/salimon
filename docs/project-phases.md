@@ -5,9 +5,9 @@
 > The roadmap is intentionally incremental. Exact phases will be finalized after the first design questions are answered.
 ## Active browser 2D progression (2026-11-05)
 
-Old native Phase 0 and Rust completion notes below are historical, not the current playable delivery timeline. The browser world supports overhead Scout/planet walking, cargo/cockpit crossing, holographic radar, weight-only mining and local source/inventory saves; #783 added a ledger domain, **not** a usable ship storage console. See [current status](current-client-status.md) and [the migration register](2d-migration-register.md).
+Old native Phase 0 and Rust completion notes below are historical, not the current playable delivery timeline. The browser world supports overhead Scout/planet walking, cargo/cockpit crossing, panoramic observation, weight-only mining and local source/inventory saves; #783 added a ledger domain, **not** a usable ship storage console. See [current status](current-client-status.md) and [the migration register](2d-migration-register.md).
 
-Next independently tested slices: [#784 Resource Container](https://github.com/mr-exception/salimon/issues/784), [#785 cargo UI](https://github.com/mr-exception/salimon/issues/785), [#786 count-item inventory](https://github.com/mr-exception/salimon/issues/786), [#787 survival](https://github.com/mr-exception/salimon/issues/787) and [#788 hazards](https://github.com/mr-exception/salimon/issues/788). Active Core/Fabricator, canonical planetary world and multiplayer need separate migration and decisions. No entire-game phase is declared finished by this documentation update.
+Resource Container, cargo UI, count-item transactions, survival and hazard domains are delivered in the browser. Planetary exploration V1 adds published geology, continuous walking, illustrated regions, deposits, field marks and atomic regional persistence (#847–#853). [Cross-feature QA](browser-planetary-qa.md) defines its browser acceptance; required CI remains pending until reported for the delivered revision. Climate, ecology, underground, water, procedural resource types, full chart, Core, Fabricator and multiplayer remain future work. No entire-game phase is declared finished.
 
 ## Future narrative/experience initiative (2026-10-21)
 
@@ -16,7 +16,7 @@ A grounded cinematic Scout vertical slice, opening memory-loss narrative, Archiv
 ## Current browser scope
 
 The default `/` delivers the 2D Scout/planet slice: walking, seamless doorway
-frames, cockpit radar and weight-only gathering with local persistence. See
+frames, panoramic cockpit and weight-only gathering with local persistence. See
 [code-verified status and future decisions](current-client-status.md) and
 [playable acceptance](playable-2d-foundation.md). Cloud/browser checks qualify
 routine 2D work; native/M1 gates remain historical or separately owned. No new

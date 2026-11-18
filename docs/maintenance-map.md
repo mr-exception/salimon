@@ -1,5 +1,7 @@
 # Feature maintenance map
 
+Combined planetary QA (#854): `tests/planetary-journey.spec.ts` owns restored Vesper multi-region mining/mark/storage/reload and corrupt-save UI. `npm run test:planetary` selects the affected existing domain browser owners; see [acceptance routing](browser-planetary-qa.md).
+
 Browser field exploration (#852): `exploration.ts` owns physical landmark identity,
 explicit versioned field-mark commands and local walking-fix policy;
 `ExplorationHud.tsx` owns the notebook, projected known-place cues and on-demand

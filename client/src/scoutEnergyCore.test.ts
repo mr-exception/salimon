@@ -40,7 +40,7 @@ test('Core is an independent 50 kg unconverted buffer with initial and durable e
   assert.deepEqual(s.snapshot, before)
   assert.equal(storage.raw, bytes)
   assert.equal(s.withdrawCoreFuel('mineral', 10000, s.snapshot.revision), true)
-  assert.equal(s.payload().shipGrams, 50000) // aboard player is not at this exterior site
+  assert.equal(s.payload().shipGrams, 40000) // player is outside; carried mass is not onboard
   assert.equal(s.snapshot.inventory.quantities.mineral, 10000)
   const restored = session(storage)
   assert.equal(restored.error, '')

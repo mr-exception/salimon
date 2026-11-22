@@ -1,6 +1,6 @@
 # Browser Core + Fabricator vertical slice — proposed decision contract (E01 / #873)
 
-**Status: PROPOSAL — OWNER APPROVAL REQUIRED.** None of the new numeric balance values, item behavior, save additions or machine commands below are implemented or approved. E02–E07 MUST NOT implement this proposal until the owner approves the decision rows and resolves the marked TBD. A docs PR does not itself authorize runtime balance changes.
+**Status: PARTIALLY APPROVED.** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. Other proposed balance values, item effects and machine commands remain unimplemented and require their own approval. A docs PR alone does not authorize the remaining runtime features.
 
 > **E02 Core-only approval (2026-11-22, #874):** The owner approved the proposed independent `scout:core:fuel` 50,000 g buffer, 2,000,000 J reserve cap, 500,000 J initial reserve for both new and v1–v13 migrated expeditions, biomass 2,000 J/g, mineral 500 J/g, 10,000 W maximum generation, and job draw before conversion in a future single-tick machine loop. Issue #874 ships only the durable fuel account, exact transfers and v14 Core state; it does **not** convert fuel, add UI, gate propulsion or settle Fabricator product/use decisions. The other E01 proposals and TBDs remain pending their respective implementation approvals. The current v14 Core conversion accumulator is strictly zero until the conversion implementation ships.
 

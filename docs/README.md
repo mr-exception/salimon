@@ -41,6 +41,8 @@ These newer approved narrative contracts supersede historical Earth-start assump
 These are planning contracts only. The current browser prototype is local, not an already-running server-authoritative multiplayer game.
 
 ## Product and gameplay
+- [Proposed browser Core/Fabricator vertical-slice economy (E01, awaiting owner approval)](browser-core-fabricator-vertical-slice.md)
+
 
 - [Project Vision](project-vision.md)
 - [Game Systems Overview](game-systems-overview.md)

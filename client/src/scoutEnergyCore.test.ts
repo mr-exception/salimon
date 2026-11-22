@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createTopDownState } from './topDownRuntime.ts'
+import { TEST_ITEMS } from '../tests/itemFixtures.ts'
 import { ResourceSession, RESOURCE_SAVE_KEY, type ResourceStorage } from './resourceSession.ts'
 import { SCOUT_CORE_FUEL_ID, CORE_CAPACITY_J, CORE_INITIAL_RESERVE_J } from './scoutEnergyCore.ts'
 
@@ -33,14 +34,20 @@ test('Core is an independent 50 kg unconverted buffer with initial and durable e
   assert.equal(s.snapshot.stores['scout:storage']!.quantities.mineral, undefined)
   assert.equal(s.payload().shipGrams, 50000)
   assert.equal(s.snapshot.sources[source]!.remainingGrams, 10000)
+  assert.equal(collect(s, 1), true)
   const before = structuredClone(s.snapshot), bytes = storage.raw
   assert.equal(s.depositCoreFuel('mineral', 1, s.snapshot.revision), false)
-  assert.equal(s.withdrawCoreFuel('mineral', 50001, s.snapshot.revision), false)
-  assert.equal(s.withdrawCoreFuel('mineral', 1, s.snapshot.revision - 1), false)
+  assert.match(s.feedback, /Store exceeds capacity/)
   assert.deepEqual(s.snapshot, before)
   assert.equal(storage.raw, bytes)
+  assert.equal(s.deposit('mineral', 1, s.snapshot.revision), true)
+  const filled = s.snapshot, filledBytes = storage.raw
+  assert.equal(s.withdrawCoreFuel('mineral', 50001, s.snapshot.revision), false)
+  assert.equal(s.withdrawCoreFuel('mineral', 1, s.snapshot.revision - 1), false)
+  assert.equal(s.snapshot, filled)
+  assert.equal(storage.raw, filledBytes)
   assert.equal(s.withdrawCoreFuel('mineral', 10000, s.snapshot.revision), true)
-  assert.equal(s.payload().shipGrams, 40000) // player is outside; carried mass is not onboard
+  assert.equal(s.payload().shipGrams, 40001) // player is outside; carried mass is not onboard
   assert.equal(s.snapshot.inventory.quantities.mineral, 10000)
   const restored = session(storage)
   assert.equal(restored.error, '')
@@ -76,6 +83,25 @@ test('Core rejects fractional grams, full player cargo, storage failures and ano
   assert.match(b.error, /Saving failed/)
 })
 
+test('Core transfer keeps onboard mass exact and honors shared inventory slots', () => {
+  const storage = new Storage()
+  const s = new ResourceSession(storage, createTopDownState('interior', true), undefined, TEST_ITEMS, () => 0)
+  assert.equal(collect(s, 1000), true)
+  assert.deepEqual(s.payload(), { playerGrams: 1000, storeGrams: 0, shipGrams: 1000 })
+  assert.equal(s.depositCoreFuel('mineral', 1000, s.snapshot.revision), true)
+  assert.deepEqual(s.payload(), { playerGrams: 0, storeGrams: 1000, shipGrams: 1000 })
+  assert.equal(s.changeItem('add', 'fixture-single', 12, s.snapshot.revision), true)
+  const before = s.snapshot, bytes = storage.raw
+  assert.equal(s.withdrawCoreFuel('mineral', 1, s.snapshot.revision), false)
+  assert.match(s.feedback, /Inventory exceeds its capacity/)
+  assert.equal(s.snapshot, before)
+  assert.equal(storage.raw, bytes)
+  assert.equal(s.changeItem('remove', 'fixture-single', 1, s.snapshot.revision), true)
+  const onboard = s.payload().shipGrams
+  assert.equal(s.withdrawCoreFuel('mineral', 1000, s.snapshot.revision), true)
+  assert.equal(s.payload().shipGrams, onboard)
+})
+
 test('v13 migrates empty Core without minting fuel or rewriting bytes until commit', () => {
   const storage = new Storage(), s = session(storage)
   assert.equal(collect(s, 1000), true)
@@ -88,6 +114,8 @@ test('v13 migrates empty Core without minting fuel or rewriting bytes until comm
   assert.equal(restored.error, '')
   assert.equal(restored.snapshot.version, 14)
   assert.equal(restored.snapshot.revision, v13.revision)
+  assert.deepEqual(restored.snapshot.sources, v13.sources)
+  assert.deepEqual(restored.snapshot.inventory, v13.inventory)
   assert.deepEqual(restored.snapshot.stores[SCOUT_CORE_FUEL_ID]!.quantities, {})
   assert.equal(restored.snapshot.core.reserveJ, CORE_INITIAL_RESERVE_J)
   assert.equal(storage.raw, prior)
@@ -102,6 +130,7 @@ test('corrupt or future Core saves fail closed with original bytes preserved', (
   const original = JSON.parse(storage.raw!)
   const mutations: ((save: any) => void)[] = [
     save => { save.version = 15 },
+    save => { save.version = 13; delete save.core; save.stores[SCOUT_CORE_FUEL_ID].capacityGrams = 1 },
     save => { delete save.core },
     save => { save.core.capacityJ++ },
     save => { save.core.reserveJ = -1 },

@@ -155,21 +155,24 @@ function sourceDefinitions(sources: Readonly<Record<string, ResourceSource>>): R
 export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
-  const hasStores = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
-  const hasItems = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
-  const hasSurvival = [6, 7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
-  const hasHazards = [7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
-  const hasWork = [8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
-  const hasScout = data.version === 9 || data.version === 10 || data.version === 11 || data.version === 12 || data.version === 13 || data.version === 14
-  const hasSites = data.version === 11 || data.version === 12 || data.version === 13 || data.version === 14
-  const allowed = [...([13, 14].includes(data.version as number) ? ['journal'] : []), ...(data.version === 14 ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const version = data.version
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 14) throw new Error('Unsupported save version')
+  const legacy = version === 1
+  const hasStores = version >= 3
+  const hasItems = version >= 5
+  const hasSurvival = version >= 6
+  const hasHazards = version >= 7
+  const hasWork = version >= 8
+  const hasScout = version >= 9
+  const hasSites = version >= 11
+  const hasJournal = version >= 13
+  const hasCore = version >= 14
+  const allowed = [...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
-  const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && data.version !== 12 && data.version !== 13 && data.version !== 14) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
+  if (data.catalogVersion !== (legacy ? LEGACY_CATALOG_VERSION : RESOURCE_CATALOG_VERSION) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && data.version !== 12 && data.version !== 13 && data.version !== 14 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -215,15 +218,16 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const savedStores = hasStores ? object(data.stores) : null
   // Only the newly introduced Scout store may be absent in v3. v4 requires it.
   const stores = savedStores ? { ...savedStores } as Record<string, ResourceLedger['stores'][string]> : emptyResourceStores(storeDefinitions)
-  // All pre-v14 campaigns had no Core fuel: add the trusted empty account without minting material.
-  if (data.version !== 14 && Object.hasOwn(storeDefinitions, SCOUT_CORE_FUEL_ID)) {
+  // A legacy save can acquire the new store, but cannot already declare it.
+  if (!hasCore && savedStores && Object.hasOwn(savedStores, SCOUT_CORE_FUEL_ID)) throw new Error('Core fuel requires schema v14')
+  if (!hasCore && savedStores && Object.hasOwn(storeDefinitions, SCOUT_CORE_FUEL_ID)) {
     stores[SCOUT_CORE_FUEL_ID] = emptyResourceStores({ [SCOUT_CORE_FUEL_ID]: storeDefinitions[SCOUT_CORE_FUEL_ID]! })[SCOUT_CORE_FUEL_ID]!
   }
-  if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
+  if (version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
     stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
   }
   const miningWork = hasWork ? validateMiningWork(data.miningWork, sources) : {}
-  const scout = hasScout ? decodeScout(data.scout, data.version === 9) : startingLocationForMigration()
+  const scout = hasScout ? decodeScout(data.scout, version === 9) : startingLocationForMigration()
   if (!hasSites && scout.siteId !== STARTING_SITE.id) throw Error('Legacy save cannot bind a generated site')
   if (hasSites && !object(data.scout).surface) throw Error('Missing saved surface mapping')
   const initialSite = resolveSurface(startingLocationForMigration().surface)
@@ -234,10 +238,10 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   }
   if (hasSites && (data.siteId !== scout.siteId || scout.binding && !Object.hasOwn(sites, scout.siteId))) throw Error('Missing active site state')
   const restoredWorld = materializeSite({ ...world, scoutLocation: scout, frames: scout.frames }, sites)
-  if (data.version !== 12 && data.version !== 13 && data.version !== 14 && object(object(data.location).anchor).chart !== undefined) throw Error('Walking chart requires schema v12')
+  if (version < 12 && object(object(data.location).anchor).chart !== undefined) throw Error('Walking chart requires schema v12')
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
-  const save: ResourceSave = { version: 14, core: data.version === 14 ? validateCoreEnergy(data.core) : freshCoreEnergy(), journal: [13, 14].includes(data.version as number) ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 14, core: hasCore ? validateCoreEnergy(data.core) : freshCoreEnergy(), journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }

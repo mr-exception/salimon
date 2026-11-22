@@ -45,13 +45,13 @@ unchanged; no procedural biomass is added. See [deposit publication and persiste
 transfers and resource container upgrade rules remain TBD.
 
 
-> **E01 design proposal, not yet approved:** [Browser Core/Fabricator minimal economy and item contracts](browser-core-fabricator-vertical-slice.md) proposes exact candidate numbers, job and energy rules, and a v14 migration boundary. This proposal does not change any existing approved requirement or ship runtime. E02–E07 are blocked until its owner decision gate is resolved.
+> The [browser Core/Fabricator contract](browser-core-fabricator-vertical-slice.md) records the approved E02 fuel buffer and reserve, plus the decisions still needed for later machine work.
 
 ## Fabricator and Energy Core material handling
 
 - Fabricator jobs consume/reserve ingredients as **integer grams of raw material** with exact mass conservation. The previous 50 kg / 50 L input limit is now **50 kg only**. Preserve the existing queue, power pauses and output tray contract; integration of the new shared count-item inventory remains future work.
 - The Energy Core has an independent **50 kg raw-material buffer**, separate from its energy reserve in joules and its maximum generation power in watts. Material conversion is **continuous over time**, pauses when the energy reserve is full, and resumes automatically when space for energy becomes available. Unconverted input is not lost.
-- Core material yield and batch bookkeeping must be defined using **mass**, not whole litres. Its highest-yield selection, deterministic tie-breaks, initial/upgrade maximum generation power, batch reservation/withdrawal and save behavior remain unresolved; do not invent numbers or claim this is implemented.
+- Core conversion will debit whole grams. The E02 contract records the approved starter yields and 10,000 W generation cap. Conversion scheduling and upgrades belong to later work.
 - Each inventory and processing buffer must contribute its contained mass exactly once to ship simulation. Resource weight currently contributes to player payload, and to ship mass when the player is aboard. Registered carried count-item mass contributes through the same payload path; equipped-suit attribution remains pending.
 
 ## Save format, authority and migration
@@ -130,6 +130,20 @@ items, unknown raw IDs, volume cap or organizational slot cap are accepted.
 Default sessions persist the identified container in the same atomic envelope
 as player inventory/source depletion/location. Its mass counts once even while
 the player is outside; onboard player mass remains separate. UI is described below.
+
+## Scout Energy Core fuel buffer (#874)
+
+`scout:core:fuel` is a separate 50,000 g raw store aboard the Scout. The
+`ResourceSession.depositCoreFuel` and `withdrawCoreFuel` commands move exact
+integer grams through player cargo using the same revision and capacity checks.
+Fuel counts once toward Scout mass. Player cargo contributes while aboard.
+
+Schema v14 saves the fuel and the Core reserve together under the existing
+localStorage key. Fresh sessions and v1–v13 migrations start with an empty
+Core buffer and 500,000 J out of 2,000,000 J. Migration preserves source
+depletion and revision, and writes only on the next successful commit.
+Malformed Core data or a Core store declared in a legacy save blocks writes
+and preserves the original bytes. The visible Core still supports inspection.
 
 ## Playable container interface (#785)
 

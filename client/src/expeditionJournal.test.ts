@@ -1,4 +1,5 @@
 import { test } from 'node:test'
+import { SCOUT_CORE_FUEL_ID } from './scoutEnergyCore.ts'
 import assert from 'node:assert/strict'
 import { ResourceSession, decodeResourceSave, RESOURCE_SAVE_KEY } from './resourceSession.ts'
 import { emptyJournal, MAX_VISITS, recordVisit, validateJournal } from './expeditionJournal.ts'
@@ -58,10 +59,11 @@ test('P07 v12 migration is lossless and lazy; corrupt journals/publications and 
   const { storage, session } = open()
   session.upgrade(12000, 13)
   const valid = JSON.parse(storage.getItem()!)
-  const old = { ...valid, version: 12 }; delete old.journal
+  const old = { ...structuredClone(valid), version: 12 }
+  delete old.core; delete old.stores[SCOUT_CORE_FUEL_ID]; delete old.journal
   const legacy = JSON.stringify(old), restored = new ResourceSession({ getItem: () => legacy, setItem: () => assert.fail('migration wrote eagerly') }, createTopDownState(), undefined, undefined, () => 0)
   assert.equal(restored.error, '')
-  assert.equal(restored.snapshot.version, 13)
+  assert.equal(restored.snapshot.version, 14)
   for (const key of ['sources','inventory','stores','survival','hazards','scout','location','sites'] as const) assert.deepEqual(JSON.parse(JSON.stringify(restored.snapshot, (_,v) => typeof v === 'bigint' ? String(v) : v))[key], valid[key])
   assert.deepEqual(restored.snapshot.journal, emptyJournal())
   session.markField('Here', 'Observed')

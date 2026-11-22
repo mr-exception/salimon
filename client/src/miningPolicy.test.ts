@@ -1,3 +1,4 @@
+import { SCOUT_CORE_FUEL_ID } from './scoutEnergyCore.ts'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { ResourceSession, decodeResourceSave } from './resourceSession.ts'
@@ -62,7 +63,7 @@ test('failed extraction retains last whole work/ledger revision; malformed work 
   for (const work of [{ [mineral]: 960 }, { [mineral]: -1 }, { [mineral]: .5 }, { unknown: 10 }, null]) {
     assert.throws(() => decodeResourceSave(JSON.stringify({ ...JSON.parse(saved), miningWork: work }), s.world))
   }
-  const old = { ...JSON.parse(saved), version: 7 }; delete old.journal; delete old.sites; delete old.scout; delete old.miningWork
+  const old = { ...JSON.parse(saved), version: 7 }; delete old.core; delete old.stores[SCOUT_CORE_FUEL_ID]; delete old.journal; delete old.sites; delete old.scout; delete old.miningWork
   const migrated = decodeResourceSave(JSON.stringify(old), s.world)
   assert.deepEqual(migrated.miningWork, {}); assert.deepEqual(migrated.inventory, JSON.parse(saved).inventory)
 })

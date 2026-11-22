@@ -1,3 +1,4 @@
+import { SCOUT_CORE_FUEL_ID } from './scoutEnergyCore.ts'
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
 import {RegionStream,STREAM_REGION_LIMIT,STREAM_SAMPLE_LIMIT,STREAM_FRAME_BUDGET} from './regionStream.ts'
@@ -109,11 +110,11 @@ test('P03 v2 geological walking preserves shared collision and camera follow acr
 test('P03 v11 anchor migration is lossless; rebased metadata cannot masquerade as an old save',()=>{
   const world=flatWorld(),session=new ResourceSession({getItem:()=>null,setItem:()=>{}},world)
   const data=JSON.parse(JSON.stringify(session.snapshot,(_,v)=>typeof v==='bigint'?String(v):v))
-  data.version=11; delete data.journal
+  data.version=11; delete data.core; delete data.stores[SCOUT_CORE_FUEL_ID]; delete data.journal
   let raw=JSON.stringify(data)
   const storage={getItem:()=>raw,setItem:(_:string,v:string)=>{raw=v}}
   const migrated=new ResourceSession(storage,createTopDownState())
-  assert.equal(migrated.error,'');assert.equal(migrated.snapshot.version,13)
+  assert.equal(migrated.error,'');assert.equal(migrated.snapshot.version,14)
   assert.deepEqual(migrated.snapshot.location,session.snapshot.location)
   assert.deepEqual(migrated.snapshot.sources,session.snapshot.sources)
   assert.equal(JSON.parse(raw).version,11) // read migration does not rewrite storage

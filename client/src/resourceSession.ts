@@ -160,8 +160,8 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const hasSurvival = [6, 7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
   const hasHazards = [7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
   const hasWork = [8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
-  const hasScout = data.version === 9 || data.version === 10 || data.version === 11 || data.version === 12 || data.version === 13 || data.version === 14 || data.version === 14
-  const hasSites = data.version === 11 || data.version === 12 || data.version === 13
+  const hasScout = data.version === 9 || data.version === 10 || data.version === 11 || data.version === 12 || data.version === 13 || data.version === 14
+  const hasSites = data.version === 11 || data.version === 12 || data.version === 13 || data.version === 14
   const allowed = [...([13, 14].includes(data.version as number) ? ['journal'] : []), ...(data.version === 14 ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')

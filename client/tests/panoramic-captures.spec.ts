@@ -4,6 +4,9 @@ import { execFileSync } from 'node:child_process'
 import { isAbsolute, resolve, sep } from 'node:path'
 import { compareImages, POLICY, sha256 } from '../scripts/visual-comparison.ts'
 
+// Negative telescope mode captures only wide + telescope; full PANO-VIS still
+// checks every reference with the unchanged strict screenshot policy.
+const negativeTelescopeOnly = process.env.SALIMON_PANORAMIC_NEGATIVE_TELESCOPE === '1'
 const directory = 'tests/navigation-baselines'
 const candidate = process.env.SALIMON_PANORAMIC_CANDIDATES || undefined
 if (candidate && process.env.CI) throw Error('Candidate generation is forbidden in CI')
@@ -54,7 +57,9 @@ test('PANO-VIS panoramic optical, sensor, actions and HUD reference matrix', asy
   await boot(`/tests/optical.html?scenario=${scenario}`, 'optical')
   expect((await state(page, 'optical')).contacts).toBe(0)
   await capture(scenario, 'optical')
+  if (negativeTelescopeOnly && scenario === 'telescope') break
  }
+ if (!negativeTelescopeOnly) {
  await boot('/tests/perspective.html?low-resolution', 'sensor')
  expect((await state(page, 'sensor')).selected).toBeNull()
  await capture('empty-scanner', 'sensor')
@@ -111,6 +116,7 @@ test('PANO-VIS panoramic optical, sensor, actions and HUD reference matrix', asy
   if (kind === 'warning') await expect(page.getByLabel('Navigation warnings')).not.toBeEmpty()
   if (kind === 'destroyed') await expect(page.getByRole('button', { name: 'Restart navigation', exact: true })).toBeInViewport()
   await capture(`small-${kind}`, 'hud')
+ }
  }
  expect(errors).toEqual([])
  await writeFile(`${output}/summary.json`, json({ source, environment, candidate, results, errors }))

@@ -14,6 +14,7 @@ import { freshHazards, validateHazards, hazardRates, stepHazards, type HazardSta
 import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
+import { SCOUT_CORE_FUEL_ID, freshCoreEnergy, validateCoreEnergy, type CoreEnergyState } from './scoutEnergyCore.ts'
 import { CELL_SIZE_M, ORIGIN, relativeM } from './coordinates.ts'
 import { controlsCockpit, LOCAL_PLAYER, leaveCockpit, type CockpitState } from './cockpit.ts'
 import { STARTING_SITE } from './planetarySite.ts'
@@ -41,7 +42,8 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
 }
 export interface ResourceSave extends ResourceLedger {
   readonly depositPublication: typeof DEPOSIT_PUBLICATION
-  readonly version: 13
+  readonly version: 14
+  readonly core: CoreEnergyState
   readonly journal: ExpeditionJournal
   readonly sites: SiteStates
   readonly scout: ScoutSave
@@ -153,21 +155,21 @@ function sourceDefinitions(sources: Readonly<Record<string, ResourceSource>>): R
 export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
-  const hasStores = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(data.version as number)
-  const hasItems = [5, 6, 7, 8, 9, 10, 11, 12, 13].includes(data.version as number)
-  const hasSurvival = [6, 7, 8, 9, 10, 11, 12, 13].includes(data.version as number)
-  const hasHazards = [7, 8, 9, 10, 11, 12, 13].includes(data.version as number)
-  const hasWork = [8, 9, 10, 11, 12, 13].includes(data.version as number)
-  const hasScout = data.version === 9 || data.version === 10 || data.version === 11 || data.version === 12 || data.version === 13
+  const hasStores = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
+  const hasItems = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
+  const hasSurvival = [6, 7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
+  const hasHazards = [7, 8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
+  const hasWork = [8, 9, 10, 11, 12, 13, 14].includes(data.version as number)
+  const hasScout = data.version === 9 || data.version === 10 || data.version === 11 || data.version === 12 || data.version === 13 || data.version === 14 || data.version === 14
   const hasSites = data.version === 11 || data.version === 12 || data.version === 13
-  const allowed = [...(data.version === 13 ? ['journal'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const allowed = [...([13, 14].includes(data.version as number) ? ['journal'] : []), ...(data.version === 14 ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
   const legacy = data.version === 1 && data.catalogVersion === LEGACY_CATALOG_VERSION
-  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && data.version !== 12 && data.version !== 13) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
+  if ((!legacy && ((data.version !== 2 && data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && data.version !== 12 && data.version !== 13 && data.version !== 14) || data.catalogVersion !== RESOURCE_CATALOG_VERSION)) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
     throw new Error('Unsupported save version')
   }
-  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && data.version !== 12 && data.version !== 13 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
+  if (data.version !== 3 && data.version !== 4 && data.version !== 5 && data.version !== 6 && data.version !== 7 && data.version !== 8 && data.version !== 9 && data.version !== 10 && data.version !== 11 && data.version !== 12 && data.version !== 13 && data.version !== 14 && Object.hasOwn(data, 'stores')) throw new Error('Stores require schema v3')
   const inv = object(data.inventory), quantities: Record<string, number> = {}
   for (const [id, quantity] of Object.entries(object(inv.quantities))) {
     if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
@@ -213,6 +215,10 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const savedStores = hasStores ? object(data.stores) : null
   // Only the newly introduced Scout store may be absent in v3. v4 requires it.
   const stores = savedStores ? { ...savedStores } as Record<string, ResourceLedger['stores'][string]> : emptyResourceStores(storeDefinitions)
+  // All pre-v14 campaigns had no Core fuel: add the trusted empty account without minting material.
+  if (data.version !== 14 && Object.hasOwn(storeDefinitions, SCOUT_CORE_FUEL_ID)) {
+    stores[SCOUT_CORE_FUEL_ID] = emptyResourceStores({ [SCOUT_CORE_FUEL_ID]: storeDefinitions[SCOUT_CORE_FUEL_ID]! })[SCOUT_CORE_FUEL_ID]!
+  }
   if (data.version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
     stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
   }
@@ -228,10 +234,10 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   }
   if (hasSites && (data.siteId !== scout.siteId || scout.binding && !Object.hasOwn(sites, scout.siteId))) throw Error('Missing active site state')
   const restoredWorld = materializeSite({ ...world, scoutLocation: scout, frames: scout.frames }, sites)
-  if (data.version !== 12 && data.version !== 13 && object(object(data.location).anchor).chart !== undefined) throw Error('Walking chart requires schema v12')
+  if (data.version !== 12 && data.version !== 13 && data.version !== 14 && object(object(data.location).anchor).chart !== undefined) throw Error('Walking chart requires schema v12')
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
-  const save: ResourceSave = { version: 13, journal: data.version === 13 ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 14, core: data.version === 14 ? validateCoreEnergy(data.core) : freshCoreEnergy(), journal: [13, 14].includes(data.version as number) ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
   return save
 }
@@ -291,7 +297,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 13, journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 14, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -369,6 +375,7 @@ export class ResourceSession {
       const sources = Object.fromEntries(Object.entries(next.sources).filter(([id, source]) => !isDepositId(id) || source.remainingGrams !== definitions[id]!.remainingGrams || this.miningWork[id] || id === this.activeSourceId).sort(([a], [b]) => a.localeCompare(b)))
       const candidate: ResourceSave = { ...next, sources, journal: validateJournal(recordVisit(next.journal, this.world), sites), sites, siteId: this.world.scoutLocation.siteId, scout: captureScout(this.world.scoutLocation), miningWork: validateMiningWork(this.miningWork, next.sources), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
       validateResourceLedger(candidate, sourceDefinitions(candidate.sources), this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
+      validateCoreEnergy(candidate.core)
       validateSurvival(candidate.survival)
       validateHazards(candidate.hazards)
       // Registered active baselines are useful to the live ledger, but only
@@ -519,6 +526,13 @@ export class ResourceSession {
   }
   withdraw(resourceId: string, grams: number, revision: number): boolean {
     return this.transfer({ revision, from: { kind: 'store', id: SCOUT_RESOURCE_CONTAINER_ID }, to: { kind: 'player' }, resourceId, grams })
+  }
+  /** Transfer only unconverted Core fuel through player cargo and the shared revision gate. */
+  depositCoreFuel(resourceId: string, grams: number, revision: number): boolean {
+    return this.transfer({ revision, from: { kind: 'player' }, to: { kind: 'store', id: SCOUT_CORE_FUEL_ID }, resourceId, grams })
+  }
+  withdrawCoreFuel(resourceId: string, grams: number, revision: number): boolean {
+    return this.transfer({ revision, from: { kind: 'store', id: SCOUT_CORE_FUEL_ID }, to: { kind: 'player' }, resourceId, grams })
   }
   /** Explicit terminal-only fresh character. The world ledger and depletion survive. */
   freshRun(): boolean {

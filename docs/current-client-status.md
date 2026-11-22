@@ -33,6 +33,9 @@ Start with the [playable journey](playable-2d-foundation.md),
 The [docs index](README.md) includes both approved designs and historical contracts;
 an issue closure or native implementation note does not establish browser delivery.
 
+
+> **Core/Fabricator E01 (#873):** [Proposed economy, item, power and save contract](browser-core-fabricator-vertical-slice.md) is **not approved or implemented**. All proposed tuning and item-use behavior remain blocked pending owner decisions; flight stays on unlimited prototype energy.
+
 ## Code-checked reconciliation
 
 All source paths below are relative to `client/src/`. “Approved future” records

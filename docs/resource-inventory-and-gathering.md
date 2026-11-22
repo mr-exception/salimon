@@ -44,6 +44,9 @@ unchanged; no procedural biomass is added. See [deposit publication and persiste
 - Players may withdraw **unconsumed** materials from the Resource Container, Fabricator or Core; resources already reserved/used by a fabrication job or converted by the Core are not recoverable. The Resource Container transfer UI is implemented in #785. Machine/module-to-module
 transfers and resource container upgrade rules remain TBD.
 
+
+> **E01 design proposal, not yet approved:** [Browser Core/Fabricator minimal economy and item contracts](browser-core-fabricator-vertical-slice.md) proposes exact candidate numbers, job and energy rules, and a v14 migration boundary. This proposal does not change any existing approved requirement or ship runtime. E02–E07 are blocked until its owner decision gate is resolved.
+
 ## Fabricator and Energy Core material handling
 
 - Fabricator jobs consume/reserve ingredients as **integer grams of raw material** with exact mass conservation. The previous 50 kg / 50 L input limit is now **50 kg only**. Preserve the existing queue, power pauses and output tray contract; integration of the new shared count-item inventory remains future work.

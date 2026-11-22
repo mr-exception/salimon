@@ -1,5 +1,7 @@
-// Perturb exactly one expected image in an isolated copy. Rehash it so this
-// proves a pixel comparison failure, rather than an integrity/startup failure.
+// Perturb exactly one expected image in an isolated copy and rehash it.
+// Run the first two optical captures only: the full PANO-VIS reference matrix
+// already runs twice in CI, while live HUD telemetry can advance by one frame
+// independently of the intentional telescope-baseline defect.
 import { cp, mkdtemp, mkdir, readFile, writeFile, symlink, rm } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
@@ -24,7 +26,7 @@ try {
  const manifest = JSON.parse(await readFile(manifestPath, 'utf8')); manifest.images[name] = hash(changed)
  await writeFile(manifestPath, JSON.stringify(manifest))
  const child = spawnSync(process.execPath, [join(root, 'node_modules/@playwright/test/cli.js'), 'test', '--project=navigation-captures', '--grep', 'PANO-VIS'], {
-  cwd: scratch, env: { ...process.env, CI: 'true', SALIMON_PANORAMIC_CANDIDATES: '', SALIMON_EVIDENCE_DIR: output }, encoding: 'utf8', timeout: 480000, maxBuffer: 2e6,
+  cwd: scratch, env: { ...process.env, CI: 'true', SALIMON_PANORAMIC_CANDIDATES: '', SALIMON_PANORAMIC_NEGATIVE_TELESCOPE: '1', SALIMON_EVIDENCE_DIR: output }, encoding: 'utf8', timeout: 480000, maxBuffer: 2e6,
  })
  await mkdir(output, { recursive: true }); await writeFile(join(output, 'command.log'), `${child.stdout ?? ''}\n${child.stderr ?? ''}`)
  await writeFile(join(output, 'mutated-expected.png'), changed)
@@ -35,9 +37,10 @@ try {
  const summary = attachment ? JSON.parse(attachment.body ? Buffer.from(attachment.body, 'base64').toString() : await readFile(attachment.path, 'utf8')) : null
  const failed = summary?.results.filter(r => !r.pass)
  const valid = child.status === 1 && !child.error && report.stats.unexpected === 1 && results.length === 1 &&
-  failed?.length === 1 && failed[0].id === 'telescope' && failed[0].actual === hash(original) && failed[0].changedPixels >= 10000 &&
+  summary?.results.length === 2 && summary.results[0].id === 'wide' && summary.results[0].pass === true &&
+  failed?.length === 1 && failed[0].id === 'telescope' && failed[0].actual === hash(original) && failed[0].changedPixels === 10000 &&
   results[0].errors.some(e => e.message?.includes('PANORAMIC_PIXEL_MISMATCH telescope'))
  await writeFile(join(output, 'mutation-summary.json'), JSON.stringify({ status: valid ? 'PASS' : 'INVALID_DEMONSTRATION', source, name, original: hash(original), mutated: hash(changed), exit: child.status, summary }, null, 2))
  if (!valid) throw Error(`Expected telescope screenshot failure was not isolated: ${output}`)
- console.log('PASS: mutated expected telescope fails its pixel assertion; other panoramic references pass; originals, diff and trace retained')
+ console.log('PASS: mutated expected telescope fails its pixel assertion; wide reference passes; full matrix remains covered separately; diff and trace retained')
 } finally { await rm(scratch, { recursive: true, force: true }) }

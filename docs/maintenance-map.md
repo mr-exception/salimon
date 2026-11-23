@@ -1,5 +1,14 @@
 # Feature maintenance map
 
+Browser Energy Core console (#876): `ResourceContainerPanel.tsx` shares the
+industrial transfer form/shell with storage and reads `ResourceSession` Core
+state/receipts; `resourceContainerInteraction.ts` binds the reachable Core fixture
+to its independent fuel store. Conversion-normalized draft signatures allow the
+sole world clock to run while confirming exact live grams. Domain rejection and
+atomic saves remain authoritative. `tests/core-console.spec.ts` owns built gather,
+transfer/reload and 960/1280/1920 state/repeat/negative captures in ignored output.
+
+
 Browser Core processing (#875): `scoutEnergyCore.ts` owns exact 60 Hz energy,
 fuel ranking and consumer receipts; `resourceLedger.ts` validates converted gram
 totals; `resourceSession.ts` commits schema v15 and prevents tick replay.

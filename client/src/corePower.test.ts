@@ -173,3 +173,19 @@ test('consumer debit remains durable in a trusted composition without a fuel acc
   const restored = new ResourceSession(storage, createTopDownState('interior', true), {}, undefined, () => 0)
   assert.deepEqual(restored.snapshot.core, s.snapshot.core)
 })
+
+
+test('Core telemetry distinguishes a committed tick from startup, duplicate ticks and failed writes', () => {
+  let raw: string | null = null, fail = false
+  const session = new ResourceSession({ getItem: () => raw, setItem: (_, value) => { if (fail) throw Error('quota'); raw = value } }, createTopDownState('interior', true))
+  assert.equal(session.corePowerTick, null)
+  session.advance({ ...session.world, tick: 1 }, { watts: 60 })
+  assert.equal(session.corePowerTick, 1)
+  assert.equal(session.corePower.drawnJ60, 60)
+  session.advance(session.world)
+  assert.equal(session.corePowerTick, null)
+  fail = true
+  session.advance({ ...session.world, tick: 2 }, { watts: 60 })
+  assert.equal(session.corePowerTick, null)
+  assert.equal(session.corePower.drawnJ60, 0)
+})

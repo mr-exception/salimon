@@ -24,6 +24,8 @@ These newer approved narrative contracts supersede historical Earth-start assump
 
 ## Active browser world and cockpit
 
+- [Approved mouse-driven 2D movement, context menus and follow-camera design (planned; #890–#894)](mouse-driven-2d-interactions.md)
+
 - [Active browser launch/landing contract and cross-phase regression](browser-launch-landing.md)
 
 - [Playable 2D foundation, QA commands and mining reuse boundary](playable-2d-foundation.md)

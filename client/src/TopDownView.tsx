@@ -68,6 +68,15 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const session = useRef<ResourceSession | null>(null)
   const lockAttempt = useRef<Promise<unknown>>(Promise.resolve())
   const container = useRef<ResourceContainerInteraction | null>(null)
+  const openEquipment = (world: TopDownState) => {
+    if (!session.current || ![SCOUT_RESOURCE_CONTAINER_ID, 'scout:core'].includes(world.selectedId ?? '')) return false
+    const equipment = world.selectedId === 'scout:core' ? 'core' : 'container'
+    if (container.current?.equipment !== equipment) {
+      container.current?.close()
+      container.current = new ResourceContainerInteraction(session.current, equipment)
+    }
+    return container.current!.open(world)
+  }
   const paused = useRef(false)
   const [inventoryOpen, setInventoryOpen] = useState(false)
   const inventoryExpanded = useRef(false)
@@ -148,8 +157,8 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         event.preventDefault(); input.clear()
         if (container.current?.opened && event.code === 'Escape') {
           container.current.close(); current.current = container.current.session.world
-        } else if (event.code === 'KeyE' && current.current.selectedId === SCOUT_RESOURCE_CONTAINER_ID && container.current?.open(current.current)) {
-          current.current = container.current.session.world
+        } else if (event.code === 'KeyE' && openEquipment(current.current)) {
+          current.current = container.current!.session.world
         } else if (event.code === 'KeyE' && current.current.selectedId === BOARDING_DOOR_ID && session.current) {
           session.current.world = current.current
           session.current.toggleBoardingDoor(session.current.snapshot.revision)
@@ -197,7 +206,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       setState(current.current)
       raf = requestAnimationFrame(frame)
     }
-    const focus = () => { release(); if (document.activeElement?.closest('.hud-utility, dialog')) session.current?.cancel() }
+    const focus = () => { release(); if (document.activeElement?.closest('.hud-utility, dialog')) session.current?.cancel(); if (container.current?.opened && !document.activeElement?.closest('dialog')) { container.current.close(); current.current = session.current!.world; setState({ ...current.current }) } }
     window.addEventListener('keydown', keydown); window.addEventListener('keyup', keyup)
     window.addEventListener('blur', clear); window.addEventListener('resize', clear)
     document.addEventListener('visibilitychange', clear); window.addEventListener('focusin', focus)
@@ -216,12 +225,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const cockpitTarget = gameplay && isCockpitTarget(selected?.id ?? null)
   const resourceSession = session.current
   const usage = resourceSession && resourceInventoryUsage(resourceSession.snapshot.inventory, RESOURCE_CATALOG, resourceSession.itemCatalog)
-  const selectedContainer = resourceSession && selected?.id === SCOUT_RESOURCE_CONTAINER_ID
+  const selectedContainer = resourceSession && [SCOUT_RESOURCE_CONTAINER_ID, 'scout:core'].includes(selected?.id ?? '')
   const closeContainer = () => { container.current?.close(); current.current = session.current?.world ?? current.current; (document.activeElement as HTMLElement | null)?.blur(); setState({ ...current.current }) }
   const selectedSource = resourceSession && selected && resourceSession.source(selected.id)
   const interact = () => {
     if (current.current.scoutLocation.ship.mode === 'destroyed' || paused.current || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && (!!resourceSession.error || !survivalPolicy(resourceSession.survival).canWork)) return
-    if (selectedContainer && container.current?.open(current.current)) current.current = container.current.session.world
+    if (selectedContainer && openEquipment(current.current)) current.current = container.current!.session.world
     else if (selected?.id === BOARDING_DOOR_ID && resourceSession) { resourceSession.world = current.current; resourceSession.toggleBoardingDoor(resourceSession.snapshot.revision); current.current = resourceSession.world }
     else if (resourceSession?.equipped && selectedSource) { resourceSession.start(selected!.id); current.current = resourceSession.world }
     else { if (resourceSession) resourceSession.feedback = ''; current.current = current.current.player.mode === 'interacting' ? cancelInteraction(current.current) : requestInteraction(current.current) }
@@ -310,7 +319,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     <div className="top-down-bottom">
     <aside className="top-down-interaction" aria-label="Nearby interaction">
       <div><p data-prompt hidden={!canAct}>{selected?.interaction ? `${selected.interaction.label} · ${cockpitTarget ? 'Navigate' : selectedContainer ? 'Use' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : selected.interaction.action} [E]` : ''}</p><StatusMessage announce={!resourceSession?.error} priority={resourceSession?.error ? 'error' : resourceSession?.activeSourceId ? 'pending' : 'status'}>{resourceSession?.error || resourceSession?.feedback || state.feedback}</StatusMessage></div>
-      {canAct && <button onClick={event => { interact(); event.currentTarget.blur() }}>{selected?.id === BOARDING_DOOR_ID ? selected.interaction?.action : selectedContainer ? 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>}
+      {canAct && <button onClick={event => { interact(); event.currentTarget.blur() }}>{selected?.id === BOARDING_DOOR_ID ? selected.interaction?.action : selectedContainer ? selected?.id === 'scout:core' ? 'Use Energy Core' : 'Use container' : resourceSession?.activeSourceId ? 'Stop gathering' : selectedSource && resourceSession?.equipped ? 'Gather' : state.player.mode === 'interacting' ? 'Cancel inspection' : cockpitTarget ? 'Use cockpit' : 'Inspect fixture'}</button>}
     </aside>
     {gatherBlocked && <p className="source-summary">{gatherBlocked}</p>}
     {selectedSource && <p className="source-summary" data-source-summary>{RESOURCE_CATALOG[selectedSource.resourceId as keyof typeof RESOURCE_CATALOG].name} · {selectedSource.remainingGrams / 1000} kg remaining</p>}

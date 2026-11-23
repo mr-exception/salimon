@@ -3,6 +3,7 @@ import type { ResourceInventory } from './resourceInventory.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import { resourceStoreMass } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID as containerId } from './scoutResourceContainer.ts'
+import { SCOUT_CORE_FUEL_ID } from './scoutEnergyCore.ts'
 import { interactionInReach } from './topDownInteraction.ts'
 import { cancelInteraction, PLAYER_ID, requestInteraction, type TopDownState } from './topDownRuntime.ts'
 
@@ -17,6 +18,10 @@ export function withdrawalCapacityError(inventory: ResourceInventory, used: { gr
 /** UI draft/confirmation state only. ResourceSession remains the sole save authority. */
 export class ResourceContainerInteraction {
   readonly session: ResourceSession
+  readonly equipment: 'container' | 'core'
+  readonly targetId: string
+  readonly storeId: string
+  get title(): string { return this.equipment === 'core' ? 'Energy Core' : 'Resource Container' }
   opened = false
   pending: ContainerCommand | null = null
   message = ''
@@ -24,18 +29,28 @@ export class ResourceContainerInteraction {
   private reviewedResources = ''
   private resourceSignature(): string {
     const { inventory, sources, stores, itemDefinitions } = this.session.snapshot
-    return JSON.stringify({ inventory, sources, stores, itemDefinitions })
+    // Conversion is allowed while reviewing: normalize fuel + converted grams.
+    // Other material transactions still invalidate the reviewed revision.
+    const normalized = { ...stores, [SCOUT_CORE_FUEL_ID]: {
+      ...stores[SCOUT_CORE_FUEL_ID], quantities: Object.fromEntries(Object.keys(RESOURCE_CATALOG).map(id =>
+        [id, (stores[SCOUT_CORE_FUEL_ID]?.quantities[id] ?? 0) + (this.session.snapshot.convertedGrams[id] ?? 0)])),
+    } }
+    return JSON.stringify({ inventory, sources, stores: normalized, itemDefinitions })
   }
-  constructor(session: ResourceSession) { this.session = session }
+  constructor(session: ResourceSession, equipment: 'container' | 'core' = 'container') {
+    this.session = session; this.equipment = equipment
+    this.targetId = equipment === 'core' ? 'scout:core' : containerId
+    this.storeId = equipment === 'core' ? SCOUT_CORE_FUEL_ID : containerId
+  }
   private reachable(world: TopDownState): boolean {
-    const player = world.entities.find(e => e.id === PLAYER_ID), target = world.entities.find(e => e.id === containerId)
+    const player = world.entities.find(e => e.id === PLAYER_ID), target = world.entities.find(e => e.id === this.targetId)
     return world.cockpit.view === 'world' && world.player.mode !== 'seated' && !!player && !!target
       && interactionInReach(player.anchor, target, world.frames)
   }
   open(world: TopDownState): boolean {
-    if (world.selectedId !== containerId || !this.reachable(world)) return false
+    if (world.selectedId !== this.targetId || !this.reachable(world)) return false
     this.session.cancel()
-    this.session.world = requestInteraction(world, containerId)
+    this.session.world = requestInteraction(world, this.targetId)
     // Persist arrival before capturing any draft revision. A later location-only
     // autosave must not invalidate an otherwise unchanged transfer confirmation.
     this.session.checkpoint()
@@ -44,28 +59,28 @@ export class ResourceContainerInteraction {
   }
   close(): void {
     this.opened = false; this.pending = null
-    if (this.session.world.player.targetId === containerId) this.session.world = cancelInteraction(this.session.world)
+    if (this.session.world.player.targetId === this.targetId) this.session.world = cancelInteraction(this.session.world)
   }
   synchronize(world: TopDownState): void {
     this.session.world = world
-    if (this.opened && (!this.reachable(world) || world.player.mode !== 'interacting' || world.player.targetId !== containerId)) this.close()
+    if (this.opened && (!this.reachable(world) || world.player.mode !== 'interacting' || world.player.targetId !== this.targetId)) this.close()
   }
   discard(): void { this.pending = null; this.message = ''; this.failed = false }
   review(direction: ContainerDirection, resourceId: string, amount: string): boolean {
     this.pending = null; this.failed = true
     this.synchronize(this.session.world)
-    if (!this.opened) { this.message = 'Container is out of reach. Approach it and use E.'; return false }
+    if (!this.opened) { this.message = `${this.title} is out of reach. Approach it and use E.`; return false }
     if (this.session.error) { this.message = this.session.error; return false }
     if (!Object.hasOwn(RESOURCE_CATALOG, resourceId)) { this.message = 'Invalid raw resource. Count-based items cannot be transferred.'; return false }
     const grams = Number(amount.trim())
     if (!/^\d+$/.test(amount.trim()) || !Number.isSafeInteger(grams) || grams <= 0) {
       this.message = 'Enter a positive whole number of grams (for example 333).'; return false
     }
-    const store = this.session.snapshot.stores[containerId]!, inv = this.session.snapshot.inventory
+    const store = this.session.snapshot.stores[this.storeId]!, inv = this.session.snapshot.inventory
     const available = direction === 'deposit' ? inv.quantities[resourceId] ?? 0 : store.quantities[resourceId] ?? 0
     if (grams > available) { this.message = `Insufficient amount: only ${available} g available to ${direction}.`; return false }
     if (direction === 'deposit' && resourceStoreMass(store, RESOURCE_CATALOG) + grams > store.capacityGrams) {
-      this.message = `Container overweight: only ${store.capacityGrams - resourceStoreMass(store, RESOURCE_CATALOG)} g free (50 kg maximum).`; return false
+      this.message = `${this.equipment === 'core' ? 'Fuel buffer' : 'Container'} overweight: only ${store.capacityGrams - resourceStoreMass(store, RESOURCE_CATALOG)} g free (50 kg maximum).`; return false
     }
     if (direction === 'withdraw') {
       const used = resourceInventoryUsage(inv, RESOURCE_CATALOG, this.session.itemCatalog)
@@ -85,7 +100,8 @@ export class ResourceContainerInteraction {
     // Clock/location-only commits do not alter the reviewed transfer. A material
     // change still uses its stale revision and is rejected by the session.
     const revision = this.reviewedResources === this.resourceSignature() ? this.session.snapshot.revision : command.revision
-    const ok = this.session[command.direction](command.resourceId, command.grams, revision)
+    const method = this.equipment === 'core' ? command.direction === 'deposit' ? 'depositCoreFuel' : 'withdrawCoreFuel' : command.direction
+    const ok = this.session[method](command.resourceId, command.grams, revision)
     this.failed = !ok
     this.message = ok ? `Saved: ${command.direction === 'deposit' ? 'deposited' : 'withdrew'} ${command.grams} g (${command.grams / 1000} kg).`
       : this.session.error || (/Stale/.test(this.session.feedback) ? 'Stale transaction. Amounts changed; review a new transfer.' : this.session.feedback)

@@ -53,7 +53,7 @@ Every value labelled **P** is a concrete *proposal*, not a shipped or owner-appr
 - The current `resourceLedgerMass` returns player mass and raw ship-store mass. Ship mass must count Core input, Fabricator input, reserved job and tray **exactly once**, regardless of UI visibility, with the player payload counted only aboard. Mass converted to Core energy leaves the ship as fuel mass (no automatic return of consumed grams). Manufacturing conserves mass by construction for the candidate recipe.
 - Schema **v14** keeps the existing localStorage key and catalog version. It validates the trusted Core store and Core reserve. v1–v13 migrate to an empty fuel buffer, 500,000 J reserve and zero conversion budget while preserving existing source depletion, revision and expedition data. Original bytes remain until the next successful commit. Future Fabricator work will define trusted recipe/item catalogs and durable job reservations, progress and tray state.
 - An invalid or missing v14 Core field or store, unknown future schema, incompatible item catalog or corrupt envelope must fail closed, preserve source bytes and block new writes; never silently reset the campaign. A valid v13 migration cannot mint machine fuel or output items. Revision/compare-and-replace/Web Lock behavior continues unchanged.
-- The original E01 proposal introduced no runtime change. E02 and E03 implement the Core portions; Fabricator and machine UI checks below remain downstream requirements.
+- The original E01 proposal introduced no runtime change. E02 and E03 implement the Core portions; Fabricator checks below remain downstream requirements; E04 delivers the Core console.
 
 ### Required downstream implementation checks (E02–E07)
 
@@ -119,3 +119,15 @@ Checks: `corePower.test.ts`, `scoutEnergyCore.test.ts`, existing ledger/session,
 survival and flight tests, and built `tests/core-power.spec.ts`. Raw state and
 original captures stay in ignored `client/test-results/` and existing CI artifacts
 (14-day retention); PR descriptions carry delivery and review results.
+
+
+### E04 console delivery (#876)
+
+The reachable `scout:core` fixture now opens the existing shared industrial
+EquipmentDialog/transfer form. Its buffer/reserve/status and last-tick W receipts
+come directly from ResourceSession; UI timing never simulates energy. Pending
+transfers normalize fuel plus converted totals to tolerate ordinary conversion,
+while other material mutations retain stale-revision rejection. The confirmed
+whole grams must still exist in the live buffer; converted fuel cannot be
+withdrawn. Escape, reach, focus and save failures preserve committed state.
+See the [controls and built-browser checks](../client/README.md#reachable-energy-core-console-876).

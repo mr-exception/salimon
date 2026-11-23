@@ -598,8 +598,10 @@ export class ResourceSession {
     this.feedback = 'Gathering. Move or Escape to stop; partial work saved.'
   }
   /** One consumer receipt per committed world tick; no UI-owned energy timer. */
+  corePowerTick: number | null = null
   corePower: CorePowerResult = { status: 'idle', consumer: 'idle', drawnJ60: 0, generatedJ: 0, convertedGrams: {} }
   advance(next: TopDownState, power: CorePowerRequest = { watts: 0 }): TopDownState {
+    this.corePowerTick = null
     this.corePower = { status: 'idle', consumer: 'idle', drawnJ60: 0, generatedJ: 0, convertedGrams: {} }
 
     if (!Number.isSafeInteger(next.tick) || next.tick < this.world.tick) return this.world
@@ -648,7 +650,7 @@ export class ResourceSession {
       const machines = machine ? { core: machine.core, convertedGrams, ...(fuel ? { stores: { ...this.snapshot.stores, [SCOUT_CORE_FUEL_ID]: { ...fuel, quantities: machine.quantities } } } : {}) } : {}
       if (!this.commit({ ...this.snapshot, ...machines, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
     }
-    if (machine) this.corePower = machine.result
+    if (machine) { this.corePower = machine.result; this.corePowerTick = next.tick }
     if (!survivalPolicy(this.survival).canWork) {
       this.cancel('Exhausted: gathering and piloting unavailable.')
       if (this.world.player.mode === 'seated') this.world = leaveCockpit(this.world)

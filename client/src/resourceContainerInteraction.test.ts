@@ -12,12 +12,12 @@ class Storage implements ResourceStorage {
   getItem() { return this.raw }
   setItem(_key: string, value: string) { if (this.fail) throw Error('quota'); this.raw = value }
 }
-function make(grams = 1000) {
+function make(grams = 1000, equipment: 'container' | 'core' = 'container') {
   const storage = new Storage(), initial = createTopDownState('exterior', true)
-  const world = { ...initial, selectedId: id, entities: initial.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout' as const, point: point2(.5, 4.25) } } : e) }
+  const world = { ...initial, selectedId: equipment === 'core' ? 'scout:core' : id, entities: initial.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout' as const, point: equipment === 'core' ? point2(.8, 1.8) : point2(.5, 4.25) } } : e) }
   const session = new ResourceSession(storage, world)
   assert.equal(session.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams }), true)
-  const ui = new ResourceContainerInteraction(session)
+  const ui = new ResourceContainerInteraction(session, equipment)
   assert.equal(ui.open(world), true)
   return { ui, session, storage, world }
 }
@@ -129,4 +129,53 @@ test('a survival-only autosave cannot invalidate an unchanged resource confirmat
   assert.equal(ui.confirm(), true)
   assert.equal(session.snapshot.stores[id]!.quantities.mineral, 333)
   assert.equal(ui.confirm(), false)
+})
+
+
+test('Core draft tolerates conversion, confirms exact live grams once, rejects depleted fuel and stale transfers', () => {
+  const { ui, session } = make(1000, 'core')
+  assert.equal(ui.review('deposit', 'mineral', '333'), true)
+  assert.equal(ui.confirm(), true)
+  assert.equal(ui.review('withdraw', 'mineral', '111'), true)
+  for (let i = 0; i < 60; i++) session.advance(stepTopDown(session.world, [0, 0]))
+  assert.ok(session.snapshot.convertedGrams.mineral! > 0)
+  assert.equal(ui.confirm(), true)
+  assert.equal(session.snapshot.inventory.quantities.mineral, 778)
+  assert.equal(ui.confirm(), false)
+  const remaining = session.snapshot.stores[ui.storeId]!.quantities.mineral!
+  assert.equal(ui.review('withdraw', 'mineral', String(remaining)), true)
+  for (let i = 0; i < 6; i++) session.advance(stepTopDown(session.world, [0, 0]))
+  const before = session.snapshot
+  assert.equal(ui.confirm(), false)
+  assert.equal(session.snapshot, before)
+  assert.equal(ui.review('deposit', 'mineral', '1'), true)
+  session.depositCoreFuel('mineral', 1, session.snapshot.revision)
+  assert.equal(ui.confirm(), false)
+  assert.match(ui.message, /Stale/)
+})
+
+test('Core admission, cancellation, loss of reach and failed saves preserve both endpoints', () => {
+  for (const reason of ['close', 'range', 'external', 'quota']) {
+    const { ui, session, storage } = make(1000, 'core')
+    assert.equal(ui.open({ ...session.world, selectedId: id }), false)
+    assert.equal(ui.review('deposit', 'mineral', '333'), true)
+    if (reason === 'close') ui.close()
+    if (reason === 'range') ui.synchronize({ ...session.world, entities: session.world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout', point: point2(0, 5) } } : e) })
+    if (reason === 'external') storage.raw += ' '
+    if (reason === 'quota') storage.fail = true
+    const before = session.snapshot, bytes = storage.raw
+    assert.equal(ui.confirm(), false)
+    assert.equal(session.snapshot, before); assert.equal(storage.raw, bytes)
+  }
+})
+
+
+test('storage confirmation survives independent background Core conversion', () => {
+  const { ui, session } = make()
+  assert.equal(session.transfer({ revision: session.snapshot.revision, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'store', id: 'scout:core:fuel' }, resourceId: 'mineral', grams: 1000 }), true)
+  assert.equal(ui.review('deposit', 'mineral', '333'), true)
+  for (let i = 0; i < 60; i++) session.advance(stepTopDown(session.world, [0, 0]))
+  assert.ok(session.snapshot.convertedGrams.mineral! > 0)
+  assert.equal(ui.confirm(), true)
+  assert.equal(session.snapshot.stores[id]!.quantities.mineral, 333)
 })

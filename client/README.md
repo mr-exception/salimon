@@ -1148,3 +1148,37 @@ Focused domain checks: `node --experimental-strip-types --test src/corePower.tes
 Built clock/reload checks: `npx playwright test --project=cockpit tests/core-power.spec.ts`.
 The latter also runs in PR smoke and full world regression. Original captures
 and raw saved states stay in ignored test output and existing CI uploads.
+
+
+### Reachable Energy Core console (#876)
+
+Walk to the Core in the Scout engineering compartment and use **E** or **Use
+Energy Core**. The shared industrial EquipmentDialog shows each raw fuel type in
+g/kg, the independent 50 kg fuel buffer, live reserve in J, generation and consumer
+draw in W, and processing/empty/full/outage/save-error states. Rates are the last
+committed 1/60 s receipt, not an estimated steady rate: whole-gram generation
+pulses can exceed 10,000 W for one tick while the existing accumulated conversion
+budget enforces 10,000 W over time. No consumer work means zero draw; flight
+continues to use its independent prototype power.
+
+Select the raw type, enter positive whole grams, then Review deposit/withdrawal
+and Confirm. Drafts do not move resources. Conversion continues on the sole world
+clock during review; confirmation revalidates the exact amount of unconverted
+fuel still available. A depleted request is rejected in full, never silently
+reduced. Other material changes invalidate the reviewed transaction. Escape,
+Cancel transfer, leaving reach, window blur/visibility loss or closing discards
+only the draft. Native modal focus owns typing and Tab; world shortcuts cannot
+move the player behind the console. Committed transfers and conversion are
+atomic and survive reload; rates are unavailable until this session observes a successful simulation tick. Failed/stale storage writes preserve saved bytes.
+
+Focused verification after `npm run build`:
+`node --experimental-strip-types --test src/resourceContainerInteraction.test.ts`
+and `npx playwright test --project=cockpit tests/core-console.spec.ts`.
+The built-production journey gathers material, walks aboard, transfers exact
+grams, exercises cancellation/rejection and verifies material/energy conservation
+through reload. The 960×600, 1280×720 and 1920×1080 matrix retains original,
+repeat, diff, scrolled-control and state JSON evidence under ignored
+`test-results/` / CI artifacts, using the existing pixel policy and a wrong-state
+negative comparison. Original captures remain subject to owner visual review;
+no approved reference is replaced. `tests/core-power.spec.ts` retains sole-clock
+and cockpit continuity coverage. CI artifacts retain the existing 14-day limit.

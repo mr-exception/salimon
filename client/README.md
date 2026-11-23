@@ -1141,8 +1141,8 @@ The [active Core contract](../docs/browser-core-fabricator-vertical-slice.md#e03
 owns units, fuels, whole-gram eligibility, bounded budget, status and draw order.
 `ResourceSession.advance(world, { watts, paused })` handles one consumer from the
 single world clock; read `corePower` only as the receipt for that invocation.
-Duplicate/rejected calls publish no draw. Future Fabricator job progress must
-commit in that same boundary. The visible Core remains inspection-only.
+Duplicate/rejected calls publish no draw. Fabricator job progress commits in that
+same boundary; the reachable Core console controls fuel transfers.
 
 Focused domain checks: `node --experimental-strip-types --test src/corePower.test.ts src/scoutEnergyCore.test.ts`.
 Built clock/reload checks: `npx playwright test --project=cockpit tests/core-power.spec.ts`.
@@ -1190,7 +1190,7 @@ state; `resourceLedger.ts` accounts for reserved/transformed mineral and exact
 physical output mass, and `resourceSession.ts` owns revision-bound start/claim,
 Core-paid progress on the existing world clock and schema v16 migration from
 v1–v15. No offline work or post-start cancellation; failed writes preserve the
-previous snapshot. The kit has no approved use effect. The reachable Fabricator
+previous snapshot. The kit deploys a durable visible field marker (#879). The reachable Fabricator
 console is delivered in #878. See [the E05 contract](../docs/browser-core-fabricator-vertical-slice.md) for numbers, validation and boundaries.
 
 
@@ -1220,7 +1220,7 @@ the clock, and closed tabs make no fabrication progress. Reload restores the job
 tray and claimed item without a second output grant.
 
 Built-production acceptance: `CHROMIUM_PATH=/usr/bin/chromium npx playwright test
---project=cockpit tests/fabricator-console.spec.ts` (omit the environment variable
+--project=cockpit tests/vertical-slice.spec.ts tests/fabricator-console.spec.ts` (omit the environment variable
 for Playwright Chromium). The journey starts with a valid prior low-reserve
 expedition, then uses actual keyboard/mouse controls for mine → carry → ship
 storage → Core fuel → input → start → natural power loss → refuel → claim →
@@ -1260,10 +1260,42 @@ select guidance again after reload.
 
 Checks: `node --experimental-strip-types --test src/fieldMarker.test.ts`,
 `npm test`, `npm run build`, and `CHROMIUM_PATH=/usr/bin/chromium npx playwright
-test --project=cockpit tests/fabricator-console.spec.ts --grep 'FAB-UI-1|MARKER-879'`.
+test --project=cockpit tests/vertical-slice.spec.ts tests/fabricator-console.spec.ts --grep 'SLICE-880|MARKER-879'`.
 The production keyboard/mouse journey mines, stores, fuels, fabricates, survives
 power loss, claims, deploys, renames, follows guidance, enters the ship and reloads.
 Confirmation tests cover cancellation/stale saves/focus and 960/1280/1920 captures;
 fixed-policy repeat and missing-marker/CSS negative comparisons retain originals,
 traces and canonical state in ignored `test-results/` and existing 14-day CI
 artifacts. No changed approved baseline is implied; owner visual review remains.
+
+
+## Combined Core/Fabricator acceptance (#880)
+
+`tests/vertical-slice.spec.ts` owns the actual-control journey formerly named
+FAB-UI-1: mine 2 kg, store/withdraw, fuel, reserve 1 kg, exhaust power, refuel,
+complete/claim, deploy/rename/guide to the marker, enter/exit the panoramic cockpit
+and reload. Its only journey seed is a domain-admitted prior expedition with
+5 kJ reserve, to make a real outage reproducible without waiting for long depletion.
+No test command adapter, item grant or production query backdoor drives the route.
+Pause/hidden-document/reload checks run during the interrupted job. Hidden state
+is injected through the real visibility handler; it does not prove OS minimize behavior.
+
+After `npm ci --no-audit --no-fund`, run `npm test`, `npm run build`, then:
+
+```sh
+npx playwright test --project=cockpit tests/vertical-slice.spec.ts tests/fabricator-console.spec.ts
+npm run test:browser:smoke
+```
+
+Set `CHROMIUM_PATH` only to reuse a compatible installed Chromium. Optional
+`SALIMON_SLOW_BROWSER=1` batches walking ticks without changing physics/tolerances.
+`SALIMON_EVIDENCE_DIR=test-results/issue-880/targeted` isolates originals, traces,
+canonical conservation snapshots, save-error and capacity negatives. To inspect a
+trace, use `npx playwright show-trace <path-to-trace.zip>`. Traces omit DOM snapshots
+to avoid duplicating sprites; retained JSON records the authoritative saved states.
+Existing fixed-tolerance console/marker repeat and injected-defect checks remain
+in `fabricator-console.spec.ts`; no approved reference is overwritten.
+
+See [the acceptance matrix and limits](../docs/browser-core-fabricator-vertical-slice.md#e08-built-production-acceptance-880).
+The existing full workflow includes the suite in its cockpit/world group. CI
+outcomes need an exact head/run binding in the PR, separately from local results.

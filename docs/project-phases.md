@@ -3,11 +3,11 @@
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > The roadmap is intentionally incremental. Exact phases will be finalized after the first design questions are answered.
-## Active browser 2D progression (2026-11-05)
+## Active browser 2D progression (2026-11-23)
 
 Old native Phase 0 and Rust completion notes below are historical, not the current playable delivery timeline. The browser world supports overhead Scout/planet walking, cargo/cockpit crossing, panoramic observation, weight-only mining and local source/inventory saves; #783 added a ledger domain, **not** a usable ship storage console. See [current status](current-client-status.md) and [the migration register](2d-migration-register.md).
 
-Resource Container, cargo UI, count-item transactions, survival and hazard domains are delivered in the browser. Planetary exploration V1 adds published geology, continuous walking, illustrated regions, deposits, field marks and atomic regional persistence (#847–#853). [Cross-feature QA](browser-planetary-qa.md) defines its browser acceptance; required CI remains pending until reported for the delivered revision. Climate, ecology, underground, water, procedural resource types, full chart, Core, Fabricator and multiplayer remain future work. No entire-game phase is declared finished.
+Resource Container, cargo UI, count-item transactions, survival and hazard domains are delivered in the browser. Planetary exploration V1 adds published geology, continuous walking, illustrated regions, deposits, field marks and atomic regional persistence (#847–#853). [Cross-feature QA](browser-planetary-qa.md) defines its browser acceptance; required CI remains pending until reported for the delivered revision. Climate, ecology, underground, water, procedural resource types, full chart and multiplayer remain future work. Core conversion, the paid single-job Fabricator and deployable field marker are delivered by #874–#879. [E08 acceptance](browser-core-fabricator-vertical-slice.md#e08-built-production-acceptance-880) joins mining, storage, power, fabrication, use and cockpit/reload; current-head smoke/full CI outcomes await the user report. No entire-game phase is declared finished.
 
 ## Future narrative/experience initiative (2026-10-21)
 

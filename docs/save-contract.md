@@ -809,3 +809,14 @@ Tests: `expeditionJournal.test.ts`, migration/ledger tests in the existing owner
 suites. The deposit out/back journey mines, marks, evicts, reloads away from home
 and returns with the same depleted mass and observations. Evidence stays in
 ignored local output and the existing CI uploads; no report files are committed.
+
+## Browser Core energy processing v15 (#875)
+
+The [E03 contract](browser-core-fabricator-vertical-slice.md#e03-deterministic-processing-and-power-api-875)
+defines exact 1/60 J reserve, generation budget, expenditure and committed tick.
+`convertedGrams` extends raw ledger conservation, while energy validation checks
+initial + yields = reserve + expenditure. Fuel debits, joule credits and progress
+share the existing atomic replacement and stale-writer guard. V1–v14 migrate
+lazily; v14's initial reserve/zero accumulator become exact integers without
+fuel grants, conversion or lost partial ticks. Invalid/future state preserves
+original bytes and blocks writes. Flight still uses prototype unlimited energy.

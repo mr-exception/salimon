@@ -14,7 +14,7 @@ import { freshHazards, validateHazards, hazardRates, stepHazards, type HazardSta
 import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
 import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
-import { SCOUT_CORE_FUEL_ID, freshCoreEnergy, validateCoreEnergy, type CoreEnergyState } from './scoutEnergyCore.ts'
+import { SCOUT_CORE_FUEL_ID, freshCoreEnergy, validateCoreEnergy, migrateCoreEnergy, validateCoreConservation, stepCoreEnergy, type CorePowerRequest, type CorePowerResult, type CoreEnergyState } from './scoutEnergyCore.ts'
 import { CELL_SIZE_M, ORIGIN, relativeM } from './coordinates.ts'
 import { controlsCockpit, LOCAL_PLAYER, leaveCockpit, type CockpitState } from './cockpit.ts'
 import { STARTING_SITE } from './planetarySite.ts'
@@ -42,7 +42,8 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
 }
 export interface ResourceSave extends ResourceLedger {
   readonly depositPublication: typeof DEPOSIT_PUBLICATION
-  readonly version: 14
+  readonly version: 15
+  readonly convertedGrams: Readonly<Record<string, number>>
   readonly core: CoreEnergyState
   readonly journal: ExpeditionJournal
   readonly sites: SiteStates
@@ -156,7 +157,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
   const version = data.version
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 14) throw new Error('Unsupported save version')
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 15) throw new Error('Unsupported save version')
   const legacy = version === 1
   const hasStores = version >= 3
   const hasItems = version >= 5
@@ -167,7 +168,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const hasSites = version >= 11
   const hasJournal = version >= 13
   const hasCore = version >= 14
-  const allowed = [...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const allowed = [...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
   if (data.catalogVersion !== (legacy ? LEGACY_CATALOG_VERSION : RESOURCE_CATALOG_VERSION) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
@@ -241,8 +242,9 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   if (version < 12 && object(object(data.location).anchor).chart !== undefined) throw Error('Walking chart requires schema v12')
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
-  const save: ResourceSave = { version: 14, core: hasCore ? validateCoreEnergy(data.core) : freshCoreEnergy(), journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 15, convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core: version >= 15 ? validateCoreEnergy(data.core) : hasCore ? migrateCoreEnergy(data.core) : freshCoreEnergy(), journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
+  validateCoreConservation(save.core, save.convertedGrams)
   return save
 }
 export function resourcePayload(inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG) {
@@ -301,7 +303,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 14, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 15, convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -312,7 +314,7 @@ export class ResourceSession {
         this.hazards = this.snapshot.hazards
         const restored = decodeScout(serializeForDecode(this.snapshot.scout))
         Object.assign(world.scoutLocation, restored)
-        world = { ...world, frames: this.snapshot.location.anchor.chart ? walkingFrames(restored.frames,surfaceRegion(restored.surface,restored.surface.definition),this.snapshot.location.anchor.chart) : restored.frames, tick: restored.ship.tick }
+        world = { ...world, frames: this.snapshot.location.anchor.chart ? walkingFrames(restored.frames,surfaceRegion(restored.surface,restored.surface.definition),this.snapshot.location.anchor.chart) : restored.frames, tick: Math.max(restored.ship.tick, this.snapshot.core.tick) }
         const location = this.snapshot.location
         this.world = materializeSite(synchronizeDoor({ ...world, entities: world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: location.anchor } : e),
           camera: { ...world.camera, anchor: location.anchor }, player: { facing: location.facing, mode: 'standing', targetId: null }, feedback: 'Saved expedition restored. Gathering is stopped.' }), this.snapshot.sites)
@@ -379,7 +381,7 @@ export class ResourceSession {
       const sources = Object.fromEntries(Object.entries(next.sources).filter(([id, source]) => !isDepositId(id) || source.remainingGrams !== definitions[id]!.remainingGrams || this.miningWork[id] || id === this.activeSourceId).sort(([a], [b]) => a.localeCompare(b)))
       const candidate: ResourceSave = { ...next, sources, journal: validateJournal(recordVisit(next.journal, this.world), sites), sites, siteId: this.world.scoutLocation.siteId, scout: captureScout(this.world.scoutLocation), miningWork: validateMiningWork(this.miningWork, next.sources), survival: { ...next.survival, offlineAtMs: Math.max(next.survival.offlineAtMs, this.now()) }, revision: integer(this.snapshot.revision + 1), location: safeLocation(this.world) }
       validateResourceLedger(candidate, sourceDefinitions(candidate.sources), this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
-      validateCoreEnergy(candidate.core)
+      validateCoreConservation(candidate.core, candidate.convertedGrams)
       validateSurvival(candidate.survival)
       validateHazards(candidate.hazards)
       // Registered active baselines are useful to the live ledger, but only
@@ -595,15 +597,22 @@ export class ResourceSession {
     this.world = { ...this.world, selectedId: id, player: { ...this.world.player, mode: 'interacting', targetId: id } }
     this.feedback = 'Gathering. Move or Escape to stop; partial work saved.'
   }
-  advance(next: TopDownState): TopDownState {
+  /** One consumer receipt per committed world tick; no UI-owned energy timer. */
+  corePower: CorePowerResult = { status: 'idle', consumer: 'idle', drawnJ60: 0, generatedJ: 0, convertedGrams: {} }
+  advance(next: TopDownState, power: CorePowerRequest = { watts: 0 }): TopDownState {
+    this.corePower = { status: 'idle', consumer: 'idle', drawnJ60: 0, generatedJ: 0, convertedGrams: {} }
+
     if (!Number.isSafeInteger(next.tick) || next.tick < this.world.tick) return this.world
     const elapsed = next.tick - this.world.tick, wasWalking = this.world.player.mode === 'walking'
     if (this.error || this.survival.health === 0) return this.world
     // The same per-tick ordering applies to batched callers and foreground RAF.
     if (elapsed > 1) {
-      for (let tick = this.world.tick + 1; tick <= next.tick && !this.error && this.survival.health > 0; tick++) this.advance({ ...next, tick })
+      for (let tick = this.world.tick + 1; tick <= next.tick && !this.error && this.survival.health > 0; tick++) this.advance({ ...next, tick }, power)
       return this.world
     }
+    // Reject malformed consumer commands before advancing any session owner.
+    const machine = elapsed > 0 && next.tick > this.snapshot.core.tick ? stepCoreEnergy(this.snapshot.core, this.snapshot.stores[SCOUT_CORE_FUEL_ID]?.quantities ?? {}, power) : null
+    if (machine) machine.core = { ...machine.core, tick: next.tick }
     const workUnits = survivalPolicy(this.survival).miningUnits
     const previousWorld = this.world
     const rates = hazardRates(this.sources)
@@ -626,14 +635,20 @@ export class ResourceSession {
       this.world = leaveCockpit(this.world)
       this.feedback = 'Touchdown verified. Open the aft door to explore this surface site.'
     }
-    if (touchdown) {
+    if (touchdown && !machine) {
       this.checkpoint()
       if (this.error) { this.world = previousWorld; return this.world }
     }
     // Publish hazard progress only after the whole health/exposure/budget transaction is durable.
-    if (elapsed > 0 && needsHazards) {
-      if (!this.commit({ ...this.snapshot, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
+    const machineChanged = machine && (machine.core.spentJ60 !== this.snapshot.core.spentJ60 || machine.core.reserveJ60 !== this.snapshot.core.reserveJ60 || machine.core.conversionBudgetJ60 !== this.snapshot.core.conversionBudgetJ60)
+    if (elapsed > 0 && (needsHazards || machineChanged || touchdown)) {
+      const convertedGrams = { ...this.snapshot.convertedGrams }
+      for (const [id, grams] of Object.entries(machine?.result.convertedGrams ?? {})) convertedGrams[id] = (convertedGrams[id] ?? 0) + grams
+      const fuel = this.snapshot.stores[SCOUT_CORE_FUEL_ID]
+      const machines = machine ? { core: machine.core, convertedGrams, ...(fuel ? { stores: { ...this.snapshot.stores, [SCOUT_CORE_FUEL_ID]: { ...fuel, quantities: machine.quantities } } } : {}) } : {}
+      if (!this.commit({ ...this.snapshot, ...machines, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
     }
+    if (machine) this.corePower = machine.result
     if (!survivalPolicy(this.survival).canWork) {
       this.cancel('Exhausted: gathering and piloting unavailable.')
       if (this.world.player.mode === 'seated') this.world = leaveCockpit(this.world)

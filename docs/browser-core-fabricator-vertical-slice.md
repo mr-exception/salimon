@@ -1,8 +1,8 @@
-# Browser Core + Fabricator vertical slice — proposed decision contract (E01 / #873)
+# Browser Core + Fabricator vertical slice — decision contract (E01 / #873, E03 / #875)
 
-**Status: PARTIALLY APPROVED.** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. Other proposed balance values, item effects and machine commands remain unimplemented and require their own approval. A docs PR alone does not authorize the remaining runtime features.
+**Status: Core processing implemented through E03 (#875); Fabricator decisions pending.** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. Other proposed balance values, item effects and machine commands remain unimplemented and require their own approval. A docs PR alone does not authorize the remaining runtime features.
 
-> **E02 Core-only approval (2026-11-22, #874):** The owner approved the proposed independent `scout:core:fuel` 50,000 g buffer, 2,000,000 J reserve cap, 500,000 J initial reserve for both new and v1–v13 migrated expeditions, biomass 2,000 J/g, mineral 500 J/g, 10,000 W maximum generation, and job draw before conversion in a future single-tick machine loop. Issue #874 ships only the durable fuel account, exact transfers and v14 Core state; it does **not** convert fuel, add UI, gate propulsion or settle Fabricator product/use decisions. The other E01 proposals and TBDs remain pending their respective implementation approvals. The current v14 Core conversion accumulator is strictly zero until the conversion implementation ships.
+> **E02 Core-only approval (2026-11-22, #874):** The owner approved the proposed independent `scout:core:fuel` 50,000 g buffer, 2,000,000 J reserve cap, 500,000 J initial reserve for both new and v1–v13 migrated expeditions, biomass 2,000 J/g, mineral 500 J/g, 10,000 W maximum generation, and job draw before conversion in a future single-tick machine loop. Issue #874 ships only the durable fuel account, exact transfers and v14 Core state; it does **not** convert fuel, add UI, gate propulsion or settle Fabricator product/use decisions. The other E01 proposals and TBDs remain pending their respective implementation approvals. The historical v14 accumulator was strictly zero. E03 migrates it to exact 1/60-joule accounting in v15.
 
 ## Ground truth / ownership
 
@@ -23,13 +23,13 @@ Every value labelled **P** is a concrete *proposal*, not a shipped or owner-appr
 | Starter fuel eligibility | `biomass` 2,000 J/g; `mineral` 500 J/g | A | Both existing source types can fuel a first run. |
 | Core peak generation | 10,000 W (= 10,000 J/s) | A | Caps Core generation. |
 | Core energy reserve | 2,000,000 J maximum; 500,000 J initial for fresh and migrated expeditions | A | A nonempty start will support initial fabrication. |
-| Core conversion | Prefer higher J/g, then ascending stable resource ID; process as integer-gram discrete debits against a continuous energy budget | P | Deterministic across reload, ticks and unordered maps. No whole-kg rounding. |
-| Core rounding | Each elapsed 1/60 s step accrues up to 10,000/60 J in **integer microjoules**; consume 1 g only if the whole gram's yield fits remaining reserve **and** accrued generation budget; carry fractional budget | P | No fractional-gram material creation or lost fractional ticks. Cap budget to one gram of the highest eligible yield when reserve is full, and never mint free joules. |
-| Reserve-full behavior | Pause conversion when no complete eligible gram fits the energy headroom; resume after draw | A intent / P atomic rule | No input debit if energy cannot be credited atomically. |
-| Core idle draw | 0 W in E01; no background drains or battery self-discharge | P | Makes a bounded and testable prototype. |
+| Core conversion | Prefer higher J/g, then ascending stable resource ID; process as integer-gram discrete debits against a continuous energy budget | E03 | Deterministic across reload, ticks and unordered maps. No whole-kg rounding. |
+| Core rounding | Each elapsed 1/60 s step accrues exactly 10,000/60 J in **integer sixtieths of a joule**; consume 1 g only if the whole gram's yield fits remaining reserve **and** accrued generation budget; carry fractional budget | E03 | No fractional-gram material creation or lost fractional ticks. Cap budget to one gram of the highest eligible yield when reserve is full, and never mint free joules. |
+| Reserve-full behavior | Pause conversion when no complete eligible gram fits the energy headroom; resume after draw | E03 | No input debit if energy cannot be credited atomically. |
+| Core idle draw | 0 W; no background drains or battery self-discharge | E03 | Makes a bounded and testable prototype. |
 | Fabricator job | `field-marker-kit:v1`: debit/reserve 1,000 g `mineral`, produce one count item of 1,000 g, stack limit 1 | P / **TBD use effect** | One real mass-bearing item and a single job; consuming it to create a field mark is a suggested use, but the existing exploration mark API is currently free. **Do not change mark gameplay until owner approves the use effect.** |
 | Fabricator processing | 20 simulated seconds at 5,000 W, total 100,000 J | P | Duration * power equals energy cost; no free completion. |
-| Power allocation | Core generation supplies Fabricator draw first, then charges reserve; reserve may also discharge to cover a shortage; other machine draws are 0 W in E01 | P | One global tick, no alternating-order double spend; if available budget below requested draw, job makes **no progress** this step and no energy is debited for that step. |
+| Power allocation | Draw the whole consumer tick from reserve first, then convert fuel to replenish reserve; other machine draws are 0 W | E03 | One global tick, no alternating-order double spend; if available budget below requested draw, job makes **no progress** this step and no energy is debited for that step. |
 | Tray | 1 completed job, 1 item, 1,000 g total; one active job maximum | P | Full tray blocks starting another job until claim. Never auto-credit player inventory. |
 | Claim | On deliberate E/Use claim, validate 1 free count-item slot and 1,000 g free carried mass; atomic tray → inventory transfer | P | On full slots/mass keep output in tray with separate reason. No loss, duplicate or implicit discard. |
 | Offline | No Core conversion or Fabricator progress while tab closed/unloaded; clock starts from restored saved tick, no wall-clock catch-up | P | Consistent with explicit foreground machine loop; offline fatigue remains governed by survival rules. |
@@ -47,13 +47,13 @@ Every value labelled **P** is a concrete *proposal*, not a shipped or owner-appr
 
 ### Tick, power and persistence invariants
 
-- Work only from the session's **single authoritative simulated tick** (60 ticks/s). Do not use a second `setInterval`, `Date.now`, or independent RAF time source for generation or crafting. Make batched and individual ticks equivalent; no offline wall-clock conversion. Use exact integer gram, joule (or fixed microjoule accumulator) and integer progress fields; reject NaN, negative and unsafe integers.
-- Process each tick by committing an input/debit and output/credit **together** to one local session snapshot. Supply fresh power to the active job first; if insufficient, job pauses (no partial paid tick); otherwise draw the exact deficit from energy reserve and credit any unused generation to storage, subject to cap. Choose and convert fuel only within the cap; no energy should be credited then lost to a full reserve. The approved future tick order applies job draw before conversion. Verify full-reserve behavior through deterministic replay.
+- Work only from the session's **single authoritative simulated tick** (60 ticks/s). Do not use a second `setInterval`, `Date.now`, or independent RAF time source for generation or crafting. Make batched and individual ticks equivalent; no offline wall-clock conversion. Use exact integer gram and exact sixtieth-joule and integer progress fields; reject NaN, negative and unsafe integers.
+- Process each tick by committing an input/debit and output/credit **together** to one local session snapshot. Fund the whole requested consumer tick from the pre-tick reserve first; if insufficient, the job pauses without a partial paid tick. Then convert fuel to replenish reserve, subject to cap. Choose and convert fuel only within the cap; no energy should be credited then lost to a full reserve. E03 implements the approved job-draw-before-conversion order. Verify full-reserve behavior through deterministic replay.
 - The browser's current resource ledger validator equates initial raw resource mass with raw source + player + store mass. **It must be extended, not bypassed**: include all machine raw accounts, reserved jobs, tray items and manufactured count items. Define raw-material-to-item conversion as a typed, explicitly authorized mass-balanced transformation instead of pretending the raw resource still exists. Record per-resource transformed totals or an equivalent immutable transaction journal sufficient to reject replay/fabricated mass. Generated geologic deposits retain their own source identity/depletion accounting.
 - The current `resourceLedgerMass` returns player mass and raw ship-store mass. Ship mass must count Core input, Fabricator input, reserved job and tray **exactly once**, regardless of UI visibility, with the player payload counted only aboard. Mass converted to Core energy leaves the ship as fuel mass (no automatic return of consumed grams). Manufacturing conserves mass by construction for the candidate recipe.
 - Schema **v14** keeps the existing localStorage key and catalog version. It validates the trusted Core store and Core reserve. v1–v13 migrate to an empty fuel buffer, 500,000 J reserve and zero conversion budget while preserving existing source depletion, revision and expedition data. Original bytes remain until the next successful commit. Future Fabricator work will define trusted recipe/item catalogs and durable job reservations, progress and tray state.
 - An invalid or missing v14 Core field or store, unknown future schema, incompatible item catalog or corrupt envelope must fail closed, preserve source bytes and block new writes; never silently reset the campaign. A valid v13 migration cannot mint machine fuel or output items. Revision/compare-and-replace/Web Lock behavior continues unchanged.
-- E01 should introduce **no runtime schema, catalog, item, fixture, machine, UI, HUD or flight change**. Tests below are acceptance requirements for implementation tasks, not claimed E01 results.
+- The original E01 proposal introduced no runtime change. E02 and E03 implement the Core portions; Fabricator and machine UI checks below remain downstream requirements.
 
 ### Required downstream implementation checks (E02–E07)
 
@@ -74,6 +74,48 @@ No real propulsion fuel or ship/scanner power gating; no new planetary resources
 
 ## Decision gate and dependencies
 
-**Remaining decisions** include the whole-gram conversion details, the recipe and its usable effect, job duration and energy, tray behavior, and the cancellation policy. Settle the field marker effect and existing free marks before changing field-mark gameplay. Review design against [active resource contract](resource-inventory-and-gathering.md), [browser status](current-client-status.md), [save continuity](save-contract.md) and [flight contract](browser-launch-landing.md).
+**Remaining decisions** include the recipe and its usable effect, job duration and energy, tray behavior, and the cancellation policy. Settle the field marker effect and existing free marks before changing field-mark gameplay. Review design against [active resource contract](resource-inventory-and-gathering.md), [browser status](current-client-status.md), [save continuity](save-contract.md) and [flight contract](browser-launch-landing.md).
 
 #873 established the E01 design contract. Scope beyond the E02 approval follows the remaining decisions above. Existing #783–#788 and #838–#845 / #847–#854 are prior foundations, not evidence of delivered Core/Fabricator behavior.
+
+## E03 deterministic processing and power API (#875)
+
+`scoutEnergyCore.ts` owns one pure tick; `ResourceSession.advance(world, power)`
+is the only production adapter. Integer-watt requests represent one active
+Fabricator consumer (default 0 W); `{ watts, paused: true }` pays nothing.
+The consumer receives an all-or-nothing draw from the pre-tick reserve, then
+whole-gram conversion refills the reserve. An insufficient draw makes no paid
+progress; newly converted energy becomes available on the following tick.
+No Fabricator job, recipe, item or UI is introduced here.
+
+`reserveJ60`, `conversionBudgetJ60` and `spentJ60` store integer 1/60 J units.
+Generation adds 10,000 units per tick while eligible fuel exists. Choose the
+highest-yield gram that fits both budget and reserve headroom, then stable ID.
+Budget is capped to the highest available fuel's one-gram yield; it resets when
+fuel is depleted and cannot accumulate an offline backlog. Full-reserve waiting
+may retain this bounded budget. Sub-gram headroom leaves fuel untouched. All
+unconverted grams remain withdrawable; there is no separate fuel reservation.
+
+The committed `corePower` receipt exposes `powered`, `idle`, `empty`, or `full`
+and consumer `idle`, `powered`, `paused`, or `insufficient-power`, plus exact
+joules drawn/generated and per-resource gram debits. `powered` means this tick
+paid a consumer or converted fuel; otherwise `full` means exact capacity,
+`empty` means no reserve/eligible fuel, and `idle` covers waiting for budget or
+whole-gram headroom. Receipts clear on duplicate/rejected ticks and storage
+failure. HUDs read receipts and durable state; they never simulate energy.
+Future job progress must join the same save transaction before publication.
+
+Schema v15 preserves the key/catalog and migrates v14's legitimate initial
+reserve and zero budget losslessly, without rewriting bytes until commit.
+`convertedGrams` joins the existing ledger conservation equation and is excluded
+from payload. Initial energy + converted yields must equal reserve + cumulative
+expenditure. Invalid sums, unsafe counters, fractional grams/units and future
+schemas fail closed. `core.tick` records the last committed processing tick;
+reload restores the single world clock to at least that tick, preventing replay.
+No closed/inactive-tab catch-up is performed. Flight/cockpit/scanner prototype
+power remains independent.
+
+Checks: `corePower.test.ts`, `scoutEnergyCore.test.ts`, existing ledger/session,
+survival and flight tests, and built `tests/core-power.spec.ts`. Raw state and
+original captures stay in ignored `client/test-results/` and existing CI artifacts
+(14-day retention); PR descriptions carry delivery and review results.

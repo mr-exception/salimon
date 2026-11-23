@@ -1134,3 +1134,17 @@ includes these suites and uploads that directory for 14 days. Three Help referen
 images intentionally propose the corrected durable-notes wording, with retained
 originals/diffs and unchanged pixel thresholds; appearance review remains with the
 owner. No new monitoring is introduced. CI acceptance awaits the owner's report.
+
+### Energy Core processing (#875)
+
+The [active Core contract](../docs/browser-core-fabricator-vertical-slice.md#e03-deterministic-processing-and-power-api-875)
+owns units, fuels, whole-gram eligibility, bounded budget, status and draw order.
+`ResourceSession.advance(world, { watts, paused })` handles one consumer from the
+single world clock; read `corePower` only as the receipt for that invocation.
+Duplicate/rejected calls publish no draw. Future Fabricator job progress must
+commit in that same boundary. The visible Core remains inspection-only.
+
+Focused domain checks: `node --experimental-strip-types --test src/corePower.test.ts src/scoutEnergyCore.test.ts`.
+Built clock/reload checks: `npx playwright test --project=cockpit tests/core-power.spec.ts`.
+The latter also runs in PR smoke and full world regression. Original captures
+and raw saved states stay in ignored test output and existing CI uploads.

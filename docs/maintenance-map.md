@@ -1,5 +1,11 @@
 # Feature maintenance map
 
+Browser Core processing (#875): `scoutEnergyCore.ts` owns exact 60 Hz energy,
+fuel ranking and consumer receipts; `resourceLedger.ts` validates converted gram
+totals; `resourceSession.ts` commits schema v15 and prevents tick replay.
+See [E03 contracts](browser-core-fabricator-vertical-slice.md#e03-deterministic-processing-and-power-api-875),
+`corePower.test.ts` and built `tests/core-power.spec.ts`.
+
 Combined planetary QA (#854): `tests/planetary-journey.spec.ts` owns restored Vesper multi-region mining/mark/storage/reload and corrupt-save UI. `npm run test:planetary` selects the affected existing domain browser owners; see [acceptance routing](browser-planetary-qa.md).
 
 Browser field exploration (#852): `exploration.ts` owns physical landmark identity,

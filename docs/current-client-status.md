@@ -7,7 +7,7 @@ and schema-v13 sparse persistence in the React/TypeScript browser.
 Production cockpit presentation is panoramic; `/?scene=radar` is an isolated
 orthographic engineering fixture. Historical Rust systems do not establish
 browser delivery. Climate, ecology, underground, water, procedural resource types,
-a full planetary chart, Fabricator jobs and multiplayer remain deferred.
+a full planetary chart, Fabricator console and multiplayer remain deferred.
 
 See the [active browser launch/landing contract](browser-launch-landing.md) for the delivered
 production loop, supported sample sites, safety/save boundaries and QA coverage.
@@ -34,7 +34,7 @@ The [docs index](README.md) includes both approved designs and historical contra
 an issue closure or native implementation note does not establish browser delivery.
 
 
-> **Energy Core E03 (#875)** adds deterministic whole-gram conversion and an exact per-tick consumer power API to the independent 50 kg fuel buffer. The [economy and save contract](browser-core-fabricator-vertical-slice.md) records the approved Core values and remaining Fabricator decisions.
+> **Energy Core E03 (#875)** adds deterministic whole-gram conversion and an exact per-tick consumer power API to the independent 50 kg fuel buffer. The [economy and save contract](browser-core-fabricator-vertical-slice.md) records the approved Core values and approved E05 Fabricator domain and deferred use effect.
 
 ## Code-checked reconciliation
 
@@ -51,7 +51,7 @@ requirements, not playable behavior. “Decision pending” identifies missing r
 | Suits | No suit/equipment UI or production gear catalog in `client/src` | [Approved tierless suits and hazard design](spacesuit-and-hazards.md): initial basic suit is a requirement, not a shipped grant; exact masses, recipes and switching rules pending |
 | Hazards and health | `survival.ts` provides 200 HP and terminal local-run state; `hazards.ts` adds exact temperature, radiation/poison exposure and 1,000 HP module budgets via schema-v11 atomic saves | [Browser hazard domain](browser-hazards.md) has no production source/module defaults; planetary sampling, equipment and unspecified categories remain pending |
 | Core | `scoutEnergyCore.ts` processes biomass/mineral at 2,000/500 J/g within 10,000 W and 2,000,000 J; `resourceSession.ts` commits fuel, exact energy and converted totals on the sole 60 Hz clock | Domain deposit/withdraw and consumer power APIs are implemented; the reachable fixture opens the shared industrial console with exact-gram review/confirmation and live committed telemetry (#876). Propulsion retains unlimited prototype energy |
-| Fabricator | Visible inspection fixture | Approved queue/power/tray design remains future browser integration; recipes and count-item content are not implemented |
+| Fabricator | E05 exact single-job domain: 50 kg input, paid Core ticks, reserved inputs, persistent tray, revision-bound claim and trusted marker-kit item | Reachable console and actual-control crafting journey remain E06 (#878); marker-kit use effect deferred |
 | Survival | [Browser survival](browser-survival.md): active hunger/fatigue, starvation, passive regen, offline fatigue, persisted HUD and explicit terminal reset | Historical Rust survival implementations are legacy-only; suit/hazard requirements govern future 2D work |
 | Multiplayer | `cockpit.ts` is explicitly local; `TopDownView.tsx` uses a Web Lock for one local save writer | Server authority, presence, reconnect and offline death are future; no backend sync/anti-cheat claim |
 | Universe | `sampleUniverse.ts`, `scanner.ts`, `contact.ts`: illustrative radar catalog, scanning, conservative contact; `planetarySite.ts`: original authored site; `surfaceSite.ts`: deterministic sparse planet/moon patches, tangent frames, clearance and saved local site state | [Versioned canonical surface and P02 geology](browser-planet-surface.md) are delivered (#847/#848): deterministic provinces/relief, swept slope collision, landing footprints, body-wide revision binding and bounded physical ground preview. Continuous regional walking and bounded baseline streaming are delivered by `regionStream.ts` and the chart handoff in `topDownRuntime.ts` (#849). Scientific catalogs, travel/opening narrative and full universe integration remain future browser work; native catalog claims are historical |

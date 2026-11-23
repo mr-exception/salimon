@@ -63,7 +63,7 @@ test('failed extraction retains last whole work/ledger revision; malformed work 
   for (const work of [{ [mineral]: 960 }, { [mineral]: -1 }, { [mineral]: .5 }, { unknown: 10 }, null]) {
     assert.throws(() => decodeResourceSave(JSON.stringify({ ...JSON.parse(saved), miningWork: work }), s.world))
   }
-  const old = { ...JSON.parse(saved), version: 7 }; delete old.convertedGrams; delete old.core; delete old.stores[SCOUT_CORE_FUEL_ID]; delete old.journal; delete old.sites; delete old.scout; delete old.miningWork
+  const old = { ...JSON.parse(saved), version: 7 }; delete old.fabricator; if (old.stores) delete old.stores['scout:fabricator:input']; if (old.itemDefinitions) delete old.itemDefinitions['field-marker-kit:v1']; delete old.convertedGrams; delete old.core; delete old.stores[SCOUT_CORE_FUEL_ID]; delete old.journal; delete old.sites; delete old.scout; delete old.miningWork
   const migrated = decodeResourceSave(JSON.stringify(old), s.world)
   assert.deepEqual(migrated.miningWork, {}); assert.deepEqual(migrated.inventory, JSON.parse(saved).inventory)
 })

@@ -45,11 +45,11 @@ unchanged; no procedural biomass is added. See [deposit publication and persiste
 transfers and resource container upgrade rules remain TBD.
 
 
-> The [browser Core/Fabricator contract](browser-core-fabricator-vertical-slice.md) records the approved E02 fuel buffer and reserve, plus the decisions still needed for later machine work.
+> The [browser Core/Fabricator contract](browser-core-fabricator-vertical-slice.md) records the approved Core and E05 Fabricator recipe/power/save contracts, plus the deferred kit use effect and E06 console.
 
 ## Fabricator and Energy Core material handling
 
-- Fabricator jobs consume/reserve ingredients as **integer grams of raw material** with exact mass conservation. The previous 50 kg / 50 L input limit is now **50 kg only**. Preserve the existing queue, power pauses and output tray contract; integration of the new shared count-item inventory remains future work.
+- Fabricator jobs consume/reserve ingredients as **integer grams of raw material** with exact mass conservation. The previous 50 kg / 50 L input limit is now **50 kg only**. Preserve the existing queue, power pauses and output tray contract; E05 integrates the trusted marker-kit count item and atomic tray claim; E06 owns the reachable console.
 - The Energy Core has an independent **50 kg raw-material buffer**, separate from its energy reserve in joules and its maximum generation power in watts. Material conversion is **continuous over time**, pauses when the energy reserve is full, and resumes automatically when space for energy becomes available. Unconverted input is not lost.
 - Core conversion debits whole grams on the shared 60 Hz clock (#875). The E02 contract records the approved starter yields and 10,000 W generation cap. Conversion scheduling is implemented; upgrades remain later work.
 - Each inventory and processing buffer must contribute its contained mass exactly once to ship simulation. Resource weight currently contributes to player payload, and to ship mass when the player is aboard. Registered carried count-item mass contributes through the same payload path; equipped-suit attribution remains pending.
@@ -75,7 +75,7 @@ The approved [Stasis Pod and Transfer contract](stasis-pod-and-transfer.md) affe
 - Suit base/expansion slot usage, worn suit payload, swapping locations, actual item weights and default inventory contents beyond the basic suit.
 - Slots versus mass limits for future ship containers where only a weight capacity is currently approved, and weight caps for drawer/module storage.
 - Gear bench, suit/module recipes, authored count-item content, machine transfers and upgrades.
-- Fabricator recipes, production queue and item effects; Core upgrades.
+- Additional Fabricator recipes, longer queues and kit use effects; Core upgrades.
 - Final gathering rates, tools, full catalog/economy balance and high-capacity item stack constraints.
 
 ## Atomic multi-inventory foundation (#783)

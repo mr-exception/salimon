@@ -9,7 +9,7 @@ import { geologicalDefinition, planetDefinition } from './planetDefinition.ts'
 import { localToSurface, surfaceRegion } from './surfaceCoordinates.ts'
 import { probeGeology } from './planetGeology.ts'
 import { samplePlanetSurface } from './planetSurface.ts'
-import { ResourceSession, RESOURCE_SOURCES } from './resourceSession.ts'
+import { ResourceSession, RESOURCE_SOURCES, ITEM_CATALOG } from './resourceSession.ts'
 import { createTopDownState, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
 import { point2, walkingFrames, type WorldFrames } from './topDownFrames.ts'
 import { resolveSurface, siteEntities } from './surfaceSite.ts'
@@ -19,7 +19,7 @@ const definition = geologicalDefinition('vesper-moon')
 const origin = surfaceRegion({ bodyId: definition.bodyId, radialM: [definition.radiusM + 5, 0, 0] }, definition)
 const regionAt = (i: number) => surfaceRegion(localToSurface(origin, [i * 64, 0]), definition)
 const ticks = (session: ResourceSession, n: number) => { for (let i = 0; i < n; i++) session.advance(stepTopDown(session.world, [0, 0])) }
-function fixture(index = 1, items = {}) {
+function fixture(index = 1, items = ITEM_CATALOG) {
   const region = regionAt(index), deposit = regionDeposits(region)[0]!, [x, y] = deposit.entity.anchor.point.offsetM
   const address = { ...localToSurface(origin, [22528, 1000]), yaw: 0, definition: { bodyId: definition.bodyId, version: definition.version, digest: definition.digest } }
   const site = resolveSurface(address), location = surfaceScoutLocation(address), base = createTopDownState()

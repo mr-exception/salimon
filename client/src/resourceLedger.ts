@@ -1,3 +1,4 @@
+import { validateFabricator, FABRICATOR_INPUT_ID, FABRICATOR_GRAMS, MARKER_KIT_ID, type FabricatorState } from './scoutFabricator.ts'
 import { addResource, removeResource, resourceInventoryUsage, type CountItemCatalog, type ResourceCatalog, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
 
 /** Trusted declarations come from future ship composition, never saved bytes. */
@@ -8,6 +9,7 @@ export interface ResourceStore extends ResourceStoreDefinition {
   readonly quantities: Readonly<Record<string, number>>
 }
 export interface ResourceLedger {
+  readonly fabricator?: FabricatorState
   /** Raw grams irreversibly transformed to Core energy; never physical payload. */
   readonly convertedGrams?: Readonly<Record<string, number>>
   readonly revision: number
@@ -94,6 +96,13 @@ export function validateResourceLedger(
       credit(totals, id, integer(grams, 1))
     }
   }
+  if (ledger.fabricator !== undefined) {
+    const f = validateFabricator(ledger.fabricator)
+    credit(totals, 'mineral', (f.completed + (f.job ? 1 : 0)) * FABRICATOR_GRAMS)
+    if ((ledger.inventory.items[MARKER_KIT_ID] ?? 0) !== f.claimed) throw Error('Fabricator item conservation failed')
+    const input = ledger.stores[FABRICATOR_INPUT_ID]
+    if ((f.started || input) && (!input || resourceStoreMass(input, resources) + (f.job?.reservedGrams ?? 0) > input.capacityGrams)) throw Error('Fabricator reservation exceeds buffer')
+  }
   for (const id of new Set([...initial.keys(), ...totals.keys()])) {
     if ((totals.get(id) ?? 0) !== (initial.get(id) ?? 0)) throw new RangeError('Material conservation failed')
   }
@@ -138,7 +147,7 @@ export function transferResource(
     if (origin.resourceId !== id || grams > origin.remainingGrams) throw new RangeError('Insufficient or mismatched source material')
     nextSources = { ...nextSources, [from]: { ...origin, remainingGrams: origin.remainingGrams - grams } }
   }
-  const next = { ...(ledger.convertedGrams === undefined ? {} : { convertedGrams: ledger.convertedGrams }), revision: integer(ledger.revision + 1), inventory, stores: nextStores, sources: nextSources }
+  const next = { ...(ledger.fabricator === undefined ? {} : { fabricator: ledger.fabricator }), ...(ledger.convertedGrams === undefined ? {} : { convertedGrams: ledger.convertedGrams }), revision: integer(ledger.revision + 1), inventory, stores: nextStores, sources: nextSources }
   validateResourceLedger(next, sources, stores, resources, items)
   return next
 }
@@ -150,5 +159,6 @@ export function resourceLedgerMass(ledger: ResourceLedger, shipId: string, playe
     const grams = resourceStoreMass(store, resources)
     if (store.shipId === shipId) storeGrams = sum(storeGrams, grams)
   }
+  if (shipId === 'ship:scout' && ledger.fabricator) storeGrams = sum(storeGrams, (ledger.fabricator.job?.reservedGrams ?? 0) + (ledger.fabricator.tray ? FABRICATOR_GRAMS : 0))
   return { playerGrams, storeGrams, shipGrams: sum(storeGrams, playerAboard ? playerGrams : 0) }
 }

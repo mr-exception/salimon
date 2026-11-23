@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { createTopDownState } from './topDownRuntime.ts'
 import { TEST_ITEMS } from '../tests/itemFixtures.ts'
 import { ResourceSession, RESOURCE_SAVE_KEY, type ResourceStorage } from './resourceSession.ts'
-import { SCOUT_CORE_FUEL_ID, CORE_CAPACITY_J, CORE_INITIAL_RESERVE_J } from './scoutEnergyCore.ts'
+import { SCOUT_CORE_FUEL_ID, CORE_INITIAL_RESERVE_J, freshCoreEnergy } from './scoutEnergyCore.ts'
 
 class Storage implements ResourceStorage {
   raw: string | null = null
@@ -22,7 +22,7 @@ const collect = (s: ResourceSession, grams: number) =>
 
 test('Core is an independent 50 kg unconverted buffer with initial and durable energy', () => {
   const storage = new Storage(), s = session(storage)
-  assert.deepEqual(s.snapshot.core, { capacityJ: CORE_CAPACITY_J, reserveJ: CORE_INITIAL_RESERVE_J, conversionBudgetMicroJ: 0 })
+  assert.deepEqual(s.snapshot.core, freshCoreEnergy())
   assert.deepEqual(s.snapshot.stores[SCOUT_CORE_FUEL_ID], {
     id: SCOUT_CORE_FUEL_ID, shipId: 'ship:scout', capacityGrams: 50000, quantities: {},
   })
@@ -52,7 +52,7 @@ test('Core is an independent 50 kg unconverted buffer with initial and durable e
   const restored = session(storage)
   assert.equal(restored.error, '')
   assert.deepEqual(restored.snapshot, s.snapshot)
-  assert.equal(restored.snapshot.core.reserveJ, CORE_INITIAL_RESERVE_J)
+  assert.equal(restored.snapshot.core.reserveJ60, CORE_INITIAL_RESERVE_J * 60)
 })
 
 test('Core rejects fractional grams, full player cargo, storage failures and another writer', () => {
@@ -107,20 +107,20 @@ test('v13 migrates empty Core without minting fuel or rewriting bytes until comm
   assert.equal(collect(s, 1000), true)
   const v13 = JSON.parse(storage.raw!)
   v13.version = 13
-  delete v13.core
+  delete v13.convertedGrams; delete v13.core
   delete v13.stores[SCOUT_CORE_FUEL_ID]
   storage.raw = JSON.stringify(v13)
   const prior = storage.raw, restored = session(storage)
   assert.equal(restored.error, '')
-  assert.equal(restored.snapshot.version, 14)
+  assert.equal(restored.snapshot.version, 15)
   assert.equal(restored.snapshot.revision, v13.revision)
   assert.deepEqual(restored.snapshot.sources, v13.sources)
   assert.deepEqual(restored.snapshot.inventory, v13.inventory)
   assert.deepEqual(restored.snapshot.stores[SCOUT_CORE_FUEL_ID]!.quantities, {})
-  assert.equal(restored.snapshot.core.reserveJ, CORE_INITIAL_RESERVE_J)
+  assert.equal(restored.snapshot.core.reserveJ60, CORE_INITIAL_RESERVE_J * 60)
   assert.equal(storage.raw, prior)
   assert.equal(restored.depositCoreFuel('mineral', 333, restored.snapshot.revision), true)
-  assert.equal(JSON.parse(storage.raw!).version, 14)
+  assert.equal(JSON.parse(storage.raw!).version, 15)
   assert.equal(session(storage).snapshot.stores[SCOUT_CORE_FUEL_ID]!.quantities.mineral, 333)
 })
 
@@ -129,14 +129,14 @@ test('corrupt or future Core saves fail closed with original bytes preserved', (
   assert.equal(collect(s, 1000), true)
   const original = JSON.parse(storage.raw!)
   const mutations: ((save: any) => void)[] = [
-    save => { save.version = 15 },
-    save => { save.version = 13; delete save.core; save.stores[SCOUT_CORE_FUEL_ID].capacityGrams = 1 },
-    save => { delete save.core },
+    save => { save.version = 16 },
+    save => { save.version = 13; delete save.convertedGrams; delete save.core; save.stores[SCOUT_CORE_FUEL_ID].capacityGrams = 1 },
+    save => { delete save.convertedGrams; delete save.core },
     save => { save.core.capacityJ++ },
-    save => { save.core.reserveJ = -1 },
-    save => { save.core.reserveJ = 2_000_001 },
-    save => { save.core.reserveJ = 0.5 },
-    save => { save.core.conversionBudgetMicroJ = 1.5 },
+    save => { save.core.reserveJ60 = -1 },
+    save => { save.core.reserveJ60 = 120_000_001 },
+    save => { save.core.reserveJ60 = 0.5 },
+    save => { save.core.conversionBudgetJ60 = 1.5 },
     save => { save.core.other = 1 },
     save => { delete save.stores[SCOUT_CORE_FUEL_ID] },
     save => { save.stores[SCOUT_CORE_FUEL_ID].quantities.mineral = 0.1 },

@@ -1,6 +1,6 @@
 # Unified weight-based inventory, gathering and ship processing — top-down 2D
 
-**Status (2026-11-05):** owner-approved weight-only revision superseding the prior dual 10 kg / 10 L design. The browser's current 2D mining and local saves use grams and one weight limit; generic count-item registration, atomic add/remove and the unified field-inventory UI are implemented, but gear item definitions, equipment UI and Core processing are **not** playable. Scout Resource Container
+**Status (2026-11-05):** owner-approved weight-only revision superseding the prior dual 10 kg / 10 L design. The browser's current 2D mining and local saves use grams and one weight limit; generic count-item registration, atomic add/remove and the unified field-inventory UI are implemented, but gear item definitions, equipment UI and machine transfer panels are **not** playable. Scout Resource Container
 transfers are playable through #785. The older native physical-fragment system is historical, not current 2D gameplay. See [spacesuits, environmental hazards and gear storage](spacesuit-and-hazards.md).
 
 ## Universal inventory quantities and limits
@@ -51,7 +51,7 @@ transfers and resource container upgrade rules remain TBD.
 
 - Fabricator jobs consume/reserve ingredients as **integer grams of raw material** with exact mass conservation. The previous 50 kg / 50 L input limit is now **50 kg only**. Preserve the existing queue, power pauses and output tray contract; integration of the new shared count-item inventory remains future work.
 - The Energy Core has an independent **50 kg raw-material buffer**, separate from its energy reserve in joules and its maximum generation power in watts. Material conversion is **continuous over time**, pauses when the energy reserve is full, and resumes automatically when space for energy becomes available. Unconverted input is not lost.
-- Core conversion will debit whole grams. The E02 contract records the approved starter yields and 10,000 W generation cap. Conversion scheduling and upgrades belong to later work.
+- Core conversion debits whole grams on the shared 60 Hz clock (#875). The E02 contract records the approved starter yields and 10,000 W generation cap. Conversion scheduling is implemented; upgrades remain later work.
 - Each inventory and processing buffer must contribute its contained mass exactly once to ship simulation. Resource weight currently contributes to player payload, and to ship mass when the player is aboard. Registered carried count-item mass contributes through the same payload path; equipped-suit attribution remains pending.
 
 ## Save format, authority and migration
@@ -75,7 +75,7 @@ The approved [Stasis Pod and Transfer contract](stasis-pod-and-transfer.md) affe
 - Suit base/expansion slot usage, worn suit payload, swapping locations, actual item weights and default inventory contents beyond the basic suit.
 - Slots versus mass limits for future ship containers where only a weight capacity is currently approved, and weight caps for drawer/module storage.
 - Gear bench, suit/module recipes, authored count-item content, machine transfers and upgrades.
-- Core yield per gram, batch accounting, priority ranking, watts and continuous processing persistence.
+- Fabricator recipes, production queue and item effects; Core upgrades.
 - Final gathering rates, tools, full catalog/economy balance and high-capacity item stack constraints.
 
 ## Atomic multi-inventory foundation (#783)
@@ -138,12 +138,13 @@ the player is outside; onboard player mass remains separate. UI is described bel
 integer grams through player cargo using the same revision and capacity checks.
 Fuel counts once toward Scout mass. Player cargo contributes while aboard.
 
-Schema v14 saves the fuel and the Core reserve together under the existing
+Schema v15 saves fuel, exact reserve/budget/expenditure and converted gram totals together under the existing
 localStorage key. Fresh sessions and v1–v13 migrations start with an empty
 Core buffer and 500,000 J out of 2,000,000 J. Migration preserves source
 depletion and revision, and writes only on the next successful commit.
 Malformed Core data or a Core store declared in a legacy save blocks writes
 and preserves the original bytes. The visible Core still supports inspection.
+Processing and consumer power semantics are documented in the [E03 contract](browser-core-fabricator-vertical-slice.md#e03-deterministic-processing-and-power-api-875).
 
 ## Playable container interface (#785)
 

@@ -8,6 +8,8 @@ export interface ResourceStore extends ResourceStoreDefinition {
   readonly quantities: Readonly<Record<string, number>>
 }
 export interface ResourceLedger {
+  /** Raw grams irreversibly transformed to Core energy; never physical payload. */
+  readonly convertedGrams?: Readonly<Record<string, number>>
   readonly revision: number
   readonly inventory: ResourceInventory
   readonly sources: Readonly<Record<string, ResourceSource>>
@@ -85,6 +87,13 @@ export function validateResourceLedger(
     for (const [material, grams] of Object.entries(actual.quantities)) credit(totals, material, grams)
   }
   for (const [id, grams] of Object.entries(ledger.inventory.quantities)) credit(totals, id, grams)
+  if (ledger.convertedGrams !== undefined) {
+    record(ledger.convertedGrams)
+    for (const [id, grams] of Object.entries(ledger.convertedGrams)) {
+      if (!Object.hasOwn(resources, id)) throw new RangeError('Unknown converted resource')
+      credit(totals, id, integer(grams, 1))
+    }
+  }
   for (const id of new Set([...initial.keys(), ...totals.keys()])) {
     if ((totals.get(id) ?? 0) !== (initial.get(id) ?? 0)) throw new RangeError('Material conservation failed')
   }
@@ -129,7 +138,7 @@ export function transferResource(
     if (origin.resourceId !== id || grams > origin.remainingGrams) throw new RangeError('Insufficient or mismatched source material')
     nextSources = { ...nextSources, [from]: { ...origin, remainingGrams: origin.remainingGrams - grams } }
   }
-  const next = { revision: integer(ledger.revision + 1), inventory, stores: nextStores, sources: nextSources }
+  const next = { ...(ledger.convertedGrams === undefined ? {} : { convertedGrams: ledger.convertedGrams }), revision: integer(ledger.revision + 1), inventory, stores: nextStores, sources: nextSources }
   validateResourceLedger(next, sources, stores, resources, items)
   return next
 }

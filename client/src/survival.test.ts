@@ -1,3 +1,4 @@
+import { SCOUT_CORE_FUEL_ID } from './scoutEnergyCore.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import test from 'node:test'
@@ -130,16 +131,18 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   const world = createTopDownState('exterior', true)
   const old = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   old.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 333 })
-  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.journal; delete v5.survival; delete v5.miningWork; delete v5.sites; delete v5.scout; delete v5.hazards
+  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.core; delete v5.journal; delete v5.survival; delete v5.miningWork; delete v5.sites; delete v5.scout; delete v5.hazards
+  const { [SCOUT_CORE_FUEL_ID]: emptyCore, ...oldStores } = v5.stores
+  v5.stores = oldStores
   raw = JSON.stringify(v5); const bytes = raw
   const migrated = new ResourceSession(storage, world, undefined, undefined, () => 21_601_000)
   assert.equal(migrated.error, ''); assert.equal(raw, bytes)
   assert.deepEqual(migrated.survival, freshSurvival(21_601_000))
   assert.deepEqual(migrated.snapshot.inventory, v5.inventory)
   assert.deepEqual(migrated.snapshot.sources, v5.sources)
-  assert.deepEqual(migrated.snapshot.stores, v5.stores)
+  assert.deepEqual(migrated.snapshot.stores, { ...v5.stores, [SCOUT_CORE_FUEL_ID]: emptyCore })
   migrated.advance(stepTopDown(migrated.world, [0, 0])); migrated.checkpoint()
-  assert.equal(JSON.parse(raw!).version, 13)
+  assert.equal(JSON.parse(raw!).version, 14)
   assert.equal(new ResourceSession(storage, world, undefined, undefined, () => 21_601_000).survival.activeTicks, 1)
 })
 

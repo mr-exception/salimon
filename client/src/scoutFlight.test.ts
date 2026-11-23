@@ -1,5 +1,6 @@
 import { translate } from './coordinates.ts'
 import { test } from 'node:test'
+import { SCOUT_CORE_FUEL_ID } from './scoutEnergyCore.ts'
 import assert from 'node:assert/strict'
 import { enterCockpit, leaveCockpit, setCockpitPower } from './cockpit.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
@@ -75,9 +76,9 @@ test('inconsistent snapshots fail closed; legacy v8 migrates without fabricating
   const raw=storage.getItem(),restored=new ResourceSession(storage,createTopDownState())
   assert.match(restored.error,/safely/);restored.checkpoint();assert.equal(storage.getItem(),raw)
  }
- const {session,storage,corrupt}=setup();session.upgrade(10000,12);corrupt(s=>{s.version=8; delete s.journal;delete s.sites;delete s.scout})
+ const {session,storage,corrupt}=setup();session.upgrade(10000,12);corrupt(s=>{s.version=8; delete s.core; delete s.stores[SCOUT_CORE_FUEL_ID]; delete s.journal;delete s.sites;delete s.scout})
  const legacy=new ResourceSession(storage,createTopDownState())
- assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,13)
+ assert.equal(legacy.error,'');assert.equal(legacy.world.scoutLocation.binding,STARTING_SITE.id);assert.equal(legacy.snapshot.version,14)
 })
 
 test('physical contact never fabricates a site, and landing cannot teleport a distant ship',()=>{

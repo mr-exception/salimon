@@ -10,7 +10,7 @@
 
 This contract applies only to the active React/TypeScript single-player browser. The current `resourceSession.ts` publishes **schema v17** at `salimon:expedition:v1`, retains `landing-resources:v2`, and registers the trusted `field-marker-kit:v1` count item. The active sources expose `mineral` and `biomass` (the original authored source quantities are 60,000 g and 15,000 g). `resourceInventory.ts` validates integer-gram raw quantities and count items; `resourceLedger.ts` owns revision-bound, conserved raw transfers; `scoutResourceContainer.ts` provides the existing 50,000 g `scout:storage` store. The Core has a reachable console; the reachable Fabricator console provides input transfers, start, paid status and output claim.
 
-All machines belong to `ship:scout` and are physically accessed at the existing `scout:core` anchor (1.9, 1.8 m) and `scout:fabricator` anchor (-1.85, 3.9 m) in `scoutLayout.ts`; use current nearby selection, same-scene reach, E/Use, keyboard/modal/Escape and focus ownership. They are **not remotely operable**. Exact equipment reach is **TBD: use an existing interaction policy only after checking collision and access in a browser fixture**; do not hardcode an unreviewed radius.
+All machines belong to `ship:scout` and are physically accessed at the existing `scout:core` anchor (1.9, 1.8 m) and `scout:fabricator` anchor (-1.85, 3.9 m) in `scoutLayout.ts`; use current nearby selection, same-scene reach, E/Use, keyboard/modal/Escape and focus ownership. They are **not remotely operable**. Both use the existing 1.9 m center-distance reach from `scoutLayout.ts` and `interactionInReach`; shared collision and production walking routes determine access. E08 exercises reachable positions rather than teleporting to the anchors.
 
 ## Proposed minimum economy — approval matrix
 
@@ -183,8 +183,8 @@ persistent tray with shared UI primitives. No UI timer advances a job or grants
 an item. Full carrying weight/slots preserve output with a specific reason.
 
 See [controls and validation](../client/README.md#reachable-fabricator-console-878).
-`tests/fabricator-console.spec.ts` owns the actual-control mine/storage/fuel/start/
-power-loss/refuel/claim/reload loop, negative transactions/focus and fixed-policy
+`tests/vertical-slice.spec.ts` owns the combined actual-control mine/storage/fuel/start/
+power-loss/refuel/claim/use/cockpit/reload loop. `tests/fabricator-console.spec.ts` owns negative transactions/focus and fixed-policy
 repeat captures at 960/1280/1920. Evidence remains in ignored output and existing
 CI artifacts; the PR records the same-session review. E07 implements the separately approved deployment rules below.
 
@@ -207,3 +207,39 @@ renaming and guidance selection; HUD direction/range only appears on the same
 surface within 384 m. A flag glyph distinguishes kits from free observation cues.
 Schema v17 requires validated deployment records; v1–v16 migrate with none and
 retain original bytes until successful commit. See the [gameplay guide](../client/README.md#deploy-a-fabricated-field-marker-879).
+
+
+## E08 built-production acceptance (#880)
+
+The production bundle served by Vite preview is the reproducible deployment
+candidate. This check does not publish or verify a live hosted deployment.
+`tests/vertical-slice.spec.ts` extends the E06/E07 journey instead of maintaining
+another copy; shared valid expedition seeds/control helpers live in
+`tests/fabricatorFixtures.ts`. The cockpit project remains in the existing full
+world CI group. PR smoke retains its existing journey coverage under the new
+`SLICE-880 built` selector; no additional workflow or baseline policy is introduced.
+
+| Criterion | Reproducible check / evidence |
+| --- | --- |
+| Complete playable loop | `SLICE-880 built mine…` uses real keyboard/mouse controls on the built route; low-reserve prior-expedition seed forces outage. Trace, original power-loss/marker/cockpit images and `conservation.json` retain state. |
+| Exact conservation | Each recorded transaction stage checks 60 kg authored mineral = source + carry + stores + reserved + converted + tray/carried/deployed products; reserve + spent = initial + conversion; paid ticks bind expenditure to the single job. |
+| Interruptions and clock | Pause and injected hidden-document events freeze durable state; reload preserves interrupted work; cockpit has one 60 Hz clock, marker and receipts survive view/reload. Escape/blur cancel drafts. |
+| Capacities | Full Core/Fabricator 50 kg buffers reject surplus; existing FAB-UI-2 full carry rejects claim without losing tray then recovers. `scoutFabricator.test.ts` covers tray, weight/slots, reservation capacity and duplicate receipts. |
+| Save failures | Built stale/quota-failed claim preserves bytes and tray, reload recovers exactly once; malformed/unsupported/unpaid saves remain untouched. Competing-tab Web Lock prevents job advancement/claim. |
+| Visuals | Existing 960/1280/1920 fixed-policy console and marker repeats plus injected CSS/missing-marker negatives; original screenshots and traces are retained, references/thresholds unchanged. |
+| Domain/build | `npm test`; `npm run build`. Record actual PASS/FAIL and exact tested revision in the PR. |
+| Smoke / full | `npm run test:browser:smoke` is bounded; existing Navigation client and daily/manual full regression are separate outcomes. Record NOT RUN until current-revision results are supplied; smoke green never implies full green. |
+
+Completion and same-session review belong in the PR with head/base SHA, exact
+commands, PASS/FAIL/NOT RUN and original evidence paths. Local artifacts remain
+ignored under `client/test-results/`; CI artifacts retain 14 days. The user tracks
+CI and reports results in the same chat. CI awaiting that report is UNVERIFIED,
+not QA acceptance. No M1-only qualification is required for this browser slice.
+
+Limits: this is one mineral recipe, one active job, one tray item and a deliberate
+surface marker with bounded 384 m local guidance. No offline conversion/crafting,
+remote automation or server authority. Future **suits**, **planetary hazards**
+(the hazard domain is not production planetary sampling), **ecology**,
+**multiplayer** and **propulsion energy** remain deferred. Flight retains its
+unlimited-energy prototype; cabin power is separate. Wider economy, equipment,
+recipes, full charting and native systems are outside this acceptance claim.

@@ -1,5 +1,9 @@
 # Feature maintenance map
 
+Core/Fabricator cross-feature QA (#880) belongs to `tests/vertical-slice.spec.ts`;
+`tests/fabricatorFixtures.ts` shares valid prior-expedition seeds/control helpers
+with console/marker visual negatives. See [acceptance and limits](browser-core-fabricator-vertical-slice.md#e08-built-production-acceptance-880).
+
 Usable field markers (#879): `fieldMarker.ts` validates durable deployment and
 bounded local guidance; `resourceSession.ts` owns atomic kit removal/placement and
 v17 migration, and `resourceLedger.ts` conserves claimed = carried + deployed.

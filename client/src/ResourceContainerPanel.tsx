@@ -69,7 +69,7 @@ function FabricatorTelemetry({ interaction, onChange }: { interaction: ResourceC
   return <section aria-label="Fabricator job and output">
     <StatusMessage label="Fabricator operating status" priority={session.error || job?.powerPaused ? 'error' : 'status'}>{status}</StatusMessage>
     <p>Selected recipe: <strong>{FABRICATOR_ITEMS[MARKER_KIT_ID].name}</strong></p>
-    <p className="container-note">{FABRICATOR_GRAMS.toLocaleString('en-US')} g mineral → 1 kit · 1,000 g · 1 slot. Marker use effect is deferred.</p>
+    <p className="container-note">{FABRICATOR_GRAMS.toLocaleString('en-US')} g mineral → 1 kit · 1,000 g · 1 slot. Deploy outdoors from Field inventory.</p>
     <p className="container-note">{FABRICATOR_TICKS / 60} s at {FABRICATOR_WATTS.toLocaleString('en-US')} W · 100,000 J. Queue: {job ? '1 / 1 active' : '0 / 1 active'}.</p>
     {job && <><Progress label="Fabrication progress" value={FABRICATOR_TICKS - job.remainingTicks} max={FABRICATOR_TICKS} unit="ticks" /><p data-fabricator-job>Job #{job.id} · {job.remainingTicks} ticks remaining ({(job.remainingTicks / 60).toFixed(2)} s) · {job.reservedGrams} g reserved</p></>}
     <p data-fabricator-power>Core reserve: {core.reserveJ60 / 60} J · job draw: {session.corePowerTick === null ? '— W · awaiting simulation tick' : `${session.corePower.drawnJ60} W · last committed tick`}</p>

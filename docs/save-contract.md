@@ -820,3 +820,13 @@ share the existing atomic replacement and stale-writer guard. V1–v14 migrate
 lazily; v14's initial reserve/zero accumulator become exact integers without
 fuel grants, conversion or lost partial ticks. Invalid/future state preserves
 original bytes and blocks writes. Flight still uses prototype unlimited energy.
+
+## Browser Fabricator domain (#877)
+
+`client/src/scoutFabricator.ts` owns the trusted marker-kit recipe and one-job/tray
+state; `resourceLedger.ts` accounts for reserved/transformed mineral and exact
+physical output mass, and `resourceSession.ts` owns revision-bound start/claim,
+Core-paid progress on the existing world clock and schema v16 migration from
+v1–v15. No offline work or post-start cancellation; failed writes preserve the
+previous snapshot. The kit has no approved use effect. The reachable Fabricator
+console is #878. See [the E05 contract](browser-core-fabricator-vertical-slice.md) for numbers, validation and boundaries.

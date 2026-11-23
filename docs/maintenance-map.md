@@ -1174,3 +1174,13 @@ SVG scene from `RegionStream`. Geology/collision/publication ownership remains
 art fixtures, repeat/negative captures and generated border journeys;
 `terrain.spec.ts` retains production collision approach and reload. See the
 [client guide](../client/README.md#illustrated-streamed-geology-850).
+
+## Browser Fabricator domain (#877)
+
+`client/src/scoutFabricator.ts` owns the trusted marker-kit recipe and one-job/tray
+state; `resourceLedger.ts` accounts for reserved/transformed mineral and exact
+physical output mass, and `resourceSession.ts` owns revision-bound start/claim,
+Core-paid progress on the existing world clock and schema v16 migration from
+v1–v15. No offline work or post-start cancellation; failed writes preserve the
+previous snapshot. The kit has no approved use effect. The reachable Fabricator
+console is #878. See [the E05 contract](browser-core-fabricator-vertical-slice.md) for numbers, validation and boundaries.

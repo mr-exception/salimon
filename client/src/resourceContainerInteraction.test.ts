@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { ResourceContainerInteraction, withdrawalCapacityError } from './resourceContainerInteraction.ts'
-import { ResourceSession, type ResourceStorage } from './resourceSession.ts'
+import { ResourceSession, ITEM_CATALOG, type ResourceStorage } from './resourceSession.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID as id } from './scoutResourceContainer.ts'
 import { createTopDownState, PLAYER_ID, stepTopDown } from './topDownRuntime.ts'
 import { point2 } from './topDownFrames.ts'
@@ -12,9 +12,9 @@ class Storage implements ResourceStorage {
   getItem() { return this.raw }
   setItem(_key: string, value: string) { if (this.fail) throw Error('quota'); this.raw = value }
 }
-function make(grams = 1000, equipment: 'container' | 'core' = 'container') {
+function make(grams = 1000, equipment: 'container' | 'core' | 'fabricator' = 'container') {
   const storage = new Storage(), initial = createTopDownState('exterior', true)
-  const world = { ...initial, selectedId: equipment === 'core' ? 'scout:core' : id, entities: initial.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout' as const, point: equipment === 'core' ? point2(.8, 1.8) : point2(.5, 4.25) } } : e) }
+  const world = { ...initial, selectedId: equipment === 'fabricator' ? 'scout:fabricator' : equipment === 'core' ? 'scout:core' : id, entities: initial.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout' as const, point: equipment === 'fabricator' ? point2(-.7, 3.9) : equipment === 'core' ? point2(.8, 1.8) : point2(.5, 4.25) } } : e) }
   const session = new ResourceSession(storage, world)
   assert.equal(session.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams }), true)
   const ui = new ResourceContainerInteraction(session, equipment)
@@ -178,4 +178,71 @@ test('storage confirmation survives independent background Core conversion', () 
   assert.ok(session.snapshot.convertedGrams.mineral! > 0)
   assert.equal(ui.confirm(), true)
   assert.equal(session.snapshot.stores[id]!.quantities.mineral, 333)
+})
+
+
+test('Fabricator UI reserves inputs, rejects double start and enforces reachable claims after closing', () => {
+  const { ui, session, storage } = make(2000, 'fabricator')
+  assert.match(ui.startBlocked!, /1,000 g/)
+  assert.equal(ui.review('deposit', 'mineral', '1000'), true); assert.equal(ui.confirm(), true)
+  assert.equal(ui.startBlocked, undefined)
+  assert.equal(ui.start(), true); assert.equal(ui.start(), false)
+  assert.match(ui.message, /occupied/)
+  assert.equal(ui.bufferGrams, 1000)
+  assert.equal(ui.review('withdraw', 'mineral', '1'), false)
+  assert.equal(ui.review('deposit', 'mineral', '1'), true)
+  ui.close(); assert.equal(ui.confirm(), false); assert.equal(ui.claim(), false)
+  assert.equal(session.snapshot.fabricator.job!.reservedGrams, 1000)
+  assert.equal(ui.open({ ...session.world, selectedId: 'scout:fabricator' }), true)
+  session.advance({ ...session.world, tick: session.world.tick + 1200 })
+  assert.match(ui.startBlocked!, /Claim/)
+  const completed = session.snapshot.fabricator
+  ui.synchronize({ ...session.world, entities: session.world.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout', point: point2(0, -3) } } : e) })
+  const bytes = storage.raw
+  assert.equal(ui.claim(), false); assert.equal(ui.start(), false)
+  assert.equal(storage.raw, bytes); assert.equal(session.snapshot.fabricator, completed)
+})
+
+test('Fabricator review includes reserved capacity and machine writes fail atomically', () => {
+  for (const reason of ['capacity', 'quota', 'external']) {
+    const { ui, session, storage } = make(1000, 'fabricator')
+    if (reason === 'capacity') {
+      for (let i = 0; i < 5; i++) assert.equal(session.transfer({ revision: session.snapshot.revision, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'store', id: ui.storeId }, resourceId: 'mineral', grams: 10000 }), true)
+    } else { ui.review('deposit', 'mineral', '1000'); ui.confirm() }
+    if (reason === 'quota') storage.fail = true
+    if (reason === 'external') storage.raw += ' '
+    const before = storage.raw
+    if (reason === 'capacity') {
+      assert.equal(ui.start(), true); assert.equal(ui.bufferGrams, 50000)
+      assert.equal(ui.review('deposit', 'mineral', '1'), false)
+      assert.match(ui.message, /Input buffer overweight: only 0 g free/)
+    } else {
+      assert.equal(ui.start(), false); assert.equal(session.snapshot.fabricator.job, null)
+      assert.equal(storage.raw, before); assert.match(ui.message, /Saving failed/)
+    }
+  }
+})
+
+
+test('Fabricator rejected claims explain mass and slots, retain tray, then claim once after freeing capacity', () => {
+  for (const kind of ['mass', 'slots']) {
+    const { world } = make(1000, 'fabricator')
+    const storage = new Storage()
+    const session = new ResourceSession(storage, world, undefined, { ...ITEM_CATALOG, ballast: { gramsPerItem: 1, stackSize: 1 } })
+    const take = (grams: number) => session.transfer({ revision: session.snapshot.revision, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams })
+    take(1000); session.depositFabricatorInput('mineral', 1000, session.snapshot.revision)
+    const ui = new ResourceContainerInteraction(session, 'fabricator')
+    assert.equal(ui.open(world), true); assert.equal(ui.start(), true)
+    session.advance({ ...session.world, tick: session.world.tick + 1200 })
+    if (kind === 'mass') take(10000)
+    else assert.equal(session.changeItem('add', 'ballast', 12, session.snapshot.revision), true)
+    const before = storage.raw, tray = session.snapshot.fabricator.tray
+    assert.equal(ui.claim(), false)
+    assert.match(ui.message, kind === 'mass' ? /Player overweight.*Output kept in tray/ : /Player slots full.*Output kept in tray/)
+    assert.equal(storage.raw, before); assert.equal(session.snapshot.fabricator.tray, tray)
+    if (kind === 'mass') session.deposit('mineral', 1000, session.snapshot.revision)
+    else session.changeItem('remove', 'ballast', 1, session.snapshot.revision)
+    assert.equal(ui.claim(), true); assert.equal(ui.claim(), false)
+    assert.equal(session.snapshot.inventory.items['field-marker-kit:v1'], 1)
+  }
 })

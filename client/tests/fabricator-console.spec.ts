@@ -18,9 +18,9 @@ async function transfer(page: Page, direction: 'deposit' | 'withdraw', grams: nu
   await page.getByRole('button', { name: direction === 'deposit' ? 'Review deposit' : 'Review withdrawal' }).click()
   await page.getByRole('button', { name: `Confirm ${direction}` }).click()
 }
-function fixture(state: 'journey' | 'empty' | 'ready' | 'powered' | 'paused' | 'complete' | 'full') {
+function fixture(state: 'journey' | 'empty' | 'ready' | 'powered' | 'paused' | 'complete' | 'full' | 'marker') {
   const initial = createTopDownState('exterior', true)
-  const world = state === 'journey' ? initial : { ...initial, entities: initial.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout' as const, point: point2(-.7, 3.9) } } : e) }
+  const world = state === 'journey' || state === 'marker' ? initial : { ...initial, entities: initial.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor: { frame: 'ship:scout' as const, point: point2(-.7, 3.9) } } : e) }
   let raw: string | null = null
   const s = new ResourceSession({ getItem: () => raw, setItem: (_, v) => { raw = v } }, world, undefined, undefined, () => Date.parse('2026-11-04T00:00:01Z'))
   // A valid prior expedition spent its reserve. The journey itself gathers,
@@ -34,14 +34,17 @@ function fixture(state: 'journey' | 'empty' | 'ready' | 'powered' | 'paused' | '
     expect(s.depositFabricatorInput('mineral', 2000, s.snapshot.revision)).toBe(true)
     if (state !== 'ready') {
       expect(s.startFabricator(FABRICATOR_RECIPE_ID, s.snapshot.revision)).toBe(true)
-      s.advance({ ...s.world, tick: s.world.tick + (state === 'complete' || state === 'full' ? 1200 : 1) })
+      s.advance({ ...s.world, tick: s.world.tick + (state === 'complete' || state === 'full' || state === 'marker' ? 1200 : 1) })
     }
+    if (state === 'marker') expect(s.claimFabricator(1, s.snapshot.revision)).toBe(true)
     if (state === 'full') expect(s.transfer({ revision: s.snapshot.revision, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 10000 })).toBe(true)
   }
   return raw!
 }
 
-test('FAB-UI-1 built mine, carry, ship buffer, fuel, start, power loss, resume, claim and reload', async ({ page }, info) => {
+test.use({ trace: { mode: 'on', snapshots: false, screenshots: true, sources: true } })
+test('FAB-UI-1 built mine, carry, fuel, fabricate, claim, deploy marker, guide and reload', async ({ page }, info) => {
+  test.setTimeout(300000)
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message))
   await seed(page, fixture('journey')); await boot(page, '', origin)
   await page.screenshot({ path: info.outputPath('production-start.png') })
@@ -114,6 +117,72 @@ test('FAB-UI-1 built mine, carry, ship buffer, fuel, start, power loss, resume, 
   expect(raw + restored.inventory.items[MARKER_KIT_ID] * 1000 + restored.sources['source:landing:mineral:01'].remainingGrams).toBe(60000)
   expect(restored.core.spentJ60 - started.core.spentJ60).toBe(100000 * 60)
   expect(errors).toEqual([])
+  // E07: use the manufactured item through actual inventory controls outdoors.
+  await page.keyboard.press('Escape')
+  for (const p of [[0, 4.25], [0, 7]]) await walkTo(page, p, 'ship:scout', true)
+  for (const p of [[-2, 7], [-2, 3], [-6, 3]]) await walkTo(page, p, 'planet:fixture', true)
+  await page.keyboard.press('i')
+  await page.getByRole('button', { name: 'Deploy field marker', exact: true }).click()
+  const deployment = page.getByRole('dialog', { name: 'Deploy field marker', exact: true })
+  await expect(deployment).toBeVisible()
+  const beforeCancel = await saved(page)
+  await page.keyboard.press('Escape')
+  expect((await saved(page)).inventory).toEqual(beforeCancel.inventory)
+  expect((await saved(page)).deployedMarkers).toEqual([])
+  await page.getByRole('button', { name: 'Deploy field marker', exact: true }).click()
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')))
+  await expect(deployment).not.toBeVisible()
+  expect((await saved(page)).deployedMarkers).toEqual([])
+  await page.getByRole('button', { name: 'Deploy field marker', exact: true }).click()
+  const outdoor = await position(page)
+  await deployment.getByLabel('Marker name').fill('Mineral return')
+  await page.keyboard.press('w'); await page.clock.runFor(100)
+  expect(await position(page)).toEqual(outdoor)
+  await deployment.getByLabel('Marker name').fill('Mineral return')
+  await page.screenshot({ path: info.outputPath('marker-confirmation.png') })
+  await deployment.getByRole('button', { name: 'Confirm deployment' }).dblclick()
+  await expect(deployment).not.toBeVisible()
+  const deployed = await saved(page)
+  expect(deployed.deployedMarkers).toHaveLength(1)
+  expect(deployed.inventory.items[MARKER_KIT_ID]).toBeUndefined()
+  expect(deployed.fabricator).toEqual(restored.fabricator)
+  expect(deployed.inventory.quantities).toEqual(restored.inventory.quantities)
+  await page.keyboard.press('Escape')
+  await page.locator('main').click({ position: { x: 640, y: 350 } })
+  await page.keyboard.press('m')
+  const notebook = page.getByRole('dialog', { name: 'Field notebook', exact: true })
+  await notebook.getByLabel('Name (optional)', { exact: true }).fill('Return beacon')
+  await notebook.getByRole('button', { name: 'Rename Mineral return', exact: true }).click()
+  await notebook.getByRole('button', { name: 'Guide to Return beacon', exact: true }).click()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('[data-marker-guidance]')).toContainText('marker here')
+  await page.locator('main').click({ position: { x: 640, y: 350 } })
+  await walkTicks(page, 'a', 60)
+  await expect(page.locator('[data-marker-guidance]')).toContainText('local marker guidance')
+  const marker = page.locator('[data-deployed-marker]')
+  await expect(marker).toHaveCount(1)
+  await page.mouse.move(0, 0)
+  const original = await page.screenshot({ path: info.outputPath('marker-guidance.png') })
+  const repeat = await page.screenshot({ path: info.outputPath('marker-guidance-repeat.png') })
+  expect(compareImages(original, repeat).pass).toBe(true)
+  const box = (await marker.boundingBox())!
+  const clip = { x: box.x - 10, y: box.y - 10, width: box.width + 20, height: box.height + 20 }
+  const detail = await page.screenshot({ clip, path: info.outputPath('marker-detail.png') })
+  await marker.evaluate(el => el.setAttribute('visibility', 'hidden'))
+  const negative = await page.screenshot({ clip, path: info.outputPath('negative-missing-marker.png') })
+  expect(compareImages(detail, negative).pass).toBe(false)
+  await marker.evaluate(el => el.removeAttribute('visibility'))
+  // Actual ship/outdoor frame transitions and reload preserve deployed mass.
+  for (const p of [[-6, 3], [-2, 3], [-2, 7]]) await walkTo(page, p, 'planet:fixture', true)
+  for (const p of [[0, 7], [0, 4.25]]) await walkTo(page, p, 'ship:scout', true)
+  await page.reload(); await page.clock.runFor(200)
+  const afterDeploymentReload = await saved(page)
+  expect(afterDeploymentReload.deployedMarkers).toHaveLength(1)
+  expect(afterDeploymentReload.deployedMarkers[0].name).toBe('Return beacon')
+  expect(afterDeploymentReload.inventory.items[MARKER_KIT_ID]).toBeUndefined()
+  expect(afterDeploymentReload.fabricator).toEqual(deployed.fabricator)
+  expect(errors).toEqual([])
+  await info.attach('marker-journey.json', { body: JSON.stringify({ beforeCancel, deployed, afterDeploymentReload, originalRepeat: compareImages(original, repeat).changedPixels, negative: compareImages(detail, negative).changedPixels, errors, policy: POLICY }, null, 2), contentType: 'application/json' })
   await info.attach('journey.json', { body: JSON.stringify({ started, interrupted, resumed, complete, claimed, restored, errors, input: 'Production keyboard/mouse; valid prior low-reserve expedition fixture; SVG CPU rasterization' }, null, 2), contentType: 'application/json' })
 })
 
@@ -175,4 +244,42 @@ for (const [width, height] of [[960, 600], [1280, 720], [1920, 1080]]) test(`FAB
   }
   const negative = compareImages(captures.empty!, captures.paused!); expect(negative.pass).toBe(false)
   await info.attach('comparisons.json', { body: JSON.stringify({ viewport: { width, height }, browser: page.context().browser()!.version(), policy: POLICY, results, cssNegatives, negative: { pass: negative.pass, changedPixels: negative.changedPixels }, baselineApproval: 'owner deployed-version visual review pending' }, null, 2), contentType: 'application/json' })
+})
+
+
+for (const [width, height] of [[960, 600], [1280, 720], [1920, 1080]]) test(`MARKER-879 confirmation, cancellation, stale save and repeat ${width}`, async ({ page }, info) => {
+  await page.setViewportSize({ width, height }); await seed(page, fixture('marker')); await boot(page, '', origin)
+  await page.keyboard.press('i')
+  const deploy = page.getByRole('button', { name: 'Deploy field marker', exact: true })
+  await deploy.click()
+  const dialog = page.getByRole('dialog', { name: 'Deploy field marker', exact: true })
+  await expect(dialog).toBeFocused()
+  await page.keyboard.press('Tab'); await expect(dialog.getByRole('textbox', { name: 'Marker name' })).toBeFocused()
+  await dialog.getByLabel('Marker name').fill('West supply')
+  const box = (await dialog.boundingBox())!
+  expect(box.x).toBeGreaterThanOrEqual(0); expect(box.y).toBeGreaterThanOrEqual(0)
+  expect(box.x + box.width).toBeLessThanOrEqual(width); expect(box.y + box.height).toBeLessThanOrEqual(height)
+  expect(await dialog.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(false)
+  await dialog.focus(); await page.mouse.move(0, 0)
+  const original = await dialog.screenshot({ path: info.outputPath('confirmation.png'), animations: 'disabled' })
+  const repeat = await dialog.screenshot({ path: info.outputPath('confirmation-repeat.png'), animations: 'disabled' })
+  expect(compareImages(original, repeat).pass).toBe(true)
+  const style = await page.addStyleTag({ content: '.ui-dialog--equipment { background: #ff00ff !important; }' })
+  const broken = await dialog.screenshot({ path: info.outputPath('negative-css.png'), animations: 'disabled' })
+  expect(compareImages(original, broken).pass).toBe(false)
+  await style.evaluate(el => el.parentNode?.removeChild(el))
+  const before = await saved(page)
+  await dialog.getByRole('button', { name: 'Cancel deployment' }).click()
+  expect((await saved(page)).inventory).toEqual(before.inventory)
+  expect((await saved(page)).deployedMarkers).toEqual([])
+  await expect(deploy).toBeFocused()
+  await deploy.click()
+  await page.evaluate(key => localStorage.setItem(key, localStorage.getItem(key)! + ' '), RESOURCE_SAVE_KEY)
+  const bytes = await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)
+  await dialog.getByRole('button', { name: 'Confirm deployment' }).click()
+  expect(await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)).toBe(bytes)
+  expect((await saved(page)).deployedMarkers).toEqual([])
+  expect((await saved(page)).inventory.items[MARKER_KIT_ID]).toBe(1)
+  await expect(page.getByLabel('Resource inventory')).toContainText('Saving failed')
+  await info.attach('marker-negative.json', { body: JSON.stringify({ width, before, after: await saved(page), repeat: compareImages(original, repeat).changedPixels, cssNegative: compareImages(original, broken).changedPixels, policy: POLICY }, null, 2), contentType: 'application/json' })
 })

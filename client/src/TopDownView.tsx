@@ -1,3 +1,4 @@
+import { MarkerDeployment } from './MarkerDeployment.tsx'
 import { ExplorationHud, FieldMarkCues } from './ExplorationHud.tsx'
 import { GeneratedGround } from './GeneratedGround.tsx'
 import { BOARDING_DOOR_ID } from './scoutDoor.ts'
@@ -307,6 +308,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
             const meta = resourceSession.itemCatalog[id]!
             return <li className="count-item" key={id} data-item={id}><span>{meta.name ?? id} × {count}</span><span>{count * meta.gramsPerItem / 1000} kg · {Math.ceil(count / meta.stackSize)} slots</span></li>
           })}</ul>
+          <MarkerDeployment session={resourceSession} blocked={paused.current || resourceSession.survival.health === 0 || !!resourceSession.error} onChange={() => setState({...current.current})} />
           {!Object.keys(resourceSession.snapshot.inventory.items).length && <p data-empty-items>No items carried.</p>}
           <p className="resource-note">{resourceSession.error || saveStatus}</p>
           <Button onClick={() => toggleInventory(false, true)}>Close inventory</Button>

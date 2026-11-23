@@ -1,14 +1,14 @@
 # Browser Core + Fabricator vertical slice — decision contract (E01 / #873, E03 / #875)
 
-**Status: Core processing, E05 Fabricator domain and E06 reachable console implemented (#878).** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. The E05 values below were approved separately; the marker use effect remains unapproved. A docs PR alone does not authorize the remaining runtime features.
+**Status: Core processing, E05 Fabricator domain and E06 reachable console implemented (#878).** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. The E05 values below were approved separately; E07 marker deployment is approved and implemented. A docs PR alone does not authorize the remaining runtime features.
 
 > **E02 Core-only approval (2026-11-22, #874):** The owner approved the proposed independent `scout:core:fuel` 50,000 g buffer, 2,000,000 J reserve cap, 500,000 J initial reserve for both new and v1–v13 migrated expeditions, biomass 2,000 J/g, mineral 500 J/g, 10,000 W maximum generation, and job draw before conversion in a future single-tick machine loop. Issue #874 ships only the durable fuel account, exact transfers and v14 Core state; it does **not** convert fuel, add UI, gate propulsion or settle Fabricator product/use decisions. The other E01 proposals and TBDs remain pending their respective implementation approvals. The historical v14 accumulator was strictly zero. E03 migrates it to exact 1/60-joule accounting in v15.
 
-> **E05 approval (2026-11-23, #877, active implementation chat):** The owner approved 1,000 g mineral → one 1,000 g field-marker kit (stack limit 1), 20 seconds at 5,000 W (100,000 J), one-item tray, no cancellation after start, and no offline progress. Kit use remains deferred. The independent input ID is `scout:fabricator:input`; reserved grams still occupy its 50,000 g capacity.
+> **E05 approval (2026-11-23, #877, active implementation chat):** The owner approved 1,000 g mineral → one 1,000 g field-marker kit (stack limit 1), 20 seconds at 5,000 W (100,000 J), one-item tray, no cancellation after start, and no offline progress. E07 implements the separately approved deployment rules below. The independent input ID is `scout:fabricator:input`; reserved grams still occupy its 50,000 g capacity.
 
 ## Ground truth / ownership
 
-This contract applies only to the active React/TypeScript single-player browser. The current `resourceSession.ts` publishes **schema v16** at `salimon:expedition:v1`, retains `landing-resources:v2`, and registers the trusted `field-marker-kit:v1` count item. The active sources expose `mineral` and `biomass` (the original authored source quantities are 60,000 g and 15,000 g). `resourceInventory.ts` validates integer-gram raw quantities and count items; `resourceLedger.ts` owns revision-bound, conserved raw transfers; `scoutResourceContainer.ts` provides the existing 50,000 g `scout:storage` store. The Core has a reachable console; the reachable Fabricator console provides input transfers, start, paid status and output claim.
+This contract applies only to the active React/TypeScript single-player browser. The current `resourceSession.ts` publishes **schema v17** at `salimon:expedition:v1`, retains `landing-resources:v2`, and registers the trusted `field-marker-kit:v1` count item. The active sources expose `mineral` and `biomass` (the original authored source quantities are 60,000 g and 15,000 g). `resourceInventory.ts` validates integer-gram raw quantities and count items; `resourceLedger.ts` owns revision-bound, conserved raw transfers; `scoutResourceContainer.ts` provides the existing 50,000 g `scout:storage` store. The Core has a reachable console; the reachable Fabricator console provides input transfers, start, paid status and output claim.
 
 All machines belong to `ship:scout` and are physically accessed at the existing `scout:core` anchor (1.9, 1.8 m) and `scout:fabricator` anchor (-1.85, 3.9 m) in `scoutLayout.ts`; use current nearby selection, same-scene reach, E/Use, keyboard/modal/Escape and focus ownership. They are **not remotely operable**. Exact equipment reach is **TBD: use an existing interaction policy only after checking collision and access in a browser fixture**; do not hardcode an unreviewed radius.
 
@@ -29,7 +29,7 @@ Every value labelled **P** is a concrete *proposal*, not a shipped or owner-appr
 | Core rounding | Each elapsed 1/60 s step accrues exactly 10,000/60 J in **integer sixtieths of a joule**; consume 1 g only if the whole gram's yield fits remaining reserve **and** accrued generation budget; carry fractional budget | E03 | No fractional-gram material creation or lost fractional ticks. Cap budget to one gram of the highest eligible yield when reserve is full, and never mint free joules. |
 | Reserve-full behavior | Pause conversion when no complete eligible gram fits the energy headroom; resume after draw | E03 | No input debit if energy cannot be credited atomically. |
 | Core idle draw | 0 W; no background drains or battery self-discharge | E03 | Makes a bounded and testable prototype. |
-| Fabricator job | `field-marker-kit:v1`: debit/reserve 1,000 g `mineral`, produce one count item of 1,000 g, stack limit 1 | E05 / **TBD use effect** | One real mass-bearing item and a single job; consuming it to create a field mark is a suggested use, but the existing exploration mark API is currently free. **Do not change mark gameplay until owner approves the use effect.** |
+| Fabricator job | `field-marker-kit:v1`: debit/reserve 1,000 g `mineral`, produce one count item of 1,000 g, stack limit 1 | E05 / E07 | One real mass-bearing item and a single job. E07 consumes the kit into a persistent outdoor marker; existing notebook observations stay free. |
 | Fabricator processing | 20 simulated seconds at 5,000 W, total 100,000 J | E05 | Duration * power equals energy cost; no free completion. |
 | Power allocation | Draw the whole consumer tick from reserve first, then convert fuel to replenish reserve; other machine draws are 0 W | E03 | One global tick, no alternating-order double spend; if available budget below requested draw, job makes **no progress** this step and no energy is debited for that step. |
 | Tray | 1 completed job, 1 item, 1,000 g total; one active job maximum | E05 | Full tray blocks starting another job until claim. Never auto-credit player inventory. |
@@ -45,7 +45,7 @@ Every value labelled **P** is a concrete *proposal*, not a shipped or owner-appr
 4. The Core has no user-set consumption reservation or batch queue. At each simulated step choose the highest-yield **eligible** material, tie-break lexicographically by stable ID; debit only a complete gram in the same state transition that credits exact energy. A gram in the conversion operation is no longer withdrawable. No hidden fractional material is consumed, and generation never exceeds the exact watt/energy limits. Recompute eligibility as energy headroom and buffer contents change.
 5. Explicit withdraw actions target **unreserved, unconverted** grams only; reject a request that includes Fabricator reserved grams or Core already converted grams. No machine-to-machine transfer in E01; route through player inventory after explicit retrieval/deposit. Reject simultaneous Start/withdraw/claim races via one revision.
 6. During work the Fabricator holds reserved grams, accrued progress ticks and spent joules. A power loss *pauses* job progress without resetting reservation or cumulative energy spent; restored power resumes. Closing panel, moving away, leaving ship, focus loss or tab unload cancels the **interaction UI**, not the already committed job. A terminal ship state cannot silently duplicate committed machine contents.
-7. **E05:** no cancel command once started; leave the job resumable. Failed start/progress/claim writes publish no partial transaction. **TBD before kit use is made usable:** whether a field marker kit consumes on creation of a mark, what happens to already free marks and how marker count is enforced at the existing mark API.
+7. **E05:** no cancel command once started; leave the job resumable. Failed start/progress/claim writes publish no partial transaction. E07 records each deployed kit separately from free notebook marks, and validates carried + deployed kit count against claimed outputs.
 
 ### Tick, power and persistence invariants
 
@@ -76,7 +76,7 @@ No real propulsion fuel or ship/scanner power gating; no new planetary resources
 
 ## Decision gate and dependencies
 
-**Remaining decisions** concern the kit use effect. The E05 approval settles recipe, duration, energy, tray and no-cancel behavior. Settle the field marker effect and existing free marks before changing field-mark gameplay. Review design against [active resource contract](resource-inventory-and-gathering.md), [browser status](current-client-status.md), [save continuity](save-contract.md) and [flight contract](browser-launch-landing.md).
+**E07 approval (2026-11-23, active implementation chat):** The owner approved deploying one carried kit at the current outdoor position into a persistent visible marker with local direction/range guidance, preserving free notebook marks and free marker renaming, with no reclaim. Failed, cancelled or stale actions consume nothing; scene changes and reload preserve deployment. Guidance is bounded to 384 m on the same surface; up to 256 deployed markers are retained independently of the 256 notebook observations. Review design against [active resource contract](resource-inventory-and-gathering.md), [browser status](current-client-status.md), [save continuity](save-contract.md) and [flight contract](browser-launch-landing.md).
 
 #873 established the E01 design contract. Scope beyond the E02 approval follows the remaining decisions above. Existing #783–#788 and #838–#845 / #847–#854 are prior foundations, not evidence of delivered Core/Fabricator behavior.
 
@@ -150,8 +150,7 @@ the job. Power loss keeps inputs reserved and pauses progress; closing a panel o
 changing view cannot cancel the committed job. Completion turns the reservation
 into one tray item atomically. A full tray blocks another start. Claim requires
 exact carrying mass and stack slots, the current revision and matching tray job ID.
-The kit has no use/removal command yet; generic item grants/removals cannot bypass
-its manufacture/claim accounting.
+The E07 `deployMarker` command is the sole kit removal path; generic item grants/removals cannot bypass manufacture/claim/deployment accounting.
 
 Schema v16 retains the storage key and resource catalog version. v1–v15 migrate
 with empty input/job/tray/receipts and trusted kit metadata, preserving original
@@ -187,4 +186,24 @@ See [controls and validation](../client/README.md#reachable-fabricator-console-8
 `tests/fabricator-console.spec.ts` owns the actual-control mine/storage/fuel/start/
 power-loss/refuel/claim/reload loop, negative transactions/focus and fixed-policy
 repeat captures at 960/1280/1920. Evidence remains in ignored output and existing
-CI artifacts; the PR records the same-session review. Kit use remains deferred.
+CI artifacts; the PR records the same-session review. E07 implements the separately approved deployment rules below.
+
+
+## E07 usable field marker (#879)
+
+`fieldMarker.ts` validates durable surface deployment records and bounded local
+guidance. `ResourceSession.deployMarker` requires outdoor world authority, a living
+character able to work, a carried kit, current revision and the reviewed position.
+It atomically removes one kit and adds one immutable-position deployment record.
+Duplicate positions, full 256-marker capacity, malformed names and failed/stale
+saves publish nothing. The ledger enforces **claimed = carried + deployed**;
+manufactured mineral is counted once and deployed kits are outside ship payload.
+No remote placement, reclaim, equip slot, offline work or propulsion change.
+
+`MarkerDeployment.tsx` exposes the inventory action and explicit confirmation;
+Escape, cancel, blur, blocked authority or changed position/kit count discards the
+review. Ordinary foreground time continues. The field notebook provides free
+renaming and guidance selection; HUD direction/range only appears on the same
+surface within 384 m. A flag glyph distinguishes kits from free observation cues.
+Schema v17 requires validated deployment records; v1–v16 migrate with none and
+retain original bytes until successful commit. See the [gameplay guide](../client/README.md#deploy-a-fabricated-field-marker-879).

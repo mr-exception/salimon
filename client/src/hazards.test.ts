@@ -117,7 +117,7 @@ test('HAZ-4 v6 migration preserves existing health/ledger and malformed v7 saves
   const storage = { getItem: () => raw, setItem: (_: string, v: string) => { raw = v } }, world = createTopDownState('exterior', true)
   const session = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   session.upgrade(10000, 12)
-  const old = JSON.parse(raw!); old.version = 6; delete old.fabricator; if (old.stores) delete old.stores['scout:fabricator:input']; if (old.itemDefinitions) delete old.itemDefinitions['field-marker-kit:v1']; delete old.convertedGrams; delete old.core; delete old.stores[SCOUT_CORE_FUEL_ID]; delete old.journal; delete old.sites; delete old.scout; delete old.miningWork; delete old.hazards; old.survival.health = 167
+  const old = JSON.parse(raw!); old.version = 6; delete old.fabricator; delete old.deployedMarkers; if (old.stores) delete old.stores['scout:fabricator:input']; if (old.itemDefinitions) delete old.itemDefinitions['field-marker-kit:v1']; delete old.convertedGrams; delete old.core; delete old.stores[SCOUT_CORE_FUEL_ID]; delete old.journal; delete old.sites; delete old.scout; delete old.miningWork; delete old.hazards; old.survival.health = 167
   raw = JSON.stringify(old)
   const migrated = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   assert.equal(migrated.survival.health, 167); assert.deepEqual(migrated.hazards, freshHazards()); assert.deepEqual(migrated.snapshot.inventory, old.inventory)

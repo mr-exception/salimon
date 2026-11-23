@@ -1,3 +1,4 @@
+import { validateDeployedMarkers } from './fieldMarker.ts'
 import { FABRICATOR_INPUT_ID, FABRICATOR_RECIPE_ID, FABRICATOR_GRAMS, FABRICATOR_TICKS, FABRICATOR_WATTS, FABRICATOR_ITEMS, MARKER_KIT_ID, freshFabricator, validateFabricator, fabricatorSpentJ60, stepFabricator, type FabricatorState } from './scoutFabricator.ts'
 import { emptyJournal, recordVisit, validateJournal, type ExpeditionJournal } from './expeditionJournal.ts'
 import { createFieldMark, recordFieldMark, updateWalkingFix, type WalkingFix, type FieldMark } from './exploration.ts'
@@ -35,7 +36,7 @@ export const RESOURCE_CATALOG = {
   mineral: { name: 'Banded mineral' },
   biomass: { name: 'Plate biomass' },
 } as const
-// Trusted E05 output; its use effect is deferred.
+// Trusted manufactured starter item; deployment is an atomic E07 transaction.
 export const ITEM_CATALOG = registerCountItems(FABRICATOR_ITEMS)
 export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:mineral:01': { id: 'source:landing:mineral:01', resourceId: 'mineral', remainingGrams: 60_000 },
@@ -43,7 +44,8 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
 }
 export interface ResourceSave extends ResourceLedger {
   readonly depositPublication: typeof DEPOSIT_PUBLICATION
-  readonly version: 16
+  readonly version: 17
+  readonly deployedMarkers: readonly FieldMark[]
   readonly fabricator: FabricatorState
   readonly convertedGrams: Readonly<Record<string, number>>
   readonly core: CoreEnergyState
@@ -159,7 +161,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
   const version = data.version
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 16) throw new Error('Unsupported save version')
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 17) throw new Error('Unsupported save version')
   const legacy = version === 1
   const hasStores = version >= 3
   const hasItems = version >= 5
@@ -170,7 +172,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const hasSites = version >= 11
   const hasJournal = version >= 13
   const hasCore = version >= 14
-  const allowed = [...(version >= 16 ? ['fabricator'] : []), ...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const allowed = [...(version >= 17 ? ['deployedMarkers'] : []), ...(version >= 16 ? ['fabricator'] : []), ...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
   if (data.catalogVersion !== (legacy ? LEGACY_CATALOG_VERSION : RESOURCE_CATALOG_VERSION) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
@@ -249,7 +251,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
   const core = version >= 15 ? validateCoreEnergy(data.core) : hasCore ? migrateCoreEnergy(data.core) : freshCoreEnergy()
-  const save: ResourceSave = { version: 16, fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 17, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
   validateCoreConservation(save.core, save.convertedGrams)
   if (BigInt(fabricatorSpentJ60(save.fabricator)) + BigInt(save.fabricator.otherSpentJ60) !== BigInt(save.core.spentJ60)) throw Error('Unpaid Fabricator work')
@@ -286,6 +288,40 @@ export class ResourceSession {
     } catch (error) { this.feedback = (error as Error).message; return false }
   }
 
+  markerDeploymentDenial(): string | null {
+    if (this.error) return this.error
+    if (!survivalPolicy(this.survival).canWork || this.world.scoutLocation.ship.mode === 'destroyed') return 'Marker deployment requires a living expedition able to work.'
+    if (this.world.cockpit.view !== 'world' || this.world.player.mode === 'seated') return 'Leave the cockpit before deploying.'
+    try {
+      const mark = createFieldMark(this.world, '', '')
+      if (this.snapshot.deployedMarkers.some(m => m.id === mark.id)) return 'A marker is already deployed here.'
+      if (this.snapshot.deployedMarkers.length >= 256) return 'Deployed marker capacity full (256).'
+      if (!(this.snapshot.inventory.items[MARKER_KIT_ID] ?? 0)) return 'Carry a fabricated field marker kit first.'
+      return null
+    } catch { return 'Deploy only at your current outdoor position.' }
+  }
+  deployMarker(name: string, revision: number, positionId: string): boolean {
+    try {
+      if (this.markerDeploymentDenial()) throw Error(this.markerDeploymentDenial()!)
+      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw Error('Stale marker revision')
+      const mark = createFieldMark(this.world, name || 'Field marker', '')
+      if (mark.id !== positionId) throw Error('Deployment position changed; review again.')
+      const inventory = removeCountItem(this.snapshot.inventory, MARKER_KIT_ID, 1, RESOURCE_CATALOG, this.itemCatalog)
+      if (!this.commit({ ...this.snapshot, inventory, deployedMarkers: [...this.snapshot.deployedMarkers, mark] })) return false
+      this.feedback = 'Field marker deployed. One kit placed on the surface.'
+      return true
+    } catch (error) { this.feedback = (error as Error).message; return false }
+  }
+  renameMarker(id: string, name: string, revision: number): boolean {
+    if (this.error || this.survival.health === 0) return false
+    try {
+      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw Error('Stale marker revision')
+      if (typeof name !== 'string' || !name.trim() || name.length > 48 || /[\u0000-\u001f]/.test(name)) throw Error('Use a marker name of 1–48 characters.')
+      if (!this.snapshot.deployedMarkers.some(m => m.id === id)) throw Error('Unknown deployed marker')
+      return this.commit({ ...this.snapshot, deployedMarkers: this.snapshot.deployedMarkers.map(m => m.id === id ? { ...m, name: name.trim() } : m) })
+    } catch (error) { this.feedback = (error as Error).message; return false }
+  }
+
   world: TopDownState
   snapshot: ResourceSave
   survival: SurvivalState
@@ -311,7 +347,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 16, fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 17, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)

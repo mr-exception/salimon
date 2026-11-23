@@ -1,5 +1,14 @@
 # Feature maintenance map
 
+Usable field markers (#879): `fieldMarker.ts` validates durable deployment and
+bounded local guidance; `resourceSession.ts` owns atomic kit removal/placement and
+v17 migration, and `resourceLedger.ts` conserves claimed = carried + deployed.
+`MarkerDeployment.tsx` owns inventory review/cancel and `ExplorationHud.tsx` owns
+flag projection, free rename and guidance selection. `fieldMarker.test.ts` covers
+save/authority/receipts; `tests/fabricator-console.spec.ts` extends the built
+mine-to-fabrication journey through deployment, guidance, negative/repeat captures
+and reload. Evidence stays in ignored test output and CI artifacts.
+
 Browser Fabricator console (#878): `ResourceContainerInteraction.ts` shares
 reachable admission, draft transfers and cancellation across storage/Core/input,
 then invokes `ResourceSession` start/claim. `ResourceContainerPanel.tsx` reads

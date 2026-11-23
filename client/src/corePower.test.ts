@@ -149,7 +149,7 @@ test('atomic failed write/crash/retry, stale writer and invalid saved consumed/e
 test('v14 migration preserves original bytes, initial reserve and raw mass', () => {
   const { storage, s } = fuelSession()
   const legacy = JSON.parse(storage.raw!)
-  legacy.version = 14; delete legacy.fabricator; delete legacy.stores['scout:fabricator:input']; delete legacy.itemDefinitions['field-marker-kit:v1']; delete legacy.convertedGrams
+  legacy.version = 14; delete legacy.fabricator; delete legacy.deployedMarkers; delete legacy.stores['scout:fabricator:input']; delete legacy.itemDefinitions['field-marker-kit:v1']; delete legacy.convertedGrams
   legacy.core = { capacityJ: CORE_CAPACITY_J, reserveJ: CORE_INITIAL_RESERVE_J, conversionBudgetMicroJ: 0 }
   storage.raw = JSON.stringify(legacy)
   const bytes = storage.raw, migrated = open(storage)
@@ -158,7 +158,7 @@ test('v14 migration preserves original bytes, initial reserve and raw mass', () 
   assert.deepEqual(migrated.snapshot.core, freshCoreEnergy())
   assert.equal(migrated.payload().shipGrams, s.payload().shipGrams)
   advance(migrated, 3)
-  assert.equal(JSON.parse(storage.getItem(RESOURCE_SAVE_KEY)!).version, 16)
+  assert.equal(JSON.parse(storage.getItem(RESOURCE_SAVE_KEY)!).version, 17)
   assert.equal(migrated.snapshot.convertedGrams.mineral, 1)
 })
 

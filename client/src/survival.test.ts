@@ -131,7 +131,7 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   const world = createTopDownState('exterior', true)
   const old = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   old.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 333 })
-  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.fabricator; if (v5.stores) delete v5.stores['scout:fabricator:input']; if (v5.itemDefinitions) delete v5.itemDefinitions['field-marker-kit:v1']; delete v5.convertedGrams; delete v5.core; delete v5.journal; delete v5.survival; delete v5.miningWork; delete v5.sites; delete v5.scout; delete v5.hazards
+  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.fabricator; delete v5.deployedMarkers; if (v5.stores) delete v5.stores['scout:fabricator:input']; if (v5.itemDefinitions) delete v5.itemDefinitions['field-marker-kit:v1']; delete v5.convertedGrams; delete v5.core; delete v5.journal; delete v5.survival; delete v5.miningWork; delete v5.sites; delete v5.scout; delete v5.hazards
   const { [SCOUT_CORE_FUEL_ID]: emptyCore, ...oldStores } = v5.stores
   v5.stores = oldStores
   raw = JSON.stringify(v5); const bytes = raw
@@ -142,7 +142,7 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   assert.deepEqual(migrated.snapshot.sources, v5.sources)
   assert.deepEqual(migrated.snapshot.stores, { ...v5.stores, [SCOUT_CORE_FUEL_ID]: emptyCore, 'scout:fabricator:input': { id: 'scout:fabricator:input', shipId: 'ship:scout', capacityGrams: 50000, quantities: {} } })
   migrated.advance(stepTopDown(migrated.world, [0, 0])); migrated.checkpoint()
-  assert.equal(JSON.parse(raw!).version, 16)
+  assert.equal(JSON.parse(raw!).version, 17)
   assert.equal(new ResourceSession(storage, world, undefined, undefined, () => 21_601_000).survival.activeTicks, 1)
 })
 

@@ -1,3 +1,4 @@
+import type { FieldMark } from './exploration.ts'
 import { validateFabricator, FABRICATOR_INPUT_ID, FABRICATOR_GRAMS, MARKER_KIT_ID, type FabricatorState } from './scoutFabricator.ts'
 import { addResource, removeResource, resourceInventoryUsage, type CountItemCatalog, type ResourceCatalog, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
 
@@ -9,6 +10,7 @@ export interface ResourceStore extends ResourceStoreDefinition {
   readonly quantities: Readonly<Record<string, number>>
 }
 export interface ResourceLedger {
+  readonly deployedMarkers?: readonly FieldMark[]
   readonly fabricator?: FabricatorState
   /** Raw grams irreversibly transformed to Core energy; never physical payload. */
   readonly convertedGrams?: Readonly<Record<string, number>>
@@ -99,7 +101,8 @@ export function validateResourceLedger(
   if (ledger.fabricator !== undefined) {
     const f = validateFabricator(ledger.fabricator)
     credit(totals, 'mineral', (f.completed + (f.job ? 1 : 0)) * FABRICATOR_GRAMS)
-    if ((ledger.inventory.items[MARKER_KIT_ID] ?? 0) !== f.claimed) throw Error('Fabricator item conservation failed')
+    if (ledger.deployedMarkers !== undefined && (!Array.isArray(ledger.deployedMarkers) || ledger.deployedMarkers.length > 256)) throw Error('Invalid deployed marker receipts')
+    if ((ledger.inventory.items[MARKER_KIT_ID] ?? 0) + (ledger.deployedMarkers?.length ?? 0) !== f.claimed) throw Error('Fabricator item conservation failed')
     const input = ledger.stores[FABRICATOR_INPUT_ID]
     if ((f.started || input) && (!input || resourceStoreMass(input, resources) + (f.job?.reservedGrams ?? 0) > input.capacityGrams)) throw Error('Fabricator reservation exceeds buffer')
   }
@@ -147,7 +150,7 @@ export function transferResource(
     if (origin.resourceId !== id || grams > origin.remainingGrams) throw new RangeError('Insufficient or mismatched source material')
     nextSources = { ...nextSources, [from]: { ...origin, remainingGrams: origin.remainingGrams - grams } }
   }
-  const next = { ...(ledger.fabricator === undefined ? {} : { fabricator: ledger.fabricator }), ...(ledger.convertedGrams === undefined ? {} : { convertedGrams: ledger.convertedGrams }), revision: integer(ledger.revision + 1), inventory, stores: nextStores, sources: nextSources }
+  const next = { ...(ledger.deployedMarkers === undefined ? {} : { deployedMarkers: ledger.deployedMarkers }), ...(ledger.fabricator === undefined ? {} : { fabricator: ledger.fabricator }), ...(ledger.convertedGrams === undefined ? {} : { convertedGrams: ledger.convertedGrams }), revision: integer(ledger.revision + 1), inventory, stores: nextStores, sources: nextSources }
   validateResourceLedger(next, sources, stores, resources, items)
   return next
 }

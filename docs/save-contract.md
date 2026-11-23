@@ -828,5 +828,20 @@ state; `resourceLedger.ts` accounts for reserved/transformed mineral and exact
 physical output mass, and `resourceSession.ts` owns revision-bound start/claim,
 Core-paid progress on the existing world clock and schema v16 migration from
 v1–v15. No offline work or post-start cancellation; failed writes preserve the
-previous snapshot. The kit has no approved use effect. The reachable Fabricator
+previous snapshot. E07 adds approved deployment below. The reachable Fabricator
 console is #878. See [the E05 contract](browser-core-fabricator-vertical-slice.md) for numbers, validation and boundaries.
+
+
+## Browser deployed field markers (#879)
+
+Schema v17 retains the key/catalog and migrates v1–v16 with an empty
+`deployedMarkers` list, preserving original bytes until a successful commit.
+Every entry binds a unique physical surface position and visited publication,
+validated name and immutable position; capacity is 256. Free notebook marks remain
+separate. The ledger requires claimed kits = carried kits + deployed markers.
+Kit removal and surface deployment share one revision-bound storage replacement;
+failed/stale writes preserve inventory and records. Deployed mass no longer
+contributes to carried/ship payload. Renaming is free; no delete/reclaim route.
+Malformed positions, duplicate records, unknown bodies/publications, missing v17
+records and count mismatches fail closed. Guidance selection is session-local;
+the actual markers survive views, region eviction and reload.

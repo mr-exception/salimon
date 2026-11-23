@@ -120,9 +120,9 @@ test('v9 grounded/airborne migration is explicit; malformed v10 door and embedde
  for(const airborne of [false,true]) {
   const {session:s,storage,seat,action}=setup();s.toggleBoardingDoor(s.snapshot.revision)
   if(airborne){seat();action()}
-  const data=JSON.parse(storage.getItem()!);data.version=9; delete data.fabricator; if (data.stores) delete data.stores['scout:fabricator:input']; if (data.itemDefinitions) delete data.itemDefinitions['field-marker-kit:v1']; delete data.convertedGrams; delete data.core; delete data.stores[SCOUT_CORE_FUEL_ID]; delete data.journal;delete data.sites;delete data.scout.surface;delete data.scout.boardingDoor
+  const data=JSON.parse(storage.getItem()!);data.version=9; delete data.fabricator; delete data.deployedMarkers; if (data.stores) delete data.stores['scout:fabricator:input']; if (data.itemDefinitions) delete data.itemDefinitions['field-marker-kit:v1']; delete data.convertedGrams; delete data.core; delete data.stores[SCOUT_CORE_FUEL_ID]; delete data.journal;delete data.sites;delete data.scout.surface;delete data.scout.boardingDoor
   const migrated=decodeResourceSave(JSON.stringify(data),createTopDownState())
-  assert.equal(migrated.version,16);assert.equal(migrated.scout.boardingDoor,airborne?'closed':'open')
+  assert.equal(migrated.version,17);assert.equal(migrated.scout.boardingDoor,airborne?'closed':'open')
  }
  const {session:s,storage}=setup();s.toggleBoardingDoor(s.snapshot.revision)
  const raw=JSON.parse(storage.getItem()!)
@@ -135,7 +135,7 @@ test('v9 grounded/airborne migration is explicit; malformed v10 door and embedde
  const {session:flight,seat,action,storage:flightStorage}=setup();flight.toggleBoardingDoor(0);seat();action()
  const openFlight=JSON.parse(flightStorage.getItem()!);openFlight.scout.boardingDoor='open'
  assert.throws(()=>decodeResourceSave(JSON.stringify(openFlight),createTopDownState()),/Open airborne boarding door/)
- const forgedLegacy=structuredClone(raw);forgedLegacy.version=9; delete forgedLegacy.fabricator; if (forgedLegacy.stores) delete forgedLegacy.stores['scout:fabricator:input']; if (forgedLegacy.itemDefinitions) delete forgedLegacy.itemDefinitions['field-marker-kit:v1']; delete forgedLegacy.convertedGrams; delete forgedLegacy.core; delete forgedLegacy.stores[SCOUT_CORE_FUEL_ID]; delete forgedLegacy.journal;delete forgedLegacy.sites
+ const forgedLegacy=structuredClone(raw);forgedLegacy.version=9; delete forgedLegacy.fabricator; delete forgedLegacy.deployedMarkers; if (forgedLegacy.stores) delete forgedLegacy.stores['scout:fabricator:input']; if (forgedLegacy.itemDefinitions) delete forgedLegacy.itemDefinitions['field-marker-kit:v1']; delete forgedLegacy.convertedGrams; delete forgedLegacy.core; delete forgedLegacy.stores[SCOUT_CORE_FUEL_ID]; delete forgedLegacy.journal;delete forgedLegacy.sites
  assert.throws(()=>decodeResourceSave(JSON.stringify(forgedLegacy),createTopDownState()),/Invalid Scout snapshot/)
  assert.throws(()=>transitionScout({...flight.world.scoutLocation,boardingDoor:'open',ship:{...flight.world.scoutLocation.ship,mode:'grounded'}},{kind:'begin-takeoff'}))
 })

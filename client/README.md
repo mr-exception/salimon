@@ -1199,7 +1199,7 @@ console is delivered in #878. See [the E05 contract](../docs/browser-core-fabric
 Walk into the aft cargo room beside the port Fabricator and press **E**, or click
 **Use Fabricator**. The shared industrial dialog shows the selected trusted field
 marker recipe: **1,000 g mineral → one 1,000 g kit**, one slot, **20 simulated
-seconds at 5,000 W / 100,000 J**. The kit use effect remains deferred.
+seconds at 5,000 W / 100,000 J**. The kit can be deployed as described below.
 
 Choose raw material and whole grams, **Review deposit/withdrawal**, then confirm.
 The independent **50 kg input buffer** includes reserved job grams; the table
@@ -1231,3 +1231,39 @@ Original/repeat/diff/state artifacts use ignored `test-results/`; comparisons us
 the shared fixed zero-changed-pixel policy, with a mismatched-state negative.
 The owner retains deployed-version visual review. CI artifacts retain 14 days;
 the PR holds the validation record, with no new committed evidence reports.
+
+
+## Deploy a fabricated field marker (#879)
+
+Mine mineral, deposit 1,000 g in the Fabricator, start its paid 20-second job and
+claim the 1 kg kit. Walk outdoors, open **Field inventory (I)**, choose **Deploy
+field marker**, enter a name and **Confirm deployment**. One kit moves from your
+carried inventory into a permanent surface marker; it frees 1 kg and one slot.
+A flag cue shows its physical location. No reclaim or equip slot is provided.
+Cancel, Escape or window blur discards confirmation without spending a kit.
+Moving, losing authority or changing the reviewed kit count also cancels it.
+The world continues while reviewing; typing captures walking shortcuts.
+
+Open the **Field notebook (M)**, select **Guide to [name]**, then close it to see
+local HUD direction and range. Guidance works only outdoors on the same surface
+within **384 m**; it supplies no global map, scanner discovery or autopilot.
+Use the notebook Name field and **Rename [name]** to rename a deployed marker for
+free. Existing notebook location marks/landmark observations remain free and
+independent. Up to **256 deployed markers** and 256 notebook marks are retained.
+
+Placement is an atomic revision-bound save: claimed kits must equal carried plus
+deployed kits. Duplicate positions, malformed names, full deployment capacity,
+stale/concurrent saves and storage failures cannot consume or duplicate a kit.
+Schema v17 preserves earlier expeditions and claimed kits, migrating v1–v16 with
+no fabricated deployment records. Markers survive scene changes and reload;
+select guidance again after reload.
+
+Checks: `node --experimental-strip-types --test src/fieldMarker.test.ts`,
+`npm test`, `npm run build`, and `CHROMIUM_PATH=/usr/bin/chromium npx playwright
+test --project=cockpit tests/fabricator-console.spec.ts --grep 'FAB-UI-1|MARKER-879'`.
+The production keyboard/mouse journey mines, stores, fuels, fabricates, survives
+power loss, claims, deploys, renames, follows guidance, enters the ship and reloads.
+Confirmation tests cover cancellation/stale saves/focus and 960/1280/1920 captures;
+fixed-policy repeat and missing-marker/CSS negative comparisons retain originals,
+traces and canonical state in ignored `test-results/` and existing 14-day CI
+artifacts. No changed approved baseline is implied; owner visual review remains.

@@ -6,7 +6,7 @@ import type { Entity2D } from './topDownRuntime.ts'
 const prop = (id: string, x: number, y: number, appearance: Entity2D['appearance'], halfWidth: number, halfHeight: number, label?: string, reachM = 1.9): Entity2D => ({
   id, anchor: { frame: 'ship:scout', point: point2(x, y) }, layer: 'props', appearance,
   footprint: { halfWidth, halfHeight },
-  ...(label ? { interaction: { label, action: 'Inspect', reachM } } : {}),
+  ...(label ? { interaction: { label, action: id === 'scout:fabricator' || id === 'scout:core' ? 'Use' : 'Inspect', reachM } } : {}),
 })
 export const SCOUT_ANCHORS: Readonly<Record<string, Anchor>> = {
   cockpit: { frame: 'ship:scout', point: point2(0, -5) },

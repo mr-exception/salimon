@@ -182,7 +182,7 @@ swap is used. Explicit line metrics keep the desktop SVG viewport on the device-
 The world viewport and translucent caption use rectangular pixel-aligned edges;
 curved ancestor clipping otherwise varies at compositor/capture boundaries. `scoutLayout.ts` owns ship-local named anchors, shared collision/
 visual footprints and storage capacity metadata; Core/Fabricator interactions
-inspect placeholders. The Resource Container opens its transfer panel in the default game.
+open reachable industrial consoles. The Resource Container opens its transfer panel in the default game.
 
 `/?scene=top-down&view=exterior` starts a fresh development world outside the
 Scout to inspect its always-visible interior. The default fixture starts outdoors;
@@ -236,7 +236,7 @@ both source archetypes, continuous doorway/camera handoffs, actual radar control
 standing return and walking back outside, twice in fresh browser contexts.
 Original screenshots and raw frame/source measurements are retained in the issue report.
 This proves foundation playability. #757 adds gathering and local saves below;
-Core processing, Fabricator, multiplayer and localized damage remain future features; whole-ship destructive flight collision is delivered.
+Marker-kit use, multiplayer and localized damage remain future features; whole-ship destructive flight collision is delivered.
 
 ## Gathering and saved expeditions (#757)
 
@@ -1191,4 +1191,43 @@ physical output mass, and `resourceSession.ts` owns revision-bound start/claim,
 Core-paid progress on the existing world clock and schema v16 migration from
 v1–v15. No offline work or post-start cancellation; failed writes preserve the
 previous snapshot. The kit has no approved use effect. The reachable Fabricator
-console is #878. See [the E05 contract](../docs/browser-core-fabricator-vertical-slice.md) for numbers, validation and boundaries.
+console is delivered in #878. See [the E05 contract](../docs/browser-core-fabricator-vertical-slice.md) for numbers, validation and boundaries.
+
+
+### Reachable Fabricator console (#878)
+
+Walk into the aft cargo room beside the port Fabricator and press **E**, or click
+**Use Fabricator**. The shared industrial dialog shows the selected trusted field
+marker recipe: **1,000 g mineral → one 1,000 g kit**, one slot, **20 simulated
+seconds at 5,000 W / 100,000 J**. The kit use effect remains deferred.
+
+Choose raw material and whole grams, **Review deposit/withdrawal**, then confirm.
+The independent **50 kg input buffer** includes reserved job grams; the table
+shows only unreserved grams available for withdrawal. Start requires the exact
+recipe ingredients and an empty job/tray. **Start fabrication** reserves once;
+there is one active job and no post-start cancellation. The live job shows
+remaining ticks/seconds, reserved grams, real Core reserve and committed draw.
+Power exhaustion pauses work; carry fuel to the Core console to resume.
+
+Completion leaves one item on the **output tray**. **Claim output** deliberately
+moves it to carried inventory using the existing count-item transaction. A full
+weight/slot rejection keeps the tray intact and explains the missing capacity.
+Free capacity through storage/input transfers and retry. Claims save immediately.
+**Escape**, window blur, focus leaving the dialog or loss of reach discards pending
+transfers; committed jobs/trays remain. Typing in the dialog captures walking
+shortcuts. The world continues while the console is open; pause/hidden tabs stop
+the clock, and closed tabs make no fabrication progress. Reload restores the job,
+tray and claimed item without a second output grant.
+
+Built-production acceptance: `CHROMIUM_PATH=/usr/bin/chromium npx playwright test
+--project=cockpit tests/fabricator-console.spec.ts` (omit the environment variable
+for Playwright Chromium). The journey starts with a valid prior low-reserve
+expedition, then uses actual keyboard/mouse controls for mine → carry → ship
+storage → Core fuel → input → start → natural power loss → refuel → claim →
+reload. State fixtures supplement that journey with blocked/ready/powered/paused/
+complete/full-cargo states, rejected amounts/reserved withdrawals/claims, stale
+save failures, focus/Escape and 960/1280/1920 DPR-1 reduced-motion captures.
+Original/repeat/diff/state artifacts use ignored `test-results/`; comparisons use
+the shared fixed zero-changed-pixel policy, with a mismatched-state negative.
+The owner retains deployed-version visual review. CI artifacts retain 14 days;
+the PR holds the validation record, with no new committed evidence reports.

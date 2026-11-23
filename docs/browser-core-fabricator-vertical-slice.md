@@ -1,6 +1,6 @@
 # Browser Core + Fabricator vertical slice — decision contract (E01 / #873, E03 / #875)
 
-**Status: Core processing and E05 Fabricator domain implemented; Fabricator console remains E06 (#878).** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. The E05 values below were approved separately; the marker use effect remains unapproved. A docs PR alone does not authorize the remaining runtime features.
+**Status: Core processing, E05 Fabricator domain and E06 reachable console implemented (#878).** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. The E05 values below were approved separately; the marker use effect remains unapproved. A docs PR alone does not authorize the remaining runtime features.
 
 > **E02 Core-only approval (2026-11-22, #874):** The owner approved the proposed independent `scout:core:fuel` 50,000 g buffer, 2,000,000 J reserve cap, 500,000 J initial reserve for both new and v1–v13 migrated expeditions, biomass 2,000 J/g, mineral 500 J/g, 10,000 W maximum generation, and job draw before conversion in a future single-tick machine loop. Issue #874 ships only the durable fuel account, exact transfers and v14 Core state; it does **not** convert fuel, add UI, gate propulsion or settle Fabricator product/use decisions. The other E01 proposals and TBDs remain pending their respective implementation approvals. The historical v14 accumulator was strictly zero. E03 migrates it to exact 1/60-joule accounting in v15.
 
@@ -8,7 +8,7 @@
 
 ## Ground truth / ownership
 
-This contract applies only to the active React/TypeScript single-player browser. The current `resourceSession.ts` publishes **schema v16** at `salimon:expedition:v1`, retains `landing-resources:v2`, and registers the trusted `field-marker-kit:v1` count item. The active sources expose `mineral` and `biomass` (the original authored source quantities are 60,000 g and 15,000 g). `resourceInventory.ts` validates integer-gram raw quantities and count items; `resourceLedger.ts` owns revision-bound, conserved raw transfers; `scoutResourceContainer.ts` provides the existing 50,000 g `scout:storage` store. The Core has a reachable console; Fabricator graphics remain inspection-only until E06.
+This contract applies only to the active React/TypeScript single-player browser. The current `resourceSession.ts` publishes **schema v16** at `salimon:expedition:v1`, retains `landing-resources:v2`, and registers the trusted `field-marker-kit:v1` count item. The active sources expose `mineral` and `biomass` (the original authored source quantities are 60,000 g and 15,000 g). `resourceInventory.ts` validates integer-gram raw quantities and count items; `resourceLedger.ts` owns revision-bound, conserved raw transfers; `scoutResourceContainer.ts` provides the existing 50,000 g `scout:storage` store. The Core has a reachable console; the reachable Fabricator console provides input transfers, start, paid status and output claim.
 
 All machines belong to `ship:scout` and are physically accessed at the existing `scout:core` anchor (1.9, 1.8 m) and `scout:fabricator` anchor (-1.85, 3.9 m) in `scoutLayout.ts`; use current nearby selection, same-scene reach, E/Use, keyboard/modal/Escape and focus ownership. They are **not remotely operable**. Exact equipment reach is **TBD: use an existing interaction policy only after checking collision and access in a browser fixture**; do not hardcode an unreviewed radius.
 
@@ -45,7 +45,7 @@ Every value labelled **P** is a concrete *proposal*, not a shipped or owner-appr
 4. The Core has no user-set consumption reservation or batch queue. At each simulated step choose the highest-yield **eligible** material, tie-break lexicographically by stable ID; debit only a complete gram in the same state transition that credits exact energy. A gram in the conversion operation is no longer withdrawable. No hidden fractional material is consumed, and generation never exceeds the exact watt/energy limits. Recompute eligibility as energy headroom and buffer contents change.
 5. Explicit withdraw actions target **unreserved, unconverted** grams only; reject a request that includes Fabricator reserved grams or Core already converted grams. No machine-to-machine transfer in E01; route through player inventory after explicit retrieval/deposit. Reject simultaneous Start/withdraw/claim races via one revision.
 6. During work the Fabricator holds reserved grams, accrued progress ticks and spent joules. A power loss *pauses* job progress without resetting reservation or cumulative energy spent; restored power resumes. Closing panel, moving away, leaving ship, focus loss or tab unload cancels the **interaction UI**, not the already committed job. A terminal ship state cannot silently duplicate committed machine contents.
-7. **E05:** no cancel command once started; leave the job resumable. Failed start/progress/claim writes publish no partial transaction. **TBD before crafting is made usable:** whether a field marker kit consumes on creation of a mark, what happens to already free marks and how marker count is enforced at the existing mark API.
+7. **E05:** no cancel command once started; leave the job resumable. Failed start/progress/claim writes publish no partial transaction. **TBD before kit use is made usable:** whether a field marker kit consumes on creation of a mark, what happens to already free marks and how marker count is enforced at the existing mark API.
 
 ### Tick, power and persistence invariants
 
@@ -141,8 +141,8 @@ monotonic started/completed/claimed job receipts, explicit reserved grams, remai
 60 Hz ticks, persisted power-paused state and count-item tray. `ResourceSession`
 exposes `depositFabricatorInput`, `withdrawFabricatorInput`, `startFabricator` and
 `claimFabricator`; mutations share the exact ledger revision and atomic save gate.
-These domain APIs are the adapter boundary for E06, which must enforce reachable
-ship-local interaction. There is no instant-craft UI or new remote machine control.
+E06 enforces reachable ship-local interaction through the shared machine adapter
+and industrial EquipmentDialog. There is no instant-craft UI or new remote machine control.
 
 An active job owns the Core consumer request (5,000 W). The existing sole world
 clock draws the entire tick before fuel conversion; only its paid receipt advances
@@ -171,3 +171,20 @@ the real domain API and exercises the built production clock, pause/hidden tab,
 completion/power loss and reload; it does not claim the E06 actual-control journey.
 Original JSON/captures/logs stay in ignored `client/test-results/`; validation belongs
 in the PR and existing 14-day CI artifacts.
+
+
+### E06 console delivery (#878)
+
+`ResourceContainerInteraction` admits the reachable `scout:fabricator`, routes
+exact raw transfers to its independent input store and invokes the existing
+revision-bound start/claim APIs. Reservation-aware capacity includes job inputs;
+withdrawals expose only unreserved grams. `ResourceContainerPanel` composes the
+trusted recipe, blocked/ready/powered/paused/complete job status, Core receipt and
+persistent tray with shared UI primitives. No UI timer advances a job or grants
+an item. Full carrying weight/slots preserve output with a specific reason.
+
+See [controls and validation](../client/README.md#reachable-fabricator-console-878).
+`tests/fabricator-console.spec.ts` owns the actual-control mine/storage/fuel/start/
+power-loss/refuel/claim/reload loop, negative transactions/focus and fixed-policy
+repeat captures at 960/1280/1920. Evidence remains in ignored output and existing
+CI artifacts; the PR records the same-session review. Kit use remains deferred.

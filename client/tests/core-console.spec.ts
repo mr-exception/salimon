@@ -16,6 +16,8 @@ function fixture(state: 'empty' | 'processing' | 'full' | 'outage') {
   let raw: string | null = null
   const session = new ResourceSession({ getItem: () => raw, setItem: (_, value) => { raw = value } }, world)
   expect(session.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 1000 })).toBe(true)
+  // Spend through the domain so schema-v16 non-Fabricator receipts agree.
+  if (state === 'outage') session.advance({ ...session.world, tick: 1 }, { watts: session.snapshot.core.reserveJ60 })
   const s = JSON.parse(raw!)
   // Valid prior expeditions: conserve mineral and initial+converted energy.
   if (state === 'processing' || state === 'full') {
@@ -24,7 +26,6 @@ function fixture(state: 'empty' | 'processing' | 'full' | 'outage') {
     s.stores[fuelId].quantities = { mineral: grams }; s.convertedGrams = converted ? { mineral: converted } : {}
     if (state === 'full') s.core.reserveJ60 = CORE_CAPACITY_J * 60
   }
-  if (state === 'outage') { s.core.spentJ60 = s.core.reserveJ60; s.core.reserveJ60 = 0 }
   return JSON.stringify(s)
 }
 

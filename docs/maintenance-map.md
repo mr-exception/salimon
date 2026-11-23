@@ -1,5 +1,13 @@
 # Feature maintenance map
 
+Browser Fabricator console (#878): `ResourceContainerInteraction.ts` shares
+reachable admission, draft transfers and cancellation across storage/Core/input,
+then invokes `ResourceSession` start/claim. `ResourceContainerPanel.tsx` reads
+trusted recipe/job/reservation/tray and Core receipts in the shared industrial
+shell. `tests/fabricator-console.spec.ts` owns the built actual-control journey,
+negative transactions/focus and three-viewport repeated captures in ignored output.
+See [controls](../client/README.md#reachable-fabricator-console-878).
+
 Browser Energy Core console (#876): `ResourceContainerPanel.tsx` shares the
 industrial transfer form/shell with storage and reads `ResourceSession` Core
 state/receipts; `resourceContainerInteraction.ts` binds the reachable Core fixture

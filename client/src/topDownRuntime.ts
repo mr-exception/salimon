@@ -1,4 +1,5 @@
 import { cancelGroundMovement, groundPositionClear, terrainMovementFraction, type GroundCommand } from './topDownNavigation.ts'
+import { followWorldCamera, type WorldCamera } from './topDownCamera.ts'
 import { surfaceRegion, surfaceToLocal, localToSurface } from './surfaceCoordinates.ts'
 import { BOARDING_DOOR_ID, BOARDING_DOOR_HALF_DEPTH_M, synchronizeDoor, toggleDoor } from './scoutDoor.ts'
 import { startingScoutLocation, type ScoutLocation } from './scoutLocation.ts'
@@ -25,7 +26,7 @@ export interface TopDownState {
   readonly feedback: string
   readonly frames: WorldFrames
   readonly entities: readonly Entity2D[]
-  readonly camera: { readonly anchor: Anchor; readonly pixelsPerM: number }
+  readonly camera: WorldCamera
 }
 export const STEP_2D = 1 / 60
 export const PLAYER_SPEED_MPS = 2.4
@@ -56,6 +57,7 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   const previousAngle = state.frames.ship.angle
   state = rechartWalking(state)
   direction = rotate2(direction, state.frames.ship.angle - previousAngle)
+  if (Math.hypot(...direction) > 0) state = followWorldCamera(state)
   if (Math.hypot(...direction) > 0 || state.player.mode === 'seated' || state.cockpit.view !== 'world' || state.scoutLocation.ship.mode === 'destroyed') state = cancelGroundMovement(state)
   let command = state.groundCommand
   if (command?.status === 'moving' && !groundPositionClear(state, state.entities.find(e => e.id === PLAYER_ID)!.anchor)) {
@@ -83,8 +85,11 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   let terrainBlocked = false
   const angle = anchor.frame === state.frames.ship.id ? state.frames.ship.angle : 0
   const local = rotate2([x * scale, y * scale], -angle)
-  // Independent local axes provide sliding along walls without tunnelling.
-  for (const delta of [[local[0], 0], [0, local[1]]] as const) {
+  // Routes must sweep the same diagonal edge validated by the planner. Axis
+  // splitting can clip a nearby corner that the diagonal legally clears.
+  // Direct keyboard movement retains its existing wall sliding.
+  const deltas: readonly Point2[] = command?.status === 'moving' ? [local] : [[local[0], 0], [0, local[1]]]
+  for (const delta of deltas) {
     const terrainFraction = terrainMovementFraction(state, anchor, rotate2(delta, angle))
     const fraction = Math.min(allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames), terrainFraction)
     terrainBlocked ||= terrainFraction < 1
@@ -123,7 +128,7 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   // subpixel SVG rasterization after view changes. Player/world points stay exact.
   const cameraAnchor = { ...state.camera.anchor, point: translate(state.camera.anchor.point, [deltaCamera[0], deltaCamera[1], 0]) }
   return { ...state, tick: state.tick + 1, entities, player: activity, selectedId, feedback,
-    camera: { ...state.camera, anchor: Math.hypot(cx, cy) < 1e-9 ? anchor : convertAnchor(cameraAnchor, anchor.frame, state.frames) } }
+    camera: state.camera.panned ? state.camera : { ...state.camera, anchor: Math.hypot(cx, cy) < 1e-9 ? anchor : convertAnchor(cameraAnchor, anchor.frame, state.frames) } }
 }
 export function capturePlayerLocation(state: TopDownState): PlayerLocation {
   return copyPlayerLocation({ anchor: state.entities.find(e => e.id === PLAYER_ID)!.anchor, facing: state.player.facing })

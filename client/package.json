@@ -16,7 +16,7 @@
     "test:ui": "playwright test --project=expedition",
     "test:ui:negative": "node scripts/negative-ui.mjs",
     "test:planetary": "playwright test --project=cockpit tests/planetary-journey.spec.ts tests/exploration.spec.ts tests/streaming.spec.ts tests/deposits.spec.ts tests/terrain.spec.ts tests/terrain-art.spec.ts tests/landing.spec.ts",
-    "test:browser:smoke": "playwright test --project=production --project=deterministic --project=cockpit tests/ground-movement.spec.ts tests/production.spec.ts tests/deterministic.spec.ts tests/flight.spec.ts tests/terrain.spec.ts tests/terrain-art.spec.ts tests/core-power.spec.ts tests/vertical-slice.spec.ts --grep \"SLICE-880 built|MOVE-890|CORE-875|built production|NAV-2|FLIGHT-838|TERRAIN-848|ART-850 .*production\""
+    "test:browser:smoke": "playwright test --project=production --project=deterministic --project=cockpit tests/camera.spec.ts tests/ground-movement.spec.ts tests/production.spec.ts tests/deterministic.spec.ts tests/flight.spec.ts tests/terrain.spec.ts tests/terrain-art.spec.ts tests/core-power.spec.ts tests/vertical-slice.spec.ts --grep \"SLICE-880 built|CAMERA-891|MOVE-890|CORE-875|built production|NAV-2|FLIGHT-838|TERRAIN-848|ART-850 .*production\""
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",

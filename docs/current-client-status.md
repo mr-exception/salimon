@@ -77,7 +77,7 @@ precedence over incompatible native/earlier designs. No approved number changes 
 Use Node >=22.18, `cd client`, `npm ci`, `npm test`, `npm run build`,
 `npx playwright install --with-deps chromium`, and `npm run test:browser`.
 The [PR Navigation client workflow](../.github/workflows/navigation-client.yml)
-runs domain tests, build/typecheck and four focused browser smoke cases. The
+runs domain tests, build/typecheck and bounded production browser smoke cases. The
 [daily full workflow](../.github/workflows/navigation-client-full.yml) preserves
 every browser project, negative mutation and repeated visual comparison in five
 parallel groups. Scheduled/manual failures create or update a bug per failing

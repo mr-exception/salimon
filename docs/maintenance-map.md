@@ -1,5 +1,13 @@
 # Feature maintenance map
 
+2D camera controls (#891): `topDownCamera.ts` owns presentation-local zoom,
+bounded manual pan, follow restoration and the single-pointer drag lifecycle.
+`TopDownView.tsx` owns SVG screen-CTM input, capture cleanup and focus priority;
+`topDownRuntime.ts` retains the 60 Hz exponential follow and frame/chart handoff.
+`topDownNavigation.ts` restores follow on movement requests and shares the live
+camera projection. See `topDownCamera.test.ts`, `tests/camera.spec.ts` and the
+[client camera guide](../client/README.md#2d-camera-controls-891).
+
 Core/Fabricator cross-feature QA (#880) belongs to `tests/vertical-slice.spec.ts`;
 `tests/fabricatorFixtures.ts` shares valid prior-expedition seeds/control helpers
 with console/marker visual negatives. See [acceptance and limits](browser-core-fabricator-vertical-slice.md#e08-built-production-acceptance-880).

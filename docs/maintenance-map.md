@@ -1,5 +1,12 @@
 # Feature maintenance map
 
+Browser object menus (#892): `topDownActions.ts` owns capability/action contracts and
+live invocation guards; `ObjectContextMenu.tsx` owns clamping, keyboard navigation
+and dismissal/focus. `topDownNavigation.interactiveAt` shares render ordering and
+visibility with the scene; `TopDownView.tsx` dispatches to existing domain adapters.
+`topDownActions.test.ts` and built `tests/object-context.spec.ts` own coverage.
+Automatic approach/execution remains #893; see the client menu guide.
+
 2D camera controls (#891): `topDownCamera.ts` owns presentation-local zoom,
 bounded manual pan, follow restoration and the single-pointer drag lifecycle.
 `TopDownView.tsx` owns SVG screen-CTM input, capture cleanup and focus priority;

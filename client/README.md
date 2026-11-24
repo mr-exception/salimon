@@ -1364,3 +1364,29 @@ smooth restoration, lifecycle negatives, HUD/dialog priority and save/reload.
 Original/recenter repeat captures, pan-negative comparison and raw trajectory/save
 records stay in ignored `test-results/` and the existing CI artifacts (14 days).
 Panoramic and normal keyboard/save regressions retain their existing suites.
+
+### Object context menus (#892)
+
+Right-click a visible interactive sprite or footprint to open an Expedition Interface
+menu. Opening/replacing it cancels a route without invoking the object. Right-click
+ground closes it and dispatches the existing ground command; left-click outside,
+Escape, Tab, focus/scene loss or an absent target dismisses it. Escape/Tab and action
+selection restore world focus. Menus remain viewport-clamped and the simulation
+continues. Arrow keys/Home/End navigate named menu items, including disabled rows
+whose descriptions explain the reason. HUD and menu events retain their own input.
+
+`topDownActions.ts` owns stable IDs, range/frame, availability, preconditions,
+interrupt and handler contracts; invocation rebuilds availability from live state.
+Remote Inspect repeats only the displayed label and never registers discovery.
+Implemented gathering, container, Core, Fabricator, door and cockpit capabilities
+use their existing domain adapters. Transfers still require panel confirmation.
+Out-of-range actions explain ground/WASD approach; automatic approach belongs to
+#893. Existing E and nearby controls remain available.
+
+Check with `node --experimental-strip-types --test src/topDownActions.test.ts
+src/topDownNavigation.test.ts` and, after `npm run build`,
+`npx playwright test --project=cockpit tests/object-context.spec.ts`.
+Built `/` checks use actual mouse/keyboard input, semantic accessibility assertions,
+original/repeat/negative screenshots and action outcomes. Evidence remains in
+ignored `test-results/` and the existing 14-day CI artifacts; PRs own validation
+summaries. No visual references are changed by this feature.

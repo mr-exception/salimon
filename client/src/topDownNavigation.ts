@@ -3,7 +3,7 @@ import { probeGeology } from './planetGeology.ts'
 import { localToSurface, surfaceRegion } from './surfaceCoordinates.ts'
 import { allowedMove, objectAngle, PLAYER_RADIUS_M } from './topDownInteraction.ts'
 import { convertAnchor, inPlanet, relativeAnchor, rotate2, viewToWorld, type Anchor, type Point2 } from './topDownFrames.ts'
-import type { TopDownState } from './topDownRuntime.ts'
+import { drawList, type TopDownState } from './topDownRuntime.ts'
 import { followWorldCamera } from './topDownCamera.ts'
 
 export interface GroundCommand {
@@ -20,8 +20,11 @@ export function groundFromView(state: TopDownState, svg: Point2): Anchor {
   const local = rotate2(delta, state.camera.anchor.frame === 'ship:scout' ? -state.frames.ship.angle : 0)
   return { ...state.camera.anchor, point: translate(state.camera.anchor.point, [...local, 0]) }
 }
-export function interactiveAt(state: TopDownState, anchor: Anchor): string | null {
-  return [...state.entities].reverse().find(object => {
+export function interactiveAt(state: TopDownState, anchor: Anchor, spriteId?: string | null): string | null {
+  const visible = drawList(state).map(item => item.entity)
+  // DOM sprite picking is admitted only from the same rendered publication.
+  if (visible.some(object => object.id === spriteId && object.interaction)) return spriteId!
+  return visible.reverse().find(object => {
     if (!object.interaction || state.frames.ship.parent === null && object.anchor.frame !== anchor.frame) return false
     const [x, y] = rotate2(relativeAnchor(anchor, object.anchor, state.frames), -objectAngle(object, state.frames))
     return Math.abs(x) <= (object.footprint?.halfWidth ?? .65) && Math.abs(y) <= (object.footprint?.halfHeight ?? .3)

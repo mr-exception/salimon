@@ -4,6 +4,7 @@ import { localToSurface, surfaceRegion } from './surfaceCoordinates.ts'
 import { allowedMove, objectAngle, PLAYER_RADIUS_M } from './topDownInteraction.ts'
 import { convertAnchor, inPlanet, relativeAnchor, rotate2, viewToWorld, type Anchor, type Point2 } from './topDownFrames.ts'
 import type { TopDownState } from './topDownRuntime.ts'
+import { followWorldCamera } from './topDownCamera.ts'
 
 export interface GroundCommand {
   readonly destination: Anchor
@@ -138,6 +139,7 @@ export function cancelGroundMovement(state: TopDownState): TopDownState {
 export function requestGroundMovement(state: TopDownState, destination: Anchor): TopDownState {
   state = cancelGroundMovement(state)
   if (state.player.mode === 'seated' || state.cockpit.view !== 'world' || state.scoutLocation.ship.mode === 'destroyed') return state
+  state = followWorldCamera(state)
   const waypoints = planGroundRoute(state, destination)
   return { ...state, groundCommand: { destination, waypoints: waypoints ?? [], status: waypoints ? 'moving' : 'failed' }, player: { ...state.player, mode: 'standing', targetId: null }, feedback: waypoints ? 'Moving to destination. Escape to cancel.' : 'Destination unreachable or outside the local route range.' }
 }

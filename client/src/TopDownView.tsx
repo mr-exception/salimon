@@ -1,3 +1,4 @@
+import { CameraDrag, followWorldCamera, panWorldCamera, zoomWorldCamera } from './topDownCamera.ts'
 import { MarkerDeployment } from './MarkerDeployment.tsx'
 import { ExplorationHud, FieldMarkCues } from './ExplorationHud.tsx'
 import { GeneratedGround } from './GeneratedGround.tsx'
@@ -26,8 +27,69 @@ import { useDismissLayer } from './ui/interaction.ts'
 import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
-export function TopDownScene({ state, session, onGround, onCancelGround }: { state: TopDownState; session?: ResourceSession | null; onGround?: (anchor: Anchor, objectId: string | null) => void; onCancelGround?: () => void }) {
+export function TopDownScene({ state, session, onGround, onCancelGround, onCamera }: { state: TopDownState; session?: ResourceSession | null; onGround?: (anchor: Anchor, objectId: string | null) => void; onCancelGround?: () => void; onCamera?: (operation: (world: TopDownState) => TopDownState) => void }) {
   const viewport = useRef<SVGSVGElement>(null)
+  const cameraInput = useRef({ onCamera, onCancelGround })
+  cameraInput.current = { onCamera, onCancelGround }
+  useEffect(() => {
+    if (state.cockpit.view !== 'world') return
+    const svg = viewport.current!, drag = new CameraDrag()
+    const point = (event: PointerEvent) => {
+      const matrix = svg.getScreenCTM()
+      if (!matrix) return null
+      const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse())
+      return [p.x, p.y] as const
+    }
+    const cancel = () => {
+      const id = drag.cancel()
+      if (id !== null && svg.hasPointerCapture(id)) svg.releasePointerCapture(id)
+    }
+    const down = (event: PointerEvent) => {
+      if (event.button === 0 || event.button === 1) svg.focus({ preventScroll: true })
+      if (event.button !== 1 || !cameraInput.current.onCamera) return
+      const p = point(event)
+      if (!p || !drag.begin(event.pointerId, p)) return
+      event.preventDefault()
+      cameraInput.current.onCancelGround?.()
+      svg.setPointerCapture(event.pointerId)
+    }
+    const move = (event: PointerEvent) => {
+      if (drag.id !== event.pointerId) return
+      if (!(event.buttons & 4)) { cancel(); return }
+      const p = point(event), delta = p && drag.move(event.pointerId, p)
+      if (delta) cameraInput.current.onCamera?.(world => panWorldCamera(world, delta))
+    }
+    const end = (event: PointerEvent) => { if (drag.id === event.pointerId) cancel() }
+    const wheel = (event: WheelEvent) => {
+      if (!cameraInput.current.onCamera || event.ctrlKey) return
+      event.preventDefault()
+      const pixels = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? svg.clientHeight : 1)
+      cameraInput.current.onCamera(world => zoomWorldCamera(world, pixels))
+    }
+    svg.addEventListener('pointerdown', down)
+    svg.addEventListener('pointermove', move)
+    svg.addEventListener('pointerup', end)
+    svg.addEventListener('pointercancel', end)
+    svg.addEventListener('lostpointercapture', end)
+    svg.addEventListener('focusout', cancel)
+    svg.addEventListener('wheel', wheel, { passive: false })
+    window.addEventListener('blur', cancel)
+    window.addEventListener('resize', cancel)
+    document.addEventListener('visibilitychange', cancel)
+    return () => {
+      cancel()
+      svg.removeEventListener('pointerdown', down)
+      svg.removeEventListener('pointermove', move)
+      svg.removeEventListener('pointerup', end)
+      svg.removeEventListener('pointercancel', end)
+      svg.removeEventListener('lostpointercapture', end)
+      svg.removeEventListener('focusout', cancel)
+      svg.removeEventListener('wheel', wheel)
+      window.removeEventListener('blur', cancel)
+      window.removeEventListener('resize', cancel)
+      document.removeEventListener('visibilitychange', cancel)
+    }
+  }, [state.cockpit.view])
   const [size, setSize] = useState({ width: 1200, height: 640 })
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) => {
@@ -58,7 +120,7 @@ export function TopDownScene({ state, session, onGround, onCancelGround }: { sta
     const objectId = state.entities.some(e => e.id === id && e.interaction) ? id! : interactiveAt(state, anchor)
     event.currentTarget.focus({ preventScroll: true })
     onGround?.(anchor, objectId)
-  }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
+  }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" data-camera-scale={state.camera.pixelsPerM} data-camera-panned={String(!!state.camera.panned)} viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {layer === 'terrain' && state.scoutLocation.binding && <rect x={-width/2} y={-height/2} width={width} height={height} fill="#b5a58b" />}
       {renderItems(items.filter(item => item.entity.layer === layer && ['ground', 'surface'].includes(item.entity.appearance)))}
@@ -168,6 +230,11 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (paused.current || session.current?.survival.health === 0 || current.current.scoutLocation.ship.mode === 'destroyed' && event.code !== 'Escape') return
       if (event.code === 'KeyE' && isCockpitTarget(current.current.selectedId) && session.current && (!!session.current.error || !survivalPolicy(session.current.survival).canWork)) return
       if (current.current.cockpit.view === 'radar') return
+      if (event.code === 'Space' && event.target instanceof SVGSVGElement && event.target.classList.contains('top-down-scene') && !document.querySelector('dialog[open]')) {
+        event.preventDefault(); current.current = followWorldCamera(current.current)
+        if (session.current) session.current.world = current.current
+        setState(current.current); return
+      }
       if (container.current?.opened && event.code === 'KeyE') return
       if (!event.repeat && (event.code === 'Escape' || (event.code === 'KeyE' && acceptsFlightShortcut(event.target)))) {
         event.preventDefault(); input.clear(); current.current = cancelGroundMovement(current.current); if (session.current) session.current.world = current.current
@@ -287,6 +354,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     <Dialog open={helpOpen} title="Surface controls" onDismiss={() => setHelpOpen(false)}>
       {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
       <p>W A S D: walk · E: nearby action · Escape: close panel, then cancel interaction.</p>
+      <p>Wheel over world: zoom · Middle drag: pan · Space with world focus: follow player. Moving resumes follow.</p>
       <p>I: inventory · P: pause active time. Menus do not pause time. Movement, Escape or stowing the tool interrupts gathering; partial work is saved.</p>
       <p>M: inspect / mark a field location · G: toggle local Scout guidance. Field notes save with your expedition.</p>
       <button onClick={() => {setHelpOpen(false);session.current?.cancel();setNotebookOpen(true)}}>Inspect / mark</button>
@@ -310,7 +378,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     <main data-surface-bound={String(state.scoutLocation.binding !== null)} data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
-    <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} onCancelGround={() => update(cancelGroundMovement(current.current))} onGround={(anchor, objectId) => {
+    <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} onCamera={operation => {
+        if (paused.current || current.current.cockpit.view !== 'world' || container.current?.opened || document.querySelector('dialog[open]')) return
+        const next = operation(current.current)
+        if (resourceSession) resourceSession.world = next
+        update(next)
+      }} onCancelGround={() => update(cancelGroundMovement(current.current))} onGround={(anchor, objectId) => {
         if (paused.current || current.current.cockpit.view !== 'world' || container.current?.opened || gameplay && (!resourceSession || resourceSession.error || resourceSession.survival.health === 0)) return
         resourceSession?.cancel()
         if (resourceSession) resourceSession.feedback = ''

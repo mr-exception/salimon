@@ -1331,3 +1331,36 @@ These tests also run in PR smoke and the existing full world group; CI artifacts
 retain evidence for 14 days. Camera zoom/pan controls (#891), object menus (#892),
 auto-approach (#893) and the final shared command HUD (#894) remain separately
 owned; the inverse projection already supports different live camera transforms.
+
+
+## 2D camera controls (#891)
+
+The existing 60 Hz follow remains in `topDownRuntime.ts`, with the same `.16`
+exponential step and continuous ship/planet and generated-chart conversions.
+`topDownCamera.ts` adds presentation-only controls:
+
+- Wheel over the world zooms between 14 and 64 SVG pixels per metre. CSS pixels,
+  line and page wheel units are normalized; HUD/dialog scrolling and browser
+  Ctrl-wheel keep their native behavior.
+- Middle drag captures one pointer and holds the camera where released, bounded
+  to 40 metres from the player. It cancels a pending route before inspection.
+  Release, cancellation, lost capture, focus loss, blur, visibility change,
+  resize, cockpit transition and unmount release the capture.
+- Space with keyboard focus on the world resumes smooth follow. Click the world
+  or use Tab to focus it. Buttons, editable fields, dialogs and cockpit controls
+  retain priority. WASD or a new ground/approach movement request also resumes
+  follow; the command preserves the current camera anchor rather than snapping.
+
+The same SVG screen CTM and `groundFromView` transform drive picking after
+zoom/pan/resize/DPR changes. Player movement/collision, saves, radar and panoramic
+observation state do not store or consume zoom/pan. Reload opens at default zoom
+centered on the saved player.
+
+Validation: `npm test`, `npm run build`, and
+`npm run test:browser -- --project=cockpit tests/camera.spec.ts tests/ground-movement.spec.ts`.
+Camera browser checks use actual wheel/middle drag/Space/right-click input against
+built `/`, DPR 1 and 2, resize, obstacle routes/doorway frames, idle-pan stability,
+smooth restoration, lifecycle negatives, HUD/dialog priority and save/reload.
+Original/recenter repeat captures, pan-negative comparison and raw trajectory/save
+records stay in ignored `test-results/` and the existing CI artifacts (14 days).
+Panoramic and normal keyboard/save regressions retain their existing suites.

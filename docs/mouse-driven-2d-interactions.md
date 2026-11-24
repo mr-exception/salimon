@@ -1,6 +1,6 @@
 # Mouse-driven 2D exploration and interaction contract
 
-**Status:** approved design. #890 implements ground movement, pointer projection, cancellation and initial destination feedback; camera controls, menus, auto-approach and final HUD integration remain owned by #891–#894. Applies to the React/TypeScript browser's 2D planetary surface and Scout interior. Does **not** change the independently controlled panoramic cockpit or isolated radar fixture. Implementation: [#890](https://github.com/mr-exception/salimon/issues/890)–[#894](https://github.com/mr-exception/salimon/issues/894).
+**Status:** approved design. #890 implements ground movement, pointer projection, cancellation and initial destination feedback; #891 extends the existing follow camera with bounded zoom, persistent manual pan and focus-scoped recentering. Menus, auto-approach and final HUD integration remain owned by #892–#894. Applies to the React/TypeScript browser's 2D planetary surface and Scout interior. Does **not** change the independently controlled panoramic cockpit or isolated radar fixture. Implementation: [#890](https://github.com/mr-exception/salimon/issues/890)–[#894](https://github.com/mr-exception/salimon/issues/894).
 
 ## Intent and integration
 
@@ -74,4 +74,4 @@ Built-production browser/Playwright: actual right-click outdoor path around hull
 4. [#893](https://github.com/mr-exception/salimon/issues/893): unified approach/execution, depends on #890 and #892.
 5. [#894](https://github.com/mr-exception/salimon/issues/894): HUD, help, quality and end-to-end integration, depends on previous steps.
 
-Ground movement implementation and verification are described in the [client guide](../client/README.md#right-click-ground-movement-890). Remaining sections describe approved future behavior until their owning issues have code-backed evidence and are merged.
+Ground movement implementation and verification are described in the [client guide](../client/README.md#right-click-ground-movement-890). The [camera guide](../client/README.md#2d-camera-controls-891) documents #891. Remaining sections describe approved future behavior until their owning issues have code-backed evidence and are merged.

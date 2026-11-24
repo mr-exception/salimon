@@ -7,6 +7,8 @@ import { drawList, type TopDownState } from './topDownRuntime.ts'
 import { followWorldCamera } from './topDownCamera.ts'
 
 export interface GroundCommand {
+  /** Approach routes belong to an object receipt; ordinary clicks supersede it. */
+  readonly objectSequence?: number
   readonly destination: Anchor
   readonly waypoints: readonly Anchor[]
   readonly status: 'moving' | 'arrived' | 'failed' | 'cancelled'

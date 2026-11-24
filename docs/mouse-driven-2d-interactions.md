@@ -1,6 +1,6 @@
 # Mouse-driven 2D exploration and interaction contract
 
-**Status:** approved design. #890 implements ground movement, pointer projection, cancellation and initial destination feedback; #891 extends the existing follow camera with bounded zoom, persistent manual pan and focus-scoped recentering. #892 adds the action registry and accessible context menus; #893 adds automatic approach, live revalidation and once-only dispatch; final HUD integration remains #894. Applies to the React/TypeScript browser's 2D planetary surface and Scout interior. Does **not** change the independently controlled panoramic cockpit or isolated radar fixture. Implementation: [#890](https://github.com/mr-exception/salimon/issues/890)–[#894](https://github.com/mr-exception/salimon/issues/894).
+**Status:** approved design. #890 implements ground movement, pointer projection, cancellation and initial destination feedback; #891 extends the existing follow camera with bounded zoom, persistent manual pan and focus-scoped recentering. #892 adds the action registry and accessible context menus; #893 adds automatic approach, live revalidation and once-only dispatch; command HUD, Surface Help and combined built mouse QA are implemented in #894, with acceptance recorded in its PR. Applies to the React/TypeScript browser's 2D planetary surface and Scout interior. Does **not** change the independently controlled panoramic cockpit or isolated radar fixture. Implementation: [#890](https://github.com/mr-exception/salimon/issues/890)–[#894](https://github.com/mr-exception/salimon/issues/894).
 
 ## Intent and integration
 
@@ -79,3 +79,25 @@ Ground movement implementation and verification are described in the [client gui
 The [context-menu guide](../client/README.md#object-context-menus-892) describes implemented menus and current proximity behavior.
 
 The [command guide](../client/README.md#automatic-approach-and-execution-893) describes implemented #893 approach/execution and cancellation boundaries.
+
+## Command feedback and validation (#894)
+
+`commandFeedback.ts` derives a compact readout from session-local receipts and
+active domain gathering. It names queued/routing/approaching work, displays ongoing
+Mining separately from the completed start receipt, and exposes Cancel for
+interruptible commands. Survival warnings retain their separate priority HUD.
+Destination cues use Expedition Interface tokens; cancelled routes remove their
+marker. Menus/dialogs own Escape before inventory and world work. Surface Help
+documents mouse actions and keyboard fallback; panoramic Help keeps its bindings.
+
+`tests/command-feedback.spec.ts` exercises built `/` with desktop mouse input:
+outdoor travel around the hull, remote mining, exact-gram review/confirmation,
+Scout/cockpit entry and reload; Help/input isolation, hidden-tab/resize/Cancel,
+E fallback and capacity failures. The existing `auto-approach`, `object-context`,
+`camera` and `ground-movement` suites retain interruption, unavailable-target/domain,
+closed-door, projection, capture-release and repeat/negative coverage. Originals,
+traces and state attachments stay in ignored `client/test-results/` and existing
+CI artifacts (14-day retention). No baseline is auto-approved or tolerance changed.
+After `npm run build`, run `npx playwright test --project=cockpit tests/command-feedback.spec.ts`
+with Playwright Chromium, or set `CHROMIUM_PATH` for an installed compatible browser.
+CI results and final acceptance belong to the implementation PR.

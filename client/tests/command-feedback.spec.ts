@@ -70,7 +70,7 @@ test('UX-894 built mouse-only obstruction → mine → confirmed deposit → coc
     const debug = gl.getExtension('WEBGL_debug_renderer_info')
     return { version: gl.getParameter(gl.VERSION), renderer: gl.getParameter(debug?.UNMASKED_RENDERER_WEBGL ?? gl.RENDERER) }
   })
-  expect(backend.renderer).toBeTruthy()
+  expect(backend.renderer).toContain('SwiftShader')
   await page.screenshot({ path: info.outputPath('cockpit.png') })
   await page.reload(); await page.clock.runFor(200)
   await expect.poll(async () => { await page.clock.runFor(50); return saved(page) }).toMatchObject({ inventory: { quantities: { mineral: 667 } }, stores: { 'scout:storage': { quantities: { mineral: 333 } } } })

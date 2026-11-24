@@ -2,7 +2,8 @@ import { MarkerDeployment } from './MarkerDeployment.tsx'
 import { ExplorationHud, FieldMarkCues } from './ExplorationHud.tsx'
 import { GeneratedGround } from './GeneratedGround.tsx'
 import { BOARDING_DOOR_ID } from './scoutDoor.ts'
-import { viewToWorld } from './topDownFrames.ts'
+import { cancelGroundMovement, groundFromView, interactiveAt, requestGroundMovement } from './topDownNavigation.ts'
+import { relativeAnchor, worldToView, type Anchor, viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
 import { DRY_MASS_KG, setMass } from './simulation.ts'
 import { PanoramicNavigation } from './PanoramicNavigation.tsx'
@@ -25,7 +26,7 @@ import { useDismissLayer } from './ui/interaction.ts'
 import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
-export function TopDownScene({ state, session }: { state: TopDownState; session?: ResourceSession | null }) {
+export function TopDownScene({ state, session, onGround, onCancelGround }: { state: TopDownState; session?: ResourceSession | null; onGround?: (anchor: Anchor, objectId: string | null) => void; onCancelGround?: () => void }) {
   const viewport = useRef<SVGSVGElement>(null)
   const [size, setSize] = useState({ width: 1200, height: 640 })
   useEffect(() => {
@@ -46,12 +47,26 @@ export function TopDownScene({ state, session }: { state: TopDownState; session?
         <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
           <WorldSprite entity={entity} />
         </g>)
-  return <svg ref={viewport} className="top-down-scene" viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
+  const destination = state.groundCommand && (state.frames.ship.parent !== null || state.groundCommand.destination.frame === 'ship:scout') && worldToView(relativeAnchor(state.groundCommand.destination, state.camera.anchor, state.frames), state.frames)
+  return <svg onContextMenu={event => {
+    event.preventDefault()
+    const matrix = event.currentTarget.getScreenCTM()
+    if (!matrix) return
+    const svg = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse())
+    const anchor = groundFromView(state, [svg.x, svg.y])
+    const id = (event.target as Element).closest('[data-entity]')?.getAttribute('data-entity')
+    const objectId = state.entities.some(e => e.id === id && e.interaction) ? id! : interactiveAt(state, anchor)
+    event.currentTarget.focus({ preventScroll: true })
+    onGround?.(anchor, objectId)
+  }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
     {LAYERS.map(layer => <g key={layer} data-layer={layer}>
       {layer === 'terrain' && state.scoutLocation.binding && <rect x={-width/2} y={-height/2} width={width} height={height} fill="#b5a58b" />}
       {renderItems(items.filter(item => item.entity.layer === layer && ['ground', 'surface'].includes(item.entity.appearance)))}
       {layer === 'terrain' && <GeneratedGround state={state} width={width} height={height} />}
       {renderItems(items.filter(item => item.entity.layer === layer && !['ground', 'surface'].includes(item.entity.appearance)))}
+      {layer === 'cues' && destination && <g pointerEvents="none" data-destination={state.groundCommand!.status} transform={`translate(${destination[0] * state.camera.pixelsPerM} ${destination[1] * state.camera.pixelsPerM})`} fill="none" stroke={state.groundCommand!.status === 'failed' ? '#ffae8a' : '#bce9df'} strokeWidth="2">
+        <circle r="9" /><path d="M -14 0 H -5 M 5 0 H 14 M 0 -14 V -5 M 0 5 V 14" />
+      </g>}
       {layer === 'cues' && <FieldMarkCues state={state} session={session} />}
       {layer === 'cues' && items.filter(item => item.entity.id === state.selectedId).map(({ entity, positionM: [x, y], angle }) => <g key={entity.id} data-selection={entity.id} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={entity} selected /></g>)}
     </g>)}
@@ -155,7 +170,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (current.current.cockpit.view === 'radar') return
       if (container.current?.opened && event.code === 'KeyE') return
       if (!event.repeat && (event.code === 'Escape' || (event.code === 'KeyE' && acceptsFlightShortcut(event.target)))) {
-        event.preventDefault(); input.clear()
+        event.preventDefault(); input.clear(); current.current = cancelGroundMovement(current.current); if (session.current) session.current.world = current.current
         if (container.current?.opened && event.code === 'Escape') {
           container.current.close(); current.current = container.current.session.world
         } else if (event.code === 'KeyE' && openEquipment(current.current)) {
@@ -176,13 +191,13 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         setState(current.current)
       }
       const axis = panAxisForCode(event.code)
-      if (axis && acceptsFlightShortcut(event.target)) { event.preventDefault(); input.press(event.code, axis) }
+      if (axis && acceptsFlightShortcut(event.target)) { event.preventDefault(); current.current = cancelGroundMovement(current.current); input.press(event.code, axis) }
     }
     const keyup = (event: KeyboardEvent) => input.release(event.code)
     const frame = (now: number) => {
       const dt = timer.sample(now, document.hidden || paused.current || gameplay && (!session.current || !!session.current.error || session.current.survival.health === 0))
       const inWorld = current.current.cockpit.view === 'world'
-      if (!inWorld) input.clear()
+      if (!inWorld) { input.clear(); current.current = cancelGroundMovement(current.current) }
       if (paused.current || document.hidden) { input.clear(); clock.reset() }
       const controls = input.controls
       current.current = clock.advance(current.current, dt, viewToWorld([Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], current.current.frames), (world, direction) => {
@@ -207,7 +222,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       setState(current.current)
       raf = requestAnimationFrame(frame)
     }
-    const focus = () => { release(); if (document.activeElement?.closest('.hud-utility, dialog')) session.current?.cancel(); if (container.current?.opened && !document.activeElement?.closest('dialog')) { container.current.close(); current.current = session.current!.world; setState({ ...current.current }) } }
+    const focus = () => { release(); current.current = cancelGroundMovement(current.current); if (session.current) session.current.world = current.current; if (document.activeElement?.closest('.hud-utility, dialog')) session.current?.cancel(); if (container.current?.opened && !document.activeElement?.closest('dialog')) { container.current.close(); current.current = session.current!.world; setState({ ...current.current }) } }
     window.addEventListener('keydown', keydown); window.addEventListener('keyup', keyup)
     window.addEventListener('blur', clear); window.addEventListener('resize', clear)
     document.addEventListener('visibilitychange', clear); window.addEventListener('focusin', focus)
@@ -231,6 +246,8 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const selectedSource = resourceSession && selected && resourceSession.source(selected.id)
   const interact = () => {
     if (current.current.scoutLocation.ship.mode === 'destroyed' || paused.current || resourceSession?.survival.health === 0 || cockpitTarget && resourceSession && (!!resourceSession.error || !survivalPolicy(resourceSession.survival).canWork)) return
+    current.current = cancelGroundMovement(current.current)
+    if (resourceSession) resourceSession.world = current.current
     if (selectedContainer && openEquipment(current.current)) current.current = container.current!.session.world
     else if (selected?.id === BOARDING_DOOR_ID && resourceSession) { resourceSession.world = current.current; resourceSession.toggleBoardingDoor(resourceSession.snapshot.revision); current.current = resourceSession.world }
     else if (resourceSession?.equipped && selectedSource) { resourceSession.start(selected!.id); current.current = resourceSession.world }
@@ -259,7 +276,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         <Meter label="Hunger" value={Math.ceil(vital.hunger / METER * 100)} max={100} unit="" />
         <Meter label="Fatigue" value={Math.ceil(vital.fatigue / METER * 100)} max={100} unit="" />
         </div>
-        {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); if (resourceSession.freshRun()) observation.reset(navigation.clock.state); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
+        {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); if (resourceSession.freshRun()) observation.reset(navigation.clock.state); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; current.current = cancelGroundMovement(current.current); resourceSession.world = current.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
       </> : <p>{resourceSession?.error || saveStatus}</p>}
       {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
       {persistentMessages[1].text && <StatusMessage priority="critical">{persistentMessages[1].text}</StatusMessage>}
@@ -293,7 +310,14 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     <main data-surface-bound={String(state.scoutLocation.binding !== null)} data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
-    <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} />
+    <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} onCancelGround={() => update(cancelGroundMovement(current.current))} onGround={(anchor, objectId) => {
+        if (paused.current || current.current.cockpit.view !== 'world' || container.current?.opened || gameplay && (!resourceSession || resourceSession.error || resourceSession.survival.health === 0)) return
+        resourceSession?.cancel()
+        if (resourceSession) resourceSession.feedback = ''
+        const next = objectId ? { ...cancelGroundMovement(current.current), feedback: 'Object selected. Use E or the nearby action when in reach.' } : requestGroundMovement(current.current, anchor)
+        if (resourceSession) resourceSession.world = next
+        update(next)
+      }} />
       {gameplay && resourceSession && <ExplorationHud state={state} session={resourceSession} blocked={paused.current || !!resourceSession.error || resourceSession.survival.health === 0 || state.scoutLocation.ship.mode === 'destroyed'} onChange={() => setState({...current.current})} open={notebookOpen} guiding={scoutGuiding} onDismiss={() => setNotebookOpen(false)} onGuidanceChange={() => setScoutGuiding(value => !value)} />}
       {gameplay && <aside className="resource-hud" aria-label="Resource inventory" data-gathering={resourceSession?.activeSourceId ?? ''}>
         <button ref={inventoryTrigger} aria-expanded={inventoryOpen} aria-controls="field-inventory" onClick={() => toggleInventory(!inventoryOpen)}>Field inventory <KeyHint>I</KeyHint></button>
@@ -331,7 +355,8 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <p>Capacity: {usage!.grams / 1000} / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg · {usage!.slots} / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
     </div>}
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
-    <footer><p><strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p></footer>
+    {state.groundCommand && <p role="status" data-movement-status={state.groundCommand.status}>{state.groundCommand.status === 'moving' ? 'Moving to destination · Escape to cancel' : state.groundCommand.status === 'failed' ? 'Destination unreachable or route blocked. Choose another destination.' : state.groundCommand.status === 'arrived' ? 'Arrived at destination.' : 'Movement cancelled.'}</p>}
+    <footer><p>Right-click ground to walk · <strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p></footer>
     </div>
   </main></div></FeedbackScope>
 }

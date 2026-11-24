@@ -1205,3 +1205,13 @@ Core-paid progress on the existing world clock and schema v16 migration from
 v1–v15. No offline work or post-start cancellation; failed writes preserve the
 previous snapshot. The kit has no approved use effect. The reachable Fabricator
 console is #878. See [the E05 contract](browser-core-fabricator-vertical-slice.md) for numbers, validation and boundaries.
+
+Mouse ground movement (#890): `topDownNavigation.ts` owns inverse SVG/camera
+projection, reserved object hits and bounded deterministic footprint-corner
+routing (supplemental slope samples use the shared geology probes).
+`topDownRuntime.ts` follows waypoints on its existing 60 Hz swept movement and
+single doorway handoff. `TopDownView.tsx` owns real pointer input, lifecycle
+cancellation and destination/status feedback. Routes are session-local;
+`ResourceSession` saves only the existing resulting location. Tests:
+`topDownNavigation.test.ts`, built `tests/ground-movement.spec.ts` in the cockpit
+project and PR smoke. See the client movement contract.

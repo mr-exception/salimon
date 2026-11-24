@@ -1,4 +1,4 @@
-import { probeGeology } from './planetGeology.ts'
+import { cancelGroundMovement, groundPositionClear, terrainMovementFraction, type GroundCommand } from './topDownNavigation.ts'
 import { surfaceRegion, surfaceToLocal, localToSurface } from './surfaceCoordinates.ts'
 import { BOARDING_DOOR_ID, BOARDING_DOOR_HALF_DEPTH_M, synchronizeDoor, toggleDoor } from './scoutDoor.ts'
 import { startingScoutLocation, type ScoutLocation } from './scoutLocation.ts'
@@ -9,13 +9,14 @@ import { scoutEntities } from './scoutLayout.ts'
 import { copyPlayerLocation, crossScoutEntry, type PlayerLocation } from './topDownTraversal.ts'
 import { relativeM, ORIGIN, translate } from './coordinates.ts'
 import { allowedMove, objectAngle, PLAYER_RADIUS_M, interactionInReach, nearbyObject, type WorldObject } from './topDownInteraction.ts'
-import { walkingFrames, inPlanet, convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
+import { walkingFrames, convertAnchor, point2, relativeAnchor, rotate2, worldToView, type Anchor, type Point2, type WorldFrames } from './topDownFrames.ts'
 
 export const LAYERS = ['terrain', 'hull', 'interior', 'people', 'props', 'cues'] as const
 export type Layer = typeof LAYERS[number]
 export type Appearance = 'ground' | 'surface' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold' | 'mineral' | 'flora' | 'stones'
 export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance; readonly source?: SourceIdentity }
 export interface TopDownState {
+  readonly groundCommand?: GroundCommand
   readonly scoutLocation: ScoutLocation
   readonly cockpit: CockpitState
   readonly tick: number
@@ -55,6 +56,25 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   const previousAngle = state.frames.ship.angle
   state = rechartWalking(state)
   direction = rotate2(direction, state.frames.ship.angle - previousAngle)
+  if (Math.hypot(...direction) > 0 || state.player.mode === 'seated' || state.cockpit.view !== 'world' || state.scoutLocation.ship.mode === 'destroyed') state = cancelGroundMovement(state)
+  let command = state.groundCommand
+  if (command?.status === 'moving' && !groundPositionClear(state, state.entities.find(e => e.id === PLAYER_ID)!.anchor)) {
+    command = { ...command, status: 'failed', waypoints: [] }
+    state = { ...state, groundCommand: command, feedback: 'Route blocked. Choose another destination.' }
+  }
+  if (command?.status === 'moving') {
+    const anchor = state.entities.find(e => e.id === PLAYER_ID)!.anchor
+    let waypoints = command.waypoints
+    while (waypoints.length && Math.hypot(...relativeAnchor(waypoints[0]!, anchor, state.frames)) < 1e-7) waypoints = waypoints.slice(1)
+    command = { ...command, waypoints, status: waypoints.length ? 'moving' : 'arrived' }
+    state = { ...state, groundCommand: command, feedback: waypoints.length ? state.feedback : 'Arrived at destination.' }
+    if (waypoints.length) {
+      const delta = relativeAnchor(waypoints[0]!, anchor, state.frames), distance = Math.hypot(...delta)
+      const speed = PLAYER_SPEED_MPS * speedMultiplier * STEP_2D
+      const factor = Math.min(1, distance / speed) / distance
+      direction = [delta[0] * factor, delta[1] * factor]
+    }
+  }
   const [x, y] = state.player.mode === 'seated' || state.scoutLocation.ship.mode === 'destroyed' ? [0, 0] : direction
   if (![x, y].every(Number.isFinite)) throw new RangeError('Expected finite movement')
   const length = Math.hypot(x, y), scale = length > 0 ? PLAYER_SPEED_MPS * speedMultiplier * STEP_2D / Math.max(1, length) : 0
@@ -65,20 +85,21 @@ export function stepTopDown(state: TopDownState, direction: Point2, speedMultipl
   const local = rotate2([x * scale, y * scale], -angle)
   // Independent local axes provide sliding along walls without tunnelling.
   for (const delta of [[local[0], 0], [0, local[1]]] as const) {
-    let fraction = allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames)
-    if (anchor.frame === 'planet:fixture' && state.scoutLocation.binding && state.scoutLocation.surface.definition?.version === 2) {
-      const address = state.scoutLocation.surface, region = state.frames.surface?.chart ?? surfaceRegion(address, address.definition)
-      const [px, py] = relativeM(inPlanet(anchor, state.frames), ORIGIN)
-      const sample = probeGeology(localToSurface(region, [px, py]), address.definition!, PLAYER_RADIUS_M, rotate2(delta, angle), undefined, region)
-      terrainBlocked ||= sample.moveFraction < 1
-      fraction = Math.min(fraction, sample.moveFraction)
-    }
+    const terrainFraction = terrainMovementFraction(state, anchor, rotate2(delta, angle))
+    const fraction = Math.min(allowedMove(anchor, rotate2(delta, angle), state.entities, state.frames), terrainFraction)
+    terrainBlocked ||= terrainFraction < 1
     anchor = { ...anchor, point: translate(anchor.point, [delta[0] * fraction, delta[1] * fraction, 0]) }
   }
   const nearShip = Math.hypot(...relativeAnchor(anchor, {frame: 'ship:scout', point: point2(0,0)}, state.frames)) < 64
   const crossed = nearShip ? crossScoutEntry(player.anchor, anchor, state.frames, state.scoutLocation.boardingDoor === 'open') : anchor
   const doorBlocked = state.frames.ship.parent === null && (anchor.point.offsetM[1] > 5.5 || (state.scoutLocation.boardingDoor === 'closed' && length > 0 && player.anchor.point.offsetM[1] >= 5.5 - BOARDING_DOOR_HALF_DEPTH_M - PLAYER_RADIUS_M - 1e-6 && local[1] > 0))
   anchor = doorBlocked ? player.anchor : crossed
+  if (command?.status === 'moving') {
+    const actual = relativeAnchor(anchor, player.anchor, state.frames)
+    if (Math.hypot(actual[0] - x * scale, actual[1] - y * scale) > 1e-6) {
+      state = { ...state, groundCommand: { ...command, status: 'failed', waypoints: [] }, feedback: 'Route blocked. Choose another destination.' }
+    }
+  }
   const entities = state.entities.map(e => e.id === PLAYER_ID ? { ...e, anchor } : e)
   const selectedId = nearbyObject(anchor, entities, state.frames)?.id ?? null
   let activity = state.player
@@ -108,6 +129,7 @@ export function capturePlayerLocation(state: TopDownState): PlayerLocation {
   return copyPlayerLocation({ anchor: state.entities.find(e => e.id === PLAYER_ID)!.anchor, facing: state.player.facing })
 }
 export function requestInteraction(state: TopDownState, id: string | null = state.selectedId): TopDownState {
+  state = cancelGroundMovement(state)
   if (state.scoutLocation.ship.mode === 'destroyed') return { ...state, feedback: 'Journey ended — whole ship destroyed.' }
   if (id === BOARDING_DOOR_ID) return toggleDoor(state)
   if (state.cockpit.enabled && isCockpitTarget(id)) return enterCockpit({ ...state, selectedId: id })
@@ -119,6 +141,7 @@ export function requestInteraction(state: TopDownState, id: string | null = stat
     feedback: `${target.interaction!.label}: test inspection active. No systems changed.` }
 }
 export function cancelInteraction(state: TopDownState): TopDownState {
+  state = cancelGroundMovement(state)
   return state.player.mode === 'interacting' ? { ...state, player: { ...state.player, mode: 'standing', targetId: null }, feedback: 'Inspection cancelled.' } : state
 }
 export interface DrawItem { readonly entity: Entity2D; readonly positionM: Point2; readonly angle: number }
@@ -154,7 +177,7 @@ export function synchronizeScout(state: TopDownState): TopDownState {
     ...state.entities.filter(e => e.anchor.frame === 'ship:scout' || e.layer !== 'terrain'),
     ...(state.scoutLocation.binding ? siteEntities(resolveSurface(state.scoutLocation.surface)) : []),
   ]
-  return { ...state, entities, frames: state.scoutLocation.frames, camera, selectedId: null }
+  return { ...cancelGroundMovement(state), entities, frames: state.scoutLocation.frames, camera, selectedId: null }
 }
 
 /** Change charts before precision/horizon limits, preserving physical positions.

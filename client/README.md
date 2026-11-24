@@ -1299,3 +1299,35 @@ in `fabricator-console.spec.ts`; no approved reference is overwritten.
 See [the acceptance matrix and limits](../docs/browser-core-fabricator-vertical-slice.md#e08-built-production-acceptance-880).
 The existing full workflow includes the suite in its cockpit/world group. CI
 outcomes need an exact head/run binding in the PR, separately from local results.
+
+## Right-click ground movement (#890)
+
+Right-click navigable ground in the 2D world to walk there. The SVG screen CTM,
+live camera anchor, pixels per metre and ship orientation define the exact
+clicked physical point. A destination marker and accessible status show movement,
+arrival or failure. Right-clicking an interactive sprite reserves the object hit
+and cancels movement; context menus are owned by #892. Existing E/actions remain
+available. WASD immediately overrides a route; Escape cancels it. New ground
+commands replace the route and stop gathering. Focus/pointer loss, pause,
+visibility loss, resize, scene change and reload discard active movement.
+
+The planner connects conservative corners of the same authored footprints used
+by walking collision, including closed doors, with swept edges. Supplemental
+2 m slope samples seek local terrain detours. Routes use a 48 m destination
+radius, an 8 m detour corridor and hard limits of 512 candidate nodes, 4,096 edge
+checks and 16,384 swept subprobes per command. Exhausting a local budget fails
+visibly; this is not a global planetary path search. A changed collider stops
+the route on the existing fixed tick and asks for another destination. No
+automatic retry loop or collider bypass exists. Crossing the Scout threshold
+uses `crossScoutEntry`; flight keeps its existing exterior lock. Only resulting
+player locations enter the existing save envelope, never commands/waypoints.
+
+Validation: `npm test`, `npm run build`, and
+`npx playwright test --project=cockpit tests/ground-movement.spec.ts`.
+The production mouse journeys, pixel-repeat comparison, keyboard interruptions,
+closed-door failure, viewport mapping and reload check retain originals, traces
+on failure and canonical state/trajectory JSON under ignored `test-results/`.
+These tests also run in PR smoke and the existing full world group; CI artifacts
+retain evidence for 14 days. Camera zoom/pan controls (#891), object menus (#892),
+auto-approach (#893) and the final shared command HUD (#894) remain separately
+owned; the inverse projection already supports different live camera transforms.

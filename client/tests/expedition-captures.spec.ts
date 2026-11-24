@@ -220,7 +220,7 @@ for (const viewport of sizes) {
     await expect(page.locator('main')).toHaveAttribute('data-player-mode', 'seated')
     await page.getByLabel('Survival condition').getByRole('button', { name: 'Help', exact: true }).press('Enter')
     const help = page.getByRole('dialog', { name: 'Surface controls' })
-    await expect(help).toBeFocused()
+    await expect(help.getByRole('heading', { name: 'Surface controls' })).toBeFocused()
     const protectedView = await page.locator('.panoramic').getAttribute('data-observation')
     await page.keyboard.press('e'); await page.keyboard.press('ArrowLeft'); await page.keyboard.press('w')
     await page.clock.runFor(128)

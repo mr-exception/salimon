@@ -377,7 +377,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       {state.cockpit.view === 'radar' && resourceSession?.feedback && <StatusMessage>{resourceSession.feedback}</StatusMessage>}
       <Button data-field-help variant="secondary" onClick={() => setHelpOpen(true)}>Help</Button>
     </aside>}
-    <Dialog open={helpOpen} title="Surface controls" onDismiss={() => setHelpOpen(false)}>
+    <Dialog open={helpOpen} initialFocus="heading" title="Surface controls" onDismiss={() => setHelpOpen(false)}>
       {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
       <p>Right-click ground: move around obstacles. Right-click an object: always open its context menu; no action runs until you left-click an enabled option.</p>
       <p>W A S D: walk and override queued movement or approach. E: nearby action keyboard fallback. Use arrows, Home / End and Enter in object menus.</p>

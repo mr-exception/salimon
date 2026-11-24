@@ -84,6 +84,8 @@ test('UX-894 built Help, overlays, Cancel, hidden-tab interruption and keyboard 
   const start = await positionIn(page, 'ship:scout')
   await page.getByRole('button', { name: 'Help', exact: true }).click()
   const help = page.getByRole('dialog', { name: 'Surface controls' })
+  await expect(help.getByRole('heading', { name: 'Surface controls' })).toBeFocused()
+  await expect(help.getByRole('heading', { name: 'Surface controls' })).toBeInViewport()
   await expect(help).toContainText('Right-click an object: always open')
   await expect(help).toContainText('topmost menu or dialog first')
   await expect(help).toContainText('E: nearby action keyboard fallback')

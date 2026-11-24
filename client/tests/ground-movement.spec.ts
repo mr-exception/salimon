@@ -6,6 +6,14 @@ import { compareImages } from '../scripts/visual-comparison.ts'
 const trajectories = new WeakMap<Page, unknown[]>()
 const clickTargets = new WeakMap<Page, { x: number; y: number; pixelRadiusM: number }>()
 async function rightClick(page: Page, x: number, y: number) {
+  // runFor can finish with the last React camera/resize publication queued.
+  // Flush that task before sampling the CTM used by the actual mouse event;
+  // do not advance simulation or relax the physical arrival tolerance.
+  await page.evaluate(() => new Promise<void>(resolve => {
+    const channel = new MessageChannel()
+    channel.port1.onmessage = () => { channel.port1.close(); channel.port2.close(); resolve() }
+    channel.port2.postMessage(null)
+  }))
   const screen = await page.locator('[data-entity="ship:scout"]').evaluate((g, p) => {
     const matrix = (g as SVGGraphicsElement).getScreenCTM()!
     const point = new DOMPoint(p[0], p[1]).matrixTransform(matrix)

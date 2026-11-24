@@ -8,13 +8,14 @@ import { drawList, PLAYER_ID, type TopDownState } from './topDownRuntime.ts'
 import type { Anchor } from './topDownFrames.ts'
 
 export type ObjectActionId = 'inspect' | 'gather' | 'container' | 'core' | 'fabricator' | 'cockpit' | 'door'
-export interface ActionContext { world: TopDownState; session?: ResourceSession | null; paused: boolean }
+export interface ActionContext { world: TopDownState; session?: ResourceSession | null; paused: boolean; phase?: 'selection' | 'approach' | 'execution' }
 export interface ObjectAction {
   id: ObjectActionId
   label: string
   targetId: string
   targetFrame: Anchor['frame']
   rangeM: number | null
+  requiresApproach: boolean
   available: boolean
   reason: string | null
   preconditions: readonly string[]
@@ -27,13 +28,15 @@ export function objectActions(context: ActionContext, id: string): ObjectAction[
   const { world, session, paused } = context
   const target = drawList(world).find(item => item.entity.id === id)?.entity
   if (!target?.interaction || world.cockpit.view !== 'world') return []
-  const common = paused ? 'Resume the expedition first.' : world.scoutLocation.ship.mode === 'destroyed' ? 'Journey ended.' : session?.error || (session?.survival.health === 0 ? 'Run ended.' : null)
+  const common = paused ? 'Resume the expedition first.' : world.scoutLocation.ship.mode === 'destroyed' ? 'Journey ended.' : target.interaction.enabled === false ? 'Target unavailable.' : session?.error || (session?.survival.health === 0 ? 'Run ended.' : null)
   const player = world.entities.find(e => e.id === PLAYER_ID)!
   const reach = interactionInReach(player.anchor, target, world.frames)
-  const nearby = !reach ? 'Move closer using right-click ground or WASD.' : world.player.mode === 'seated' ? 'Stand up first.' : null
+  const executing = context.phase === 'execution'
+  const nearby = world.player.mode === 'seated' ? 'Stand up first.' : executing && !reach ? 'Target is out of reach.' : null
   const action = (actionId: ObjectActionId, label: string, reason: string | null, physical = true, preconditions: readonly string[] = []): ObjectAction => ({
     id: actionId, label, targetId: id, targetFrame: target.anchor.frame,
     rangeM: physical ? target.interaction!.reachM : null,
+    requiresApproach: physical && (!reach || id !== BOARDING_DOOR_ID && player.anchor.frame !== target.anchor.frame),
     available: !(common || reason), reason: common || reason,
     preconditions: ['visible target', 'active expedition', ...preconditions], interrupt: 'replace-command',
     execute: handlers => actionId === 'inspect' ? handlers.inspect(id) : handlers.interact(id, actionId),
@@ -42,11 +45,11 @@ export function objectActions(context: ActionContext, id: string): ObjectAction[
   // register a source, or call the nearby discovery/notebook APIs.
   const actions = [action('inspect', 'Inspect', null, false)]
   const work = session && !survivalPolicy(session.survival).canWork ? 'Too exhausted to work.' : null
-  if (id === BOARDING_DOOR_ID) actions.push(action('door', world.scoutLocation.boardingDoor === 'open' ? 'Close door' : 'Open door', nearby || doorDenial(world), true, ['door unlocked', 'doorway clear']))
-  else if (isCockpitTarget(id) && world.cockpit.enabled) actions.push(action('cockpit', 'Use cockpit', nearby || (!world.cockpit.powered ? 'Cockpit has no power.' : world.cockpit.ownerId !== LOCAL_PLAYER || world.cockpit.occupantId !== null && world.cockpit.occupantId !== LOCAL_PLAYER ? 'Cockpit requires owner control and a free chair.' : player.anchor.frame !== world.frames.ship.id ? 'Enter the Scout first.' : work), true, ['powered', 'owner', 'free chair']))
+  if (id === BOARDING_DOOR_ID) actions.push(action('door', world.scoutLocation.boardingDoor === 'open' ? 'Close door' : 'Open door', nearby || doorDenial(world, executing, context.phase !== 'approach'), true, ['door unlocked', 'doorway clear']))
+  else if (isCockpitTarget(id) && world.cockpit.enabled) actions.push(action('cockpit', 'Use cockpit', nearby || (!world.cockpit.powered ? 'Cockpit has no power.' : world.cockpit.ownerId !== LOCAL_PLAYER || world.cockpit.occupantId !== null && world.cockpit.occupantId !== LOCAL_PLAYER ? 'Cockpit requires owner control and a free chair.' : executing && player.anchor.frame !== world.frames.ship.id ? 'Enter the Scout first.' : work), true, ['powered', 'owner', 'free chair']))
   else if (session && ['scout:storage', 'scout:core', 'scout:fabricator'].includes(id)) {
     const kind = id === 'scout:storage' ? 'container' : id === 'scout:core' ? 'core' : 'fabricator'
-    actions.push(action(kind, kind === 'container' ? 'Use Resource Container' : kind === 'core' ? 'Use Energy Core' : 'Use Fabricator', nearby, true, ['proximity', 'explicit panel confirmation']))
+    actions.push(action(kind, kind === 'container' ? 'Use Resource Container' : kind === 'core' ? 'Use Energy Core' : 'Use Fabricator', nearby || (executing && player.anchor.frame !== target.anchor.frame ? 'Enter the Scout first.' : null), true, ['proximity', 'explicit panel confirmation']))
   } else if (session && target.source) {
     const source = session.source(id), inventory = session.snapshot.inventory
     const usage = resourceInventoryUsage(inventory, RESOURCE_CATALOG, session.itemCatalog)
@@ -57,7 +60,7 @@ export function objectActions(context: ActionContext, id: string): ObjectAction[
 }
 /** Rebuild on invocation; a retained menu row never grants stale authority. */
 export function executeObjectAction(context: ActionContext, targetId: string, actionId: ObjectActionId, handlers: ActionHandlers): boolean {
-  const action = objectActions(context, targetId).find(action => action.id === actionId)
+  const action = objectActions({ ...context, phase: 'execution' }, targetId).find(action => action.id === actionId)
   if (!action?.available) return false
   action.execute(handlers)
   return true

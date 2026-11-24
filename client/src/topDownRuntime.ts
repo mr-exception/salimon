@@ -1,4 +1,5 @@
 import { cancelGroundMovement, groundPositionClear, terrainMovementFraction, type GroundCommand } from './topDownNavigation.ts'
+import type { ObjectCommand } from './topDownCommands.ts'
 import { followWorldCamera, type WorldCamera } from './topDownCamera.ts'
 import { surfaceRegion, surfaceToLocal, localToSurface } from './surfaceCoordinates.ts'
 import { BOARDING_DOOR_ID, BOARDING_DOOR_HALF_DEPTH_M, synchronizeDoor, toggleDoor } from './scoutDoor.ts'
@@ -17,6 +18,7 @@ export type Layer = typeof LAYERS[number]
 export type Appearance = 'ground' | 'surface' | 'rock' | 'hull' | 'floor' | 'player' | 'desk' | 'bed' | 'core' | 'crate' | 'wall' | 'door' | 'cue' | 'chair' | 'fabricator' | 'storage' | 'threshold' | 'mineral' | 'flora' | 'stones'
 export interface Entity2D extends WorldObject { readonly layer: Layer; readonly appearance: Appearance; readonly source?: SourceIdentity }
 export interface TopDownState {
+  readonly objectCommand?: ObjectCommand
   readonly groundCommand?: GroundCommand
   readonly scoutLocation: ScoutLocation
   readonly cockpit: CockpitState

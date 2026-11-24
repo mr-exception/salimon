@@ -1329,8 +1329,7 @@ closed-door failure, viewport mapping and reload check retain originals, traces
 on failure and canonical state/trajectory JSON under ignored `test-results/`.
 These tests also run in PR smoke and the existing full world group; CI artifacts
 retain evidence for 14 days. Camera zoom/pan controls (#891), object menus (#892),
-auto-approach (#893) and the final shared command HUD (#894) remain separately
-owned; the inverse projection already supports different live camera transforms.
+auto-approach (#893) and the final shared command HUD (#894) have separate owners; the inverse projection already supports different live camera transforms.
 
 
 ## 2D camera controls (#891)
@@ -1380,8 +1379,8 @@ interrupt and handler contracts; invocation rebuilds availability from live stat
 Remote Inspect repeats only the displayed label and never registers discovery.
 Implemented gathering, container, Core, Fabricator, door and cockpit capabilities
 use their existing domain adapters. Transfers still require panel confirmation.
-Out-of-range actions explain ground/WASD approach; automatic approach belongs to
-#893. Existing E and nearby controls remain available.
+Eligible out-of-range actions say they will approach first; #893 owns that
+command lifecycle. Existing E and nearby controls remain available.
 
 Check with `node --experimental-strip-types --test src/topDownActions.test.ts
 src/topDownNavigation.test.ts` and, after `npm run build`,
@@ -1390,3 +1389,38 @@ Built `/` checks use actual mouse/keyboard input, semantic accessibility asserti
 original/repeat/negative screenshots and action outcomes. Evidence remains in
 ignored `test-results/` and the existing 14-day CI artifacts; PRs own validation
 summaries. No visual references are changed by this feature.
+
+### Automatic approach and execution (#893)
+
+Selecting an enabled physical action routes to a collision-free point within the
+object's interaction range, then revalidates and calls the existing domain API.
+Right-clicking the object alone still opens only its menu. Equip the gathering
+tool before selecting remote Gather / Mine. Resource Container, Core and Fabricator
+commands open their existing panels; transfers and machine operations still need
+their existing explicit review/confirmation. Cockpit ownership/power, Scout door
+locks, survival and uncancellable flight maneuvers retain authority.
+
+`topDownCommands.ts` owns the session-local selected → routing → approaching →
+revalidating → executing → completed/cancelled/failed lifecycle. It uses bounded,
+deterministically ordered approach candidates and #890's swept route planner.
+Live target ID/frame/position/site, phase, tool, inventory, survival and capability
+are checked during approach and immediately before dispatch. Door endpoints must
+also be clear of the threshold. A consumed menu-publication receipt prevents a
+replayed selection from restarting mining or toggling a door twice. Gathering
+continues on the sole ResourceSession clock with its exact-gram atomic ledger;
+commands never add their own mining ticks or transfers.
+
+New commands/ground movement, WASD, Escape, pause and focus/pointer/scene loss
+cancel queued work. Stowing the tool interrupts mining. Commands/routes are not
+saved, and reload never resumes them. Terminal failures and the current approach
+are shown with the existing interaction feedback; final HUD integration is #894.
+
+Run `npm test`, `npm run build`, then
+`npx playwright test --project=cockpit tests/auto-approach.spec.ts tests/object-context.spec.ts`.
+The built `/` journey selects a remote deposit, mines, approaches the Resource
+Container, confirms a 333 g deposit exactly once and approaches the cockpit.
+Interruption/reload and closed-door negatives, plus original/repeat image checks,
+run in PR smoke and the full world group, retaining raw observations under
+ignored `test-results/` and existing CI artifacts
+(14 days). `topDownCommands.test.ts` also covers deterministic states, stale
+identity/site, capacity/tool/survival changes, power/seat revocation and replay.

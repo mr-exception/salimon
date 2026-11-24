@@ -33,7 +33,9 @@ test('remote Inspect is label-only; physical range, power, pause and stale targe
   let world = createTopDownState('interior', true)
   const get = () => ({ world, paused: false })
   assert.equal(objectActions(get(), 'scout:chair')[0]!.available, true)
-  assert.match(objectActions(get(), 'scout:chair')[1]!.reason!, /closer/)
+  assert.equal(objectActions(get(), 'scout:chair')[1]!.requiresApproach, true)
+  assert.equal(objectActions(get(), 'scout:chair')[1]!.available, true)
+  assert.match(objectActions({ ...get(), phase: 'execution' }, 'scout:chair')[1]!.reason!, /reach/)
   world = place(world, 0, -3.1)
   assert.equal(objectActions(get(), 'scout:chair')[1]!.available, true)
   let calls = 0

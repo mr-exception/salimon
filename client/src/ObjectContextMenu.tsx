@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { useDismissLayer } from './ui/interaction.ts'
 import type { ObjectAction, ObjectActionId } from './topDownActions.ts'
 
-export interface ObjectMenuSelection { targetId: string; x: number; y: number }
+export interface ObjectMenuSelection { targetId: string; x: number; y: number; sequence: number }
 export function ObjectContextMenu({ selection, label, actions, onClose, onChoose }: {
   selection: ObjectMenuSelection; label: string; actions: ObjectAction[]
   onClose: () => void; onChoose: (id: ObjectActionId) => void
@@ -54,6 +54,7 @@ export function ObjectContextMenu({ selection, label, actions, onClose, onChoose
     {actions.map(action => <button key={action.id} role="menuitem" tabIndex={-1} aria-disabled={!action.available} aria-describedby={action.reason ? `object-action-${action.id}-reason` : undefined}
       onClick={() => { if (action.available) { onClose(); restore(); onChoose(action.id) } }}>
       <span>{action.label}</span>
+      {action.available && action.requiresApproach && <small>Approach, then {action.label.toLowerCase()}</small>}
       {action.reason && <small id={`object-action-${action.id}-reason`}>{action.reason}</small>}
     </button>)}
   </div>

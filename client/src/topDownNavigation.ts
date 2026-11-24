@@ -137,6 +137,7 @@ export function planGroundRoute(state: TopDownState, destination: Anchor): reado
   return null
 }
 export function cancelGroundMovement(state: TopDownState): TopDownState {
+  if (state.objectCommand && !['completed', 'cancelled', 'failed'].includes(state.objectCommand.status)) state = { ...state, objectCommand: { ...state.objectCommand, status: 'cancelled', message: 'Command cancelled.' } }
   return state.groundCommand?.status === 'moving' ? { ...state, groundCommand: { ...state.groundCommand, status: 'cancelled', waypoints: [] }, player: { ...state.player, mode: state.player.mode === 'walking' ? 'standing' : state.player.mode }, feedback: 'Movement cancelled.' } : state
 }
 export function requestGroundMovement(state: TopDownState, destination: Anchor): TopDownState {

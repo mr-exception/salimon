@@ -1,5 +1,6 @@
+import { advanceObjectCommand, selectObjectCommand } from './topDownCommands.ts'
 import { ObjectContextMenu, type ObjectMenuSelection } from './ObjectContextMenu.tsx'
-import { executeObjectAction, objectActions, type ObjectActionId } from './topDownActions.ts'
+import { objectActions, type ObjectActionId } from './topDownActions.ts'
 import { CameraDrag, followWorldCamera, panWorldCamera, zoomWorldCamera } from './topDownCamera.ts'
 import { MarkerDeployment } from './MarkerDeployment.tsx'
 import { ExplorationHud, FieldMarkCues } from './ExplorationHud.tsx'
@@ -157,6 +158,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     }
     return container.current!.open(world)
   }
+  const menuSequence = useRef(0)
   const [objectMenu, setObjectMenu] = useState<ObjectMenuSelection | null>(null)
   const closeObjectMenu = useCallback(() => setObjectMenu(null), [])
   const paused = useRef(false)
@@ -272,13 +274,15 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       if (paused.current || document.hidden) { input.clear(); clock.reset() }
       const controls = input.controls
       current.current = clock.advance(current.current, dt, viewToWorld([Number(controls.right) - Number(controls.left), Number(controls.down) - Number(controls.up)], current.current.frames), (world, direction) => {
-        if (!session.current) return stepTopDown(world, direction)
+        if (!session.current) return advanceObjectCommand({ world: stepTopDown(world, direction), paused: paused.current })
         if (session.current.error || session.current.survival.health === 0) return world
         const locationBefore = { ...world.scoutLocation }
         if (gameplay) navigation.advance(1 / 60, controlsCockpit(world.cockpit, LOCAL_PLAYER) && survivalPolicy(session.current.survival).canWork ? navigation.pilotInput.controls : undefined)
         const next = session.current.advance(stepTopDown(world, direction, survivalPolicy(session.current.survival).movement))
         if (next.tick === world.tick) Object.assign(world.scoutLocation, locationBefore)
-        return next
+        const commanded = advanceObjectCommand({ world: next, session: session.current, paused: paused.current }, openEquipment)
+        session.current.world = commanded
+        return commanded
       })
       if (session.current) {
         session.current.world = current.current
@@ -328,30 +332,11 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const chooseObjectAction = (action: ObjectActionId) => {
     const id = objectMenu?.targetId
     if (!id) return
-    executeObjectAction({ world: current.current, session: session.current, paused: paused.current }, id, action, {
-      inspect: targetId => {
-        // Only repeat the already displayed label, never award remote discovery.
-        const target = current.current.entities.find(e => e.id === targetId)!
-        if (session.current) session.current.feedback = ''
-        const next = { ...cancelGroundMovement(current.current), feedback: `${target.interaction!.label}. Physical actions require proximity.` }
-        if (session.current) session.current.world = next
-        update(next)
-      },
-      interact: (targetId, actionId) => {
-        let next: TopDownState = { ...cancelGroundMovement(current.current), selectedId: targetId }
-        if (session.current) {
-          session.current.cancel()
-          session.current.world = next
-          if (['container', 'core', 'fabricator'].includes(actionId)) openEquipment(next)
-          else if (actionId === 'door') session.current.toggleBoardingDoor(session.current.snapshot.revision)
-          else if (actionId === 'gather') session.current.start(targetId)
-          else session.current.world = requestInteraction(next, targetId)
-          next = session.current.world
-        } else next = requestInteraction(next, targetId)
-        update(next)
-      },
-    })
+    const next = selectObjectCommand({ world: current.current, session: session.current, paused: paused.current }, id, action, objectMenu.sequence)
+    if (session.current) { session.current.world = next; session.current.feedback = '' }
+    update(next)
   }
+
   const menuActions = objectMenu ? objectActions({ world: state, session: resourceSession, paused: paused.current }, objectMenu.targetId) : []
   useEffect(() => { if (objectMenu && !menuActions.length) closeObjectMenu() }, [objectMenu, menuActions.length, closeObjectMenu])
   const vital = resourceSession?.survival
@@ -422,7 +407,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       }} onCancelGround={() => update(cancelGroundMovement(current.current))} onGround={(anchor, objectId, pointer) => {
         if (current.current.cockpit.view !== 'world' || container.current?.opened || document.querySelector('dialog[open]')) return
         if (!objectId && (paused.current || gameplay && (!resourceSession || resourceSession.error || resourceSession.survival.health === 0))) return
-        if (objectId) setObjectMenu({ targetId: objectId, ...pointer })
+        if (objectId) setObjectMenu({ targetId: objectId, ...pointer, sequence: ++menuSequence.current })
         else { closeObjectMenu(); resourceSession?.cancel() }
         if (resourceSession && !objectId) resourceSession.feedback = ''
         const next = objectId ? cancelGroundMovement(current.current) : requestGroundMovement(current.current, anchor)
@@ -466,6 +451,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <p>Capacity: {usage!.grams / 1000} / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg · {usage!.slots} / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
     </div>}
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
+    {state.objectCommand && <p role="status" data-command-status={state.objectCommand.status} data-command-target={state.objectCommand.targetId}>{state.objectCommand.message}</p>}
     {state.groundCommand && <p role="status" data-movement-status={state.groundCommand.status}>{state.groundCommand.status === 'moving' ? 'Moving to destination · Escape to cancel' : state.groundCommand.status === 'failed' ? 'Destination unreachable or route blocked. Choose another destination.' : state.groundCommand.status === 'arrived' ? 'Arrived at destination.' : 'Movement cancelled.'}</p>}
     <footer><p>Right-click ground to walk · <strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p></footer>
     </div>

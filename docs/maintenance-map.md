@@ -5,7 +5,13 @@ live invocation guards; `ObjectContextMenu.tsx` owns clamping, keyboard navigati
 and dismissal/focus. `topDownNavigation.interactiveAt` shares render ordering and
 visibility with the scene; `TopDownView.tsx` dispatches to existing domain adapters.
 `topDownActions.test.ts` and built `tests/object-context.spec.ts` own coverage.
-Automatic approach/execution remains #893; see the client menu guide.
+Automatic approach/execution (#893): `topDownCommands.ts` owns bounded legal
+endpoints, lifecycle/revalidation and consumed menu receipts. The existing
+`cancelGroundMovement` path also cancels queued object commands; `TopDownView.tsx`
+advances them after the ResourceSession update on the sole fixed clock. Domain
+transaction and confirmation owners remain authoritative. Coverage belongs to
+`topDownCommands.test.ts` and built `tests/auto-approach.spec.ts`; see the client
+[command guide](../client/README.md#automatic-approach-and-execution-893).
 
 2D camera controls (#891): `topDownCamera.ts` owns presentation-local zoom,
 bounded manual pan, follow restoration and the single-pointer drag lifecycle.

@@ -7,16 +7,16 @@ import type { TopDownState } from './topDownRuntime.ts'
 
 export const BOARDING_DOOR_ID = 'scout:entry'
 export const BOARDING_DOOR_HALF_DEPTH_M = .15
-export function doorDenial(world: TopDownState): string | null {
+export function doorDenial(world: TopDownState, requireReach = true, requireClear = true): string | null {
   const location = world.scoutLocation
   if (location.ship.mode !== 'grounded' || !location.binding || location.maneuver !== null || world.frames.ship.parent === null)
     return 'Airlock locked in flight. Land at a validated surface site before opening the aft boarding door.'
   const siteDenial = takeoffDenial({ ...location, boardingDoor: 'closed' })
   if (siteDenial) return siteDenial
   const player = world.entities.find(e => e.id === 'person:player')!, door = world.entities.find(e => e.id === BOARDING_DOOR_ID)
-  if (world.player.mode === 'seated' || !door || !interactionInReach(player.anchor, door, world.frames)) return 'Approach the aft boarding door to operate it.'
+  if (world.player.mode === 'seated' || !door || requireReach && !interactionInReach(player.anchor, door, world.frames)) return 'Approach the aft boarding door to operate it.'
   // Never close a collider through a person standing across the threshold.
-  if (location.boardingDoor === 'open' && world.entities.some(e => {
+  if (requireClear && location.boardingDoor === 'open' && world.entities.some(e => {
     if (e.appearance !== 'player' && e.layer !== 'people') return false
     const [x, y] = relativeM(convertAnchor(e.anchor, world.frames.ship.id, world.frames).point, SCOUT_ANCHORS.entry!.point)
     return Math.abs(x) < SCOUT_ENTRY_HALF_WIDTH_M + PLAYER_RADIUS_M && Math.abs(y) < BOARDING_DOOR_HALF_DEPTH_M + PLAYER_RADIUS_M

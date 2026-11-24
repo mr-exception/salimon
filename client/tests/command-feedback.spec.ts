@@ -31,11 +31,13 @@ const saved = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getIte
 test('UX-894 built mouse-only obstruction → mine → confirmed deposit → cockpit and durable reload', async ({ page }, info) => {
   await boot(page, '', 'http://127.0.0.1:4175')
   // Reach an outdoor point around the hull before choosing a remote mineral.
-  const target = await point(page, 'ship:scout', -4, 4)
+  const trajectory: number[][] = []
+  const target = await point(page, 'ship:scout', 4, 0)
   await page.mouse.click(target.x, target.y, { button: 'right' })
   await expect(page.locator('.command-feedback')).toContainText('Moving to destination')
   await expect(page.getByRole('button', { name: 'Cancel command' })).toBeVisible()
-  await expect.poll(async () => { await page.clock.runFor(250); return page.locator('[data-movement-status]').getAttribute('data-movement-status') }, { timeout: 60000, intervals: [10, 25] }).toBe('arrived')
+  await expect.poll(async () => { await page.clock.runFor(250); trajectory.push(await positionIn(page, 'ship:scout')); return page.locator('[data-movement-status]').getAttribute('data-movement-status') }, { timeout: 60000, intervals: [10, 25] }).toBe('arrived')
+  expect(trajectory.some(p => p[1]! > 5.5 || p[1]! < -6.1)).toBe(true) // detour outside the hull
   await expect(page.locator('[data-entity="person:player"]')).toHaveAttribute('data-frame', 'planet:fixture')
   await page.getByRole('button', { name: 'Equip gathering tool' }).click()
   await choose(page, source, 'Gather / Mine')
@@ -74,7 +76,7 @@ test('UX-894 built mouse-only obstruction → mine → confirmed deposit → coc
   await expect.poll(async () => { await page.clock.runFor(50); return saved(page) }).toMatchObject({ inventory: { quantities: { mineral: 667 } }, stores: { 'scout:storage': { quantities: { mineral: 333 } } } })
   expect(JSON.stringify(await saved(page))).not.toMatch(/objectCommand|groundCommand|waypoints/)
   await expect(receipt(page)).toHaveCount(0)
-  await info.attach('journey-state.json', { body: JSON.stringify({ before, committed, reloaded: await saved(page), repeat: { pass: comparison.pass, changedPixels: comparison.changedPixels }, input: 'Playwright desktop mouse; keyboard only for amount entry', backend: { world: 'SVG CPU', cockpit: backend }, viewport: '1280x800 DPR1' }), contentType: 'application/json' })
+  await info.attach('journey-state.json', { body: JSON.stringify({ trajectory, before, committed, reloaded: await saved(page), repeat: { pass: comparison.pass, changedPixels: comparison.changedPixels }, input: 'Playwright desktop mouse; keyboard only for amount entry', backend: { world: 'SVG CPU', cockpit: backend }, viewport: '1280x800 DPR1' }), contentType: 'application/json' })
 })
 
 test('UX-894 built Help, overlays, Cancel, hidden-tab interruption and keyboard fallback', async ({ page }, info) => {

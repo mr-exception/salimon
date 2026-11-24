@@ -142,7 +142,12 @@ test('UX-894 built unavailable mining, active Cancel and full-inventory feedback
   await expect(mine).toHaveAttribute('aria-disabled', 'true')
   await expect(mine).toContainText('Equip the gathering tool first')
   const held = await positionIn(page, 'ship:scout')
-  await mine.click(); await page.clock.runFor(500)
+  const disabledClick = async () => {
+    const box = (await mine.boundingBox())!
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
+    await page.clock.runFor(500)
+  }
+  await disabledClick()
   expect(await positionIn(page, 'ship:scout')).toEqual(held)
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'Equip gathering tool' }).click()
@@ -165,7 +170,7 @@ test('UX-894 built unavailable mining, active Cancel and full-inventory feedback
   await page.mouse.click(q.x, q.y, { button: 'right' })
   await expect(mine).toHaveAttribute('aria-disabled', 'true')
   await expect(mine).toContainText('Inventory full: weight limit')
-  await mine.click(); await page.clock.runFor(500)
+  await disabledClick()
   expect((await saved(page)).inventory).toEqual(full.inventory)
   await page.screenshot({ path: info.outputPath('inventory-full.png') })
   await info.attach('capacity-state.json', { body: JSON.stringify({ cancelled, full, afterUnavailable: await saved(page) }), contentType: 'application/json' })

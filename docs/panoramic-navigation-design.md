@@ -69,7 +69,7 @@ admission, supported sites, persistence, regression ownership and prototype limi
 The 3D scene fills the available viewport in desktop cockpit mode: no permanent right sidebar, coordinate lattice, unused margins or normal body scrolling. All controls remain reachable through accessible HUD overlays, not hidden or sacrificed to appearance.
 
 - **Always visible:** Small cyan observation reticle, scanner status/contact count/pulse; current speed with explicit reference frame, throttle and flight/grounded status; compact **3D mini orientation compass**; critical warnings when present.
-- **Compass:** Cyan = camera/view axis; yellow = ship heading/thrust axis; light green = physical velocity direction. Express full spherical directions relative to camera (including behind/above/below). Use distinct solid/front versus hollow or dashed/rear glyphs, and distinguish overlapping heading/velocity. Suppress green direction near zero speed and show Stationary. **No** old viewport-reaching yellow/green vector rays.
+- **Compass:** Cyan = camera/view axis; amber = ship heading/thrust axis; light green = physical velocity direction. Express full spherical directions relative to camera (including behind/above/below). Use distinct solid/front versus hollow or dashed/rear glyphs, and distinguish overlapping heading/velocity. Suppress green direction near zero speed and show Stationary. Heading and dashed light-green velocity lines stay inside the compass; **no** viewport-reaching vector rays or off-screen object arrows.
 - **On selection:** Small contact identification/status and independent Look at / Set direction actions. Contact details and ship stats can expand. The contact browser is collapsed by default but searchable and paginated; preserve access to all currently detected IDs, including grouped/off-screen/occluded contacts.
 - **HUD safety:** Warning severity takes priority over normal panels; dangerous approach and terminal ship destruction remain visible. Inputs within dialogs/forms/panels cannot accidentally steer/turn/zoom the ship or camera. Escape closes the topmost panel before any cockpit-exit behavior. Keep Tab for accessibility; a proposed contact-browser shortcut is **C**, not Tab.
 - Keyboard and mouse UI, help text, test IDs and screenshots must reflect actual bindings. No mobile-specific interface requirement.
@@ -118,7 +118,7 @@ handlers; this adoption does not substitute the foundation Button's deliberately
 focusable `aria-disabled` policy. Search and throttle use the same palette,
 focus ring and typography. Opaque instrument surfaces preserve text contrast
 against both bright bodies and near-black sky without changing optical rendering.
-The compass consumes the reserved heading/velocity tokens, preserving its shapes,
+The compass consumes reserved heading/velocity tokens (heading is scoped to amber after #908), preserving its shapes,
 hemisphere calculation and stationary threshold; cyan remains the view axis.
 
 Contacts and telemetry stay collapsed by default. Expanded telemetry starts to
@@ -137,3 +137,23 @@ acceptance. See [issue #828 evidence](../reports/issue-828/README.md). Changed
 reference images retain their originals/diffs for review. The owner reviews
 appearance in the deployed version and files follow-up issues; no separate human
 baseline-approval CI job is required (PR #834).
+
+### Targeting and orientation refinement (#908)
+
+`PerspectiveContacts.tsx` uses `sensorMarkers.css` for fixed 32 px hit areas,
+matching the existing overlap grouping threshold. Open muted ticks remain
+readable for optically unresolved scanned contacts at 75° through 0.1° FOV.
+Hover/focus shows bright brackets; selection shows cyan brackets, including when
+the selected ID belongs to a group. Group counts retain every member in the
+browser. Active landing destinations use an amber diamond; this is the existing
+`ScoutLocation.landing.surface.bodyId`, not a new waypoint mechanic. Existing
+`navigationWarnings` dangerous approaches add a red diamond/exclamation and a
+text description. Danger, destination and selection can coexist.
+
+Marker descriptions and titles contain only current scanned identities. Occluded,
+off-screen and rear contacts remain browser-only; range loss still clears
+selection/actions. Markers do not change physical occlusion, scanner pulses,
+edge clipping, input/wheel routing or panel priority. The cyan open reticle
+denotes the camera; the amber heading triangle and light-green velocity ring
+remain separate inside the camera-relative compass, including exact axial
+overlap and rear directions. The existing <=0.01 m/s Stationary threshold stays.

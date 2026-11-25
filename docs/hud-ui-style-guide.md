@@ -30,7 +30,7 @@ Colors below are **sRGB UI design tokens**, not linear-space shader material con
 | `--ui-active` | `#69D3DD` | Active systems, focus, selected instrument information |
 | `--ui-mechanical` | `#EBC076` | Mechanical affordance, physical emphasis, caution context |
 | `--ui-danger` | `#E77F73` | Danger/destructive actions **with text/icon** |
-| `--ui-heading` | `#FFE36A` | Panoramic compass ship-heading axis (reserved role) |
+| `--ui-heading` | `#FFE36A` | Heading fixture ink; production compass scopes this to amber `#EBC076` (#908) |
 | `--ui-velocity` | `#B6F5A2` | Panoramic compass physical-velocity axis (reserved role) |
 
 Do not communicate condition/severity by hue alone. Do not use heading/velocity colors as generic action success colors. No global bloom, perpetual pulsing, blinking decoration or blanket blur filters; a small highlight/emissive accent can mark an actual active device. Semi-transparent projected backgrounds must be dark enough over both bright ground and near-black space; support stronger opaque backgrounds in accessibility settings if needed.
@@ -74,10 +74,10 @@ Preserve the actual `TopDownView` gameplay and [full-viewport 2D contract](playa
 
 ## 5. 3D panoramic cockpit: precision sensor HUD
 
-The *production* 360° optical sky must fill the viewport; this style layer **does not add** a hull/cockpit model, body lattice, off-screen target rays, heading/velocity rays or a permanent side drawer. [Panoramic navigation](panoramic-navigation-design.md#compact-full-viewport-hud) and the delivered #814/#815 functional layout govern.
+The *production* 360° optical sky must fill the viewport; this style layer **does not add** a hull/cockpit model, body lattice, off-screen target rays, viewport-reaching heading/velocity rays or a permanent side drawer. [Panoramic navigation](panoramic-navigation-design.md#compact-full-viewport-hud) and the delivered #814/#815 functional layout govern.
 
 - Always on-screen: small cyan **observation reticle**, scanner state/contact count/pulse, speed with explicit frame, flight/grounded status, throttle access, mini 3D orientation compass, and active critical warnings.
-- Compass semantics immutable: cyan = camera/view axis, yellow = ship heading, light green = velocity; distinguish front/back with shape/fill, handle overlap, and suppress velocity direction when stationary.
+- Compass semantics immutable: cyan = camera/view axis, amber = ship heading, light green = velocity; distinguish front/back with shape/fill, handle overlap, and suppress velocity direction when stationary.
 - Searchable/paginated contacts default collapsed; a selected **scanned** contact opens small identifying/actions UI for separate `Look at` (camera) and `Set direction` (ship), subject to authority.
 - Expanded telemetry/help are on demand, not permanently layered over celestial observation. Compact survival status remains available during cockpit use without competing with navigation's primary instruments.
 - Scanned, off-screen or optically occluded contacts stay discoverable in the contact browser, but do **not** gain through-body world markers. Visible unscanned bodies must never gain name, identity, tooltip or selectable commands.
@@ -195,7 +195,7 @@ The delivered panoramic HUD now consumes the shared DOM token source and control
 utility-panel and dialog skins. Its compact native controls preserve the existing
 disabled and keyboard contract. Opaque `--ui-void` surfaces isolate text contrast
 from celestial brightness; warning/terminal text uses mechanical/danger inks and
-the compass alone consumes heading/velocity inks. Seated survival remains available
+the compass consumes heading/velocity inks, with a scoped amber heading after #908. Seated survival remains available
 in its own bounded column above the compass, with expanded telemetry beside it.
 See the [panoramic contract](panoramic-navigation-design.md#shared-projected-instrumentation-828)
 and [original captures/results](../reports/issue-828/README.md). Styling acceptance
@@ -248,3 +248,14 @@ do not grant appearance approval. Preserve original/repeat/expected/diff images
 and canonical per-scenario state in ignored `client/test-results/` and existing
 14-day CI artifacts. The delivering PR records revisions, commands, criteria,
 environment and unverified qualifications; do not add new committed reports.
+
+### Scanner marker states (#908)
+
+Muted open ticks are the default; hover/focus reveals bright corner brackets,
+and selected contacts/groups retain cyan brackets. Active landing destinations
+add an amber diamond. Dangerous approaches use a red diamond with an exclamation
+and a textual description from the existing warning owner. These cues combine
+without replacing the selected state. Their fixed 32 px hit area preserves
+existing clustering and edge/panel policies. The cyan reticle has an open center;
+short amber heading and dashed light-green velocity lines live only inside the
+mini compass. See the [navigation contract](panoramic-navigation-design.md#targeting-and-orientation-refinement-908).

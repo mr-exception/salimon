@@ -641,8 +641,9 @@ help, contacts, then telemetry before requesting cockpit exit. Focused controls
 suppress WASD, ship arrows and optical wheel. Reset returns to the current ship
 heading and 75° FOV. The compass uses a camera-relative hemispherical disk: center
 is axial, rim is sideways, up/down follows the screen. Solid markers are front;
-hollow markers are rear (exact 180° rear is at the center). Yellow triangles and
-larger green circles distinguish coincident vectors; cyan marks the view axis.
+hollow markers are rear (exact 180° rear is at the center). Amber triangles and
+larger light-green circles distinguish coincident vectors; cyan marks the camera axis.
+Short heading/velocity lines stay inside the compass; the central reticle is open.
 Velocity at or below 0.01 m/s is Stationary. Speed explicitly uses the sample
 inertial frame. Warnings/terminal actions have priority over expanded telemetry.
 
@@ -1516,3 +1517,29 @@ new checks run in PR smoke. Originals and measurements
 are in ignored `test-results/`; CI artifacts retain evidence for 14 days.
 Changed visual references require the existing explicit baseline approval;
 new captures do not approve themselves.
+
+## Targeting markers and orientation (#908)
+
+`PerspectiveContacts.tsx` / `sensorMarkers.css` present current scanner contacts
+as muted open ticks with fixed 32 px hit areas at all optical zoom levels. Hover
+and keyboard focus show bright brackets; selection retains cyan brackets,
+including selection within a grouped marker. The contact browser keeps every ID.
+`destinationId` accepts the existing active landing body's ID; the production
+owner supplies `navigation.location?.landing?.surface.bodyId`. Its amber diamond
+is presentation only. Dangerous approaches from `navigationWarnings` add a red
+! diamond and accessible text; selection/destination cues remain visible.
+
+Scanner acquisition, physical center-ray occlusion, rear/off-screen suppression,
+edge clipping, range eviction, panel stacking and wheel routing remain with the
+existing owners. The cyan open reticle marks camera orientation, while short
+amber heading and dashed light-green velocity lines remain within the mini
+compass. Front/rear glyphs and <=0.01 m/s Stationary behavior are preserved.
+
+Focused verification: `npx playwright test --project=perspective --project=panoramic
+--grep 'SENSOR-908|HUD-908'`. Both cases also run in PR smoke and full perspective
+CI. Screenshots cover hover, warning/destination, selected distant contacts at
+75°/0.1°, selected groups, occluded browser selection, compass overlap/rear/zero
+and independent camera rotation. Originals, repeat comparisons, state JSON and
+traces use ignored `test-results/` and existing CI artifacts (14 days). Existing
+reference comparisons and explicit review of changed baselines remain in force;
+new captures do not approve references.

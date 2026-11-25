@@ -1,0 +1,17 @@
+/* Fixed 32px hit area matches the projection owner's overlap threshold.
+ * Open centers preserve the optical scene; panel z-order and edge clipping stay
+ * with the panoramic shell. Works in standalone sensor fixtures as well. */
+.sensor-marker { position:absolute; transform:translate(-50%,-50%); width:32px; height:32px; padding:0; border:0; border-radius:0; background:transparent; color:var(--ui-muted,#afc2c8); pointer-events:auto; cursor:pointer }
+.sensor-marker svg { display:block; width:32px; height:32px; overflow:visible; filter:drop-shadow(1px 0 0 #09141c) drop-shadow(-1px 0 0 #09141c) drop-shadow(0 1px 0 #09141c) drop-shadow(0 -1px 0 #09141c) }
+.sensor-marker path { fill:none; stroke:currentColor; stroke-width:1.5 }
+.sensor-marker .marker-brackets { opacity:0 }
+.sensor-marker:hover, .sensor-marker:focus-visible { color:var(--ui-text,#e8e1d1) }
+.sensor-marker:focus-visible { outline:1px solid currentColor; outline-offset:2px }
+.sensor-marker:hover .marker-brackets, .sensor-marker:focus-visible .marker-brackets, .sensor-marker[data-selected=true] .marker-brackets { opacity:1 }
+.sensor-marker[data-destination=true] .marker-core { stroke:var(--ui-mechanical,#ebc076) }
+.sensor-marker[data-selected=true] { color:var(--ui-active,#69d3dd) }
+.sensor-marker .marker-count { fill:currentColor; stroke:var(--ui-void,#09141c); stroke-width:3px; paint-order:stroke; font:11px ui-monospace,monospace; font-weight:bold }
+.sensor-marker:has(.marker-count) .marker-core { display:none }
+.sensor-marker[data-destination=true]:has(.marker-count) .marker-core { display:block; transform:translate(-8px,-9px) scale(.65); transform-origin:16px 16px }
+.marker-danger { box-sizing:border-box; position:absolute; top:2px; right:2px; width:10px; height:10px; color:var(--ui-danger,#e77f73); background:var(--ui-void,#09141c); border:1px solid currentColor; transform:rotate(45deg); font:bold 9px/8px ui-monospace,monospace }
+.marker-danger b { display:block; transform:rotate(-45deg) }

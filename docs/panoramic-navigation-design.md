@@ -157,3 +157,19 @@ edge clipping, input/wheel routing or panel priority. The cyan open reticle
 denotes the camera; the amber heading triangle and light-green velocity ring
 remain separate inside the camera-relative compass, including exact axial
 overlap and rear directions. The existing <=0.01 m/s Stationary threshold stays.
+
+### Contextual warnings and restrained motion (#909)
+
+Shared `ui/Feedback.tsx` notifications pair info/caution/danger inks with explicit
+labels and glyphs. Existing proximity conditions display Caution; dangerous
+approaches and terminal impacts display Danger immediately. The navigation owner
+retains all thresholds, scanner gating, priority and lifecycle. The warning slot
+paints above utility panels, while Help mirrors current conditions inside its
+native modal layer and clears resolved warnings there too.
+
+Panoramic panels enter with a single 180 ms opacity change; hover, selection and
+marker brackets use paint-only 180 ms transitions. Input and focus remain
+immediate, warnings never fade, and reduced-motion preferences disable effects.
+No layout animation, scanlines, persistent animation or new simulation/React
+publication loop is introduced. `tests/panoramic.spec.ts` HUD-909 owns lifecycle,
+motion and panel-visibility regressions alongside HUD-907 geometry checks.

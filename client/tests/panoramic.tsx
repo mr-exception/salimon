@@ -27,6 +27,9 @@ Object.assign(window, {
   if (kind === 'overlap') navigation.clock.state = { ...navigation.clock.state, yaw: 0, velocityMps: [0, 0, -10] }
   if (kind === 'stationary') navigation.clock.state = { ...navigation.clock.state, velocityMps: [0, 0, 0] }
   if (kind === 'warning') navigation.clock.state = { ...navigation.clock.state, position: translate(ORIGIN, [0, 5000, -98000]), velocityMps: [0, 0, -200] }
+  if (kind === 'proximity') navigation.clock.state = { ...navigation.clock.state, position: translate(ORIGIN, [0, 5000, -99500]), velocityMps: [0, 0, 0], throttle: 0 }
+  if (kind === 'clear-warning') navigation.clock.state = { ...navigation.clock.state, position: ORIGIN, velocityMps: [0, 0, 0], throttle: 0 }
+  if (kind === 'recovery') navigation.clock.state = { ...navigation.clock.state, mode:'grounded', throttle:0, contact:{ bodyId:bodies[0].id, outcome:'crash', impactSpeedMps:50, normal:[0,0,1], ageTicks:0 } }
   if (kind === 'destroyed') navigation.clock.state = { ...navigation.clock.state, mode: 'destroyed', throttle: 0, contact: { bodyId: bodies[0].id, outcome: 'destroyed', impactSpeedMps: 200, normal: [0, 0, 1], ageTicks: 0 } }
  }
 })

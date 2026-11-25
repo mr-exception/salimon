@@ -14,6 +14,92 @@ async function capture(page: Page, name: string, info: TestInfo) {
  await page.screenshot({ path })
  await info.attach(name, { path, contentType: 'image/png' })
 }
+for (const reducedMotion of ['reduce', 'no-preference'] as const) {
+ test(`HUD-909 warning lifecycle, immediate controls and motion ${reducedMotion}`, async ({ page }, info) => {
+  await page.emulateMedia({ reducedMotion })
+  await page.setViewportSize({ width:960, height:600 })
+  await page.clock.install({ time:new Date('2026-11-25T12:00:00Z') })
+  await page.clock.pauseAt(new Date('2026-11-25T12:00:01Z'))
+  await page.goto('/tests/panoramic.html')
+  await expect.poll(async () => { await page.clock.runFor(64); return (await state(page))?.renderer }).toContain('SwiftShader')
+  await acquireContacts(page); await page.clock.runFor(64)
+  const warnings = page.getByLabel('Navigation warnings')
+  const fixed = '.panoramic-status, .panoramic-utilities, .panoramic-instruments, .panoramic-propulsion, .panoramic-systems'
+  const boxes = () => page.locator(fixed).evaluateAll(els => els.map(el => { const r=el.getBoundingClientRect(); return [r.x,r.y,r.width,r.height] }))
+  const initialBoxes = await boxes()
+  await scenario(page, 'proximity'); await page.clock.runFor(64)
+  await expect(warnings).toContainText('Caution: Contact 00: surface proximity')
+  await expect(warnings.locator('.ui-notification--caution')).toHaveCount(1)
+  await expect(warnings.locator('[aria-hidden=true]')).toHaveText('⚠')
+  await expect(warnings.getByRole('status')).toHaveAttribute('aria-live', 'polite')
+  await capture(page, 'proximity.png', info)
+  await scenario(page, 'warning'); await page.clock.runFor(64)
+  await expect(warnings).toContainText('Danger: Contact 00: dangerous approach')
+  await expect(warnings.locator('.ui-notification--danger')).toHaveCount(3)
+  await expect(warnings.getByRole('status').first()).toHaveAttribute('aria-live', 'assertive')
+  expect(await warnings.getByRole('status').first().evaluate(el => getComputedStyle(el).animationName)).toBe('none')
+  await page.getByRole('button', { name:/Contacts \(C\)/ }).click(); await page.clock.runFor(16)
+  await page.getByRole('button', { name:'Contact 00', exact:true }).click()
+  await page.getByRole('button', { name:'Telemetry', exact:true }).click(); await page.clock.runFor(16)
+  // Input works during entry; selection/throttle need no animation timer.
+  await expect(page.getByRole('button', { name:'Look at', exact:true })).toBeEnabled()
+  await page.getByRole('slider', { name:'Throttle', exact:true }).fill('10')
+  expect((await state(page)).ship.throttle).toBe(10)
+  await page.getByRole('button', { name:'Zero throttle (Space)', exact:true }).click()
+  expect((await state(page)).ship.throttle).toBe(0)
+  const motion = await page.locator('#detailed-telemetry').evaluate(el => {
+   const panel=getComputedStyle(el), button=getComputedStyle(document.querySelector('.telemetry-toggle')!), marker=getComputedStyle(document.querySelector('.marker-brackets')!)
+   return { animation:panel.animationName, duration:panel.animationDuration, transition:button.transitionDuration, marker:marker.transitionDuration }
+  })
+  expect(motion).toEqual(reducedMotion === 'reduce'
+   ? { animation:'none', duration:'0s', transition:'0s', marker:'0s' }
+   : { animation:'panoramic-panel-enter', duration:'0.18s', transition:'0.18s, 0.18s, 0.18s', marker:'0.18s' })
+  await page.clock.runFor(256)
+  expect(await boxes(), 'context and warnings must not shift fixed instruments').toEqual(initialBoxes)
+  const hitWarning = () => warnings.getByRole('status').first().evaluate(el => { const r=el.getBoundingClientRect(); return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)) })
+  expect(await hitWarning(), 'critical warning obscured by utility panels').toBe(true)
+  expect(await warnings.evaluate(el => el.scrollHeight <= el.clientHeight), 'bounded warning list must fit without scrolling').toBe(true)
+  const original = await warnings.screenshot()
+  expect((await warnings.screenshot()).equals(original), 'stable warning repeat').toBe(true)
+  await capture(page, 'danger-with-panels.png', info)
+  // Negative: the visibility oracle must reject a warning painted behind sky.
+  await warnings.evaluate(el => { (el as HTMLElement).style.zIndex='-2' })
+  expect(await hitWarning(), 'hidden warning mutation must fail').toBe(false)
+  await warnings.evaluate(el => el.removeAttribute('style'))
+  // Frame publications must not repeatedly mutate or announce stable warning text.
+  // Retain a live observer across controlled simulation frames.
+  await warnings.evaluate(el => {
+   const probe={ count:0, observer:new MutationObserver(records => { probe.count+=records.length }) }
+   probe.observer.observe(el, { childList:true, characterData:true, subtree:true })
+   Object.assign(window, { warningProbe:probe })
+  })
+  await page.clock.runFor(512)
+  const mutationCount = await page.evaluate(() => {
+   const probe=(window as unknown as { warningProbe:{ count:number; observer:MutationObserver } }).warningProbe
+   probe.observer.disconnect(); return probe.count
+  })
+  expect(mutationCount).toBe(0)
+  await page.getByRole('button', { name:'Help', exact:true }).click(); await page.clock.runFor(256)
+  const summary=page.getByRole('dialog').getByLabel('Persistent warnings')
+  await expect(summary).toContainText('Danger: Contact 00: dangerous approach')
+  await capture(page, 'danger-in-help.png', info)
+  await scenario(page, 'proximity'); await page.clock.runFor(64)
+  await expect(summary).toContainText('Caution: Contact 00: surface proximity')
+  await expect(summary).not.toContainText('dangerous approach')
+  await scenario(page, 'clear-warning'); await page.clock.runFor(64)
+  await expect(summary).toBeEmpty()
+  await page.keyboard.press('Escape'); await page.clock.runFor(64)
+  await expect(warnings).toBeEmpty()
+  await scenario(page, 'recovery'); await page.clock.runFor(64)
+  await expect(warnings.locator('.ui-notification--info')).toContainText('Info: crash · impact 50.0 m/s')
+  await capture(page, 'impact-info.png', info)
+  await scenario(page, 'destroyed'); await page.clock.runFor(64)
+  await expect(warnings).toContainText('Danger: Journey ended — ship destroyed')
+  await page.getByRole('button', { name:'Restart navigation', exact:true }).click(); await page.clock.runFor(64)
+  await expect(warnings).toBeEmpty()
+  await info.attach('lifecycle.json', { body:JSON.stringify({ reducedMotion, motion, initialBoxes, finalBoxes:await boxes(), mutationCount, state:await state(page) }, (_,v) => typeof v==='bigint'?String(v):v), contentType:'application/json' })
+ })
+}
 test('HUD-1 full viewport, scanner authority, keyboard browser and priority Escape', async ({ page }, info) => {
  await boot(page)
  await expect(page.getByLabel('Search contacts')).toHaveCount(0)

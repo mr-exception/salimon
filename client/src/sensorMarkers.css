@@ -5,6 +5,8 @@
 .sensor-marker svg { display:block; width:32px; height:32px; overflow:visible; filter:drop-shadow(1px 0 0 #09141c) drop-shadow(-1px 0 0 #09141c) drop-shadow(0 1px 0 #09141c) drop-shadow(0 -1px 0 #09141c) }
 .sensor-marker path { fill:none; stroke:currentColor; stroke-width:1.5 }
 .sensor-marker .marker-brackets { opacity:0 }
+.sensor-marker .marker-brackets { transition:opacity 180ms ease-out }
+@media(prefers-reduced-motion:reduce) { .sensor-marker .marker-brackets { transition:none } }
 .sensor-marker:hover, .sensor-marker:focus-visible { color:var(--ui-text,#e8e1d1) }
 .sensor-marker:focus-visible { outline:1px solid currentColor; outline-offset:2px }
 .sensor-marker:hover .marker-brackets, .sensor-marker:focus-visible .marker-brackets, .sensor-marker[data-selected=true] .marker-brackets { opacity:1 }

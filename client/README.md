@@ -1543,3 +1543,27 @@ and independent camera rotation. Originals, repeat comparisons, state JSON and
 traces use ignored `test-results/` and existing CI artifacts (14 days). Existing
 reference comparisons and explicit review of changed baselines remain in force;
 new captures do not approve references.
+
+## Contextual navigation notifications (#909)
+
+The shared `StatusMessage` supports info, caution and danger tones with text labels
+and glyphs. Surface proximity is a polite amber **Caution**; dangerous approach
+and terminal impact are immediate red **Danger** notifications. Impact recovery
+uses **Info**. `contact.ts` still owns the unchanged 1 km proximity and destructive
+closing-within-30-seconds conditions, ordering and three-warning bound. Scanner
+eviction/resolution removes warnings; Help mirrors live conditions in its native
+modal top layer. The isolated radar fixture uses the same notification skin.
+
+Panoramic utility entry, button hover/selection and sensor brackets use 180 ms
+paint-only transitions. Notifications never fade or wait for animation, no loops
+or delayed unmounts are added, and reduced motion disables these effects. The
+existing grid and publication clocks retain their owners; CSS adds no React state,
+simulation ticks or warning-text updates on unchanged frame publications.
+
+Run `npm test`, `npm run build`, then `CHROMIUM_PATH=/usr/bin/chromium npx
+playwright test --project=panoramic --grep 'HUD-909|HUD-907|HUD-BRIGHT|HUD-2'`.
+HUD-909 tests caution/danger/clear/terminal/restart, live modal summaries, immediate
+controls, fixed panel geometry, stable DOM text, reduced motion, original/repeat
+captures and an injected hidden-warning negative. PR smoke and full perspective
+CI include it. Evidence stays in ignored `test-results/` and existing 14-day CI
+artifacts; owner review of changed visual references remains required.

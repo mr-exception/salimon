@@ -56,3 +56,10 @@
   .expedition-ui .ui-dialog, .expedition-ui [data-ui-utility] { animation: none; transition: none; }
 }
 .expedition-ui .ui-warning-summary > p { margin: 0; }
+/* Shared semantic notifications use words and glyphs as well as token inks.
+ * Critical messages appear immediately, without an entry/fade animation. */
+.expedition-ui .ui-notification { padding:var(--ui-space-2); background:var(--ui-void); border-left:3px solid currentColor; font-weight:600 }
+.expedition-ui .ui-notification--info { color:var(--ui-active) }
+.expedition-ui .ui-notification--caution { color:var(--ui-mechanical) }
+.expedition-ui .ui-notification--danger { color:var(--ui-danger) }
+.expedition-ui .ui-notification-icon { display:inline-block; min-width:1.25em; margin-right:var(--ui-space-1); text-align:center; font-weight:700 }

@@ -15,6 +15,9 @@ import { distances, navigationWarnings } from './contact.ts'
 import { gridOffsetLs, type ContactGroup } from './radar.ts'
 import { GalacticLattice } from './navigationVisuals.tsx'
 import { ContinuousContacts } from './ContinuousContacts'
+import { StatusMessage } from './ui/Feedback.tsx'
+import './ui/tokens.css'
+import './ui/primitives.css'
 const VISIBLE_RADIUS = 900
 const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
@@ -151,7 +154,7 @@ export function App({navigation,onSceneReady,canPilot,isPaused}:{navigation?:Nav
         {pose.mode==='destroyed'?'Journey ended — ship destroyed':pose.contact.outcome==='safe-contact'?'Safe surface contact':'Crash recovery'} · impact {fmt(pose.contact.impactSpeedMps)} m/s
         {(pose.mode==='destroyed'||pose.mode==='grounded') && <button onClick={restart}>Restart navigation</button>}
       </div>}
-      <div className="warnings" role="status" aria-label="Navigation warnings">{warnings.length===0?<p>No navigation warnings</p>:warnings.map(w=><p key={w.id}>{w.message}</p>)}</div>
+      <div className="warnings expedition-ui" role="status" aria-live="off" aria-label="Navigation warnings">{warnings.length===0?<StatusMessage>No navigation warnings</StatusMessage>:warnings.map(w=><StatusMessage key={w.id} priority={w.severity==='danger'?'critical':'status'} tone={w.severity==='danger'?'danger':'caution'}>{w.message}</StatusMessage>)}</div>
       <hr/>
       <h2>Contact</h2>
       <p role="status" aria-live="polite" className="target-status">{target?`Selected target: ${target.name}`:'No selected target'}</p>

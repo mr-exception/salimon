@@ -109,7 +109,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   }
   escape.current = dismiss
   return <FeedbackScope messages={[
-    ...warnings.map(w => ({ id: w.id, text: w.message, priority: 'critical' as const })),
+    ...warnings.map(w => ({ id: w.id, text: w.message, priority: 'critical' as const, tone: w.severity === 'danger' ? 'danger' as const : 'caution' as const })),
     { id: 'terminal', text: ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : '', priority: 'critical' },
     { id: 'condition', text: conditionWarning, priority: 'critical' },
   ]}><div ref={root} className="panoramic expedition-ui" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDown={dismiss}>
@@ -128,8 +128,8 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       {onExit && <button className="ui-button ui-button--secondary" onClick={onExit}>Exit cockpit</button>}
     </nav>
     <div className="panoramic-priority" aria-label="Navigation warnings">
-      {warnings.map(w => <StatusMessage key={w.id} priority="critical">{w.message}</StatusMessage>)}
-      {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${ship.contact.impactSpeedMps.toFixed(1)} m/s`}</StatusMessage>}
+      {warnings.map(w => <StatusMessage key={w.id} priority={w.severity === 'danger' ? 'critical' : 'status'} tone={w.severity === 'danger' ? 'danger' : 'caution'}>{w.message}</StatusMessage>)}
+      {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'} tone={ship.mode === 'destroyed' ? 'danger' : 'info'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${ship.contact.impactSpeedMps.toFixed(1)} m/s`}</StatusMessage>}
       {!navigation.location && !grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
     </div>
     <PerspectiveContacts destinationId={navigation.location?.landing?.surface.bodyId} compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}

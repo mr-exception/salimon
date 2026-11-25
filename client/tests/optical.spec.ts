@@ -115,8 +115,14 @@ test('ART-906 faceted catalog materials, physical near/far LOD, repeat and scann
   }
   // Beyond the physical radius, only the restrained background remains. At
   // unresolved size the body cannot become a fixed-size solid contact disk.
-  const offset = distance === 6000 ? 65 : distance === 65000 ? 10 : 3
-  for (const x of centers) expect(brightness(png, x + offset, 400)).toBeLessThan(70)
+  // Off-axis disks project to conics: their right tangent is farther than
+  // center + angular radius. Solve the physical ray/sphere tangent directly.
+  const r = 650 / distance
+  for (const t of [-.54, -.18, .18, .54]) {
+   const tangent = (t + r * Math.sqrt(1 + t * t - r * r)) / (1 - r * r)
+   const x = Math.ceil(640 + tangent / Math.tan(75 * Math.PI / 360) * 400) + 3
+   expect(brightness(png, x, 400)).toBeLessThan(70)
+  }
   expect((await capture(page)).equals(actual), `repeat at ${distance}m`).toBe(true)
   await info.attach(`materials-${distance}m.png`, { body: actual, contentType: 'image/png' })
   measurements.push({ distance, colors, state })

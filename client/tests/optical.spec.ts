@@ -82,3 +82,68 @@ test('OPT-3 near/far physical depths and huge-origin telescope preserve optical 
  measurements.push(await snapshot(page))
  await info.attach('depth-precision.json', { body: json({ measurements, nearScale: 1e-6, farScale: 1e16, depthRangeM: [0.01, 1e24] }), contentType: 'application/json' })
 })
+
+test('ART-906 faceted catalog materials, physical near/far LOD, repeat and scanner isolation', async ({ page }, info) => {
+ test.setTimeout(240000)
+ const errors: string[] = []
+ page.on('pageerror', e => errors.push(e.message))
+ page.on('console', m => { if (m.type() === 'error') errors.push(m.text()) })
+ const measurements = []
+ let near: Buffer | undefined
+ for (const distance of [6000, 65000, 6500000]) {
+  await boot(page, `art&distance=${distance}`)
+  const state = await snapshot(page), actual = await capture(page), png = PNG.sync.read(actual)
+  expect(state.calls).toBe(1); expect(state.triangles).toBe(2)
+  expect(state.contacts).toBe(0); expect(state.selected).toBeNull()
+  expect(state.renderer).toContain('SwiftShader')
+  const centers = [-.54, -.18, .18, .54].map(x => Math.round(640 + x / Math.tan(75 * Math.PI / 360) * 400))
+  const colors = centers.map(x => [...png.data.subarray((400 * png.width + x) * 4, (400 * png.width + x) * 4 + 3)])
+  if (distance === 6000) {
+   near = actual
+   expect(new Set(colors.map(c => c.join(','))).size).toBe(4)
+   // Flat triangle interiors produce repeated colors, not per-pixel noise.
+   const histogram = new Map<string, number>()
+   for (let y = 380; y < 420; y++) for (let x = centers[0] - 20; x < centers[0] + 20; x++) {
+    const i = (y * png.width + x) * 4, key = png.data.subarray(i, i + 3).toString('hex')
+    histogram.set(key, (histogram.get(key) ?? 0) + 1)
+   }
+   expect(histogram.size).toBeGreaterThan(3); expect(histogram.size).toBeLessThan(60)
+   expect(Math.max(...histogram.values())).toBeGreaterThan(100)
+   await page.getByRole('button', { name: 'Pulse' }).click()
+   expect((await snapshot(page)).contacts).toBe(4)
+   expect((await capture(page)).equals(actual)).toBe(true)
+  }
+  // Beyond the physical radius, only the restrained background remains. At
+  // unresolved size the body cannot become a fixed-size solid contact disk.
+  const offset = distance === 6000 ? 65 : distance === 65000 ? 10 : 3
+  for (const x of centers) expect(brightness(png, x + offset, 400)).toBeLessThan(70)
+  expect((await capture(page)).equals(actual), `repeat at ${distance}m`).toBe(true)
+  await info.attach(`materials-${distance}m.png`, { body: actual, contentType: 'image/png' })
+  measurements.push({ distance, colors, state })
+ }
+ await boot(page, 'art-translated&distance=6000')
+ expect((await capture(page)).equals(near!)).toBe(true)
+ expect(errors).toEqual([])
+ await info.attach('art-measurements.json', { body: json({ measurements, errors, repeat: 'byte-identical', translated: 'byte-identical' }), contentType: 'application/json' })
+})
+
+test('ART-906 canonical polar ice differs from the same legacy moon without moving its limb', async ({ page }, info) => {
+ const measurements = []
+ await boot(page, 'ice-v1')
+ const legacy = await capture(page), a = PNG.sync.read(legacy)
+ measurements.push(await snapshot(page))
+ await boot(page, 'ice-v2')
+ const icy = await capture(page), b = PNG.sync.read(icy)
+ measurements.push(await snapshot(page))
+ expect(icy.equals(legacy)).toBe(false)
+ expect(brightness(b, 640, 360)).toBeGreaterThan(brightness(a, 640, 360))
+ // Equatorial material, physical limb and background retain their pixels.
+ for (const [x, y] of [[640, 400], [695, 400], [640, 340]]) {
+  const i = (y * a.width + x) * 4
+  expect(b.data.subarray(i, i + 4).equals(a.data.subarray(i, i + 4))).toBe(true)
+ }
+ expect((await capture(page)).equals(icy)).toBe(true)
+ await info.attach('moon-legacy.png', { body: legacy, contentType: 'image/png' })
+ await info.attach('moon-polar-ice.png', { body: icy, contentType: 'image/png' })
+ await info.attach('ice-publication.json', { body: json(measurements), contentType: 'application/json' })
+})

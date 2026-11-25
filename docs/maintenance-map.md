@@ -159,6 +159,7 @@ Take off admission reads `ResourceSession.scoutCommandDenial` and dispatches its
 revision-bound transition. Observation unmount releases held steering, preserving
 selected throttle and the trajectory. Observation input
 belongs to `ObservationCamera.tsx`, physical sky to `OpticalSky.tsx`/`opticalSky.ts`,
+catalog-kind art swatches to `bodyPalette.ts` (shared with `terrainIllustration.ts`),
 scanner-gated markers/actions to `PerspectiveContacts.tsx`/`contactCommands.ts`,
 and compact orientation UI to `OrientationCompass.tsx`. `App.tsx`,
 `CameraControls.tsx`, `ContinuousContacts.tsx` and `ShipVectorGuides.tsx` remain

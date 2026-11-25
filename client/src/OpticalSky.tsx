@@ -4,17 +4,30 @@ import { Quaternion, ShaderMaterial, Vector3 } from 'three'
 import type { Position } from './coordinates.ts'
 import { MAX_OPTICAL_BODIES, opticalSpheres } from './opticalSky.ts'
 import type { Body } from './sampleUniverse.ts'
+import { OPTICAL_ICE } from './bodyPalette.ts'
+import type { PlanetReference } from './planetDefinition.ts'
 
 const fragmentShader = `
 precision highp float;
 uniform int count;
-uniform vec3 directions[32], colors[32], lights[32];
+uniform vec3 directions[32], colors[32], accents[32], lights[32];
+uniform float icy[32];
+uniform vec3 iceColor;
 uniform vec4 spheres[32]; // log2(distance), radius/distance, factored surface term, emission
 uniform vec3 rightAxis, upAxis, forwardAxis;
 uniform float tangent, aspect, pixelAngle;
 uniform bool scannerEnvironment, orientationGrid;
 varying vec2 screen;
 float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+// Triangular octahedral surface cells, fixed in world axes. Quantization is
+// shading only: physical silhouettes and rationalized depth stay analytic.
+vec3 facet(vec3 n) {
+  vec3 p=abs(n)/(abs(n.x)+abs(n.y)+abs(n.z));
+  vec2 cell=p.xy*6.;
+  float upper=step(1.,fract(cell.x)+fract(cell.y));
+  vec2 center=(floor(cell)+vec2((1.+upper)/3.))/6.;
+  return normalize(vec3(center,1.-center.x-center.y)*sign(n+vec3(1e-20)));
+}
 vec3 stars(vec3 ray) {
   // Sparse deterministic celestial directions, unrelated to the sample catalog.
   vec2 cell=vec2(atan(ray.z,ray.x)/6.2831853+0.5,asin(clamp(ray.y,-1.,1.))/3.14159265+0.5)*vec2(512.,256.);
@@ -51,6 +64,8 @@ void main() {
     }
   }
   float nearest=1024.;
+  int nearestIndex=-1;
+  vec3 nearestNormal=vec3(0.,0.,1.);
   for(int i=0;i<32;i++) {
     if(i>=count) break;
     vec3 dir=directions[i]; vec4 s=spheres[i];
@@ -64,10 +79,31 @@ void main() {
     if(hit>=0. && logHit<nearest) {
       nearest=logHit;
       vec3 surfaceNormal=ray*along-dir-ray*sqrt(max(disc,0.));
-      vec3 n=surfaceNormal/max(length(surfaceNormal),1e-30);
-      float illumination=s.w>0.5?1.:0.055+0.945*max(0.,dot(n,lights[i]));
-      color=colors[i]*illumination;
+      nearestNormal=surfaceNormal/max(length(surfaceNormal),1e-30);
+      nearestIndex=i;
     }
+  }
+  // Shade only the visible surface, outside the bounded intersection loop.
+  // This also avoids cloning expensive facet code in unrolling GPU drivers.
+  if(nearestIndex>=0) {
+      int i=nearestIndex;
+      vec4 s=spheres[i];
+      vec3 n=nearestNormal;
+      vec3 face=facet(n);
+      // Continuous screen-size LOD suppresses subpixel facet noise. No mesh
+      // creation, draw changes or discrete topology switches during approach.
+      float detail=smoothstep(3.,12.,s.y/max(pixelAngle,1e-8));
+      float pigment=0.5+0.5*sin(dot(face,vec3(17.,31.,23.)));
+      vec3 albedo=mix(colors[i],accents[i],mix(0.5,pigment,detail));
+      // The same latitude ramp as canonical geological ice, never a guessed
+      // atmosphere/biome. Published v1 surfaces do not receive this treatment.
+      albedo=mix(albedo,iceColor,icy[i]*smoothstep(0.65,0.85,abs(n.y)));
+      vec3 shaded=normalize(mix(n,face,detail));
+      float illumination=s.w>0.5?0.86+0.14*max(0.,dot(shaded,-ray)):0.085+0.915*max(0.,dot(shaded,lights[i]));
+      color=albedo*illumination;
+      // Restrained stellar limb emission inside the real disk, no bloom halo
+      // or invented atmosphere that could reveal an occulted/distant body.
+      if(s.w>0.5) color+=accents[i]*0.08*pow(1.-max(0.,dot(n,-ray)),3.);
   }
   // Unresolved bodies: energy-limited optical PSF, never an enlarged solid disk.
   // The foreground ray's physical hit distance masks every farther point.
@@ -85,12 +121,14 @@ void main() {
 /** One reusable quad, bounded analytic sphere tests, no physical depth-buffer
  * range and no mesh tessellation/LOD churn. Call getOrigin from shared ship state.
  */
-export function OpticalSky({ bodies, getOrigin, scannerEnvironment = false, orientationGrid = false }: { bodies: readonly Body[]; getOrigin: () => Position; scannerEnvironment?: boolean; orientationGrid?: boolean }) {
+export function OpticalSky({ bodies, getOrigin, definitionForBody, scannerEnvironment = false, orientationGrid = false }: { bodies: readonly Body[]; getOrigin: () => Position; definitionForBody?: (bodyId: string) => PlanetReference | undefined; scannerEnvironment?: boolean; orientationGrid?: boolean }) {
   const material = useMemo(() => new ShaderMaterial({
     depthTest: false, depthWrite: false, toneMapped: false,
     uniforms: {
       count: { value: 0 }, directions: { value: Array.from({ length: MAX_OPTICAL_BODIES }, () => new Vector3()) },
       colors: { value: Array.from({ length: MAX_OPTICAL_BODIES }, () => new Vector3()) },
+      accents: { value: Array.from({ length: MAX_OPTICAL_BODIES }, () => new Vector3()) },
+      icy: { value: new Float32Array(MAX_OPTICAL_BODIES) }, iceColor: { value: new Vector3(...OPTICAL_ICE) },
       lights: { value: Array.from({ length: MAX_OPTICAL_BODIES }, () => new Vector3()) },
       spheres: { value: new Float32Array(MAX_OPTICAL_BODIES * 4) },
       rightAxis: { value: new Vector3() }, upAxis: { value: new Vector3() }, forwardAxis: { value: new Vector3() },
@@ -103,13 +141,15 @@ export function OpticalSky({ bodies, getOrigin, scannerEnvironment = false, orie
   useEffect(() => () => material.dispose(), [material])
   const orientation = useMemo(() => new Quaternion(), [])
   useFrame(({ camera, size, gl }) => {
-    const data = opticalSpheres(bodies, getOrigin()), uniforms = material.uniforms
+    const data = opticalSpheres(bodies, getOrigin(), definitionForBody), uniforms = material.uniforms
     uniforms.scannerEnvironment.value = scannerEnvironment
     uniforms.orientationGrid.value = orientationGrid
     uniforms.count.value = data.length
     data.forEach((sphere, i) => {
       uniforms.directions.value[i].fromArray(sphere.direction)
       uniforms.colors.value[i].fromArray(sphere.color)
+      uniforms.accents.value[i].fromArray(sphere.accent)
+      uniforms.icy.value[i] = Number(sphere.polarIce)
       uniforms.lights.value[i].fromArray(sphere.lightDirection)
       uniforms.spheres.value.set([Math.log2(sphere.distanceM), sphere.radiusRatio, sphere.surfaceTerm, Number(sphere.emissive)], i * 4)
     })

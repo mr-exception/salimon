@@ -1460,3 +1460,32 @@ wide/telescope/grid/rotation captures and canonical state measurements stay in
 ignored `test-results/` and the existing 14-day CI artifacts. ENV-905 also runs in
 PR smoke and the full perspective group. Visual reference proposals remain pending owner review; the collector's
 candidate mode does not approve baselines.
+
+## Celestial art (#906)
+
+`OpticalSky.tsx` shades the real analytic spheres with a fixed triangular
+subdivision of an octahedron (six subdivisions per edge). Facet normals and broad
+pigment regions are inertial and deterministic, with directional illumination
+from the catalog star. This is a surface-only style: sphere silhouettes and
+occlusion agree with contact/landing physics, even at metre clearance. No mesh
+or texture is allocated per body, and the existing 32-body budget and one sky
+quad/draw remain intact. Detail blends continuously between projected radii of
+3 and 12 pixels; unresolved bodies keep their energy-limited optical point.
+
+`bodyPalette.ts` shares display-space pigments with the illustrated surface,
+converting to linear RGB for the optical shader. Only catalog `kind` selects a
+material: earthy planets, slate moons, dark fractured asteroids and warm emissive
+stars. The production session’s canonical publication enables polar ice only
+where geology publishes it; legacy v1 moons remain unchanged. No gas, ocean
+or atmosphere is inferred from names or sizes. Stars have a restrained inner limb
+emission, without bloom or a halo outside their physical disk. Scanner contacts,
+identities, selection and holographic overlays keep their existing gating.
+
+Focused verification: `npm test`, `npm run build`, and
+`npm run test:browser -- --project=optical`. `ART-906` captures four representative
+kinds at near, far and unresolved distances, checks flat triangle interiors,
+physical coverage, repeat/huge-origin determinism, no scan-dependent pixels and
+one draw/two triangles. Existing `OPT-1`–`OPT-3` cover horizon/underground,
+occultation, physical depth and telescope precision. New originals and raw
+measurements stay in ignored `test-results/`; the PR carries the validation
+record. Reference appearance proposals retain pending owner review.

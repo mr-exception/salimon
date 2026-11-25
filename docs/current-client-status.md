@@ -1,5 +1,16 @@
 # Current browser implementation and contract routing
 
+Celestial art (#906) adds deterministic triangular surface facets and distinct
+planet, moon, asteroid and stellar palettes to the existing panoramic optical
+sky. `bodyPalette.ts` shares the illustrated terrain pigments. Physical spherical
+silhouettes, positions, angular sizes, depth and scanner-gated overlays retain
+their existing owners. Screen-size shading fades continuously to the existing
+energy-limited unresolved representation; the sky still uses one quad/draw.
+The live session publication enables the Moon’s geological v2 polar ice;
+legacy v1 and generic catalogs keep their original material classification.
+Gas and atmospheric effects remain unsupported rather than inferred from names.
+Stellar limb emission stays inside the physical disk. See the [art checks](../client/README.md#celestial-art-906).
+
 Planetary exploration V1 (#847–#853) delivers versioned canonical geology,
 continuous illustrated regional walking, mineral deposits, deliberate landmarks/marks
 and schema-v13 sparse persistence in the React/TypeScript browser.

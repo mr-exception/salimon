@@ -118,6 +118,9 @@ void main() {
     if(s.y>=pixelAngle*0.8 || dot(ray,directions[i])<=0. || s.x>=nearest) continue;
     float separation=length(cross(ray,directions[i]));
     float energy=min(1.,pow(s.y/max(pixelAngle,1e-8),2.)* (s.w>0.5?8.:1.));
+    // Fade to zero before the resolved-disk cutoff, avoiding a sudden PSF
+    // contribution outside the physical limb during approach or FOV changes.
+    energy*=1.-smoothstep(pixelAngle*0.4,pixelAngle*0.8,s.y);
     color+=colors[i]*energy*exp(-pow(separation/max(pixelAngle*0.65,1e-8),2.));
   }
   gl_FragColor=vec4(color,1.);

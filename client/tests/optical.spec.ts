@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { PNG } from 'pngjs'
+import { opticalRayHit, type OpticalSphere } from '../src/opticalSky.ts'
 const json = (value: unknown) => JSON.stringify(value, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2)
 type Snapshot = { contacts: number; selected: string | null; spheres: unknown; calls: number; triangles: number; renderer: string; camera: number[] }
 const capture = (page: Page) => page.locator('canvas').screenshot({ mask: [page.getByRole('button', { name: 'Pulse' })] })
@@ -160,4 +161,31 @@ test('ART-906 canonical polar ice differs from the same legacy moon without movi
  await info.attach('moon-legacy.png', { body: legacy, contentType: 'image/png' })
  await info.attach('moon-polar-ice.png', { body: icy, contentType: 'image/png' })
  await info.attach('ice-publication.json', { body: json(measurements), contentType: 'application/json' })
+})
+
+test('ART-906 unresolved point cutoff stays continuous outside the physical disk', async ({ page }, info) => {
+ test.setTimeout(180000)
+ const pixelAngle = 2 * Math.tan(75 * Math.PI / 360) / 800
+ const thresholdDistance = 650 / (.8 * pixelAngle * Math.hypot(1, .54))
+ const measurements = [], images: Buffer[] = []
+ // This ray misses the star's physical disk while sampling its optical PSF.
+ const x = 922, y = 400, ray = [(x + .5 - 640) * pixelAngle, -(y + .5 - 400) * pixelAngle, -1] as const
+ for (const factor of [1 - 1e-5, 1 + 1e-5]) {
+  const distance = thresholdDistance * factor
+  await boot(page, `art&distance=${distance}`)
+  const state = await snapshot(page), sphere = (state.spheres as OpticalSphere[])[3]
+  expect(opticalRayHit(sphere, ray)).toBeNull()
+  expect(state.calls).toBe(1); expect(state.triangles).toBe(2)
+  const actual = await capture(page), png = PNG.sync.read(actual), i = (y * png.width + x) * 4
+  measurements.push({ distance, radiusPixels: sphere.radiusRatio / pixelAngle, pixel: [...png.data.subarray(i, i + 3)], state })
+  images.push(actual)
+ }
+ expect(measurements[0].radiusPixels).toBeGreaterThan(.8)
+ expect(measurements[1].radiusPixels).toBeLessThan(.8)
+ const delta = Math.max(...measurements[0].pixel.map((v, i) => Math.abs(v - measurements[1].pixel[i])))
+ await info.attach('point-before-cutoff.png', { body: images[0], contentType: 'image/png' })
+ await info.attach('point-after-cutoff.png', { body: images[1], contentType: 'image/png' })
+ await info.attach('point-transition.json', { body: json({ measurements, delta }), contentType: 'application/json' })
+ expect(delta, 'UNRESOLVED_POINT_POP').toBeLessThanOrEqual(2)
+ expect((await capture(page)).equals(images[1])).toBe(true)
 })

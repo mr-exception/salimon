@@ -1470,7 +1470,8 @@ from the catalog star. This is a surface-only style: sphere silhouettes and
 occlusion agree with contact/landing physics, even at metre clearance. No mesh
 or texture is allocated per body, and the existing 32-body budget and one sky
 quad/draw remain intact. Detail blends continuously between projected radii of
-3 and 12 pixels; unresolved bodies keep their energy-limited optical point.
+3 and 12 pixels; unresolved bodies keep their energy-limited optical point,
+whose contribution fades continuously over radii of 0.4–0.8 pixels.
 
 `bodyPalette.ts` shares display-space pigments with the illustrated surface,
 converting to linear RGB for the optical shader. Only catalog `kind` selects a

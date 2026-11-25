@@ -167,7 +167,7 @@ test('ART-906 unresolved point cutoff stays continuous outside the physical disk
  test.setTimeout(180000)
  const pixelAngle = 2 * Math.tan(75 * Math.PI / 360) / 800
  const thresholdDistance = 650 / (.8 * pixelAngle * Math.hypot(1, .54))
- const measurements = [], images: Buffer[] = []
+ const measurements: { distance: number; radiusPixels: number; pixel: number[]; state: Snapshot }[] = [], images: Buffer[] = []
  // This ray misses the star's physical disk while sampling its optical PSF.
  const x = 922, y = 400, ray = [(x + .5 - 640) * pixelAngle, -(y + .5 - 400) * pixelAngle, -1] as const
  for (const factor of [1 - 1e-5, 1 + 1e-5]) {

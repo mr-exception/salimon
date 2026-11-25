@@ -5,6 +5,8 @@ import { opticalRayHit, opticalSpheres, MAX_OPTICAL_BODIES } from './opticalSky.
 import { startingScoutLocation } from './scoutLocation.ts'
 import { SAMPLE_BODIES, type Body } from './sampleUniverse.ts'
 import { CatalogIndex, Scanner } from './scanner.ts'
+import { bodyPalette, SURFACE_PIGMENTS } from './bodyPalette.ts'
+import { geologicalDefinition, planetDefinition } from './planetDefinition.ts'
 const body: Body = { id: 'test', name: 'Hidden identity', kind: 'moon', radiusKm: 1, position: translate(ORIGIN, [0, 0, -10000]) }
 test('physical angular sizes and telescope scaling without displacement', () => {
  const [sphere] = opticalSpheres([body], ORIGIN)
@@ -39,4 +41,23 @@ test('optical geometry carries no identity and is independent of scanner pulses'
 test('invalid geometry and excessive catalogs fail explicitly', () => {
  assert.throws(() => opticalSpheres([{ ...body, radiusKm: NaN }], ORIGIN), RangeError)
  assert.throws(() => opticalSpheres(Array(MAX_OPTICAL_BODIES + 1).fill(body), ORIGIN), RangeError)
+})
+
+test('material classification uses catalog kinds, shared pigments and no inferred planet properties', () => {
+ const palettes = ['planet', 'moon', 'asteroid', 'star'].map(kind => bodyPalette(kind as Body['kind']))
+ assert.equal(new Set(palettes.map(p => JSON.stringify(p))).size, 4)
+ for (const p of palettes) for (const c of [...p.color, ...p.accent]) assert.ok(Number.isFinite(c) && c >= 0 && c <= 1)
+ const [a, b] = opticalSpheres([{ ...body, kind: 'planet', id: 'gas giant' }, { ...body, kind: 'planet', id: 'ice world' }], ORIGIN)
+ assert.deepEqual(a, b)
+ const encoded = bodyPalette('planet').color.map(c => Math.round(255 * (c <= .0031308 ? c * 12.92 : 1.055 * c ** (1 / 2.4) - .055)))
+ assert.deepEqual(encoded, SURFACE_PIGMENTS.lowland)
+})
+
+test('polar ice follows the live canonical publication; generic and legacy bodies stay unclassified', () => {
+ const moon = SAMPLE_BODIES.find(b => b.id === 'vesper-moon')!
+ assert.equal(opticalSpheres([moon], ORIGIN)[0].polarIce, false)
+ assert.equal(opticalSpheres([moon], ORIGIN, id => planetDefinition(id))[0].polarIce, false)
+ assert.equal(opticalSpheres([moon], ORIGIN, id => geologicalDefinition(id))[0].polarIce, true)
+ assert.equal(opticalSpheres([SAMPLE_BODIES.find(b => b.id === 'vesper')!], ORIGIN, id => geologicalDefinition(id))[0].polarIce, false)
+ assert.equal(opticalSpheres([{ ...moon, radiusKm: 1 }], ORIGIN, () => { throw Error('unknown physical publication') })[0].polarIce, false)
 })

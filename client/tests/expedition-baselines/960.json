@@ -48,13 +48,13 @@
     "storage-review-controls-960.png": "05ee40abf74259c1271f5e5aa12f057cdc4eb77d3e86c0b4d63322c0a5a377bb",
     "storage-error-960.png": "244039fadf987dddaf1a21e8e42f0243e0e3ec538319962dcbc138418ebc1243",
     "storage-error-controls-960.png": "105f2032b8c91a118b7e77d2fd15ca6f75d6da81b3106a7b27e76ef880a5d4de",
-    "cockpit-horizon-960.png": "42ca1649d8573c0d5d464ba91adaa5fd6d3475534ec2fb28223576f8d7de504f",
-    "cockpit-selected-dark-960.png": "981e49bba1723cb1333938e02352b8da1cc09e9ee473f470b1221ac9b7bab1bd",
+    "cockpit-horizon-960.png": "fe5b2b581ec95701e47dc2c826e070bf2741f26f611e33009c9b310341b190f8",
+    "cockpit-selected-dark-960.png": "a558d265f749e280c5561eac49725e339f420f5d2f407282d1f5e13a7c282171",
     "surface-return-960.png": "26f08f782a41f7464992f2d186b68a6a638a7e641bc5d4e0c45716d95222e97c",
-    "contacts-unscanned-960.png": "d273d2bafeb5261a53252ef2f1436e36ea4fc813c9c8ed8b7f39dc6909ed7fc8",
-    "contacts-selected-occluded-960.png": "0eab5bbb4116ec7b246e04b011266118bc0f470da405a352c7466dfbe1ad614f",
+    "contacts-unscanned-960.png": "08884224e84aa62e320f5ae581d460c455d30348a542819b7e804a6b6cbfbc73",
+    "contacts-selected-occluded-960.png": "b64d2ce51de3f538e56f71aafa4e2e8aedc5d6befe6bf78eb146145a456e57a5",
     "contacts-lost-960.png": "8114bb4bf7069ba32834d7270f0ec364feb4fe48b27ad14a363512490b91b738",
-    "cockpit-bright-warning-960.png": "78c9984af9a50e60045ac2e8a98109468d617c9e5a711cf12992bf5745c037bb",
-    "cockpit-bright-focused-warning-960.png": "a84b08bdc9a16bb6e87cfb836ede542874ccba8872bcf85ac5be9727f40239d4"
+    "cockpit-bright-warning-960.png": "da7bcf0ce17968b8dcd290d6c910d62d7c74808bdbf561b9a2ba8a64db898fc7",
+    "cockpit-bright-focused-warning-960.png": "fa0d544b4b3fa7b410830399f30c3a5de12657af970d80c27479b9192a47215d"
   }
 }

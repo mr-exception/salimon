@@ -1,5 +1,6 @@
 import type { GroundSample } from './regionStream.ts'
 import type { Vec3 } from './math.ts'
+import { SURFACE_PIGMENTS as pigments } from './bodyPalette.ts'
 
 export type InkPoint = readonly [number, number]
 /** Flat pigment veins only: no raised silhouette or collectable decal. */
@@ -11,10 +12,10 @@ const mix = (a: readonly number[], b: readonly number[], t: number) => a.map((n,
 /** Continuous pigments; fine albedo is body-fixed, seeded and cosmetic. */
 export function terrainPigment(sample: GroundSample, physical: Vec3, seed: string): number[] {
   const w=sample.weights, phase=Number(BigInt(`0x${seed}`)%65521n)/65521*6.283185
-  let color=mix([179,160,132],[133,131,118],w.highland)
-  color=mix(color,[160,140,119],w.impact*.45)
-  color=mix(color,[103,108,105],w.fracture*.65)
-  color=mix(color,[187,211,216],w.ice)
+  let color=mix(pigments.lowland,pigments.highland,w.highland)
+  color=mix(color,pigments.impact,w.impact*.45)
+  color=mix(color,pigments.fracture,w.fracture*.65)
+  color=mix(color,pigments.ice,w.ice)
   const grain=Math.sin(physical[0]*.49+physical[1]*.31+physical[2]*.27+phase)*Math.sin(physical[0]*.17-physical[2]*.37+phase)
   const wash=sedimentField(physical,seed)
   return color.map(n=>Math.round(n+grain*5+wash*6-Math.min(24,sample.grade*24)))

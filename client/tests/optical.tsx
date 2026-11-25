@@ -8,6 +8,7 @@ import { ORIGIN, translate } from '../src/coordinates.ts'
 import { startingScoutLocation } from '../src/scoutLocation.ts'
 import { SAMPLE_BODIES, type Body } from '../src/sampleUniverse.ts'
 import { CatalogIndex, Scanner } from '../src/scanner.ts'
+import { geologicalDefinition, planetDefinition } from '../src/planetDefinition.ts'
 const scenario = new URLSearchParams(location.search).get('scenario') ?? 'wide'
 const origin = scenario.includes('translated') ? { cell: [10n ** 24n, -(10n ** 24n), 10n ** 30n] as const, offsetM: [0, 0, 0] as const } : ORIGIN
 const make = (id: string, position: readonly [number, number, number], radiusKm: number, kind: Body['kind'] = 'moon'): Body =>
@@ -16,7 +17,11 @@ const scale = scenario === 'near-depth' ? 1e-6 : scenario === 'far-depth' ? 1e16
 const calibration = [make('foreground', [0, 0, -10000], 1), make('light', [-1e8, 1e8, 0], 500, 'star'),
  make('tiny', [60000, 0, -1e8], 1.4), make('hidden', [0, 0, -1e8], 40)]
 const surface = scenario === 'surface' || scenario === 'below', site = startingScoutLocation()
-const bodies = surface ? SAMPLE_BODIES : scenario.startsWith('telescope') ? calibration.slice(1) : scenario === 'clear' ? calibration.filter(b => b.id !== 'hidden') : calibration
+const art = scenario.startsWith('art'), artDistance = Number(new URLSearchParams(location.search).get('distance') ?? 6000)
+const artBodies = ['planet', 'moon', 'asteroid', 'star'].map((kind, i) => make(`art-${kind}`, [(i - 1.5) * artDistance * .36, 0, -artDistance], 0.65, kind as Body['kind']))
+const icy = scenario.startsWith('ice')
+const bodies = icy ? [{ ...SAMPLE_BODIES.find(b => b.id === 'vesper-moon')!, position: translate(origin, [0, 0, -1.4e7]) }, calibration[1]] : art ? artBodies : surface ? SAMPLE_BODIES : scenario.startsWith('telescope') ? calibration.slice(1) : scenario === 'clear' ? calibration.filter(b => b.id !== 'hidden') : calibration
+const definitionForBody = icy ? scenario === 'ice-v2' ? geologicalDefinition : planetDefinition : undefined
 const shipOrigin = surface ? site.ship.position : origin
 const view = new ObservationCameraState({ yaw: 0, pitch: 0 })
 if (scenario.startsWith('telescope')) view.restore({ quaternion: [0, 0, 0, 1], fov: 0.1 })
@@ -29,11 +34,11 @@ function Scene() {
  useFrame(({ camera }) => {
   const ctx = gl.getContext(), debug = ctx.getExtension('WEBGL_debug_renderer_info')
   observation = { scenario, contacts: scanner.contacts.length, selected: scanner.selected,
-   spheres: opticalSpheres(bodies, shipOrigin), origin: shipOrigin, view: view.snapshot(),
+   spheres: opticalSpheres(bodies, shipOrigin, definitionForBody), origin: shipOrigin, view: view.snapshot(),
    renderer: debug ? ctx.getParameter(debug.UNMASKED_RENDERER_WEBGL) : null,
    calls: gl.info.render.calls, triangles: gl.info.render.triangles, camera: camera.position.toArray() }
  }, 0)
- return <><ObservationCamera view={view}/><OpticalSky bodies={bodies} getOrigin={() => shipOrigin}/></>
+ return <><ObservationCamera view={view}/><OpticalSky bodies={bodies} getOrigin={() => shipOrigin} definitionForBody={definitionForBody} scannerEnvironment={art}/></>
 }
 createRoot(document.getElementById('root')!).render(<>
  <div style={{ height: '100vh' }}><Canvas dpr={1} gl={{ preserveDrawingBuffer: true }}><Scene/></Canvas></div>

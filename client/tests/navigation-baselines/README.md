@@ -150,3 +150,13 @@ horizon/selection and bright-body warnings/help at 960, 1280 and 1920 pixels.
 Environment, comparison policy and pending owner-review status are unchanged.
 Originals, diffs, measurements and validation belong to the implementation PR
 and ignored local output; these proposed assets do not grant appearance approval.
+
+## Celestial material proposal (#906)
+
+Thirteen panoramic optical/sensor references propose faceted celestial materials
+and stable close-surface normals; the other 14 images retain their original
+bytes. Eighteen cockpit/contact references in `../expedition-baselines/` propose
+matching surfaces at 960, 1280 and 1920 pixels. Unrelated 2D references are
+retained. Comparison policy, environment and pending owner-review states are
+unchanged. The implementation PR records originals, old/new hashes, diffs,
+repeats and remaining CI checks; these assets do not grant appearance approval.

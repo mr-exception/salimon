@@ -302,3 +302,56 @@ test('ENV-905 seeded scanner space, angular grid, translation and marker contras
  expect(errors).toEqual([])
  await info.attach('environment-measurements.json', { body: JSON.stringify({ bright, black, original, measurements, errors, comparisons: ['repeat', 'rotation negative', 'restored', 'translation', 'reload', 'grid negative', 'grid restoration', 'telescope fade'] }, (_, v) => typeof v === 'bigint' ? String(v) : v, 2), contentType: 'application/json' })
 })
+
+for (const viewport of [{ width: 960, height: 600 }, { width: 1280, height: 720 }, { width: 1920, height: 1080 }]) {
+ test(`HUD-907 edge panels reserve space at ${viewport.width}`, async ({ page }, info) => {
+  await page.setViewportSize(viewport)
+  await page.clock.install({ time: new Date('2026-11-25T12:00:00Z') })
+  await page.clock.pauseAt(new Date('2026-11-25T12:00:01Z'))
+  await page.goto('/tests/panoramic.html')
+  await expect.poll(async () => { await page.clock.runFor(64); return (await state(page))?.renderer }).toContain('SwiftShader')
+  await expect(page.locator('.selected-contact')).toHaveCount(0)
+  await expect(page.locator('.scanner-readings')).toContainText('Range 100,000 ls · FOV 75.0°')
+  await capture(page, 'default.png', info)
+  await acquireContacts(page); await page.clock.runFor(64)
+  // Full-viewport projection still supports the existing mouse selection path.
+  await page.locator('[data-sensor-marker]').first().click(); await page.clock.runFor(64)
+  if (await page.getByLabel('Search contacts').count()) {
+   await page.getByLabel('Search contacts').fill('Contact 00')
+   await page.getByRole('button', { name: 'Contact 00', exact:true }).click(); await page.clock.runFor(64)
+   await page.keyboard.press('Escape'); await page.clock.runFor(64)
+  }
+  await expect(page.locator('.selected-contact')).toContainText('Selected:')
+  await expect(page.getByRole('button', { name: 'Look at', exact:true })).toBeEnabled()
+  await capture(page, 'selected.png', info)
+  expect((await page.screenshot()).equals(await page.screenshot()), 'HUD_REPEAT_CAPTURE').toBe(true)
+  await page.getByRole('button', { name: 'Telemetry', exact:true }).click(); await page.clock.runFor(64)
+  await scenario(page, 'warning'); await page.clock.runFor(64)
+  const panels = '.panoramic-status, .panoramic-utilities, .panoramic-contacts, .panoramic-instruments, .panoramic-propulsion, .panoramic-systems, .panoramic-telemetry, .panoramic-priority'
+  const measure = () => page.locator(panels).evaluateAll(elements => {
+   const rects = elements.filter(el => el.getBoundingClientRect().height > 0).map(el => ({ name:el.className, ...Object.fromEntries(['x','y','width','height','right','bottom'].map(k => [k, el.getBoundingClientRect()[k as keyof DOMRect]])) })) as {name:string;x:number;y:number;width:number;height:number;right:number;bottom:number}[]
+   const overlaps = rects.flatMap((a,i) => rects.slice(i+1).filter(b => Math.min(a.right,b.right)-Math.max(a.x,b.x)>1 && Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y)>1).map(b => `${a.name} / ${b.name}`))
+   return {rects, overlaps}
+  })
+  const measurements = await measure()
+  expect(measurements.overlaps).toEqual([])
+  for (const r of measurements.rects) { expect(r.x).toBeGreaterThanOrEqual(0); expect(r.y).toBeGreaterThanOrEqual(0); expect(r.right).toBeLessThanOrEqual(viewport.width); expect(r.bottom).toBeLessThanOrEqual(viewport.height) }
+  // Check actual hit targets and shared focus ink, not just panel rectangles.
+  for (const name of ['Help', 'Exit cockpit', 'Reset view', 'Telemetry', 'Look at', 'Zero throttle (Space)']) {
+   const button = page.getByRole('button', {name, exact:true})
+   expect(await button.evaluate(el => { const r=el.getBoundingClientRect(); return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)) }), name).toBe(true)
+  }
+  await page.getByRole('button', { name:'Exit cockpit', exact:true }).focus()
+  await page.keyboard.press('Shift+Tab')
+  await expect(page.getByRole('button', { name:'Help', exact:true })).toBeFocused()
+  expect(await page.getByRole('button', { name:'Help', exact:true }).evaluate(el => getComputedStyle(el).outlineStyle)).toBe('solid')
+  await info.attach('layout.json', {body:JSON.stringify({viewport, measurements, state:await state(page)},(_,v)=>typeof v==='bigint'?String(v):v), contentType:'application/json'})
+  await capture(page, 'warning-telemetry.png', info)
+  // Negative: placing the compass over status must be detected by this oracle.
+  await page.locator('.panoramic-instruments').evaluate(el => { (el as HTMLElement).style.cssText='position:absolute;grid-area:auto;left:12px;top:12px' })
+  expect((await measure()).overlaps.length, 'OVERLAP_MUTATION_NOT_DETECTED').toBeGreaterThan(0)
+  await page.locator('.panoramic-instruments').evaluate(el => el.removeAttribute('style'))
+  expect((await measure()).overlaps).toEqual([])
+  expect(await page.getByRole('button', {name:/^(Zoom in|Zoom out|Left|Right|Up|Down)$/}).count()).toBe(0)
+ })
+}

@@ -39,18 +39,20 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
   else if (previousSelection.current) { setContactLost(true); previousSelection.current = null }
  }, [selected?.id])
  const availability = selected && contactCommandAvailability(getShip(), selected, canPilot())
- const bounds = root.current?.getBoundingClientRect()
+ // The compact shell uses display:contents so its panel joins the HUD grid;
+ // marker coordinates still cover the entire panoramic parent.
+ const bounds = (compact ? root.current?.parentElement : root.current)?.getBoundingClientRect()
  const markers = perspectiveMarkers(contacts, geometry, origin, view.snapshot(), bounds?.width ?? 0, bounds?.height ?? 0)
  // A grouping menu belongs to the current visible group, never to stale IDs.
  const activeGroup = group && markers.find(m => group.includes(m.id) && m.ids.length === group.length && m.ids.every(id => group.includes(id)))
  const entries = contacts.filter(b => (!group || activeGroup?.ids.includes(b.id)) && b.name.toLowerCase().includes(query.toLowerCase()))
  const last = Math.max(0, Math.ceil(entries.length / 8) - 1), currentPage = Math.min(page, last)
  const choose = (id: string) => { selectContact(scanner, getOrigin(), id); redraw(n => n + 1) }
- return <div ref={root} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+ return <div ref={root} className={compact ? 'panoramic-projection' : undefined} style={compact ? undefined : { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
   {markers.map(marker => <button key={marker.id} data-sensor-marker aria-label={`Sensor contact ${marker.ids.length === 1 ? contacts.find(b => b.id === marker.id)?.name : `group of ${marker.ids.length}`}`}
    style={{ position: 'absolute', left: marker.x, top: marker.y, transform: 'translate(-50%, -50%)', width: 32, height: 32, borderRadius: '50%', color: compact ? 'var(--ui-active)' : '#9feaff', background: compact ? 'var(--ui-void)' : '#102431aa', border: compact ? '1px solid var(--ui-active)' : '1px solid #9feaff', pointerEvents: 'auto' }}
    onClick={() => {
-    const live = perspectiveMarkers(currentContacts(scanner, getOrigin()), geometry, getOrigin(), view.snapshot(), root.current!.clientWidth, root.current!.clientHeight).find(m => m.id === marker.id)
+    const live = perspectiveMarkers(currentContacts(scanner, getOrigin()), geometry, getOrigin(), view.snapshot(), (compact ? root.current!.parentElement! : root.current!).clientWidth, (compact ? root.current!.parentElement! : root.current!).clientHeight).find(m => m.id === marker.id)
     if (!live) return
     if (live.ids.length === 1) choose(live.id)
     else { setGroup(live.ids); setPage(0); setQuery(''); onBrowserChange?.(true) }
@@ -67,7 +69,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
    <span> {currentPage + 1}/{last + 1} </span>
    <button className={buttonClass} disabled={currentPage === last} onClick={() => setPage(currentPage + 1)}>Next</button>
    </div>}
-   <div className={compact ? "selected-contact ui-panel ui-panel--utility" : "selected-contact"}><StatusMessage priority={contactLost ? 'error' : 'status'}>{selected ? `Selected: ${selected.name}` : contactLost ? 'Scanner contact lost · target actions unavailable.' : 'No selection'}</StatusMessage>
+   {(!compact || selected || contactLost) && <div className={compact ? "selected-contact ui-panel ui-panel--utility" : "selected-contact"}><StatusMessage priority={contactLost ? 'error' : 'status'}>{selected ? `Selected: ${selected.name}` : contactLost ? 'Scanner contact lost · target actions unavailable.' : 'No selection'}</StatusMessage>
    {selected && availability && <>
     {availability.currentPlanet && <p>Current landing planet: {selected.name}</p>}
     <button className={buttonClass} disabled={!availability.lookAt} onClick={() => {
@@ -79,7 +81,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
      if (live && contactCommandAvailability(getShip(), live, canPilot()).setDirection) onSetDirection(live)
     }}>Set direction</button>}
    </>}
-   </div>
+   </div>}
   </section>
  </div>
 }

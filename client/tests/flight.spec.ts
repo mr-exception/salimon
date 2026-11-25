@@ -303,3 +303,52 @@ test('LANDING-843 admitted production trajectory survives input, exit, blur, pow
  await info.attach('landing-state.json', { body: JSON.stringify({ before, start, interrupted, saved, restored, landed, backend, viewport: { width: 1280, height: 800 }, dpr: 1, epoch: '2026-11-04T00:00:00Z', seed: 'sampleUniverse / surface:v1', input: 'Playwright keyboard/click; authorized source-session launch save' }), contentType: 'application/json' })
  await built.close()
 })
+
+test('HUD-907 built cockpit keeps survival and maneuver controls clear at desktop sizes', async ({page},info)=>{
+ const {ResourceSession,RESOURCE_SAVE_KEY}=await import('../src/resourceSession.ts')
+ const {createTopDownState,PLAYER_ID}=await import('../src/topDownRuntime.ts')
+ const {point2}=await import('../src/topDownFrames.ts')
+ const {enterCockpit,leaveCockpit}=await import('../src/cockpit.ts')
+ let raw:string|null=null,world=createTopDownState('interior',true)
+ world.scoutLocation.boardingDoor='closed'
+ world=enterCockpit({...world,selectedId:'scout:chair',entities:world.entities.map(e=>e.id===PLAYER_ID?{...e,anchor:{frame:'ship:scout',point:point2(0,-3.1)}}:e)})
+ const session=new ResourceSession({getItem:()=>raw,setItem:(_,value)=>{raw=value}},world)
+ expect(session.transfer({revision:0,from:{kind:'source',id:'source:landing:mineral:01'},to:{kind:'player'},resourceId:'mineral',grams:1000})).toBe(true)
+ session.world=leaveCockpit(session.world);session.checkpoint()
+ expect(raw).not.toBeNull()
+ await page.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:RESOURCE_SAVE_KEY,raw:raw!})
+ await page.clock.install({time:new Date('2026-11-25T12:00:00Z')});await page.clock.pauseAt(new Date('2026-11-25T12:00:01Z'))
+ await page.goto('http://127.0.0.1:4175/')
+ await expect.poll(async()=>{await page.clock.runFor(50);return page.locator('.top-down-scene').getAttribute('data-render-ready')}).toBe('true')
+ await expect(page.getByRole('button',{name:'Use cockpit',exact:true})).toBeVisible()
+ await page.getByRole('button',{name:'Use cockpit',exact:true}).click();await page.clock.runFor(64)
+ for(const viewport of [{width:960,height:600},{width:1280,height:720},{width:1920,height:1080}]) {
+  await page.setViewportSize(viewport);await page.clock.runFor(64)
+  await expect(page.getByRole('button',{name:'Take off',exact:true})).toBeEnabled()
+  await expect(page.locator('.selected-contact')).toHaveCount(0)
+  await page.screenshot({path:info.outputPath(`default-${viewport.width}.png`)})
+  await page.getByRole('button',{name:/Contacts \(C\)/}).click();await page.clock.runFor(64)
+  for(let t=0;t<5200;t+=100)await page.clock.fastForward(100)
+  await page.getByLabel('Search contacts').fill('Vesper')
+  await page.getByRole('button',{name:'Vesper',exact:true}).click();await page.clock.runFor(64)
+  await page.keyboard.press('Escape');await page.clock.runFor(64)
+  const rects=await page.locator('.survival-hud, .panoramic-status, .panoramic-utilities, .panoramic-contacts, .panoramic-instruments, .panoramic-propulsion, .panoramic-systems, .panoramic-maneuvers').evaluateAll(els=>els.map(el=>({name:el.className,...el.getBoundingClientRect().toJSON()})))
+  for(const [i,a] of rects.entries()) {
+   expect(a.x,a.name).toBeGreaterThanOrEqual(0);expect(a.y,a.name).toBeGreaterThanOrEqual(0)
+   expect(a.right,a.name).toBeLessThanOrEqual(viewport.width);expect(a.bottom,a.name).toBeLessThanOrEqual(viewport.height)
+   for(const b of rects.slice(i+1))expect(Math.min(a.right,b.right)-Math.max(a.x,b.x)>1 && Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y)>1,`${a.name} / ${b.name}`).toBe(false)
+  }
+  for(const name of ['Take off','Exit cockpit','Help','Zero throttle (Space)']) {
+   expect(await page.locator('.panoramic').getByRole('button',{name,exact:true}).evaluate(el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))}),name).toBe(true)
+  }
+  const original=await page.screenshot({path:info.outputPath(`selected-${viewport.width}.png`)})
+  expect((await page.screenshot()).equals(original)).toBe(true)
+  await info.attach(`layout-${viewport.width}.json`,{body:JSON.stringify({viewport,rects}),contentType:'application/json'})
+  await page.getByRole('button',{name:'Exit cockpit',exact:true}).click();await page.clock.runFor(64)
+  if(viewport.width!==1920) {
+   await page.reload();await expect.poll(async()=>{await page.clock.runFor(50);return page.locator('.top-down-scene').getAttribute('data-render-ready')}).toBe('true')
+   await expect(page.getByRole('button',{name:'Use cockpit',exact:true})).toBeVisible()
+ await page.getByRole('button',{name:'Use cockpit',exact:true}).click();await page.clock.runFor(64)
+  }
+ }
+})

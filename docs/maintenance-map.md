@@ -150,6 +150,12 @@ See the [client command and reference workflow](../client/README.md#cross-view-e
 
 [Architecture baseline and ownership audit](architecture-baseline.md) records measurable refactoring priorities (#638).
 
+Responsive edge tracks and actual scanner/FOV/velocity readouts (#907) belong
+to `PanoramicNavigation.tsx` / `panoramic.css`; compact contact selection and
+full-viewport marker projection remain in `PerspectiveContacts.tsx`.
+`tests/panoramic.spec.ts` HUD-907 owns responsive geometry/hit-target, repeat
+and negative-overlap evidence. See the [instrument guide](../client/README.md#responsive-panoramic-instruments-907).
+
 The production cockpit presentation is `PanoramicNavigation.tsx`, composed by
 `TopDownView.tsx` with a shared `NavigationRuntime` and session-local
 `ObservationCameraState`. The 2D owner runs the sole production navigation clock;

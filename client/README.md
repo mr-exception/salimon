@@ -1490,3 +1490,29 @@ one draw/two triangles. Existing `OPT-1`–`OPT-3` cover horizon/underground,
 occultation, physical depth and telescope precision. New originals and raw
 measurements stay in ignored `test-results/`; the PR carries the validation
 record. Reference appearance proposals retain pending owner review.
+
+
+### Responsive panoramic instruments (#907)
+
+`PanoramicNavigation.tsx` uses the shared 2D tokens and utility/control skins in
+`ui/`, with intrinsic grid tracks around the full viewport canvas. Navigation
+and scanner status sit at the upper left, Help/Exit at the upper right,
+orientation and velocity/signed throttle at the lower left, and supported
+observation systems at the lower right. Production Take off / Land and their
+live admission/progress messages occupy the lower middle. Range is the scanner
+owner's actual constant; FOV follows the observation camera. No new mechanics
+or zoom/direction control pad is added.
+
+The selected contact panel is absent until a live target is selected (or a lost
+contact needs feedback). The contact browser scrolls within its reserved edge
+track; search, pagination, native disabled controls, focus ink, mouse markers,
+C, Escape, drag/wheel and flight shortcuts retain their existing owners.
+`tests/panoramic.spec.ts` HUD-907 covers default/selected original captures,
+repeat stability, viewport bounds, non-overlap, actual hit targets, focus and a
+negative overlap mutation at 960×600, 1280×720 and 1920×1080. Existing HUD and
+production flight tests retain behavioral coverage. The built HUD-907 check also
+reserves the survival HUD and real maneuver controls at all three sizes; both
+new checks run in PR smoke. Originals and measurements
+are in ignored `test-results/`; CI artifacts retain evidence for 14 days.
+Changed visual references require the existing explicit baseline approval;
+new captures do not approve themselves.

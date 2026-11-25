@@ -58,7 +58,8 @@ body:has(.panoramic) .power-fixture { bottom:82px; left:auto; right:12px }
 .gathering-status .ui-meter { margin:0 }
 .gathering-status p { margin:4px 0 }
 .expedition-ui .top-down-app footer { font-size:11px; padding:4px 10px }
-body:has(.panoramic) .expedition-ui .survival-hud { width:220px; top:220px; max-height:calc(100dvh - 470px); font-size:12px; line-height:16px }
+/* Keep survival above the panoramic bottom grid and below priority warnings. */
+body:has(.panoramic) .expedition-ui .survival-hud { width:220px; top:220px; max-height:calc(100dvh - 410px); font-size:12px; line-height:16px }
 body:has(.panoramic) .vital-meters { gap:6px }
 @media(max-width:1000px) {
   .expedition-ui .survival-hud { width:260px }
@@ -67,8 +68,6 @@ body:has(.panoramic) .vital-meters { gap:6px }
 .expedition-ui .survival-hud .ui-status--critical { color:var(--ui-danger); position:sticky; top:0; z-index:1; }
 
 .top-down-app[data-surface-bound="false"] .top-down-stage { background:var(--ui-void, #0b151b) }
-/* Reserve the launch row and compass before sizing the scrollable survival HUD. */
-body:has(.launch-control) .expedition-ui .survival-hud { max-height:calc(100dvh - 530px) }
 
 .exploration-hud { padding: 0; border: 0; background: transparent; overflow: visible; position: absolute; right: 12px; bottom: 12px; z-index: 4; display: flex; flex-wrap: wrap; gap: .5rem; width: 224px; max-width: calc(50vw - 18px); justify-content: flex-end; }
 .exploration-hud > p { background: #202b2b; color: #f5eedb; border: 1px solid #b4bdb0; padding: .6rem; margin: 0; line-height: 1.4; }

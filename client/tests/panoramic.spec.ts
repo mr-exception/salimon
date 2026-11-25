@@ -1,7 +1,7 @@
 import { test, expect, type Page, type TestInfo } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
 import { PNG } from 'pngjs'
-type State = { ship: { yaw: number; pitch: number; throttle: number; velocityMps: number[] }; view: { quaternion: number[]; fov: number }; renderer: string; contacts: string[]; exits: number }
+type State = { ship: { yaw: number; pitch: number; throttle: number; velocityMps: number[]; position: unknown; mode: string }; view: { quaternion: number[]; fov: number }; renderer: string; contacts: string[]; exits: number }
 const state = (page: Page) => page.evaluate(() => (window as unknown as { hudSnapshot(): State }).hudSnapshot())
 const acquireContacts = (page: Page) => page.evaluate(() => (window as unknown as { hudAdvance(seconds: number): void }).hudAdvance(5))
 const scenario = (page: Page, kind: string) => page.evaluate(kind => (window as unknown as { hudScenario(kind: string): void }).hudScenario(kind), kind)
@@ -229,4 +229,76 @@ test('FEEDBACK scanner pulse is quiet; lost contact removes authoritative action
  await expect(page.getByRole('button', { name: 'Look at', exact:true })).toHaveCount(0)
  await expect(page.getByRole('button', { name: 'Set direction', exact:true })).toHaveCount(0)
  await capture(page, 'scanner-contact-lost.png', info)
+})
+
+test('ENV-905 seeded scanner space, angular grid, translation and marker contrast across FOV', async ({ page }, info) => {
+ test.setTimeout(240000)
+ const errors: string[] = []
+ page.on('pageerror', error => errors.push(error.message))
+ page.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
+ await page.goto('/tests/panoramic.html?environment')
+ await expect.poll(async () => (await state(page))?.renderer).toContain('SwiftShader')
+ const setView = async (fov: number, yaw = 0, pitch = 0) => {
+  await page.evaluate(({ fov, yaw, pitch }) => (window as unknown as { hudView(f: number, y: number, p: number): void }).hudView(fov, yaw, pitch), { fov, yaw, pitch })
+  await expect.poll(async () => (await state(page)).view.fov).toBe(fov)
+  await page.waitForTimeout(200)
+ }
+ const sky = () => page.locator('canvas').screenshot({ style: '.panoramic > :not(:first-child) { visibility: hidden !important }' })
+ const grid = page.getByRole('button', { name: 'Orientation grid', exact: true })
+ await expect(grid).toHaveAttribute('aria-pressed', 'false')
+ await setView(75)
+ const original = await state(page), wide = await sky(), png = PNG.sync.read(wide)
+ let bright = 0, black = 0
+ for (let i = 0; i < png.data.length; i += 4) {
+  if (Math.max(...png.data.subarray(i, i + 3)) > 45) bright++
+  if (png.data[i] + png.data[i + 1] + png.data[i + 2] === 0) black++
+ }
+ expect(black).toBe(0)
+ expect(bright).toBeGreaterThan(10); expect(bright).toBeLessThan(png.width * png.height * .005)
+ expect(png.data[100 * png.width * 4 + 100 * 4 + 2]).not.toBe(png.data[600 * png.width * 4 + 1100 * 4 + 2])
+ await info.attach('wide-canvas.png', { body: wide, contentType: 'image/png' })
+ expect((await sky()).equals(wide), 'static repeat').toBe(true)
+ await setView(75, 1.1, .5)
+ const rotated = await sky()
+ expect(rotated.equals(wide), 'orientation must change environment').toBe(false)
+ await info.attach('rotated-canvas.png', { body: rotated, contentType: 'image/png' })
+ await setView(75)
+ expect((await sky()).equals(wide), 'restored orientation').toBe(true)
+ await scenario(page, 'lost-contact'); await page.waitForTimeout(200)
+ expect((await sky()).equals(wide), 'origin must not translate environment').toBe(true)
+ await page.reload()
+ await expect.poll(async () => (await state(page))?.renderer).toContain('SwiftShader')
+ await setView(75)
+ expect((await sky()).equals(wide), 'seeded reload').toBe(true)
+ await grid.click(); await page.waitForTimeout(200)
+ await expect(grid).toHaveAttribute('aria-pressed', 'true')
+ const gridded = await sky()
+ expect(gridded.equals(wide), 'grid negative control').toBe(false)
+ await info.attach('grid-canvas.png', { body: gridded, contentType: 'image/png' })
+ await grid.click(); await page.waitForTimeout(200)
+ expect((await sky()).equals(wide), 'grid off restores pixels').toBe(true)
+ await acquireContacts(page)
+ const linear = (value: number) => { const c = value / 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4 }
+ const luminance = (rgb: number[]) => .2126 * linear(rgb[0]) + .7152 * linear(rgb[1]) + .0722 * linear(rgb[2])
+ const measurements = []
+ for (const fov of [75, 30, 5, .1]) {
+  await setView(fov, 0, Math.atan2(5000, 100000))
+  const marker = page.locator('[data-sensor-marker]').first()
+  await expect(marker).toBeInViewport()
+  const colors = await marker.evaluate(el => { const s = getComputedStyle(el); return [s.color, s.backgroundColor] })
+  const channels = colors.map(color => color.match(/[\d.]+/g)!.slice(0, 3).map(Number))
+  const contrast = (luminance(channels[0]) + .05) / (luminance(channels[1]) + .05)
+  expect(contrast).toBeGreaterThan(4.5)
+  const snapshot = await state(page) as State & { calls: number; triangles: number; geometries: number }
+  for (const key of ['position', 'velocityMps', 'yaw', 'pitch', 'throttle', 'mode'] as const) expect(snapshot.ship[key], key).toEqual(original.ship[key])
+  expect(snapshot.contacts.length).toBe(40)
+  expect(snapshot.calls).toBe(1); expect(snapshot.triangles).toBe(2); expect(snapshot.geometries).toBe(1)
+  measurements.push({ fov, contrast, snapshot })
+  if (fov === 75 || fov === .1) await capture(page, `scanner-${fov}.png`, info)
+ }
+ const telescope = await sky()
+ await grid.click(); await page.waitForTimeout(200)
+ expect((await sky()).equals(telescope), 'grid fades out in telescope').toBe(true)
+ expect(errors).toEqual([])
+ await info.attach('environment-measurements.json', { body: JSON.stringify({ bright, black, original, measurements, errors, comparisons: ['repeat', 'rotation negative', 'restored', 'translation', 'reload', 'grid negative', 'grid restoration', 'telescope fade'] }, (_, v) => typeof v === 'bigint' ? String(v) : v, 2), contentType: 'application/json' })
 })

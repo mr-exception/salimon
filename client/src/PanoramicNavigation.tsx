@@ -30,6 +30,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   isPaused?: () => boolean; onExit?: () => void; onSceneReady?: (state: RootState) => void
 }) {
   const [, redraw] = useState(0)
+  const [orientationGrid, setOrientationGrid] = useState(false)
   const [browser, setBrowser] = useState(false), [telemetry, setTelemetry] = useState(false), [help, setHelp] = useState(false)
   const root = useRef<HTMLDivElement>(null), contactsButton = useRef<HTMLButtonElement | null>(null)
   const input = useRef(navigation.pilotInput)
@@ -112,7 +113,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     { id: 'condition', text: conditionWarning, priority: 'critical' },
   ]}><div ref={root} className="panoramic expedition-ui" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDown={dismiss}>
     <Canvas onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
-      <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position}/>
+      <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position} scannerEnvironment orientationGrid={orientationGrid}/>
     </Canvas>
     <div className="observation-reticle" aria-hidden="true">+</div>
     <header className="panoramic-status ui-panel ui-panel--utility">
@@ -148,6 +149,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       <button className="ui-button ui-button--secondary" disabled={ship.mode !== 'flying' || !canPilot()} onClick={() => throttle(0)}>Zero throttle (Space)</button>
       <button className="ui-button ui-button--secondary" onClick={() => { view.reset(navigation.clock.state); redraw(n => n + 1) }}>Reset view</button>
       <button className="ui-button ui-button--secondary telemetry-toggle" aria-expanded={telemetry} aria-controls="detailed-telemetry" onClick={() => setTelemetry(value => !value)}>Telemetry</button>
+      <button className="ui-button ui-button--secondary" aria-pressed={orientationGrid} onClick={() => setOrientationGrid(value => !value)}>Orientation grid</button>
       <button className="ui-button ui-button--secondary help-toggle" onClick={() => setHelp(true)}>Help</button>{onExit && <button className="ui-button ui-button--secondary" onClick={onExit}>Exit cockpit</button>}
     </footer>
     {telemetry && <section data-ui-utility id="detailed-telemetry" className="panoramic-telemetry ui-panel ui-panel--utility" aria-label="Detailed telemetry">

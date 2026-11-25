@@ -140,3 +140,13 @@ for PR #836, run 42437273206, merge revision
 The PR records original/diff metrics and subsequent normal/repeat/negative checks.
 Pixel policy, environment and `AWAITING_HUMAN_REVIEW` status are unchanged;
 this proposal does not grant appearance approval or merge authority.
+
+## Scanner environment proposal (#905)
+
+The five panoramic HUD references propose the directional navy scanner background
+and optional orientation-grid control. The other 22 references are unchanged.
+The matching 12 cockpit references in `../expedition-baselines/` cover grounded
+horizon/selection and bright-body warnings/help at 960, 1280 and 1920 pixels.
+Environment, comparison policy and pending owner-review status are unchanged.
+Originals, diffs, measurements and validation belong to the implementation PR
+and ignored local output; these proposed assets do not grant appearance approval.

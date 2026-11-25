@@ -1246,3 +1246,9 @@ cancellation and destination/status feedback. Routes are session-local;
 `ResourceSession` saves only the existing resulting location. Tests:
 `topDownNavigation.test.ts`, built `tests/ground-movement.spec.ts` in the cockpit
 project and PR smoke. See the client movement contract.
+
+Scanner environment (#905): `OpticalSky.tsx` owns directional gradient/star/grid
+shader composition and physical occlusion; `PanoramicNavigation.tsx` owns the
+session-local grid toggle. `tests/panoramic.spec.ts` owns ENV-905 coverage in PR
+smoke and full perspective CI. No physical coordinates or discovery are owned by
+this presentation layer. See the [scanner guide](../client/README.md#scanner-environment-905).

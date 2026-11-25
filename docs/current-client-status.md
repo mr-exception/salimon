@@ -145,3 +145,14 @@ Scout/player cutaway layers retain their ownership. Fixed art, repeat/negative,
 region-walk and obstacle approach coverage is documented in the
 [client guide](../client/README.md#illustrated-streamed-geology-850). P04 itself adds no climate, weather or organisms; geological mineral sources
 now come from the separate #851 resource publication.
+
+### Stylized panoramic scanner environment (#905)
+
+`PanoramicNavigation.tsx` enables the presentation-only navy gradient and stable
+inertial stars in `OpticalSky.tsx`, with a default-off **Orientation grid** toggle.
+The angular grid fades out for telescope views and near the poles. One fullscreen
+shader preserves physical optical occlusion and never consumes ship translation
+for background directions. The standalone optical fixture remains a physical
+calibration view. `tests/panoramic.spec.ts` owns ENV-905's original captures,
+repeat/negative/invariance, FOV contrast and resource checks; see the
+[client contract](../client/README.md#scanner-environment-905).

@@ -57,7 +57,15 @@ test('OPT-2 telescope tiny moon and grounded horizon with below-surface occlusio
  const below = await capture(page), down = PNG.sync.read(below)
  expect(brightness(down, 640, 200)).toBeGreaterThan(10)
  expect(brightness(down, 640, 600)).toBeGreaterThan(10)
+ // A close view of one polar face must have broad flat regions, not rounding
+ // speckles. This row crosses the two adjacent octants only once.
+ let runs = 1
+ for (let x = 101; x < 1180; x++) {
+  const i = (200 * down.width + x) * 4
+  if (!down.data.subarray(i, i + 3).equals(down.data.subarray(i - 4, i - 1))) runs++
+ }
  await info.attach('below.png', { body: below, contentType: 'image/png' })
+ expect(runs, 'POLAR_FACET_SPECKLING').toBeLessThanOrEqual(4)
  expect(below.equals(telescope)).toBe(false)
  expect(errors).toEqual([])
  await info.attach('measurements.json', { body: json({ telescope: state, below: await snapshot(page), errors }), contentType: 'application/json' })

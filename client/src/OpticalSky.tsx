@@ -23,8 +23,10 @@ float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
 // shading only: physical silhouettes and rationalized depth stay analytic.
 vec3 facet(vec3 n) {
   vec3 p=abs(n)/(abs(n.x)+abs(n.y)+abs(n.z));
-  vec2 cell=p.xy*6.;
-  float upper=step(1.,fract(cell.x)+fract(cell.y));
+  // Keep rounded axis/edge samples inside the final valid triangle. Without
+  // this, metre-clearance normals can alternate between invalid pole cells.
+  vec2 cell=p.xy*5.99999;
+  float upper=step(1.,fract(cell.x)+fract(cell.y))*(1.-step(5.,floor(cell.x)+floor(cell.y)));
   vec2 center=(floor(cell)+vec2((1.+upper)/3.))/6.;
   return normalize(vec3(center,1.-center.x-center.y)*sign(n+vec3(1e-20)));
 }
@@ -78,7 +80,10 @@ void main() {
     float logHit=hit==0.?-1024.:log2(max(hit,1e-38))+s.x;
     if(hit>=0. && logHit<nearest) {
       nearest=logHit;
-      vec3 surfaceNormal=ray*along-dir-ray*sqrt(max(disc,0.));
+      // Near a surface, subtracting the two large ray terms loses metre-scale
+      // normal components. Reuse the rationalized hit there; retain the
+      // perpendicular form for tiny telescope disks where hit rounds to one.
+      vec3 surfaceNormal=s.z>=0. && s.y>0.5?ray*hit-dir:ray*along-dir-ray*sqrt(max(disc,0.));
       nearestNormal=surfaceNormal/max(length(surfaceNormal),1e-30);
       nearestIndex=i;
     }

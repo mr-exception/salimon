@@ -138,15 +138,18 @@ test('EXPLORE-852 generated ridge inspection, physical alignment and readable gu
   await expect(page.locator('[data-field-mark]')).toHaveAttribute('data-field-mark',`mark:v1:${landmark.id}`)
   await page.locator('main').click({position:{x:640,y:350}});await page.keyboard.press('g')
   await expect(page.locator('[data-scout-guidance]')).toHaveAttribute('data-fix','false')
-  for(const viewport of [{width:960,height:600},{width:1920,height:800},{width:600,height:1200}]) {
+  for(const viewport of [{width:960,height:600},{width:1920,height:800},{width:600,height:1200},{width:600,height:600}]) {
     await page.setViewportSize(viewport);await page.clock.runFor(200)
-    const a=await page.screenshot({path:info.outputPath(`ridge-${viewport.width}.png`)})
-    expect(compareImages(a,await page.screenshot({path:info.outputPath(`ridge-${viewport.width}-repeat.png`)})).pass).toBe(true)
-    const boxes=await page.locator('.survival-hud,.resource-hud,.top-down-bottom,.exploration-hud').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}}))
+    const capture=`ridge-${viewport.width}x${viewport.height}`
+    const a=await page.screenshot({path:info.outputPath(`${capture}.png`)})
+    const repeat=compareImages(a,await page.screenshot({path:info.outputPath(`${capture}-repeat.png`)}))
+    expect(repeat.pass).toBe(true)
+    const boxes=await page.locator('.survival-hud,.resource-hud,.top-down-bottom,.exploration-hud').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return{panel:el.className,x:r.x,y:r.y,width:r.width,height:r.height}}))
+    await info.attach(`${capture}-layout.json`,{body:JSON.stringify({viewport,boxes,repeat:{pass:repeat.pass,changedPixels:repeat.changedPixels,rawChangedPixels:repeat.rawChangedPixels}}),contentType:'application/json'})
     for(const box of boxes){expect(box.x).toBeGreaterThanOrEqual(0);expect(box.y).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(viewport.width);expect(box.y+box.height).toBeLessThanOrEqual(viewport.height)}
     const panel=boxes.at(-1)!
     // The new overlay may not obscure inventory, survival or nearby actions.
-    for(const other of boxes.slice(0,-1))expect(panel.x+panel.width<=other.x || other.x+other.width<=panel.x || panel.y+panel.height<=other.y || other.y+other.height<=panel.y).toBe(true)
+    for(const other of boxes.slice(0,-1))expect(panel.x+panel.width<=other.x || other.x+other.width<=panel.x || panel.y+panel.height<=other.y || other.y+other.height<=panel.y,`${capture}: guidance overlaps ${other.panel}`).toBe(true)
   }
   await info.attach('physical-landmark.json',{body:JSON.stringify({landmark,physical,sample:probeGeology(landmark.location,d),renderer:'Chromium SVG/Canvas CPU',seed:d.domains.geology.seed}),contentType:'application/json'})
 })

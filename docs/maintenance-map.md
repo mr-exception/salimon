@@ -69,7 +69,10 @@ Combined planetary QA (#854): `tests/planetary-journey.spec.ts` owns restored Ve
 Browser field exploration (#852): `exploration.ts` owns physical landmark identity,
 explicit versioned field-mark commands and local walking-fix policy;
 `ExplorationHud.tsx` owns the notebook, projected known-place cues and on-demand
-Scout guidance. `ResourceSession.fieldMarks` reads durable schema-v13 observations;
+Scout guidance. `topDown.css` reserves a separate bottom column while guidance
+is visible; the viewport geometry and repeat captures in `tests/exploration.spec.ts`
+guard it against interaction/command panel overlap (#902).
+`ResourceSession.fieldMarks` reads durable schema-v13 observations;
 `walkingFix` retains its session-local uncertainty policy. `expeditionJournal.ts`
 owns bounded physical visits and strict observation replay (#853). Tests: `exploration.test.ts` and built
 `tests/exploration.spec.ts`. See [surface contract](browser-planet-surface.md#field-exploration-and-local-scout-guidance-852).

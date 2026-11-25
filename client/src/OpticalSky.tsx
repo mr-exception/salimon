@@ -12,6 +12,7 @@ uniform vec3 directions[32], colors[32], lights[32];
 uniform vec4 spheres[32]; // log2(distance), radius/distance, factored surface term, emission
 uniform vec3 rightAxis, upAxis, forwardAxis;
 uniform float tangent, aspect, pixelAngle;
+uniform bool scannerEnvironment, orientationGrid;
 varying vec2 screen;
 float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
 vec3 stars(vec3 ray) {
@@ -33,6 +34,22 @@ vec3 stars(vec3 ray) {
 void main() {
   vec3 ray=normalize(forwardAxis+rightAxis*screen.x*tangent*aspect+upAxis*screen.y*tangent);
   vec3 color=stars(ray);
+  if(scannerEnvironment) {
+    // Inertial directions only: neither ship origin nor time enters this field.
+    // Dark linear RGB values preserve contrast with cyan scanner markers.
+    float navy=0.5+0.5*dot(ray,normalize(vec3(-0.3,0.8,-0.5)));
+    color=color*vec3(0.72,0.82,0.95)+mix(vec3(0.012,0.023,0.045),vec3(0.035,0.065,0.105),navy);
+    if(orientationGrid) {
+      // 15-degree angular graticule, antialiased in screen pixels. Fade near
+      // poles and below 5 degrees FOV so telescope lines cannot fill the view.
+      vec2 angles=vec2(atan(ray.z,ray.x),asin(clamp(ray.y,-1.,1.)))/0.261799388;
+      vec2 edge=abs(fract(angles+0.5)-0.5);
+      float width=max(pixelAngle/0.261799388,1e-7);
+      float line=1.-smoothstep(width*0.5,width*1.5,min(edge.x,edge.y));
+      float fade=smoothstep(0.04366,0.13165,tangent)*(1.-smoothstep(0.9,0.99,abs(ray.y)));
+      color+=vec3(0.012,0.023,0.031)*line*fade;
+    }
+  }
   float nearest=1024.;
   for(int i=0;i<32;i++) {
     if(i>=count) break;
@@ -68,7 +85,7 @@ void main() {
 /** One reusable quad, bounded analytic sphere tests, no physical depth-buffer
  * range and no mesh tessellation/LOD churn. Call getOrigin from shared ship state.
  */
-export function OpticalSky({ bodies, getOrigin }: { bodies: readonly Body[]; getOrigin: () => Position }) {
+export function OpticalSky({ bodies, getOrigin, scannerEnvironment = false, orientationGrid = false }: { bodies: readonly Body[]; getOrigin: () => Position; scannerEnvironment?: boolean; orientationGrid?: boolean }) {
   const material = useMemo(() => new ShaderMaterial({
     depthTest: false, depthWrite: false, toneMapped: false,
     uniforms: {
@@ -78,6 +95,7 @@ export function OpticalSky({ bodies, getOrigin }: { bodies: readonly Body[]; get
       spheres: { value: new Float32Array(MAX_OPTICAL_BODIES * 4) },
       rightAxis: { value: new Vector3() }, upAxis: { value: new Vector3() }, forwardAxis: { value: new Vector3() },
       tangent: { value: 1 }, aspect: { value: 1 }, pixelAngle: { value: 1 },
+      scannerEnvironment: { value: false }, orientationGrid: { value: false },
     },
     vertexShader: 'varying vec2 screen; void main(){ screen=position.xy; gl_Position=vec4(position.xy,0.,1.); }',
     fragmentShader,
@@ -86,6 +104,8 @@ export function OpticalSky({ bodies, getOrigin }: { bodies: readonly Body[]; get
   const orientation = useMemo(() => new Quaternion(), [])
   useFrame(({ camera, size, gl }) => {
     const data = opticalSpheres(bodies, getOrigin()), uniforms = material.uniforms
+    uniforms.scannerEnvironment.value = scannerEnvironment
+    uniforms.orientationGrid.value = orientationGrid
     uniforms.count.value = data.length
     data.forEach((sphere, i) => {
       uniforms.directions.value[i].fromArray(sphere.direction)

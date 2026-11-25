@@ -1435,3 +1435,28 @@ Wheel zooms over the world; middle drag pans; Space with world focus recenters.
 E remains the nearby keyboard action. Pending commands and camera state never
 resume from saves; committed material transfers do. See the
 [contract and built browser checks](../docs/mouse-driven-2d-interactions.md#command-feedback-and-validation-894).
+
+### Scanner environment (#905)
+
+The production panoramic cockpit enables `OpticalSky`'s `scannerEnvironment`
+layer: a restrained navy directional gradient and the existing deterministic,
+sparse inertial starfield. **Orientation grid** toggles a session-local 15-degree
+angular graticule; it defaults off and fades below 15° FOV (fully off below 5°)
+and near the poles. It conveys orientation, not distance or physical position.
+The physical optical fixture retains its unstyled sky for optical calibration.
+
+The environment uses the same fullscreen shader, one draw call and two triangles.
+Static stars are computed from fixed direction-cell hashes in the shader; they
+have no time, origin, generated JS buffers or per-frame star allocations. Physical
+sphere intersections still occlude the environment. No lighting passes, shadows,
+blur, volumetrics or changes to scanner discovery, flight, coordinates or saves
+are introduced.
+
+`npx playwright test --project=panoramic tests/panoramic.spec.ts` covers the existing
+navigation/HUD plus ENV-905. The latter measures dark nonblack coverage, sparse
+stars, orientation/translation/reload invariance, grid on/off and telescope fade,
+marker contrast at 75°, 30°, 5° and 0.1°, and stable renderer resources. Original
+wide/telescope/grid/rotation captures and canonical state measurements stay in
+ignored `test-results/` and the existing 14-day CI artifacts. ENV-905 also runs in
+PR smoke and the full perspective group. Visual references require a separate
+reviewed update; the collector's candidate mode does not approve baselines.

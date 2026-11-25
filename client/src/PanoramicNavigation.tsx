@@ -1,3 +1,5 @@
+import { formatDistance, formatSpeed } from './metricFormat.ts'
+import './metricFormat.css'
 import { Canvas, type RootState } from '@react-three/fiber'
 import { useEffect, useRef, useState } from 'react'
 import { ObservationCamera } from './ObservationCamera.tsx'
@@ -9,6 +11,7 @@ import { HelpDialog } from './HelpDialog.tsx'
 import { FrameTimer, acceptsFlightShortcut, axisForCode } from './input.ts'
 import { setContactDirection } from './contactCommands.ts'
 import { landingReadout, landingProgress } from './landingHud.ts'
+import { LIGHT_SECOND_M } from './coordinates.ts'
 import { SCANNER_RADIUS_LS } from './sampleUniverse.ts'
 import { TAKEOFF_TICKS } from './takeoff.ts'
 import { setThrottle } from './simulation.ts'
@@ -112,7 +115,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     ...warnings.map(w => ({ id: w.id, text: w.message, priority: 'critical' as const, tone: w.severity === 'danger' ? 'danger' as const : 'caution' as const })),
     { id: 'terminal', text: ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : '', priority: 'critical' },
     { id: 'condition', text: conditionWarning, priority: 'critical' },
-  ]}><div ref={root} className="panoramic expedition-ui" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDown={dismiss}>
+  ]}><div ref={root} className="panoramic expedition-ui metric-readout" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDown={dismiss}>
     <Canvas className="panoramic-scene" onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
       <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position} definitionForBody={navigation.surfaceDefinitionForBody} scannerEnvironment orientationGrid={orientationGrid}/>
     </Canvas>
@@ -121,7 +124,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       <strong className="ui-eyebrow">SALIMON · OBSERVATION</strong>
       <StatusMessage>{navigation.scanner.pulse === 0 ? 'Scanner awaiting first 5-second pulse' : `Scanner active · ${navigation.scanner.contacts.length} contacts`}</StatusMessage>
       <span className="scanner-pulse" aria-live="off">Pulse {navigation.scanner.pulse} · </span><span>{ship.mode}{grounded ? ` · ${grounded.body.name}` : ''} · sample inertial frame</span>
-      <span className="scanner-readings">Range {SCANNER_RADIUS_LS.toLocaleString()} ls · FOV {snapshot.fov.toFixed(1)}°</span>
+      <span className="scanner-readings">Range {formatDistance(SCANNER_RADIUS_LS * LIGHT_SECOND_M)} · FOV {snapshot.fov.toFixed(1)}°</span>
     </header>
     <nav className="panoramic-utilities" aria-label="Cockpit utilities">
       <button className="ui-button ui-button--secondary help-toggle" onClick={() => setHelp(true)}>Help</button>
@@ -129,7 +132,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     </nav>
     <div className="panoramic-priority" aria-label="Navigation warnings">
       {warnings.map(w => <StatusMessage key={w.id} priority={w.severity === 'danger' ? 'critical' : 'status'} tone={w.severity === 'danger' ? 'danger' : 'caution'}>{w.message}</StatusMessage>)}
-      {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'} tone={ship.mode === 'destroyed' ? 'danger' : 'info'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${ship.contact.impactSpeedMps.toFixed(1)} m/s`}</StatusMessage>}
+      {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'} tone={ship.mode === 'destroyed' ? 'danger' : 'info'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${formatSpeed(ship.contact.impactSpeedMps)}`}</StatusMessage>}
       {!navigation.location && !grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
     </div>
     <PerspectiveContacts destinationId={navigation.location?.landing?.surface.bodyId} compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
@@ -139,7 +142,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     <footer className="panoramic-controls">
       <section className="panoramic-propulsion ui-panel ui-panel--utility" aria-label="Velocity and thrust">
         <strong className="ui-eyebrow">Velocity / thrust</strong>
-        <output className="velocity-readout" aria-live="off" aria-label="Inertial speed">{speed.toFixed(1)} <small>m/s</small></output>
+        <output className="velocity-readout" aria-live="off" aria-label="Inertial speed" title={`${speed} m/s (sample inertial frame)`}>{formatSpeed(speed)}</output>
         <label>Throttle {ship.throttle}%<input aria-label="Throttle" type="range" min="-100" max="100" value={ship.throttle} disabled={ship.mode !== 'flying' || !canPilot()} onChange={e => throttle(Number(e.target.value))}/></label>
         <button className="ui-button ui-button--secondary" disabled={ship.mode !== 'flying' || !canPilot()} onClick={() => throttle(0)}>Zero throttle (Space)</button>
       </section>
@@ -155,7 +158,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
             input.current.clear(); landing.activate(target.id); redraw(n => n + 1)
           }
         }}>Land</button>
-        <div><span id="landing-readings">{approach.body ? `${approach.body.name} · altitude ${approach.altitudeM!.toFixed(1)} m · full relative speed ${approach.relativeSpeedMps!.toFixed(3)} m/s` : 'No scanned landing target'}</span>
+        <div><span id="landing-readings">{approach.body ? `${approach.body.name} · altitude ${formatDistance(approach.altitudeM!)} · full relative speed ${formatSpeed(approach.relativeSpeedMps!)}` : 'No scanned landing target'}</span>
           <span id="landing-status" role="status">{ship.mode === 'destroyed' ? 'Journey ended — whole ship destroyed. No surface access.' : progress ?? landingDenial ?? 'Ready to land · no heading requirement'}</span></div>
       </div>}
       </section>
@@ -169,7 +172,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     {telemetry && <section data-ui-utility id="detailed-telemetry" className="panoramic-telemetry ui-panel ui-panel--utility" aria-label="Detailed telemetry">
       <p>Mass {ship.massKg.toLocaleString()} kg · FOV {snapshot.fov.toFixed(2)}°</p>
       <p>Yaw {(ship.yaw * 180 / Math.PI).toFixed(1)}° · pitch {(ship.pitch * 180 / Math.PI).toFixed(1)}° · {ship.alignment ? 'Turning' : 'Manual'}</p>
-      <p>Cell {ship.position.cell.map(String).join(' / ')} · local {ship.position.offsetM.map(v => v.toFixed(1)).join(' / ')} m</p>
+      <p>Cell {ship.position.cell.map(String).join(' / ')} · local {ship.position.offsetM.map(formatDistance).join(' / ')}</p>
       {grounded && <p>Scout grounded. Close the aft door and use Take off when authorized; observation and scanner remain available.</p>}
       <p>Illustrative universe · unlimited energy. Impacts at 100 m/s or faster end the run.</p>
     </section>}

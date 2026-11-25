@@ -1,5 +1,7 @@
+import { formatDistance, formatSpeed } from './metricFormat.ts'
+import './metricFormat.css'
 import { useEffect, useRef, useState } from 'react'
-import { navigationWarnings } from './contact.ts'
+import { distances, navigationWarnings } from './contact.ts'
 import './sensorMarkers.css'
 import { StatusMessage } from './ui/Feedback.tsx'
 import { contactCommandAvailability, lookAtContact } from './contactCommands.ts'
@@ -35,6 +37,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  }, [])
  const origin = getOrigin(), contacts = currentContacts(scanner, origin)
  const selected = selectedContact(scanner, origin)
+ const readings = selected && distances(getShip(), selected)
  const previousSelection = useRef<string | null>(null)
  const [contactLost, setContactLost] = useState(false)
  useEffect(() => {
@@ -52,7 +55,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  const entries = contacts.filter(b => (!group || activeGroup?.ids.includes(b.id)) && b.name.toLowerCase().includes(query.toLowerCase()))
  const last = Math.max(0, Math.ceil(entries.length / 8) - 1), currentPage = Math.min(page, last)
  const choose = (id: string) => { selectContact(scanner, getOrigin(), id); redraw(n => n + 1) }
- return <div ref={root} className={compact ? 'panoramic-projection' : undefined} style={compact ? undefined : { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+ return <div ref={root} className={compact ? 'panoramic-projection metric-readout' : 'metric-readout'} style={compact ? undefined : { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
   {markers.map(marker => {
    const isSelected = !!selected && marker.ids.includes(selected.id)
    const destination = !!destinationId && marker.ids.includes(destinationId)
@@ -89,6 +92,11 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
    </div>}
    {(!compact || selected || contactLost) && <div className={compact ? "selected-contact ui-panel ui-panel--utility" : "selected-contact"}><StatusMessage priority={contactLost ? 'error' : 'status'}>{selected ? `Selected: ${selected.name}` : contactLost ? 'Scanner contact lost · target actions unavailable.' : 'No selection'}</StatusMessage>
    {selected && availability && <>
+    {readings && <div aria-label="Selected contact readings">
+     <p title={`${readings.centerDistanceM} m`}>Distance {formatDistance(readings.centerDistanceM)}</p>
+     <p title={`${readings.surfaceDistanceM} m`}>Surface clearance {formatDistance(readings.surfaceDistanceM)}</p>
+     <p title={`${Math.hypot(...readings.velocityRelativeMps)} m/s`}>Relative speed {formatSpeed(Math.hypot(...readings.velocityRelativeMps))}</p>
+    </div>}
     {availability.currentPlanet && <p>Current landing planet: {selected.name}</p>}
     <button className={buttonClass} disabled={!availability.lookAt} onClick={() => {
      const live = selectedContact(scanner, getOrigin())

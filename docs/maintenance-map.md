@@ -1,5 +1,11 @@
 # Feature maintenance map
 
+Adaptive metric UI (#910): `client/src/metricFormat.ts` owns display-only distance
+and speed formatting, including the deliberate Bm (SI Gm) convention. Navigation
+and contact components consume it; physics/storage/input units stay with their
+existing owners. See [readout rules](hud-ui-style-guide.md#adaptive-metric-readouts-910),
+`metricFormat.test.ts` and METRIC-910 browser coverage.
+
 Browser mouse-first command UX (#894): `commandFeedback.ts` derives the compact
 readout and `TopDownView.tsx` owns Cancel and Surface Help. `topDownCommands.ts`
 marks approach routes with their object receipt sequence so later ground clicks

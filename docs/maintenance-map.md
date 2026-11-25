@@ -167,7 +167,10 @@ selected throttle and the trajectory. Observation input
 belongs to `ObservationCamera.tsx`, physical sky to `OpticalSky.tsx`/`opticalSky.ts`,
 catalog-kind art swatches to `bodyPalette.ts` (shared with `terrainIllustration.ts`),
 scanner-gated markers/actions to `PerspectiveContacts.tsx`/`contactCommands.ts`,
-and compact orientation UI to `OrientationCompass.tsx`. `App.tsx`,
+and compact orientation UI to `OrientationCompass.tsx`. #908 scanner marker states
+belong to `PerspectiveContacts.tsx` / `sensorMarkers.css`; active landing supplies
+the optional destination ID and existing contact warnings supply danger text.
+See the [marker contract](panoramic-navigation-design.md#targeting-and-orientation-refinement-908). `App.tsx`,
 `CameraControls.tsx`, `ContinuousContacts.tsx` and `ShipVectorGuides.tsx` remain
 isolated orthographic flight fixture owners at `/?scene=radar`.
 Panoramic acceptance (#816) extends the existing navigation-captures project in

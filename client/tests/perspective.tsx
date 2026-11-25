@@ -48,7 +48,7 @@ function Scene() {
 }
 createRoot(document.getElementById('root')!).render(<>
  <div style={{ height: '100vh', position: 'relative' }}><Canvas dpr={lowResolution ? 0.5 : 1} gl={{ preserveDrawingBuffer: true }}><Scene/></Canvas>
- <PerspectiveContacts scanner={scanner} geometry={bodies} view={view} getOrigin={() => origin} getShip={() => ({ ...initialShip(), position: origin })} onSetDirection={() => actions++}/></div>
+ <PerspectiveContacts scanner={scanner} geometry={bodies} view={view} getOrigin={() => origin} destinationId={new URLSearchParams(location.search).has('destination') ? 'tiny' : null} getShip={() => ({ ...initialShip(), position: origin, velocityMps: new URLSearchParams(location.search).has('danger') ? [0, 0, -400] : [0, 0, 0] })} onSetDirection={() => actions++}/></div>
  <nav style={{ position: 'absolute', bottom: 8, left: 8 }}>
  <button onClick={() => scanner.update(++tick, origin)}>Tick</button>
  <button onClick={() => { tick = Math.ceil((tick + 1) / 300) * 300; scanner.update(tick, origin) }}>Pulse</button>

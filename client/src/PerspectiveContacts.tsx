@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { navigationWarnings } from './contact.ts'
+import './sensorMarkers.css'
 import { StatusMessage } from './ui/Feedback.tsx'
 import { contactCommandAvailability, lookAtContact } from './contactCommands.ts'
 import type { ShipState } from './simulation.ts'
@@ -12,7 +14,8 @@ import { currentContacts, perspectiveMarkers, selectContact, selectedContact } f
  * physical origin and optional flight action. No optical raycaster/hit meshes.
  * Every handler rechecks live scanner authority, including stale DOM events.
  */
-export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShip, canPilot = () => true, onSetDirection, compact = false, browserOpen = true, onBrowserChange }: {
+export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShip, canPilot = () => true, onSetDirection, destinationId = null, compact = false, browserOpen = true, onBrowserChange }: {
+ destinationId?: string | null
  compact?: boolean; browserOpen?: boolean; onBrowserChange?: (open: boolean) => void
  scanner: Scanner; geometry: readonly Body[]; view: ObservationCameraState; getOrigin: () => Position
  getShip: () => ShipState; canPilot?: () => boolean
@@ -38,6 +41,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
   if (selected) { previousSelection.current = selected.id; setContactLost(false) }
   else if (previousSelection.current) { setContactLost(true); previousSelection.current = null }
  }, [selected?.id])
+ const dangers = new Map(navigationWarnings(getShip(), contacts).filter(w => w.severity === 'danger').map(w => [w.bodyId, w.message]))
  const availability = selected && contactCommandAvailability(getShip(), selected, canPilot())
  // The compact shell uses display:contents so its panel joins the HUD grid;
  // marker coordinates still cover the entire panoramic parent.
@@ -49,14 +53,28 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  const last = Math.max(0, Math.ceil(entries.length / 8) - 1), currentPage = Math.min(page, last)
  const choose = (id: string) => { selectContact(scanner, getOrigin(), id); redraw(n => n + 1) }
  return <div ref={root} className={compact ? 'panoramic-projection' : undefined} style={compact ? undefined : { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-  {markers.map(marker => <button key={marker.id} data-sensor-marker aria-label={`Sensor contact ${marker.ids.length === 1 ? contacts.find(b => b.id === marker.id)?.name : `group of ${marker.ids.length}`}`}
-   style={{ position: 'absolute', left: marker.x, top: marker.y, transform: 'translate(-50%, -50%)', width: 32, height: 32, borderRadius: '50%', color: compact ? 'var(--ui-active)' : '#9feaff', background: compact ? 'var(--ui-void)' : '#102431aa', border: compact ? '1px solid var(--ui-active)' : '1px solid #9feaff', pointerEvents: 'auto' }}
+  {markers.map(marker => {
+   const isSelected = !!selected && marker.ids.includes(selected.id)
+   const destination = !!destinationId && marker.ids.includes(destinationId)
+   const danger = marker.ids.map(id => dangers.get(id)).filter(Boolean).join('; ')
+   const name = marker.ids.length === 1 ? contacts.find(b => b.id === marker.id)?.name : `Group of ${marker.ids.length} contacts`
+   const description = [name, isSelected && `Selected: ${selected.name}`, destination && 'Landing destination', danger].filter(Boolean).join(' · ')
+   return <button key={marker.id} data-sensor-marker className="sensor-marker" data-selected={isSelected} data-destination={destination} data-danger={!!danger} aria-pressed={isSelected} title={description} aria-description={description} aria-label={`Sensor contact ${marker.ids.length === 1 ? contacts.find(b => b.id === marker.id)?.name : `group of ${marker.ids.length}`}`}
+   style={{ left: marker.x, top: marker.y }}
    onClick={() => {
     const live = perspectiveMarkers(currentContacts(scanner, getOrigin()), geometry, getOrigin(), view.snapshot(), (compact ? root.current!.parentElement! : root.current!).clientWidth, (compact ? root.current!.parentElement! : root.current!).clientHeight).find(m => m.id === marker.id)
     if (!live) return
     if (live.ids.length === 1) choose(live.id)
     else { setGroup(live.ids); setPage(0); setQuery(''); onBrowserChange?.(true) }
-   }}>{marker.ids.length === 1 ? '+' : marker.ids.length}</button>)}
+   }}>
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+     <path className="marker-brackets" d="M4 11V4H11 M21 4H28V11 M28 21V28H21 M11 28H4V21"/>
+     <path className="marker-core" d={destination ? 'M16 10 22 16 16 22 10 16Z' : 'M12 16H14 M18 16H20 M16 12V14 M16 18V20'}/>
+     {marker.ids.length > 1 && <text className="marker-count" x={danger ? 14 : 16} y={danger ? 26 : 20} textAnchor="middle">{marker.ids.length}</text>}
+    </svg>
+    {!!danger && <span className="marker-danger" aria-hidden="true"><b>!</b></span>}
+   </button>
+  })}
   <section className={compact ? "panoramic-contacts" : undefined} aria-label="Detected contacts" style={compact ? undefined : { position: 'absolute', right: 8, top: 8, width: 240, padding: 12, color: 'white', background: '#102431ee', pointerEvents: 'auto' }}>
    {!compact && <details><summary>Observation help</summary><p>Look at turns only the camera once, preserving zoom and ship motion. Drag, W/A/S/D or wheel cancels it. Set direction turns only the ship without thrust; arrow keys cancel that turn. Grounded ships can observe other detected bodies, but cannot aim at their landing planet center. Typing and focused controls do not steer the view.</p></details>}
    {compact && <button className={`${buttonClass} contacts-toggle`} aria-expanded={browserOpen} aria-controls="scanned-browser" onClick={() => onBrowserChange?.(!browserOpen)}>Contacts (C) · {contacts.length}</button>}

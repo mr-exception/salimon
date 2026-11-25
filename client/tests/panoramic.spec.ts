@@ -285,8 +285,10 @@ test('ENV-905 seeded scanner space, angular grid, translation and marker contras
   await setView(fov, 0, Math.atan2(5000, 100000))
   const marker = page.locator('[data-sensor-marker]').first()
   await expect(marker).toBeInViewport()
-  const colors = await marker.evaluate(el => { const s = getComputedStyle(el); return [s.color, s.backgroundColor] })
-  const channels = colors.map(color => color.match(/[\d.]+/g)!.slice(0, 3).map(Number))
+  const colors = await marker.evaluate(el => { const s = getComputedStyle(el), halo = getComputedStyle(el.querySelector('svg')!).filter; return [s.color, halo] })
+  // Open markers use a dark outline rather than an opaque box over the sky.
+  expect(colors[1]).toContain('rgb(9, 20, 28)')
+  const channels = colors.map(color => color.match(/rgb\(([^)]+)\)/)![1].split(',').map(Number))
   const contrast = (luminance(channels[0]) + .05) / (luminance(channels[1]) + .05)
   expect(contrast).toBeGreaterThan(4.5)
   const snapshot = await state(page) as State & { calls: number; triangles: number; geometries: number }
@@ -355,3 +357,37 @@ for (const viewport of [{ width: 960, height: 600 }, { width: 1280, height: 720 
   expect(await page.getByRole('button', {name:/^(Zoom in|Zoom out|Left|Right|Up|Down)$/}).count()).toBe(0)
  })
 }
+
+test('HUD-908 camera reticle and amber heading / green velocity lines stay distinct', async ({ page }, info) => {
+ await page.clock.install({ time: new Date('2026-11-25T12:00:00Z') })
+ await page.clock.pauseAt(new Date('2026-11-25T12:00:01Z'))
+ await page.goto('/tests/panoramic.html')
+ const settle = async () => { await page.clock.runFor(64) }
+ await expect.poll(async () => { await settle(); return (await state(page))?.renderer }).toContain('SwiftShader')
+ const compass = page.getByRole('figure', { name: '3D orientation compass' })
+ await expect(compass).toContainText('Cyan camera')
+ await expect(compass).toContainText('Amber ship')
+ await expect(page.locator('[data-compass-line=velocity]')).toHaveCount(0)
+ await expect(page.locator('.observation-reticle svg')).toBeVisible()
+ const frames = []
+ for (const kind of ['rear', 'overlap', 'stationary']) {
+  await scenario(page, kind); await settle()
+  const heading = page.locator('[data-compass=heading]')
+  expect(await heading.evaluate(el => getComputedStyle(el).stroke)).toBe('rgb(235, 192, 118)')
+  if (kind !== 'stationary') {
+   const line = page.locator('[data-compass-line=velocity]')
+   expect(await line.evaluate(el => getComputedStyle(el).stroke)).toBe('rgb(182, 245, 162)')
+   await expect(line).toHaveAttribute('stroke-dasharray', '3 2')
+  } else await expect(page.locator('[data-compass-line=velocity]')).toHaveCount(0)
+  await page.screenshot({ path: info.outputPath(`orientation-${kind}.png`) })
+  frames.push({ kind, state: await state(page) })
+ }
+ const before = await state(page)
+ await page.evaluate(() => (window as unknown as { hudView(fov: number, yaw: number): void }).hudView(75, Math.PI / 2)); await settle()
+ const after = await state(page)
+ for (const key of ['position', 'velocityMps', 'yaw', 'pitch', 'throttle', 'mode'] as const) expect(after.ship[key], key).toEqual(before.ship[key])
+ const line = page.locator('[data-compass-line=heading]')
+ expect(Math.abs(Number(await line.getAttribute('x2')))).toBeCloseTo(42)
+ await page.screenshot({ path: info.outputPath('camera-independent-from-ship.png') })
+ await info.attach('orientation.json', { body: JSON.stringify({ frames, cameraTurned: await state(page) }, (_, v) => typeof v === 'bigint' ? String(v) : v), contentType: 'application/json' })
+})

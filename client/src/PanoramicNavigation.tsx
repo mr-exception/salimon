@@ -116,7 +116,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     <Canvas className="panoramic-scene" onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
       <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position} definitionForBody={navigation.surfaceDefinitionForBody} scannerEnvironment orientationGrid={orientationGrid}/>
     </Canvas>
-    <div className="observation-reticle" aria-hidden="true">+</div>
+    <div className="observation-reticle" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M3 16H10 M22 16H29 M16 3V10 M16 22V29"/><circle cx="16" cy="16" r="1"/></svg></div>
     <header className="panoramic-status ui-panel ui-panel--utility">
       <strong className="ui-eyebrow">SALIMON · OBSERVATION</strong>
       <StatusMessage>{navigation.scanner.pulse === 0 ? 'Scanner awaiting first 5-second pulse' : `Scanner active · ${navigation.scanner.contacts.length} contacts`}</StatusMessage>
@@ -132,7 +132,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${ship.contact.impactSpeedMps.toFixed(1)} m/s`}</StatusMessage>}
       {!navigation.location && !grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
     </div>
-    <PerspectiveContacts compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
+    <PerspectiveContacts destinationId={navigation.location?.landing?.surface.bodyId} compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
       getOrigin={() => navigation.clock.state.position} getShip={() => navigation.clock.state} canPilot={canPilot}
       onSetDirection={body => { navigation.clock.state = setContactDirection(navigation.scanner, navigation.clock.state, body.id, canPilot() && !isPaused() && !document.querySelector('dialog[open]')) }}/>
     <div className="panoramic-instruments"><OrientationCompass ship={ship} view={snapshot}/></div>

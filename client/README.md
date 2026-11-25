@@ -1458,5 +1458,5 @@ stars, orientation/translation/reload invariance, grid on/off and telescope fade
 marker contrast at 75°, 30°, 5° and 0.1°, and stable renderer resources. Original
 wide/telescope/grid/rotation captures and canonical state measurements stay in
 ignored `test-results/` and the existing 14-day CI artifacts. ENV-905 also runs in
-PR smoke and the full perspective group. Visual references require a separate
-reviewed update; the collector's candidate mode does not approve baselines.
+PR smoke and the full perspective group. Visual reference proposals remain pending owner review; the collector's
+candidate mode does not approve baselines.

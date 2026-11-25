@@ -1,5 +1,12 @@
 # Feature maintenance map
 
+Browser mouse-first command UX (#894): `commandFeedback.ts` derives the compact
+readout and `TopDownView.tsx` owns Cancel and Surface Help. `topDownCommands.ts`
+marks approach routes with their object receipt sequence so later ground clicks
+cannot show stale object results. `tests/command-feedback.spec.ts` owns the combined
+built mouse journey and HUD/input/capacity negatives; see the
+[mouse interaction contract](mouse-driven-2d-interactions.md#command-feedback-and-validation-894).
+
 Browser object menus (#892): `topDownActions.ts` owns capability/action contracts and
 live invocation guards; `ObjectContextMenu.tsx` owns clamping, keyboard navigation
 and dismissal/focus. `topDownNavigation.interactiveAt` shares render ordering and

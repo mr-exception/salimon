@@ -1424,3 +1424,14 @@ run in PR smoke and the full world group, retaining raw observations under
 ignored `test-results/` and existing CI artifacts
 (14 days). `topDownCommands.test.ts` also covers deterministic states, stale
 identity/site, capacity/tool/survival changes, power/seat revocation and replay.
+
+### Mouse-first command UX (#894)
+
+Right-click ground to route around obstacles; right-click objects always opens
+a context menu. Left-click an action to approach and execute it. The compact
+HUD names the command or active Mining and provides Cancel. WASD overrides
+commands; Escape dismisses menus/dialogs, then inventory, before cancelling work.
+Wheel zooms over the world; middle drag pans; Space with world focus recenters.
+E remains the nearby keyboard action. Pending commands and camera state never
+resume from saves; committed material transfers do. See the
+[contract and built browser checks](../docs/mouse-driven-2d-interactions.md#command-feedback-and-validation-894).

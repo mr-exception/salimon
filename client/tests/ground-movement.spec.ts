@@ -79,7 +79,21 @@ test('MOVE-890 built right-click travels around hull and crate, doorway and save
 test('MOVE-890 built replacement, WASD, Escape, pause, focus loss, pointer loss, reload and viewport projection', async ({ page }, info) => {
   await boot(page, '', 'http://127.0.0.1:4175')
   for (const size of [{ width: 1280, height: 800 }, { width: 1600, height: 900 }, { width: 960, height: 720 }]) {
-    await page.setViewportSize(size); await page.clock.runFor(64)
+    const previous = page.viewportSize()!
+    if (previous.width !== size.width || previous.height !== size.height) {
+      // setViewportSize updates dimensions before Chromium necessarily delivers
+      // resize. Its production cleanup must finish before the next command.
+      await page.evaluate(() => {
+        document.documentElement.dataset.worldResizeObserved = 'false'
+        window.addEventListener('resize', () => { document.documentElement.dataset.worldResizeObserved = 'true' }, { once: true })
+      })
+      await page.setViewportSize(size)
+      await expect.poll(async () => {
+        await page.clock.runFor(32)
+        return page.locator('html').getAttribute('data-world-resize-observed')
+      }).toBe('true')
+    }
+    await page.clock.runFor(64)
     await rightClick(page, -4, 6.8); await arrive(page, [-4, 6.8])
     await rightClick(page, -4, 4); await arrive(page, [-4, 4])
   }

@@ -1,3 +1,4 @@
+import { commandFeedback } from './commandFeedback.ts'
 import { advanceObjectCommand, selectObjectCommand } from './topDownCommands.ts'
 import { ObjectContextMenu, type ObjectMenuSelection } from './ObjectContextMenu.tsx'
 import { objectActions, type ObjectActionId } from './topDownActions.ts'
@@ -112,7 +113,7 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
         <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
           <WorldSprite entity={entity} />
         </g>)
-  const destination = state.groundCommand && (state.frames.ship.parent !== null || state.groundCommand.destination.frame === 'ship:scout') && worldToView(relativeAnchor(state.groundCommand.destination, state.camera.anchor, state.frames), state.frames)
+  const destination = state.groundCommand && ['moving', 'arrived', 'failed'].includes(state.groundCommand.status) && (state.frames.ship.parent !== null || state.groundCommand.destination.frame === 'ship:scout') && worldToView(relativeAnchor(state.groundCommand.destination, state.camera.anchor, state.frames), state.frames)
   return <svg onContextMenu={event => {
     event.preventDefault()
     const matrix = event.currentTarget.getScreenCTM()
@@ -129,7 +130,7 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
       {renderItems(items.filter(item => item.entity.layer === layer && ['ground', 'surface'].includes(item.entity.appearance)))}
       {layer === 'terrain' && <GeneratedGround state={state} width={width} height={height} />}
       {renderItems(items.filter(item => item.entity.layer === layer && !['ground', 'surface'].includes(item.entity.appearance)))}
-      {layer === 'cues' && destination && <g pointerEvents="none" data-destination={state.groundCommand!.status} transform={`translate(${destination[0] * state.camera.pixelsPerM} ${destination[1] * state.camera.pixelsPerM})`} fill="none" stroke={state.groundCommand!.status === 'failed' ? '#ffae8a' : '#bce9df'} strokeWidth="2">
+      {layer === 'cues' && destination && <g pointerEvents="none" data-destination={state.groundCommand!.status} transform={`translate(${destination[0] * state.camera.pixelsPerM} ${destination[1] * state.camera.pixelsPerM})`} className="command-destination" fill="none" stroke={state.groundCommand!.status === 'failed' ? 'var(--ui-danger)' : 'var(--ui-active)'} strokeWidth="2">
         <circle r="9" /><path d="M -14 0 H -5 M 5 0 H 14 M 0 -14 V -5 M 0 5 V 14" />
       </g>}
       {layer === 'cues' && <FieldMarkCues state={state} session={session} />}
@@ -348,6 +349,13 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   ].filter(Boolean).join(' ')
   const gatherBlocked = selectedSource && resourceSession?.equipped && usage && !resourceSession.activeSourceId ? selectedSource.remainingGrams === 0 ? 'Source depleted. No material remains.' : usage.grams >= resourceSession.snapshot.inventory.capacityGrams ? 'Inventory full: weight limit.' : !resourceSession.snapshot.inventory.quantities[selectedSource.resourceId] && usage.slots >= resourceSession.snapshot.inventory.capacitySlots ? 'Inventory full: slot limit.' : '' : ''
   const canAct = state.scoutLocation.ship.mode !== 'destroyed' && !(cockpitTarget && !state.cockpit.powered) && !gatherBlocked && !!selected?.interaction && !paused.current && !resourceSession?.error && vital?.health !== 0 && !(cockpitTarget && vital && !survivalPolicy(vital).canWork) && !(selectedSource && resourceSession?.equipped && vital && !survivalPolicy(vital).canWork)
+  const commandStatus = commandFeedback(state, resourceSession?.activeSourceId, resourceSession?.feedback)
+  const cancelCommand = () => {
+    let next = cancelInteraction(cancelGroundMovement(current.current))
+    if (resourceSession?.activeSourceId && next.objectCommand?.actionId === 'gather') next = { ...next, objectCommand: { ...next.objectCommand, status: 'cancelled', message: 'Mining cancelled. Partial work saved.' } }
+    if (resourceSession) { resourceSession.world = next; resourceSession.cancel() }
+    update(next)
+  }
   const persistentMessages = [
     { id: 'survival', text: warning, priority: 'critical' as const },
     { id: 'power', text: state.player.mode === 'seated' && !state.cockpit.powered ? 'Cockpit unpowered · observation unavailable. Stand up or restore power.' : '', priority: 'critical' as const },
@@ -369,10 +377,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       {state.cockpit.view === 'radar' && resourceSession?.feedback && <StatusMessage>{resourceSession.feedback}</StatusMessage>}
       <Button data-field-help variant="secondary" onClick={() => setHelpOpen(true)}>Help</Button>
     </aside>}
-    <Dialog open={helpOpen} title="Surface controls" onDismiss={() => setHelpOpen(false)}>
+    <Dialog open={helpOpen} initialFocus="heading" title="Surface controls" onDismiss={() => setHelpOpen(false)}>
       {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
-      <p>W A S D: walk · E: nearby action · Escape: close panel, then cancel interaction.</p>
-      <p>Wheel over world: zoom · Middle drag: pan · Space with world focus: follow player. Moving resumes follow.</p>
+      <p>Right-click ground: move around obstacles. Right-click an object: always open its context menu; no action runs until you left-click an enabled option.</p>
+      <p>W A S D: walk and override queued movement or approach. E: nearby action keyboard fallback. Use arrows, Home / End and Enter in object menus.</p>
+      <p>Escape: dismiss the topmost menu or dialog first, then inventory; otherwise cancel the route, approach or interruptible work. In the cockpit, its observation controls take priority.</p>
+      <p>Wheel over world: zoom · Middle-mouse drag: pan · Space with world focus: recenter / follow player. The next movement or approach resumes follow. Panels and text fields keep their own input.</p>
       <p>I: inventory · P: pause active time. Menus do not pause time. Movement, Escape or stowing the tool interrupts gathering; partial work is saved.</p>
       <p>M: inspect / mark a field location · G: toggle local Scout guidance. Field notes save with your expedition.</p>
       <button onClick={() => {setHelpOpen(false);session.current?.cancel();setNotebookOpen(true)}}>Inspect / mark</button>
@@ -451,8 +461,10 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <p>Capacity: {usage!.grams / 1000} / {resourceSession.snapshot.inventory.capacityGrams / 1000} kg · {usage!.slots} / {resourceSession.snapshot.inventory.capacitySlots} slots</p>
     </div>}
     {state.player.mode === 'seated' && <button onClick={() => update(leaveCockpit(current.current))}>Stand up</button>}
-    {state.objectCommand && <p role="status" data-command-status={state.objectCommand.status} data-command-target={state.objectCommand.targetId}>{state.objectCommand.message}</p>}
-    {state.groundCommand && <p role="status" data-movement-status={state.groundCommand.status}>{state.groundCommand.status === 'moving' ? 'Moving to destination · Escape to cancel' : state.groundCommand.status === 'failed' ? 'Destination unreachable or route blocked. Choose another destination.' : state.groundCommand.status === 'arrived' ? 'Arrived at destination.' : 'Movement cancelled.'}</p>}
+    {commandStatus && <div className="command-feedback" data-command-status={state.objectCommand?.status} data-command-target={state.objectCommand?.targetId} data-movement-status={state.groundCommand?.status}>
+      <StatusMessage priority={commandStatus.failed ? 'error' : commandStatus.cancellable ? 'pending' : 'status'}>{commandStatus.text}</StatusMessage>
+      {commandStatus.cancellable && <Button variant="secondary" onClick={event => { cancelCommand(); event.currentTarget.blur() }}>Cancel command</Button>}
+    </div>}
     <footer><p>Right-click ground to walk · <strong>W A S D</strong> Walk · <strong>E</strong> Interact · <strong>Esc</strong> Cancel · <strong>P</strong> Pause</p></footer>
     </div>
   </main></div></FeedbackScope>

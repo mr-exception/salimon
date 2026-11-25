@@ -90,3 +90,8 @@ body:has(.launch-control) .expedition-ui .survival-hud { max-height:calc(100dvh 
 .object-context-menu button:focus-visible { outline: 2px solid var(--ui-active); outline-offset: -2px; }
 .object-context-menu button[aria-disabled=true] { color: var(--ui-muted); cursor: default; }
 .object-context-menu small { display: block; font-size: var(--ui-small); }
+
+.expedition-ui .command-feedback { display:flex; align-items:center; justify-content:space-between; gap:var(--ui-space-2); padding:6px 10px; border-top:1px solid var(--ui-surface); color:var(--ui-text); }
+.expedition-ui .command-feedback .ui-status { margin:0; min-width:0; overflow-wrap:anywhere; }
+.expedition-ui .command-feedback button { flex-shrink:0; }
+.command-destination { opacity:.8; }

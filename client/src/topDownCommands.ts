@@ -37,7 +37,7 @@ export function selectObjectCommand(context: ActionContext, targetId: string, ac
   const target = world.entities.find(e => e.id === targetId)
   const command: ObjectCommand = { sequence, targetId, actionId, targetAnchor: target?.anchor ?? world.entities.find(e => e.id === PLAYER_ID)!.anchor,
     siteId: world.scoutLocation.siteId, shipMode: world.scoutLocation.ship.mode, doorState: world.scoutLocation.boardingDoor, status: 'selected', executed: false, message: 'Command selected.' }
-  world = { ...world, objectCommand: command }
+  world = { ...world, groundCommand: undefined, objectCommand: command }
   const action = objectActions({ ...context, world, phase: 'selection' }, targetId).find(a => a.id === actionId)
   return action?.available ? world : fail(world, action?.reason ?? 'Target or action unavailable.')
 }
@@ -93,7 +93,7 @@ export function advanceObjectCommand(context: ActionContext, openEquipment: (wor
       // only after a successful new route has been admitted.
       world = requestGroundMovement(world, route[route.length - 1]!)
       if (world.groundCommand?.status !== 'moving') return fail(world, 'Approach unavailable.')
-      world = { ...world, groundCommand: { ...world.groundCommand, waypoints: route }, objectCommand: command }
+      world = { ...world, groundCommand: { ...world.groundCommand, waypoints: route, objectSequence: command.sequence }, objectCommand: command }
       return transition(world, 'approaching', `Approaching ${target.interaction!.label}. Escape to cancel.`)
     }
     case 'approaching':

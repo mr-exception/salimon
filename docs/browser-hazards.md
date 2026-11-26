@@ -4,9 +4,7 @@
 
 
 `client/src/hazards.ts` implements the deterministic subset of the approved
-[spacesuit design](spacesuit-and-hazards.md). Normal gameplay declares **no hazard
-sources or modules**. This is a simulation/save boundary for later environment
-sampling, equipment and presentation, without suit items, masses or balance data.
+[spacesuit design](spacesuit-and-hazards.md). The hazard simulator still has **no production source/equipment bridge**. Persistent suit/module items and ship-only transfers are delivered separately (#914/#915), and [environmental queries](browser-planet-surface.md#deterministic-planetary-environment-916) now publish deterministic data (#916). Live sampling and proportional equipment wear remain #917; the stable-ID arithmetic described below is the existing synthetic domain behavior.
 
 `ResourceSession.setHazardSources` accepts explicit stable-ID temperature readings
 or radiation/poison HP/s rates. The environment adapter replaces this sample at

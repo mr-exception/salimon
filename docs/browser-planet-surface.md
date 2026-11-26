@@ -360,3 +360,61 @@ capacity, chart handoff and fix loss. `tests/exploration.spec.ts` owns built rea
 keyboard discovery, focus, non-color marker originals/repeats/negative comparisons
 and a bounded multi-region out/back route. Evidence stays in ignored test output
 and existing CI uploads; no approved visual references are silently replaced.
+
+## Deterministic planetary environment (#916)
+
+`planetEnvironment.ts` publishes supplemental environmental v1, digest
+`f9512d32ccbcfd7e`, without rewriting terrain, geology, resources or visual hashes.
+It supports the existing canonical Vesper, Vesper Moon and Caligo bodies. These
+are fictional packaged values, not atmosphere inferred from a body's name or
+scientific observations. The canonical packaged world currently has frozen
+per-body seeds, not a player-selected world-seed input.
+
+The exact v1 key is sorted-key canonical JSON (UTF-8 FNV-1a-64 via
+`definitionDigest`) of `{publication, seed, bodyId, field, cell?}`. `seed` is the
+body's **original v1 terrain seed**, retained as immutable world identity even
+when a saved body uses geological v2. `field` is `temperature`, `radiation` or
+`toxicity`. Temperature includes `surfaceRegion(...).cell` with its axis, sign,
+i, j and steps; rates omit the cell. Interpret the 64-bit digest as an unsigned
+integer: temperature is `hash % 361 − 180` °C; each rate is `hash % 21` HP/s.
+There is no mutable RNG, time, viewport, cache or landing-position input.
+Queries validate canonical body references and finite body-fixed shell positions,
+then perform bounded work independent of world/cache size.
+
+Vesper's safe start overrides the regional temperature and both body baselines:
+positive-Y hemisphere, inclusive `abs(radialM.x) <= 128` and
+`abs(radialM.z) <= 128`. These are east/north metres in the fixed +Y starting
+tangent chart. It remains 24°C and zero rates even after changing the walking
+chart or landing elsewhere. Exactly at an edge/corner is safe; any amount beyond
+an edge uses generated data. The rest of Vesper retains its body-wide baselines.
+The separately exported safe Scout sample has the same values; #917 owns the
+actual interior/exterior adapter and damage, so publishing this query adds no
+exposure yet.
+
+`samplePlanetEnvironment` returns a local sample with publication/body/region
+identity. `bodyEnvironmentSummary` returns the supported temperature range
+−180..180°C, body baselines and whether a safe starting override exists. The
+range is a conservative publication range, not a sampled local reading or a
+computed claim about exact extrema. #921 owns scanner authorization and the
+separate labeling of range versus actual supported landing-site sample. The raw
+world query itself neither scans nor reveals anything in the current HUD.
+
+| Body | +X cell temperature °C | Radiation HP/s | Toxicity HP/s |
+| --- | ---: | ---: | ---: |
+| Vesper | 85 | 12 | 16 |
+| Vesper Moon | 62 | 11 | 13 |
+| Caligo | 72 | 18 | 6 |
+
+These golden vectors bind v1; algorithm, seed-policy, bounds or safe-boundary
+changes require a new environmental publication and an explicit migration.
+Existing saves lacking `environmentPublication` bind explicitly to this v1,
+lazily persisted on the next successful atomic commit. Unknown values reject
+with original bytes preserved; catalog revisions continue using each saved
+canonical body reference. No region caches or regenerated baseline values are
+saved. `ResourceSession.environmentAt` and `environmentSummary` use that binding.
+No weather/day-night/pressure/oxygen, damage or scanner presentation ships here.
+
+`planetEnvironment.test.ts` covers published vectors in separate Node processes,
+bounds/regional variation, exact safe edges, streaming eviction/return, catalog
+references, reload/migration and failed writes. Existing surface/stream/site
+suites remain owners of physical coordinate and saved terrain continuity.

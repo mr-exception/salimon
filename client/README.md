@@ -1575,3 +1575,7 @@ Fresh and legacy-migrated expeditions own an equipped 3 kg basic suit with tempe
 ## Ship equipment transaction adapter (#915)
 
 `ResourceSession.changeEquipment(command, revision)` supports explicit location moves and suit switching with a named old-suit destination. It requires standing inside Scout; any drawer/module-storage endpoint additionally requires reach of the existing cargo cabinet (`scout:storage`). Modules installed in a stored suit use the drawer reach rule. Tier-1 capacities are 4 suits / 12 loose modules, independent of raw storage; no upgrades yet. Production UI is #920. `node --experimental-strip-types --test src/scoutEquipment.test.ts` checks transactions; `npx playwright test --project=cockpit tests/equipment-transfers.spec.ts` checks the separately built production adapter fixture and shipping exclusion. Original output is ignored under test-results.
+
+## Planetary environment publication (#916)
+
+`samplePlanetEnvironment(location, reference)` and `bodyEnvironmentSummary(bodyId, reference)` expose bounded deterministic raw world data, without new HUD or damage. The ResourceSession wrappers bind saved body/publication identity. Run `node --experimental-strip-types --test src/planetEnvironment.test.ts src/planetSurface.test.ts src/surfaceSite.test.ts src/regionStream.test.ts` for generation/boundary/streaming/save checks, and `npm run build`. See [exact keys, safe square and legacy behavior](../docs/browser-planet-surface.md#deterministic-planetary-environment-916). Scanner gating is #921; live exposure is #917.

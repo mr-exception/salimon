@@ -1,3 +1,4 @@
+import { ENVIRONMENT_PUBLICATION, validateEnvironmentPublication, samplePlanetEnvironment, bodyEnvironmentSummary } from './planetEnvironment.ts'
 import { applyGearCommand, gearCommandDenial, type GearCommand } from './scoutEquipment.ts'
 import { freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
 import { validateDeployedMarkers } from './fieldMarker.ts'
@@ -6,7 +7,7 @@ import { emptyJournal, recordVisit, validateJournal, type ExpeditionJournal } fr
 import { createFieldMark, recordFieldMark, updateWalkingFix, type WalkingFix, type FieldMark } from './exploration.ts'
 import { DEPOSIT_PUBLICATION, depositFromId, depositNeighborhood, isDepositId, regionDeposits, type PlanetDeposit } from './planetDeposits.ts'
 import { probeGeology } from './planetGeology.ts'
-import { surfaceRegion, surfaceToLocal, localToSurface } from './surfaceCoordinates.ts'
+import { surfaceRegion, surfaceToLocal, localToSurface, type SurfaceLocation } from './surfaceCoordinates.ts'
 import { planetDefinition, geologicalDefinition } from './planetDefinition.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { scoutLandingSurface } from './scoutLocation.ts'
@@ -45,6 +46,7 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
   'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
 }
 export interface ResourceSave extends ResourceLedger {
+  readonly environmentPublication: typeof ENVIRONMENT_PUBLICATION
   readonly depositPublication: typeof DEPOSIT_PUBLICATION
   readonly version: 18
   readonly deployedMarkers: readonly FieldMark[]
@@ -174,8 +176,9 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const hasSites = version >= 11
   const hasJournal = version >= 13
   const hasCore = version >= 14
-  const allowed = [...(version >= 17 ? ['deployedMarkers'] : []), ...(version >= 16 ? ['fabricator'] : []), ...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const allowed = [...(version >= 17 ? ['deployedMarkers'] : []), ...(version >= 16 ? ['fabricator'] : []), ...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'environmentPublication', 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
+  if (data.environmentPublication !== undefined) validateEnvironmentPublication(data.environmentPublication)
   if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
   if (data.catalogVersion !== (legacy ? LEGACY_CATALOG_VERSION : RESOURCE_CATALOG_VERSION) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
     throw new Error('Unsupported save version')
@@ -254,7 +257,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
   const core = version >= 15 ? validateCoreEnergy(data.core) : hasCore ? migrateCoreEnergy(data.core) : freshCoreEnergy()
-  const save: ResourceSave = { version: 18, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 18, environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
   validateCoreConservation(save.core, save.convertedGrams)
   if (BigInt(fabricatorSpentJ60(save.fabricator)) + BigInt(save.fabricator.otherSpentJ60) !== BigInt(save.core.spentJ60)) throw Error('Unpaid Fabricator work')
@@ -351,7 +354,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 18, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: { ...startingResourceInventory(), equipment: freshEquipment() }, sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 18, environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: { ...startingResourceInventory(), equipment: freshEquipment() }, sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -472,6 +475,13 @@ export class ResourceSession {
     if (plan?.surface.bodyId === bodyId) return planetDefinition(bodyId, plan.surface.definition)
     const saved = Object.values(this.snapshot.sites).find(s => s.address.bodyId === bodyId)
     return saved ? planetDefinition(bodyId, saved.address.definition) : geologicalDefinition(bodyId)
+  }
+  /** Raw world-domain inputs. Scanner authorization belongs to the presentation consumer (#921). */
+  environmentAt(location: SurfaceLocation) {
+    return samplePlanetEnvironment(location, this.bodyDefinition(location.bodyId), this.snapshot.environmentPublication)
+  }
+  environmentSummary(bodyId: string) {
+    return bodyEnvironmentSummary(bodyId, this.bodyDefinition(bodyId), this.snapshot.environmentPublication)
   }
   /** Approved controlled migration: absent ref is legacy v1. A body's first
    * binding wins for the whole save, preventing seams between visited regions. */

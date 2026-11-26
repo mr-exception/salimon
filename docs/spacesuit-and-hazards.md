@@ -3,7 +3,7 @@
 **Approved contract (#913), 2026-11-26; not an implementation claim.**
 The existing [hazard domain](browser-hazards.md) and
 [Core/Fabricator](browser-core-fabricator-vertical-slice.md) are foundations.
-Delivery is split across #914–#922. See [current browser status](current-client-status.md).
+Delivery is split across #914–#922. Persistent equipment (#914), ship-only transactions (#915) and raw environmental queries (#916) now have separate source owners; live hazards, bench and equipment/scanner UI remain later work. See [current browser status](current-client-status.md).
 
 ## Equipment and custody
 

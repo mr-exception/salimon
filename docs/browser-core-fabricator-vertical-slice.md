@@ -1,3 +1,28 @@
+## Gear Bench and shared consumer order (#918)
+
+The preinstalled `scout:gear-bench` at (2.2, −0.1 m) uses the existing shared
+industrial console and context-menu/auto-approach adapter. Its shallow wall-mounted
+footprint and matching art preserve the starboard crate-to-cockpit passage. Its independent
+`scout:gear-bench:input` stores 50,000 g including active reservations. Recipes
+and 2,000 W work use `gearBench.ts`; the approved table is in
+[the survival contract](spacesuit-and-hazards.md#gear-crafting-bench-918-and-repair-919).
+One active job or one output blocks another start. Claims create one fresh full-HP
+identity in inventory; rejected capacity/revision/save checks keep the tray intact.
+
+H01's approved order supersedes E03/E05's historical draw-first session ordering:
+on each sole tick convert once, pay Fabricator first, then Gear Bench, each from
+the remaining reserve. Both receipts and energy commit once. The pure Core API
+still supports its original draw-before-conversion operation; the session composes
+conversion with deterministic consumer allocation. No offline progress/cancel.
+Schema v19 migrates earlier saves with empty bench/buffer. Per-recipe completed
+receipts account for consumed raw inputs; tray/carried gear carries only declared
+output mass. Input minus output is byproduct-free consumed material, including
+T2 (1,000 g) and T3 (2,500 g) loss; no duplicated raw payload.
+
+Focused coverage: `gearBench.test.ts`, affected Fabricator/Core/session tests,
+and production `tests/gear-bench.spec.ts`. Validation records belong to the PR;
+original captures and raw state stay in ignored `client/test-results/`/CI artifacts.
+
 # Browser Core + Fabricator vertical slice — decision contract (E01 / #873, E03 / #875)
 
 **Status: Core processing, E05 Fabricator domain and E06 reachable console implemented (#878).** The E02 Core-only values listed immediately below were approved by the owner; issue #874 implements the durable Core buffer/state boundary. The E05 values below were approved separately; E07 marker deployment is approved and implemented. A docs PR alone does not authorize the remaining runtime features.

@@ -6,11 +6,12 @@ import type { Entity2D } from './topDownRuntime.ts'
 const prop = (id: string, x: number, y: number, appearance: Entity2D['appearance'], halfWidth: number, halfHeight: number, label?: string, reachM = 1.9): Entity2D => ({
   id, anchor: { frame: 'ship:scout', point: point2(x, y) }, layer: 'props', appearance,
   footprint: { halfWidth, halfHeight },
-  ...(label ? { interaction: { label, action: id === 'scout:fabricator' || id === 'scout:core' ? 'Use' : 'Inspect', reachM } } : {}),
+  ...(label ? { interaction: { label, action: id === 'scout:gear-bench' || id === 'scout:fabricator' || id === 'scout:core' ? 'Use' : 'Inspect', reachM } } : {}),
 })
 export const SCOUT_ANCHORS: Readonly<Record<string, Anchor>> = {
   cockpit: { frame: 'ship:scout', point: point2(0, -5) },
   chair: { frame: 'ship:scout', point: point2(0, -3.95) },
+  bench: { frame: 'ship:scout', point: point2(2.2, -.1) },
   core: { frame: 'ship:scout', point: point2(1.9, 1.8) },
   fabricator: { frame: 'ship:scout', point: point2(-1.85, 3.9) },
   storage: { frame: 'ship:scout', point: point2(1.85, 4.25) },
@@ -26,6 +27,8 @@ export function scoutEntities(): Entity2D[] {
     prop('scout:desk', 0, -5, 'desk', 1.5, .5, 'Cockpit desk'),
     prop('scout:chair', 0, -3.95, 'chair', .35, .35, 'Cockpit chair', 1),
     prop('scout:bed', -2.2, .5, 'bed', .45, 1.2),
+    // A shallow wall-mounted bench keeps the full crate-to-cockpit passage clear.
+    prop('scout:gear-bench', 2.2, -.1, 'fabricator', .2, .65, 'Gear Crafting Bench'),
     prop('scout:core', 1.9, 1.8, 'core', .4, .7, 'Core'),
     prop('scout:fabricator', -1.85, 3.9, 'fabricator', .6, .65, 'Fabricator'),
     prop('scout:storage', 1.85, 4.25, 'storage', .55, .7, 'Resource Container · 50 kg'),

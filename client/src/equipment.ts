@@ -72,3 +72,8 @@ export function functioningEquipment(value: EquipmentState): readonly GearInstan
   const state = validateEquipment(value), suit = state.instances.find(g => g.location.kind === 'equipped')
   return !suit || cmp(decode(suit.remaining), ZERO) === 0 ? [] : state.instances.filter(g => g.location.kind === 'installed' && g.location.suitId === suit.id)
 }
+
+export function gearName(definitionId: string): string {
+  const d=GEAR_DEFINITIONS[definitionId]!
+  return d.kind==='suit'?'Basic spacesuit':`${d.hazard![0]!.toUpperCase()}${d.hazard!.slice(1)} module · Tier ${d.tier}`
+}

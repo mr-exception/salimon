@@ -1,3 +1,8 @@
+Gear Crafting Bench (#918): `gearBench.ts` owns trusted recipes/receipts and exact
+work; `resourceSession.ts` owns schema v19, atomic reservations/claims and ordered
+shared power. `ResourceContainerPanel.tsx` and its interaction adapter reuse the
+industrial shell. Coverage: `gearBench.test.ts` and built `tests/gear-bench.spec.ts`.
+
 Live planetary hazards (#917): `ResourceSession.currentEnvironment` owns physical
 safe boundaries and the sole-clock bridge to `hazards.ts`; `equipment.ts` owns
 identity/durability and destruction locations. `liveHazards.test.ts` and built

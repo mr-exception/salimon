@@ -47,10 +47,10 @@ test('reject malformed identity/definition/durability/owner aliases and preserve
 })
 test('migration commits once preserving progress; reload never refreshes exact gear HP', () => {
  const storage = new Storage(), s = session(storage); s.upgrade(12000, 14)
- const legacy = JSON.parse(storage.raw!); legacy.version = 17; delete legacy.inventory.equipment; storage.raw = JSON.stringify(legacy)
+ const legacy = JSON.parse(storage.raw!); legacy.version = 17; delete legacy.bench; if (legacy.stores) delete legacy.stores['scout:gear-bench:input']; delete legacy.inventory.equipment; storage.raw = JSON.stringify(legacy)
  const migrated = session(storage)
  assert.equal(migrated.error, ''); assert.equal(JSON.parse(storage.raw!).version, 17)
- assert.equal(migrated.upgrade(12000, 14), true); assert.equal(JSON.parse(storage.raw!).version, 18)
+ assert.equal(migrated.upgrade(12000, 14), true); assert.equal(JSON.parse(storage.raw!).version, 19)
  assert.equal(migrated.snapshot.inventory.capacityGrams, 12000); assert.deepEqual(migrated.snapshot.sources, s.snapshot.sources)
  const raw = JSON.parse(storage.raw!); raw.inventory.equipment.instances[1].remaining = '1999/2'; storage.raw = JSON.stringify(raw)
  const reload = session(storage); assert.equal(reload.error, '')
@@ -60,7 +60,7 @@ test('migration commits once preserving progress; reload never refreshes exact g
 })
 test('failed migration/reset and stale commits preserve state; terminal reset advances generation once', () => {
  const storage = new Storage(), s = session(storage); s.upgrade(12000, 14)
- const raw = JSON.parse(storage.raw!); raw.version = 17; delete raw.inventory.equipment; storage.raw = JSON.stringify(raw); storage.fail = true
+ const raw = JSON.parse(storage.raw!); raw.version = 17; delete raw.bench; if (raw.stores) delete raw.stores['scout:gear-bench:input']; delete raw.inventory.equipment; storage.raw = JSON.stringify(raw); storage.fail = true
  const migration = session(storage); assert.equal(migration.upgrade(12000, 14), false); assert.match(migration.error, /Saving failed/); assert.equal(JSON.parse(storage.raw!).version, 17)
  storage.fail = false; const living = session(storage); assert.equal(living.freshRun(), false); living.upgrade(12000, 14)
  const dead = JSON.parse(storage.raw!); dead.survival.health = 0; delete dead.survival.healthExact; storage.raw = JSON.stringify(dead)

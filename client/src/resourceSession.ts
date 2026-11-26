@@ -1,3 +1,4 @@
+import { BENCH_ID, BENCH_INPUT_ID, BENCH_WATTS, GEAR_RECIPES, freshBench, validateBench, benchSpentJ60, stepBench, type BenchState } from './gearBench.ts'
 import { SCOUT_SAFE_ENVIRONMENT, ENVIRONMENT_PUBLICATION, validateEnvironmentPublication, samplePlanetEnvironment, bodyEnvironmentSummary } from './planetEnvironment.ts'
 import { applyGearCommand, gearCommandDenial, type GearCommand } from './scoutEquipment.ts'
 import { functioningEquipment, GEAR_DEFINITIONS, freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
@@ -48,8 +49,9 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
 export interface ResourceSave extends ResourceLedger {
   readonly environmentPublication: typeof ENVIRONMENT_PUBLICATION
   readonly depositPublication: typeof DEPOSIT_PUBLICATION
-  readonly version: 18
+  readonly version: 19
   readonly deployedMarkers: readonly FieldMark[]
+  readonly bench: BenchState
   readonly fabricator: FabricatorState
   readonly convertedGrams: Readonly<Record<string, number>>
   readonly core: CoreEnergyState
@@ -165,7 +167,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
   const version = data.version
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 18) throw new Error('Unsupported save version')
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 19) throw new Error('Unsupported save version')
   const legacy = version === 1
   const hasStores = version >= 3
   const hasItems = version >= 5
@@ -176,7 +178,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const hasSites = version >= 11
   const hasJournal = version >= 13
   const hasCore = version >= 14
-  const allowed = [...(version >= 17 ? ['deployedMarkers'] : []), ...(version >= 16 ? ['fabricator'] : []), ...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'environmentPublication', 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
+  const allowed = [...(version >= 19 ? ['bench'] : []),...(version >= 17 ? ['deployedMarkers'] : []), ...(version >= 16 ? ['fabricator'] : []), ...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'environmentPublication', 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
   if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
   if (data.environmentPublication !== undefined) validateEnvironmentPublication(data.environmentPublication)
   if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
@@ -241,6 +243,10 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
     if (Object.hasOwn(savedStores, FABRICATOR_INPUT_ID)) throw Error('Fabricator input requires schema v16')
     if (Object.hasOwn(storeDefinitions, FABRICATOR_INPUT_ID)) stores[FABRICATOR_INPUT_ID] = emptyResourceStores({ [FABRICATOR_INPUT_ID]: storeDefinitions[FABRICATOR_INPUT_ID]! })[FABRICATOR_INPUT_ID]!
   }
+  if(version < 19 && savedStores){
+    if(Object.hasOwn(savedStores,BENCH_INPUT_ID))throw Error('Bench input requires schema v19')
+    if(Object.hasOwn(storeDefinitions,BENCH_INPUT_ID))stores[BENCH_INPUT_ID]=emptyResourceStores({[BENCH_INPUT_ID]:storeDefinitions[BENCH_INPUT_ID]!})[BENCH_INPUT_ID]!
+  }
   const miningWork = hasWork ? validateMiningWork(data.miningWork, sources) : {}
   const scout = hasScout ? decodeScout(data.scout, version === 9) : startingLocationForMigration()
   if (!hasSites && scout.siteId !== STARTING_SITE.id) throw Error('Legacy save cannot bind a generated site')
@@ -257,10 +263,10 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
   const core = version >= 15 ? validateCoreEnergy(data.core) : hasCore ? migrateCoreEnergy(data.core) : freshCoreEnergy()
-  const save: ResourceSave = { version: 18, environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 19, bench: version >= 19 ? validateBench(data.bench) : freshBench(), environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
   validateCoreConservation(save.core, save.convertedGrams)
-  if (BigInt(fabricatorSpentJ60(save.fabricator)) + BigInt(save.fabricator.otherSpentJ60) !== BigInt(save.core.spentJ60)) throw Error('Unpaid Fabricator work')
+  if (BigInt(fabricatorSpentJ60(save.fabricator)) + BigInt(save.fabricator.otherSpentJ60) + BigInt(benchSpentJ60(save.bench)) !== BigInt(save.core.spentJ60)) throw Error('Unpaid Fabricator work')
   return save
 }
 export function resourcePayload(inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG) {
@@ -354,7 +360,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 18, environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: { ...startingResourceInventory(), equipment: freshEquipment() }, sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 19, bench: freshBench(), environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: { ...startingResourceInventory(), equipment: freshEquipment() }, sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -590,6 +596,40 @@ export class ResourceSession {
       return false
     }
   }
+  private benchAdmission(revision:number):void {
+    if(this.error||!survivalPolicy(this.survival).canWork)throw Error(this.error||'Unable to work')
+    if(!Number.isSafeInteger(revision)||revision!==this.snapshot.revision)throw Error('Stale bench revision')
+    const player=this.world.entities.find(e=>e.id===PLAYER_ID), target=this.world.entities.find(e=>e.id===BENCH_ID)
+    if(!player||!target||player.anchor.frame!=='ship:scout'||this.world.cockpit.view!=='world'||this.world.player.mode==='seated'||!interactionInReach(player.anchor,target,this.world.frames))throw Error('Approach the Gear Crafting Bench inside Scout')
+  }
+  depositBenchInput(resourceId:string,grams:number,revision:number):boolean {
+    try{this.benchAdmission(revision);return this.transfer({revision,from:{kind:'player'},to:{kind:'store',id:BENCH_INPUT_ID},resourceId,grams})}catch(e){this.feedback=(e as Error).message;return false}
+  }
+  withdrawBenchInput(resourceId:string,grams:number,revision:number):boolean {
+    try{this.benchAdmission(revision);return this.transfer({revision,from:{kind:'store',id:BENCH_INPUT_ID},to:{kind:'player'},resourceId,grams})}catch(e){this.feedback=(e as Error).message;return false}
+  }
+  startBench(recipeId:string,revision:number):boolean {
+    try{
+      this.benchAdmission(revision)
+      const b=this.snapshot.bench,r=Object.hasOwn(GEAR_RECIPES,recipeId)?GEAR_RECIPES[recipeId]:null,input=this.snapshot.stores[BENCH_INPUT_ID]!
+      if(!r)throw Error('Unknown bench recipe')
+      if(b.job||b.tray)throw Error('Bench job or output tray occupied')
+      const quantities={...input.quantities}
+      for(const id of ['mineral','biomass'] as const){if((quantities[id]??0)<r[id])throw Error('Insufficient bench ingredients');const n=(quantities[id]??0)-r[id];if(n)quantities[id]=n;else delete quantities[id]}
+      return this.commit({...this.snapshot,stores:{...this.snapshot.stores,[BENCH_INPUT_ID]:{...input,quantities}},bench:{...b,started:b.started+1,job:{id:b.started+1,recipeId,remainingTicks:r.ticks,powerPaused:false}}})
+    }catch(e){this.feedback=(e as Error).message;return false}
+  }
+  claimBench(jobId:number,revision:number):boolean {
+    try{
+      this.benchAdmission(revision)
+      const b=this.snapshot.bench,t=b.tray,e=this.snapshot.inventory.equipment!
+      if(!t||jobId!==t.jobId)throw Error('Stale bench claim')
+      const gearId=`gear:${e.generation}:bench-${jobId}`
+      const inventory={...this.snapshot.inventory,equipment:validateEquipment({...e,instances:[...e.instances,{id:gearId,definitionId:t.recipeId,remaining:'1000/1',location:{kind:'inventory'}}]})}
+      resourceInventoryUsage(inventory,RESOURCE_CATALOG,this.itemCatalog)
+      return this.commit({...this.snapshot,inventory,bench:{...b,tray:null,claims:[...b.claims,{jobId,gearId,recipeId:t.recipeId}]}})
+    }catch(e){this.feedback=(e as Error).message;return false}
+  }
   depositFabricatorInput(resourceId: string, grams: number, revision: number): boolean {
     return this.transfer({ revision, from: { kind: 'player' }, to: { kind: 'store', id: FABRICATOR_INPUT_ID }, resourceId, grams })
   }
@@ -724,9 +764,22 @@ export class ResourceSession {
       return this.world
     }
     // Reject malformed consumer commands before advancing any session owner.
-    const machine = elapsed > 0 && next.tick > this.snapshot.core.tick ? stepCoreEnergy(this.snapshot.core, this.snapshot.stores[SCOUT_CORE_FUEL_ID]?.quantities ?? {}, this.snapshot.fabricator.job ? { watts: FABRICATOR_WATTS } : power) : null
-    if (machine) machine.core = { ...machine.core, tick: next.tick }
-    const fabricator = machine ? stepFabricator(this.snapshot.fabricator, machine.result.drawnJ60) : this.snapshot.fabricator
+    if(power.paused !== undefined && typeof power.paused !== 'boolean')throw Error('Invalid Core pause')
+    // H01 order: convert once, then pay Fabricator before bench from one reserve.
+    const machine = elapsed > 0 && next.tick > this.snapshot.core.tick ? stepCoreEnergy(this.snapshot.core,this.snapshot.stores[SCOUT_CORE_FUEL_ID]?.quantities??{},{watts:0}) : null
+    let fabricatorPaid=0,benchPaid=0,otherPaid=0
+    if(machine){
+      let reserve=machine.core.reserveJ60
+      const pay=(watts:number,paused=false)=>{if(!Number.isSafeInteger(watts)||watts<0||watts>machine.core.capacityJ*60)throw Error('Invalid Core power request');if(paused||watts>reserve)return 0;reserve-=watts;return watts}
+      if(this.snapshot.fabricator.job)fabricatorPaid=pay(FABRICATOR_WATTS)
+      if(this.snapshot.bench.job)benchPaid=pay(BENCH_WATTS)
+      if(!this.snapshot.fabricator.job&&!this.snapshot.bench.job)otherPaid=pay(power.watts,power.paused)
+      const drawn=fabricatorPaid+benchPaid+otherPaid
+      machine.core={...machine.core,tick:next.tick,reserveJ60:reserve,spentJ60:machine.core.spentJ60+drawn}
+      machine.result={...machine.result,drawnJ60:drawn,consumer:drawn?'powered':this.snapshot.fabricator.job||this.snapshot.bench.job||power.watts?'insufficient-power':'idle'}
+    }
+    const fabricator=machine?stepFabricator(this.snapshot.fabricator,fabricatorPaid+otherPaid):this.snapshot.fabricator
+    const bench=machine?stepBench(this.snapshot.bench,benchPaid):this.snapshot.bench
     const workUnits = survivalPolicy(this.survival).miningUnits
     const previousWorld = this.world
     const environment = this.currentEnvironment(next)
@@ -770,12 +823,12 @@ export class ResourceSession {
     }
     // Publish hazard progress only after the whole health/exposure/budget transaction is durable.
     const machineChanged = machine && (machine.core.spentJ60 !== this.snapshot.core.spentJ60 || machine.core.reserveJ60 !== this.snapshot.core.reserveJ60 || machine.core.conversionBudgetJ60 !== this.snapshot.core.conversionBudgetJ60)
-    if (elapsed > 0 && (needsHazards || machineChanged || touchdown || JSON.stringify(fabricator) !== JSON.stringify(this.snapshot.fabricator))) {
+    if (elapsed > 0 && (needsHazards || machineChanged || touchdown || JSON.stringify(bench) !== JSON.stringify(this.snapshot.bench) || JSON.stringify(fabricator) !== JSON.stringify(this.snapshot.fabricator))) {
       const convertedGrams = { ...this.snapshot.convertedGrams }
       for (const [id, grams] of Object.entries(machine?.result.convertedGrams ?? {})) convertedGrams[id] = (convertedGrams[id] ?? 0) + grams
       const fuel = this.snapshot.stores[SCOUT_CORE_FUEL_ID]
       const machines = machine ? { core: machine.core, convertedGrams, ...(fuel ? { stores: { ...this.snapshot.stores, [SCOUT_CORE_FUEL_ID]: { ...fuel, quantities: machine.quantities } } } : {}) } : {}
-      if (!this.commit({ ...this.snapshot, ...machines, fabricator, inventory, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
+      if (!this.commit({ ...this.snapshot, ...machines, fabricator, bench, inventory, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
     }
     if (machine) { this.corePower = machine.result; this.corePowerTick = next.tick }
     if (!survivalPolicy(this.survival).canWork) {

@@ -1,3 +1,5 @@
+import { gearName } from './equipment.ts'
+import { GEAR_RECIPES, BENCH_WATTS } from './gearBench.ts'
 import { useState } from 'react'
 import { RESOURCE_CATALOG } from './resourceSession.ts'
 import { resourceStoreMass } from './resourceLedger.ts'
@@ -12,6 +14,7 @@ import './resourceContainer.css'
 export function ResourceContainerPanel({ interaction, onClose, onChange }: { interaction: ResourceContainerInteraction; onClose: () => void; onChange: () => void }) {
   const [resourceId, setResourceId] = useState('mineral'), [amount, setAmount] = useState('1000')
   const { session, pending } = interaction, inventory = session.snapshot.inventory
+  const bench = interaction.equipment === 'bench'
   const core = interaction.equipment === 'core', fabricator = interaction.equipment === 'fabricator', title = interaction.title
   const store = session.snapshot.stores[interaction.storeId]!
   const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, interaction.session.itemCatalog), stored = interaction.bufferGrams
@@ -19,18 +22,19 @@ export function ResourceContainerPanel({ interaction, onClose, onChange }: { int
   const blockedReason = session.error ? 'Saving is blocked. Close and reload to inspect the saved expedition.' : undefined
   const tone = interaction.failed || session.error ? 'error' : pending ? 'pending' : interaction.message ? 'confirmation' : 'neutral'
   return <div className="expedition-ui resource-container">
-    <EquipmentDialog open title={title} eyebrow={core || fabricator ? "Scout / Engineering" : "Scout / Cargo bay"} onDismiss={onClose}
+    <EquipmentDialog open title={title} eyebrow={core || fabricator || bench ? "Scout / Engineering" : "Scout / Cargo bay"} onDismiss={onClose}
       status={<p className={`container-state container-state--${tone}`}>{tone === 'error' ? session.error ? 'Saving blocked · nothing moved' : fabricator ? 'Action rejected · nothing moved' : 'Transfer rejected · nothing moved' : pending ? 'Pending review · not committed' : tone === 'confirmation' ? fabricator ? 'Action committed' : 'Transfer committed' : fabricator ? 'Input transfer · ready' : core ? 'Fuel transfer · ready' : 'Raw storage · ready'}</p>}
       feedback={<StatusMessage label="Container feedback" priority={tone === 'error' ? 'error' : pending ? 'pending' : tone === 'confirmation' ? 'confirmation' : 'status'}>{session.error || interaction.message || 'Choose a raw resource and amount. Committed transfers save immediately.'}</StatusMessage>}>
+    {bench && <BenchTelemetry interaction={interaction} onChange={onChange} />}
     {core && <CoreTelemetry interaction={interaction} />}
     {fabricator && <FabricatorTelemetry interaction={interaction} onChange={onChange} />}
     <div className="container-capacities">
       <div><strong>Carried</strong><p data-carried-capacity>{used.grams / 1000} / {inventory.capacityGrams / 1000} kg</p><Progress label="Carried weight" value={used.grams} max={inventory.capacityGrams} unit="g" /><small>{used.slots} / {inventory.capacitySlots} slots · {(inventory.capacityGrams - used.grams) / 1000} kg free</small></div>
-      <div><strong>{fabricator ? 'Input buffer · includes reserved' : core ? 'Unconverted fuel buffer' : 'Container'}</strong><p data-container-capacity>{stored / 1000} / {store.capacityGrams / 1000} kg</p><Progress label={core ? 'Fuel buffer weight' : 'Container weight'} max={store.capacityGrams} value={stored} unit="g" /><small>{(store.capacityGrams - stored) / 1000} kg free</small></div>
+      <div><strong>{fabricator || bench ? 'Input buffer · includes reserved' : core ? 'Unconverted fuel buffer' : 'Container'}</strong><p data-container-capacity>{stored / 1000} / {store.capacityGrams / 1000} kg</p><Progress label={core ? 'Fuel buffer weight' : 'Container weight'} max={store.capacityGrams} value={stored} unit="g" /><small>{(store.capacityGrams - stored) / 1000} kg free</small></div>
     </div>
-    <table><caption className="container-sr-only">Available raw resources</caption><thead><tr><th>Raw resource</th><th>Carried · kg</th><th>{fabricator ? 'Unreserved · g / kg' : core ? 'Fuel · g / kg' : 'Container · kg'}</th></tr></thead><tbody>{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <tr key={id}><th scope="row">{entry.name}</th><td data-carried-raw={id}>{(inventory.quantities[id] ?? 0) / 1000}</td><td data-container-raw={id}>{core || fabricator ? `${store.quantities[id] ?? 0} g / ${(store.quantities[id] ?? 0) / 1000} kg` : (store.quantities[id] ?? 0) / 1000}</td></tr>)}</tbody></table>
+    <table><caption className="container-sr-only">Available raw resources</caption><thead><tr><th>Raw resource</th><th>Carried · kg</th><th>{fabricator || bench ? 'Unreserved · g / kg' : core ? 'Fuel · g / kg' : 'Container · kg'}</th></tr></thead><tbody>{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <tr key={id}><th scope="row">{entry.name}</th><td data-carried-raw={id}>{(inventory.quantities[id] ?? 0) / 1000}</td><td data-container-raw={id}>{core || fabricator || bench ? `${store.quantities[id] ?? 0} g / ${(store.quantities[id] ?? 0) / 1000} kg` : (store.quantities[id] ?? 0) / 1000}</td></tr>)}</tbody></table>
     {core && <p className="container-note">Only unconverted fuel can be withdrawn. Conversion continues during review; confirmation rechecks the exact amount. Escape or leaving this console discards the draft.</p>}
-    {fabricator && <p className="container-note">Only unreserved ingredients can be withdrawn. Started jobs cannot be cancelled. Closing the console keeps the world and powered job running; closed tabs make no progress.</p>}
+    {(fabricator || bench) && <p className="container-note">Only unreserved ingredients can be withdrawn. Started jobs cannot be cancelled. Closing the console keeps the world and powered job running; closed tabs make no progress.</p>}
     <form onSubmit={event => { event.preventDefault(); if (pending && !session.error) { interaction.confirm(); onChange() } }}>
       <div className="container-fields"><label>Raw resource<select value={resourceId} onChange={event => { setResourceId(event.target.value); interaction.discard(); onChange() }}>{Object.entries(RESOURCE_CATALOG).map(([id, entry]) => <option key={id} value={id}>{entry.name}</option>)}</select></label>
       <label>Amount in grams<input autoFocus inputMode="numeric" value={amount} onChange={event => { setAmount(event.target.value); interaction.discard(); onChange() }} aria-describedby="container-amount-help" /></label></div>
@@ -77,4 +81,20 @@ function FabricatorTelemetry({ interaction, onChange }: { interaction: ResourceC
     <p data-fabricator-tray>Output tray: {f.tray ? `1 Field marker kit · 1,000 g · job #${f.tray.jobId}` : 'Empty · 0 / 1'}</p>
     {f.tray && <div className="container-actions"><Button disabledReason={interaction.machineBlocked} onClick={() => { interaction.claim(); onChange() }}>Claim output</Button></div>}
   </section>
+}
+
+function BenchTelemetry({interaction,onChange}:{interaction:ResourceContainerInteraction;onChange:()=>void}) {
+ const [recipe,setRecipe]=useState('suit:basic')
+ const {bench:b}=interaction.session.snapshot,r=GEAR_RECIPES[recipe]!,job=b.job
+ const reason=interaction.machineBlocked||(job?'One bench job is active.':b.tray?'Claim the output tray first.':undefined)
+ return <section aria-label="Gear bench job and output">
+  <label>Equipment recipe<select value={recipe} onChange={e=>setRecipe(e.target.value)}>{Object.keys(GEAR_RECIPES).map(id=><option key={id} value={id}>{gearName(id)}</option>)}</select></label>
+  <p>{r.mineral} g mineral + {r.biomass} g biomass · {r.ticks/60} s at {BENCH_WATTS} W</p>
+  <p>Recipe input minus equipment mass is consumed without byproducts.</p>
+  <p data-bench-status>{b.tray?'Complete · output ready':job?job.powerPaused?'Paused · insufficient power':'Powered · crafting':'Ready'}</p>
+  {job&&<><Progress label="Gear crafting progress" value={GEAR_RECIPES[job.recipeId]!.ticks-job.remainingTicks} max={GEAR_RECIPES[job.recipeId]!.ticks} unit="ticks"/><p>{job.remainingTicks} paid ticks remaining · {gearName(job.recipeId)}</p></>}
+  <Button disabledReason={reason} onClick={()=>{interaction.startBench(recipe);onChange()}}>Start gear crafting</Button>
+  <p data-bench-tray>Output tray: {b.tray?gearName(b.tray.recipeId):'Empty'}</p>
+  {b.tray&&<Button disabledReason={interaction.machineBlocked} onClick={()=>{interaction.claimBench();onChange()}}>Claim equipment</Button>}
+ </section>
 }

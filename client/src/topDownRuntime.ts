@@ -152,7 +152,11 @@ export function cancelInteraction(state: TopDownState): TopDownState {
   return state.player.mode === 'interacting' ? { ...state, player: { ...state.player, mode: 'standing', targetId: null }, feedback: 'Inspection cancelled.' } : state
 }
 export interface DrawItem { readonly entity: Entity2D; readonly positionM: Point2; readonly angle: number }
-export function drawList(state: TopDownState): DrawItem[] {
+type DrawListState = Pick<TopDownState, 'entities' | 'frames'> & {
+  readonly player: Pick<TopDownState['player'], 'mode' | 'facing'>
+  readonly camera: Pick<TopDownState['camera'], 'anchor'>
+}
+export function drawList(state: DrawListState): DrawItem[] {
   return state.entities.filter(e => state.frames.ship.parent !== null || e.anchor.frame === state.frames.ship.id).map(e => e.id === PLAYER_ID && state.player.mode === 'seated' ? { ...e, layer: 'cues' as const } : e).sort((a, b) => LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer)
     || Number(b.appearance === 'ground') - Number(a.appearance === 'ground')
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))

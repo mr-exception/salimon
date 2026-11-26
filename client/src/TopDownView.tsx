@@ -21,10 +21,11 @@ import { ObservationCameraState } from './observationCamera.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
 import { controlsCockpit, LOCAL_PLAYER, isCockpitTarget, leaveCockpit, setCockpitPower } from './cockpit.ts'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
-import { cancelInteraction, createTopDownState, drawList, LAYERS, PLAYER_ID, requestInteraction, stepTopDown, TopDownClock, type TopDownState } from './topDownRuntime.ts'
+import { cancelInteraction, createTopDownState, drawList, PLAYER_ID, type DrawItem, requestInteraction, stepTopDown, TopDownClock, type TopDownState } from './topDownRuntime.ts'
 import { useWorldSprites, WorldSprite } from './topDownSprites.tsx'
+import { svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import { ResourceContainerInteraction } from './resourceContainerInteraction.ts'
@@ -112,12 +113,18 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
   // reference scene. SVG's screen CTM remains the world-to-screen authority.
   const width = Math.max(1200, 640 * size.width / size.height)
   const height = Math.max(640, 1200 * size.height / size.width)
-  const items = drawList(state)
-  const sprites = useWorldSprites(state.entities)
-  const renderItems = (list: typeof items) => list.map(({ entity, positionM: [x, y], angle }) =>
-        <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? state.player.mode : undefined} data-facing={entity.id === PLAYER_ID ? state.player.facing : undefined} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`}>
-          <WorldSprite entity={entity} />
-        </g>)
+  const { entities, frames, camera: { anchor, pixelsPerM }, player: { mode, facing }, selectedId } = state
+  const items = useMemo(() => drawList({ entities, frames, camera: { anchor }, player: { mode, facing } }),
+    [entities, frames, anchor, mode, facing])
+  const passes = useMemo(() => svgLayers(items), [items])
+  const selection = items.find(item => item.entity.id === selectedId)
+  const sprites = useWorldSprites(entities)
+  const renderItems = (list: readonly DrawItem[]) => list.map(item => {
+    const { entity } = item
+    return <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? mode : undefined} data-facing={entity.id === PLAYER_ID ? facing : undefined} transform={svgSpriteTransform(item, pixelsPerM)}>
+      <WorldSprite entity={entity} />
+    </g>
+  })
   const destination = state.groundCommand && ['moving', 'arrived', 'failed'].includes(state.groundCommand.status) && (state.frames.ship.parent !== null || state.groundCommand.destination.frame === 'ship:scout') && worldToView(relativeAnchor(state.groundCommand.destination, state.camera.anchor, state.frames), state.frames)
   return <svg onContextMenu={event => {
     event.preventDefault()
@@ -130,16 +137,16 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
     event.currentTarget.focus({ preventScroll: true })
     onGround?.(anchor, objectId, { x: event.clientX, y: event.clientY })
   }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" data-camera-scale={state.camera.pixelsPerM} data-camera-panned={String(!!state.camera.panned)} viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
-    {LAYERS.map(layer => <g key={layer} data-layer={layer}>
+    {passes.map(({ id: layer, beforeTerrain, sprites }) => <g key={layer} data-layer={layer}>
       {layer === 'terrain' && state.scoutLocation.binding && <rect x={-width/2} y={-height/2} width={width} height={height} fill="#b5a58b" />}
-      {renderItems(items.filter(item => item.entity.layer === layer && ['ground', 'surface'].includes(item.entity.appearance)))}
+      {renderItems(beforeTerrain)}
       {layer === 'terrain' && <GeneratedGround state={state} width={width} height={height} />}
-      {renderItems(items.filter(item => item.entity.layer === layer && !['ground', 'surface'].includes(item.entity.appearance)))}
+      {renderItems(sprites)}
       {layer === 'cues' && destination && <g pointerEvents="none" data-destination={state.groundCommand!.status} transform={`translate(${destination[0] * state.camera.pixelsPerM} ${destination[1] * state.camera.pixelsPerM})`} className="command-destination" fill="none" stroke={state.groundCommand!.status === 'failed' ? 'var(--ui-danger)' : 'var(--ui-active)'} strokeWidth="2">
         <circle r="9" /><path d="M -14 0 H -5 M 5 0 H 14 M 0 -14 V -5 M 0 5 V 14" />
       </g>}
       {layer === 'cues' && <FieldMarkCues state={state} session={session} />}
-      {layer === 'cues' && items.filter(item => item.entity.id === state.selectedId).map(({ entity, positionM: [x, y], angle }) => <g key={entity.id} data-selection={entity.id} transform={`translate(${x * state.camera.pixelsPerM} ${y * state.camera.pixelsPerM}) rotate(${angle * 180 / Math.PI}) scale(${state.camera.pixelsPerM})`} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={entity} selected /></g>)}
+      {layer === 'cues' && selection && <g data-selection={selection.entity.id} transform={svgSpriteTransform(selection, pixelsPerM)} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={selection.entity} selected /></g>}
     </g>)}
   </svg>
 }

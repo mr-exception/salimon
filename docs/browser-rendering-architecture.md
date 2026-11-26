@@ -79,3 +79,21 @@ the existing 60 Hz session. SVG keeps the current browser compatibility and
 presentation lifecycle. The production build output in the benchmark revision
 was byte-identical to the parent build, and the opt-in fixture has no production
 entry point.
+
+## Retained SVG production adapter (#943)
+
+The production world projects the authoritative draw list into retained SVG
+passes in one traversal. Authored ground remains behind generated terrain;
+entities and contextual cues retain the existing order. The sprite and
+selection passes share the same camera-space transform. The projection is
+reused when entity, frame, camera anchor, posture and facing inputs stay
+unchanged. Mouse input still inverts the SVG screen transform and uses the
+same domain interaction order. The 2D scene uses CPU rasterization. The
+panoramic view retains its separate Three.js/WebGL presentation and shares the
+existing expedition clock.
+
+Run the existing #939 fixture to reassess the renderer decision at a new
+revision. Production acceptance separately checks built world and cockpit
+controls, view switching, reload, save identity and a single 60 Hz clock.
+The fixture timings compare candidate renderers under equal workloads and
+exclude the production React projection optimization.

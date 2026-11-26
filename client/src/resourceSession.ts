@@ -341,6 +341,7 @@ export class ResourceSession {
   survival: SurvivalState
   hazards: HazardState = freshHazards()
   hazardEvents: HazardEvent[] = []
+  environmentDamageHpPerSecond = 0
   private sources: HazardSource[] | null = null
   equipped = false
   activeSourceId: string | null = null
@@ -854,6 +855,7 @@ export class ResourceSession {
       const machines = machine ? { core: machine.core, convertedGrams, ...(fuel ? { stores: { ...this.snapshot.stores, [SCOUT_CORE_FUEL_ID]: { ...fuel, quantities: machine.quantities } } } : {}) } : {}
       if (!this.commit({ ...this.snapshot, ...machines, fabricator, bench, inventory, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
     }
+    if(elapsed>0)this.environmentDamageHpPerSecond=q.number(this.hazardEvents.reduce((total,e)=>q.add(total,q.mul(q.decode(e.damage),q.decimal(60))),q.ZERO))
     if (machine) { this.corePower = machine.result; this.corePowerTick = next.tick }
     if (!survivalPolicy(this.survival).canWork) {
       this.cancel('Exhausted: gathering and piloting unavailable.')

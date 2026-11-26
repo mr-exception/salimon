@@ -16,11 +16,11 @@ built `tests/live-hazards.spec.ts`. Original evidence belongs in ignored
 
 # Browser hazard domain (#788)
 
-**Approved successor contract (#913):** [planetary survival and equipment](spacesuit-and-hazards.md) specifies proportional module consumption for #917, replacing the stable-ID allocation described below. This page describes the existing implementation, not delivery of #914–#922. Character equipment reset will replace retained budgets under that contract; legacy synthetic hazard fixtures remain revision-specific.
+**Current contract (#913–#920):** [planetary survival and equipment](spacesuit-and-hazards.md) governs persistent equipment, proportional wear, live sampling, crafting/repair and UI. Legacy synthetic hazard fixtures remain separate from production equipment; historical module declarations are retained for those fixtures.
 
 
 `client/src/hazards.ts` implements the deterministic subset of the approved
-[spacesuit design](spacesuit-and-hazards.md). The hazard simulator still has **no production source/equipment bridge**. Persistent suit/module items and ship-only transfers are delivered separately (#914/#915), and [environmental queries](browser-planet-surface.md#deterministic-planetary-environment-916) now publish deterministic data (#916). Live sampling and proportional equipment wear remain #917; the stable-ID arithmetic described below is the existing synthetic domain behavior.
+[spacesuit design](spacesuit-and-hazards.md). The production bridge is delivered in #917, using persistent equipment (#914/#915) and [environmental queries](browser-planet-surface.md#deterministic-planetary-environment-916). Equipment/storage and contextual hazard presentation are delivered by #920. Explicit declarations below describe the retained synthetic fixture API, not extra production protection.
 
 `ResourceSession.setHazardSources` accepts explicit stable-ID temperature readings
 or radiation/poison HP/s rates. The environment adapter replaces this sample at
@@ -42,8 +42,9 @@ blocked, once whether preventing exposure or full-exposure damage. The domain
 splits a 1/60-second tick exactly at budget exhaustion; the remainder has the
 surviving protection only. Zero-budget modules stay as destroyed ID tombstones,
 provide no prevention/recovery bonus, and cannot be re-added under the same ID.
-Multiple declarations consume intensity in stable module-ID order. This allocation
-rule is a deterministic domain detail, not a suit-slot or installation policy.
+Multiple active same-type modules share blocked intensity proportionally to
+their strengths, recomputing after each exact depletion (#917). Stable-ID
+sequential allocation is superseded in both domain and production paths.
 Snapshots preserve per-type exposure and each module's identity, strength, type
 and remaining budget. Per-advance events report exact blocked intensity, hazard
 damage and destroyed IDs; failed transactions discard their events.
@@ -59,7 +60,8 @@ and saves. `survival.health` is a numeric projection for existing consumers;
 optional `healthExact` is the authority whenever HP is fractional. Integer health
 omits it. Positive exact HP below the numeric range projects to MIN_VALUE so
 underflow cannot end a living run. Starvation and regeneration update that same authority. All damage
-precedes passive regeneration and lethal damage prevents revival in that tick.
+precedes passive regeneration; actual production environmental damage suppresses
+regeneration, and lethal damage prevents revival in that tick.
 
 The existing survival loop is the sole 60 Hz authority, including navigation.
 Pause/background admit no ticks; offline launch recovery changes fatigue only.
@@ -77,8 +79,10 @@ Schema v7 keeps the existing storage key. V6 health/timers and all inventory,
 stores, source depletion and location migrate losslessly with zero exposure and
 no modules. V1–v5 retain their existing survival migration. Corrupt/unsupported
 saves are retained and block play. Explicit terminal fresh-character reset clears
-character exposure with health/hunger/fatigue; it retains module budgets and
-destroyed IDs as well as the resource ledger, so it grants no replacement gear.
+character exposure with health/hunger/fatigue. Production replaces character
+equipment once under a new generation, retaining machine-held repair custody;
+legacy explicit fixture modules retain their budgets/tombstones. World resource
+accounts and machine contents survive. See the current reset contract.
 
 `src/hazards.test.ts` covers source permutations, fractional rates, threshold
 splits, safe temperatures, independent recovery, exact 1,000 HP depletion,
@@ -90,6 +94,7 @@ builds it in `.hazard-fixture` and serves it on 4275; ordinary `dist` includes
 only the normal game. The suite also rejects fixture-query activation in the
 normal built game. No visual baselines are changed or promoted.
 
-Deferred: fire and acid timing/defaults, pressure/oxygen/gravity, real planetary
-sampling, wearable suit UI and installation, crafting, storage weight caps,
-multiplayer authority and module-destruction presentation.
+Deferred: fire and acid timing/defaults, pressure/oxygen/gravity and multiplayer
+authority. Real planetary sampling, wearable equipment UI, installation, crafting,
+repair and destruction presentation are delivered (#917–#920). Equipment storage
+has no extra weight cap by design.

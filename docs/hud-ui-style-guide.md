@@ -278,3 +278,19 @@ coordinates, persistence, scanner admission and control/input units are unchange
 invalid inputs and extreme finite values. METRIC-910 in `tests/panoramic.spec.ts`
 and `tests/production.spec.ts` covers rendered integration; originals belong in
 ignored test output and CI artifacts, with the validation summary in the PR.
+
+
+## Equipment and contextual hazard HUD (#920)
+
+The survival panel keeps suit condition and local temperature/actual damage visible;
+two slot details expand on demand. Radiation/toxicity meters appear with exposure
+or actual damage. Persistent text labels distinguish low (20%) and critical (5%)
+module budgets without color-only signals. A destruction alert lasts 300 admitted
+active ticks; pause freezes expiry. Resolved or removed equipment clears warnings.
+
+Field inventory and the cargo cabinet context menu open the shared equipment
+industrial dialog. Confirmation names both endpoints (and the removed suit's
+chosen location during a switch). Disabled controls retain keyboard-focusable
+reasons; the domain repeats admission and both capacity checks on commit. Escape
+cancels a draft/dialog without committing. Existing modal focus trapping, reduced
+motion tokens and viewport-bound scrolling apply. No second hazard/UI timer.

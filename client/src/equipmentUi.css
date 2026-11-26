@@ -1,0 +1,14 @@
+.equipment-panel .ui-dialog { max-width: min(44rem, calc(100vw - 1.5rem)); }
+.equipment-panel section { border-bottom: 1px solid var(--ui-surface); padding-block: .5rem; }
+.equipment-panel label { display: grid; gap: .4rem; margin-block: .75rem; }
+.equipment-panel select { width: 100%; min-width: 0; }
+.gear-list { list-style: none; padding: 0; }
+.gear-list li { margin-block: 1rem; padding: .75rem; border: 1px solid var(--ui-surface); }
+.gear-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.gear-hud { max-width: 17rem; font-size: .75rem; }
+.expedition-ui .survival-hud .gear-hud p { margin-block: .3rem; color: var(--ui-text); }
+.expedition-ui .survival-hud .gear-hud [role="status"] p { color: var(--ui-mechanical); }
+.expedition-ui .survival-hud .gear-hud [role="alert"] p { color: var(--ui-danger); font-weight: 700; }
+.gear-hud details > summary { cursor: pointer; }
+.gear-hud .ui-meter { margin-block: .3rem; }
+@media (max-width: 600px) { .gear-hud { max-width: 12rem; font-size: .68rem; } .equipment-panel .ui-dialog { padding: .75rem; } }

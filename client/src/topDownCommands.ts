@@ -109,7 +109,7 @@ export function advanceObjectCommand(context: ActionContext, openEquipment: (wor
       if (session) { session.world = world; session.feedback = '' }
       let succeeded = true
       if (command.actionId === 'inspect') world = { ...world, feedback: `${target.interaction!.label}. Physical actions require proximity.` }
-      else if (['container', 'core', 'fabricator', 'bench'].includes(command.actionId)) {
+      else if (['container', 'core', 'fabricator', 'bench', 'equipment'].includes(command.actionId)) {
         succeeded = !!session && openEquipment(world)
         if (session) world = session.world
       } else if (command.actionId === 'gather') {

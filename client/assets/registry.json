@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "scout.chair",
+      "revision": 1,
+      "category": "prop",
+      "status": "placeholder",
+      "essential": true,
+      "pivot": [0.5, 0.5],
+      "physicalSize": [0.7, 0.7],
+      "density": 64,
+      "footprintRef": "scout:chair",
+      "parts": [{ "id": "base", "layer": "entities", "source": "scout/chair.png", "content": [2, 2, 45, 45] }],
+      "anchors": { "seat": "chair" },
+      "states": { "idle": ["base"] },
+      "provenance": {
+        "origin": "Original Salimon placeholder derived from the in-repository Scout chair illustration",
+        "license": "LicenseRef-Salimon-Project",
+        "attribution": "Salimon contributors",
+        "redistributable": true,
+        "references": ["client/src/TopDownIllustration.tsx"]
+      }
+    }
+  ]
+}

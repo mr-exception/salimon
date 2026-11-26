@@ -1579,3 +1579,21 @@ Fresh and legacy-migrated expeditions own an equipped 3 kg basic suit with tempe
 ## Planetary environment publication (#916)
 
 `samplePlanetEnvironment(location, reference)` and `bodyEnvironmentSummary(bodyId, reference)` expose bounded deterministic raw world data, without new HUD or damage. The ResourceSession wrappers bind saved body/publication identity. Run `node --experimental-strip-types --test src/planetEnvironment.test.ts src/planetSurface.test.ts src/surfaceSite.test.ts src/regionStream.test.ts` for generation/boundary/streaming/save checks, and `npm run build`. See [exact keys, safe square and legacy behavior](../docs/browser-planet-surface.md#deterministic-planetary-environment-916). Scanner gating is #921; live exposure is #917.
+
+### Combined planetary survival and equipment acceptance (#922)
+
+Build with `npm run build`, then run the actual-controls expedition with
+`npm run test:browser -- --project=cockpit tests/survival-expedition.spec.ts`.
+The test starts with fresh storage, reads the scanner in the cockpit, gathers
+both authored materials, uses the Core and both machines, changes equipment at
+the storage cabinet, then pilots Scout to a generated hazardous Vesper site. It
+checks exact paid work, exposure, health and module wear while gathering there.
+Recovery, reload, a controlled pre-worn module boundary and a replacement claim
+preserve the original identities and balance sheets.
+
+The accompanying `gear-bench.spec.ts`, `equipment-ui.spec.ts`,
+`equipment-transfers.spec.ts` and `survival.spec.ts` cover controlled suit
+repair, capacity/failed commits, shipping fixture exclusion and terminal reset.
+Natural suit damage is outside this slice. Visibility testing injects the
+document signal, and browser input is Playwright keyboard/mouse. Original
+states, images and traces land in ignored `test-results/`.

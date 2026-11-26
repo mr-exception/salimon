@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
 import { freshSurvival, METER } from '../src/survival.ts'
+import { freshEquipment } from '../src/equipment.ts'
+import { freshHazards } from '../src/hazards.ts'
 import { boot, walkTicks, walkTo, position } from './worldJourney'
 
 // Original captures and raw state are explicit below; avoid synchronizing every
@@ -62,8 +64,13 @@ test('SURV built active/pause/reload, outdoor/interior/navigation-return and ter
   await capture('terminal')
   await page.reload(); await expect(hud).toContainText('Run ended')
   await page.getByRole('button', { name: 'Start fresh character' }).click()
-  expect((await save()).sources).toEqual(terminal.sources)
-  expect((await save()).inventory).toEqual(terminal.inventory)
+  const reset = await save()
+  expect(reset.sources).toEqual(terminal.sources)
+  expect(reset.stores).toEqual(terminal.stores)
+  expect(reset.inventory).toEqual({
+    ...terminal.inventory, equipment: freshEquipment(terminal.inventory.equipment.generation + 1),
+  })
+  expect(reset.hazards.exposure).toEqual(freshHazards().exposure)
   await expect(hud).toContainText('200 / 200 HP')
   // Real production keyboard journey through the Scout and radar WebGL adapter.
   for (const p of [[-2, 3], [-2, 7]]) await walkTo(page, p, 'planet:fixture', true)

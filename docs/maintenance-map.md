@@ -1272,3 +1272,7 @@ this presentation layer. See the [scanner guide](../client/README.md#scanner-env
 ## Persistent equipment (#914)
 
 `equipment.ts` owns trusted gear definitions, identity/ownership validation, exact durability, functioning-suit projection and mass attribution. `ResourceInventory.equipment` is the sole instance graph; inventory usage derives carried mass/slots without mirrored item counts. `resourceSession.ts` owns v18 migration/reset and atomic publication; `resourceLedger.ts` adds aboard equipped/stored mass once. Domain coverage: `equipment.test.ts`; built smoke: `tests/equipment.spec.ts`. Equipment actions/UI and live planetary wear are subsequent issues.
+
+## Ship equipment transactions (#915)
+
+`scoutEquipment.ts` owns explicit move/switch commands, tier-capacity declarations and live ship-frame/cabinet reach admission. The preinstalled drawer and module compartment are independent of raw storage but share its existing cargo-cabinet physical reach anchor. `ResourceSession.changeEquipment` checks revision, carry usage and save publication atomically. `scoutEquipment.test.ts` owns endpoint/capacity/boundary/failure tests; separately built `tests/equipment-transfers.html` exercises the production adapter with actual movement. Full player-facing equipment actions are #920.

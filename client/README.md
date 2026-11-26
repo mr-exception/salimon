@@ -1571,3 +1571,7 @@ artifacts; owner review of changed visual references remains required.
 ## Persistent equipment (#914)
 
 Fresh and legacy-migrated expeditions own an equipped 3 kg basic suit with temperature T1. No gear controls or environmental damage sources ship in this step. `npm test` covers schema/identity/capacity/rollback and `npx playwright test --project=cockpit tests/equipment.spec.ts` runs the built actual-gather/reload/migration smoke. `equipment.ts` owns definitions and the single location graph; `resourceInventoryUsage` includes carried gear, while `ResourceSession.payload` includes aboard equipped/stored gear once. See [save migration](../docs/save-contract.md#persistent-equipment-schema-v18-914).
+
+## Ship equipment transaction adapter (#915)
+
+`ResourceSession.changeEquipment(command, revision)` supports explicit location moves and suit switching with a named old-suit destination. It requires standing inside Scout; any drawer/module-storage endpoint additionally requires reach of the existing cargo cabinet (`scout:storage`). Modules installed in a stored suit use the drawer reach rule. Tier-1 capacities are 4 suits / 12 loose modules, independent of raw storage; no upgrades yet. Production UI is #920. `node --experimental-strip-types --test src/scoutEquipment.test.ts` checks transactions; `npx playwright test --project=cockpit tests/equipment-transfers.spec.ts` checks the separately built production adapter fixture and shipping exclusion. Original output is ignored under test-results.

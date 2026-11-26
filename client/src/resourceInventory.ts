@@ -1,9 +1,12 @@
+import { equipmentMass, type EquipmentState } from './equipment.ts'
 /** All resource and inventory mass is expressed in integer grams, never volume. */
 export interface ResourceDefinition { readonly name?: string }
 export type ResourceCatalog = Readonly<Record<string, ResourceDefinition>>
 export interface CountItemDefinition { readonly name?: string; readonly gramsPerItem: number; readonly stackSize: number }
 export type CountItemCatalog = Readonly<Record<string, CountItemDefinition>>
 export interface ResourceInventory {
+  /** Domain-owned persistent instances; equipped/stored gear does not consume carry capacity. */
+  readonly equipment?: EquipmentState
   readonly capacityGrams: number
   readonly capacitySlots: number
   /** One slot per resource type; its quantity is integer grams. */
@@ -62,7 +65,8 @@ export function resourceInventoryUsage(
 ): { readonly grams: number; readonly slots: number } {
   integer(inv.capacityGrams, 'capacityGrams', 1)
   integer(inv.capacitySlots, 'capacitySlots', 1)
-  let grams = 0, slots = 0
+  const gear = inv.equipment ? equipmentMass(inv.equipment) : null
+  let grams = gear?.carriedGrams ?? 0, slots = gear?.carriedSlots ?? 0
   for (const [id, quantity] of Object.entries(inv.quantities)) {
     resource(resources, id)
     integer(quantity, 'quantityGrams', 1)

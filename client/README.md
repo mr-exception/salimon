@@ -1567,3 +1567,7 @@ controls, fixed panel geometry, stable DOM text, reduced motion, original/repeat
 captures and an injected hidden-warning negative. PR smoke and full perspective
 CI include it. Evidence stays in ignored `test-results/` and existing 14-day CI
 artifacts; owner review of changed visual references remains required.
+
+## Persistent equipment (#914)
+
+Fresh and legacy-migrated expeditions own an equipped 3 kg basic suit with temperature T1. No gear controls or environmental damage sources ship in this step. `npm test` covers schema/identity/capacity/rollback and `npx playwright test --project=cockpit tests/equipment.spec.ts` runs the built actual-gather/reload/migration smoke. `equipment.ts` owns definitions and the single location graph; `resourceInventoryUsage` includes carried gear, while `ResourceSession.payload` includes aboard equipped/stored gear once. See [save migration](../docs/save-contract.md#persistent-equipment-schema-v18-914).

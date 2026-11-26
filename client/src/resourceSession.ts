@@ -1,3 +1,4 @@
+import { freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
 import { validateDeployedMarkers } from './fieldMarker.ts'
 import { FABRICATOR_INPUT_ID, FABRICATOR_RECIPE_ID, FABRICATOR_GRAMS, FABRICATOR_TICKS, FABRICATOR_WATTS, FABRICATOR_ITEMS, MARKER_KIT_ID, freshFabricator, validateFabricator, fabricatorSpentJ60, stepFabricator, type FabricatorState } from './scoutFabricator.ts'
 import { emptyJournal, recordVisit, validateJournal, type ExpeditionJournal } from './expeditionJournal.ts'
@@ -44,7 +45,7 @@ export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
 }
 export interface ResourceSave extends ResourceLedger {
   readonly depositPublication: typeof DEPOSIT_PUBLICATION
-  readonly version: 17
+  readonly version: 18
   readonly deployedMarkers: readonly FieldMark[]
   readonly fabricator: FabricatorState
   readonly convertedGrams: Readonly<Record<string, number>>
@@ -161,7 +162,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const catalog = registerCountItems(itemDefinitions)
   const data = object(JSON.parse(raw))
   const version = data.version
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 17) throw new Error('Unsupported save version')
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 18) throw new Error('Unsupported save version')
   const legacy = version === 1
   const hasStores = version >= 3
   const hasItems = version >= 5
@@ -194,8 +195,9 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const inventory: ResourceInventory = {
     capacityGrams: integer(inv.capacityGrams, 10_000),
     capacitySlots: legacy ? 12 : integer(inv.capacitySlots, 12),
-    quantities, items,
+    quantities, items, equipment: version >= 18 ? validateEquipment(inv.equipment) : freshEquipment(),
   }
+  if (version < 18 && inv.equipment !== undefined) throw Error('Equipment requires schema v18')
   if (hasItems) {
     const saved = registerCountItems(object(data.itemDefinitions) as CountItemCatalog)
     if (Object.keys(saved).length !== Object.keys(catalog).filter(id => version >= 16 || id !== MARKER_KIT_ID).length || Object.entries(saved).some(([id, meta]) =>
@@ -251,7 +253,7 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
   const location = parseLocation(data.location, restoredWorld)
   if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
   const core = version >= 15 ? validateCoreEnergy(data.core) : hasCore ? migrateCoreEnergy(data.core) : freshCoreEnergy()
-  const save: ResourceSave = { version: 17, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
+  const save: ResourceSave = { version: 18, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
   validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
   validateCoreConservation(save.core, save.convertedGrams)
   if (BigInt(fabricatorSpentJ60(save.fabricator)) + BigInt(save.fabricator.otherSpentJ60) !== BigInt(save.core.spentJ60)) throw Error('Unpaid Fabricator work')
@@ -259,7 +261,8 @@ export function decodeResourceSave(raw: string, world: TopDownState, storeDefini
 }
 export function resourcePayload(inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG) {
   const grams = resourceInventoryUsage(inventory, RESOURCE_CATALOG, items).grams
-  return { playerGrams: grams, shipGrams: world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === world.frames.ship.id ? grams : 0 }
+  const gear = inventory.equipment ? equipmentMass(inventory.equipment) : null
+  return { playerGrams: grams, shipGrams: (gear?.storedGrams ?? 0) + (world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === world.frames.ship.id ? grams + (gear?.equippedGrams ?? 0) : 0) }
 }
 export function withResourcePayload(ship: ShipState, inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG): ShipState {
   // Recompute from dry mass, never add the same nested player payload per tick.
@@ -347,7 +350,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 17, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: startingResourceInventory(), sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = { version: 18, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: { ...startingResourceInventory(), equipment: freshEquipment() }, sources: RESOURCE_SOURCES, location: safeLocation(world) }
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -620,7 +623,7 @@ export class ResourceSession {
   freshRun(): boolean {
     if (this.error || this.survival.health !== 0) return false
     const next = freshSurvival(this.now())
-    if (!this.commit({ ...this.snapshot, hazards: { ...this.hazards, exposure: freshHazards().exposure }, survival: next })) return false
+    if (!this.commit({ ...this.snapshot, inventory: { ...this.snapshot.inventory, equipment: freshEquipment(this.snapshot.inventory.equipment!.generation + 1) }, hazards: { ...this.hazards, exposure: freshHazards().exposure }, survival: next })) return false
     this.survival = next
     this.equipped = false
     return true

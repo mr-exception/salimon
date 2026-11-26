@@ -107,13 +107,13 @@ test('v13 migrates empty Core without minting fuel or rewriting bytes until comm
   const storage = new Storage(), s = session(storage)
   assert.equal(collect(s, 1000), true)
   const v13 = JSON.parse(storage.raw!)
-  v13.version = 13; delete v13.inventory.equipment
+  v13.version = 13; delete v13.bench; if (v13.stores) delete v13.stores['scout:gear-bench:input']; delete v13.inventory.equipment
   delete v13.fabricator; delete v13.deployedMarkers; if (v13.stores) delete v13.stores['scout:fabricator:input']; if (v13.itemDefinitions) delete v13.itemDefinitions['field-marker-kit:v1']; delete v13.convertedGrams; delete v13.core
   delete v13.stores[SCOUT_CORE_FUEL_ID]
   storage.raw = JSON.stringify(v13)
   const prior = storage.raw, restored = session(storage)
   assert.equal(restored.error, '')
-  assert.equal(restored.snapshot.version, 18)
+  assert.equal(restored.snapshot.version, 19)
   assert.equal(restored.snapshot.revision, v13.revision)
   assert.deepEqual(restored.snapshot.sources, v13.sources)
   assert.deepEqual(restored.snapshot.inventory, { ...v13.inventory, equipment: freshEquipment() })
@@ -121,7 +121,7 @@ test('v13 migrates empty Core without minting fuel or rewriting bytes until comm
   assert.equal(restored.snapshot.core.reserveJ60, CORE_INITIAL_RESERVE_J * 60)
   assert.equal(storage.raw, prior)
   assert.equal(restored.depositCoreFuel('mineral', 333, restored.snapshot.revision), true)
-  assert.equal(JSON.parse(storage.raw!).version, 18)
+  assert.equal(JSON.parse(storage.raw!).version, 19)
   assert.equal(session(storage).snapshot.stores[SCOUT_CORE_FUEL_ID]!.quantities.mineral, 333)
 })
 
@@ -130,8 +130,8 @@ test('corrupt or future Core saves fail closed with original bytes preserved', (
   assert.equal(collect(s, 1000), true)
   const original = JSON.parse(storage.raw!)
   const mutations: ((save: any) => void)[] = [
-    save => { save.version = 19 },
-    save => { save.version = 13; delete save.inventory.equipment; delete save.fabricator; delete save.deployedMarkers; if (save.stores) delete save.stores['scout:fabricator:input']; if (save.itemDefinitions) delete save.itemDefinitions['field-marker-kit:v1']; delete save.convertedGrams; delete save.core; save.stores[SCOUT_CORE_FUEL_ID].capacityGrams = 1 },
+    save => { save.version = 20 },
+    save => { save.version = 13; delete save.bench; if (save.stores) delete save.stores['scout:gear-bench:input']; delete save.inventory.equipment; delete save.fabricator; delete save.deployedMarkers; if (save.stores) delete save.stores['scout:fabricator:input']; if (save.itemDefinitions) delete save.itemDefinitions['field-marker-kit:v1']; delete save.convertedGrams; delete save.core; save.stores[SCOUT_CORE_FUEL_ID].capacityGrams = 1 },
     save => { delete save.fabricator; delete save.deployedMarkers; if (save.stores) delete save.stores['scout:fabricator:input']; if (save.itemDefinitions) delete save.itemDefinitions['field-marker-kit:v1']; delete save.convertedGrams; delete save.core },
     save => { save.core.capacityJ++ },
     save => { save.core.reserveJ60 = -1 },

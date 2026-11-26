@@ -1,3 +1,4 @@
+import { BENCH_ID, BENCH_INPUT_ID, benchReserved } from './gearBench.ts'
 import { RESOURCE_CATALOG, type ResourceSession } from './resourceSession.ts'
 import type { ResourceInventory } from './resourceInventory.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
@@ -20,10 +21,10 @@ export function withdrawalCapacityError(inventory: ResourceInventory, used: { gr
 /** UI draft/confirmation state only. ResourceSession remains the sole save authority. */
 export class ResourceContainerInteraction {
   readonly session: ResourceSession
-  readonly equipment: 'container' | 'core' | 'fabricator'
+  readonly equipment: 'container' | 'core' | 'fabricator' | 'bench'
   readonly targetId: string
   readonly storeId: string
-  get title(): string { return this.equipment === 'fabricator' ? 'Fabricator' : this.equipment === 'core' ? 'Energy Core' : 'Resource Container' }
+  get title(): string { return this.equipment === 'bench' ? 'Gear Crafting Bench' : this.equipment === 'fabricator' ? 'Fabricator' : this.equipment === 'core' ? 'Energy Core' : 'Resource Container' }
   opened = false
   pending: ContainerCommand | null = null
   message = ''
@@ -39,13 +40,14 @@ export class ResourceContainerInteraction {
     } }
     return JSON.stringify({ inventory, sources, stores: normalized, itemDefinitions })
   }
-  constructor(session: ResourceSession, equipment: 'container' | 'core' | 'fabricator' = 'container') {
+  constructor(session: ResourceSession, equipment: 'container' | 'core' | 'fabricator' | 'bench' = 'container') {
     this.session = session; this.equipment = equipment
-    this.targetId = equipment === 'fabricator' ? 'scout:fabricator' : equipment === 'core' ? 'scout:core' : containerId
-    this.storeId = equipment === 'fabricator' ? FABRICATOR_INPUT_ID : equipment === 'core' ? SCOUT_CORE_FUEL_ID : containerId
+    this.targetId = equipment === 'bench' ? BENCH_ID : equipment === 'fabricator' ? 'scout:fabricator' : equipment === 'core' ? 'scout:core' : containerId
+    this.storeId = equipment === 'bench' ? BENCH_INPUT_ID : equipment === 'fabricator' ? FABRICATOR_INPUT_ID : equipment === 'core' ? SCOUT_CORE_FUEL_ID : containerId
   }
   get bufferGrams(): number {
-    return resourceStoreMass(this.session.snapshot.stores[this.storeId]!, RESOURCE_CATALOG)
+    const r = this.equipment === 'bench' ? benchReserved(this.session.snapshot.bench) : null
+    return (r ? r.mineral + r.biomass : 0) + resourceStoreMass(this.session.snapshot.stores[this.storeId]!, RESOURCE_CATALOG)
       + (this.equipment === 'fabricator' ? this.session.snapshot.fabricator.job?.reservedGrams ?? 0 : 0)
   }
   get machineBlocked(): string | undefined {
@@ -74,6 +76,22 @@ export class ResourceContainerInteraction {
     this.failed = !ok
     this.message = ok ? kind === 'start' ? 'Saved: job started. Inputs reserved once.' : 'Saved: output claimed to carried inventory.'
       : this.machineBlocked || (kind === 'claim' && tray ? this.claimCapacityError() : undefined) || this.session.feedback
+    return ok
+  }
+  startBench(recipeId:string):boolean {
+    this.synchronize(this.session.world)
+    if(!this.opened||this.equipment!=='bench')return false
+    this.discard()
+    const ok=this.session.startBench(recipeId,this.session.snapshot.revision)
+    this.failed=!ok;this.message=ok?'Saved: gear job started. Inputs reserved once.':this.session.feedback
+    return ok
+  }
+  claimBench():boolean {
+    this.synchronize(this.session.world)
+    if(!this.opened||this.equipment!=='bench')return false
+    this.discard()
+    const ok=this.session.claimBench(this.session.snapshot.bench.tray?.jobId??-1,this.session.snapshot.revision)
+    this.failed=!ok;this.message=ok?'Saved: equipment claimed to inventory.':this.session.feedback
     return ok
   }
   start(): boolean { return this.machineAction('start') }
@@ -116,7 +134,7 @@ export class ResourceContainerInteraction {
     const available = direction === 'deposit' ? inv.quantities[resourceId] ?? 0 : store.quantities[resourceId] ?? 0
     if (grams > available) { this.message = `Insufficient amount: only ${available} g available to ${direction}.`; return false }
     if (direction === 'deposit' && this.bufferGrams + grams > store.capacityGrams) {
-      this.message = `${this.equipment === 'fabricator' ? 'Input buffer' : this.equipment === 'core' ? 'Fuel buffer' : 'Container'} overweight: only ${store.capacityGrams - this.bufferGrams} g free (50 kg maximum).`; return false
+      this.message = `${this.equipment === 'fabricator' || this.equipment === 'bench' ? 'Input buffer' : this.equipment === 'core' ? 'Fuel buffer' : 'Container'} overweight: only ${store.capacityGrams - this.bufferGrams} g free (50 kg maximum).`; return false
     }
     if (direction === 'withdraw') {
       const used = resourceInventoryUsage(inv, RESOURCE_CATALOG, this.session.itemCatalog)
@@ -136,7 +154,7 @@ export class ResourceContainerInteraction {
     // Clock/location-only commits do not alter the reviewed transfer. A material
     // change still uses its stale revision and is rejected by the session.
     const revision = this.reviewedResources === this.resourceSignature() ? this.session.snapshot.revision : command.revision
-    const method = this.equipment === 'fabricator' ? command.direction === 'deposit' ? 'depositFabricatorInput' : 'withdrawFabricatorInput' : this.equipment === 'core' ? command.direction === 'deposit' ? 'depositCoreFuel' : 'withdrawCoreFuel' : command.direction
+    const method = this.equipment === 'bench' ? command.direction === 'deposit' ? 'depositBenchInput' : 'withdrawBenchInput' : this.equipment === 'fabricator' ? command.direction === 'deposit' ? 'depositFabricatorInput' : 'withdrawFabricatorInput' : this.equipment === 'core' ? command.direction === 'deposit' ? 'depositCoreFuel' : 'withdrawCoreFuel' : command.direction
     const ok = this.session[method](command.resourceId, command.grams, revision)
     this.failed = !ok
     this.message = ok ? `Saved: ${command.direction === 'deposit' ? 'deposited' : 'withdrew'} ${command.grams} g (${command.grams / 1000} kg).`

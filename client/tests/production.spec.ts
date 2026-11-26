@@ -11,3 +11,21 @@ test('built production bundle renders WebGL, scanner and labelled controls',asyn
  expect(gpu.width).toBeGreaterThan(0);expect(gpu.renderer).toContain('SwiftShader');expect(errors).toEqual([])
  await testInfo.attach('backend.json',{body:JSON.stringify({gpu,errors,viewport:page.viewportSize()},null,2),contentType:'application/json'})
 })
+
+test('built production serves a deterministic art manifest and decodable assets', async ({ page }, info) => {
+ const origin = 'http://127.0.0.1:4175'
+ const request = await page.request.get(origin + '/assets/art/manifest.json')
+ expect(request.ok()).toBe(true)
+ const manifest = await request.json()
+ expect(manifest.schemaVersion).toBe(1)
+ expect(manifest.atlas.pages.every(({ width, height }: { width: number; height: number }) => width <= 2048 && height <= 2048)).toBe(true)
+ await page.goto(origin + '/')
+ const decoded = await page.evaluate(async urls => Promise.all(urls.map(async (url: string) => {
+   const image = new Image()
+   image.src = '/assets/art/' + url
+   await image.decode()
+   return [image.naturalWidth, image.naturalHeight]
+ })), ['scout.chair', 'ui.seat'].map(id => manifest.assets.find((asset: { id: string }) => asset.id === id).parts[0].url))
+ expect(decoded).toEqual([[49, 49], [256, 256]])
+ await info.attach('art-manifest.json', { body: JSON.stringify({ manifest, decoded }, null, 2), contentType: 'application/json' })
+})

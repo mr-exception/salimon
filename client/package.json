@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run assets:build",
     "preview": "vite preview",
     "test": "node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts",
     "test:browser": "playwright test",
@@ -18,7 +18,8 @@
     "test:ui:negative": "node scripts/negative-ui.mjs",
     "test:planetary": "playwright test --project=cockpit tests/planetary-journey.spec.ts tests/exploration.spec.ts tests/streaming.spec.ts tests/deposits.spec.ts tests/terrain.spec.ts tests/terrain-art.spec.ts tests/landing.spec.ts",
     "test:browser:smoke": "playwright test --project=perspective --project=production --project=deterministic --project=cockpit --project=panoramic --project=optical tests/optical.spec.ts tests/panoramic.spec.ts tests/command-feedback.spec.ts tests/auto-approach.spec.ts tests/camera.spec.ts tests/object-context.spec.ts tests/ground-movement.spec.ts tests/perspective.spec.ts tests/production.spec.ts tests/deterministic.spec.ts tests/flight.spec.ts tests/terrain.spec.ts tests/terrain-art.spec.ts tests/core-power.spec.ts tests/vertical-slice.spec.ts --grep \"HUD-909|HUD-907|ART-906 canonical|SENSOR-908|HUD-908|ENV-905|SLICE-880 built|UX-894|COMMAND-893|MENU-892|CAMERA-891|MOVE-890|CORE-875|built production|NAV-2|FLIGHT-838|TERRAIN-848|ART-850 .*production\"",
-    "assets:validate": "node --experimental-strip-types scripts/asset-sources.ts"
+    "assets:validate": "node --experimental-strip-types scripts/asset-sources.ts",
+    "assets:build": "node --experimental-strip-types scripts/asset-packaging.ts"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",
@@ -37,6 +38,8 @@
     "pixelmatch": "7.1.0",
     "pixi.js": "8.23.0",
     "pngjs": "7.0.0",
+    "saxes": "6.0.0",
+    "sharp": "0.35.5",
     "typescript": "^5.9.0",
     "vite": "^7.1.0"
   },

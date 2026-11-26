@@ -21,7 +21,7 @@ export function alphaBounds(pixels: PNG): readonly [number, number, number, numb
   return right < 0 ? undefined : [left, top, right - left + 1, bottom - top + 1]
 }
 
-export function readAssetRegistry() {
+export function readAssetRegistry(sourceLimit = 4096) {
   const props = new Map(scoutEntities().map(entity => [entity.id, entity.footprint]))
   return validateAssetRegistry(JSON.parse(readFileSync(registryFile, 'utf8')), {
     source(path) {
@@ -32,7 +32,16 @@ export function readAssetRegistry() {
         if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined
         throw error
       }
-      return path.endsWith('.png') ? { alphaBounds: alphaBounds(PNG.sync.read(bytes)) } : {}
+      if (!path.endsWith('.png')) return {}
+      // Check IHDR before decoding so an oversize source cannot allocate an
+      // unbounded pixel surface while the registry validator inspects alpha.
+      if (bytes.length < 33 || bytes.toString('hex', 0, 8) !== '89504e470d0a1a0a' ||
+        bytes.toString('ascii', 12, 16) !== 'IHDR') throw new Error(`Invalid PNG source ${path}`)
+      const width = bytes.readUInt32BE(16), height = bytes.readUInt32BE(20)
+      if (!width || !height || width > sourceLimit || height > sourceLimit) {
+        throw new Error(`PNG source ${path} exceeds source dimension limit or has an invalid size`)
+      }
+      return { alphaBounds: alphaBounds(PNG.sync.read(bytes)) }
     },
     footprint(ref) {
       const footprint = props.get(ref)

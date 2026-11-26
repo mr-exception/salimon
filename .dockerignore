@@ -1,7 +1,10 @@
-# Keep the production build context limited to the browser client and server config.
+# Keep the production build context limited to the browser client, art sources and server config.
 **
 !client/
 !client/**
+!art/
+!art/sources/
+!art/sources/**
 !docker/
 !docker/**
 

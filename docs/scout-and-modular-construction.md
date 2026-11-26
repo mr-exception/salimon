@@ -1,5 +1,8 @@
 # Scout art direction and modular ship construction — approved design (2026-10-22)
 
+**Owner clarification (2026-11-26):** the Scout is the single starting spaceship, not a purchasable or replaceable ship class. Players expand the same vessel; complete ship purchase/craft packages are outside current scope. [Modular artwork](equipment-art-direction.md) prepares reusable components, not new construction mechanics. This clarification supersedes conflicting ship-class/package wording.
+
+
 > **Corpus migration status (#791): Approved future 2D design.** The current [React overhead 2D world](current-client-status.md) uses **cockpit-only panoramic observation**; the orthographic radar is an isolated engineering fixture at `/?scene=radar`. Any older Rust, wgpu, 3D assets, first-person view or issue-delivery statements below concern the [archived native tree](https://github.com/mr-exception/salimon/tree/8f112bb6e6be9f813174efb47d706a8601930d04) rather than shipped browser features. Keep approved ship layout and state invariants, but render with an exposed top-down Scout cutaway and ship-local footprints. Native physical fragments, first-person cameras and localized hull damage do not describe shipped 2D gameplay; current damage scope is ship-wide. See the [migration register](2d-migration-register.md) for readiness and ownership.
 
 

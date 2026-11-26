@@ -1,5 +1,8 @@
 # Technical architecture and AI maintenance
 
+**Approved presentation boundary (2026-11-26):** [Browser rendering evaluation](browser-rendering-architecture.md) and [art production](art-production-guide.md) govern forward presentation work. PixiJS is conditional on comparative evidence; simulation, persistence, React HUD and Three.js navigation remain authoritative and unchanged.
+
+
 See the [active browser launch/landing contract](browser-launch-landing.md) for the delivered
 production loop, supported sample sites, safety/save boundaries and QA coverage.
 

@@ -1,5 +1,8 @@
 # Scout interior art direction and habitation presentation
 
+**Approved browser refinement (2026-11-26):** [Scout and equipment artwork](equipment-art-direction.md) owns modular illustration, room/material identity, machine silhouettes, state feedback and future-compatible art. Existing layout and gameplay remain authoritative. One starting Scout expands with the player; no complete ship packages.
+
+
 ## Translation to the playable top-down Scout
 
 The default 2D world renders the Scout **continuously exposed** alongside the exterior, with no toggle to a separate first-person room. Represent the aft cargo bay, service passage, main cabin, privacy nook and cockpit through consistent overhead shape and color, readable furniture silhouettes and exact ship-local interaction anchors. Floor and wall art cannot silently block a walkable route; every physical barrier uses a tested footprint/door state owned by gameplay, not sprite opacity.

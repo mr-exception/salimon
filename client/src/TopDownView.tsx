@@ -402,7 +402,8 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <PanoramicNavigation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         canPilot={() => !paused.current && !!session.current && !session.current.error && survivalPolicy(session.current.survival).canWork && controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
-        landing={{ denial: bodyId => session.current?.scoutActionDenial({ kind: 'begin-landing', bodyId }) ?? (session.current ? null : 'Expedition unavailable.'), activate: bodyId => {
+        environment={resourceSession ?? undefined}
+        landing={{ preview: bodyId => session.current?.landingPreview(bodyId) ?? { denial: 'Expedition unavailable.' }, activate: bodyId => {
           if (!session.current || paused.current) return
           session.current.world = current.current
           session.current.transitionScout({ kind: 'begin-landing', bodyId }, session.current.snapshot.revision, current.current.cockpit)

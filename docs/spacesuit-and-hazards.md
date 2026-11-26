@@ -3,7 +3,7 @@
 **Approved contract (#913), 2026-11-26; not an implementation claim.**
 The existing [hazard domain](browser-hazards.md) and
 [Core/Fabricator](browser-core-fabricator-vertical-slice.md) are foundations.
-Delivery is split across #914–#922. Persistent equipment (#914), ship-only transactions (#915) and raw environmental queries (#916) now have separate source owners; live hazards, bench and equipment/scanner UI remain later work. See [current browser status](current-client-status.md).
+Delivery is split across #914–#922. Persistent equipment (#914), ship-only transactions (#915) and raw environmental queries (#916) now have separate source owners; live hazards, the bench and equipment/scanner UI are delivered by #917–#921. See [current browser status](current-client-status.md).
 
 ## Equipment and custody
 
@@ -147,7 +147,11 @@ destruction notice; clear resolved warnings, avoid color-only signals and spam.
 #921 extends only scanner-authorized contacts: body range/baselines, local values
 only for an actually supported selected landing site, and current functioning
 gear assessment. Unknown/unscanned information stays unknown; lost scan clears
-stale assessment. Missing/insufficient gear warns but never blocks landing.
+stale assessment. The site preview uses the current or committed landing site,
+or the destination returned by the existing read-only landing admission check.
+Temperature without a site is unknown, and on Vesper the safe-start override
+also makes local radiation and toxicity unknown. Missing or insufficient gear
+warns without changing landing eligibility.
 
 Future fire/acid/impact, oxygen/pressure, weather, ship construction, medical,
 backpacks and multiplayer are outside this slice. Historical fire/burn/acid

@@ -1,4 +1,5 @@
 import { geologicalDefinition } from '../src/planetDefinition.ts'
+import { samplePlanetEnvironment } from '../src/planetEnvironment.ts'
 import { test, expect } from '@playwright/test'
 import { ResourceSession, RESOURCE_SAVE_KEY } from '../src/resourceSession.ts'
 import { NavigationRuntime } from '../src/navigationRuntime.ts'
@@ -197,4 +198,61 @@ test('LANDING-844 production disabled causes, terminal impact and power-loss res
    await page.screenshot({ path: info.outputPath(`${reason}-denied.png`) })
   }
  }
+})
+
+test('SCAN-921 production scan gates the environment and warnings preserve landing admission', async ({ page }, info) => {
+ const seed = approach('vesper-moon')
+ const scanner = seed.scout.scanner
+ seed.scout.scanner = { ...scanner, contactIds: [], selected: null }
+ await page.addInitScript(({ key, seed }) => {
+  if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(seed))
+ }, { key: RESOURCE_SAVE_KEY, seed })
+ await page.setViewportSize({ width: 960, height: 600 })
+ await page.clock.install({ time: epoch })
+ await page.clock.pauseAt(new Date(epoch.getTime() + 1000))
+ await page.goto('http://127.0.0.1:4175/')
+ const enter = async () => {
+  await expect.poll(async () => {
+   await page.clock.runFor(32)
+   return page.locator('.top-down-scene').getAttribute('data-render-ready')
+  }).toBe('true')
+  await page.getByRole('button', { name: 'Use cockpit', exact: true }).click()
+  await page.clock.runFor(64)
+ }
+ await enter()
+ const environment = page.getByRole('region', { name: 'Planetary environment and equipment' })
+ const land = page.getByRole('button', { name: 'Land', exact: true })
+ await expect(environment).toHaveCount(0)
+ await expect(land).toBeDisabled()
+ await page.screenshot({ path: info.outputPath('unscanned-cockpit.png') })
+
+ seed.scout.scanner = scanner
+ await page.evaluate(({ key, seed }) => localStorage.setItem(key, JSON.stringify(seed)), { key: RESOURCE_SAVE_KEY, seed })
+ await page.reload()
+ await enter()
+ const gearWarning = page.getByText('Planetary environment · Gear warning', { exact: true })
+ await expect(gearWarning).toBeVisible()
+ await expect(land).toBeEnabled()
+ await page.screenshot({ path: info.outputPath('compact-gear-warning.png') })
+ await gearWarning.press('Enter')
+ await expect(environment).toBeVisible()
+ await expect(environment).toContainText('Body-wide temperature range -180 to 180 °C')
+ await expect(environment).toContainText('Missing protection')
+ const localLine = await environment.getByText('Landing site ·', { exact: false }).textContent()
+ await expect(land).toBeEnabled()
+ await environment.getByText('Missing protection', { exact: false }).last().scrollIntoViewIfNeeded()
+ const a = await page.screenshot({ path: info.outputPath('scanned-cockpit.png') })
+ const b = await page.screenshot({ path: info.outputPath('scanned-cockpit-repeat.png') })
+ expect(compareImages(a, b).pass).toBe(true)
+ const hidden = await page.addStyleTag({ content: '.scanner-environment { visibility: hidden !important }' })
+ expect(compareImages(a, await page.screenshot({ path: info.outputPath('scanner-hidden.png') })).pass).toBe(false)
+ await hidden.evaluate(element => element.parentNode!.removeChild(element))
+
+ await land.click()
+ await page.clock.runFor(32)
+ const location = JSON.parse((await page.locator('main').getAttribute('data-scout-location'))!)
+ const surface = location.landing.surface
+ const expected = samplePlanetEnvironment(surface, surface.definition)
+ expect(localLine).toBe(`Landing site · ${expected.temperatureC} °C · radiation ${expected.radiationHpPerSecond} HP/s · toxicity ${expected.toxicityHpPerSecond} HP/s`)
+ await info.attach('scanner-site.json', { body: JSON.stringify({ scanner, surface, expected, localLine }), contentType: 'application/json' })
 })

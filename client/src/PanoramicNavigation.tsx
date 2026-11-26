@@ -18,6 +18,8 @@ import { setThrottle } from './simulation.ts'
 import { navigationWarnings } from './contact.ts'
 import type { NavigationRuntime } from './navigationRuntime.ts'
 import type { Body } from './sampleUniverse.ts'
+import type { SurfaceLocation } from './surfaceCoordinates.ts'
+import type { ScannerEnvironmentSource } from './scannerEnvironment.ts'
 import { useDismissLayer } from './ui/interaction.ts'
 import { FeedbackScope, StatusMessage } from './ui/Feedback.tsx'
 import './ui/tokens.css'
@@ -27,8 +29,9 @@ import './panoramic.css'
 /** Reusable presentation. The cockpit lifecycle owner supplies the runtime and
  * local view; no simulation, discovery or view lifetime belongs to the camera.
  */
-export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true, conditionWarning = '', takeoff, landing }: {
-  landing?: { denial: (bodyId: string) => string | null; activate: (bodyId: string) => void }
+export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true, conditionWarning = '', takeoff, landing, environment }: {
+  environment?: ScannerEnvironmentSource
+  landing?: { preview: (bodyId: string) => { denial: string | null; surface?: SurfaceLocation }; activate: (bodyId: string) => void }
   takeoff?: { denial: () => string | null; activate: () => void }; conditionWarning?: string; advanceSimulation?: boolean; navigation: NavigationRuntime; view: ObservationCameraState; canPilot?: () => boolean
   opticalBodies?: readonly Body[]
   isPaused?: () => boolean; onExit?: () => void; onSceneReady?: (state: RootState) => void
@@ -96,9 +99,10 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   const grounded = navigation.surfaceLocation
   const speed = Math.hypot(...ship.velocityMps)
   const approach = landingReadout(navigation)
+  const landingPreview = approach.body && landing?.preview(approach.body.id)
   const landingDenial = !canPilot() ? 'An authorized owner must pilot from the cockpit seat.'
     : isPaused() ? 'Resume the expedition before landing.'
-    : approach.body ? landing?.denial(approach.body.id) ?? null : 'Scan a target planet or moon before requesting landing.'
+    : approach.body ? landingPreview?.denial ?? null : 'Scan a target planet or moon before requesting landing.'
   const progress = landingProgress(navigation)
   const throttle = (value: number) => { if (canPilot() && !isPaused() && ship.mode === 'flying' && !document.querySelector('dialog[open]')) navigation.clock.state = setThrottle(navigation.clock.state, value); redraw(n => n + 1) }
   const dismiss = (e: { key: string; preventDefault(): void; stopPropagation(): void }) => {
@@ -135,7 +139,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       {ship.contact && <StatusMessage priority={ship.mode === 'destroyed' ? 'critical' : 'status'} tone={ship.mode === 'destroyed' ? 'danger' : 'info'}>{`${ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : ship.contact.outcome} · impact ${formatSpeed(ship.contact.impactSpeedMps)}`}</StatusMessage>}
       {!navigation.location && !grounded && (ship.mode === 'destroyed' || ship.mode === 'grounded') && <button className="ui-button ui-button--secondary" onClick={() => { navigation.reset(); view.reset(navigation.clock.state); redraw(n => n + 1) }}>Restart navigation</button>}
     </div>
-    <PerspectiveContacts destinationId={navigation.location?.landing?.surface.bodyId} compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
+    <PerspectiveContacts environment={environment} landingSurface={landingPreview?.surface} destinationId={navigation.location?.landing?.surface.bodyId} compact browserOpen={browser} onBrowserChange={setBrowser} scanner={navigation.scanner} geometry={navigation.bodies} view={view}
       getOrigin={() => navigation.clock.state.position} getShip={() => navigation.clock.state} canPilot={canPilot}
       onSetDirection={body => { navigation.clock.state = setContactDirection(navigation.scanner, navigation.clock.state, body.id, canPilot() && !isPaused() && !document.querySelector('dialog[open]')) }}/>
     <div className="panoramic-instruments"><OrientationCompass ship={ship} view={snapshot}/></div>
@@ -154,7 +158,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       {landing && ship.mode !== 'grounded' && ship.mode !== 'taking-off' && <div className="launch-control landing-control">
         <button className="ui-button" disabled={!!landingDenial} aria-describedby="landing-status landing-readings" onClick={() => {
           const target = landingReadout(navigation).body
-          if (target && canPilot() && !isPaused() && !document.querySelector('dialog[open]') && !landing.denial(target.id)) {
+          if (target && canPilot() && !isPaused() && !document.querySelector('dialog[open]') && !landing.preview(target.id).denial) {
             input.current.clear(); landing.activate(target.id); redraw(n => n + 1)
           }
         }}>Land</button>

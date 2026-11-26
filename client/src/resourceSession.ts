@@ -515,15 +515,31 @@ export class ResourceSession {
     const denial = this.scoutCommandDenial(revision, cockpitSession, actorId, action.kind === 'begin-takeoff')
     if (denial) return denial
     try {
-      const location = this.world.scoutLocation
-      const sites = this.captureSites(this.snapshot.sites)
-      const next = transitionScout(location, this.bindLandingRevision(action))
-      if (action.kind === 'begin-landing' || action.kind === 'begin-takeoff') {
-        const site = resolveSurface(action.kind === 'begin-takeoff' ? location.surface : next.surface)
-        validateSurfaceClearance(site, siteEntities(site, sites[site.id]))
-      }
+      this.previewScoutAction(action)
       return null
     } catch (error) { return error instanceof Error ? error.message : 'Scout transition rejected.' }
+  }
+  private previewScoutAction(action: ScoutAction) {
+    const location = this.world.scoutLocation
+    const sites = this.captureSites(this.snapshot.sites)
+    const next = transitionScout(location, this.bindLandingRevision(action))
+    if (action.kind === 'begin-landing' || action.kind === 'begin-takeoff') {
+      const site = resolveSurface(action.kind === 'begin-takeoff' ? location.surface : next.surface)
+      validateSurfaceClearance(site, siteEntities(site, sites[site.id]))
+    }
+    return next
+  }
+  landingPreview(bodyId: string): { denial: string | null; surface?: SurfaceLocation } {
+    const location = this.world.scoutLocation
+    const site = location.landing?.surface ?? (location.binding ? location.surface : undefined)
+    const surface = site?.bodyId === bodyId ? site : undefined
+    const denial = this.scoutCommandDenial(this.snapshot.revision, this.world.cockpit, LOCAL_PLAYER, false)
+    if (denial) return { denial, surface }
+    try {
+      return { denial: null, surface: this.previewScoutAction({ kind: 'begin-landing', bodyId }).surface }
+    } catch (error) {
+      return { denial: error instanceof Error ? error.message : 'Scout transition rejected.', surface }
+    }
   }
   /** Explicit commands are revision-bound and authorized against the live seat. */
   transitionScout(action: ScoutAction, revision: number, cockpitSession: CockpitState, actorId = LOCAL_PLAYER): boolean {

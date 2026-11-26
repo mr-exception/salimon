@@ -1,3 +1,19 @@
+## Live planetary bridge (#917)
+
+`ResourceSession.currentEnvironment` derives the admitted tick's physical player
+frame and canonical surface coordinates. Scout interior always samples 24°C and
+zero radiation/toxicity, independent of the door/Core. Production modules derive
+from functioning persistent equipment; exact wear updates those identities and
+moves exhausted modules to destroyed tombstones in the same health/exposure save.
+The legacy explicit source/module declaration API remains a controlled fixture
+boundary, with no production UI caller. Same-type absorption is proportional,
+split at depletion; actual environmental damage resets passive recovery.
+No admitted ticks means no environmental work or offline catch-up.
+
+Focused checks: `liveHazards.test.ts`, `hazards.test.ts`, `survival.test.ts` and
+built `tests/live-hazards.spec.ts`. Original evidence belongs in ignored
+`client/test-results/` and CI artifacts; the PR contains the validation record.
+
 # Browser hazard domain (#788)
 
 **Approved successor contract (#913):** [planetary survival and equipment](spacesuit-and-hazards.md) specifies proportional module consumption for #917, replacing the stable-ID allocation described below. This page describes the existing implementation, not delivery of #914–#922. Character equipment reset will replace retained budgets under that contract; legacy synthetic hazard fixtures remain revision-specific.

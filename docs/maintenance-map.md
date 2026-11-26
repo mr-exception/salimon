@@ -1,3 +1,8 @@
+Live planetary hazards (#917): `ResourceSession.currentEnvironment` owns physical
+safe boundaries and the sole-clock bridge to `hazards.ts`; `equipment.ts` owns
+identity/durability and destruction locations. `liveHazards.test.ts` and built
+`tests/live-hazards.spec.ts` cover physical sampling, pause, wear and rollback.
+
 # Feature maintenance map
 
 Adaptive metric UI (#910): `client/src/metricFormat.ts` owns display-only distance

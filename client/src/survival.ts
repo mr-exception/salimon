@@ -34,7 +34,7 @@ export function validateSurvival(value: unknown): SurvivalState {
   if (s.hunger > 0 && s.starvationTicks !== 0 || (s.hunger < METER * .7 || s.fatigue < METER * .5) && s.recoveryTicks !== 0) throw new Error('Invalid survival timer')
   return { ...s }
 }
-export function advanceSurvival(state: SurvivalState, ticks: number, damage?: (state: SurvivalState) => void): SurvivalState {
+export function advanceSurvival(state: SurvivalState, ticks: number, damage?: (state: SurvivalState) => void | boolean): SurvivalState {
   if (!Number.isSafeInteger(ticks) || ticks < 0) throw new RangeError('Invalid survival ticks')
   const s = validateSurvival(state)
   // A run lasts at most 228,000 ticks without consumables. Terminal time freezes.
@@ -45,8 +45,8 @@ export function advanceSurvival(state: SurvivalState, ticks: number, damage?: (s
     s.fatigue = Math.max(0, s.fatigue - 1)
     s.activeTicks++
     if (starving && ++s.starvationTicks === 600) { setHealth(s, exact.sub(healthValue(s), exact.ONE)); s.starvationTicks = 0 }
-    if (s.health > 0) damage?.(s)
-    if (s.hunger >= METER * .7 && s.fatigue >= METER * .5) {
+    const damaged = s.health > 0 && damage?.(s) === true
+    if (!damaged && s.hunger >= METER * .7 && s.fatigue >= METER * .5) {
       if (++s.recoveryTicks === 3600) { if (s.health > 0) setHealth(s, exact.add(healthValue(s), exact.ONE)); s.recoveryTicks = 0 }
     } else s.recoveryTicks = 0
   }

@@ -1,5 +1,8 @@
 # Salimon Expedition Interface — HUD and equipment UI art direction
 
+**Approved experience supplement (2026-11-26):** [Player experience](player-experience.md) and [atmosphere](audio-and-atmosphere.md) extend responsive layouts, help, errors, notifications, motion and audio. Existing semantic tokens, adaptive units, interaction and gameplay contracts retain authority.
+
+
 **Decision:** Owner-approved 2026-11-07, **hybrid industrial equipment + projected instrumentation**.
 **Status:** Approved presentation/style contract for the active React/browser client. The #826 shared foundation supplies scoped tokens, typed primitives and development fixtures; **#827 adopts compact 2D survival/inventory/context surfaces; other view migrations remain future work**. Existing production UI continues to operate until its own implementation issues are merged and verified. Screenshot generation does not approve a visual baseline.
 

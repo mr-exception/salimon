@@ -24,6 +24,7 @@
     "src",
     "tests",
     "playwright.config.ts",
+    "playwright.renderer.config.ts",
     "scripts"
   ]
 }

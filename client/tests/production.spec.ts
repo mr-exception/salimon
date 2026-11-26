@@ -106,3 +106,94 @@ test('built audio settings persist, a real door action plays, and muted warnings
  }
  await info.attach('audio-state.json', { body: JSON.stringify({ records, viewport: [1280, 800], dpr: 1 }, null, 2), contentType: 'application/json' })
 })
+
+test('built SVG round trips through the cockpit on one 60 Hz clock and reloads the same anchor', async ({ browser }, info) => {
+ test.setTimeout(120_000)
+ const { boot, scene } = await import('./worldJourney.ts')
+ const { ResourceSession, RESOURCE_SAVE_KEY } = await import('../src/resourceSession.ts')
+ const { createTopDownState, LAYERS, PLAYER_ID } = await import('../src/topDownRuntime.ts')
+ const { point2 } = await import('../src/topDownFrames.ts')
+ const { compareImages } = await import('../scripts/visual-comparison.ts')
+ const initial = createTopDownState('interior', true)
+ const world = { ...initial, entities: initial.entities.map(entity => entity.id === PLAYER_ID
+   ? { ...entity, anchor: { frame: 'ship:scout' as const, point: point2(0, -3.1) } } : entity) }
+ let raw = ''
+ const model = new ResourceSession({ getItem: () => raw || null, setItem: (_, value) => { raw = value } },
+   world, undefined, undefined, () => Date.parse('2026-11-04T00:00:01Z'))
+ model.upgrade(10000, 12)
+ expect(model.error).toBe('')
+ const captures = new Map<string, Buffer>()
+ const records = []
+ for (let repeat = 0; repeat < 2; repeat++) {
+   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, reducedMotion: 'reduce' })
+   const page = await context.newPage()
+   const errors: string[] = []
+   page.on('pageerror', error => errors.push(error.message))
+   try {
+     await page.addInitScript(({ key, seed }) => {
+       if (!localStorage.getItem(key)) localStorage.setItem(key, seed)
+     }, { key: RESOURCE_SAVE_KEY, seed: raw })
+     await boot(page, '', 'http://127.0.0.1:4175')
+     const main = page.locator('main')
+     const worldSvg = await scene(page).elementHandle()
+     const player = page.locator('[data-entity="person:player"]')
+     const ship = async () => JSON.parse((await main.getAttribute('data-ship'))!)
+     const ticks = async () => ({ world: Number(await main.getAttribute('data-tick')), ship: (await ship()).tick as number })
+     const measureSecond = async () => {
+       const before = await ticks()
+       for (let i = 0; i < 10; i++) await page.clock.fastForward(100)
+       const after = await ticks()
+       expect(after.world - before.world).toBeGreaterThanOrEqual(59)
+       expect(after.world - before.world).toBeLessThanOrEqual(61)
+       expect(after.ship - before.ship).toBe(after.world - before.world)
+       return after.world - before.world
+     }
+     const capture = async (name: string) => {
+       await page.mouse.move(0, 0)
+       const png = await page.screenshot({ path: info.outputPath(`${name}-${repeat}.png`) })
+       const first = captures.get(name)
+       if (!first) { captures.set(name, png); return }
+       const comparison = compareImages(first, png)
+       await info.attach(`${name}-diff.png`, { body: comparison.diff, contentType: 'image/png' })
+       expect(comparison.pass, `${name} changed ${comparison.changedPixels} pixels`).toBe(true)
+     }
+     expect(await scene(page).locator(':scope > [data-layer]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-layer')))).toEqual([...LAYERS])
+     const worldTicks = await measureSecond()
+     await capture('world')
+     let gpu = ''
+     const cockpitTicks = []
+     for (let round = 0; round < 3; round++) {
+       const before = await ship()
+       await page.keyboard.press('e')
+       await expect(main).toHaveAttribute('data-cockpit-view', 'radar')
+       await expect(page.locator('canvas')).toHaveCount(1)
+       await expect(player).toHaveAttribute('data-position', '0,-3.95')
+       if (round === 0) {
+         gpu = await page.locator('canvas').evaluate(canvas => {
+           const gl = (canvas as HTMLCanvasElement).getContext('webgl2')!
+           return gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info')!.UNMASKED_RENDERER_WEBGL) as string
+         })
+         expect(gpu).toContain('SwiftShader')
+       }
+       cockpitTicks.push(await measureSecond())
+       if (round === 0) await capture('panoramic')
+       await page.getByRole('button', { name: 'Exit cockpit', exact: true }).click()
+       await expect(main).toHaveAttribute('data-cockpit-view', 'world')
+       await expect(page.locator('canvas')).toHaveCount(0)
+       await expect(player).toHaveAttribute('data-position', '0,-3.1')
+       expect((await ship()).position).toEqual(before.position)
+       expect(await worldSvg!.evaluate(svg => svg.isConnected)).toBe(true)
+     }
+     await page.evaluate(() => window.dispatchEvent(new Event('pagehide')))
+     const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
+     expect(saved.location.anchor.frame).toBe('ship:scout')
+     await page.reload()
+     await expect.poll(async () => { await page.clock.runFor(50); return scene(page).getAttribute('data-render-ready') }).toBe('true')
+     await expect(player).toHaveAttribute('data-position', '0,-3.1')
+     await expect(player).toHaveAttribute('data-frame', 'ship:scout')
+     expect(errors).toEqual([])
+     records.push({ repeat, gpu, worldTicks, cockpitTicks, savedLocation: saved.location, errors })
+   } finally { await context.close() }
+ }
+ await info.attach('renderer-production-state.json', { body: JSON.stringify({ records, viewport: [1280, 800], dpr: 1 }, null, 2), contentType: 'application/json' })
+})

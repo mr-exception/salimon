@@ -399,7 +399,7 @@ for (const viewport of [{ width: 960, height: 600 }, { width: 1280, height: 720 
   await page.goto('/tests/panoramic.html')
   await expect.poll(async () => { await page.clock.runFor(64); return (await state(page))?.renderer }).toContain('SwiftShader')
   await expect(page.locator('.selected-contact')).toHaveCount(0)
-  await expect(page.locator('.scanner-readings')).toContainText('Range 100,000 ls · FOV 75.0°')
+  await expect(page.locator('.scanner-readings')).toContainText('Range 29.98 Tm · FOV 75.0°')
   await capture(page, 'default.png', info)
   await acquireContacts(page); await page.clock.runFor(64)
   // Full-viewport projection still supports the existing mouse selection path.

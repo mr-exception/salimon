@@ -1109,3 +1109,7 @@ validity/time-scale contracts; they do not imply observed-body playable adoption
 ## Persistent equipment owner (#914)
 
 `client/src/equipment.ts` provides trusted definitions and a single persistent ownership graph in `ResourceInventory.equipment`. Inventory/ledger consumers derive capacity and payload from that graph. The ResourceSession v18 adapter validates the whole graph before atomic replacement and generation-bound terminal reset. See [save contract](save-contract.md#persistent-equipment-schema-v18-914). No source sampling or equipment UI is added by this foundation.
+
+## Ship-only equipment transactions (#915)
+
+`scoutEquipment.ts` derives one next ownership graph for move or explicit two-suit switch, then the session validates carry/storage capacity and current physical admission before a single save. Installed modules follow suit custody; no implicit swaps or discards. Drawer/module storage are tier-1 preinstalled compartments at the existing cargo cabinet reach anchor; tiers 2/3 are definitions only, with no upgrade command. The two endpoint capacities have no extra weight cap. The live render/input clock is unchanged; UI #920 consumes this adapter.

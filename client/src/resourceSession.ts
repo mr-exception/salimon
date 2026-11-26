@@ -1,3 +1,4 @@
+import { applyGearCommand, gearCommandDenial, type GearCommand } from './scoutEquipment.ts'
 import { freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
 import { validateDeployedMarkers } from './fieldMarker.ts'
 import { FABRICATOR_INPUT_ID, FABRICATOR_RECIPE_ID, FABRICATOR_GRAMS, FABRICATOR_TICKS, FABRICATOR_WATTS, FABRICATOR_ITEMS, MARKER_KIT_ID, freshFabricator, validateFabricator, fabricatorSpentJ60, stepFabricator, type FabricatorState } from './scoutFabricator.ts'
@@ -535,6 +536,20 @@ export class ResourceSession {
     return true
   }
   /** Future environment adapter boundary. Sources are sampled, never restored as live planet data. */
+  /** Domain adapter for #920 UI. Revalidate physical admission and carry/storage capacity at publication. */
+  changeEquipment(command: GearCommand, revision: number): boolean {
+    if (this.error || !survivalPolicy(this.survival).canWork) return false
+    try {
+      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw Error('Stale equipment revision')
+      const before = this.snapshot.inventory.equipment!
+      const equipment = applyGearCommand(before, command)
+      const denial = gearCommandDenial(this.world, before, equipment)
+      if (denial) throw Error(denial)
+      const inventory = { ...this.snapshot.inventory, equipment }
+      resourceInventoryUsage(inventory, RESOURCE_CATALOG, this.itemCatalog)
+      return this.commit({ ...this.snapshot, inventory, survival: this.survival, hazards: this.hazards })
+    } catch (error) { this.feedback = (error as Error).message; return false }
+  }
   setHazardSources(sources: readonly HazardSource[]): void {
     hazardRates(sources)
     this.sources = structuredClone([...sources])

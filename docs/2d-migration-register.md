@@ -1,5 +1,8 @@
 # 2D documentation migration register
 
+**Forward art contract (2026-11-26):** [Browser art direction](browser-art-direction.md) and [delivery map](art-implementation-map.md) refine active future 2D presentation. Historical native requirements remain historical; new approval does not change shipped status or migrate any native code.
+
+
 Planetary exploration V1 (#847–#853) delivers versioned canonical geology,
 continuous illustrated regional walking, mineral deposits, deliberate landmarks/marks
 and schema-v13 sparse persistence in the React/TypeScript browser.

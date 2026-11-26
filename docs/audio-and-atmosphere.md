@@ -10,3 +10,30 @@ Minimal ambient electronic music, sparse melody/synth/orchestral textures, delib
 Natural walk, smooth short turn, settle, breathing, tool/machine motion, restrained damage and collapse; visuals never delay controls. Smooth centered bounded follow, no auto rotation/aggressive look-ahead, keep player clear of HUD, instant option. Bounded smooth wheel zoom/reset, panel scrolling takes priority, no reconnaissance leak. Temporary cyan destination marker, rejected marker with reason, selected approach target, clear on arrival/cancel; no persistent paths/selection ring. 2D↔panoramic sensor transition 250–400 ms fade, no clock/camera reset or changed admission. State-driven engine startup/lift/acceleration/coast/landing/touchdown, no speed-based fake star streaks or airborne vacuum sound. Physical sky, sparse plausible stars, planet silhouettes and atmosphere, minimal overlays, no grid/overdone flare. Vibration rare: none routine, optional damage, light startup, restrained thrust, brief touchdown/collision; visual/input transforms consistent, disable option.
 Warnings normal/advisory/warning/critical, actual exposure/protection/damage thresholds, persistent visual + controlled sound cadence, deduplicate; information transient, warning contextual, critical prominent; no focus theft or routine interruption. Fast dialog fades 100–200 ms, context menu immediate, confirmation/rejection/completion/tactile transfers, no hover sound spam.
 Accessibility: independent music/environment/warnings etc, stereo/mono, camera smoothing, vibration off/reduced/full, flashing off/reduced, motion/interface effects off/reduced/normal, heat distortion off, particle reduction, essential non-color/non-audio cues. Initial values provisional. Seven acceptance scenes: quiet Scout, expedition, gathering, hazard, power loss, flight/landing, accessibility; test triggers/lifecycle/disposal and actual audible/visual review. No new simulation state or hazard mechanics.
+
+## Browser audio foundation (#942)
+
+The browser expedition uses a single native Web Audio graph shared across its
+2D and cockpit views. Native Web Audio supplies gain buses, timed fades,
+stereo panning, low-pass filters, decoded buffer reuse and direct lifecycle
+control. A library such as Howler would simplify codec fallbacks and playback
+conveniences, while adding a dependency and leaving the expedition's scope
+and event management in application code. Help → Audio settings controls
+independent gains and centered mono playback. Preferences use a separate
+browser storage key from the expedition and remain independent of save versions.
+
+The initial cues are short original mono sounds for the committed boarding-door
+transition and the existing persistent survival warning. Visual warnings remain
+available at zero gain and when the browser cannot play audio. The manager
+drops cues before a trusted input unlock, discards pending sounds when the
+view, visibility or play state changes, and stops audio on expedition end.
+Sound observes the domain's existing state. Sound never advances it.
+
+Authoring WAVs are in `art/sources/audio/`, and compressed runtime clips are in
+`client/assets/audio/`. These original Salimon placeholders are redistributable
+with the project. Encode mono runtime clips offline with
+`ffmpeg -i SOURCE.wav -map_metadata -1 -ac 1 -c:a libmp3lame -b:a 64k CLIP.mp3`.
+Opus at 32 kb/s was smaller for these two few-hundred-millisecond clips.
+MP3 was chosen for broad browser decoding support and adds about 2.7 kB across
+both clips compared with the Opus exports. Use codec and seamless-loop tests
+when longer music or environmental content is authored.

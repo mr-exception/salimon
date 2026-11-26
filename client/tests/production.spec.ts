@@ -29,3 +29,80 @@ test('built production serves a deterministic art manifest and decodable assets'
  expect(decoded).toEqual([[49, 49], [256, 256]])
  await info.attach('art-manifest.json', { body: JSON.stringify({ manifest, decoded }, null, 2), contentType: 'application/json' })
 })
+
+test('built audio settings persist, a real door action plays, and muted warnings stay visible', async ({ browser }, info) => {
+ const { boot, scene } = await import('./worldJourney.ts')
+ const { ResourceSession, RESOURCE_SAVE_KEY } = await import('../src/resourceSession.ts')
+ const { createTopDownState, PLAYER_ID } = await import('../src/topDownRuntime.ts')
+ const { point2 } = await import('../src/topDownFrames.ts')
+ const { AUDIO_PREFERENCES_KEY } = await import('../src/audio/audioManager.ts')
+ const { compareImages } = await import('../scripts/visual-comparison.ts')
+ let raw = ''
+ const initial = createTopDownState('interior', true)
+ const world = { ...initial, entities: initial.entities.map(entity => entity.id === PLAYER_ID
+   ? { ...entity, anchor: { frame: 'ship:scout' as const, point: point2(0, 4.7) } } : entity) }
+ const model = new ResourceSession({ getItem: () => raw || null, setItem: (_, value) => { raw = value } },
+   world, undefined, undefined, () => Date.parse('2026-11-04T00:00:01Z'))
+ model.survival = { ...model.survival, health: 39 }
+ model.checkpoint()
+ const records = []
+ let original: Buffer | undefined
+ for (let repeat = 0; repeat < 2; repeat++) {
+   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, reducedMotion: 'reduce' })
+   const page = await context.newPage()
+   try {
+     await page.addInitScript(({ key, seed }) => {
+       if (!localStorage.getItem(key)) localStorage.setItem(key, seed)
+       const started: { channels: number; duration: number }[] = []
+       Object.defineProperty(window, 'playedCues', { value: started })
+       const start = AudioBufferSourceNode.prototype.start
+       AudioBufferSourceNode.prototype.start = function (...args: Parameters<typeof start>) {
+         start.apply(this, args)
+         if (this.buffer) started.push({ channels: this.buffer.numberOfChannels, duration: this.buffer.duration })
+       }
+     }, { key: RESOURCE_SAVE_KEY, seed: raw })
+     const played = () => page.evaluate(() => Reflect.get(window, 'playedCues') as { channels: number; duration: number }[])
+     await boot(page, '', 'http://127.0.0.1:4175')
+     expect(await played()).toEqual([])
+     const gameplayBefore = await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)
+     await page.getByRole('button', { name: 'Help' }).click()
+     await page.getByText('Audio settings', { exact: true }).click()
+     const warnings = page.getByRole('slider', { name: /Warnings volume/ })
+     await warnings.focus()
+     await page.keyboard.press('Home')
+     await page.getByRole('checkbox', { name: 'Mono positional audio' }).check()
+     await expect(warnings).toHaveValue('0')
+     expect(await page.evaluate(key => localStorage.getItem(key), RESOURCE_SAVE_KEY)).toBe(gameplayBefore)
+     await page.mouse.move(0, 0)
+     const capture = await page.screenshot({ path: info.outputPath(`audio-settings-${repeat}.png`) })
+     if (original) {
+       const result = compareImages(original, capture)
+       await info.attach('audio-settings-diff.png', { body: result.diff, contentType: 'image/png' })
+       expect(result.pass, `Audio settings repeat changed ${result.changedPixels} pixels`).toBe(true)
+     } else original = capture
+     await page.keyboard.press('Escape')
+     await expect(page.getByRole('status').filter({ hasText: 'Low health · critical condition.' })).toBeVisible()
+     await page.getByRole('button', { name: 'Close door', exact: true }).click()
+     await page.clock.runFor(34)
+     await expect(page.locator('[data-entity="scout:entry"]')).toHaveAttribute('data-door-state', 'closed')
+     await expect.poll(played).toHaveLength(1)
+     const [cue] = await played()
+     expect(cue.channels).toBe(1)
+     expect(cue.duration).toBeGreaterThan(.25)
+     const codecs = await page.evaluate(() => {
+       const audio = new Audio()
+       return { mp3: audio.canPlayType('audio/mpeg'), opus: audio.canPlayType('audio/ogg; codecs=opus') }
+     })
+     expect(codecs.mp3).toBeTruthy()
+     await page.reload()
+     await expect.poll(async () => { await page.clock.runFor(50); return scene(page).getAttribute('data-render-ready') }).toBe('true')
+     await expect(page.locator('[data-entity="scout:entry"]')).toHaveAttribute('data-door-state', 'closed')
+     await expect(page.getByRole('status').filter({ hasText: 'Low health · critical condition.' })).toBeVisible()
+     expect(await played()).toEqual([])
+     const preferences = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), AUDIO_PREFERENCES_KEY)
+     expect(preferences).toMatchObject({ volumes: { warnings: 0 }, mono: true })
+     records.push({ repeat, cue, codecs, preferences })
+   } finally { await context.close() }
+ }
+ await info.attach('audio-state.json', { body: JSON.stringify({ records, viewport: [1280, 800], dpr: 1 }, null, 2), contentType: 'application/json' })
+})

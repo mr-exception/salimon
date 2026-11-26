@@ -10,6 +10,8 @@ import { MarkerDeployment } from './MarkerDeployment.tsx'
 import { ExplorationHud, FieldMarkCues } from './ExplorationHud.tsx'
 import { GeneratedGround } from './GeneratedGround.tsx'
 import { BOARDING_DOOR_ID } from './scoutDoor.ts'
+import { SCOUT_ANCHORS } from './scoutLayout.ts'
+import { ExpeditionAudioSettings, useExpeditionAudio } from './audio/ExpeditionAudio.tsx'
 import { cancelGroundMovement, groundFromView, interactiveAt, requestGroundMovement } from './topDownNavigation.ts'
 import { relativeAnchor, worldToView, type Anchor, viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
@@ -240,7 +242,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         return
       }
       if (event.code === 'KeyP' && !event.repeat && acceptsFlightShortcut(event.target)) {
-        paused.current = !paused.current; clear(); return
+        paused.current = !paused.current; clear(); current.current = { ...current.current }; setState(current.current); return
       }
       if (paused.current || session.current?.survival.health === 0 || current.current.scoutLocation.ship.mode === 'destroyed' && event.code !== 'Escape') return
       if (event.code === 'KeyE' && isCockpitTarget(current.current.selectedId) && session.current && (!!session.current.error || !survivalPolicy(session.current.survival).canWork)) return
@@ -355,6 +357,20 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     vital && vital.hunger < METER * .2 ? 'Low hunger · starvation at zero. Movement and mining reduced.' : '',
     vital && vital.fatigue > 0 && vital.fatigue <= METER * .5 ? 'Low fatigue · movement reduced; mining reduced at 20 or below.' : '',
   ].filter(Boolean).join(' ')
+  const ended = state.scoutLocation.ship.mode === 'destroyed' || vital?.health === 0
+  const audio = useExpeditionAudio({
+    enabled: gameplay,
+    active: !!resourceSession && !resourceSession.error && !paused.current && !ended,
+    view: ended ? 'ended' : state.cockpit.view,
+    warning,
+    door: state.scoutLocation.boardingDoor,
+    doorPosition: () => {
+      const playerAnchor = state.entities.find(entity => entity.id === PLAYER_ID)?.anchor
+      if (!playerAnchor || (state.frames.ship.parent === null && playerAnchor.frame !== state.frames.ship.id)) return undefined
+      const offset = worldToView(relativeAnchor(SCOUT_ANCHORS.entry, playerAnchor, state.frames), state.frames)
+      return { rightM: offset[0], distanceM: Math.hypot(...offset) }
+    },
+  })
   const gatherBlocked = selectedSource && resourceSession?.equipped && usage && !resourceSession.activeSourceId ? selectedSource.remainingGrams === 0 ? 'Source depleted. No material remains.' : usage.grams >= resourceSession.snapshot.inventory.capacityGrams ? 'Inventory full: weight limit.' : !resourceSession.snapshot.inventory.quantities[selectedSource.resourceId] && usage.slots >= resourceSession.snapshot.inventory.capacitySlots ? 'Inventory full: slot limit.' : '' : ''
   const canAct = state.scoutLocation.ship.mode !== 'destroyed' && !(cockpitTarget && !state.cockpit.powered) && !gatherBlocked && !!selected?.interaction && !paused.current && !resourceSession?.error && vital?.health !== 0 && !(cockpitTarget && vital && !survivalPolicy(vital).canWork) && !(selectedSource && resourceSession?.equipped && vital && !survivalPolicy(vital).canWork)
   const commandStatus = commandFeedback(state, resourceSession?.activeSourceId, resourceSession?.feedback)
@@ -397,6 +413,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <button onClick={() => {setHelpOpen(false);session.current?.cancel();setNotebookOpen(true)}}>Inspect / mark</button>
       <button onClick={() => {setHelpOpen(false);setScoutGuiding(value => !value)}}>Return to Scout</button>
       <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>
+      {gameplay && <ExpeditionAudioSettings audio={audio} />}
     </Dialog>
     {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
       <PanoramicNavigation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}

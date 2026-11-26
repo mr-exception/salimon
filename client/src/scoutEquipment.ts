@@ -29,6 +29,8 @@ export function applyGearCommand(value: EquipmentState, command: GearCommand): E
   if (Object.keys(command).sort().join() !== expected.sort().join()) throw Error('Invalid equipment command fields')
   const item = state.instances.find(g => g.id === command.id)
   if (!item || item.location.kind === 'destroyed' || !sameLocation(item.location, command.from)) throw Error('Equipment source changed or unavailable')
+  const reserved=(location:GearLocation)=>location.kind==='bench'||location.kind==='installed'&&state.instances.some(g=>g.id===location.suitId&&g.location.kind==='bench')
+  if(reserved(item.location)||command.kind==='move'&&reserved(command.to))throw Error('Suit and attached modules are reserved by the bench')
   validDestination(command.from)
   if (command.kind === 'move') {
     validDestination(command.to)

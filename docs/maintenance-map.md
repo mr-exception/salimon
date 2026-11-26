@@ -1,3 +1,8 @@
+Spacesuit repair (#919): `gearBench.ts` owns exact repair requests/receipts and
+final power charges; `resourceSession.ts` owns exclusive suit custody and atomic
+restoration/claim. `scoutEquipment.ts` locks attached modules while reserved.
+`suitRepair.test.ts` and production `REPAIR-919` cover the contract.
+
 Gear Crafting Bench (#918): `gearBench.ts` owns trusted recipes/receipts and exact
 work; `resourceSession.ts` owns schema v19, atomic reservations/claims and ordered
 shared power. `ResourceContainerPanel.tsx` and its interaction adapter reuse the

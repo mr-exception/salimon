@@ -124,8 +124,13 @@ The suit leaves its source into exclusive bench custody; it cannot be equipped,
 transferred or reserved twice. No full-health suit or module repair. Choose exact
 positive rational HP up to missing durability; charge **ceil(requested HP) g
 mineral**, restore only requested HP, no free fractional repair. Progress is
-**20 HP/s**, **2 kW**; at most **1,000 g / 50 seconds**, with exact final partial
-tick payment and no unpaid restoration. Completion moves the same identity into
+**20 HP/s**, **2 kW**; at most **1,000 g / 50 seconds**, with a final partial
+tick charge rounded up to the Core’s exact 1/60 J unit and no unpaid restoration.
+The material ceiling and energy ceiling are independent; HP restoration never
+rounds up. The suit must be carried to the bench first; drawer access retains
+its own proximity requirement. Bench custody locks attached module changes too.
+Terminal new-character reset preserves bench-held suit/module identities as
+machine contents across the new character generation. Completion moves the same identity into
 the output tray, then explicit capacity-checked claim returns it to inventory.
 No cancellation; power loss pauses, reload retains custody, failed writes roll
 back all endpoints. Repair above zero reactivates a destroyed suit.
@@ -149,3 +154,15 @@ backpacks and multiplayer are outside this slice. Historical fire/burn/acid
 examples are not current implementation requirements. #922 owns the combined
 actual-control expedition acceptance; controlled damaged-suit fixtures prove
 repair because natural suit damage is deferred.
+
+
+### Repair delivery (#919)
+
+`gearBench.ts` persists exact requested/initial HP and completed repair receipts,
+including mineral and paid-energy derivation. Optional repair fields extend the
+v19 bench state compatibly; older v19 craft-only saves remain valid. Reserved
+suits contribute stored ship mass exactly once through equipment ownership;
+completed repairs do not add a second tray suit. Claim returns that identity to
+inventory only after both capacity checks pass. Full/partial/fractional, zero-HP,
+custody, rollback and terminal-reset cases are in `suitRepair.test.ts`; the built
+production console flow is `REPAIR-919` in `tests/gear-bench.spec.ts`.

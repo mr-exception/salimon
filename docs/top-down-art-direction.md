@@ -1,5 +1,8 @@
 # Strict top-down illustrated 2D direction
 
+**Approved refinement (2026-11-26):** [Browser art direction](browser-art-direction.md) defines semi-realistic illustration, character layers, scale, detail hierarchy, contextual highlights and the previously unresolved low-wall/adaptive occlusion convention. [Production](art-production-guide.md) owns asset specifications; [renderer evaluation](browser-rendering-architecture.md) is conditional, not a migration claim.
+
+
 **Status: owner-approved art direction (2026-11-04), delivered as the default
 browser world.** The Scout cutaway, fixed landing area, outdoor walking, source
 inspection/gathering, doorway frame handoff and panoramic cockpit are playable.

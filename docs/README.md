@@ -1,5 +1,10 @@
 # Salimon project documents
 
+## Approved browser art and player experience (2026-11-26)
+
+Start with the [master browser art contract](browser-art-direction.md). Companion specifications: [production](art-production-guide.md), [renderer evaluation](browser-rendering-architecture.md), [Scout/equipment](equipment-art-direction.md), [planetary visuals](planetary-visual-production.md), [audio/atmosphere](audio-and-atmosphere.md), [player experience](player-experience.md), [delivery map](art-implementation-map.md). These are owner-approved future presentation targets, not runtime delivery; existing gameplay and acceptance contracts remain authoritative.
+
+
 > **Start with the 2D client:** [Code-checked browser status](current-client-status.md) and the [complete documentation migration register](2d-migration-register.md). Each legacy 3D file is classified by implementation status and future overhead-view relevance; old Rust completion notes do not mean the feature is available in the current game.
 
 Follow the authoritative [visual style](visual-style.md) for art decisions.

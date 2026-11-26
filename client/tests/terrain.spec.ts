@@ -1,3 +1,4 @@
+import {validateEquipment} from '../src/equipment.ts'
 import {test,expect} from '@playwright/test'
 import {ResourceSession,RESOURCE_SAVE_KEY} from '../src/resourceSession.ts'
 import {createTopDownState,PLAYER_ID} from '../src/topDownRuntime.ts'
@@ -27,7 +28,15 @@ function terrainSave() {
   let raw:string|null=null
   const session=new ResourceSession({getItem:()=>raw,setItem:(_:string,value:string)=>{raw=value}},world,undefined,undefined,()=>Date.parse('2026-11-04T00:00:00Z'))
   expect(session.error).toBe('')
-  raw=JSON.stringify(session.snapshot,(_,v)=>typeof v==='bigint'?String(v):v)
+  // This is a prior expedition at hostile Caligo, not the safe Vesper opening.
+  // Use the two approved slots to survive the bounded collision journey while
+  // retaining real exposure, exact wear, health loss and terminal behavior.
+  const gear=session.snapshot.inventory.equipment!,suit=gear.instances[0]!
+  const equipment=validateEquipment({...gear,instances:[
+    suit,{...gear.instances[1]!,definitionId:'module:temperature:t3'},
+    {id:'gear:0:terrain-radiation',definitionId:'module:radiation:t3',remaining:'1000/1',location:{kind:'installed',suitId:suit.id,slot:1}},
+  ]})
+  raw=JSON.stringify({...session.snapshot,inventory:{...session.snapshot.inventory,equipment}},(_,v)=>typeof v==='bigint'?String(v):v)
   return {raw:raw!,start,region,definition}
 }
 
@@ -82,6 +91,9 @@ test('TERRAIN-848 built movement stops at sampled steep rock, renders shared tru
   await page.evaluate(()=>window.dispatchEvent(new Event('pagehide')))
   const saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RESOURCE_SAVE_KEY)
   expect(saved.scout.surface.definition).toEqual(fixture.definition)
+  expect(saved.survival.health).toBeGreaterThan(0)
+  expect(saved.survival.health).toBeLessThan(200)
+  for(const module of saved.inventory.equipment.instances.slice(1))expect(module.remaining).not.toBe('1000/1')
   await page.reload();await page.clock.runFor(200)
   await expect.poll(()=>physicalPosition()).toEqual(stopped)
   await walkTicks(page,'a',40);expect((await physicalPosition())[0]).toBeLessThan(stopped[0]-1)

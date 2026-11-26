@@ -7,19 +7,78 @@
       "category": "prop",
       "status": "placeholder",
       "essential": true,
-      "pivot": [0.5, 0.5],
-      "physicalSize": [0.7, 0.7],
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "physicalSize": [
+        0.7,
+        0.7
+      ],
       "density": 64,
       "footprintRef": "scout:chair",
-      "parts": [{ "id": "base", "layer": "entities", "source": "scout/chair.png", "content": [2, 2, 45, 45] }],
-      "anchors": { "seat": "chair" },
-      "states": { "idle": ["base"] },
+      "parts": [
+        {
+          "id": "base",
+          "layer": "entities",
+          "source": "scout/chair.png",
+          "content": [
+            2,
+            2,
+            45,
+            45
+          ]
+        }
+      ],
+      "anchors": {
+        "seat": "chair"
+      },
+      "states": {
+        "idle": [
+          "base"
+        ]
+      },
       "provenance": {
         "origin": "Original Salimon placeholder derived from the in-repository Scout chair illustration",
         "license": "LicenseRef-Salimon-Project",
         "attribution": "Salimon contributors",
         "redistributable": true,
-        "references": ["client/src/TopDownIllustration.tsx"]
+        "references": [
+          "client/src/TopDownIllustration.tsx"
+        ]
+      }
+    },
+    {
+      "id": "ui.seat",
+      "revision": 1,
+      "category": "icon",
+      "status": "placeholder",
+      "essential": false,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "parts": [
+        {
+          "id": "base",
+          "layer": "hud",
+          "source": "icons/seat.svg"
+        }
+      ],
+      "anchors": {},
+      "states": {
+        "idle": [
+          "base"
+        ]
+      },
+      "provenance": {
+        "origin": "Original Salimon seat icon placeholder",
+        "license": "LicenseRef-Salimon-Project",
+        "attribution": "Salimon contributors",
+        "redistributable": true,
+        "references": [
+          "client/src/TopDownIllustration.tsx"
+        ]
       }
     }
   ]

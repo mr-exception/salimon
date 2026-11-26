@@ -1,4 +1,4 @@
-import { validateBench, validateBenchGear, benchReserved, BENCH_INPUT_ID, GEAR_RECIPES, type BenchState } from './gearBench.ts'
+import { validateBench, validateBenchGear, repairGrams, benchReserved, BENCH_INPUT_ID, GEAR_RECIPES, type BenchState } from './gearBench.ts'
 import { equipmentMass, GEAR_DEFINITIONS } from './equipment.ts'
 import type { FieldMark } from './exploration.ts'
 import { validateFabricator, FABRICATOR_INPUT_ID, FABRICATOR_GRAMS, MARKER_KIT_ID, type FabricatorState } from './scoutFabricator.ts'
@@ -113,6 +113,7 @@ export function validateResourceLedger(
     const b=validateBench(ledger.bench), reserved=benchReserved(b)
     validateBenchGear(b,ledger.inventory.equipment!)
     for(const [id,count] of Object.entries(b.completed))for(const resource of ['mineral','biomass'] as const)credit(totals,resource,GEAR_RECIPES[id]![resource]*count)
+    for(const r of b.repairs??[])credit(totals,'mineral',repairGrams(r))
     if(reserved)for(const resource of ['mineral','biomass'] as const)credit(totals,resource,reserved[resource])
     const input=ledger.stores[BENCH_INPUT_ID]
     if(input&&resourceStoreMass(input,resources)+(reserved?reserved.mineral+reserved.biomass:0)>input.capacityGrams)throw Error('Bench reservation exceeds buffer')
@@ -175,6 +176,6 @@ export function resourceLedgerMass(ledger: ResourceLedger, shipId: string, playe
     if (store.shipId === shipId) storeGrams = sum(storeGrams, grams)
   }
   if (shipId === 'ship:scout' && ledger.fabricator) storeGrams = sum(storeGrams, (ledger.fabricator.job?.reservedGrams ?? 0) + (ledger.fabricator.tray ? FABRICATOR_GRAMS : 0))
-  if(shipId === 'ship:scout' && ledger.bench) { const r=benchReserved(ledger.bench); storeGrams=sum(storeGrams,(r?r.mineral+r.biomass:0)+(ledger.bench.tray?GEAR_DEFINITIONS[ledger.bench.tray.recipeId]!.grams:0)) }
+  if(shipId === 'ship:scout' && ledger.bench) { const r=benchReserved(ledger.bench); storeGrams=sum(storeGrams,(r?r.mineral+r.biomass:0)+(ledger.bench.tray&&!ledger.bench.tray.repair?GEAR_DEFINITIONS[ledger.bench.tray.recipeId]!.grams:0)) }
   return { playerGrams, storeGrams, shipGrams: sum(storeGrams, playerAboard ? sum(playerGrams, gear?.equippedGrams ?? 0) : 0) }
 }

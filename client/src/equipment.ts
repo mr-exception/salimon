@@ -1,6 +1,6 @@
 import { cmp, decode, decimal, ZERO } from './exact.ts'
 
-export type GearLocation = { readonly kind: 'inventory' | 'equipped' | 'drawer' | 'module-storage' | 'destroyed' } | { readonly kind: 'installed'; readonly suitId: string; readonly slot: 0 | 1 }
+export type GearLocation = { readonly kind: 'inventory' | 'equipped' | 'drawer' | 'bench' | 'module-storage' | 'destroyed' } | { readonly kind: 'installed'; readonly suitId: string; readonly slot: 0 | 1 }
 export interface GearInstance { readonly id: string; readonly definitionId: string; readonly remaining: string; readonly location: GearLocation }
 export interface EquipmentState { readonly version: 1; readonly generation: number; readonly instances: readonly GearInstance[] }
 export interface GearDefinition { readonly kind: 'suit' | 'module'; readonly grams: number; readonly protection: number; readonly hazard?: 'temperature' | 'radiation' | 'poison'; readonly tier?: number }
@@ -28,7 +28,7 @@ export function validateEquipment(value: unknown): EquipmentState {
   const ids = new Set<string>(), occupied = new Set<string>()
   const instances: GearInstance[] = state.instances.map(raw => {
     const g = record(raw, ['id', 'definitionId', 'remaining', 'location'])
-    if (typeof g.id !== 'string' || !/^gear:[0-9]+:[a-zA-Z0-9_-]{1,100}$/.test(g.id) || !g.id.startsWith(`gear:${state.generation}:`) || ids.has(g.id)) throw Error('Invalid or duplicate equipment identity')
+    if (typeof g.id !== 'string' || !/^gear:[0-9]+:[a-zA-Z0-9_-]{1,100}$/.test(g.id) || Number(g.id.split(':')[1]) > (state.generation as number) || ids.has(g.id)) throw Error('Invalid or duplicate equipment identity')
     ids.add(g.id)
     if (typeof g.definitionId !== 'string' || !Object.hasOwn(GEAR_DEFINITIONS, g.definitionId)) throw Error('Unknown equipment definition')
     const definition = GEAR_DEFINITIONS[g.definitionId]!, hp = decode(g.remaining)
@@ -37,7 +37,7 @@ export function validateEquipment(value: unknown): EquipmentState {
     const kind = (g.location as GearLocation).kind
     const location = record(g.location, kind === 'installed' ? ['kind', 'suitId', 'slot'] : ['kind'])
     if (definition.kind === 'suit') {
-      if (!['inventory', 'equipped', 'drawer'].includes(kind)) throw Error('Invalid suit owner')
+      if (!['inventory', 'equipped', 'drawer', 'bench'].includes(kind)) throw Error('Invalid suit owner')
       if (kind === 'equipped') { if (occupied.has('equipped')) throw Error('Duplicate equipped suit'); occupied.add('equipped') }
     } else {
       if (!['inventory', 'module-storage', 'installed', 'destroyed'].includes(kind) || (cmp(hp, ZERO) === 0) !== (kind === 'destroyed')) throw Error('Invalid module owner/durability')

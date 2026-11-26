@@ -1,3 +1,4 @@
+import * as q from './exact.ts'
 import { gearName } from './equipment.ts'
 import { GEAR_RECIPES, BENCH_WATTS } from './gearBench.ts'
 import { useState } from 'react'
@@ -84,17 +85,24 @@ function FabricatorTelemetry({ interaction, onChange }: { interaction: ResourceC
 }
 
 function BenchTelemetry({interaction,onChange}:{interaction:ResourceContainerInteraction;onChange:()=>void}) {
- const [recipe,setRecipe]=useState('suit:basic')
+ const [recipe,setRecipe]=useState('suit:basic'), [suitId,setSuitId]=useState(''), [repairHp,setRepairHp]=useState('1')
  const {bench:b}=interaction.session.snapshot,r=GEAR_RECIPES[recipe]!,job=b.job
+ const suits=interaction.session.snapshot.inventory.equipment!.instances.filter(g=>g.definitionId==='suit:basic'&&g.location.kind==='inventory')
  const reason=interaction.machineBlocked||(job?'One bench job is active.':b.tray?'Claim the output tray first.':undefined)
  return <section aria-label="Gear bench job and output">
   <label>Equipment recipe<select value={recipe} onChange={e=>setRecipe(e.target.value)}>{Object.keys(GEAR_RECIPES).map(id=><option key={id} value={id}>{gearName(id)}</option>)}</select></label>
   <p>{r.mineral} g mineral + {r.biomass} g biomass · {r.ticks/60} s at {BENCH_WATTS} W</p>
   <p>Recipe input minus equipment mass is consumed without byproducts.</p>
   <p data-bench-status>{b.tray?'Complete · output ready':job?job.powerPaused?'Paused · insufficient power':'Powered · crafting':'Ready'}</p>
-  {job&&<><Progress label="Gear crafting progress" value={GEAR_RECIPES[job.recipeId]!.ticks-job.remainingTicks} max={GEAR_RECIPES[job.recipeId]!.ticks} unit="ticks"/><p>{job.remainingTicks} paid ticks remaining · {gearName(job.recipeId)}</p></>}
+  {job&&<><Progress label="Gear crafting progress" value={(job.repair?Math.ceil(q.number(q.decode(job.repair.amount))*3):GEAR_RECIPES[job.recipeId]!.ticks)-job.remainingTicks} max={job.repair?Math.ceil(q.number(q.decode(job.repair.amount))*3):GEAR_RECIPES[job.recipeId]!.ticks} unit="ticks"/><p>{job.remainingTicks} paid ticks remaining · {job.repair?'Suit repair':gearName(job.recipeId)}</p></>}
   <Button disabledReason={reason} onClick={()=>{interaction.startBench(recipe);onChange()}}>Start gear crafting</Button>
-  <p data-bench-tray>Output tray: {b.tray?gearName(b.tray.recipeId):'Empty'}</p>
+  <fieldset><legend>Repair a carried unequipped spacesuit</legend>
+    <label>Spacesuit to repair<select value={suitId} onChange={e=>setSuitId(e.target.value)}><option value="">Choose a suit</option>{suits.map((g,i)=><option key={g.id} value={g.id}>Suit {i+1} · {q.number(q.decode(g.remaining))} / 1000 HP · {g.location.kind}</option>)}</select></label>
+    <label>HP to restore<input value={repairHp} onChange={e=>setRepairHp(e.target.value)} inputMode="decimal" /></label>
+    <p>1 g mineral per HP, rounded up · 20 HP/s at 2 kW. Modules stay attached unchanged.</p>
+    <Button disabledReason={reason||(!suitId?'Choose an unequipped suit.':undefined)} onClick={()=>{try{const amount=repairHp.includes('/')?q.encode(q.decode(repairHp)):q.encode(q.decimal(Number(repairHp)));interaction.repairSuit(suitId,amount)}catch{interaction.failed=true;interaction.message='Enter a positive HP amount or exact fraction.'}onChange()}}>Start suit repair</Button>
+  </fieldset>
+  <p data-bench-tray>Output tray: {b.tray?b.tray.repair?'Repaired spacesuit':gearName(b.tray.recipeId):'Empty'}</p>
   {b.tray&&<Button disabledReason={interaction.machineBlocked} onClick={()=>{interaction.claimBench();onChange()}}>Claim equipment</Button>}
  </section>
 }

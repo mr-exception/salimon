@@ -86,6 +86,14 @@ export class ResourceContainerInteraction {
     this.failed=!ok;this.message=ok?'Saved: gear job started. Inputs reserved once.':this.session.feedback
     return ok
   }
+  repairSuit(suitId:string,amount:string):boolean {
+    this.synchronize(this.session.world)
+    if(!this.opened||this.equipment!=='bench')return false
+    this.discard()
+    const ok=this.session.startSuitRepair(suitId,amount,this.session.snapshot.revision)
+    this.failed=!ok;this.message=ok?'Saved: suit and minerals reserved for repair.':this.session.feedback
+    return ok
+  }
   claimBench():boolean {
     this.synchronize(this.session.world)
     if(!this.opened||this.equipment!=='bench')return false

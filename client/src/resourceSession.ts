@@ -1,4 +1,5 @@
-import { BENCH_ID, BENCH_INPUT_ID, BENCH_WATTS, GEAR_RECIPES, freshBench, validateBench, benchSpentJ60, stepBench, type BenchState } from './gearBench.ts'
+import * as q from './exact.ts'
+import { BENCH_ID, BENCH_INPUT_ID, BENCH_WATTS, benchTickCost, repairCost, repairGrams, validateRepair, GEAR_RECIPES, freshBench, validateBench, benchSpentJ60, stepBench, type BenchState } from './gearBench.ts'
 import { SCOUT_SAFE_ENVIRONMENT, ENVIRONMENT_PUBLICATION, validateEnvironmentPublication, samplePlanetEnvironment, bodyEnvironmentSummary } from './planetEnvironment.ts'
 import { applyGearCommand, gearCommandDenial, type GearCommand } from './scoutEquipment.ts'
 import { functioningEquipment, GEAR_DEFINITIONS, freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
@@ -619,11 +620,30 @@ export class ResourceSession {
       return this.commit({...this.snapshot,stores:{...this.snapshot.stores,[BENCH_INPUT_ID]:{...input,quantities}},bench:{...b,started:b.started+1,job:{id:b.started+1,recipeId,remainingTicks:r.ticks,powerPaused:false}}})
     }catch(e){this.feedback=(e as Error).message;return false}
   }
+  startSuitRepair(suitId:string,amount:string,revision:number):boolean {
+    try{
+      this.benchAdmission(revision)
+      const b=this.snapshot.bench,e=this.snapshot.inventory.equipment!,suit=e.instances.find(g=>g.id===suitId)
+      if(b.job||b.tray)throw Error('Bench job or output tray occupied')
+      if(!suit||GEAR_DEFINITIONS[suit.definitionId]!.kind!=='suit'||suit.location.kind!=='inventory')throw Error('Carry an unequipped suit to the bench')
+      const repair={suitId,amount,initial:suit.remaining};validateRepair(repair)
+      const input=this.snapshot.stores[BENCH_INPUT_ID]!,grams=repairGrams(repair),quantities={...input.quantities}
+      if((quantities.mineral??0)<grams)throw Error('Insufficient unreserved mineral for repair')
+      quantities.mineral=(quantities.mineral??0)-grams;if(!quantities.mineral)delete quantities.mineral
+      const equipment=validateEquipment({...e,instances:e.instances.map(g=>g.id===suitId?{...g,location:{kind:'bench'}}:g)})
+      return this.commit({...this.snapshot,inventory:{...this.snapshot.inventory,equipment},stores:{...this.snapshot.stores,[BENCH_INPUT_ID]:{...input,quantities}},bench:{...b,started:b.started+1,job:{id:b.started+1,recipeId:'repair',repair,remainingTicks:Math.ceil(repairCost(repair)/BENCH_WATTS),powerPaused:false}}})
+    }catch(e){this.feedback=(e as Error).message;return false}
+  }
   claimBench(jobId:number,revision:number):boolean {
     try{
       this.benchAdmission(revision)
       const b=this.snapshot.bench,t=b.tray,e=this.snapshot.inventory.equipment!
       if(!t||jobId!==t.jobId)throw Error('Stale bench claim')
+      if(t.repair){
+        const inventory={...this.snapshot.inventory,equipment:validateEquipment({...e,instances:e.instances.map(g=>g.id===t.repair!.suitId?{...g,location:{kind:'inventory'}}:g)})}
+        resourceInventoryUsage(inventory,RESOURCE_CATALOG,this.itemCatalog)
+        return this.commit({...this.snapshot,inventory,bench:{...b,tray:null,repairs:b.repairs!.map(r=>r.jobId===jobId?{...r,claimed:true}:r)}})
+      }
       const gearId=`gear:${e.generation}:bench-${jobId}`
       const inventory={...this.snapshot.inventory,equipment:validateEquipment({...e,instances:[...e.instances,{id:gearId,definitionId:t.recipeId,remaining:'1000/1',location:{kind:'inventory'}}]})}
       resourceInventoryUsage(inventory,RESOURCE_CATALOG,this.itemCatalog)
@@ -695,7 +715,7 @@ export class ResourceSession {
   freshRun(): boolean {
     if (this.error || this.survival.health !== 0) return false
     const next = freshSurvival(this.now())
-    if (!this.commit({ ...this.snapshot, inventory: { ...this.snapshot.inventory, equipment: freshEquipment(this.snapshot.inventory.equipment!.generation + 1) }, hazards: { ...this.hazards, exposure: freshHazards().exposure }, survival: next })) return false
+    if (!this.commit({ ...this.snapshot, inventory: { ...this.snapshot.inventory, equipment: { ...freshEquipment(this.snapshot.inventory.equipment!.generation + 1), instances: [...freshEquipment(this.snapshot.inventory.equipment!.generation + 1).instances, ...this.snapshot.inventory.equipment!.instances.filter(g=>g.location.kind==='bench'||g.location.kind==='installed'&&this.snapshot.inventory.equipment!.instances.some(s=>s.id===(g.location as {suitId:string}).suitId&&s.location.kind==='bench'))] } }, hazards: { ...this.hazards, exposure: freshHazards().exposure }, survival: next })) return false
     this.survival = next
     this.equipped = false
     return true
@@ -772,7 +792,7 @@ export class ResourceSession {
       let reserve=machine.core.reserveJ60
       const pay=(watts:number,paused=false)=>{if(!Number.isSafeInteger(watts)||watts<0||watts>machine.core.capacityJ*60)throw Error('Invalid Core power request');if(paused||watts>reserve)return 0;reserve-=watts;return watts}
       if(this.snapshot.fabricator.job)fabricatorPaid=pay(FABRICATOR_WATTS)
-      if(this.snapshot.bench.job)benchPaid=pay(BENCH_WATTS)
+      if(this.snapshot.bench.job)benchPaid=pay(benchTickCost(this.snapshot.bench.job))
       if(!this.snapshot.fabricator.job&&!this.snapshot.bench.job)otherPaid=pay(power.watts,power.paused)
       const drawn=fabricatorPaid+benchPaid+otherPaid
       machine.core={...machine.core,tick:next.tick,reserveJ60:reserve,spentJ60:machine.core.spentJ60+drawn}
@@ -801,10 +821,14 @@ export class ResourceSession {
       this.hazardEvents.push(...result.events)
       return result.events.some(e => e.damage !== '0/1')
     } : undefined)
-    const inventory = live ? { ...this.snapshot.inventory, equipment: { ...equipment, instances: equipment.instances.map(g => {
+    let inventory = live ? { ...this.snapshot.inventory, equipment: { ...equipment, instances: equipment.instances.map(g => {
       const changed = worn.find(m => m.id === g.id)
       return changed ? { ...g, remaining: changed.remaining, location: changed.remaining === '0/1' ? { kind: 'destroyed' as const } : g.location } : g
     }) } } : this.snapshot.inventory
+    if(bench.tray?.repair&&!this.snapshot.bench.tray){
+      const repair=bench.tray.repair
+      inventory={...inventory,equipment:validateEquipment({...inventory.equipment!,instances:inventory.equipment!.instances.map(g=>g.id===repair.suitId?{...g,remaining:q.encode(q.add(q.decode(repair.initial),q.decode(repair.amount)))}:g)})}
+    }
     this.world = (next.frames.surface?.source ?? next.frames) === next.scoutLocation.frames ? next
       : next.frames.ship === next.scoutLocation.frames.ship ? { ...next, frames: next.scoutLocation.frames }
       : materializeSite(synchronizeScout(next), this.snapshot.sites)

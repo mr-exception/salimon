@@ -1,7 +1,8 @@
 ## Gear Bench and shared consumer order (#918)
 
-The preinstalled `scout:gear-bench` at (1.95, −0.1 m) uses the existing shared
-industrial console and context-menu/auto-approach adapter. Its independent
+The preinstalled `scout:gear-bench` at (2.2, −0.1 m) uses the existing shared
+industrial console and context-menu/auto-approach adapter. Its shallow wall-mounted
+footprint and matching art preserve the starboard crate-to-cockpit passage. Its independent
 `scout:gear-bench:input` stores 50,000 g including active reservations. Recipes
 and 2,000 W work use `gearBench.ts`; the approved table is in
 [the survival contract](spacesuit-and-hazards.md#gear-crafting-bench-918-and-repair-919).

@@ -1101,3 +1101,7 @@ validity/time-scale contracts; they do not imply observed-body playable adoption
 ## Opening and recovered investigations (#470 / #471)
 
 [Opening/investigation contract](opening-and-investigations.md): runtime `session/narrative.rs` owns complete-packet lead admission, fixed ground-bound physical clues, modal inspections and schema-31 receipts; universe `scanner/chart.rs` owns explicit unverified same-frame route snapshots. Runtime tests, `scripts/verify_narrative.py`, existing canonical mine/carry/Fabricator persistence and production audio exports form the acceptance matrix. Scientific full-Gaia acceptance remains #524.
+
+## Approved planetary survival contract (#913)
+
+[Survival and equipment](spacesuit-and-hazards.md) owns approved gear identities, mass/custody, environment publication, proportional wear, bench recipes/power order and repair rounding. #914–#922 deliver these separately; this contract publication changes no runtime behavior.

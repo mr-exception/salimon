@@ -1,5 +1,8 @@
 # Browser hazard domain (#788)
 
+**Approved successor contract (#913):** [planetary survival and equipment](spacesuit-and-hazards.md) specifies proportional module consumption for #917, replacing the stable-ID allocation described below. This page describes the existing implementation, not delivery of #914–#922. Character equipment reset will replace retained budgets under that contract; legacy synthetic hazard fixtures remain revision-specific.
+
+
 `client/src/hazards.ts` implements the deterministic subset of the approved
 [spacesuit design](spacesuit-and-hazards.md). Normal gameplay declares **no hazard
 sources or modules**. This is a simulation/save boundary for later environment

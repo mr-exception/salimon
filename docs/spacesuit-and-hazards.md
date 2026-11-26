@@ -1,43 +1,151 @@
 # Spacesuits, gear storage and environmental hazards
 
-**Status (2026-11-05): owner-approved gameplay design, not yet shipped.** Extends [unified weight-based inventory and gathering](resource-inventory-and-gathering.md). The [browser hazard domain](browser-hazards.md) now implements temperature, radiation/poison exposure, exact module budgets and durable session integration (#788). Normal gameplay has no hazard sources or modules; protective suits, gear bench and equipment crafting remain unimplemented.
+**Approved contract (#913), 2026-11-26; not an implementation claim.**
+The existing [hazard domain](browser-hazards.md) and
+[Core/Fabricator](browser-core-fabricator-vertical-slice.md) are foundations.
+Delivery is split across #914–#922. See [current browser status](current-client-status.md).
 
-## Suit ownership, configuration and crafting
+## Equipment and custody
 
-- The player **starts with one basic suit equipped**, may own multiple suits, can intentionally remove a suit and leave the ship unprotected, and manually chooses the suitable suit for each expedition. Suits do **not** have tiers.
-- Each base suit has **two protection-module slots**. Protection modules are installed into a particular suit and can be upgraded using materials; suit modules, not suit tiers, define environmental specialization. Temperature, radiation, poisonous/acidic atmosphere, poison puddles, fire and ice protection are example families. A module affects only its supported hazard categories; cross-category coverage must be explicitly defined.
-- Suits may also have passive movement-speed modifiers or physical-damage protection; exact values, compatibility and tier progression for these effects are **TBD**.
-- A **Gear Crafting Bench**, built in the spaceship, will craft additional suits and modules and support future upgrades. Until built, the initial basic suit remains usable; exact bench recipes, research gates, swapping locations and installation rules are **TBD**.
-- Potential later expansion examples (not approved as working mechanics): a backpack granting personal inventory **12 → 16 slots** plus **two additional suit module slots**; a resource pack granting **+20 kg** weight capacity. Whether these occupy the two base protection slots, separate attachment slots or other positions is **TBD**. No volume stat applies.
+A tierless basic suit weighs **3,000 g**, has **1,000 HP repairable durability**
+and **two module slots**, with no intrinsic protection or movement penalty.
+A fresh character starts with this suit equipped and one temperature T1 installed;
+the gathering tool is unchanged. Removing the suit is allowed. Zero-HP suits
+remain equipped but inactive until deliberately removed/replaced; their modules
+remain intact. No new source of suit damage is approved in this slice.
 
-## Storage
+Temperature, radiation and poison modules have tiers T1/T2/T3: **2/5/10 HP/s**
+protection, **500/1,000/1,500 g** mass, and **1,000 HP** nonrepairable absorption
+budget each. Higher tiers are crafted independently, not upgrades consuming an
+older instance. Same-type modules add; different types act independently.
+Durability uses exact rational HP, never a rounded display value.
 
-- **Spacesuit Drawer** tier 1/2/3 stores **4 / 8 / 12 suits**, one complete unequipped suit per slot, modules included.
-- **Protection Module Storage** tier 1/2/3 stores **12 / 16 / 24 uninstalled modules**, one per slot when the item stack size is 1.
-- Uninstalled modules can instead occupy shared player inventory slots and their mass contributes to the player's **10 kg** default weight cap. Complete suits/gear are count-based items when carried; exact item masses are TBD.
-- The former resource storage module is renamed **Resource Container**, holds only raw resources and starts at **50 kg**. Ship-side storage has **no volume constraints**; drawer and module-storage total weight caps are TBD.
+Every suit/module has one persistent unique identity, trusted definition and
+single ownership location. A module belongs to inventory, module storage, or one
+specific slot on one suit. A suit belongs to inventory, drawer, or the equipped
+location. Stored/carried suits retain installed module identities and durability.
+Destroyed modules become unavailable permanently; preserve tombstone identities
+so reload cannot resurrect/reuse them. Malformed definitions, duplicate IDs,
+aliased ownership and out-of-range durability reject the whole save.
 
-## Universal player health and hazard intensity
+Equip/unequip, suit switching, installation and transfers are atomic and allowed
+only **inside Scout**, with current ship-frame/reach admission checked at commit.
+No implicit swap, discard or field equipment change. Full destinations reject
+without changing either endpoint; failed/stale writes publish no changed state.
 
-- Base player maximum health is fixed at **200 HP**; no maximum-health upgrade is approved yet.
-- Hazard intensity and module protection use **HP per second**, including fractional values. Multiple simultaneous sources of the *same type* add their intensity before protection is subtracted **once**. Different hazard types accumulate and recover independently, but all actual damage affects the same 200 HP pool.
-- Effective intensity = `max(0, sum(hazard sources HP/s) - effective module protection HP/s)`. This is the rate used for direct hazard damage or the hazard's exposure buildup, depending on hazard behavior.
-- **Exposure hazards:** radiation and poisonous atmospheres/puddles build a separate 0–100 exposure meter before dealing health damage; outside exposure there is no direct exposure-hazard damage. The buildup rate is the effective intensity in points/s. At **100 points**, that hazard's HP-damage effect activates while exposed; exiting the hazard stops exposure-only damage immediately.
-- **Direct + buildup hazards:** fire and the selected acidic-burn example deal effective HP damage immediately while exposed and also build a 0–100 meter. Full fire buildup causes **approximately five seconds of lingering burn damage** after leaving the fire; precise tick/refresh/cancellation rules remain TBD. Example: 10 HP/s acid plus 2 HP/s extra when full, against 9 HP/s protection, yields 1 HP/s initially and 3 HP/s at full buildup.
-- **Direct-only hazards:** temperature differences produce HP damage while exposed without a buildup meter or lingering damage. Reference ideal temperature is **24°C**; raw damage is `abs(temperatureC - 24) / 10` HP/s. A temperature module with 2 HP/s protection makes **4°C–44°C** safe inclusive under this formula.
-- All exposure meters recover **independently** after leaving the corresponding hazard: **5 points/s + active corresponding module protection HP/s**. Recovery requires no module durability. Reentering before reaching zero retains the residual exposure. Recovery modifiers and any treatment equipment are future decisions.
+Unequipped carried suits and loose modules each use one shared inventory slot.
+A carried suit's mass includes its installed modules. Equipped gear consumes no
+personal carry capacity; all gear aboard, including equipped gear, counts exactly
+once in ship payload. Gear outside Scout does not count aboard. No volume stat.
+The preinstalled tier-1 **Spacesuit Drawer** stores **4** suits (tiers 2/3: **8/12**);
+preinstalled **Protection Module Storage** stores **12** loose modules (tiers 2/3:
+**16/24**). No additional storage mass cap. Actual storage upgrades are deferred.
+The raw-only Resource Container remains separate.
 
-## Module protection and destruction
+Legacy saves gain the starter set exactly once when migrated to the equipment
+schema. Ordinary reload never grants gear. Existing progress, ledger, depletion,
+machine state and earlier migrations survive. Explicit terminal new-character
+reset retains the existing expedition world/ledger policy but replaces all old
+character equipment with one fresh starter set; advance a persisted equipment
+generation so old IDs cannot reappear. This supersedes #788's retain-module-budget
+reset for character equipment. It grants no raw materials or other items.
 
-- Every protection module has a universal **1,000 HP absorption budget**, separate from its protection strength in HP/s.
-- It loses durability **only** when it actually blocks incoming hazard intensity, including preventing buildup on exposure hazards. Consumption per second is `min(incoming intensity HP/s, available protection HP/s)`, subject to the budget left. Do **not** charge twice for preventing both exposure and health damage from the same intensity.
-- No passive durability loss from time equipped or distance traveled. Faster buildup recovery does **not** spend durability.
-- When the remaining budget reaches zero, the module is **destroyed permanently** and provides no protection or recovery bonus. It needs replacement, not repair. Precise mid-tick destruction and installed-item removal presentation are implementation details.
-- Protective strength upgrades can change HP/s absorption but the universal 1,000 HP capacity stays the baseline unless a separate owner decision changes it.
+## Environmental publication and safe boundary
 
-## Not yet specified
+#916 owns a versioned, immutable supplemental environmental publication, keyed
+by canonical packaged world seed/body identity and body-fixed region coordinates.
+It must not change existing terrain/resource digests or infer atmosphere from names.
+Use canonical sorted-key UTF-8 FNV-1a-64 hashing (the existing definition digest),
+domain-separated by environmental version and field. Regional temperature is a
+bounded deterministic integer in **−180..180°C**; body-wide radiation and toxicity
+baselines are bounded deterministic integers in **0..20 HP/s**. Scanner summaries
+state the supported range separately from a local sample. Queries use bounded
+work with no mutable random generator, elapsed time or cache residency inputs.
+Missing legacy publication binds explicitly to environmental v1; unknown future
+versions reject rather than silently resample. Catalog revisions retain their
+saved canonical body reference. Exact hash keys/bucketing belong to the versioned
+implementation and its tests; algorithm changes require a new publication.
 
-- Exact damage and buildup rules for every hazard category (especially pressure, oxygen, gravity and chemical status).
-- Hazard intensity sources, authoritative multiplayer sampling and combined exposure behavior at transitions.
-- Worn suit physical mass, base suit stats and equipment-vs-inventory mass attribution.
-- Suit switching/accessibility, module compatibility, bench recipes, storage weight caps, post-destruction notifications and medical treatment.
+Vesper's authored **starting region** is safe: on the positive-Y hemisphere,
+inside the inclusive **±128 m east/north square** in the canonical starting tangent
+chart centered on radial +Y. Boundary is physical, independent of landing position,
+walking chart or region cache. It is **24°C, 0 radiation, 0 toxicity**; beyond it
+use generated values. Scout interior is always the same safe sample, regardless
+of door or Core power. No weather, day/night, pressure or oxygen simulation.
+
+## Exposure, absorption and health
+
+Player maximum health remains **200 HP**. Temperature directly damages at
+`abs(T − 24) / 10 HP/s`, without buildup. T1 makes 4..44°C safe inclusive.
+Radiation and poison independently accumulate **0..100** exposure points at
+`max(0, incoming − active protection)` points/s, then damage at that same HP/s
+only during the exposed time at 100. Same-type source rates sum before protection;
+different types share only the health pool. Leaving a hazard stops its damage
+immediately and recovers its meter at **5 + active protection** points/s, without
+budget cost. Reentry retains residual exposure.
+
+Actual blocked intensity consumes durability once, including prevented buildup.
+For active same-type modules with strengths p_i, let B = min(incoming, sum(p_i)).
+Each spends **B × p_i / sum(p_i)** HP/s. Split exactly at the earliest depletion,
+remove the exhausted module from its slot atomically, then recompute for remaining
+time/modules. Stable-ID sequential allocation in #788 is **superseded by this
+proportional policy** for #917; source/ID ordering cannot favor a module. No passive
+wear, no recovery wear, no double charge for exposure and damage. Zero suit HP
+disables intact installed modules. Passive health regeneration is suppressed
+while actual environmental HP damage occurs. Use ResourceSession's sole admitted
+60 Hz clock: pause/hidden/offline admit no hazard or machine progress. Health,
+exposure, equipment budgets/removal and events commit or roll back together.
+
+## Gear Crafting Bench (#918) and repair (#919)
+
+Preinstall one reachable bench: separate **50 kg raw input**, one job, one output
+item tray, **2 kW active draw**, explicit claim, no cancellation/offline progress.
+Reuse exact reservations/revision checks and Core accounting. On each sole world
+tick, convert Core fuel first, then pay **Fabricator before Gear Crafting Bench**;
+only a fully paid tick progresses its job. Insufficient energy pauses without
+partial progress or double spending. A full tray blocks starting another job;
+full carry leaves output untouched. Unreserved input alone can be withdrawn.
+
+| Recipe | Mineral g | Biomass g | Seconds | Output g |
+| --- | ---: | ---: | ---: | ---: |
+| Basic suit | 2000 | 1000 | 60 | 3000 |
+| Temperature T1 | 400 | 100 | 15 | 500 |
+| Radiation T1 | 500 | 0 | 15 | 500 |
+| Poison T1 | 200 | 300 | 15 | 500 |
+| Any T2 module | 1500 | 500 | 30 | 1000 |
+| Any T3 module | 3000 | 1000 | 60 | 1500 |
+
+Recipe input minus output is declared consumed material with no byproduct, never
+extra payload. Claim creates a unique fresh full-durability instance once.
+
+Repair reserves an **unequipped** suit identity (including zero HP), attached
+modules unchanged, and requested missing HP, in the same single-job bench.
+The suit leaves its source into exclusive bench custody; it cannot be equipped,
+transferred or reserved twice. No full-health suit or module repair. Choose exact
+positive rational HP up to missing durability; charge **ceil(requested HP) g
+mineral**, restore only requested HP, no free fractional repair. Progress is
+**20 HP/s**, **2 kW**; at most **1,000 g / 50 seconds**, with exact final partial
+tick payment and no unpaid restoration. Completion moves the same identity into
+the output tray, then explicit capacity-checked claim returns it to inventory.
+No cancellation; power loss pauses, reload retains custody, failed writes roll
+back all endpoints. Repair above zero reactivates a destroyed suit.
+
+## Presentation and exclusions
+
+#920 adds shared Expedition Interface equipment/storage UI with context actions,
+auto-approach, accessible disabled reasons, confirmation and focus/Escape rules.
+Show actual committed suit HP, two slots, module type/tier/protection/HP, capacities,
+outside temperature, actual damage HP/s and independent exposure meters. Warn
+once on downward **20% / 5%** module-budget crossings, with a prominent temporary
+destruction notice; clear resolved warnings, avoid color-only signals and spam.
+
+#921 extends only scanner-authorized contacts: body range/baselines, local values
+only for an actually supported selected landing site, and current functioning
+gear assessment. Unknown/unscanned information stays unknown; lost scan clears
+stale assessment. Missing/insufficient gear warns but never blocks landing.
+
+Future fire/acid/impact, oxygen/pressure, weather, ship construction, medical,
+backpacks and multiplayer are outside this slice. Historical fire/burn/acid
+examples are not current implementation requirements. #922 owns the combined
+actual-control expedition acceptance; controlled damaged-suit fixtures prove
+repair because natural suit damage is deferred.

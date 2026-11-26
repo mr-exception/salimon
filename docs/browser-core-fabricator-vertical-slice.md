@@ -243,3 +243,7 @@ remote automation or server authority. Future **suits**, **planetary hazards**
 **multiplayer** and **propulsion energy** remain deferred. Flight retains its
 unlimited-energy prototype; cabin power is separate. Wider economy, equipment,
 recipes, full charting and native systems are outside this acceptance claim.
+
+## Approved planetary survival contract (#913)
+
+[Survival and equipment](spacesuit-and-hazards.md) owns approved gear identities, mass/custody, environment publication, proportional wear, bench recipes/power order and repair rounding. #914–#922 deliver these separately; this contract publication changes no runtime behavior.

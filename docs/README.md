@@ -89,3 +89,7 @@ the contracts without implying these tools or assets exist in the current client
 - [Phase 0 evaluation](phase-0-evaluation.md)
 - [Legacy Salimon hub notes](legacy-salimon-hub.md) — older entity/buffer concept, separate from the current space game.
 - [All issues](https://github.com/mr-exception/salimon/issues)
+
+## Approved planetary survival contract (#913)
+
+[Survival and equipment](spacesuit-and-hazards.md) owns approved gear identities, mass/custody, environment publication, proportional wear, bench recipes/power order and repair rounding. #914–#922 deliver these separately; this contract publication changes no runtime behavior.

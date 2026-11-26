@@ -1,5 +1,8 @@
 # Salimon visual style
 
+**Active forward browser art authority (2026-11-26):** [Browser art direction](browser-art-direction.md) and its companion contracts supersede conflicting historical presentation and native authoring requirements. Existing gameplay contracts remain authoritative; delivery status is separate.
+
+
 > **UI/HUD companion (approved future design, 2026-11-07):** [Expedition Interface style guide](hud-ui-style-guide.md) governs shared browser HUD, dialogs, buttons, equipment surfaces, semantic typography/colors and interaction feedback. It preserves this page's illustrated world-art identity and does **not** claim the style system is implemented.
 
 ## Active 2D visual language

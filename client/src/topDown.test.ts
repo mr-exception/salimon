@@ -200,3 +200,15 @@ test('universal ship-up projection and screen-direction input agree at every shi
     }
   }
 })
+
+test('wall-mounted gear bench preserves the full Core-to-cockpit walking route and its own reach',()=>{
+ const state=createTopDownState('interior'),points=[[0,3],[0,.45],[1.35,.45],[1.35,-1.65],[0,-1.65],[0,-3.1]] as const
+ const objects=state.entities.filter(e=>e.layer!=='people')
+ for(let i=1;i<points.length;i++){
+  const [x,y]=points[i-1]!,[nx,ny]=points[i]!
+  const anchor:Anchor={frame:'ship:scout',point:point2(x,y)}
+  assert.equal(allowedMove(anchor,rotate2([nx-x,ny-y],state.frames.ship.angle),objects,state.frames),1,`blocked cockpit segment ${i}`)
+ }
+ const bench=state.entities.find(e=>e.id==='scout:gear-bench')!
+ assert.equal(interactionInReach({frame:'ship:scout',point:point2(.8,1.1)},bench,state.frames),true)
+})

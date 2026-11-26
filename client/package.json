@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts",
     "test:browser": "playwright test",
-    "benchmark:renderer": "SALIMON_RENDERER_BENCHMARK=1 playwright test --project=renderer",
+    "benchmark:renderer": "playwright test --config playwright.renderer.config.ts",
     "test:browser:negative": "node scripts/negative-navigation.mjs",
     "test:visual": "playwright test --project=navigation-captures",
     "test:visual:negative": "node scripts/negative-visual.mjs && node scripts/negative-panoramic.mjs",

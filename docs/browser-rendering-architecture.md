@@ -9,9 +9,9 @@ Diagnostics development-only: footprints, anchors, chunks, layers, IDs, timings,
 
 ## Reproduce the renderer comparison (#939)
 
-From `client/`, run `npm ci`, `npm run build`, then
+From `client/`, run `npm ci`, then
 `CHROMIUM_PATH=/path/to/chromium npm run benchmark:renderer`. The opt-in
-Playwright project builds and serves a separate fixture at port 4375. The
+Playwright configuration builds and serves a separate fixture at port 4375. The
 ordinary Vite entry and build graph contain the existing SVG production adapter.
 The fixture uses a fixed seed, 960×600 CSS pixels at DPR 1, two trials per
 renderer and density, 20 warm-up frames, and 90 real animation-frame intervals

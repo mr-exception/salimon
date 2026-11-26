@@ -1276,3 +1276,13 @@ this presentation layer. See the [scanner guide](../client/README.md#scanner-env
 ## Ship equipment transactions (#915)
 
 `scoutEquipment.ts` owns explicit move/switch commands, tier-capacity declarations and live ship-frame/cabinet reach admission. The preinstalled drawer and module compartment are independent of raw storage but share its existing cargo-cabinet physical reach anchor. `ResourceSession.changeEquipment` checks revision, carry usage and save publication atomically. `scoutEquipment.test.ts` owns endpoint/capacity/boundary/failure tests; separately built `tests/equipment-transfers.html` exercises the production adapter with actual movement. Full player-facing equipment actions are #920.
+
+## Planetary environment (#916)
+
+`planetEnvironment.ts` owns supplemental v1 rules/digest, local sample and body
+summary. `ResourceSession.environmentAt/environmentSummary` supplies the saved
+publication/body reference. `planetEnvironment.test.ts` owns cross-process golden
+vectors, bounded property checks, safe edges, eviction/return and save migration.
+See [exact environment contract](browser-planet-surface.md#deterministic-planetary-environment-916).
+Changing environmental rules requires a publication/migration, never a renderer
+or cache tweak. Live hazards/scanner remain with #917/#921.

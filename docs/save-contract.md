@@ -853,3 +853,13 @@ The existing storage key remains unchanged. `inventory.equipment` owns version-1
 ## Equipment ownership transitions (#915)
 
 Equipment moves retain schema v18 and all IDs/exact HP. Drawer and module storage use separate location kinds in the same instance graph; installed modules remain attached across suit transfer/reload. Move commands name expected origin; switch commands explicitly name the equipped identity and its destination. Full destinations, stale revisions, field/remote access and failed writes preserve the whole previous graph. Destroyed module tombstones cannot transfer. Capacity tiers are trusted definitions, not editable save metadata.
+
+## Environmental publication binding (#916)
+
+Schema v18 gains the supplemental `environmentPublication` metadata field.
+Absent legacy metadata explicitly binds to environmental v1 `f9512d32ccbcfd7e`;
+reading does not rewrite saves. The next successful atomic commit persists that
+binding with the existing equipment, ledger and site state; failures retain the
+old bytes. Unknown/null publications reject rather than silently resampling.
+Terrain/body references remain unchanged and pin the existing catalog revisions.
+No baseline region sample is saved. See [environment keys and compatibility](browser-planet-surface.md#deterministic-planetary-environment-916).

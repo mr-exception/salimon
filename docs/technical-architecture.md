@@ -1113,3 +1113,14 @@ validity/time-scale contracts; they do not imply observed-body playable adoption
 ## Ship-only equipment transactions (#915)
 
 `scoutEquipment.ts` derives one next ownership graph for move or explicit two-suit switch, then the session validates carry/storage capacity and current physical admission before a single save. Installed modules follow suit custody; no implicit swaps or discards. Drawer/module storage are tier-1 preinstalled compartments at the existing cargo cabinet reach anchor; tiers 2/3 are definitions only, with no upgrade command. The two endpoint capacities have no extra weight cap. The live render/input clock is unchanged; UI #920 consumes this adapter.
+
+## Planetary environmental publication (#916)
+
+`client/src/planetEnvironment.ts` owns immutable supplemental environmental v1,
+canonical seed/body/cell keys, finite local queries and body summary/range. It
+uses `planetDefinition.ts` for frozen world identity and `surfaceCoordinates.ts`
+for region classification, independent of streaming/render residency. The session
+pins `environmentPublication` and uses saved body references for queries.
+[Surface contract](browser-planet-surface.md#deterministic-planetary-environment-916)
+defines exact hashing, safe boundary, ranges and legacy compatibility. The live
+hazard adapter (#917) and scanner/UI (#920/#921) are separate consumers.

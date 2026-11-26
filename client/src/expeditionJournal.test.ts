@@ -59,11 +59,11 @@ test('P07 v12 migration is lossless and lazy; corrupt journals/publications and 
   const { storage, session } = open()
   session.upgrade(12000, 13)
   const valid = JSON.parse(storage.getItem()!)
-  const old = { ...structuredClone(valid), version: 12 }
+  const old = { ...structuredClone(valid), version: 12 }; delete old.inventory.equipment
   delete old.fabricator; delete old.deployedMarkers; if (old.stores) delete old.stores['scout:fabricator:input']; if (old.itemDefinitions) delete old.itemDefinitions['field-marker-kit:v1']; delete old.convertedGrams; delete old.core; delete old.stores[SCOUT_CORE_FUEL_ID]; delete old.journal
   const legacy = JSON.stringify(old), restored = new ResourceSession({ getItem: () => legacy, setItem: () => assert.fail('migration wrote eagerly') }, createTopDownState(), undefined, undefined, () => 0)
   assert.equal(restored.error, '')
-  assert.equal(restored.snapshot.version, 17)
+  assert.equal(restored.snapshot.version, 18)
   for (const key of ['sources','inventory','stores','survival','hazards','scout','location','sites'] as const) assert.deepEqual(JSON.parse(JSON.stringify(restored.snapshot, (_,v) => typeof v === 'bigint' ? String(v) : v))[key], valid[key])
   assert.deepEqual(restored.snapshot.journal, emptyJournal())
   session.markField('Here', 'Observed')

@@ -845,3 +845,7 @@ contributes to carried/ship payload. Renaming is free; no delete/reclaim route.
 Malformed positions, duplicate records, unknown bodies/publications, missing v17
 records and count mismatches fail closed. Guidance selection is session-local;
 the actual markers survive views, region eviction and reload.
+
+## Persistent equipment (schema v18, #914)
+
+The existing storage key remains unchanged. `inventory.equipment` owns version-1 unique suit/module instances with one explicit location edge and canonical exact durability. V1–v17 migrations add one equipped basic suit and temperature T1 while preserving progress and ledger; migration is lazy until the next atomic commit, so failed writes preserve the original bytes. V18 requires equipment and never recreates missing gear. Terminal reset replaces character equipment, advances its persisted generation and grants one starter set; ordinary reload cannot grant. Old generation identities cannot reappear. See [equipment contract](spacesuit-and-hazards.md).

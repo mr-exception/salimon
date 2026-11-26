@@ -45,7 +45,7 @@ test('E07 paid manufacture → placement conserves kit, frees carrying capacity,
   assert.equal(restored.snapshot.deployedMarkers[0]!.name, 'Return')
   assert.match(markerGuidance(restored.world, restored.snapshot.deployedMarkers[0]!), /unavailable/)
   assert.equal(restored.snapshot.inventory.items[MARKER_KIT_ID], undefined)
-  assert.equal(JSON.parse(storage.getItem()!).version, 17)
+  assert.equal(JSON.parse(storage.getItem()!).version, 18)
 })
 
 test('E07 authority, changed position/revision, malformed names and duplicate clicks cannot consume or deploy remotely', () => {
@@ -74,7 +74,7 @@ for (const stale of [false, true]) test(`E07 ${stale ? 'concurrent writer' : 'qu
 
 test('E07 fail-closed receipt/location/capacity validation and lossless v16 migration', () => {
   const { s, storage, deploy } = setup()
-  const old = JSON.parse(storage.raw!); old.version = 16; delete old.deployedMarkers
+  const old = JSON.parse(storage.raw!); old.version = 16; delete old.inventory.equipment; delete old.deployedMarkers
   const migrated = decodeResourceSave(JSON.stringify(old), s.world)
   assert.deepEqual(migrated.deployedMarkers, []); assert.equal(migrated.inventory.items[MARKER_KIT_ID], 1)
   assert.equal(deploy(), true)

@@ -1,3 +1,4 @@
+import { freshEquipment } from './equipment.ts'
 import { SCOUT_CORE_FUEL_ID } from './scoutEnergyCore.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
@@ -85,7 +86,7 @@ test('production session clocks radar once; launch credit durable, failed writes
   const ledger = { sources: terminal.snapshot.sources, inventory: terminal.snapshot.inventory, stores: terminal.snapshot.stores }
   assert.equal(terminal.freshRun(), true)
   assert.equal(terminal.survival.health, 200)
-  assert.deepEqual({ sources: terminal.snapshot.sources, inventory: terminal.snapshot.inventory, stores: terminal.snapshot.stores }, ledger)
+  assert.deepEqual({ sources: terminal.snapshot.sources, inventory: terminal.snapshot.inventory, stores: terminal.snapshot.stores }, { ...ledger, inventory: { ...ledger.inventory, equipment: freshEquipment(1) } })
   assert.equal(terminal.freshRun(), false)
 })
 
@@ -131,18 +132,18 @@ test('v5 migration preserves the entire ledger and initializes no historic activ
   const world = createTopDownState('exterior', true)
   const old = new ResourceSession(storage, world, undefined, undefined, () => 1000)
   old.transfer({ revision: 0, from: { kind: 'source', id: 'source:landing:mineral:01' }, to: { kind: 'player' }, resourceId: 'mineral', grams: 333 })
-  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.fabricator; delete v5.deployedMarkers; if (v5.stores) delete v5.stores['scout:fabricator:input']; if (v5.itemDefinitions) delete v5.itemDefinitions['field-marker-kit:v1']; delete v5.convertedGrams; delete v5.core; delete v5.journal; delete v5.survival; delete v5.miningWork; delete v5.sites; delete v5.scout; delete v5.hazards
+  const v5 = JSON.parse(raw!); v5.version = 5; delete v5.inventory.equipment; delete v5.fabricator; delete v5.deployedMarkers; if (v5.stores) delete v5.stores['scout:fabricator:input']; if (v5.itemDefinitions) delete v5.itemDefinitions['field-marker-kit:v1']; delete v5.convertedGrams; delete v5.core; delete v5.journal; delete v5.survival; delete v5.miningWork; delete v5.sites; delete v5.scout; delete v5.hazards
   const { [SCOUT_CORE_FUEL_ID]: emptyCore, ...oldStores } = v5.stores
   v5.stores = oldStores
   raw = JSON.stringify(v5); const bytes = raw
   const migrated = new ResourceSession(storage, world, undefined, undefined, () => 21_601_000)
   assert.equal(migrated.error, ''); assert.equal(raw, bytes)
   assert.deepEqual(migrated.survival, freshSurvival(21_601_000))
-  assert.deepEqual(migrated.snapshot.inventory, v5.inventory)
+  assert.deepEqual(migrated.snapshot.inventory, { ...v5.inventory, equipment: freshEquipment() })
   assert.deepEqual(migrated.snapshot.sources, v5.sources)
   assert.deepEqual(migrated.snapshot.stores, { ...v5.stores, [SCOUT_CORE_FUEL_ID]: emptyCore, 'scout:fabricator:input': { id: 'scout:fabricator:input', shipId: 'ship:scout', capacityGrams: 50000, quantities: {} } })
   migrated.advance(stepTopDown(migrated.world, [0, 0])); migrated.checkpoint()
-  assert.equal(JSON.parse(raw!).version, 17)
+  assert.equal(JSON.parse(raw!).version, 18)
   assert.equal(new ResourceSession(storage, world, undefined, undefined, () => 21_601_000).survival.activeTicks, 1)
 })
 

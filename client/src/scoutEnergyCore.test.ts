@@ -1,3 +1,4 @@
+import { freshEquipment } from './equipment.ts'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createTopDownState } from './topDownRuntime.ts'
@@ -87,9 +88,9 @@ test('Core transfer keeps onboard mass exact and honors shared inventory slots',
   const storage = new Storage()
   const s = new ResourceSession(storage, createTopDownState('interior', true), undefined, TEST_ITEMS, () => 0)
   assert.equal(collect(s, 1000), true)
-  assert.deepEqual(s.payload(), { playerGrams: 1000, storeGrams: 0, shipGrams: 1000 })
+  assert.deepEqual(s.payload(), { playerGrams: 1000, storeGrams: 0, shipGrams: 4500 })
   assert.equal(s.depositCoreFuel('mineral', 1000, s.snapshot.revision), true)
-  assert.deepEqual(s.payload(), { playerGrams: 0, storeGrams: 1000, shipGrams: 1000 })
+  assert.deepEqual(s.payload(), { playerGrams: 0, storeGrams: 1000, shipGrams: 4500 })
   assert.equal(s.changeItem('add', 'fixture-single', 12, s.snapshot.revision), true)
   const before = s.snapshot, bytes = storage.raw
   assert.equal(s.withdrawCoreFuel('mineral', 1, s.snapshot.revision), false)
@@ -106,21 +107,21 @@ test('v13 migrates empty Core without minting fuel or rewriting bytes until comm
   const storage = new Storage(), s = session(storage)
   assert.equal(collect(s, 1000), true)
   const v13 = JSON.parse(storage.raw!)
-  v13.version = 13
+  v13.version = 13; delete v13.inventory.equipment
   delete v13.fabricator; delete v13.deployedMarkers; if (v13.stores) delete v13.stores['scout:fabricator:input']; if (v13.itemDefinitions) delete v13.itemDefinitions['field-marker-kit:v1']; delete v13.convertedGrams; delete v13.core
   delete v13.stores[SCOUT_CORE_FUEL_ID]
   storage.raw = JSON.stringify(v13)
   const prior = storage.raw, restored = session(storage)
   assert.equal(restored.error, '')
-  assert.equal(restored.snapshot.version, 17)
+  assert.equal(restored.snapshot.version, 18)
   assert.equal(restored.snapshot.revision, v13.revision)
   assert.deepEqual(restored.snapshot.sources, v13.sources)
-  assert.deepEqual(restored.snapshot.inventory, v13.inventory)
+  assert.deepEqual(restored.snapshot.inventory, { ...v13.inventory, equipment: freshEquipment() })
   assert.deepEqual(restored.snapshot.stores[SCOUT_CORE_FUEL_ID]!.quantities, {})
   assert.equal(restored.snapshot.core.reserveJ60, CORE_INITIAL_RESERVE_J * 60)
   assert.equal(storage.raw, prior)
   assert.equal(restored.depositCoreFuel('mineral', 333, restored.snapshot.revision), true)
-  assert.equal(JSON.parse(storage.raw!).version, 17)
+  assert.equal(JSON.parse(storage.raw!).version, 18)
   assert.equal(session(storage).snapshot.stores[SCOUT_CORE_FUEL_ID]!.quantities.mineral, 333)
 })
 
@@ -129,8 +130,8 @@ test('corrupt or future Core saves fail closed with original bytes preserved', (
   assert.equal(collect(s, 1000), true)
   const original = JSON.parse(storage.raw!)
   const mutations: ((save: any) => void)[] = [
-    save => { save.version = 18 },
-    save => { save.version = 13; delete save.fabricator; delete save.deployedMarkers; if (save.stores) delete save.stores['scout:fabricator:input']; if (save.itemDefinitions) delete save.itemDefinitions['field-marker-kit:v1']; delete save.convertedGrams; delete save.core; save.stores[SCOUT_CORE_FUEL_ID].capacityGrams = 1 },
+    save => { save.version = 19 },
+    save => { save.version = 13; delete save.inventory.equipment; delete save.fabricator; delete save.deployedMarkers; if (save.stores) delete save.stores['scout:fabricator:input']; if (save.itemDefinitions) delete save.itemDefinitions['field-marker-kit:v1']; delete save.convertedGrams; delete save.core; save.stores[SCOUT_CORE_FUEL_ID].capacityGrams = 1 },
     save => { delete save.fabricator; delete save.deployedMarkers; if (save.stores) delete save.stores['scout:fabricator:input']; if (save.itemDefinitions) delete save.itemDefinitions['field-marker-kit:v1']; delete save.convertedGrams; delete save.core },
     save => { save.core.capacityJ++ },
     save => { save.core.reserveJ60 = -1 },

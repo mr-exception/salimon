@@ -1,3 +1,4 @@
+import { equipmentMass } from './equipment.ts'
 import type { FieldMark } from './exploration.ts'
 import { validateFabricator, FABRICATOR_INPUT_ID, FABRICATOR_GRAMS, MARKER_KIT_ID, type FabricatorState } from './scoutFabricator.ts'
 import { addResource, removeResource, resourceInventoryUsage, type CountItemCatalog, type ResourceCatalog, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
@@ -157,11 +158,12 @@ export function transferResource(
 /** Stores are flat raw inventories. Player cargo is never nested in a store. */
 export function resourceLedgerMass(ledger: ResourceLedger, shipId: string, playerAboard: boolean, resources: ResourceCatalog, items: CountItemCatalog = {}) {
   const playerGrams = resourceInventoryUsage(ledger.inventory, resources, items).grams
-  let storeGrams = 0
+  const gear = ledger.inventory.equipment ? equipmentMass(ledger.inventory.equipment) : null
+  let storeGrams = shipId === 'ship:scout' ? gear?.storedGrams ?? 0 : 0
   for (const store of Object.values(ledger.stores)) {
     const grams = resourceStoreMass(store, resources)
     if (store.shipId === shipId) storeGrams = sum(storeGrams, grams)
   }
   if (shipId === 'ship:scout' && ledger.fabricator) storeGrams = sum(storeGrams, (ledger.fabricator.job?.reservedGrams ?? 0) + (ledger.fabricator.tray ? FABRICATOR_GRAMS : 0))
-  return { playerGrams, storeGrams, shipGrams: sum(storeGrams, playerAboard ? playerGrams : 0) }
+  return { playerGrams, storeGrams, shipGrams: sum(storeGrams, playerAboard ? sum(playerGrams, gear?.equippedGrams ?? 0) : 0) }
 }

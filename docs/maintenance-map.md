@@ -1268,3 +1268,7 @@ shader composition and physical occlusion; `PanoramicNavigation.tsx` owns the
 session-local grid toggle. `tests/panoramic.spec.ts` owns ENV-905 coverage in PR
 smoke and full perspective CI. No physical coordinates or discovery are owned by
 this presentation layer. See the [scanner guide](../client/README.md#scanner-environment-905).
+
+## Persistent equipment (#914)
+
+`equipment.ts` owns trusted gear definitions, identity/ownership validation, exact durability, functioning-suit projection and mass attribution. `ResourceInventory.equipment` is the sole instance graph; inventory usage derives carried mass/slots without mirrored item counts. `resourceSession.ts` owns v18 migration/reset and atomic publication; `resourceLedger.ts` adds aboard equipped/stored mass once. Domain coverage: `equipment.test.ts`; built smoke: `tests/equipment.spec.ts`. Equipment actions/UI and live planetary wear are subsequent issues.

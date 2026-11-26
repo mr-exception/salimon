@@ -1105,3 +1105,7 @@ validity/time-scale contracts; they do not imply observed-body playable adoption
 ## Approved planetary survival contract (#913)
 
 [Survival and equipment](spacesuit-and-hazards.md) owns approved gear identities, mass/custody, environment publication, proportional wear, bench recipes/power order and repair rounding. #914–#922 deliver these separately; this contract publication changes no runtime behavior.
+
+## Persistent equipment owner (#914)
+
+`client/src/equipment.ts` provides trusted definitions and a single persistent ownership graph in `ResourceInventory.equipment`. Inventory/ledger consumers derive capacity and payload from that graph. The ResourceSession v18 adapter validates the whole graph before atomic replacement and generation-bound terminal reset. See [save contract](save-contract.md#persistent-equipment-schema-v18-914). No source sampling or equipment UI is added by this foundation.

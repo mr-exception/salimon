@@ -28,7 +28,7 @@ test('Fabricator exact 50 kg input cap includes reserved grams and only unreserv
   assert.equal(s.withdrawFabricatorInput('mineral', 49001, s.snapshot.revision), false)
   assert.equal(s.withdrawFabricatorInput('mineral', 9999, s.snapshot.revision), true)
   assert.equal(s.snapshot.fabricator.job!.reservedGrams, 1000)
-  assert.equal(s.payload().shipGrams, 50001)
+  assert.equal(s.payload().shipGrams, 53501)
 })
 
 test('partial ingredients, unknown/multiple recipes, stale starts and generic output grants cannot mutate', () => {
@@ -157,7 +157,7 @@ test('save rejects unpaid work, forged reservations, outputs, claims, recipes, r
     (v: any) => { v.fabricator.tray = { jobId: 1, itemId: MARKER_KIT_ID, count: 1 } },
     (v: any) => { v.inventory.items[MARKER_KIT_ID] = 1 },
     (v: any) => { v.fabricator.extra = true },
-    (v: any) => { v.version = 18 },
+    (v: any) => { v.version = 19 },
   ]) {
     const v = JSON.parse(raw); corrupt(v); storage.raw = JSON.stringify(v)
     const before = storage.raw, invalid = open()
@@ -170,7 +170,7 @@ test('save rejects unpaid work, forged reservations, outputs, claims, recipes, r
 
 test('v15 migrates empty Fabricator and trusted kit metadata without modifying original bytes', () => {
   const { s, storage, open, gather } = setup(); gather(100)
-  const old = JSON.parse(storage.raw!); old.version = 15; delete old.fabricator; delete old.deployedMarkers; delete old.stores[FABRICATOR_INPUT_ID]; delete old.itemDefinitions[MARKER_KIT_ID]
+  const old = JSON.parse(storage.raw!); old.version = 15; delete old.inventory.equipment; delete old.fabricator; delete old.deployedMarkers; delete old.stores[FABRICATOR_INPUT_ID]; delete old.itemDefinitions[MARKER_KIT_ID]
   storage.raw = JSON.stringify(old)
   const before = storage.raw, restored = open()
   assert.equal(restored.error, '')
@@ -180,7 +180,7 @@ test('v15 migrates empty Fabricator and trusted kit metadata without modifying o
   restored.checkpoint()
   assert.equal(storage.raw, before)
   assert.equal(restored.depositFabricatorInput('mineral', 100, restored.snapshot.revision), true)
-  assert.equal(JSON.parse(storage.getItem()!).version, 17)
+  assert.equal(JSON.parse(storage.getItem()!).version, 18)
 })
 
 test('pure Fabricator rejects partial power receipts, validates bounded state, and split ticks match uninterrupted work', () => {
@@ -202,7 +202,7 @@ test('non-Fabricator power receipts cannot fund forged fabrication progress, inc
   gather(1000); deposit(1000)
   s.advance({ ...s.world, tick: 1 }, { watts: 1000000 })
   assert.equal(s.snapshot.fabricator.otherSpentJ60, 1000000)
-  const old = JSON.parse(storage.raw!); old.version = 15; delete old.fabricator; delete old.deployedMarkers; delete old.stores[FABRICATOR_INPUT_ID]; delete old.itemDefinitions[MARKER_KIT_ID]
+  const old = JSON.parse(storage.raw!); old.version = 15; delete old.inventory.equipment; delete old.fabricator; delete old.deployedMarkers; delete old.stores[FABRICATOR_INPUT_ID]; delete old.itemDefinitions[MARKER_KIT_ID]
   // This legacy fixture must preserve raw conservation: return its input to player.
   old.inventory.quantities.mineral = 1000
   storage.raw = JSON.stringify(old)

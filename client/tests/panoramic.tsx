@@ -25,6 +25,7 @@ Object.assign(window, {
   if (kind === 'lost-contact') navigation.clock.state = { ...navigation.clock.state, position: translate(ORIGIN, [1e20, 0, 0]) }
   if (kind === 'rear') navigation.clock.state = { ...navigation.clock.state, yaw: Math.PI, velocityMps: [0, 0, 10] }
   if (kind === 'overlap') navigation.clock.state = { ...navigation.clock.state, yaw: 0, velocityMps: [0, 0, -10] }
+  if (kind === 'metric-speed') navigation.clock.state = { ...navigation.clock.state, velocityMps: [12400, 0, 0], throttle: 0 }
   if (kind === 'stationary') navigation.clock.state = { ...navigation.clock.state, velocityMps: [0, 0, 0] }
   if (kind === 'warning') navigation.clock.state = { ...navigation.clock.state, position: translate(ORIGIN, [0, 5000, -98000]), velocityMps: [0, 0, -200] }
   if (kind === 'proximity') navigation.clock.state = { ...navigation.clock.state, position: translate(ORIGIN, [0, 5000, -99500]), velocityMps: [0, 0, 0], throttle: 0 }

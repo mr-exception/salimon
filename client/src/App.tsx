@@ -1,10 +1,12 @@
+import { formatDistance, formatSpeed } from './metricFormat.ts'
+import './metricFormat.css'
 import { Canvas, type RootState } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CameraControls } from './CameraControls'
 import { HelpDialog } from './HelpDialog'
 import { ShipVectorGuides, type VectorElements } from './ShipVectorGuides'
 import { STATIONARY_SPEED_MPS } from './vectorGuides'
-import { SAMPLE_BODIES, length, type Body } from './sampleUniverse'
+import { SAMPLE_BODIES, SCANNER_RADIUS_LS, length, type Body } from './sampleUniverse'
 
 import { LIGHT_SECOND_M, relativeM } from './coordinates.ts'
 import { alignTo, setThrottle as changeThrottle, type ShipState } from './simulation.ts'
@@ -21,7 +23,6 @@ import './ui/primitives.css'
 const VISIBLE_RADIUS = 900
 const RADAR_CAMERA = {position:[200000,125000,200000] as [number,number,number],zoom:0.5,near:0.1,far:1000000}
 const radians = (v: number) => (v * 180 / Math.PI).toFixed(1)
-const fmt = (v: number) => Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(1)
 function RadarScene({ pose, contacts, selected, selectGroup, viewRadius, setViewRadius, setGroups, viewCommand, panInput, navigation, vectorElements }: { pose: Pose; contacts: readonly Body[]; selected: string|null; selectGroup:(group:ContactGroup)=>void; viewRadius:number; setViewRadius:(radius:number)=>void; setGroups:(groups:ContactGroup[])=>void; viewCommand:number; panInput:NavigationInput;navigation:NavigationRuntime;vectorElements:VectorElements }) {
   const spacing=10**Math.floor(Math.log10(Math.max(1,viewRadius/5)))
   const gridOffset=gridOffsetLs(pose.position,spacing)
@@ -126,8 +127,8 @@ export function App({navigation,onSceneReady,canPilot,isPaused}:{navigation?:Nav
   const resetView=()=>{panInput.current.clear();setViewCommand(c=>c+1)}
   const warnings=navigationWarnings(pose,contacts)
   const targetDistances=target?distances(pose,target):null
-  const distance=target?length(relativeM(target.position,pose.position))/LIGHT_SECOND_M:null
-  return <div className="app" data-mode={pose.mode}>
+  const distance=target?length(relativeM(target.position,pose.position)):null
+  return <div className="app metric-readout" data-mode={pose.mode}>
     <div className="radar" role="region" aria-label="Navigation radar" aria-describedby="navigation-help" tabIndex={0} onPointerDown={e=>{if(e.target instanceof HTMLCanvasElement)e.currentTarget.focus({preventScroll:true})}}>
       <Canvas orthographic camera={RADAR_CAMERA} onCreated={(state)=>{onSceneReady?.(state);const {gl}=state;gl.domElement.setAttribute('aria-label','Ship-centered three-dimensional radar');gl.domElement.setAttribute('role','img')}} fallback={<p role="alert">WebGL is unavailable. A WebGL 2 browser is required.</p>}>
         <RadarScene pose={pose} contacts={contacts} selected={selected} selectGroup={selectGroup} viewRadius={viewRadius} setViewRadius={setViewRadius} setGroups={setGroupsStable} viewCommand={viewCommand} panInput={panInput.current} navigation={runtime.current} vectorElements={vectorElements}/>
@@ -138,20 +139,20 @@ export function App({navigation,onSceneReady,canPilot,isPaused}:{navigation?:Nav
         <line ref={velocityLine} data-vector="velocity" vectorEffect="non-scaling-stroke" style={{display:'none'}}/>
       </svg>
       <div className="edge-layer">{groups.filter(g=>g.bodies.length>1).map(g=><button key={g.id} className="edge" style={{left:g.x+'%',top:g.y+'%'}} onClick={()=>selectGroup(g)}>◉ {g.bodies.length} contacts</button>)}</div>
-      <div className="legend"><b>HEADING</b> <span>{length(pose.velocityMps)<=STATIONARY_SPEED_MPS?'STATIONARY':'VELOCITY · dashed'}</span> · Scanner 100,000 light-seconds · pulse #{pulse}</div>
+      <div className="legend"><b>HEADING</b> <span>{length(pose.velocityMps)<=STATIONARY_SPEED_MPS?'STATIONARY':'VELOCITY · dashed'}</span> · Scanner {formatDistance(SCANNER_RADIUS_LS * LIGHT_SECOND_M)} · pulse #{pulse}</div>
     </div>
     <aside>
       <h1>NAVIGATION</h1><p className="muted">Navigation-only prototype · unlimited energy</p>
       <p className="scan-status" role="status" aria-live="polite">{paused?'Navigation paused while hidden':pulse===0?'Scanner: awaiting first five-second pulse':`Scanner pulse ${pulse}: ${contacts.length} temporary contacts`}</p>
       <div className="stat"><span>Total ship mass</span><strong>{pose.massKg.toLocaleString(undefined, { maximumFractionDigits: 3 })} kg</strong></div>
-      <div className="stat"><span>Relative position</span><strong>{pose.position.offsetM.map(fmt).join(' / ')} m (cell local)</strong></div>
-      <div className="stat"><span>Speed (sample inertial frame)</span><strong>{fmt(length(pose.velocityMps))} m/s</strong></div>
+      <div className="stat"><span>Relative position</span><strong>{pose.position.offsetM.map(formatDistance).join(' / ')} (cell local)</strong></div>
+      <div className="stat"><span>Speed (sample inertial frame)</span><strong>{formatSpeed(length(pose.velocityMps))}</strong></div>
       <div className="stat"><span>Yaw / pitch</span><strong>{radians(pose.yaw)}° / {radians(pose.pitch)}°</strong></div>
       <div className="stat"><span>Alignment</span><strong>{aligning?'Turning':'Manual'}</strong></div>
       <div className="stat"><span>Flight status</span><strong>{pose.mode}</strong></div>
       {runtime.current.surfaceLocation && <p role="status" className="surface-status">Scout grounded on {runtime.current.surfaceLocation.body.name}. Takeoff and relocation are unavailable at this landing site. Scanner and camera remain available.</p>}
       {pose.contact && !runtime.current.surfaceLocation && <div role="status" className="contact-status">
-        {pose.mode==='destroyed'?'Journey ended — ship destroyed':pose.contact.outcome==='safe-contact'?'Safe surface contact':'Crash recovery'} · impact {fmt(pose.contact.impactSpeedMps)} m/s
+        {pose.mode==='destroyed'?'Journey ended — ship destroyed':pose.contact.outcome==='safe-contact'?'Safe surface contact':'Crash recovery'} · impact {formatSpeed(pose.contact.impactSpeedMps)}
         {(pose.mode==='destroyed'||pose.mode==='grounded') && <button onClick={restart}>Restart navigation</button>}
       </div>}
       <div className="warnings expedition-ui" role="status" aria-live="off" aria-label="Navigation warnings">{warnings.length===0?<StatusMessage>No navigation warnings</StatusMessage>:warnings.map(w=><StatusMessage key={w.id} priority={w.severity==='danger'?'critical':'status'} tone={w.severity==='danger'?'danger':'caution'}>{w.message}</StatusMessage>)}</div>
@@ -172,7 +173,7 @@ export function App({navigation,onSceneReady,canPilot,isPaused}:{navigation?:Nav
         <button disabled={menuPage===0} onClick={()=>setMenuPage(p=>p-1)}>Previous contacts</button>
         <button disabled={(menuPage+1)*32>=menuBodies.length} onClick={()=>setMenuPage(p=>p+1)}>Next contacts</button>
       </div>}
-      {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {fmt(distance??0)} light-seconds</p><p className="muted">Surface clearance {fmt(targetDistances?.surfaceDistanceM??0)} m</p><button className="action" disabled={pose.mode!=='flying'} onClick={setDirection}>Set direction</button></>:<p className="muted">Select a visible contact or use the scanned-contact list.</p>}
+      {target?<><strong>{target.name}</strong><p className="muted">{target.kind} · {formatDistance(distance??0)}</p><p className="muted">Surface clearance {formatDistance(targetDistances?.surfaceDistanceM??0)}</p><p className="muted">Relative speed {formatSpeed(length(targetDistances?.velocityRelativeMps??[0,0,0]))}</p><button className="action" disabled={pose.mode!=='flying'} onClick={setDirection}>Set direction</button></>:<p className="muted">Select a visible contact or use the scanned-contact list.</p>}
       <hr/>
       <h2>Camera and orientation</h2>
       <p className="muted" id="navigation-help">WASD pans the view · wheel zooms · arrow keys turn the ship.</p>

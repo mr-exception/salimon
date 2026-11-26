@@ -86,7 +86,7 @@ test('right-drag pointer release outside canvas ends pan and ship controls relea
 })
 test('zero throttle coasts while ship rotates; focused slider keeps native keyboard input',async({page})=>{
  await page.goto('/?scene=radar');await page.getByLabel('Throttle',{exact:true}).fill('100');await page.waitForTimeout(450)
- await page.getByRole('button',{name:'Zero throttle (Space)',exact:true}).click();await page.waitForTimeout(250);const speed=await stat(page,'Speed').textContent();expect(speed).not.toBe('0.0 m/s')
+ await page.getByRole('button',{name:'Zero throttle (Space)',exact:true}).click();await page.waitForTimeout(250);const speed=await stat(page,'Speed').textContent();expect(speed).not.toBe('0 m/s')
  await page.getByRole('region',{name:'Navigation radar',exact:true}).focus();await page.keyboard.down('ArrowRight');await page.waitForTimeout(400);await page.keyboard.up('ArrowRight');await expect(stat(page,'Speed')).toHaveText(speed!)
  await page.getByLabel('Throttle',{exact:true}).focus();await page.keyboard.press('ArrowRight');await expect(page.getByLabel('Throttle',{exact:true})).toHaveValue('1')
  await page.keyboard.press('Space');await expect(page.getByLabel('Throttle',{exact:true})).toHaveValue('1')

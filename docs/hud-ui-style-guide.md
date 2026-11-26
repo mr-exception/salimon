@@ -259,3 +259,22 @@ without replacing the selected state. Their fixed 32 px hit area preserves
 existing clustering and edge/panel policies. The cyan reticle has an open center;
 short amber heading and dashed light-green velocity lines live only inside the
 mini compass. See the [navigation contract](panoramic-navigation-design.md#targeting-and-orientation-refinement-908).
+
+## Adaptive metric readouts (#910)
+
+`client/src/metricFormat.ts` owns display-only `formatDistance` (metres) and
+`formatSpeed` (metres/second). Navigation, scanner range, selected contact centre
+distance/surface clearance/relative speed, landing, impact and coordinate readouts
+share m, km, Mm, Bm, Tm and Pm at powers of 1000, with at most two decimals,
+trimmed zeros and rounding carry into the next unit. **Bm is deliberate game
+notation for billion metres; the SI equivalent is Gm.** Pm is the largest suffix;
+larger values retain Pm (scientific notation with at most two mantissa decimals
+when fixed notation is exhausted). Nonfinite inputs show an em dash; rounded
+negative zero shows zero. Readouts use tabular numerals. Exact SI values remain
+available in selected-contact and inertial-speed tooltips. Physics, split
+coordinates, persistence, scanner admission and control/input units are unchanged.
+
+`metricFormat.test.ts` covers examples, signs, zero, every unit boundary, carry,
+invalid inputs and extreme finite values. METRIC-910 in `tests/panoramic.spec.ts`
+and `tests/production.spec.ts` covers rendered integration; originals belong in
+ignored test output and CI artifacts, with the validation summary in the PR.

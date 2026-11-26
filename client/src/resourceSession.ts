@@ -1,6 +1,6 @@
-import { ENVIRONMENT_PUBLICATION, validateEnvironmentPublication, samplePlanetEnvironment, bodyEnvironmentSummary } from './planetEnvironment.ts'
+import { SCOUT_SAFE_ENVIRONMENT, ENVIRONMENT_PUBLICATION, validateEnvironmentPublication, samplePlanetEnvironment, bodyEnvironmentSummary } from './planetEnvironment.ts'
 import { applyGearCommand, gearCommandDenial, type GearCommand } from './scoutEquipment.ts'
-import { freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
+import { functioningEquipment, GEAR_DEFINITIONS, freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
 import { validateDeployedMarkers } from './fieldMarker.ts'
 import { FABRICATOR_INPUT_ID, FABRICATOR_RECIPE_ID, FABRICATOR_GRAMS, FABRICATOR_TICKS, FABRICATOR_WATTS, FABRICATOR_ITEMS, MARKER_KIT_ID, freshFabricator, validateFabricator, fabricatorSpentJ60, stepFabricator, type FabricatorState } from './scoutFabricator.ts'
 import { emptyJournal, recordVisit, validateJournal, type ExpeditionJournal } from './expeditionJournal.ts'
@@ -334,7 +334,7 @@ export class ResourceSession {
   survival: SurvivalState
   hazards: HazardState = freshHazards()
   hazardEvents: HazardEvent[] = []
-  private sources: HazardSource[] = []
+  private sources: HazardSource[] | null = null
   equipped = false
   activeSourceId: string | null = null
   private miningWork: Record<string, number> = {}
@@ -475,6 +475,13 @@ export class ResourceSession {
     if (plan?.surface.bodyId === bodyId) return planetDefinition(bodyId, plan.surface.definition)
     const saved = Object.values(this.snapshot.sites).find(s => s.address.bodyId === bodyId)
     return saved ? planetDefinition(bodyId, saved.address.definition) : geologicalDefinition(bodyId)
+  }
+  /** Physical frame owns safety; a door or empty Core never changes interior sampling. */
+  currentEnvironment(world = this.world) {
+    const player = world.entities.find(e => e.id === PLAYER_ID)!
+    if (player.anchor.frame === 'ship:scout') return SCOUT_SAFE_ENVIRONMENT
+    const chart = player.anchor.chart ?? surfaceRegion(world.scoutLocation.surface, world.scoutLocation.surface.definition)
+    return this.environmentAt(localToSurface(chart, relativeM(player.anchor.point, ORIGIN).slice(0, 2) as [number, number]))
   }
   /** Raw world-domain inputs. Scanner authorization belongs to the presentation consumer (#921). */
   environmentAt(location: SurfaceLocation) {
@@ -722,14 +729,29 @@ export class ResourceSession {
     const fabricator = machine ? stepFabricator(this.snapshot.fabricator, machine.result.drawnJ60) : this.snapshot.fabricator
     const workUnits = survivalPolicy(this.survival).miningUnits
     const previousWorld = this.world
-    const rates = hazardRates(this.sources)
-    const needsHazards = this.sources.length > 0 || Object.values(this.hazards.exposure).some(v => v !== '0/1')
+    const environment = this.currentEnvironment(next)
+    const live = this.sources === null
+    const rates = hazardRates(this.sources ?? [
+      { id: 'planet:temperature', type: 'temperature', temperatureC: environment.temperatureC },
+      { id: 'planet:radiation', type: 'radiation', intensity: environment.radiationHpPerSecond },
+      { id: 'planet:poison', type: 'poison', intensity: environment.toxicityHpPerSecond },
+    ])
+    const equipment = this.snapshot.inventory.equipment!
+    const modules = live ? functioningEquipment(equipment).map(g => ({ id: g.id, type: GEAR_DEFINITIONS[g.definitionId]!.hazard!, protection: GEAR_DEFINITIONS[g.definitionId]!.protection, remaining: g.remaining })) : this.hazards.modules
+    const needsHazards = Object.values(rates).some(v => v[0] > 0n) || Object.values(this.hazards.exposure).some(v => v !== '0/1')
+    let worn = modules
     this.hazardEvents = []
     this.survival = advanceSurvival(this.survival, elapsed, needsHazards ? survival => {
-      const result = stepHazards(this.hazards, rates, survival)
-      this.hazards = result.state
+      const result = stepHazards({ ...this.hazards, modules: worn }, rates, survival)
+      worn = result.state.modules
+      this.hazards = live ? { ...result.state, modules: this.hazards.modules } : result.state
       this.hazardEvents.push(...result.events)
+      return result.events.some(e => e.damage !== '0/1')
     } : undefined)
+    const inventory = live ? { ...this.snapshot.inventory, equipment: { ...equipment, instances: equipment.instances.map(g => {
+      const changed = worn.find(m => m.id === g.id)
+      return changed ? { ...g, remaining: changed.remaining, location: changed.remaining === '0/1' ? { kind: 'destroyed' as const } : g.location } : g
+    }) } } : this.snapshot.inventory
     this.world = (next.frames.surface?.source ?? next.frames) === next.scoutLocation.frames ? next
       : next.frames.ship === next.scoutLocation.frames.ship ? { ...next, frames: next.scoutLocation.frames }
       : materializeSite(synchronizeScout(next), this.snapshot.sites)
@@ -753,7 +775,7 @@ export class ResourceSession {
       for (const [id, grams] of Object.entries(machine?.result.convertedGrams ?? {})) convertedGrams[id] = (convertedGrams[id] ?? 0) + grams
       const fuel = this.snapshot.stores[SCOUT_CORE_FUEL_ID]
       const machines = machine ? { core: machine.core, convertedGrams, ...(fuel ? { stores: { ...this.snapshot.stores, [SCOUT_CORE_FUEL_ID]: { ...fuel, quantities: machine.quantities } } } : {}) } : {}
-      if (!this.commit({ ...this.snapshot, ...machines, fabricator, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
+      if (!this.commit({ ...this.snapshot, ...machines, fabricator, inventory, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
     }
     if (machine) { this.corePower = machine.result; this.corePowerTick = next.tick }
     if (!survivalPolicy(this.survival).canWork) {

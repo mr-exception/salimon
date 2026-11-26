@@ -38,7 +38,7 @@ export function hazardRates(sources: readonly HazardSource[]): Record<HazardType
   return result
 }
 /** One authoritative 60 Hz step. Split exactly at budget exhaustion and exposure threshold.
- * Multiple modules allocate blocked intensity in stable ID order; no slot/install policy implied.
+ * Active same-type modules share blocked intensity proportionally; split at each depletion.
  */
 export function stepHazards(state: HazardState, rates: Record<HazardType, q.Exact>, survival: SurvivalState): { state: HazardState; events: HazardEvent[] } {
   const next = structuredClone(state), events: HazardEvent[] = []
@@ -48,10 +48,12 @@ export function stepHazards(state: HazardState, rates: Record<HazardType, q.Exac
     let remainingTime: q.Exact = [1n, 60n], damage = q.ZERO, blocked = q.ZERO
     const destroyed: string[] = []
     while (q.cmp(remainingTime, q.ZERO) > 0) {
-      let available = incoming, duration = remainingTime
+      let duration = remainingTime
+      const strength = modules.reduce((v, m) => q.cmp(q.decode(m.remaining), q.ZERO) > 0 ? q.add(v, q.decimal(m.protection)) : v, q.ZERO)
+      const absorption = q.min(incoming, strength), available = q.sub(incoming, absorption)
       const allocations = modules.map(m => {
-        const rate = q.cmp(q.decode(m.remaining), q.ZERO) > 0 ? q.min(available, q.decimal(m.protection)) : q.ZERO
-        available = q.sub(available, rate)
+        const rate = q.cmp(q.decode(m.remaining), q.ZERO) > 0 && q.cmp(strength, q.ZERO) > 0
+          ? q.mul(absorption, q.div(q.decimal(m.protection), strength)) : q.ZERO
         if (q.cmp(rate, q.ZERO) > 0) duration = q.min(duration, q.div(q.decode(m.remaining), rate))
         return { m, rate }
       })

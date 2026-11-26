@@ -34,7 +34,7 @@ Documentation ships in the **same PR** as its implementation. The final audit
 | Physics, flight, resources, scanner or timed/offline behavior | Owning invariants, cross-system gameplay contracts and affected scenarios; preserve approved rules |
 | New command, input, build/test/config parameter or asset interface | User/contributor usage, validation/build commands and asset regeneration guide where applicable |
 | Implemented/deferred status changes | Project phases, relevant feature documentation and implemented-status notes in approved design; retain the approved requirement record |
-| Evidence, limitations or unresolved acceptance | Per-issue report with actual checks, failures/unrun gates and linked follow-up ownership |
+| Evidence, limitations or unresolved acceptance | PR validation record with actual checks, failures/unrun gates and linked follow-up ownership |
 
 For every PR, include a **Documentation impact** section with:
 
@@ -45,7 +45,7 @@ For every PR, include a **Documentation impact** section with:
   mapping from changed behavior to source/test and its canonical guide. Include
   root routing documents when ownership changes.
 - Superseded statements corrected, remaining TODO/deferred/native boundaries,
-  the link/path checks performed and the per-issue report.
+  the link/path checks performed and the PR validation record.
 
 A small mapping is sufficient; avoid restating whole contracts in a PR:
 
@@ -94,7 +94,7 @@ repository-permission change.
 - [#441](https://github.com/mr-exception/salimon/issues/441) performs the final
   implemented-code-to-doc audit after U01–U33, with evidence and explicit blockers.
   It remains independent of U34 to avoid a dependency cycle.
-- U01–U34 authors remain responsible for the same-PR updates and report for their
+- U01–U34 authors remain responsible for the same-PR updates and PR validation record for their
   own implementation. Completing #440 installs this ongoing contributor rule;
   it does not certify future PRs or bypass unfinished native validation.
 
@@ -131,3 +131,5 @@ Run `python -m unittest discover -s scripts -p test_check_docs.py -v` for positi
 and deliberately broken fixtures. CI emits file/line errors and fails on findings.
 The source job now includes documentation validation; branch protections and
 semantic review remain maintainer-owned.
+
+New work stores completion summaries in the PR description or one maintained comment. Do not commit new reports or evidence archives; keep originals in ignored `client/test-results/` and CI artifacts (14-day retention). Historical reports remain intact.

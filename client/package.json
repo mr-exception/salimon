@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "node --experimental-strip-types --test src/*.test.ts scripts/*.test.ts",
     "test:browser": "playwright test",
+    "benchmark:renderer": "SALIMON_RENDERER_BENCHMARK=1 playwright test --project=renderer",
     "test:browser:negative": "node scripts/negative-navigation.mjs",
     "test:visual": "playwright test --project=navigation-captures",
     "test:visual:negative": "node scripts/negative-visual.mjs && node scripts/negative-panoramic.mjs",
@@ -33,6 +34,7 @@
     "@types/three": "^0.180.0",
     "@vitejs/plugin-react": "^5.0.0",
     "pixelmatch": "7.1.0",
+    "pixi.js": "8.23.0",
     "pngjs": "7.0.0",
     "typescript": "^5.9.0",
     "vite": "^7.1.0"

@@ -1,3 +1,6 @@
+import { EquipmentHud } from './EquipmentHud.tsx'
+import { GearNoticeTracker, equipmentHudReadout } from './equipmentHud.ts'
+import { EquipmentPanel } from './EquipmentPanel.tsx'
 import { commandFeedback } from './commandFeedback.ts'
 import { advanceObjectCommand, selectObjectCommand } from './topDownCommands.ts'
 import { ObjectContextMenu, type ObjectMenuSelection } from './ObjectContextMenu.tsx'
@@ -149,9 +152,14 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const current = useRef(state)
   const session = useRef<ResourceSession | null>(null)
   const lockAttempt = useRef<Promise<unknown>>(Promise.resolve())
+  const gearNotices=useRef(new GearNoticeTracker()).current
+  const [gearOpen,setGearOpen]=useState(false)
   const container = useRef<ResourceContainerInteraction | null>(null)
   const openEquipment = (world: TopDownState) => {
     if (!session.current || ![SCOUT_RESOURCE_CONTAINER_ID, 'scout:core', 'scout:fabricator', 'scout:gear-bench'].includes(world.selectedId ?? '')) return false
+    if(world.selectedId===SCOUT_RESOURCE_CONTAINER_ID&&world.objectCommand?.actionId==='equipment'){
+      container.current?.close();session.current.cancel();session.current.world=requestInteraction(world,SCOUT_RESOURCE_CONTAINER_ID);session.current.checkpoint();setGearOpen(true);return true
+    }
     const equipment = world.selectedId === 'scout:gear-bench' ? 'bench' : world.selectedId === 'scout:fabricator' ? 'fabricator' : world.selectedId === 'scout:core' ? 'core' : 'container'
     if (container.current?.equipment !== equipment) {
       container.current?.close()
@@ -216,7 +224,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     const input = new NavigationInput(), clock = new TopDownClock(), timer = new FrameTimer(performance.now())
     let raf = 0, publishedError = ''
     const release = () => { input.clear(); clock.reset(); timer.resume(performance.now()) }
-    const clear = () => { closeObjectMenu(); release(); session.current?.cancel(); container.current?.close(); current.current = cancelInteraction(current.current); if (session.current) session.current.world = current.current; session.current?.checkpoint(); setState(current.current) }
+    const clear = () => { setGearOpen(false);closeObjectMenu(); release(); session.current?.cancel(); container.current?.close(); current.current = cancelInteraction(current.current); if (session.current) session.current.world = current.current; session.current?.checkpoint(); setState(current.current) }
     const keydown = (event: KeyboardEvent) => {
       if (event.defaultPrevented) return
       if (event.code === 'Escape' && inventoryExpanded.current && !container.current?.opened) {
@@ -371,6 +379,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         </div>
         {vital.health === 0 ? <button onClick={event => { event.currentTarget.blur(); if (resourceSession.freshRun()) observation.reset(navigation.clock.state); setState({ ...current.current }) }}>Start fresh character · keep world resources</button> : <button onClick={event => { event.currentTarget.blur(); paused.current = !paused.current; current.current = cancelGroundMovement(current.current); resourceSession.world = current.current; resourceSession.cancel(); resourceSession.checkpoint(); setState({ ...current.current }) }}>{paused.current ? 'Resume' : 'Pause'} [P]</button>}
       </> : <p>{resourceSession?.error || saveStatus}</p>}
+      {resourceSession && <EquipmentHud readout={equipmentHudReadout(resourceSession,gearNotices)} />}
       {resourceSession?.error && <StatusMessage priority="error">{resourceSession.error}</StatusMessage>}
       {persistentMessages[1].text && <StatusMessage priority="critical">{persistentMessages[1].text}</StatusMessage>}
       {state.scoutLocation.boardingDoor === 'closed' && <p data-boarding-door-status>Aft door: closed{state.scoutLocation.binding === null ? ' · flight lock' : ''}</p>}
@@ -403,6 +412,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
     </div>}
     {flightFixture && <div className="power-fixture">{(['begin-takeoff', 'finish-takeoff', 'begin-landing', 'finish-landing'] as const).map(kind => <button key={kind} onClick={event => { event.currentTarget.blur(); if (session.current) { session.current.world = current.current; session.current.transitionScout(kind === 'begin-landing' ? { kind, siteId: current.current.scoutLocation.siteId, bodyId: current.current.scoutLocation.body.id } : { kind }, session.current.snapshot.revision, current.current.cockpit); update({ ...session.current.world }) } }}>{kind}</button>)}</div>}
     {powerFixture && <div className="power-fixture" style={flightFixture ? { transform: 'translateY(-50px)' } : undefined}><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}
+    {gearOpen && resourceSession && <EquipmentPanel viewKey={JSON.stringify([resourceSession.snapshot.inventory,state.entities.find(e=>e.id===PLAYER_ID)?.anchor,state.player.mode,state.cockpit.view,state.scoutLocation.ship.mode,resourceSession.survival.health===0,resourceSession.error],(_,value)=>typeof value==='bigint'?String(value):value)} session={resourceSession} onClose={()=>setGearOpen(false)} onChange={()=>setState({...current.current})} />}
     {container.current?.opened && <ResourceContainerPanel interaction={container.current} onClose={closeContainer} onChange={() => setState({ ...current.current })} />}
     {objectMenu && menuActions.length > 0 && <ObjectContextMenu key={objectMenu.targetId} selection={objectMenu}
       label={state.entities.find(e => e.id === objectMenu.targetId)!.interaction!.label}
@@ -438,6 +448,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
             const meta = resourceSession.itemCatalog[id]!
             return <li className="count-item" key={id} data-item={id}><span>{meta.name ?? id} × {count}</span><span>{count * meta.gramsPerItem / 1000} kg · {Math.ceil(count / meta.stackSize)} slots</span></li>
           })}</ul>
+          <Button onClick={()=>{resourceSession.cancel();container.current?.close();setGearOpen(true)}}>Equipment and storage</Button>
           <MarkerDeployment session={resourceSession} blocked={paused.current || resourceSession.survival.health === 0 || !!resourceSession.error} onChange={() => setState({...current.current})} />
           {!Object.keys(resourceSession.snapshot.inventory.items).length && <p data-empty-items>No items carried.</p>}
           <p className="resource-note">{resourceSession.error || saveStatus}</p>

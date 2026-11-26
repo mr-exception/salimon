@@ -1,3 +1,10 @@
+Equipment/storage and hazard presentation (#920): `EquipmentPanel.tsx` reuses the
+shared industrial dialog; `equipmentUi.ts` owns confirmation drafts and read-only
+admission explanations. `equipmentHud.ts` derives stable committed readouts and
+sole-clock notices, rendered by memoized `EquipmentHud.tsx`. Production context
+routing stays in `topDownActions.ts`, `topDownCommands.ts`, `TopDownView.tsx`.
+`equipmentUi.test.ts` and `tests/equipment-ui.spec.ts` own focused coverage.
+
 Spacesuit repair (#919): `gearBench.ts` owns exact repair requests/receipts and
 final power charges; `resourceSession.ts` owns exclusive suit custody and atomic
 restoration/claim. `scoutEquipment.ts` locks attached modules while reserved.

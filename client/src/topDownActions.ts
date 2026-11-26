@@ -7,7 +7,7 @@ import { interactionInReach } from './topDownInteraction.ts'
 import { drawList, PLAYER_ID, type TopDownState } from './topDownRuntime.ts'
 import type { Anchor } from './topDownFrames.ts'
 
-export type ObjectActionId = 'inspect' | 'gather' | 'container' | 'core' | 'fabricator' | 'bench' | 'cockpit' | 'door'
+export type ObjectActionId = 'inspect' | 'gather' | 'container' | 'core' | 'fabricator' | 'bench' | 'equipment' | 'cockpit' | 'door'
 export interface ActionContext { world: TopDownState; session?: ResourceSession | null; paused: boolean; phase?: 'selection' | 'approach' | 'execution' }
 export interface ObjectAction {
   id: ObjectActionId
@@ -48,6 +48,7 @@ export function objectActions(context: ActionContext, id: string): ObjectAction[
   if (id === BOARDING_DOOR_ID) actions.push(action('door', world.scoutLocation.boardingDoor === 'open' ? 'Close door' : 'Open door', nearby || doorDenial(world, executing, context.phase !== 'approach'), true, ['door unlocked', 'doorway clear']))
   else if (isCockpitTarget(id) && world.cockpit.enabled) actions.push(action('cockpit', 'Use cockpit', nearby || (!world.cockpit.powered ? 'Cockpit has no power.' : world.cockpit.ownerId !== LOCAL_PLAYER || world.cockpit.occupantId !== null && world.cockpit.occupantId !== LOCAL_PLAYER ? 'Cockpit requires owner control and a free chair.' : executing && player.anchor.frame !== world.frames.ship.id ? 'Enter the Scout first.' : work), true, ['powered', 'owner', 'free chair']))
   else if (session && ['scout:storage', 'scout:core', 'scout:fabricator', 'scout:gear-bench'].includes(id)) {
+    if(id==='scout:storage')actions.push(action('equipment','Manage equipment and storage',nearby,true,['inside Scout','storage proximity','explicit confirmation']))
     const kind = id === 'scout:gear-bench' ? 'bench' : id === 'scout:storage' ? 'container' : id === 'scout:core' ? 'core' : 'fabricator'
     actions.push(action(kind, kind === 'bench' ? 'Use Gear Crafting Bench' : kind === 'container' ? 'Use Resource Container' : kind === 'core' ? 'Use Energy Core' : 'Use Fabricator', nearby || (executing && player.anchor.frame !== target.anchor.frame ? 'Enter the Scout first.' : null), true, ['proximity', 'explicit panel confirmation']))
   } else if (session && target.source) {

@@ -1,6 +1,6 @@
 import { formatDistance, formatSpeed } from './metricFormat.ts'
 import './metricFormat.css'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { distances, navigationWarnings } from './contact.ts'
 import './sensorMarkers.css'
 import { StatusMessage } from './ui/Feedback.tsx'
@@ -10,13 +10,17 @@ import type { Position } from './coordinates.ts'
 import type { ObservationCameraState } from './observationCamera.ts'
 import type { Body } from './sampleUniverse.ts'
 import type { Scanner } from './scanner.ts'
+import { assessScannerEnvironment, type ScannerEnvironmentSource } from './scannerEnvironment.ts'
+import { ScannerEnvironment } from './ScannerEnvironment.tsx'
+import type { SurfaceLocation } from './surfaceCoordinates.ts'
 import { currentContacts, perspectiveMarkers, selectContact, selectedContact } from './perspectiveContacts.ts'
 
 /** DOM companion to ObservationCamera + OpticalSky. Parent owns scanner ticks,
  * physical origin and optional flight action. No optical raycaster/hit meshes.
  * Every handler rechecks live scanner authority, including stale DOM events.
  */
-export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShip, canPilot = () => true, onSetDirection, destinationId = null, compact = false, browserOpen = true, onBrowserChange }: {
+export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShip, canPilot = () => true, onSetDirection, destinationId = null, compact = false, browserOpen = true, onBrowserChange, environment, landingSurface }: {
+ environment?: ScannerEnvironmentSource; landingSurface?: SurfaceLocation
  destinationId?: string | null
  compact?: boolean; browserOpen?: boolean; onBrowserChange?: (open: boolean) => void
  scanner: Scanner; geometry: readonly Body[]; view: ObservationCameraState; getOrigin: () => Position
@@ -37,6 +41,9 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
  }, [])
  const origin = getOrigin(), contacts = currentContacts(scanner, origin)
  const selected = selectedContact(scanner, origin)
+ const equipment = environment?.snapshot.inventory.equipment
+ const assessment = useMemo(() => environment && assessScannerEnvironment(selected, environment, landingSurface, equipment),
+  [selected, environment, landingSurface, equipment])
  const readings = selected && distances(getShip(), selected)
  const previousSelection = useRef<string | null>(null)
  const [contactLost, setContactLost] = useState(false)
@@ -106,6 +113,7 @@ export function PerspectiveContacts({ scanner, geometry, view, getOrigin, getShi
      const live = selectedContact(scanner, getOrigin())
      if (live && contactCommandAvailability(getShip(), live, canPilot()).setDirection) onSetDirection(live)
     }}>Set direction</button>}
+    {environment && <ScannerEnvironment key={selected.id} assessment={assessment} />}
    </>}
    </div>}
   </section>

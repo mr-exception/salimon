@@ -1,5 +1,8 @@
 # Planetary environmental art direction and exploration contract
 
+**Approved browser visual supplement (2026-11-26):** [Planetary visual production](planetary-visual-production.md) defines deterministic materials, relief, continuity, streaming, effects and orbital consistency. Existing physical environment and generation contracts remain authoritative; historical native delivery does not imply browser delivery.
+
+
 ## Current 2D environmental presentation boundary
 
 The **authoritative gameplay view is overhead illustrated 2D**, not an overhead camera over a low-poly 3D terrain renderer. Canonical geology, source IDs, climate, ecology and landmarks retain their deterministic meaning; surface appearance is projected into persistent regional illustrations, material sprites and readable local effects. Gameplay collision/reach uses stable 2D footprints from the same published source, not independently painted obstacles. Geological uplift, eroded ridges, biological silhouettes, rain, fog and rare sites must remain coherent across zoom and replay rather than random independent AI background images.

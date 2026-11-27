@@ -29,7 +29,7 @@ import { QUALITY, renderDpr, type WorldQuality } from './rendering/graphicsPrefe
 import { useWorldGraphics, WorldGraphicsSettings } from './rendering/WorldGraphicsSettings.tsx'
 import { diagnosticsEnabled, FrameDiagnostics, RenderDiagnostics } from './rendering/RenderDiagnostics.tsx'
 import { isScoutModule, scoutArtObstructs, scoutWallJoins } from './rendering/scoutArt.ts'
-import { ScoutCharacter } from './rendering/ScoutCharacter.tsx'
+import { characterArt, ScoutCharacter } from './rendering/ScoutCharacter.tsx'
 import { ScoutModule, ScoutWall } from './rendering/ScoutModules.tsx'
 import { svgArtIntersects, svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
@@ -131,13 +131,19 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
   const visible = usePresentationVisibility()
   const showWorld = visible && state.cockpit.view === 'world'
   const rasterScale = Math.max(.5, renderDpr(window.devicePixelRatio, quality) / window.devicePixelRatio)
-  const request = (entity: DrawItem['entity'], selected = false) => spriteRequest(entity, selected, rasterScale)
+  const pilot = characterArt(session?.snapshot.inventory.equipment, !!session?.equipped, mode, quality.shadows === 'dynamic')
+  const stride = mode === 'walking' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? .13 * Math.sin(state.tick * Math.PI / 12) : 0
+  const request = (entity: DrawItem['entity'], selected = false) => ({
+    ...spriteRequest(entity, selected, rasterScale),
+    character: entity.id === PLAYER_ID && !selected ? pilot : undefined,
+  })
   const intersects = (item: DrawItem, margin = 0, selected = false) => svgArtIntersects(item,
     spriteBounds({ entity: item.entity, selected }), width / pixelsPerM, height / pixelsPerM, margin)
   const requests = showWorld ? items.filter(item => intersects(item, 4)).flatMap<ReturnType<typeof spriteRequest>>(({ entity }) => {
     const wall = wallJoins.get(entity.id)
     if (wall) return scoutWallRequests(entity, wall)
-    return isScoutModule(entity) || entity.id === PLAYER_ID ? [] : [request(entity)]
+    return isScoutModule(entity) ? [] : [request(entity)]
   }) : []
   if (showWorld && selection && intersects(selection, 4, true)) requests.push(request(selection.entity, true))
   const artwork = useWorldSprites(requests)
@@ -150,9 +156,13 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
       playerArt.positionM[0] - item.positionM[0], playerArt.positionM[1] - item.positionM[1],
     ], -item.angle))
     const illustration = entity.id === PLAYER_ID
-      ? <ScoutCharacter equipment={session?.snapshot.inventory.equipment} tool={!!session?.equipped}
-          mode={mode} tick={state.tick} dynamicShadow={quality.shadows === 'dynamic'}
-          reducedMotion={window.matchMedia('(prefers-reduced-motion: reduce)').matches} />
+      ? <g data-character="" data-suit-condition={pilot.condition} data-suit-equipped={String(pilot.suited)}>
+          {pilot.tool && <g data-held-tool="" />}
+          {pilot.modules.map(item => <g key={item.slot} data-character-module={item.definitionId}
+            data-module-condition={item.condition} />)}
+          {stride !== 0 ? <ScoutCharacter art={pilot} stride={stride} />
+            : <WorldSprite request={sprite} outcome={artwork.get(sprite)} pending={<ScoutCharacter art={pilot} />} />}
+        </g>
       : <WorldSprite request={sprite} outcome={artwork.get(sprite)} />
     const wallSprites = wall && scoutWallRequests(entity, wall).map(wallSprite =>
       <WorldSprite key={wallSprite.wall.part} request={wallSprite} outcome={artwork.get(wallSprite)} />)

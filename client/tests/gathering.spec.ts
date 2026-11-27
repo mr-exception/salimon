@@ -113,6 +113,8 @@ test('modular pilot follows actual movement and held tool through reload', async
   await expect(pilot).toHaveAttribute('transform', /rotate\(-90\)/)
   await page.getByRole('button', { name: 'Equip gathering tool' }).click()
   await expect(character.locator('[data-held-tool]')).toHaveCount(1)
+  await expect(page.locator('.top-down-scene')).toHaveAttribute('data-render-ready', 'true')
+  await expect(character.locator('image')).toBeVisible()
   const original = await page.screenshot({ path: info.outputPath('pilot-equipped.png') })
   const repeat = await page.screenshot({ path: info.outputPath('pilot-equipped-repeat.png') })
   expect(compareImages(original, repeat).pass).toBe(true)

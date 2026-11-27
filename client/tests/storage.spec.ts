@@ -28,9 +28,13 @@ test('STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and r
       await expect(page.locator('[data-resource="mineral"]')).toHaveText('1 kg')
       for (const p of [[-6, 3], [-2, 3], [-2, 7]]) await walkTo(page, p, 'planet:fixture', true)
       for (const p of [[0, 7], [.5, 4.25]]) await walkTo(page, p, 'ship:scout', true)
+      const artwork = page.locator('[data-scout-fixture="storage"]')
+      await expect(artwork).toHaveAttribute('data-fixture-state', 'empty')
+      await expect(artwork).toHaveAttribute('data-fixture-rotation', '270')
       await expect(page.locator('[data-prompt]')).toContainText('Resource Container · 50 kg · Use [E]')
       await page.keyboard.press('e')
       await expect(dialog(page)).toBeVisible()
+      await expect(artwork).toHaveAttribute('data-fixture-state', 'raw-access')
       await expect(page.locator('[data-gathering]')).toHaveAttribute('data-gathering', '') // E chose storage even with the tool equipped.
       const capture = async (name: string) => {
         await page.clock.runFor(5000)
@@ -73,6 +77,8 @@ test('STORE-UI-1 built mine, enter, confirm deposit/withdraw, cancel, exit and r
       await input.fill('wasde'); await walkTicks(page, [], 5)
       expect(await position(page)).toEqual(beforeTyping)
       await page.keyboard.press('Escape')
+      await expect(artwork).toHaveAttribute('data-fixture-state', 'loaded')
+      await capture('storage-fixture-loaded')
       await walkTicks(page, 's', 5); expect(await position(page)).not.toEqual(beforeTyping)
       for (const p of [[0, 4.5], [0, 7]]) await walkTo(page, p, 'ship:scout', true)
       await walkTo(page, [-2, 7], 'planet:fixture', true)

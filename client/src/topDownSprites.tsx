@@ -1,3 +1,4 @@
+import { scoutFixture, ScoutFixtureBody } from './rendering/ScoutFixtures.tsx'
 import { scoutMachine, ScoutMachineBody } from './rendering/ScoutMachine.tsx'
 import { ScoutCharacter, type CharacterArt } from './rendering/ScoutCharacter.tsx'
 import { useEffect, useRef, useState } from 'react'
@@ -65,6 +66,8 @@ function spriteArt({ entity, wall, character }: SpriteRequest) {
   if (character) return <ScoutCharacter art={character} />
   const machine = scoutMachine(entity)
   if (machine) return <ScoutMachineBody entity={entity} machine={machine} />
+  const fixture = scoutFixture(entity)
+  if (fixture) return <ScoutFixtureBody entity={entity} fixture={fixture} />
   return wall
     ? <ScoutWallArt entity={entity} {...wall} />
     : <Illustration appearance={entity.appearance} footprint={entity.footprint} />

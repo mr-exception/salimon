@@ -23,3 +23,31 @@ test('HAZ-917 production physical sampling wears gear, pauses and restores exact
  await page.screenshot({path:info.outputPath('live-exposure.png')})
  await info.attach('live-hazard-state.json',{body:JSON.stringify({first,worn,paused,restored}),contentType:'application/json'})
 })
+
+test('destroyed installed module disappears from the production pilot', async ({ page }, info) => {
+  let raw = ''
+  const initial = createTopDownState('exterior', true)
+  const world = { ...initial, entities: initial.entities.map(entity => entity.id === PLAYER_ID
+    ? { ...entity, anchor: { frame: 'planet:fixture' as const, point: point2(129, 0) } }
+    : entity) }
+  const session = new ResourceSession({ getItem: () => raw || null, setItem: (_, value) => { raw = value } },
+    world, undefined, undefined, () => Date.parse('2026-11-04T00:00:01Z'))
+  session.upgrade(10000, 12)
+  expect(session.error).toBe('')
+  const save = JSON.parse(raw)
+  const module = save.inventory.equipment.instances[1]
+  module.remaining = '1/1000'
+  await page.addInitScript(({ key, snapshot }) => {
+    if (!localStorage.getItem(key)) localStorage.setItem(key, snapshot)
+  }, { key: RESOURCE_SAVE_KEY, snapshot: JSON.stringify(save) })
+  await boot(page, '', 'http://127.0.0.1:4175')
+  await walkTicks(page, [], 20)
+  await expect(page.locator('[data-character]')).toHaveAttribute('data-suit-equipped', 'true')
+  await expect(page.locator('[data-character-module="module:temperature:t1"]')).toHaveCount(0)
+  await expect(page.getByLabel('Equipment destruction')).toContainText('Temperature module')
+  const destroyed = await page.evaluate(({ key, id }) => JSON.parse(localStorage.getItem(key)!)
+    .inventory.equipment.instances.find((item: { id: string }) => item.id === id),
+  { key: RESOURCE_SAVE_KEY, id: module.id })
+  expect(destroyed).toEqual({ ...module, remaining: '0/1', location: { kind: 'destroyed' } })
+  await page.screenshot({ path: info.outputPath('pilot-module-destroyed.png') })
+})

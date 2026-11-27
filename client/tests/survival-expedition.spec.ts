@@ -200,6 +200,8 @@ test('H10-922 fresh production expedition conserves equipment, cargo, power and 
     expect((await record('installed')).inventory.equipment!.instances.find(item => item.id === claim.gearId)?.location)
       .toEqual({ kind: 'installed', suitId: starter[0]!.id, slot: 1 })
     await page.keyboard.press('Escape')
+    const installedArt = player(page).locator(`[data-character-module="${radModule}"]`)
+    await expect(installedArt).toHaveCount(1)
 
     await walkTo(page, [0, 4.7], 'ship:scout', true)
     await page.keyboard.press('e'); await page.clock.runFor(32)
@@ -329,6 +331,7 @@ test('H10-922 fresh production expedition conserves equipment, cargo, power and 
       ...boundary.inventory.equipment.instances.find(item => item.id === claim.gearId),
       location: { kind: 'destroyed' }, remaining: '0/1',
     })
+    await expect(installedArt).toHaveCount(0)
     await capture('module-destruction')
     for (let segment = 0; segment < 20 && await player(page).getAttribute('data-frame') === 'planet:fixture'; segment++) {
       await walkTicks(page, 'w', 12)

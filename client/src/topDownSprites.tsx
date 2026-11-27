@@ -1,3 +1,4 @@
+import { ScoutCharacter, type CharacterArt } from './rendering/ScoutCharacter.tsx'
 import { useEffect, useRef, useState } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { ScoutWallArt } from './rendering/ScoutModules.tsx'
@@ -7,11 +8,11 @@ import type { Entity2D } from './topDownRuntime.ts'
 
 type Bounds = readonly [number, number, number, number]
 interface Sprite { readonly url: string; readonly bounds: Bounds; readonly bytes: number; readonly decodedBytes: number }
-type SpriteRequest = { entity: Entity2D; selected?: boolean; rasterScale?: number; wall?: { joins: WallJoins; part: 'base' | 'cap' } }
+type SpriteRequest = { entity: Entity2D; selected?: boolean; rasterScale?: number; wall?: { joins: WallJoins; part: 'base' | 'cap' }; character?: CharacterArt }
 type SpriteOutcome = { key: string; sprite?: Sprite; failed?: boolean }
 
-const spriteKey = ({ entity, selected, rasterScale = 1, wall }: SpriteRequest) =>
-  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}:${rasterScale}${wall ? `:${wall.part}:${wall.joins.join(',')}` : ''}`
+const spriteKey = ({ entity, selected, rasterScale = 1, wall, character }: SpriteRequest) =>
+  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}:${rasterScale}${wall ? `:${wall.part}:${wall.joins.join(',')}` : ''}${character ? JSON.stringify(character) : ''}`
 const essential = ({ entity, selected }: SpriteRequest) =>
   selected || !['ground', 'surface', 'stones'].includes(entity.appearance)
 
@@ -59,7 +60,8 @@ export function scoutWallRequests(entity: Entity2D, joins: WallJoins) {
   ] as const
 }
 
-function spriteArt({ entity, wall }: SpriteRequest) {
+function spriteArt({ entity, wall, character }: SpriteRequest) {
+  if (character) return <ScoutCharacter art={character} />
   return wall
     ? <ScoutWallArt entity={entity} {...wall} />
     : <Illustration appearance={entity.appearance} footprint={entity.footprint} />
@@ -189,14 +191,14 @@ export function useWorldSprites(requests: readonly SpriteRequest[]) {
   }
 }
 
-export function WorldSprite({ request, outcome }: { request: SpriteRequest; outcome?: SpriteOutcome }) {
+export function WorldSprite({ request, outcome, pending }: { request: SpriteRequest; outcome?: SpriteOutcome; pending?: React.ReactNode }) {
   if (outcome?.failed) {
     if (request.selected) return null
     // The retained vector source supplies the same silhouette if its raster
     // cannot be decoded. The retry control is reserved for essential artwork.
     return spriteArt(request)
   }
-  if (!outcome?.sprite) return null
+  if (!outcome?.sprite) return pending ?? null
   const { url, bounds: [x, y, width, height] } = outcome.sprite
   return <image href={url} x={x} y={y} width={width} height={height} />
 }

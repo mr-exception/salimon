@@ -142,6 +142,7 @@ test('every delivered protection and gathering icon exports a transparent 256px 
   expect(bottom - top).toBeGreaterThan(20)
   await info.attach(asset.id.replaceAll(':', '-'), { body: Buffer.from(asset.png.split(',')[1]!, 'base64'), contentType: 'image/png' })
  }
+ await dialog.getByRole('list', { name: 'Equipment inventory' }).evaluate(list => list.scrollIntoView({ block: 'start' }))
  const original = await dialog.screenshot({ path: info.outputPath('equipment-icons.png') })
  const repeat = await dialog.screenshot({ path: info.outputPath('equipment-icons-repeat.png') })
  expect(compareImages(original, repeat).pass).toBe(true)

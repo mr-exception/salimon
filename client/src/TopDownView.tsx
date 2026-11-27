@@ -24,7 +24,10 @@ import { controlsCockpit, LOCAL_PLAYER, isCockpitTarget, leaveCockpit, setCockpi
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
 import { cancelInteraction, createTopDownState, drawList, PLAYER_ID, type DrawItem, requestInteraction, stepTopDown, TopDownClock, type TopDownState } from './topDownRuntime.ts'
-import { spriteBounds, usePresentationVisibility, useWorldSprites, WorldSprite } from './topDownSprites.tsx'
+import { spriteBounds, spriteRequest, usePresentationVisibility, useWorldSprites, WorldSprite } from './topDownSprites.tsx'
+import { QUALITY, renderDpr, type WorldQuality } from './rendering/graphicsPreferences.ts'
+import { useWorldGraphics, WorldGraphicsSettings } from './rendering/WorldGraphicsSettings.tsx'
+import { diagnosticsEnabled, FrameDiagnostics, RenderDiagnostics } from './rendering/RenderDiagnostics.tsx'
 import { svgArtIntersects, svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
@@ -37,7 +40,7 @@ import { useDismissLayer } from './ui/interaction.ts'
 import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
-export function TopDownScene({ state, session, onGround, onCancelGround, onCamera }: { state: TopDownState; session?: ResourceSession | null; onGround?: (anchor: Anchor, objectId: string | null, pointer: { x: number; y: number }) => void; onCancelGround?: () => void; onCamera?: (operation: (world: TopDownState) => TopDownState) => void }) {
+export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () => [], session, onGround, onCancelGround, onCamera }: { state: TopDownState; quality?: WorldQuality; activeCues?: () => readonly string[]; session?: ResourceSession | null; onGround?: (anchor: Anchor, objectId: string | null, pointer: { x: number; y: number }) => void; onCancelGround?: () => void; onCamera?: (operation: (world: TopDownState) => TopDownState) => void }) {
   const viewport = useRef<SVGSVGElement>(null)
   const cameraInput = useRef({ onCamera, onCancelGround })
   cameraInput.current = { onCamera, onCancelGround }
@@ -120,15 +123,18 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
   const selection = items.find(item => item.entity.id === selectedId)
   const visible = usePresentationVisibility()
   const showWorld = visible && state.cockpit.view === 'world'
+  const rasterScale = Math.max(.5, renderDpr(window.devicePixelRatio, quality) / window.devicePixelRatio)
+  const request = (entity: DrawItem['entity'], selected = false) => spriteRequest(entity, selected, rasterScale)
   const intersects = (item: DrawItem, margin = 0, selected = false) => svgArtIntersects(item,
     spriteBounds({ entity: item.entity, selected }), width / pixelsPerM, height / pixelsPerM, margin)
-  const requests = showWorld ? items.filter(item => intersects(item, 4)).map(({ entity }) => ({ entity, selected: false })) : []
-  if (showWorld && selection && intersects(selection, 4, true)) requests.push({ entity: selection.entity, selected: true })
+  const requests = showWorld ? items.filter(item => intersects(item, 4)).map(({ entity }) => request(entity)) : []
+  if (showWorld && selection && intersects(selection, 4, true)) requests.push(request(selection.entity, true))
   const artwork = useWorldSprites(requests)
   const renderItems = (list: readonly DrawItem[]) => list.map(item => {
     const { entity } = item
+    const sprite = request(entity)
     return <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? mode : undefined} data-facing={entity.id === PLAYER_ID ? facing : undefined} transform={svgSpriteTransform(item, pixelsPerM)}>
-      {showWorld && intersects(item) && <WorldSprite request={{ entity }} outcome={artwork.get({ entity })} />}
+      {showWorld && intersects(item) && <WorldSprite request={sprite} outcome={artwork.get(sprite)} />}
     </g>
   })
   const destination = state.groundCommand && ['moving', 'arrived', 'failed'].includes(state.groundCommand.status) && (state.frames.ship.parent !== null || state.groundCommand.destination.frame === 'ship:scout') && worldToView(relativeAnchor(state.groundCommand.destination, state.camera.anchor, state.frames), state.frames)
@@ -146,19 +152,30 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
     const objectId = interactiveAt(state, anchor, id)
     event.currentTarget.focus({ preventScroll: true })
     onGround?.(anchor, objectId, { x: event.clientX, y: event.clientY })
-  }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" data-camera-scale={state.camera.pixelsPerM} data-camera-panned={String(!!state.camera.panned)} viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(artwork.ready)} data-art-resources={JSON.stringify(artwork.stats)} aria-busy={!artwork.ready && !artwork.error}>
+  }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" data-camera-scale={state.camera.pixelsPerM} data-camera-panned={String(!!state.camera.panned)} viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-world-raster-scale={rasterScale} data-render-ready={String(artwork.ready)} data-art-resources={JSON.stringify(artwork.stats)} aria-busy={!artwork.ready && !artwork.error}>
     {passes.map(({ id: layer, beforeTerrain, sprites }) => <g key={layer} data-layer={layer}>
       {layer === 'terrain' && state.scoutLocation.binding && <rect x={-width/2} y={-height/2} width={width} height={height} fill="#b5a58b" />}
       {renderItems(beforeTerrain)}
-      {layer === 'terrain' && showWorld && <GeneratedGround state={state} width={width} height={height} />}
+      {layer === 'terrain' && showWorld && <GeneratedGround state={state} width={width} height={height} rasterScale={rasterScale} detail={quality.environment / 100} diagnostics={diagnosticsEnabled} />}
+      {layer === 'people' && showWorld && quality.shadows === 'dynamic' && <g data-world-shadows="dynamic" pointerEvents="none">
+        {items.filter(item => ['player', 'core', 'fabricator', 'storage', 'bed'].includes(item.entity.appearance) && intersects(item))
+          .map(item => <ellipse key={item.entity.id} transform={svgSpriteTransform(item, pixelsPerM)}
+            cx=".14" cy=".18" rx={(item.entity.footprint?.halfWidth ?? .28) + .17}
+            ry={(item.entity.footprint?.halfHeight ?? .24) + .09} fill="#18242a" opacity=".23" />)}
+      </g>}
       {renderItems(sprites)}
       {layer === 'cues' && destination && <g pointerEvents="none" data-destination={state.groundCommand!.status} transform={`translate(${destination[0] * state.camera.pixelsPerM} ${destination[1] * state.camera.pixelsPerM})`} className="command-destination" fill="none" stroke={state.groundCommand!.status === 'failed' ? 'var(--ui-danger)' : 'var(--ui-active)'} strokeWidth="2">
         <circle r="9" /><path d="M -14 0 H -5 M 5 0 H 14 M 0 -14 V -5 M 0 5 V 14" />
       </g>}
       {layer === 'cues' && <FieldMarkCues state={state} session={session} />}
-      {layer === 'cues' && showWorld && selection && intersects(selection, 0, true) && <g data-selection={selection.entity.id} transform={svgSpriteTransform(selection, pixelsPerM)} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite request={{ entity: selection.entity, selected: true }} outcome={artwork.get({ entity: selection.entity, selected: true })} /></g>}
+      {layer === 'cues' && showWorld && selection && intersects(selection, 0, true) && <g data-selection={selection.entity.id} transform={svgSpriteTransform(selection, pixelsPerM)} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite request={request(selection.entity, true)} outcome={artwork.get(request(selection.entity, true))} /></g>}
     </g>)}
-  </svg></>
+    {diagnosticsEnabled && showWorld && <RenderDiagnostics state={state} items={items} art={artwork.stats} activeCues={activeCues} />}
+  </svg>
+  {diagnosticsEnabled && showWorld && <FrameDiagnostics backend="SVG CPU"
+    details={`${artwork.stats.count} images · ${artwork.stats.decodedBytes} estimated decoded RGBA8 bytes · ${state.frames.surface?.chart?.id ?? 'authored terrain'}`}
+    measure={() => `audio ${activeCues().join(', ') || 'idle'}`} />}
+  </>
 }
 
 let navigationPresentation: Promise<typeof PanoramicNavigation> | undefined
@@ -170,6 +187,7 @@ function loadNavigationPresentation() {
 
 const openResourceSession = (storage: ResourceStorage, world: TopDownState) => new ResourceSession(storage, world)
 export function TopDownView({ gameplay = false, createResourceSession = openResourceSession }: { gameplay?: boolean; createResourceSession?: typeof openResourceSession }) {
+  const graphics = useWorldGraphics()
   const flightFixture = import.meta.env.DEV && gameplay && new URLSearchParams(location.search).has('flightFixture')
   const powerFixture = import.meta.env.DEV && gameplay && new URLSearchParams(location.search).has('powerFixture')
   const [state, setState] = useState(() => createTopDownState(import.meta.env.DEV && new URLSearchParams(location.search).get('view') === 'interior' ? 'interior' : 'exterior', gameplay))
@@ -451,6 +469,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       <button onClick={() => {setHelpOpen(false);setScoutGuiding(value => !value)}}>Return to Scout</button>
       <p>In the cockpit use the observation controls and Exit cockpit to stand up.</p>
       {gameplay && <ExpeditionAudioSettings audio={audio} />}
+      {gameplay && <WorldGraphicsSettings graphics={graphics} />}
     </Dialog>
     {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
       {!NavigationPresentation && <div className="world-art-error">
@@ -458,7 +477,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
         {panoramic.error && <button onClick={() => { setPanoramic({}); setNavigationRetry(value => value + 1) }}>Retry navigation</button>}
         <button onClick={() => update(leaveCockpit(current.current))}>Exit cockpit</button>
       </div>}
-      {NavigationPresentation && <NavigationPresentation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
+      {NavigationPresentation && <NavigationPresentation graphics={graphics} conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         canPilot={() => !paused.current && !!session.current && !session.current.error && survivalPolicy(session.current.survival).canWork && controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         environment={resourceSession ?? undefined}
@@ -479,7 +498,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       actions={menuActions} onClose={closeObjectMenu} onChoose={chooseObjectAction} />}
     <main data-surface-bound={String(state.scoutLocation.binding !== null)} data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
-    <section className="top-down-stage"><TopDownScene state={state} session={resourceSession} onCamera={operation => {
+    <section className="top-down-stage"><TopDownScene state={state} quality={graphics.quality} activeCues={audio.activeCueIds} session={resourceSession} onCamera={operation => {
         if (paused.current || current.current.cockpit.view !== 'world' || container.current?.opened || document.querySelector('dialog[open]')) return
         const next = operation(current.current)
         if (resourceSession) resourceSession.world = next

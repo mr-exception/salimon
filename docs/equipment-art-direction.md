@@ -11,3 +11,15 @@ Core rounded/cylindrical reinforced reactor with subtle cyan activity and energy
 ## Equipment
 Tierless suit always equipped indoors/outdoors; no automatic clothing/helmet swap. Modular layers, recognizable temperature insulation/heat exchange, radiation shield housing, toxicity filters/cartridges, future backpack storage; tier refinement within same functional shape/anchors, no RPG rarity rainbow or oversized superhero gear. Held tools only when equipped; practical handles and working parts, extraction not weapon silhouette. Three-quarter inventory icons per production guide; same object identity as world sprite. Durability overlays: >=80% maintained, >=40% and <80% minor wear, >0% and <40% deterioration, zero broken/destroyed per domain; broken suit remains until replaced/repaired, destroyed modules disappear per state, cosmetic aging independent, repairs restore appearance. Thresholds presentation only; no damage sources introduced.
 Initial slice: hull/interior → character/suit → Core/Fabricator/bench/storage/cabinet/cockpit/door → tools/modules/icons → habitation → lighting/motion → integrated acceptance. Reuse existing gameplay; no new ship classes.
+
+### Scout modular cutaway
+
+The playable SVG Scout assembles its bow, side rails, aft corners, propulsion
+housings, three deck zones, wall caps, glazing and boarding-door panels in the
+existing ship-local view. Wall ends join where the published footprint meets a
+neighbor at the seam. Cabin, cockpit and cargo finishes share the existing
+positions. Door leaves follow the saved closed state and leave the open
+threshold visible. Wall caps and furniture near the player’s foreground
+silhouette can fade to 26% opacity over 190 ms. Reduced-motion preference makes
+that change immediate. The cues and the door state remain visible. All
+collision, movement, interaction anchors and save data remain domain-owned.

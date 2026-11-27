@@ -1,3 +1,4 @@
+import { scoutMachine, ScoutMachineBody } from './rendering/ScoutMachine.tsx'
 import { ScoutCharacter, type CharacterArt } from './rendering/ScoutCharacter.tsx'
 import { useEffect, useRef, useState } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -12,7 +13,7 @@ type SpriteRequest = { entity: Entity2D; selected?: boolean; rasterScale?: numbe
 type SpriteOutcome = { key: string; sprite?: Sprite; failed?: boolean }
 
 const spriteKey = ({ entity, selected, rasterScale = 1, wall, character }: SpriteRequest) =>
-  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}:${rasterScale}${wall ? `:${wall.part}:${wall.joins.join(',')}` : ''}${character ? JSON.stringify(character) : ''}`
+  `${selected ? 'selection' : scoutMachine(entity)?.kind ?? entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}:${rasterScale}${wall ? `:${wall.part}:${wall.joins.join(',')}` : ''}${character ? JSON.stringify(character) : ''}`
 const essential = ({ entity, selected }: SpriteRequest) =>
   selected || !['ground', 'surface', 'stones'].includes(entity.appearance)
 
@@ -62,6 +63,8 @@ export function scoutWallRequests(entity: Entity2D, joins: WallJoins) {
 
 function spriteArt({ entity, wall, character }: SpriteRequest) {
   if (character) return <ScoutCharacter art={character} />
+  const machine = scoutMachine(entity)
+  if (machine) return <ScoutMachineBody entity={entity} machine={machine} />
   return wall
     ? <ScoutWallArt entity={entity} {...wall} />
     : <Illustration appearance={entity.appearance} footprint={entity.footprint} />

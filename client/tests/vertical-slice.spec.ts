@@ -32,6 +32,13 @@ test('SLICE-880 built mine → storage → Core → Fabricator → marker → co
     return s
   }
   await seed(page, fixture('journey')); await boot(page, '', origin)
+  const fabricatorArt = page.locator('[data-scout-machine="fabricator"]')
+  const machineCapture = async (state: string) => {
+    await expect(fabricatorArt).toHaveAttribute('data-machine-state', state)
+    const original = await page.screenshot({ path: info.outputPath(`fabricator-${state}.png`) })
+    const repeat = await page.screenshot({ path: info.outputPath(`fabricator-${state}-repeat.png`) })
+    expect(compareImages(original, repeat).pass).toBe(true)
+  }
   await record('initial')
   await page.screenshot({ path: info.outputPath('production-start.png') })
   await expect(panel(page)).toHaveCount(0)
@@ -54,11 +61,13 @@ test('SLICE-880 built mine → storage → Core → Fabricator → marker → co
   await expect(page.getByRole('button', { name: 'Start fabrication' })).toBeDisabled()
   await transfer(page, 'deposit', 1000)
   await page.getByRole('button', { name: 'Start fabrication' }).press('Enter')
+  await machineCapture('active')
   const started = await record('started')
   expect(started.fabricator.started).toBe(1); expect(started.stores[inputId].quantities).toEqual({})
   await expect(page.getByRole('button', { name: 'Start fabrication' })).toBeDisabled()
   await page.clock.runFor(2000)
   await expect(page.getByRole('status', { name: 'Fabricator operating status' })).toContainText('Paused')
+  await machineCapture('paused')
   const interrupted = await record('interrupted')
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'Pause [P]', exact: true }).click()
@@ -72,6 +81,7 @@ test('SLICE-880 built mine → storage → Core → Fabricator → marker → co
   expect((await record('paused-reload')).fabricator).toEqual(interrupted.fabricator)
   await page.keyboard.press('e'); await expect(panel(page)).toBeVisible()
 
+  await expect(page.locator('[data-scout-machine="core"]')).toHaveAttribute('data-machine-state', 'unpowered')
   await page.clock.runFor(1000); expect((await saved(page)).fabricator).toEqual(interrupted.fabricator)
   await page.screenshot({ path: info.outputPath('power-interruption.png') })
   await page.keyboard.press('Escape'); await page.keyboard.press('e')
@@ -100,10 +110,12 @@ test('SLICE-880 built mine → storage → Core → Fabricator → marker → co
   const before = await position(page); await input.fill('wasdep'); await page.keyboard.press('w'); await walkTicks(page, [], 5)
   expect(await position(page)).toEqual(before)
   await page.clock.runFor(21000)
+  await machineCapture('output')
   const complete = await record('complete')
   expect(complete.fabricator.tray.count).toBe(1); expect(complete.inventory.items[MARKER_KIT_ID]).toBeUndefined()
   await expect(page.getByRole('status', { name: 'Fabricator operating status' })).toContainText('Complete')
   await page.getByRole('button', { name: 'Claim output' }).click()
+  await expect(fabricatorArt).toHaveAttribute('data-machine-state', 'idle')
   const claimed = await record('claimed')
   expect(claimed.fabricator.tray).toBeNull(); expect(claimed.inventory.items[MARKER_KIT_ID]).toBe(1)
   await expect(page.getByRole('button', { name: 'Claim output' })).toHaveCount(0)

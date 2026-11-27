@@ -1,3 +1,4 @@
+import { ScoutCharacter } from './rendering/ScoutCharacter.tsx'
 import { EquipmentHud } from './EquipmentHud.tsx'
 import { GearNoticeTracker, equipmentHudReadout } from './equipmentHud.ts'
 import { EquipmentPanel } from './EquipmentPanel.tsx'
@@ -136,7 +137,7 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
   const requests = showWorld ? items.filter(item => intersects(item, 4)).flatMap<ReturnType<typeof spriteRequest>>(({ entity }) => {
     const wall = wallJoins.get(entity.id)
     if (wall) return scoutWallRequests(entity, wall)
-    return isScoutModule(entity) ? [] : [request(entity)]
+    return isScoutModule(entity) || entity.id === PLAYER_ID ? [] : [request(entity)]
   }) : []
   if (showWorld && selection && intersects(selection, 4, true)) requests.push(request(selection.entity, true))
   const artwork = useWorldSprites(requests)
@@ -148,7 +149,10 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
     const fade = playerArt && scoutArtObstructs(entity, rotate2([
       playerArt.positionM[0] - item.positionM[0], playerArt.positionM[1] - item.positionM[1],
     ], -item.angle))
-    const illustration = <WorldSprite request={sprite} outcome={artwork.get(sprite)} />
+    const illustration = entity.id === PLAYER_ID
+      ? <ScoutCharacter equipment={session?.snapshot.inventory.equipment} tool={!!session?.equipped}
+          mode={mode} tick={state.tick} reducedMotion={window.matchMedia('(prefers-reduced-motion: reduce)').matches} />
+      : <WorldSprite request={sprite} outcome={artwork.get(sprite)} />
     const wallSprites = wall && scoutWallRequests(entity, wall).map(wallSprite =>
       <WorldSprite key={wallSprite.wall.part} request={wallSprite} outcome={artwork.get(wallSprite)} />)
     return <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? mode : undefined} data-facing={entity.id === PLAYER_ID ? facing : undefined} transform={svgSpriteTransform(item, pixelsPerM)}>

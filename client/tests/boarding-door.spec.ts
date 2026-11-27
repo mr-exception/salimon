@@ -99,7 +99,7 @@ test('Scout modular cutaway joins walls, keeps the door readable and fades nearb
    const rails = page.locator('[data-scout-module="hull-rail"]')
    const deck = page.locator('[data-scout-module="deck"]')
    const crate = page.locator('[data-entity="fixture:crate"] .scout-obstruction')
-   const avatar = page.locator('[data-entity="person:player"] image')
+   const avatar = page.locator('[data-entity="person:player"] [data-character]')
    await expect(rails).toHaveCount(2)
    await expect(deck.locator('[data-scout-module$="-floor"]')).toHaveCount(3)
    await expect(page.locator('[data-scout-module="window"]')).toHaveCount(1)

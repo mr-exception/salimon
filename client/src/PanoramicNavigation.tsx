@@ -25,6 +25,7 @@ import { FeedbackScope, StatusMessage } from './ui/Feedback.tsx'
 import './ui/tokens.css'
 import './ui/primitives.css'
 import './panoramic.css'
+import { usePresentationVisibility } from './topDownSprites.tsx'
 
 /** Reusable presentation. The cockpit lifecycle owner supplies the runtime and
  * local view; no simulation, discovery or view lifetime belongs to the camera.
@@ -36,6 +37,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   opticalBodies?: readonly Body[]
   isPaused?: () => boolean; onExit?: () => void; onSceneReady?: (state: RootState) => void
 }) {
+  const visible = usePresentationVisibility()
   const [, redraw] = useState(0)
   const [orientationGrid, setOrientationGrid] = useState(false)
   const [browser, setBrowser] = useState(false), [telemetry, setTelemetry] = useState(false), [help, setHelp] = useState(false)
@@ -120,7 +122,7 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     { id: 'terminal', text: ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : '', priority: 'critical' },
     { id: 'condition', text: conditionWarning, priority: 'critical' },
   ]}><div ref={root} className="panoramic expedition-ui metric-readout" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDown={dismiss}>
-    <Canvas className="panoramic-scene" onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
+    <Canvas frameloop={visible ? 'always' : 'never'} className="panoramic-scene" onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
       <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position} definitionForBody={navigation.surfaceDefinitionForBody} scannerEnvironment orientationGrid={orientationGrid}/>
     </Canvas>
     <div className="observation-reticle" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M3 16H10 M22 16H29 M16 3V10 M16 22V29"/><circle cx="16" cy="16" r="1"/></svg></div>

@@ -97,3 +97,21 @@ revision. Production acceptance separately checks built world and cockpit
 controls, view switching, reload, save identity and a single 60 Hz clock.
 The fixture timings compare candidate renderers under equal workloads and
 exclude the production React projection optimization.
+
+### Presentation resource lifetime
+
+The retained world loads essential authored sprites before decorative terrain
+art. The viewport plus a four-metre margin determines which sprite variants
+are prepared. Rotated art bounds include overhang and raster padding. Only
+intersecting artwork paints, while the interaction and collision paths retain
+their domain projections. The cache reuses identical artwork variants and
+revokes blob URLs on eviction, cockpit entry, hidden tabs and teardown.
+Decorative raster failures use the authored vector source. Essential failures
+offer an in-game retry and preserve the current expedition.
+
+The cockpit presentation uses Vite's content-hashed chunk. Approach to the
+cockpit seat starts its preload. The 3D canvas and its materials are owned by
+the mounted cockpit and released on exit. Hidden tabs suspend both render
+paths under the existing simulation pause policy. SVG reports compressed
+blob bytes and decoded RGBA8 estimates, with browser compositor memory outside
+that estimate.

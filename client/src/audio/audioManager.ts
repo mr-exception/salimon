@@ -98,6 +98,10 @@ export class AudioManager<Buffer> {
     backend.setPreferences(preferences)
   }
 
+  activeCueIds(): readonly CueId[] {
+    return [...new Set([...this.instances].filter(instance => instance.voice).map(instance => instance.id))]
+  }
+
   setPreferences(preferences: AudioPreferences) {
     if (this.disposed) return
     this.preferences = preferences

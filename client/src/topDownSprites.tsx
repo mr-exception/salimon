@@ -5,11 +5,11 @@ import type { Entity2D } from './topDownRuntime.ts'
 
 type Bounds = readonly [number, number, number, number]
 interface Sprite { readonly url: string; readonly bounds: Bounds; readonly bytes: number; readonly decodedBytes: number }
-type SpriteRequest = { entity: Entity2D; selected?: boolean }
+type SpriteRequest = { entity: Entity2D; selected?: boolean; rasterScale?: number }
 type SpriteOutcome = { key: string; sprite?: Sprite; failed?: boolean }
 
-const spriteKey = ({ entity, selected }: SpriteRequest) =>
-  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}`
+const spriteKey = ({ entity, selected, rasterScale = 1 }: SpriteRequest) =>
+  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}:${rasterScale}`
 const essential = ({ entity, selected }: SpriteRequest) =>
   selected || !['ground', 'surface', 'stones'].includes(entity.appearance)
 
@@ -44,9 +44,14 @@ function boundsFor(entity: Entity2D, selected: boolean): Bounds {
     }
   }
 }
-async function createSprite(entity: Entity2D, selected: boolean): Promise<Sprite> {
+export function spriteRequest(entity: Entity2D, selected: boolean, scale: number): SpriteRequest {
+  return { entity, selected, rasterScale: essential({ entity, selected }) ? 1 : scale }
+}
+
+async function createSprite(request: SpriteRequest): Promise<Sprite> {
+  const { entity, selected = false, rasterScale = 1 } = request
   await document.fonts.ready
-  const density = (entity.appearance === 'ground' || entity.appearance === 'surface') ? 32 : 64
+  const density = Math.round((entity.appearance === 'ground' || entity.appearance === 'surface' ? 32 : 64) * rasterScale)
   const [x, y, width, height] = boundsFor(entity, selected)
   // Align the asset itself to a fixed integer backing grid, independent of the
   // world camera, render cadence, view switching and screenshot readback.
@@ -78,7 +83,7 @@ async function createSprite(entity: Entity2D, selected: boolean): Promise<Sprite
 export function spriteBounds({ entity, selected = false }: SpriteRequest): Bounds {
   const [x, y, width, height] = boundsFor(entity, selected)
   // Include backing-grid rounding and padding in the viewport test.
-  const padding = 3 / 32
+  const padding = 3 / 16
   return [x - padding, y - padding, width + 2 * padding, height + 2 * padding]
 }
 
@@ -120,8 +125,7 @@ export function useWorldSprites(requests: readonly SpriteRequest[]) {
     const load = (key: string) => {
       const previous = cache.get(key)
       if (previous) return previous
-      const { entity, selected } = requested.get(key)!
-      const entry = createSprite(entity, selected ?? false).then(
+      const entry = createSprite(requested.get(key)!).then(
         sprite => ({ key, sprite }),
         () => ({ key, failed: true }),
       )

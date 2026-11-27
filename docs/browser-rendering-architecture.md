@@ -115,3 +115,23 @@ the mounted cockpit and released on exit. Hidden tabs suspend both render
 paths under the existing simulation pause policy. SVG reports compressed
 blob bytes and decoded RGBA8 estimates, with browser compositor memory outside
 that estimate.
+
+### World quality and developer diagnostics
+
+Open **Help → Graphics settings** from the world or cockpit. Medium uses the
+original authored calibration. Low lowers nonessential SVG raster density and
+cockpit render scale to 75%, decorative stars to 25% of the preset range
+and environmental effects to 50%. High uses denser stars, full environmental
+detail and optional dynamic contact shading. Custom exposes render scale,
+particle density, environmental detail, lighting, shadows and resolution cap.
+The settings use a presentation-only key. World camera geometry, input,
+collisions, essential sprites, terrain grade cues and HUD warnings use the
+same authority at every quality level. The cockpit checks WebGL 2 before
+mounting its canvas and retains an exit control if observation is unavailable.
+
+In a development build, append `?renderDiagnostics` to display the read-only
+world footprints, authored anchors, terrain patch boundary, layer and object
+IDs, active audio cues, frame percentiles and estimated decoded raster bytes.
+The cockpit identifies its WebGL renderer and effective render DPR. Frame
+intervals include browser scheduling. RGBA8 estimates exclude compositor
+overhead and GPU allocator behaviour. Production omits the overlays.

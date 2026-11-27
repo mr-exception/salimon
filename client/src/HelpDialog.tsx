@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Dialog } from './ui/primitives.tsx'
 
-export function HelpDialog({onClose,panoramic=false, warnings}:{onClose:()=>void;panoramic?:boolean;warnings?:ReactNode}) {
+export function HelpDialog({onClose,panoramic=false, warnings, children}:{onClose:()=>void;panoramic?:boolean;warnings?:ReactNode; children?:ReactNode}) {
   return <div className="expedition-ui"><Dialog open initialFocus={panoramic ? 'heading' : 'dismiss'} title="Navigation help" onDismiss={onClose} dismissLabel="Close help">
     {warnings}
     <dl>
@@ -15,5 +15,6 @@ export function HelpDialog({onClose,panoramic=false, warnings}:{onClose:()=>void
       <dt>Reset camera</dt><dd>{panoramic?'Reset observation to current ship heading and 75° FOV.':'Restore the default camera view without changing the ship.'}</dd>
       <dt>Keyboard focus</dt><dd>Tab moves between controls; Enter activates buttons. Form fields keep their typing and slider keys. Escape or Close help dismisses this dialog.</dd>
     </dl>
+    {children}
   </Dialog></div>
 }

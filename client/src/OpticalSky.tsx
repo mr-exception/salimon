@@ -15,7 +15,7 @@ uniform float icy[32];
 uniform vec3 iceColor;
 uniform vec4 spheres[32]; // log2(distance), radius/distance, factored surface term, emission
 uniform vec3 rightAxis, upAxis, forwardAxis;
-uniform float tangent, aspect, pixelAngle;
+uniform float tangent, aspect, pixelAngle, starDensity, environmentDetail, materialLight;
 uniform bool scannerEnvironment, orientationGrid;
 varying vec2 screen;
 float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
@@ -37,7 +37,7 @@ vec3 stars(vec3 ray) {
   for(int y=-1;y<=1;y++) for(int x=-1;x<=1;x++) {
     vec2 key=floor(cell)+vec2(float(x),float(y));
     key.x=mod(key.x,512.);
-    if(key.y<0. || key.y>=256. || hash(key)>0.008) continue;
+    if(key.y<0. || key.y>=256. || hash(key)>0.008*starDensity) continue;
     vec2 uv=(key+vec2(hash(key+13.),hash(key+37.)))/vec2(512.,256.);
     float lat=(uv.y-0.5)*3.14159265, lon=(uv.x-0.5)*6.2831853;
     vec3 direction=vec3(cos(lat)*cos(lon),sin(lat),cos(lat)*sin(lon));
@@ -53,7 +53,7 @@ void main() {
     // Inertial directions only: neither ship origin nor time enters this field.
     // Dark linear RGB values preserve contrast with cyan scanner markers.
     float navy=0.5+0.5*dot(ray,normalize(vec3(-0.3,0.8,-0.5)));
-    color=color*vec3(0.72,0.82,0.95)+mix(vec3(0.012,0.023,0.045),vec3(0.035,0.065,0.105),navy);
+    color=color*vec3(0.72,0.82,0.95)+mix(vec3(0.012,0.023,0.045),vec3(0.035,0.065,0.105),navy)*environmentDetail;
     if(orientationGrid) {
       // 15-degree angular graticule, antialiased in screen pixels. Fade near
       // poles and below 5 degrees FOV so telescope lines cannot fill the view.
@@ -97,7 +97,7 @@ void main() {
       vec3 face=facet(n);
       // Continuous screen-size LOD suppresses subpixel facet noise. No mesh
       // creation, draw changes or discrete topology switches during approach.
-      float detail=smoothstep(3.,12.,s.y/max(pixelAngle,1e-8));
+      float detail=min(1.,smoothstep(3.,12.,s.y/max(pixelAngle,1e-8))*materialLight);
       float pigment=0.5+0.5*sin(dot(face,vec3(17.,31.,23.)));
       vec3 albedo=mix(colors[i],accents[i],mix(0.5,pigment,detail));
       // The same latitude ramp as canonical geological ice, never a guessed
@@ -129,7 +129,7 @@ void main() {
 /** One reusable quad, bounded analytic sphere tests, no physical depth-buffer
  * range and no mesh tessellation/LOD churn. Call getOrigin from shared ship state.
  */
-export function OpticalSky({ bodies, getOrigin, definitionForBody, scannerEnvironment = false, orientationGrid = false }: { bodies: readonly Body[]; getOrigin: () => Position; definitionForBody?: (bodyId: string) => PlanetReference | undefined; scannerEnvironment?: boolean; orientationGrid?: boolean }) {
+export function OpticalSky({ bodies, getOrigin, definitionForBody, scannerEnvironment = false, orientationGrid = false, starDensity = 1, environmentDetail = 1, materialLight = 1 }: { bodies: readonly Body[]; getOrigin: () => Position; definitionForBody?: (bodyId: string) => PlanetReference | undefined; scannerEnvironment?: boolean; orientationGrid?: boolean; starDensity?: number; environmentDetail?: number; materialLight?: number }) {
   const material = useMemo(() => new ShaderMaterial({
     depthTest: false, depthWrite: false, toneMapped: false,
     uniforms: {
@@ -142,6 +142,7 @@ export function OpticalSky({ bodies, getOrigin, definitionForBody, scannerEnviro
       rightAxis: { value: new Vector3() }, upAxis: { value: new Vector3() }, forwardAxis: { value: new Vector3() },
       tangent: { value: 1 }, aspect: { value: 1 }, pixelAngle: { value: 1 },
       scannerEnvironment: { value: false }, orientationGrid: { value: false },
+      starDensity: { value: 1 }, environmentDetail: { value: 1 }, materialLight: { value: 1 },
     },
     vertexShader: 'varying vec2 screen; void main(){ screen=position.xy; gl_Position=vec4(position.xy,0.,1.); }',
     fragmentShader,
@@ -152,6 +153,9 @@ export function OpticalSky({ bodies, getOrigin, definitionForBody, scannerEnviro
     const data = opticalSpheres(bodies, getOrigin(), definitionForBody), uniforms = material.uniforms
     uniforms.scannerEnvironment.value = scannerEnvironment
     uniforms.orientationGrid.value = orientationGrid
+    uniforms.starDensity.value = starDensity
+    uniforms.environmentDetail.value = environmentDetail
+    uniforms.materialLight.value = materialLight
     uniforms.count.value = data.length
     data.forEach((sphere, i) => {
       uniforms.directions.value[i].fromArray(sphere.direction)

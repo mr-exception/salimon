@@ -354,3 +354,18 @@ test('TRAVERSE-1 outdoor spawn to cockpit and back preserves frames, camera and 
   expect(negative.pass).toBe(false)
   await info.attach('traversal-journeys.json', { body: JSON.stringify({ journeys, wrongCheckpoint: { pass: negative.pass, changedPixels: negative.changedPixels, rawChangedPixels: negative.rawChangedPixels }, clock: '2026-11-04T00:00:01Z fixed steps', baseline: 'repeat evidence only; no approved references changed' }, null, 2), contentType: 'application/json' })
 })
+
+test('development render diagnostics expose read-only geometry and backend timing', async ({ page }) => {
+  const { boot } = await import('./worldJourney.ts')
+  await boot(page, '?renderDiagnostics')
+  const geometry = page.locator('[data-dev-render-diagnostics]')
+  await expect(geometry).toHaveAttribute('pointer-events', 'none')
+  await expect(geometry.locator('text').filter({ hasText: 'props/scout:chair' })).toHaveCount(1)
+  await expect(geometry.locator('rect').first()).toBeAttached()
+  await expect(geometry).toContainText('chair')
+  await page.clock.runFor(1100)
+  const timing = page.locator('[data-dev-frame-diagnostics]')
+  await expect(timing).toContainText('SVG CPU')
+  await expect(timing).toContainText('estimated decoded RGBA8 bytes')
+  await expect(timing).toContainText('frame p50')
+})

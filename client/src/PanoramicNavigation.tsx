@@ -25,12 +25,17 @@ import { FeedbackScope, StatusMessage } from './ui/Feedback.tsx'
 import './ui/tokens.css'
 import './ui/primitives.css'
 import './panoramic.css'
+import { supportsWebGL2 } from './rendering/browserGraphics.ts'
+import { QUALITY, renderDpr } from './rendering/graphicsPreferences.ts'
+import { WorldGraphicsSettings, type useWorldGraphics } from './rendering/WorldGraphicsSettings.tsx'
+import { diagnosticsEnabled, FrameDiagnostics } from './rendering/RenderDiagnostics.tsx'
 import { usePresentationVisibility } from './topDownSprites.tsx'
 
 /** Reusable presentation. The cockpit lifecycle owner supplies the runtime and
  * local view; no simulation, discovery or view lifetime belongs to the camera.
  */
-export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true, conditionWarning = '', takeoff, landing, environment }: {
+export function PanoramicNavigation({ navigation, view, opticalBodies = navigation.bodies, canPilot = () => true, isPaused = () => false, onExit, onSceneReady, advanceSimulation = true, conditionWarning = '', takeoff, landing, environment, graphics }: {
+  graphics?: ReturnType<typeof useWorldGraphics>
   environment?: ScannerEnvironmentSource
   landing?: { preview: (bodyId: string) => { denial: string | null; surface?: SurfaceLocation }; activate: (bodyId: string) => void }
   takeoff?: { denial: () => string | null; activate: () => void }; conditionWarning?: string; advanceSimulation?: boolean; navigation: NavigationRuntime; view: ObservationCameraState; canPilot?: () => boolean
@@ -38,6 +43,17 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
   isPaused?: () => boolean; onExit?: () => void; onSceneReady?: (state: RootState) => void
 }) {
   const visible = usePresentationVisibility()
+  const [webgl2] = useState(supportsWebGL2)
+  const quality = graphics?.quality ?? QUALITY.Medium
+  const [backend, setBackend] = useState<string>()
+  const diagnosticsRoot = useRef<RootState | null>(null)
+  const [deviceDpr, setDeviceDpr] = useState(() => window.devicePixelRatio)
+  useEffect(() => {
+    const media = matchMedia(`(resolution: ${deviceDpr}dppx)`)
+    const update = () => setDeviceDpr(window.devicePixelRatio)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [deviceDpr])
   const [, redraw] = useState(0)
   const [orientationGrid, setOrientationGrid] = useState(false)
   const [browser, setBrowser] = useState(false), [telemetry, setTelemetry] = useState(false), [help, setHelp] = useState(false)
@@ -122,9 +138,33 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
     { id: 'terminal', text: ship.mode === 'destroyed' ? 'Journey ended — ship destroyed' : '', priority: 'critical' },
     { id: 'condition', text: conditionWarning, priority: 'critical' },
   ]}><div ref={root} className="panoramic expedition-ui metric-readout" data-observation-surface role="region" aria-label="Panoramic navigation" data-observation={JSON.stringify(snapshot)} data-mode={ship.mode} onKeyDown={dismiss}>
-    <Canvas frameloop={visible ? 'always' : 'never'} className="panoramic-scene" onCreated={state => { state.gl.domElement.setAttribute('aria-label', 'Panoramic universe'); state.gl.domElement.tabIndex = 0; state.gl.domElement.focus({ preventScroll: true }); onSceneReady?.(state) }} fallback={<p role="alert">WebGL 2 is required.</p>}>
-      <ObservationCamera view={view} isPaused={() => options.current.isPaused()}/><OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position} definitionForBody={navigation.surfaceDefinitionForBody} scannerEnvironment orientationGrid={orientationGrid}/>
-    </Canvas>
+    {webgl2 ? <Canvas dpr={renderDpr(deviceDpr, quality)} frameloop={visible ? 'always' : 'never'} className="panoramic-scene"
+      onCreated={state => {
+        state.gl.domElement.setAttribute('aria-label', 'Panoramic universe')
+        state.gl.domElement.tabIndex = 0
+        state.gl.domElement.focus({ preventScroll: true })
+        if (diagnosticsEnabled) {
+          diagnosticsRoot.current = state
+          const gl = state.gl.getContext()
+          const debug = gl.getExtension('WEBGL_debug_renderer_info')
+          const label = debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) as string : 'renderer unavailable'
+          setBackend(`WebGL 2 · ${label}`)
+        }
+        onSceneReady?.(state)
+      }}>
+      <ObservationCamera view={view} isPaused={() => options.current.isPaused()} />
+      <OpticalSky bodies={opticalBodies} getOrigin={() => navigation.clock.state.position}
+        definitionForBody={navigation.surfaceDefinitionForBody} scannerEnvironment orientationGrid={orientationGrid}
+        starDensity={quality.particles / 60} environmentDetail={quality.environment / 75}
+        materialLight={quality.lighting === 'reduced' ? .6 : quality.lighting === 'full' ? 1.25 : 1} />
+    </Canvas> : <div className="world-art-error" role="alert">Panoramic observation requires WebGL 2. World controls remain available when you exit the cockpit.</div>}
+    {diagnosticsEnabled && backend && <FrameDiagnostics backend={backend}
+      details={`render DPR ${renderDpr(deviceDpr, quality).toFixed(2)}`} measure={() => {
+        const renderer = diagnosticsRoot.current?.gl
+        if (!renderer) return ''
+        const { width, height } = renderer.domElement
+        return `${renderer.info.memory.textures} GL textures · ${width * height * 4} estimated RGBA8 color-buffer bytes`
+      }} />}
     <div className="observation-reticle" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M3 16H10 M22 16H29 M16 3V10 M16 22V29"/><circle cx="16" cy="16" r="1"/></svg></div>
     <header className="panoramic-status ui-panel ui-panel--utility">
       <strong className="ui-eyebrow">SALIMON · OBSERVATION</strong>
@@ -182,6 +222,6 @@ export function PanoramicNavigation({ navigation, view, opticalBodies = navigati
       {grounded && <p>Scout grounded. Close the aft door and use Take off when authorized; observation and scanner remain available.</p>}
       <p>Illustrative universe · unlimited energy. Impacts at 100 m/s or faster end the run.</p>
     </section>}
-    {help && <HelpDialog panoramic onClose={() => setHelp(false)} />}
+    {help && <HelpDialog panoramic onClose={() => setHelp(false)}>{graphics && <WorldGraphicsSettings graphics={graphics} />}</HelpDialog>}
   </div></FeedbackScope>
 }

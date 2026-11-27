@@ -76,6 +76,7 @@ export function useExpeditionAudio(state: ExpeditionAudioState) {
 
   return {
     preferences,
+    activeCueIds: () => manager.current?.activeCueIds() ?? [],
     change(next: typeof preferences) {
       setPreferences(next)
       storeAudioPreferences(storage, next)

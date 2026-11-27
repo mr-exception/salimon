@@ -34,3 +34,16 @@ The command reports package file bytes and an RGBA8 decoded-size estimate
 without mipmaps, framebuffers, allocator overhead, or the JSON manifest.
 Output under `dist/` contains only runtime files. Editable exports stay under
 `art/sources/`.
+
+## Equipment artwork
+
+The production equipment SVGs are drawn by Salimon contributors under
+`LicenseRef-Salimon-Project` and redistributable as part of Salimon. Their
+materials and shapes follow the [Scout equipment contract](../../docs/equipment-art-direction.md).
+[Protection modules and the gathering tool](../src/rendering/EquipmentParts.tsx)
+share vector geometry across the pilot and inventory. The
+[inventory view](../src/rendering/EquipmentIcon.tsx) projects that geometry
+onto a transparent 256 × 256 canvas. Gear definitions supply equipment
+identity, hazard family and tier. The gathering tool keeps its existing
+equipped state. The production equipment browser test verifies export bounds,
+transparency and distinct artwork for every delivered identity.

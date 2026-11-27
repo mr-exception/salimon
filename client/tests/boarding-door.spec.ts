@@ -28,6 +28,7 @@ test('DOOR-839 built boarding interaction, blocked crossing, reload and cockpit 
     else {const r=compareImages(originals[name]!,png);await info.attach(`${name}-repeat.json`,{body:JSON.stringify({pass:r.pass,changedPixels:r.changedPixels,rawChangedPixels:r.rawChangedPixels,policy:POLICY}),contentType:'application/json'});await info.attach(`${name}-diff.png`,{body:r.diff,contentType:'image/png'});expect(r.pass,name).toBe(true)}
    }
    await expect(door).toHaveAttribute('data-door-state','open')
+   await expect(door.locator('[data-scout-module="boarding-door"]')).toHaveAttribute('data-fixture-rotation','0')
    for(const p of [[-2,3],[-2,7]])await walkTo(page,p,'planet:fixture',true)
    for(const p of [[0,7],[0,4.7]])await walkTo(page,p,'ship:scout',true)
    await capture('door-open')
@@ -59,6 +60,9 @@ test('DOOR-839 built boarding interaction, blocked crossing, reload and cockpit 
    await walkTo(page,[0,4.7],'ship:scout',true);await page.keyboard.press('e');await page.clock.runFor(32)
    await expect(door).toHaveAttribute('data-door-state','closed')
    for(const p of [[0,2],[0,.45],[1.35,.45],[1.35,-1.65],[0,-1.65],[0,-3.1]])await walkTo(page,p,'ship:scout',true)
+   await expect(page.locator('[data-scout-fixture="seat"]')).toHaveAttribute('data-fixture-state','vacant')
+   await expect(page.locator('[data-scout-fixture="desk"]')).toHaveAttribute('data-fixture-state','powered')
+   await capture('physical-cockpit')
    await page.keyboard.press('e');await page.clock.runFor(64)
    await expect(page.locator('.panoramic')).toBeVisible()
    await expect(page.locator('[data-boarding-door-status]')).toHaveText('Aft door: closed')
@@ -95,7 +99,7 @@ test('Scout modular cutaway joins walls, keeps the door readable and fades nearb
    const rails = page.locator('[data-scout-module="hull-rail"]')
    const deck = page.locator('[data-scout-module="deck"]')
    const crate = page.locator('[data-entity="fixture:crate"] .scout-obstruction')
-   const avatar = page.locator('[data-entity="person:player"] image')
+   const avatar = page.locator('[data-entity="person:player"] [data-character]')
    await expect(rails).toHaveCount(2)
    await expect(deck.locator('[data-scout-module$="-floor"]')).toHaveCount(3)
    await expect(page.locator('[data-scout-module="window"]')).toHaveCount(1)

@@ -30,6 +30,7 @@ import { useWorldGraphics, WorldGraphicsSettings } from './rendering/WorldGraphi
 import { diagnosticsEnabled, FrameDiagnostics, RenderDiagnostics } from './rendering/RenderDiagnostics.tsx'
 import { isScoutModule, scoutArtObstructs, scoutWallJoins } from './rendering/scoutArt.ts'
 import { characterArt, ScoutCharacter } from './rendering/ScoutCharacter.tsx'
+import { scoutFixture, ScoutFixtureSignal } from './rendering/ScoutFixtures.tsx'
 import { machineState, scoutMachine, ScoutMachineSignal } from './rendering/ScoutMachine.tsx'
 import { ScoutModule, ScoutWall } from './rendering/ScoutModules.tsx'
 import { svgArtIntersects, svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
@@ -44,7 +45,7 @@ import { useDismissLayer } from './ui/interaction.ts'
 import './topDown.css'
 
 // Presentation receives immutable scene state. It has no radar or Three imports.
-export function TopDownScene({ state, quality = QUALITY.Medium, paused = false, activeCues = () => [], session, onGround, onCancelGround, onCamera }: { state: TopDownState; quality?: WorldQuality; paused?: boolean; activeCues?: () => readonly string[]; session?: ResourceSession | null; onGround?: (anchor: Anchor, objectId: string | null, pointer: { x: number; y: number }) => void; onCancelGround?: () => void; onCamera?: (operation: (world: TopDownState) => TopDownState) => void }) {
+export function TopDownScene({ state, quality = QUALITY.Medium, paused = false, rawAccess = false, equipmentAccess = false, activeCues = () => [], session, onGround, onCancelGround, onCamera }: { state: TopDownState; quality?: WorldQuality; paused?: boolean; rawAccess?: boolean; equipmentAccess?: boolean; activeCues?: () => readonly string[]; session?: ResourceSession | null; onGround?: (anchor: Anchor, objectId: string | null, pointer: { x: number; y: number }) => void; onCancelGround?: () => void; onCamera?: (operation: (world: TopDownState) => TopDownState) => void }) {
   const viewport = useRef<SVGSVGElement>(null)
   const cameraInput = useRef({ onCamera, onCancelGround })
   cameraInput.current = { onCamera, onCancelGround }
@@ -154,6 +155,7 @@ export function TopDownScene({ state, quality = QUALITY.Medium, paused = false, 
     const wall = wallJoins.get(entity.id)
     const modular = isScoutModule(entity)
     const machine = scoutMachine(entity)
+    const fixture = scoutFixture(entity)
     const fade = playerArt && scoutArtObstructs(entity, rotate2([
       playerArt.positionM[0] - item.positionM[0], playerArt.positionM[1] - item.positionM[1],
     ], -item.angle))
@@ -167,6 +169,11 @@ export function TopDownScene({ state, quality = QUALITY.Medium, paused = false, 
         </g>
       : <>
           <WorldSprite request={sprite} outcome={artwork.get(sprite)} />
+          {fixture && <ScoutFixtureSignal entity={entity} fixture={fixture} rawAccess={rawAccess}
+            equipmentAccess={equipmentAccess} occupied={state.cockpit.occupantId !== null} powered={state.cockpit.powered}
+            gearStocked={session?.snapshot.inventory.equipment?.instances.some(item =>
+              item.location.kind === 'drawer' || item.location.kind === 'module-storage') ?? false}
+            stocked={Object.values(session?.snapshot.stores[SCOUT_RESOURCE_CONTAINER_ID]?.quantities ?? {}).some(grams => grams > 0)} />}
           {machine && <ScoutMachineSignal entity={entity} machine={machine} state={machineState(machine, session, paused)} />}
         </>
     const wallSprites = wall && scoutWallRequests(entity, wall).map(wallSprite =>
@@ -542,7 +549,9 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       actions={menuActions} onClose={closeObjectMenu} onChoose={chooseObjectAction} />}
     <main data-surface-bound={String(state.scoutLocation.binding !== null)} data-tick={state.tick} hidden={state.cockpit.view === 'radar'} data-cockpit-view={state.cockpit.view} data-powered={String(state.cockpit.powered)} data-occupant={state.cockpit.occupantId ?? ''} data-scout-location={gameplay ? JSON.stringify(state.scoutLocation, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} data-ship={gameplay ? JSON.stringify(navigation.clock.state, (_, v) => typeof v === 'bigint' ? v.toString() : v) : undefined} className="top-down-app" data-player-mode={state.player.mode} data-target={state.player.targetId ?? ''}>
     <header className="top-down-sr-only"><h1>Scout · Surface study</h1></header>
-    <section className="top-down-stage"><TopDownScene state={state} quality={graphics.quality} paused={paused.current} activeCues={audio.activeCueIds} session={resourceSession} onCamera={operation => {
+    <section className="top-down-stage"><TopDownScene state={state} quality={graphics.quality} paused={paused.current}
+        rawAccess={!!container.current?.opened && container.current.storeId === SCOUT_RESOURCE_CONTAINER_ID}
+        equipmentAccess={gearOpen && state.player.targetId === SCOUT_RESOURCE_CONTAINER_ID} activeCues={audio.activeCueIds} session={resourceSession} onCamera={operation => {
         if (paused.current || current.current.cockpit.view !== 'world' || container.current?.opened || document.querySelector('dialog[open]')) return
         const next = operation(current.current)
         if (resourceSession) resourceSession.world = next

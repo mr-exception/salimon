@@ -81,6 +81,8 @@ test('LOOP-845 fresh outdoor launch, manual flight, original-site landing and de
  await expect(page.locator('[data-entity][data-frame="planet:fixture"]')).toHaveCount(0)
  await expect(page.locator('[data-entity="ship:scout"]')).toHaveCount(1)
  await expect(page.locator('[data-entity="person:player"]')).toHaveCount(1)
+ // Switching from the cockpit releases and reconstructs the world sprite set.
+ await expect(page.locator('.top-down-scene')).toHaveAttribute('data-render-ready', 'true')
  await capture('inflight-cabin')
  const flyingSave = await save()
  await page.reload(); await page.clock.runFor(64)

@@ -99,12 +99,15 @@ export function ScoutWall({ entity, joins, fade, base, cap }: {
 
 function BoardingDoor({ closed }: { closed: boolean }) {
   const edge = SCOUT_ENTRY_HALF_WIDTH_M
-  return <g data-scout-module="boarding-door">
+  return <g data-scout-module="boarding-door" data-fixture-rotation="0">
     <rect x={-edge - .15} y="-.3" width={2 * edge + .3} height={closed ? .6 : 1.2} fill="transparent" />
     <path d={`M${-edge}-.13H${edge}v.28H${-edge}Z`} fill="#666866" />
     <path d={`M${-edge + .05} .11H${edge - .05}`} stroke="#d7a967" strokeWidth=".065" />
     <path d={`M${-edge + .12}-.12v.3m.16-.3v.3m${2 * edge - .56} -.3v.3m.16-.3v.3`}
       stroke="#e4b978" strokeWidth=".065" />
+    <path d={`M${-edge + .17} -.18H${edge - .17}M${-edge + .17} .18H${edge - .17}`}
+      stroke="#323e43" strokeWidth=".04" />
+    <path d={`M${-edge + .04} -.22v.44m${2 * edge - .08} -.44v.44`} stroke="#778986" strokeWidth=".09" />
     {closed ? <g data-scout-door-leaf fill="#b28151" stroke="#573c30" strokeWidth=".038">
       <rect x={-edge + .2} y="-.13" height=".24" width={edge - .23} rx=".04" />
       <rect x=".03" y="-.13" height=".24" width={edge - .23} rx=".04" />

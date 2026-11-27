@@ -14,7 +14,7 @@ export function EquipmentIcon({ gear }: { gear?: GearInstance }) {
     className="equipment-art-icon" aria-hidden="true" focusable="false"
     data-equipment-icon={id} data-icon-condition={condition}>
     <g transform={`translate(121 126) matrix(.87 .28 -.44 .76 0 0) scale(${scale})`}>
-      <g transform="translate(.06 .14)" style={{ filter: "brightness(.42)" }}>{art}</g>
+      <g transform={`translate(${5 / scale} ${12 / scale})`} style={{ filter: 'brightness(.42)' }}>{art}</g>
       {art}
     </g>
   </svg>

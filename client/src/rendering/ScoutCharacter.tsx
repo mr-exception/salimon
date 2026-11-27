@@ -2,12 +2,13 @@ import { GEAR_DEFINITIONS, type EquipmentState } from '../equipment.ts'
 import { gearCondition } from './gearCondition.ts'
 import type { TopDownState } from '../topDownRuntime.ts'
 
-export function ScoutCharacter({ equipment, tool, mode, tick, reducedMotion }: {
+export function ScoutCharacter({ equipment, tool, mode, tick, reducedMotion, dynamicShadow }: {
   equipment: EquipmentState | undefined
   tool: boolean
   mode: TopDownState['player']['mode']
   tick: number
   reducedMotion: boolean
+  dynamicShadow: boolean
 }) {
   const suit = equipment?.instances.find(item => item.location.kind === 'equipped')
   const suited = !equipment || !!suit
@@ -18,6 +19,8 @@ export function ScoutCharacter({ equipment, tool, mode, tick, reducedMotion }: {
     item.location.kind === 'installed' && item.location.suitId === suit?.id)
   return <g data-character="" data-suit-condition={condition} data-suit-equipped={String(suited)}
     strokeLinejoin="round" strokeLinecap="round">
+    <ellipse data-character-shadow="" cx={dynamicShadow ? '.13' : '0'} cy=".225" rx=".34" ry=".235"
+      fill="#18242a" opacity={dynamicShadow ? '.26' : '.19'} pointerEvents="none" />
     {[-1, 1].map(side => <g key={side} transform={`translate(${side * .16} ${side * stride})`}>
       <path d={seated ? 'M-.085 .02H.085L.07 -.25H-.07Z' : 'M-.09 .11H.09L.075 .45H-.075Z'}
         fill={suited ? '#55666b' : '#68737c'} stroke="#283a40" strokeWidth=".035" />

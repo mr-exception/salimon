@@ -1,4 +1,3 @@
-import { ScoutCharacter } from './rendering/ScoutCharacter.tsx'
 import { EquipmentHud } from './EquipmentHud.tsx'
 import { GearNoticeTracker, equipmentHudReadout } from './equipmentHud.ts'
 import { EquipmentPanel } from './EquipmentPanel.tsx'
@@ -30,6 +29,7 @@ import { QUALITY, renderDpr, type WorldQuality } from './rendering/graphicsPrefe
 import { useWorldGraphics, WorldGraphicsSettings } from './rendering/WorldGraphicsSettings.tsx'
 import { diagnosticsEnabled, FrameDiagnostics, RenderDiagnostics } from './rendering/RenderDiagnostics.tsx'
 import { isScoutModule, scoutArtObstructs, scoutWallJoins } from './rendering/scoutArt.ts'
+import { ScoutCharacter } from './rendering/ScoutCharacter.tsx'
 import { ScoutModule, ScoutWall } from './rendering/ScoutModules.tsx'
 import { svgArtIntersects, svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
@@ -151,7 +151,8 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
     ], -item.angle))
     const illustration = entity.id === PLAYER_ID
       ? <ScoutCharacter equipment={session?.snapshot.inventory.equipment} tool={!!session?.equipped}
-          mode={mode} tick={state.tick} reducedMotion={window.matchMedia('(prefers-reduced-motion: reduce)').matches} />
+          mode={mode} tick={state.tick} dynamicShadow={quality.shadows === 'dynamic'}
+          reducedMotion={window.matchMedia('(prefers-reduced-motion: reduce)').matches} />
       : <WorldSprite request={sprite} outcome={artwork.get(sprite)} />
     const wallSprites = wall && scoutWallRequests(entity, wall).map(wallSprite =>
       <WorldSprite key={wallSprite.wall.part} request={wallSprite} outcome={artwork.get(wallSprite)} />)
@@ -185,7 +186,7 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
       {renderItems(beforeTerrain)}
       {layer === 'terrain' && showWorld && <GeneratedGround state={state} width={width} height={height} rasterScale={rasterScale} detail={quality.environment / 100} diagnostics={diagnosticsEnabled} />}
       {layer === 'people' && showWorld && quality.shadows === 'dynamic' && <g data-world-shadows="dynamic" pointerEvents="none">
-        {items.filter(item => ['player', 'core', 'fabricator', 'storage', 'bed'].includes(item.entity.appearance) && intersects(item))
+        {items.filter(item => ['core', 'fabricator', 'storage', 'bed'].includes(item.entity.appearance) && intersects(item))
           .map(item => <ellipse key={item.entity.id} transform={svgSpriteTransform(item, pixelsPerM)}
             cx=".14" cy=".18" rx={(item.entity.footprint?.halfWidth ?? .28) + .17}
             ry={(item.entity.footprint?.halfHeight ?? .24) + .09} fill="#18242a" opacity=".23" />)}

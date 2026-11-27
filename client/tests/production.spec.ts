@@ -162,11 +162,15 @@ test('built SVG round trips through the cockpit on one 60 Hz clock and reloads t
      await capture('world')
      let gpu = ''
      const cockpitTicks = []
+     const art = async () => JSON.parse((await worldSvg!.getAttribute('data-art-resources'))!)
+     const worldArt = await art()
+     expect(worldArt.decodedBytes).toBeGreaterThan(0)
      for (let round = 0; round < 3; round++) {
        const before = await ship()
        await page.keyboard.press('e')
        await expect(main).toHaveAttribute('data-cockpit-view', 'radar')
        await expect(page.locator('canvas')).toHaveCount(1)
+       await expect.poll(art).toEqual({ count: 0, encodedBytes: 0, decodedBytes: 0 })
        await expect(player).toHaveAttribute('data-position', '0,-3.95')
        if (round === 0) {
          gpu = await page.locator('canvas').evaluate(canvas => {
@@ -183,6 +187,7 @@ test('built SVG round trips through the cockpit on one 60 Hz clock and reloads t
        await expect(player).toHaveAttribute('data-position', '0,-3.1')
        expect((await ship()).position).toEqual(before.position)
        expect(await worldSvg!.evaluate(svg => svg.isConnected)).toBe(true)
+       await expect.poll(art).toEqual(worldArt)
      }
      await page.evaluate(() => window.dispatchEvent(new Event('pagehide')))
      const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), RESOURCE_SAVE_KEY)
@@ -192,8 +197,80 @@ test('built SVG round trips through the cockpit on one 60 Hz clock and reloads t
      await expect(player).toHaveAttribute('data-position', '0,-3.1')
      await expect(player).toHaveAttribute('data-frame', 'ship:scout')
      expect(errors).toEqual([])
-     records.push({ repeat, gpu, worldTicks, cockpitTicks, savedLocation: saved.location, errors })
+     records.push({ repeat, gpu, worldTicks, cockpitTicks, worldArt, savedLocation: saved.location, errors })
    } finally { await context.close() }
  }
  await info.attach('renderer-production-state.json', { body: JSON.stringify({ records, viewport: [1280, 800], dpr: 1 }, null, 2), contentType: 'application/json' })
+})
+
+test('built artwork culls offscreen sprites, releases URLs on hide, and recovers a failed initial raster', async ({ page }, info) => {
+ const { boot, scene } = await import('./worldJourney.ts')
+ const { compareImages } = await import('../scripts/visual-comparison.ts')
+ const origin = 'http://127.0.0.1:4175'
+ const requests: string[] = []
+ page.on('request', request => {
+   const url = new URL(request.url())
+   if (url.origin === origin && url.pathname.startsWith('/assets/')) requests.push(url.pathname)
+ })
+ await page.addInitScript(() => {
+   const urls = new Set<string>()
+   const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL)
+   URL.createObjectURL = blob => { const url = create(blob); urls.add(url); return url }
+   URL.revokeObjectURL = url => { urls.delete(url); revoke(url) }
+   Object.defineProperty(window, 'activeArtUrls', { get: () => urls.size })
+ })
+ await boot(page, '', origin)
+ const world = scene(page)
+ const art = async () => JSON.parse((await world.getAttribute('data-art-resources'))!)
+ const urls = () => page.evaluate(() => Reflect.get(window, 'activeArtUrls') as number)
+ const normal = await art()
+ const player = page.locator('[data-entity="person:player"]')
+ const physicalPosition = await player.getAttribute('data-position')
+ await page.mouse.move(0, 0)
+ const original = await page.screenshot({ path: info.outputPath('world-initial.png') })
+ await page.mouse.move(140, 480)
+ await page.mouse.down({ button: 'middle' })
+ await page.mouse.move(1200, 480, { steps: 8 })
+ await page.mouse.up({ button: 'middle' })
+ await expect(world).toHaveAttribute('data-camera-panned', 'true')
+ await expect(player.locator('image')).toHaveCount(0)
+ await expect(player).toHaveAttribute('data-position', physicalPosition!)
+ await page.keyboard.press('Space')
+ await page.clock.runFor(3000)
+ await expect.poll(art).toEqual(normal)
+ await page.evaluate(() => {
+   Object.defineProperty(document, 'hidden', { configurable: true, value: true })
+   document.dispatchEvent(new Event('visibilitychange'))
+ })
+ await expect.poll(urls).toBe(0)
+ const before = await page.locator('main').getAttribute('data-tick')
+ await page.clock.runFor(1000)
+ await expect(page.locator('main')).toHaveAttribute('data-tick', before!)
+ await page.evaluate(() => {
+   Reflect.deleteProperty(document, 'hidden')
+   document.dispatchEvent(new Event('visibilitychange'))
+ })
+ await expect.poll(art).toEqual(normal)
+ await expect.poll(urls).toBe(normal.count)
+ await page.mouse.move(0, 0)
+ const restored = await page.screenshot({ path: info.outputPath('world-restored.png') })
+ const comparison = compareImages(original, restored)
+ await info.attach('world-diff.png', { body: comparison.diff, contentType: 'image/png' })
+ expect(comparison.pass, `World artwork changed ${comparison.changedPixels} pixels`).toBe(true)
+ expect(requests.some(path => /\/index-[^/]+\.js$/.test(path))).toBe(true)
+ expect(requests.some(path => path.includes('PanoramicNavigation-'))).toBe(false)
+ await info.attach('asset-lifecycle.json', { body: JSON.stringify({ renderer: 'SVG CPU', normal, hiddenUrls: 0, requests, comparison: comparison.changedPixels }, null, 2), contentType: 'application/json' })
+ await page.addInitScript(() => {
+   const original = HTMLCanvasElement.prototype.toBlob
+   HTMLCanvasElement.prototype.toBlob = function (callback) {
+     HTMLCanvasElement.prototype.toBlob = original
+     callback(null)
+   }
+ })
+ await page.reload()
+ await expect(page.getByRole('alert').filter({ hasText: 'Some world artwork could not load' })).toBeVisible()
+ await page.getByRole('button', { name: 'Retry artwork' }).click()
+ await expect(world).toHaveAttribute('data-render-ready', 'true')
+ await expect(page.getByRole('button', { name: 'Retry artwork' })).toHaveCount(0)
+ await expect(player).toHaveAttribute('data-position', physicalPosition!)
 })

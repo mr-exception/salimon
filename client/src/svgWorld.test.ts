@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createTopDownState, drawList, LAYERS, PLAYER_ID } from './topDownRuntime.ts'
-import { svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
+import { svgArtIntersects, svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
 
 test('retained SVG stages preserve domain layer order, with terrain art behind generated ground', () => {
   const world = createTopDownState('exterior', true)
@@ -23,4 +23,12 @@ test('sprite and selection share signed camera-space translation, rotation and s
     'translate(-40 64) rotate(90) scale(32)')
   assert.equal(svgSpriteTransform({ ...item, positionM: [0, 0], angle: -Math.PI / 2 }, 64),
     'translate(0 0) rotate(-90) scale(64)')
+})
+
+test('art culling retains rotated overhang and the exact viewport boundary', () => {
+  const item = drawList(createTopDownState())[0]
+  const bounds = [-1, -4, 2, 8] as const
+  assert.equal(svgArtIntersects({ ...item, positionM: [14, 0], angle: Math.PI / 2 }, bounds, 20, 20), true)
+  assert.equal(svgArtIntersects({ ...item, positionM: [14.01, 0], angle: Math.PI / 2 }, bounds, 20, 20), false)
+  assert.equal(svgArtIntersects({ ...item, positionM: [15, 0], angle: Math.PI / 2 }, bounds, 20, 20, 2), true)
 })

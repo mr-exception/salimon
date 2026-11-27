@@ -1,13 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { Illustration } from './TopDownIllustration.tsx'
 import type { Entity2D } from './topDownRuntime.ts'
 
 type Bounds = readonly [number, number, number, number]
-interface Sprite { readonly url: string; readonly bounds: Bounds }
-interface CachedSprite { readonly promise: Promise<Sprite>; sprite?: Sprite }
-const cache = new Map<string, CachedSprite>()
-const key = (entity: Entity2D, selected = false) => `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}`
+interface Sprite { readonly url: string; readonly bounds: Bounds; readonly bytes: number; readonly decodedBytes: number }
+type SpriteRequest = { entity: Entity2D; selected?: boolean }
+type SpriteOutcome = { key: string; sprite?: Sprite; failed?: boolean }
+
+const spriteKey = ({ entity, selected }: SpriteRequest) =>
+  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}`
+const essential = ({ entity, selected }: SpriteRequest) =>
+  selected || !['ground', 'surface', 'stones'].includes(entity.appearance)
 
 // Fixed authored-art bounds, in metres. Padding includes strokes; it never
 // changes logical footprints. The terrain details end well inside its tile;
@@ -40,14 +44,6 @@ function boundsFor(entity: Entity2D, selected: boolean): Bounds {
     }
   }
 }
-function loadSprite(entity: Entity2D, selected = false): CachedSprite {
-  const id = key(entity, selected), existing = cache.get(id)
-  if (existing) return existing
-  const entry: CachedSprite = { promise: createSprite(entity, selected) }
-  entry.promise.then(sprite => { entry.sprite = sprite }, () => {})
-  cache.set(id, entry)
-  return entry
-}
 async function createSprite(entity: Entity2D, selected: boolean): Promise<Sprite> {
   await document.fonts.ready
   const density = (entity.appearance === 'ground' || entity.appearance === 'surface') ? 32 : 64
@@ -67,7 +63,7 @@ async function createSprite(entity: Entity2D, selected: boolean): Promise<Sprite
     const bitmap = new Image()
     await new Promise<void>((resolve, reject) => {
       bitmap.onload = () => resolve()
-      bitmap.onerror = () => reject(new Error(`Unable to rasterize world sprite ${key(entity, selected)}`))
+      bitmap.onerror = () => reject(new Error(`Unable to rasterize world sprite ${spriteKey({ entity, selected })}`))
       bitmap.src = objectUrl
     })
     const canvas = document.createElement('canvas')
@@ -76,28 +72,110 @@ async function createSprite(entity: Entity2D, selected: boolean): Promise<Sprite
     if (!context) throw new Error('Canvas 2D is required to initialize world sprites')
     context.drawImage(bitmap, 0, 0)
     const png = await new Promise<Blob>((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Unable to encode world sprite')), 'image/png'))
-    // Blob references keep immutable assets out of per-frame DOM snapshots.
-    // This bounded cache lives as long as the persistent world/document.
-    return { url: URL.createObjectURL(png), bounds }
+    return { url: URL.createObjectURL(png), bounds, bytes: png.size, decodedBytes: pixelsW * pixelsH * 4 }
   } finally { URL.revokeObjectURL(objectUrl) }
 }
-export function useWorldSprites(entities: readonly Entity2D[]) {
-  const signature = entities.map(e => key(e) + (e.interaction ? `/${key(e, true)}` : '')).sort().join('|')
-  const [ready, setReady] = useState(false), [error, setError] = useState<Error | null>(null)
-  useEffect(() => {
-    let alive = true
-    setReady(false)
-    const loads = entities.flatMap(e => [loadSprite(e).promise, ...(e.interaction ? [loadSprite(e, true).promise] : [])])
-    Promise.all(loads).then(() => { if (alive) setReady(true) }, reason => { if (alive) setError(reason instanceof Error ? reason : new Error(String(reason))) })
-    return () => { alive = false }
-    // Entity positions/frames do not invalidate authored illustration assets.
-  }, [signature])
-  if (error) throw error
-  return { ready }
+export function spriteBounds({ entity, selected = false }: SpriteRequest): Bounds {
+  const [x, y, width, height] = boundsFor(entity, selected)
+  // Include backing-grid rounding and padding in the viewport test.
+  const padding = 3 / 32
+  return [x - padding, y - padding, width + 2 * padding, height + 2 * padding]
 }
-export function WorldSprite({ entity, selected = false }: { entity: Entity2D; selected?: boolean }) {
-  const sprite = cache.get(key(entity, selected))?.sprite
-  if (!sprite) return null
-  const [x, y, width, height] = sprite.bounds
-  return <image href={sprite.url} x={x} y={y} width={width} height={height} />
+
+export function usePresentationVisibility() {
+  const [visible, setVisible] = useState(() => !document.hidden)
+  useEffect(() => {
+    const update = () => setVisible(!document.hidden)
+    document.addEventListener('visibilitychange', update)
+    return () => document.removeEventListener('visibilitychange', update)
+  }, [])
+  return visible
+}
+
+export function useWorldSprites(requests: readonly SpriteRequest[]) {
+  const unique = new Map(requests.map(request => [spriteKey(request), request]))
+  const keys = [...unique.keys()].sort()
+  const signature = keys.join('|')
+  const cache = useRef(new Map<string, Promise<SpriteOutcome>>()).current
+  const [outcomes, setOutcomes] = useState(new Map<string, SpriteOutcome>())
+  const [attempt, retry] = useState(0)
+  const lastAttempt = useRef(attempt)
+  const lastRequests = useRef(unique)
+  lastRequests.current = unique
+
+  useEffect(() => {
+    const requested = lastRequests.current
+    const retrying = lastAttempt.current !== attempt
+    lastAttempt.current = attempt
+    let active = true
+    const release = (entry: Promise<SpriteOutcome>) => {
+      void entry.then(({ sprite }) => { if (sprite) URL.revokeObjectURL(sprite.url) })
+    }
+    for (const [key, entry] of cache) {
+      if (!requested.has(key) || retrying) {
+        cache.delete(key)
+        release(entry)
+      }
+    }
+    const load = (key: string) => {
+      const previous = cache.get(key)
+      if (previous) return previous
+      const { entity, selected } = requested.get(key)!
+      const entry = createSprite(entity, selected ?? false).then(
+        sprite => ({ key, sprite }),
+        () => ({ key, failed: true }),
+      )
+      cache.set(key, entry)
+      return entry
+    }
+    const ordered = [...requested.keys()].sort()
+    const required = ordered.filter(key => essential(requested.get(key)!))
+    const decorative = ordered.filter(key => !essential(requested.get(key)!))
+    setOutcomes(previous => new Map([...previous].filter(([key]) => requested.has(key) && !retrying)))
+    void (async () => {
+      const first = await Promise.all(required.map(load))
+      if (!active) return
+      setOutcomes(previous => new Map([...previous, ...first.map(entry => [entry.key, entry] as const)]))
+      const second = await Promise.all(decorative.map(load))
+      if (active) setOutcomes(new Map([...first, ...second].map(entry => [entry.key, entry])))
+    })()
+    return () => { active = false }
+  }, [attempt, cache, signature])
+
+  useEffect(() => () => {
+    for (const entry of cache.values()) {
+      void entry.then(({ sprite }) => { if (sprite) URL.revokeObjectURL(sprite.url) })
+    }
+    cache.clear()
+  }, [cache])
+
+  let encodedBytes = 0, decodedBytes = 0, count = 0
+  let ready = true, error = false
+  for (const [key, request] of unique) {
+    const outcome = outcomes.get(key)
+    if (!outcome) ready = false
+    if (outcome?.failed && essential(request)) error = true
+    if (outcome?.sprite) {
+      encodedBytes += outcome.sprite.bytes
+      decodedBytes += outcome.sprite.decodedBytes
+      count++
+    }
+  }
+  return {
+    ready: ready && !error, error, retry: () => retry(value => value + 1),
+    stats: { count, encodedBytes, decodedBytes },
+    get: (request: SpriteRequest) => outcomes.get(spriteKey(request)),
+  }
+}
+
+export function WorldSprite({ request, outcome }: { request: SpriteRequest; outcome?: SpriteOutcome }) {
+  if (outcome?.failed) {
+    if (request.selected) return null
+    // The retained vector source supplies the same silhouette if its raster
+    // cannot be decoded. The retry control is reserved for essential artwork.
+    return <Illustration appearance={request.entity.appearance} footprint={request.entity.footprint} />
+  }
+  if (!outcome?.sprite) return null
+  const { url, bounds: [x, y, width, height] } = outcome.sprite
+  return <image href={url} x={x} y={y} width={width} height={height} />
 }

@@ -23,3 +23,19 @@ export function svgLayers(orderedItems: readonly DrawItem[]) {
 export function svgSpriteTransform({ positionM: [x, y], angle }: DrawItem, scale: number) {
   return `translate(${x * scale} ${y * scale}) rotate(${angle * 180 / Math.PI}) scale(${scale})`
 }
+
+/** Conservative rectangle for rotated authored artwork, in camera metres. */
+export function svgArtIntersects(
+  { positionM: [x, y], angle }: DrawItem,
+  [left, top, width, height]: readonly [number, number, number, number],
+  viewWidthM: number, viewHeightM: number, marginM = 0,
+) {
+  const cos = Math.cos(angle), sin = Math.sin(angle)
+  const localX = left + width / 2, localY = top + height / 2
+  const cx = x + localX * cos - localY * sin
+  const cy = y + localX * sin + localY * cos
+  const hx = (width * Math.abs(cos) + height * Math.abs(sin)) / 2
+  const hy = (width * Math.abs(sin) + height * Math.abs(cos)) / 2
+  return Math.abs(cx) <= viewWidthM / 2 + hx + marginM &&
+    Math.abs(cy) <= viewHeightM / 2 + hy + marginM
+}

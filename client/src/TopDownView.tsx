@@ -16,7 +16,7 @@ import { cancelGroundMovement, groundFromView, interactiveAt, requestGroundMovem
 import { relativeAnchor, worldToView, type Anchor, viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
 import { DRY_MASS_KG, setMass } from './simulation.ts'
-import { PanoramicNavigation } from './PanoramicNavigation.tsx'
+import type { PanoramicNavigation } from './PanoramicNavigation.tsx'
 import { ObservationCameraState } from './observationCamera.ts'
 import { NavigationRuntime } from './navigationRuntime.ts'
 import { SAMPLE_BODIES } from './sampleUniverse.ts'
@@ -24,8 +24,8 @@ import { controlsCockpit, LOCAL_PLAYER, isCockpitTarget, leaveCockpit, setCockpi
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
 import { cancelInteraction, createTopDownState, drawList, PLAYER_ID, type DrawItem, requestInteraction, stepTopDown, TopDownClock, type TopDownState } from './topDownRuntime.ts'
-import { useWorldSprites, WorldSprite } from './topDownSprites.tsx'
-import { svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
+import { spriteBounds, usePresentationVisibility, useWorldSprites, WorldSprite } from './topDownSprites.tsx'
+import { svgArtIntersects, svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
 import { ResourceContainerInteraction } from './resourceContainerInteraction.ts'
@@ -118,15 +118,25 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
     [entities, frames, anchor, mode, facing])
   const passes = useMemo(() => svgLayers(items), [items])
   const selection = items.find(item => item.entity.id === selectedId)
-  const sprites = useWorldSprites(entities)
+  const visible = usePresentationVisibility()
+  const showWorld = visible && state.cockpit.view === 'world'
+  const intersects = (item: DrawItem, margin = 0, selected = false) => svgArtIntersects(item,
+    spriteBounds({ entity: item.entity, selected }), width / pixelsPerM, height / pixelsPerM, margin)
+  const requests = showWorld ? items.filter(item => intersects(item, 4)).map(({ entity }) => ({ entity, selected: false })) : []
+  if (showWorld && selection && intersects(selection, 4, true)) requests.push({ entity: selection.entity, selected: true })
+  const artwork = useWorldSprites(requests)
   const renderItems = (list: readonly DrawItem[]) => list.map(item => {
     const { entity } = item
     return <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? mode : undefined} data-facing={entity.id === PLAYER_ID ? facing : undefined} transform={svgSpriteTransform(item, pixelsPerM)}>
-      <WorldSprite entity={entity} />
+      {showWorld && intersects(item) && <WorldSprite request={{ entity }} outcome={artwork.get({ entity })} />}
     </g>
   })
   const destination = state.groundCommand && ['moving', 'arrived', 'failed'].includes(state.groundCommand.status) && (state.frames.ship.parent !== null || state.groundCommand.destination.frame === 'ship:scout') && worldToView(relativeAnchor(state.groundCommand.destination, state.camera.anchor, state.frames), state.frames)
-  return <svg onContextMenu={event => {
+  return <>
+  {artwork.error && <div className="world-art-error" role="alert">
+    Some world artwork could not load. <button onClick={artwork.retry}>Retry artwork</button>
+  </div>}
+  <svg onContextMenu={event => {
     event.preventDefault()
     const matrix = event.currentTarget.getScreenCTM()
     if (!matrix) return
@@ -136,19 +146,26 @@ export function TopDownScene({ state, session, onGround, onCancelGround, onCamer
     const objectId = interactiveAt(state, anchor, id)
     event.currentTarget.focus({ preventScroll: true })
     onGround?.(anchor, objectId, { x: event.clientX, y: event.clientY })
-  }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" data-camera-scale={state.camera.pixelsPerM} data-camera-panned={String(!!state.camera.panned)} viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(sprites.ready)} aria-busy={!sprites.ready}>
+  }} onPointerLeave={onCancelGround} onPointerCancel={onCancelGround} onLostPointerCapture={onCancelGround} tabIndex={0} ref={viewport} className="top-down-scene" data-camera-scale={state.camera.pixelsPerM} data-camera-panned={String(!!state.camera.panned)} viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`} shapeRendering="geometricPrecision" textRendering="geometricPrecision" role="img" aria-label={state.frames.ship.parent === null ? "Strict overhead Scout interior in flight" : "Strict overhead Scout and planetary test site"} data-render-ready={String(artwork.ready)} data-art-resources={JSON.stringify(artwork.stats)} aria-busy={!artwork.ready && !artwork.error}>
     {passes.map(({ id: layer, beforeTerrain, sprites }) => <g key={layer} data-layer={layer}>
       {layer === 'terrain' && state.scoutLocation.binding && <rect x={-width/2} y={-height/2} width={width} height={height} fill="#b5a58b" />}
       {renderItems(beforeTerrain)}
-      {layer === 'terrain' && <GeneratedGround state={state} width={width} height={height} />}
+      {layer === 'terrain' && showWorld && <GeneratedGround state={state} width={width} height={height} />}
       {renderItems(sprites)}
       {layer === 'cues' && destination && <g pointerEvents="none" data-destination={state.groundCommand!.status} transform={`translate(${destination[0] * state.camera.pixelsPerM} ${destination[1] * state.camera.pixelsPerM})`} className="command-destination" fill="none" stroke={state.groundCommand!.status === 'failed' ? 'var(--ui-danger)' : 'var(--ui-active)'} strokeWidth="2">
         <circle r="9" /><path d="M -14 0 H -5 M 5 0 H 14 M 0 -14 V -5 M 0 5 V 14" />
       </g>}
       {layer === 'cues' && <FieldMarkCues state={state} session={session} />}
-      {layer === 'cues' && selection && <g data-selection={selection.entity.id} transform={svgSpriteTransform(selection, pixelsPerM)} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite entity={selection.entity} selected /></g>}
+      {layer === 'cues' && showWorld && selection && intersects(selection, 0, true) && <g data-selection={selection.entity.id} transform={svgSpriteTransform(selection, pixelsPerM)} fill="none" stroke="#bce9df" strokeWidth=".08"><WorldSprite request={{ entity: selection.entity, selected: true }} outcome={artwork.get({ entity: selection.entity, selected: true })} /></g>}
     </g>)}
-  </svg>
+  </svg></>
+}
+
+let navigationPresentation: Promise<typeof PanoramicNavigation> | undefined
+function loadNavigationPresentation() {
+  navigationPresentation ??= import('./PanoramicNavigation.tsx').then(module => module.PanoramicNavigation)
+    .catch(error => { navigationPresentation = undefined; throw error })
+  return navigationPresentation
 }
 
 const openResourceSession = (storage: ResourceStorage, world: TopDownState) => new ResourceSession(storage, world)
@@ -332,6 +349,19 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
   const selected = state.entities.find(e => e.id === state.selectedId)
   const update = (next: TopDownState) => { current.current = next; setState(next) }
   const cockpitTarget = gameplay && isCockpitTarget(selected?.id ?? null)
+  const [panoramic, setPanoramic] = useState<{ component?: typeof PanoramicNavigation; error?: boolean }>({})
+  const [navigationRetry, setNavigationRetry] = useState(0)
+  const needsPanoramic = cockpitTarget || state.cockpit.view === 'radar'
+  useEffect(() => {
+    if (!needsPanoramic) return
+    let active = true
+    void loadNavigationPresentation().then(
+      component => { if (active) setPanoramic({ component }) },
+      () => { if (active) setPanoramic({ error: true }) },
+    )
+    return () => { active = false }
+  }, [needsPanoramic, navigationRetry])
+  const NavigationPresentation = panoramic.component
   const resourceSession = session.current
   const usage = resourceSession && resourceInventoryUsage(resourceSession.snapshot.inventory, RESOURCE_CATALOG, resourceSession.itemCatalog)
   const selectedContainer = resourceSession && [SCOUT_RESOURCE_CONTAINER_ID, 'scout:core', 'scout:fabricator', 'scout:gear-bench'].includes(selected?.id ?? '')
@@ -423,7 +453,12 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
       {gameplay && <ExpeditionAudioSettings audio={audio} />}
     </Dialog>
     {state.cockpit.view === 'radar' && <div inert={paused.current || !!resourceSession?.error}>
-      <PanoramicNavigation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
+      {!NavigationPresentation && <div className="world-art-error">
+        <p role={panoramic.error ? 'alert' : 'status'}>{panoramic.error ? 'Navigation artwork could not load.' : 'Loading navigation…'}</p>
+        {panoramic.error && <button onClick={() => { setPanoramic({}); setNavigationRetry(value => value + 1) }}>Retry navigation</button>}
+        <button onClick={() => update(leaveCockpit(current.current))}>Exit cockpit</button>
+      </div>}
+      {NavigationPresentation && <NavigationPresentation conditionWarning={warning} navigation={navigation} view={observation} advanceSimulation={false}
         isPaused={() => paused.current || !session.current || !!session.current.error || session.current.survival.health === 0 || !controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         canPilot={() => !paused.current && !!session.current && !session.current.error && survivalPolicy(session.current.survival).canWork && controlsCockpit(current.current.cockpit, LOCAL_PLAYER)}
         environment={resourceSession ?? undefined}
@@ -433,7 +468,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
           session.current.transitionScout({ kind: 'begin-landing', bodyId }, session.current.snapshot.revision, current.current.cockpit)
           update(session.current.world)
         } }}
-        takeoff={{ denial: () => paused.current ? 'Resume the expedition before takeoff.' : session.current?.scoutCommandDenial() ?? (session.current ? null : 'Expedition unavailable.'), activate: () => { if (!session.current || paused.current) return; session.current.world = current.current; session.current.transitionScout({ kind: 'begin-takeoff' }, session.current.snapshot.revision, current.current.cockpit); update(session.current.world) } }} onExit={() => update(leaveCockpit(current.current))} />
+        takeoff={{ denial: () => paused.current ? 'Resume the expedition before takeoff.' : session.current?.scoutCommandDenial() ?? (session.current ? null : 'Expedition unavailable.'), activate: () => { if (!session.current || paused.current) return; session.current.world = current.current; session.current.transitionScout({ kind: 'begin-takeoff' }, session.current.snapshot.revision, current.current.cockpit); update(session.current.world) } }} onExit={() => update(leaveCockpit(current.current))} />}
     </div>}
     {flightFixture && <div className="power-fixture">{(['begin-takeoff', 'finish-takeoff', 'begin-landing', 'finish-landing'] as const).map(kind => <button key={kind} onClick={event => { event.currentTarget.blur(); if (session.current) { session.current.world = current.current; session.current.transitionScout(kind === 'begin-landing' ? { kind, siteId: current.current.scoutLocation.siteId, bodyId: current.current.scoutLocation.body.id } : { kind }, session.current.snapshot.revision, current.current.cockpit); update({ ...session.current.world }) } }}>{kind}</button>)}</div>}
     {powerFixture && <div className="power-fixture" style={flightFixture ? { transform: 'translateY(-50px)' } : undefined}><button onClick={event => { update(setCockpitPower(current.current, !current.current.cockpit.powered)); event.currentTarget.blur() }}>{state.cockpit.powered ? 'Test cockpit power loss' : 'Restore cockpit power'}</button></div>}

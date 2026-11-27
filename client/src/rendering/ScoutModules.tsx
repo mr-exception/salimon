@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Entity2D } from '../topDownRuntime.ts'
 import { SCOUT_ENTRY_HALF_WIDTH_M } from '../scoutLayout.ts'
 import type { WallJoins } from './scoutArt.ts'
@@ -66,7 +67,7 @@ function WindowPanel({ width, depth }: { width: number; depth: number }) {
   </g>
 }
 
-function WallModule({ entity, joins, fade }: { entity: Entity2D; joins: WallJoins; fade: boolean }) {
+export function ScoutWallArt({ entity, joins, part }: { entity: Entity2D; joins: WallJoins; part: 'base' | 'cap' }) {
   const { halfWidth, halfHeight } = entity.footprint!
   const horizontal = halfWidth >= halfHeight
   const length = 2 * (horizontal ? halfWidth : halfHeight)
@@ -74,15 +75,24 @@ function WallModule({ entity, joins, fade }: { entity: Entity2D; joins: WallJoin
   const corner = Math.min(.065, depth / 3)
   const left = -length / 2, right = length / 2, top = -depth / 2, bottom = depth / 2
   const start = joins[0] ? 0 : corner, end = joins[1] ? 0 : corner
-  return <g data-scout-module="wall" data-scout-joins={joins.map(join => join ? 'joined' : 'capped').join(' ')}
-    transform={horizontal ? undefined : 'rotate(90)'}>
-    <path d={`M${left} ${top + start}L${left + start} ${top}H${right - end}L${right} ${top + end}V${bottom - end}L${right - end} ${bottom}H${left + start}L${left} ${bottom - start}Z`}
-      fill="#4b5b5e" />
-    <g className="scout-obstruction" data-scout-faded={String(fade)}>
+  return <g transform={horizontal ? undefined : 'rotate(90)'}>
+    {part === 'base' ? <path d={`M${left} ${top + start}L${left + start} ${top}H${right - end}L${right} ${top + end}V${bottom - end}L${right - end} ${bottom}H${left + start}L${left} ${bottom - start}Z`}
+      fill="#4b5b5e" /> : <>
       <path d={`M${left + start} ${top + .035}H${right - end}V${bottom - .05}H${left + start}Z`}
         fill="#a9aeaa" />
       <path d={`M${left + start} ${bottom - .065}H${right - end}`} stroke="#758080" strokeWidth=".035" />
-      {entity.id === 'wall:nose' && <WindowPanel width={length - .38} depth={depth} />}
+    </>}
+  </g>
+}
+
+export function ScoutWall({ entity, joins, fade, base, cap }: {
+  entity: Entity2D; joins: WallJoins; fade: boolean; base: ReactNode; cap: ReactNode
+}) {
+  return <g data-scout-module="wall" data-scout-joins={joins.map(join => join ? 'joined' : 'capped').join(' ')}>
+    {base}
+    <g className="scout-obstruction" data-scout-faded={String(fade)}>
+      {cap}
+      {entity.id === 'wall:nose' && <WindowPanel width={2 * entity.footprint!.halfWidth - .38} depth={2 * entity.footprint!.halfHeight} />}
     </g>
   </g>
 }
@@ -103,13 +113,10 @@ function BoardingDoor({ closed }: { closed: boolean }) {
   </g>
 }
 
-export function ScoutModule({ entity, joins = [false, false], fade = false }: {
-  entity: Entity2D; joins?: WallJoins; fade?: boolean
-}) {
+export function ScoutModule({ entity }: { entity: Entity2D }) {
   switch (entity.appearance) {
     case 'hull': return <ScoutHull />
     case 'floor': return <ScoutDeck />
-    case 'wall': return <WallModule entity={entity} joins={joins} fade={fade} />
     case 'door': case 'threshold': return <BoardingDoor closed={entity.appearance === 'door'} />
     default: return null
   }

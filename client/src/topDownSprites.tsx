@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { ScoutWallArt } from './rendering/ScoutModules.tsx'
+import type { WallJoins } from './rendering/scoutArt.ts'
 import { Illustration } from './TopDownIllustration.tsx'
 import type { Entity2D } from './topDownRuntime.ts'
 
 type Bounds = readonly [number, number, number, number]
 interface Sprite { readonly url: string; readonly bounds: Bounds; readonly bytes: number; readonly decodedBytes: number }
-type SpriteRequest = { entity: Entity2D; selected?: boolean; rasterScale?: number }
+type SpriteRequest = { entity: Entity2D; selected?: boolean; rasterScale?: number; wall?: { joins: WallJoins; part: 'base' | 'cap' } }
 type SpriteOutcome = { key: string; sprite?: Sprite; failed?: boolean }
 
-const spriteKey = ({ entity, selected, rasterScale = 1 }: SpriteRequest) =>
-  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}:${rasterScale}`
+const spriteKey = ({ entity, selected, rasterScale = 1, wall }: SpriteRequest) =>
+  `${selected ? 'selection' : entity.appearance}:${entity.footprint?.halfWidth ?? 0}:${entity.footprint?.halfHeight ?? 0}:${rasterScale}${wall ? `:${wall.part}:${wall.joins.join(',')}` : ''}`
 const essential = ({ entity, selected }: SpriteRequest) =>
   selected || !['ground', 'surface', 'stones'].includes(entity.appearance)
 
@@ -48,6 +50,21 @@ export function spriteRequest(entity: Entity2D, selected: boolean, scale: number
   return { entity, selected, rasterScale: essential({ entity, selected }) ? 1 : scale }
 }
 
+// Rasterize wall pieces on the sprite grid so pan and recenter repaint them consistently.
+// Keep the cap separate so its opacity can change without hiding the base.
+export function scoutWallRequests(entity: Entity2D, joins: WallJoins) {
+  return [
+    { entity, wall: { joins, part: 'base' } },
+    { entity, wall: { joins, part: 'cap' } },
+  ] as const
+}
+
+function spriteArt({ entity, wall }: SpriteRequest) {
+  return wall
+    ? <ScoutWallArt entity={entity} {...wall} />
+    : <Illustration appearance={entity.appearance} footprint={entity.footprint} />
+}
+
 async function createSprite(request: SpriteRequest): Promise<Sprite> {
   const { entity, selected = false, rasterScale = 1 } = request
   await document.fonts.ready
@@ -61,7 +78,7 @@ async function createSprite(request: SpriteRequest): Promise<Sprite> {
   const hw = entity.footprint?.halfWidth ?? .4, hh = entity.footprint?.halfHeight ?? .4
   const art = selected
     ? <rect x={-hw - .15} y={-hh - .15} width={hw * 2 + .3} height={hh * 2 + .3} rx=".1" fill="none" stroke="#bce9df" strokeWidth=".08" />
-    : <Illustration appearance={entity.appearance} footprint={entity.footprint} />
+    : spriteArt(request)
   const svg = renderToStaticMarkup(<svg xmlns="http://www.w3.org/2000/svg" width={pixelsW} height={pixelsH} viewBox={bounds.join(' ')} shapeRendering="geometricPrecision" textRendering="geometricPrecision" style={{ fontFamily: 'system-ui,sans-serif' }}>{art}</svg>)
   const objectUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }))
   try {
@@ -177,7 +194,7 @@ export function WorldSprite({ request, outcome }: { request: SpriteRequest; outc
     if (request.selected) return null
     // The retained vector source supplies the same silhouette if its raster
     // cannot be decoded. The retry control is reserved for essential artwork.
-    return <Illustration appearance={request.entity.appearance} footprint={request.entity.footprint} />
+    return spriteArt(request)
   }
   if (!outcome?.sprite) return null
   const { url, bounds: [x, y, width, height] } = outcome.sprite

@@ -15,7 +15,7 @@ export function characterArt(equipment: EquipmentState | undefined, tool: boolea
   mode: TopDownState['player']['mode'], dynamicShadow: boolean): CharacterArt {
   const suit = equipment?.instances.find(item => item.location.kind === 'equipped')
   const suited = !equipment || !!suit
-  const modules = equipment?.instances.flatMap(item =>
+  const modules = equipment?.instances.flatMap<CharacterArt['modules'][number]>(item =>
     item.location.kind === 'installed' && item.location.suitId === suit?.id
       ? [{ slot: item.location.slot, definitionId: item.definitionId, condition: gearCondition(item.remaining) }]
       : []) ?? []

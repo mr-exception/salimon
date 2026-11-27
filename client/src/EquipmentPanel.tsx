@@ -4,6 +4,7 @@ import type { ResourceSession } from './resourceSession.ts'
 import type { GearCommand } from './scoutEquipment.ts'
 import { EquipmentDraft, equipmentActionDenial } from './equipmentUi.ts'
 import { EquipmentDialog, Button, Progress } from './ui/primitives.tsx'
+import { EquipmentIcon } from './rendering/EquipmentIcon.tsx'
 import { StatusMessage } from './ui/Feedback.tsx'
 import * as q from './exact.ts'
 import './equipmentUi.css'
@@ -33,7 +34,7 @@ export const EquipmentPanel=memo(function EquipmentPanel({session,onClose,onChan
   <label>Module installation suit<select value={suit?.id??''} onChange={e=>setSelectedSuit(e.target.value)}>{suits.map((g,i)=><option key={g.id} value={g.id}>Suit {i+1} · {g.location.kind} · {hp(g.remaining).toFixed(2)} HP</option>)}</select></label>
   <ul className="gear-list" aria-label="Equipment inventory">{gear.filter(g=>g.location.kind!=='destroyed').map((g,i)=>{
    const d=GEAR_DEFINITIONS[g.definitionId]!,blocked=g.location.kind==='bench'
-   return <li key={g.id} data-gear-id={g.id}><strong>{gearName(g.definitionId)}</strong><p>Item {i+1} · {g.location.kind==='installed'?'Installed in suit':g.location.kind==='bench'?'Reserved by bench':g.location.kind} · {d.grams/1000} kg</p>
+   return <li key={g.id} data-gear-id={g.id}><div className="gear-item-heading"><EquipmentIcon gear={g}/><strong>{gearName(g.definitionId)}</strong></div><p>Item {i+1} · {g.location.kind==='installed'?'Installed in suit':g.location.kind==='bench'?'Reserved by bench':g.location.kind} · {d.grams/1000} kg</p>
     <Progress label={`${gearName(g.definitionId)} condition ${i+1}`} value={hp(g.remaining)} max={1000} unit="HP"/>
     {d.kind==='module'&&<p>{d.protection} HP/s protection · {g.location.kind==='installed'&&gear.some(s=>s.id===(g.location as {suitId:string}).suitId&&hp(s.remaining)===0)?'Inactive: suit destroyed':'Requires a functioning equipped suit'}</p>}
     {!blocked&&<div className="gear-actions">

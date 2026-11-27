@@ -1,4 +1,5 @@
 import {test,expect,type Page} from '@playwright/test'
+import { GEAR_DEFINITIONS, type GearInstance } from '../src/equipment.ts'
 import {ResourceSession,RESOURCE_SAVE_KEY} from '../src/resourceSession.ts'
 import {createTopDownState,PLAYER_ID} from '../src/topDownRuntime.ts'
 import {point2} from '../src/topDownFrames.ts'
@@ -90,4 +91,58 @@ test('GEAR-920 production threshold warning stays stable and clears on removal',
  await page.evaluate(({key,raw})=>localStorage.setItem(key,JSON.stringify(raw)),{key:RESOURCE_SAVE_KEY,raw});await page.reload()
  await expect.poll(async()=>{await page.clock.runFor(32);return scene(page).getAttribute('data-render-ready')}).toBe('true')
  await expect(page.getByLabel('Equipment warnings')).toBeEmpty()
+})
+
+test('every delivered protection and gathering icon exports a transparent 256px image', async ({ page }, info) => {
+ const seed = JSON.parse(fixture())
+ const inventory = seed.inventory.equipment.instances
+ for (const definitionId of Object.keys(GEAR_DEFINITIONS)) {
+  if (inventory.some((item: GearInstance) => item.definitionId === definitionId)) continue
+  inventory.push({ id: `gear:0:icon-${definitionId.replaceAll(':', '-')}`, definitionId,
+   remaining: definitionId === 'module:poison:t2' ? '400/1' : '1000/1', location: { kind: 'module-storage' } })
+ }
+ await page.addInitScript(({ key, raw }) => {
+  if (!localStorage.getItem(key)) localStorage.setItem(key, raw)
+ }, { key: RESOURCE_SAVE_KEY, raw: JSON.stringify(seed) })
+ await boot(page, '', 'http://127.0.0.1:4175')
+ await page.getByRole('button', { name: /Field inventory/ }).click()
+ await page.getByRole('button', { name: 'Equipment and storage' }).click()
+ const dialog = page.getByRole('dialog', { name: 'Equipment and storage' })
+ await expect(dialog).toBeVisible()
+ await expect(dialog.locator('[data-equipment-icon]')).toHaveCount(Object.keys(GEAR_DEFINITIONS).length)
+ await expect(dialog.locator('[data-equipment-icon="module:poison:t2"]')).toHaveAttribute('data-icon-condition', 'worn')
+ const assets = await page.locator('[data-equipment-icon]').evaluateAll(async icons => {
+  return Promise.all(icons.map(async icon => {
+   const source = new XMLSerializer().serializeToString(icon)
+   const image = new Image()
+   image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(source)}`
+   await image.decode()
+   const canvas = document.createElement('canvas')
+   canvas.width = image.naturalWidth
+   canvas.height = image.naturalHeight
+   const context = canvas.getContext('2d')!
+   context.drawImage(image, 0, 0)
+   const { data } = context.getImageData(0, 0, canvas.width, canvas.height)
+   let left = canvas.width, top = canvas.height, right = -1, bottom = -1
+   for (let y = 0; y < canvas.height; y++) for (let x = 0; x < canvas.width; x++) {
+    if (!data[(y * canvas.width + x) * 4 + 3]) continue
+    left = Math.min(left, x); top = Math.min(top, y); right = Math.max(right, x); bottom = Math.max(bottom, y)
+   }
+   return { id: (icon as SVGSVGElement).dataset.equipmentIcon!, dimensions: [canvas.width, canvas.height],
+    bounds: [left, top, right, bottom], png: canvas.toDataURL() }
+  }))
+ })
+ expect(assets.map(asset => asset.id).sort()).toEqual([...Object.keys(GEAR_DEFINITIONS), 'gathering-tool'].sort())
+ expect(new Set(assets.map(asset => asset.png)).size).toBe(assets.length)
+ for (const asset of assets) {
+  expect(asset.dimensions).toEqual([256, 256])
+  const [left, top, right, bottom] = asset.bounds
+  expect(Math.min(left, top, 255 - right, 255 - bottom)).toBeGreaterThan(0)
+  expect(right - left).toBeGreaterThan(20)
+  expect(bottom - top).toBeGreaterThan(20)
+  await info.attach(asset.id.replaceAll(':', '-'), { body: Buffer.from(asset.png.split(',')[1]!, 'base64'), contentType: 'image/png' })
+ }
+ const original = await dialog.screenshot({ path: info.outputPath('equipment-icons.png') })
+ const repeat = await dialog.screenshot({ path: info.outputPath('equipment-icons-repeat.png') })
+ expect(compareImages(original, repeat).pass).toBe(true)
 })

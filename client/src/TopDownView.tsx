@@ -1,5 +1,6 @@
 import { EquipmentHud } from './EquipmentHud.tsx'
 import { GearNoticeTracker, equipmentHudReadout } from './equipmentHud.ts'
+import { EquipmentIcon } from './rendering/EquipmentIcon.tsx'
 import { EquipmentPanel } from './EquipmentPanel.tsx'
 import { commandFeedback } from './commandFeedback.ts'
 import { advanceObjectCommand, selectObjectCommand } from './topDownCommands.ts'
@@ -587,7 +588,7 @@ export function TopDownView({ gameplay = false, createResourceSession = openReso
           <Button onClick={() => toggleInventory(false, true)}>Close inventory</Button>
           </UtilityPanel></div>
         </>}
-        <button disabled={!resourceSession || !!resourceSession.error || resourceSession.survival.health === 0 || paused.current} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}>{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
+        <button disabled={!resourceSession || !!resourceSession.error || resourceSession.survival.health === 0 || paused.current} aria-pressed={resourceSession?.equipped ?? false} onClick={event => { resourceSession?.toggleTool(); event.currentTarget.blur(); setState({ ...current.current }) }}><EquipmentIcon />{resourceSession?.equipped ? 'Stow gathering tool' : 'Equip gathering tool'}</button>
         {(!resourceSession || resourceSession.error) && <StatusMessage announce={!resourceSession?.error}>{resourceSession?.error || saveStatus}</StatusMessage>}
       </aside>}
     </section>

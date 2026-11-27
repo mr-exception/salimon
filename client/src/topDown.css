@@ -142,3 +142,16 @@ body:has(.panoramic) .vital-meters { gap:6px }
   background: #09141cec;
   font: 11px/1.4 monospace;
 }
+
+.scout-obstruction {
+  opacity: 1;
+  transition: opacity 190ms ease-out;
+}
+
+.scout-obstruction[data-scout-faded="true"] {
+  opacity: .26;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scout-obstruction { transition: none; }
+}

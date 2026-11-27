@@ -13,7 +13,7 @@ import { BOARDING_DOOR_ID } from './scoutDoor.ts'
 import { SCOUT_ANCHORS } from './scoutLayout.ts'
 import { ExpeditionAudioSettings, useExpeditionAudio } from './audio/ExpeditionAudio.tsx'
 import { cancelGroundMovement, groundFromView, interactiveAt, requestGroundMovement } from './topDownNavigation.ts'
-import { relativeAnchor, worldToView, type Anchor, viewToWorld } from './topDownFrames.ts'
+import { relativeAnchor, rotate2, worldToView, type Anchor, viewToWorld } from './topDownFrames.ts'
 import { METER, survivalPolicy } from './survival.ts'
 import { DRY_MASS_KG, setMass } from './simulation.ts'
 import type { PanoramicNavigation } from './PanoramicNavigation.tsx'
@@ -24,10 +24,12 @@ import { controlsCockpit, LOCAL_PLAYER, isCockpitTarget, leaveCockpit, setCockpi
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { acceptsFlightShortcut, FrameTimer, NavigationInput, panAxisForCode } from './input.ts'
 import { cancelInteraction, createTopDownState, drawList, PLAYER_ID, type DrawItem, requestInteraction, stepTopDown, TopDownClock, type TopDownState } from './topDownRuntime.ts'
-import { spriteBounds, spriteRequest, usePresentationVisibility, useWorldSprites, WorldSprite } from './topDownSprites.tsx'
+import { scoutWallRequests, spriteBounds, spriteRequest, usePresentationVisibility, useWorldSprites, WorldSprite } from './topDownSprites.tsx'
 import { QUALITY, renderDpr, type WorldQuality } from './rendering/graphicsPreferences.ts'
 import { useWorldGraphics, WorldGraphicsSettings } from './rendering/WorldGraphicsSettings.tsx'
 import { diagnosticsEnabled, FrameDiagnostics, RenderDiagnostics } from './rendering/RenderDiagnostics.tsx'
+import { isScoutModule, scoutArtObstructs, scoutWallJoins } from './rendering/scoutArt.ts'
+import { ScoutModule, ScoutWall } from './rendering/ScoutModules.tsx'
 import { svgArtIntersects, svgLayers, svgSpriteTransform } from './rendering/svgWorld.ts'
 import { RESOURCE_CATALOG, RESOURCE_SAVE_KEY, ResourceSession, type ResourceStorage } from './resourceSession.ts'
 import { resourceInventoryUsage } from './resourceInventory.ts'
@@ -119,7 +121,11 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
   const { entities, frames, camera: { anchor, pixelsPerM }, player: { mode, facing }, selectedId } = state
   const items = useMemo(() => drawList({ entities, frames, camera: { anchor }, player: { mode, facing } }),
     [entities, frames, anchor, mode, facing])
-  const passes = useMemo(() => svgLayers(items), [items])
+  // The boarding assembly lies over the deck within the interior pass.
+  const boardingDoor = items.find(item => item.entity.id === BOARDING_DOOR_ID)
+  const passes = useMemo(() => svgLayers(items.filter(item => item.entity.id !== BOARDING_DOOR_ID)), [items])
+  const wallJoins = useMemo(() => scoutWallJoins(entities), [entities])
+  const playerArt = items.find(item => item.entity.id === PLAYER_ID && item.entity.anchor.frame === 'ship:scout')
   const selection = items.find(item => item.entity.id === selectedId)
   const visible = usePresentationVisibility()
   const showWorld = visible && state.cockpit.view === 'world'
@@ -127,14 +133,31 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
   const request = (entity: DrawItem['entity'], selected = false) => spriteRequest(entity, selected, rasterScale)
   const intersects = (item: DrawItem, margin = 0, selected = false) => svgArtIntersects(item,
     spriteBounds({ entity: item.entity, selected }), width / pixelsPerM, height / pixelsPerM, margin)
-  const requests = showWorld ? items.filter(item => intersects(item, 4)).map(({ entity }) => request(entity)) : []
+  const requests = showWorld ? items.filter(item => intersects(item, 4)).flatMap<ReturnType<typeof spriteRequest>>(({ entity }) => {
+    const wall = wallJoins.get(entity.id)
+    if (wall) return scoutWallRequests(entity, wall)
+    return isScoutModule(entity) ? [] : [request(entity)]
+  }) : []
   if (showWorld && selection && intersects(selection, 4, true)) requests.push(request(selection.entity, true))
   const artwork = useWorldSprites(requests)
   const renderItems = (list: readonly DrawItem[]) => list.map(item => {
     const { entity } = item
     const sprite = request(entity)
+    const wall = wallJoins.get(entity.id)
+    const modular = isScoutModule(entity)
+    const fade = playerArt && scoutArtObstructs(entity, rotate2([
+      playerArt.positionM[0] - item.positionM[0], playerArt.positionM[1] - item.positionM[1],
+    ], -item.angle))
+    const illustration = <WorldSprite request={sprite} outcome={artwork.get(sprite)} />
+    const wallSprites = wall && scoutWallRequests(entity, wall).map(wallSprite =>
+      <WorldSprite key={wallSprite.wall.part} request={wallSprite} outcome={artwork.get(wallSprite)} />)
     return <g key={entity.id} data-entity={entity.id} data-door-state={entity.id === BOARDING_DOOR_ID ? state.scoutLocation.boardingDoor : undefined} data-source-kind={entity.source?.kind} data-source-site={entity.source?.siteId} data-remaining-grams={session?.source(entity.id)?.remainingGrams} data-depleted={session?.source(entity.id)?.remainingGrams === 0 || undefined} data-frame={entity.anchor.frame} data-surface-chart={entity.anchor.chart ? JSON.stringify(entity.anchor.chart) : undefined} data-position={entity.anchor.point.offsetM.slice(0, 2).join(',')} data-posture={entity.id === PLAYER_ID ? mode : undefined} data-facing={entity.id === PLAYER_ID ? facing : undefined} transform={svgSpriteTransform(item, pixelsPerM)}>
-      {showWorld && intersects(item) && <WorldSprite request={sprite} outcome={artwork.get(sprite)} />}
+      {showWorld && intersects(item) && (wall
+        ? <ScoutWall entity={entity} joins={wall} fade={!!fade} base={wallSprites?.[0]} cap={wallSprites?.[1]} />
+        : modular ? <ScoutModule entity={entity} />
+        : entity.footprint && entity.anchor.frame === 'ship:scout'
+          ? <g className="scout-obstruction" data-scout-faded={String(!!fade)}>{illustration}</g>
+          : illustration)}
     </g>
   })
   const destination = state.groundCommand && ['moving', 'arrived', 'failed'].includes(state.groundCommand.status) && (state.frames.ship.parent !== null || state.groundCommand.destination.frame === 'ship:scout') && worldToView(relativeAnchor(state.groundCommand.destination, state.camera.anchor, state.frames), state.frames)
@@ -164,6 +187,7 @@ export function TopDownScene({ state, quality = QUALITY.Medium, activeCues = () 
             ry={(item.entity.footprint?.halfHeight ?? .24) + .09} fill="#18242a" opacity=".23" />)}
       </g>}
       {renderItems(sprites)}
+      {layer === 'interior' && boardingDoor && renderItems([boardingDoor])}
       {layer === 'cues' && destination && <g pointerEvents="none" data-destination={state.groundCommand!.status} transform={`translate(${destination[0] * state.camera.pixelsPerM} ${destination[1] * state.camera.pixelsPerM})`} className="command-destination" fill="none" stroke={state.groundCommand!.status === 'failed' ? 'var(--ui-danger)' : 'var(--ui-active)'} strokeWidth="2">
         <circle r="9" /><path d="M -14 0 H -5 M 5 0 H 14 M 0 -14 V -5 M 0 5 V 14" />
       </g>}

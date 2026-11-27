@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs><linearGradient id="steel" x2="0" y2="1"><stop stop-color="#798686"/><stop offset="1" stop-color="#465154"/></linearGradient><linearGradient id="ivory" x2="0" y2="1"><stop stop-color="#ece4ca"/><stop offset="1" stop-color="#b6a68b"/></linearGradient><linearGradient id="glass" x2="0" y2="1"><stop stop-color="#90d2c8"/><stop offset="1" stop-color="#31626a"/></linearGradient><linearGradient id="ochre" x2="0" y2="1"><stop stop-color="#d8af69"/><stop offset="1" stop-color="#9b643e"/></linearGradient></defs>
+
+<path d="M88 108 106 86h44l18 22 20 8 13 24-11 24-12-3-5-24-10 4-5 48-29 7-28-7-5-48-11-4-4 24-12 3-12-24 14-24Z" fill="url(#steel)" stroke="#26383c" stroke-width="5"/>
+<path d="m105 170-7 48 7 15h17l7-13 5-29 6 29 7 13h16l6-15-9-48Z" fill="#3c4b4d" stroke="#25353a" stroke-width="4"/>
+<path d="M110 146h39l7 31-28 10-23-10Z" fill="url(#ivory)"/>
+<path d="M98 129V66c0-24 13-42 30-42 25 0 37 20 37 42v63l-35 19Z" fill="url(#ivory)" stroke="#4d5551" stroke-width="5"/>
+<path d="M109 67c0-18 8-30 20-30 17 0 25 14 25 30l-5 20h-35Z" fill="url(#glass)" stroke="#354e54" stroke-width="4"/>
+<path d="M106 91l21 15 29-15v25l-27 16-23-16Z" fill="url(#steel)"/>
+<path d="M107 148h43m-40 8h39m-35 54v11m42-11v11" stroke="#889a94" stroke-width="3"/>
+<path d="M74 124l13 5-6 21-14-6m114-20-11 5 5 21 14-6" fill="url(#ochre)"/>
+<path d="M116 58c4-7 8-9 15-9" fill="none" stroke="#b8ded2" stroke-width="4" stroke-linecap="round"/>
+
+</svg>

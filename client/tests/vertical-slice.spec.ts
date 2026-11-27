@@ -35,9 +35,7 @@ test('SLICE-880 built mine → storage → Core → Fabricator → marker → co
   const fabricatorArt = page.locator('[data-scout-machine="fabricator"]')
   const machineCapture = async (state: string) => {
     await expect(fabricatorArt).toHaveAttribute('data-machine-state', state)
-    const original = await page.screenshot({ path: info.outputPath(`fabricator-${state}.png`) })
-    const repeat = await page.screenshot({ path: info.outputPath(`fabricator-${state}-repeat.png`) })
-    expect(compareImages(original, repeat).pass).toBe(true)
+    await page.screenshot({ path: info.outputPath(`fabricator-${state}.png`) })
   }
   await record('initial')
   await page.screenshot({ path: info.outputPath('production-start.png') })
@@ -81,7 +79,6 @@ test('SLICE-880 built mine → storage → Core → Fabricator → marker → co
   expect((await record('paused-reload')).fabricator).toEqual(interrupted.fabricator)
   await page.keyboard.press('e'); await expect(panel(page)).toBeVisible()
 
-  await expect(page.locator('[data-scout-machine="core"]')).toHaveAttribute('data-machine-state', 'unpowered')
   await page.clock.runFor(1000); expect((await saved(page)).fabricator).toEqual(interrupted.fabricator)
   await page.screenshot({ path: info.outputPath('power-interruption.png') })
   await page.keyboard.press('Escape'); await page.keyboard.press('e')
@@ -302,4 +299,25 @@ for (const machine of ['Core', 'Fabricator'] as const) test(`SLICE-880 full ${ma
   expect(before.stores[storeId].quantities.mineral).toBe(50000)
   await page.screenshot({ path: info.outputPath('full-buffer.png') })
   await info.attach('capacity.json', { body: JSON.stringify({ machine, before, after: await saved(page) }, null, 2), contentType: 'application/json' })
+})
+
+test('scout machines hold their fixed-clock artwork in each committed state', async ({ browser }, info) => {
+  const states = { ready: 'idle', powered: 'active', paused: 'paused', complete: 'output' } as const
+  const originals: Buffer[] = []
+  for (const scenario of Object.keys(states) as (keyof typeof states)[]) {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, reducedMotion: 'reduce' })
+    try {
+      const page = await context.newPage()
+      await seed(page, fixture(scenario))
+      await boot(page, '', origin)
+      await expect(page.locator('[data-scout-machine="fabricator"]')).toHaveAttribute('data-machine-state', states[scenario])
+      await expect(page.locator('[data-scout-machine="bench"]')).toHaveAttribute('data-machine-rotation', '270')
+      if (scenario === 'paused') await expect(page.locator('[data-scout-machine="core"]')).toHaveAttribute('data-machine-state', 'unpowered')
+      const original = await page.screenshot({ path: info.outputPath(`machine-${scenario}.png`) })
+      const repeat = await page.screenshot({ path: info.outputPath(`machine-${scenario}-repeat.png`) })
+      expect(compareImages(original, repeat).pass).toBe(true)
+      originals.push(original)
+    } finally { await context.close() }
+  }
+  expect(compareImages(originals[1]!, originals[2]!).pass).toBe(false)
 })

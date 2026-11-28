@@ -22,6 +22,28 @@ identity/durability and destruction locations. `liveHazards.test.ts` and built
 
 # Feature maintenance map
 
+## Browser session and world-view modules
+
+`resourceSession.ts` retains the public single-writer facade and atomic storage
+commit. `resourceCatalog.ts` owns trusted starter metadata and save/storage types;
+`resourceSave.ts` owns fresh saves and versioned decoding, with physical location,
+site and mining validation in `resourceSaveLocation.ts`. Read-only payload helpers
+live in `resourcePayload.ts`. Inventory, machine, marker and Scout commands live
+in `resourceInventoryCommands.ts`, `resourceMachineCommands.ts`,
+`resourceMarkerCommands.ts` and `resourceScoutCommands.ts`; every write still
+returns through the session commit. `resourceDeposits.ts` owns disposable deposit
+projection; `resourceTick.ts` retains the existing ordered power, survival, hazard,
+gathering and rollback sequence on the sole world clock. Existing imports from
+`resourceSession.ts`, save versions and local-storage keys remain compatible.
+
+`TopDownView.tsx` composes the writer, controllers and world UI. `useTopDownLoop.ts`
+owns the existing RAF/input lifecycle; `TopDownScene.tsx` owns SVG presentation
+and camera pointer input. `TopDownHud.tsx`, `TopDownHelp.tsx` and
+`TopDownCockpit.tsx` own the HUD, controls dialog and lazy panoramic presentation.
+These adapters do not create a second simulation clock or persistence writer.
+The existing `TopDownScene` export through `TopDownView.tsx` remains available.
+
+
 Adaptive metric UI (#910): `client/src/metricFormat.ts` owns display-only distance
 and speed formatting, including the deliberate Bm (SI Gm) convention. Navigation
 and contact components consume it; physics/storage/input units stay with their

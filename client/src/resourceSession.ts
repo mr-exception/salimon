@@ -1,288 +1,34 @@
-import * as q from './exact.ts'
-import { BENCH_ID, BENCH_INPUT_ID, BENCH_WATTS, benchTickCost, repairCost, repairGrams, validateRepair, GEAR_RECIPES, freshBench, validateBench, benchSpentJ60, stepBench, type BenchState } from './gearBench.ts'
-import { SCOUT_SAFE_ENVIRONMENT, ENVIRONMENT_PUBLICATION, validateEnvironmentPublication, samplePlanetEnvironment, bodyEnvironmentSummary } from './planetEnvironment.ts'
-import { applyGearCommand, gearCommandDenial, type GearCommand } from './scoutEquipment.ts'
-import { functioningEquipment, GEAR_DEFINITIONS, freshEquipment, validateEquipment, equipmentMass } from './equipment.ts'
-import { validateDeployedMarkers } from './fieldMarker.ts'
-import { FABRICATOR_INPUT_ID, FABRICATOR_RECIPE_ID, FABRICATOR_GRAMS, FABRICATOR_TICKS, FABRICATOR_WATTS, FABRICATOR_ITEMS, MARKER_KIT_ID, freshFabricator, validateFabricator, fabricatorSpentJ60, stepFabricator, type FabricatorState } from './scoutFabricator.ts'
-import { emptyJournal, recordVisit, validateJournal, type ExpeditionJournal } from './expeditionJournal.ts'
-import { createFieldMark, recordFieldMark, updateWalkingFix, type WalkingFix, type FieldMark } from './exploration.ts'
-import { DEPOSIT_PUBLICATION, depositFromId, depositNeighborhood, isDepositId, regionDeposits, type PlanetDeposit } from './planetDeposits.ts'
-import { probeGeology } from './planetGeology.ts'
-import { surfaceRegion, surfaceToLocal, localToSurface, type SurfaceLocation } from './surfaceCoordinates.ts'
-import { planetDefinition, geologicalDefinition } from './planetDefinition.ts'
-import { SAMPLE_BODIES } from './sampleUniverse.ts'
-import { scoutLandingSurface } from './scoutLocation.ts'
-import { captureSite, resolveSurface, siteEntities, validateSurfaceClearance, type SiteStates, type SiteState, type SurfaceAddress } from './surfaceSite.ts'
-import { toggleDoor, synchronizeDoor } from './scoutDoor.ts'
-import { captureScout, decodeScout, type ScoutSave } from './scoutSave.ts'
-import { surfaceScoutLocation, startingScoutLocation, transitionScout, takeoffDenial, type ScoutAction } from './scoutLocation.ts'
-import { freshHazards, validateHazards, hazardRates, stepHazards, type HazardState, type HazardSource, type HazardEvent, type ProtectionModule } from './hazards.ts'
-import { advanceSurvival, freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
-import { emptyResourceStores, resourceLedgerMass, transferResource, validateResourceLedger, type ResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
+import * as resourceInventoryCommands from './resourceInventoryCommands.ts'
+import { synchronizeDeposits } from './resourceDeposits.ts'
+import { advanceResourceSession, type ResourceTickControl } from './resourceTick.ts'
+import { type GearCommand } from './scoutEquipment.ts'
+import { recordVisit, validateJournal } from './expeditionJournal.ts'
+import { type WalkingFix, type FieldMark } from './exploration.ts'
+import { isDepositId, type PlanetDeposit } from './planetDeposits.ts'
+import { surfaceRegion, type SurfaceLocation } from './surfaceCoordinates.ts'
+import { resolveSurface, validateSurfaceClearance, type SiteStates } from './surfaceSite.ts'
+import { synchronizeDoor } from './scoutDoor.ts'
+import { captureScout, decodeScout } from './scoutSave.ts'
+import { type ScoutAction } from './scoutLocation.ts'
+import { freshHazards, validateHazards, hazardRates, type HazardState, type HazardSource, type HazardEvent, type ProtectionModule } from './hazards.ts'
+import { freshSurvival, recoverOffline, validateSurvival, survivalPolicy, type SurvivalState } from './survival.ts'
+import { resourceLedgerMass, validateResourceLedger, type ResourceStoreCatalog, type ResourceTransfer } from './resourceLedger.ts'
 import { SCOUT_RESOURCE_CONTAINER_ID, SCOUT_RESOURCE_STORES } from './scoutResourceContainer.ts'
-import { SCOUT_CORE_FUEL_ID, freshCoreEnergy, validateCoreEnergy, migrateCoreEnergy, validateCoreConservation, stepCoreEnergy, type CorePowerRequest, type CorePowerResult, type CoreEnergyState } from './scoutEnergyCore.ts'
-import { CELL_SIZE_M, ORIGIN, relativeM } from './coordinates.ts'
-import { controlsCockpit, LOCAL_PLAYER, leaveCockpit, type CockpitState } from './cockpit.ts'
-import { STARTING_SITE } from './planetarySite.ts'
-import { addCountItem, removeCountItem, registerCountItems, type CountItemCatalog, increaseResourceInventoryCapacity, resourceInventoryUsage, startingResourceInventory, type ResourceInventory, type ResourceSource } from './resourceInventory.ts'
-import { DRY_MASS_KG, setMass, type ShipState } from './simulation.ts'
-import { point2, walkingFrames, relativeAnchor, rotate2, type Anchor } from './topDownFrames.ts'
-import { interactionInReach, PLAYER_RADIUS_M } from './topDownInteraction.ts'
-import { capturePlayerLocation, synchronizeScout, PLAYER_ID, type TopDownState } from './topDownRuntime.ts'
-import type { PlayerLocation } from './topDownTraversal.ts'
-
-export const RESOURCE_SAVE_KEY = 'salimon:expedition:v1'
-export const RESOURCE_CATALOG_VERSION = 'landing-resources:v2'
-// The existing v1 localStorage key is retained for safe one-time save migration.
-const LEGACY_CATALOG_VERSION = 'landing-resources:v1'
-const LEGACY_GRAMS_PER_LITRE = { mineral: 2500, biomass: 500 } as const
-export const RESOURCE_CATALOG = {
-  mineral: { name: 'Banded mineral' },
-  biomass: { name: 'Plate biomass' },
-} as const
-// Trusted manufactured starter item; deployment is an atomic E07 transaction.
-export const ITEM_CATALOG = registerCountItems(FABRICATOR_ITEMS)
-export const RESOURCE_SOURCES: Readonly<Record<string, ResourceSource>> = {
-  'source:landing:mineral:01': { id: 'source:landing:mineral:01', resourceId: 'mineral', remainingGrams: 60_000 },
-  'source:landing:biology:01': { id: 'source:landing:biology:01', resourceId: 'biomass', remainingGrams: 15_000 },
-}
-export interface ResourceSave extends ResourceLedger {
-  readonly environmentPublication: typeof ENVIRONMENT_PUBLICATION
-  readonly depositPublication: typeof DEPOSIT_PUBLICATION
-  readonly version: 19
-  readonly deployedMarkers: readonly FieldMark[]
-  readonly bench: BenchState
-  readonly fabricator: FabricatorState
-  readonly convertedGrams: Readonly<Record<string, number>>
-  readonly core: CoreEnergyState
-  readonly journal: ExpeditionJournal
-  readonly sites: SiteStates
-  readonly scout: ScoutSave
-  readonly miningWork: Readonly<Record<string, number>>
-  readonly hazards: HazardState
-  readonly survival: SurvivalState
-  readonly itemDefinitions: CountItemCatalog
-  readonly catalogVersion: typeof RESOURCE_CATALOG_VERSION
-  readonly siteId: string
-  readonly revision: number
-  readonly inventory: ResourceInventory
-  readonly sources: Readonly<Record<string, ResourceSource>>
-  readonly location: PlayerLocation
-}
-export interface ResourceStorage { getItem(key: string): string | null; setItem(key: string, value: string): void }
-const startingLocationForMigration = () => {
-  const { definition: _reference, ...address } = startingScoutLocation().surface
-  return surfaceScoutLocation(address)
-}
-const serializeForDecode = (value: unknown) => JSON.parse(serialize(value))
-const serialize = (value: unknown) => JSON.stringify(value, (_, v) => typeof v === 'bigint' ? v.toString() : v)
-function object(value: unknown): Record<string, unknown> {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Expected object')
-  return value as Record<string, unknown>
-}
-function integer(value: unknown, min = 0): number {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < min) throw new Error('Invalid integer')
-  return value
-}
-function parseLocation(value: unknown, world: TopDownState): PlayerLocation {
-  const location = object(value), anchor = object(location.anchor), point = object(anchor.point)
-  if (anchor.frame !== world.frames.planet.id && anchor.frame !== world.frames.ship.id) throw new Error('Unknown frame')
-  if (!Array.isArray(point.cell) || point.cell.length !== 3 || !Array.isArray(point.offsetM) || point.offsetM.length !== 3) throw new Error('Invalid position')
-  const cell = point.cell.map((v: unknown) => {
-    if (typeof v !== 'string' || !/^-?(0|[1-9][0-9]{0,127})$/.test(v)) throw new Error('Invalid cell')
-    return BigInt(v)
-  }) as [bigint, bigint, bigint]
-  const offsetM = point.offsetM.map((v: unknown) => {
-    if (typeof v !== 'number' || !Number.isFinite(v) || v < -CELL_SIZE_M / 2 || v >= CELL_SIZE_M / 2) throw new Error('Invalid offset')
-    return v
-  }) as [number, number, number]
-  if (cell[2] !== 0n || offsetM[2] !== 0 || typeof location.facing !== 'number' || !Number.isFinite(location.facing)) throw new Error('Invalid planar location')
-  const chart = anchor.chart as import('./surfaceCoordinates.ts').SurfaceRegion | undefined
-  if (anchor.chart !== undefined && (!chart || typeof chart !== 'object' || Array.isArray(chart))) throw Error('Invalid walking chart')
-  if (chart) {
-    if (!world.scoutLocation.binding || anchor.frame !== 'planet:fixture') throw Error('Invalid walking chart')
-    const landing = surfaceRegion(world.scoutLocation.surface,world.scoutLocation.surface.definition)
-    if (chart.bodyId !== landing.bodyId || chart.definition.digest !== landing.definition.digest) throw Error('Walking chart publication mismatch')
-    localToSurface(chart,[offsetM[0],offsetM[1]])
-    world = {...world,frames:walkingFrames(world.scoutLocation.frames,landing,chart)}
-  }
-  const parsed: Anchor = { frame: anchor.frame, point: { cell, offsetM }, ...(chart ? {chart} : {}) }
-  if (world.frames.ship.parent === null && (parsed.frame !== 'ship:scout' || cell.some(v=>v!==0n) || offsetM[1]>5.5 || offsetM[1]<-5.5 || Math.abs(offsetM[0])>2.2)) throw new Error('Unsafe airborne location')
-  for (const entity of world.entities) {
-    if (!entity.footprint || world.frames.ship.parent === null && entity.anchor.frame !== parsed.frame) continue
-    const [x, y] = rotate2(relativeAnchor(parsed, entity.anchor, world.frames), entity.anchor.frame === world.frames.ship.id ? -world.frames.ship.angle : 0)
-    if (![x, y].every(Number.isFinite) || (Math.abs(x) < entity.footprint.halfWidth + PLAYER_RADIUS_M - 1e-8 && Math.abs(y) < entity.footprint.halfHeight + PLAYER_RADIUS_M - 1e-8)) throw new Error('Unsafe saved location')
-  }
-  const surface = world.scoutLocation.surface
-  if (parsed.frame === 'planet:fixture') {
-    const [x,y] = relativeM(parsed.point, ORIGIN)
-    localToSurface(chart ?? surfaceRegion(surface,surface.definition),[x,y])
-  }
-  if (parsed.frame === 'planet:fixture' && surface.definition?.version === 2) {
-    const region = chart ?? surfaceRegion(surface, surface.definition), [x,y] = relativeM(parsed.point, ORIGIN)
-    if (probeGeology(localToSurface(region,[x,y]), surface.definition, PLAYER_RADIUS_M).collision) throw Error('Unsafe saved terrain location')
-  }
-  return { anchor: parsed, facing: location.facing }
-}
-function decodeSites(value: unknown): SiteStates {
-  const bodyRevisions = new Map<string, string>()
-  const states = object(value), sites: Record<string, SiteState> = {}
-  if (!Object.hasOwn(states, STARTING_SITE.id)) throw Error('Missing original world state')
-  for (const [id, raw] of Object.entries(states)) {
-    const state = object(raw)
-    if (Object.keys(state).sort().join() !== 'address,anchors') throw Error('Invalid site fields')
-    const site = resolveSurface(state.address as SurfaceAddress)
-    if (site.id !== id) throw Error('Saved site/body mismatch')
-    const saved = state as unknown as SiteState
-    const digest = planetDefinition(site.body.id, saved.address.definition).digest
-    if (bodyRevisions.has(site.body.id) && bodyRevisions.get(site.body.id) !== digest) throw Error('Conflicting saved body revisions')
-    bodyRevisions.set(site.body.id, digest)
-    siteEntities(site, saved)
-    sites[id] = saved
-  }
-  return sites
-}
-function materializeSite(world: TopDownState, sites: SiteStates): TopDownState {
-  const location = world.scoutLocation
-  const terrain = location.binding ? siteEntities(resolveSurface(location.surface), sites[location.siteId]) : []
-  if (location.binding) validateSurfaceClearance(resolveSurface(location.surface), terrain)
-  return synchronizeDoor({ ...world, entities: [...world.entities.filter(e => e.anchor.frame !== 'planet:fixture' || e.layer !== 'terrain'), ...terrain] })
-}
-/** Work is source-bound, canonical and strictly below one 960-unit extraction. */
-function validateMiningWork(value: unknown, sources: Readonly<Record<string, ResourceSource>> = RESOURCE_SOURCES): Record<string, number> {
-  const work: Record<string, number> = {}
-  for (const [id, units] of Object.entries(object(value))) {
-    if (!Object.hasOwn(sources, id) || integer(units, 1) >= 960) throw new Error('Invalid mining work')
-    work[id] = units as number
-  }
-  return work
-}
-function sourceDefinitions(sources: Readonly<Record<string, ResourceSource>>): Readonly<Record<string, ResourceSource>> {
-  const definitions = { ...RESOURCE_SOURCES }
-  for (const id of Object.keys(sources)) if (!Object.hasOwn(definitions, id)) definitions[id] = depositFromId(id).initial
-  return definitions
-}
-/** Reject inconsistent saves, and migrate whole-litre v1 saves to exact grams without loss. */
-export function decodeResourceSave(raw: string, world: TopDownState, storeDefinitions: ResourceStoreCatalog = SCOUT_RESOURCE_STORES, itemDefinitions: CountItemCatalog = ITEM_CATALOG): ResourceSave {
-  const catalog = registerCountItems(itemDefinitions)
-  const data = object(JSON.parse(raw))
-  const version = data.version
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 19) throw new Error('Unsupported save version')
-  const legacy = version === 1
-  const hasStores = version >= 3
-  const hasItems = version >= 5
-  const hasSurvival = version >= 6
-  const hasHazards = version >= 7
-  const hasWork = version >= 8
-  const hasScout = version >= 9
-  const hasSites = version >= 11
-  const hasJournal = version >= 13
-  const hasCore = version >= 14
-  const allowed = [...(version >= 19 ? ['bench'] : []),...(version >= 17 ? ['deployedMarkers'] : []), ...(version >= 16 ? ['fabricator'] : []), ...(version >= 15 ? ['convertedGrams'] : []), ...(hasJournal ? ['journal'] : []), ...(hasCore ? ['core'] : []), 'environmentPublication', 'depositPublication', ...(hasSites ? ['sites'] : []), ...(hasScout ? ['scout'] : []), 'version', 'catalogVersion', 'siteId', 'revision', 'inventory', 'sources', 'location', ...(hasStores ? ['stores'] : []), ...(hasItems ? ['itemDefinitions'] : []), ...(hasSurvival ? ['survival'] : []), ...(hasHazards ? ['hazards'] : []), ...(hasWork ? ['miningWork'] : [])]
-  if (Object.keys(data).some(key => !allowed.includes(key))) throw new Error('Unknown save metadata')
-  if (data.environmentPublication !== undefined) validateEnvironmentPublication(data.environmentPublication)
-  if (data.depositPublication !== undefined && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Unsupported resource publication')
-  if (data.catalogVersion !== (legacy ? LEGACY_CATALOG_VERSION : RESOURCE_CATALOG_VERSION) || (hasSites ? typeof data.siteId !== 'string' : data.siteId !== STARTING_SITE.id)) {
-    throw new Error('Unsupported save version')
-  }
-  const inv = object(data.inventory), quantities: Record<string, number> = {}
-  for (const [id, quantity] of Object.entries(object(inv.quantities))) {
-    if (!Object.hasOwn(RESOURCE_CATALOG, id)) throw new Error('Unknown resource')
-    const count = integer(quantity, 1)
-    quantities[id] = legacy ? integer(count * LEGACY_GRAMS_PER_LITRE[id as keyof typeof LEGACY_GRAMS_PER_LITRE], 1) : count
-  }
-  const items: Record<string, number> = {}
-  if (!legacy) {
-    for (const [id, count] of Object.entries(object(inv.items))) {
-      if (!Object.hasOwn(catalog, id) || (version < 16 && id === MARKER_KIT_ID)) throw new Error('Unknown item')
-      items[id] = integer(count, 1)
-    }
-  }
-  const inventory: ResourceInventory = {
-    capacityGrams: integer(inv.capacityGrams, 10_000),
-    capacitySlots: legacy ? 12 : integer(inv.capacitySlots, 12),
-    quantities, items, equipment: version >= 18 ? validateEquipment(inv.equipment) : freshEquipment(),
-  }
-  if (version < 18 && inv.equipment !== undefined) throw Error('Equipment requires schema v18')
-  if (hasItems) {
-    const saved = registerCountItems(object(data.itemDefinitions) as CountItemCatalog)
-    if (Object.keys(saved).length !== Object.keys(catalog).filter(id => version >= 16 || id !== MARKER_KIT_ID).length || Object.entries(saved).some(([id, meta]) =>
-      !Object.hasOwn(catalog, id) || (version < 16 && id === MARKER_KIT_ID) || meta.gramsPerItem !== catalog[id]!.gramsPerItem || meta.stackSize !== catalog[id]!.stackSize || meta.name !== catalog[id]!.name)) throw new Error('Changed item definitions')
-  } else if (Object.keys(items).length || (legacy && Object.hasOwn(inv, 'items'))) {
-    throw new Error('Items require schema v5')
-  }
-  resourceInventoryUsage(inventory, RESOURCE_CATALOG, catalog)
-  if (legacy) {
-    const capacityLitres = integer(inv.capacityLitres, 10)
-    const litres = Object.values(object(inv.quantities)).reduce<number>((n, q) => integer(n + integer(q, 1)), 0)
-    if (litres > capacityLitres) throw new Error('Legacy volume capacity exceeded')
-  }
-  const savedSources = object(data.sources), sources: Record<string, ResourceSource> = {}
-  if (Object.keys(savedSources).some(isDepositId) && data.depositPublication !== DEPOSIT_PUBLICATION) throw Error('Missing resource publication')
-  const definitions = sourceDefinitions(savedSources as unknown as Record<string, ResourceSource>)
-  if (Object.keys(savedSources).length !== Object.keys(definitions).length) throw new Error('Wrong source set')
-  for (const [id, initial] of Object.entries(definitions)) {
-    const source = object(savedSources[id])
-    const previous = integer(legacy ? source.remainingLitres : source.remainingGrams)
-    const remainingGrams = legacy ? integer(previous * LEGACY_GRAMS_PER_LITRE[initial.resourceId as keyof typeof LEGACY_GRAMS_PER_LITRE]) : previous
-    if (source.id !== id || source.resourceId !== initial.resourceId) throw new Error('Material conservation failed')
-    sources[id] = { id, resourceId: initial.resourceId, remainingGrams }
-  }
-  const savedStores = hasStores ? object(data.stores) : null
-  // Only the newly introduced Scout store may be absent in v3. v4 requires it.
-  const stores = savedStores ? { ...savedStores } as Record<string, ResourceLedger['stores'][string]> : emptyResourceStores(storeDefinitions)
-  // A legacy save can acquire the new store, but cannot already declare it.
-  if (!hasCore && savedStores && Object.hasOwn(savedStores, SCOUT_CORE_FUEL_ID)) throw new Error('Core fuel requires schema v14')
-  if (!hasCore && savedStores && Object.hasOwn(storeDefinitions, SCOUT_CORE_FUEL_ID)) {
-    stores[SCOUT_CORE_FUEL_ID] = emptyResourceStores({ [SCOUT_CORE_FUEL_ID]: storeDefinitions[SCOUT_CORE_FUEL_ID]! })[SCOUT_CORE_FUEL_ID]!
-  }
-  if (version === 3 && Object.hasOwn(storeDefinitions, SCOUT_RESOURCE_CONTAINER_ID) && !Object.hasOwn(stores, SCOUT_RESOURCE_CONTAINER_ID)) {
-    stores[SCOUT_RESOURCE_CONTAINER_ID] = emptyResourceStores({ [SCOUT_RESOURCE_CONTAINER_ID]: storeDefinitions[SCOUT_RESOURCE_CONTAINER_ID]! })[SCOUT_RESOURCE_CONTAINER_ID]!
-  }
-  if (version < 16 && savedStores) {
-    if (Object.hasOwn(savedStores, FABRICATOR_INPUT_ID)) throw Error('Fabricator input requires schema v16')
-    if (Object.hasOwn(storeDefinitions, FABRICATOR_INPUT_ID)) stores[FABRICATOR_INPUT_ID] = emptyResourceStores({ [FABRICATOR_INPUT_ID]: storeDefinitions[FABRICATOR_INPUT_ID]! })[FABRICATOR_INPUT_ID]!
-  }
-  if(version < 19 && savedStores){
-    if(Object.hasOwn(savedStores,BENCH_INPUT_ID))throw Error('Bench input requires schema v19')
-    if(Object.hasOwn(storeDefinitions,BENCH_INPUT_ID))stores[BENCH_INPUT_ID]=emptyResourceStores({[BENCH_INPUT_ID]:storeDefinitions[BENCH_INPUT_ID]!})[BENCH_INPUT_ID]!
-  }
-  const miningWork = hasWork ? validateMiningWork(data.miningWork, sources) : {}
-  const scout = hasScout ? decodeScout(data.scout, version === 9) : startingLocationForMigration()
-  if (!hasSites && scout.siteId !== STARTING_SITE.id) throw Error('Legacy save cannot bind a generated site')
-  if (hasSites && !object(data.scout).surface) throw Error('Missing saved surface mapping')
-  const initialSite = resolveSurface(startingLocationForMigration().surface)
-  const sites: SiteStates = hasSites ? decodeSites(data.sites) : { [STARTING_SITE.id]: captureSite(initialSite, siteEntities(initialSite)) }
-  for (const id of Object.keys(sources).filter(isDepositId)) {
-    const chart = depositFromId(id).entity.anchor.chart!
-    if (!Object.values(sites).some(site => site.address.bodyId === chart.bodyId && site.address.definition?.digest === chart.definition.digest)) throw Error('Deposit body/publication was not visited')
-  }
-  if (hasSites && (data.siteId !== scout.siteId || scout.binding && !Object.hasOwn(sites, scout.siteId))) throw Error('Missing active site state')
-  const restoredWorld = materializeSite({ ...world, scoutLocation: scout, frames: scout.frames }, sites)
-  if (version < 12 && object(object(data.location).anchor).chart !== undefined) throw Error('Walking chart requires schema v12')
-  const location = parseLocation(data.location, restoredWorld)
-  if (!scout.binding && location.anchor.frame !== 'ship:scout') throw new Error('Airborne player outside Scout')
-  const core = version >= 15 ? validateCoreEnergy(data.core) : hasCore ? migrateCoreEnergy(data.core) : freshCoreEnergy()
-  const save: ResourceSave = { version: 19, bench: version >= 19 ? validateBench(data.bench) : freshBench(), environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: version >= 17 ? validateDeployedMarkers(data.deployedMarkers, sites) : [], fabricator: version >= 16 ? validateFabricator(data.fabricator) : freshFabricator(core.spentJ60), convertedGrams: version >= 15 ? object(data.convertedGrams) as Record<string, number> : {}, core, journal: hasJournal ? validateJournal(data.journal, sites) : emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites, scout: captureScout(scout), miningWork, hazards: hasHazards ? validateHazards(data.hazards) : freshHazards(), survival: hasSurvival ? validateSurvival(data.survival) : freshSurvival(), itemDefinitions: catalog, catalogVersion: RESOURCE_CATALOG_VERSION, siteId: scout.siteId, revision: integer(data.revision), inventory, sources, stores, location }
-  validateResourceLedger(save, definitions, storeDefinitions, RESOURCE_CATALOG, catalog)
-  validateCoreConservation(save.core, save.convertedGrams)
-  if (BigInt(fabricatorSpentJ60(save.fabricator)) + BigInt(save.fabricator.otherSpentJ60) + BigInt(benchSpentJ60(save.bench)) !== BigInt(save.core.spentJ60)) throw Error('Unpaid Fabricator work')
-  return save
-}
-export function resourcePayload(inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG) {
-  const grams = resourceInventoryUsage(inventory, RESOURCE_CATALOG, items).grams
-  const gear = inventory.equipment ? equipmentMass(inventory.equipment) : null
-  return { playerGrams: grams, shipGrams: (gear?.storedGrams ?? 0) + (world.entities.find(e => e.id === PLAYER_ID)!.anchor.frame === world.frames.ship.id ? grams + (gear?.equippedGrams ?? 0) : 0) }
-}
-export function withResourcePayload(ship: ShipState, inventory: ResourceInventory, world: TopDownState, items: CountItemCatalog = ITEM_CATALOG): ShipState {
-  // Recompute from dry mass, never add the same nested player payload per tick.
-  return setMass(ship, DRY_MASS_KG + resourcePayload(inventory, world, items).shipGrams / 1000)
-}
-function safeLocation(world: TopDownState): PlayerLocation {
-  // A reload returns standing beside the chair, never inside its collider.
-  return capturePlayerLocation(world.player.mode === 'seated' ? leaveCockpit(world) : world)
-}
+import { SCOUT_CORE_FUEL_ID, validateCoreConservation, type CorePowerRequest, type CorePowerResult } from './scoutEnergyCore.ts'
+import { LOCAL_PLAYER, type CockpitState } from './cockpit.ts'
+import { registerCountItems, type CountItemCatalog, resourceInventoryUsage, type ResourceSource } from './resourceInventory.ts'
+import { walkingFrames } from './topDownFrames.ts'
+import { interactionInReach } from './topDownInteraction.ts'
+import { PLAYER_ID, type TopDownState } from './topDownRuntime.ts'
+import { RESOURCE_SAVE_KEY, RESOURCE_CATALOG, ITEM_CATALOG, RESOURCE_SOURCES, type ResourceSave, type ResourceStorage } from './resourceCatalog.ts'
+import { serializeForDecode, serialize, integer, materializeSite, validateMiningWork, sourceDefinitions, safeLocation, captureResourceSites } from './resourceSaveLocation.ts'
+import { decodeResourceSave, freshResourceSave } from './resourceSave.ts'
+import * as resourceMarkerCommands from './resourceMarkerCommands.ts'
+import * as resourceMachineCommands from './resourceMachineCommands.ts'
+import * as resourceScoutCommands from './resourceScoutCommands.ts'
+export { RESOURCE_SAVE_KEY, RESOURCE_CATALOG_VERSION, RESOURCE_CATALOG, ITEM_CATALOG, RESOURCE_SOURCES, type ResourceSave, type ResourceStorage } from './resourceCatalog.ts'
+export { decodeResourceSave } from './resourceSave.ts'
+export { resourcePayload, withResourcePayload } from './resourcePayload.ts'
 
 /** Single-writer local session. Browser adapter holds a Web Lock for its lifetime.
  * One synchronous storage replacement commits inventory + source + location.
@@ -293,47 +39,16 @@ export class ResourceSession {
   get fieldMarks(): readonly FieldMark[] { return this.snapshot.journal.marks }
   walkingFix: WalkingFix | null = null
   markField(name: string, note: string, landmarkId?: string): boolean {
-    if (this.error || this.survival.health === 0) return false
-    try {
-      const marks = recordFieldMark(this.fieldMarks, createFieldMark(this.world, name, note, landmarkId))
-      if (!this.commit({ ...this.snapshot, survival: this.survival, hazards: this.hazards, journal: { ...this.snapshot.journal, marks } })) return false
-      this.feedback = 'Field mark saved.'
-      return true
-    } catch (error) { this.feedback = (error as Error).message; return false }
+    return resourceMarkerCommands.markField(this, next => this.commit(next), name, note, landmarkId)
   }
-
   markerDeploymentDenial(): string | null {
-    if (this.error) return this.error
-    if (!survivalPolicy(this.survival).canWork || this.world.scoutLocation.ship.mode === 'destroyed') return 'Marker deployment requires a living expedition able to work.'
-    if (this.world.cockpit.view !== 'world' || this.world.player.mode === 'seated') return 'Leave the cockpit before deploying.'
-    try {
-      const mark = createFieldMark(this.world, '', '')
-      if (this.snapshot.deployedMarkers.some(m => m.id === mark.id)) return 'A marker is already deployed here.'
-      if (this.snapshot.deployedMarkers.length >= 256) return 'Deployed marker capacity full (256).'
-      if (!(this.snapshot.inventory.items[MARKER_KIT_ID] ?? 0)) return 'Carry a fabricated field marker kit first.'
-      return null
-    } catch { return 'Deploy only at your current outdoor position.' }
+    return resourceMarkerCommands.markerDeploymentDenial(this)
   }
   deployMarker(name: string, revision: number, positionId: string): boolean {
-    try {
-      if (this.markerDeploymentDenial()) throw Error(this.markerDeploymentDenial()!)
-      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw Error('Stale marker revision')
-      const mark = createFieldMark(this.world, name || 'Field marker', '')
-      if (mark.id !== positionId) throw Error('Deployment position changed; review again.')
-      const inventory = removeCountItem(this.snapshot.inventory, MARKER_KIT_ID, 1, RESOURCE_CATALOG, this.itemCatalog)
-      if (!this.commit({ ...this.snapshot, inventory, deployedMarkers: [...this.snapshot.deployedMarkers, mark] })) return false
-      this.feedback = 'Field marker deployed. One kit placed on the surface.'
-      return true
-    } catch (error) { this.feedback = (error as Error).message; return false }
+    return resourceMarkerCommands.deployMarker(this, next => this.commit(next), name, revision, positionId)
   }
   renameMarker(id: string, name: string, revision: number): boolean {
-    if (this.error || this.survival.health === 0) return false
-    try {
-      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw Error('Stale marker revision')
-      if (typeof name !== 'string' || !name.trim() || name.length > 48 || /[\u0000-\u001f]/.test(name)) throw Error('Use a marker name of 1–48 characters.')
-      if (!this.snapshot.deployedMarkers.some(m => m.id === id)) throw Error('Unknown deployed marker')
-      return this.commit({ ...this.snapshot, deployedMarkers: this.snapshot.deployedMarkers.map(m => m.id === id ? { ...m, name: name.trim() } : m) })
-    } catch (error) { this.feedback = (error as Error).message; return false }
+    return resourceMarkerCommands.renameMarker(this, next => this.commit(next), id, name, revision)
   }
 
   world: TopDownState
@@ -362,7 +77,7 @@ export class ResourceSession {
     this.storeDefinitions = structuredClone(storeDefinitions)
     this.storage = storage
     this.world = world
-    this.snapshot = { version: 19, bench: freshBench(), environmentPublication: ENVIRONMENT_PUBLICATION, deployedMarkers: [], fabricator: freshFabricator(), convertedGrams: {}, core: freshCoreEnergy(), journal: emptyJournal(), depositPublication: DEPOSIT_PUBLICATION, sites: { [STARTING_SITE.id]: captureSite(resolveSurface(startingScoutLocation().surface), siteEntities(resolveSurface(startingScoutLocation().surface))), ...(world.scoutLocation.binding ? { [world.scoutLocation.siteId]: captureSite(resolveSurface(world.scoutLocation.surface), world.entities) } : {}) }, scout: captureScout(world.scoutLocation), miningWork: {}, hazards: this.hazards, survival: this.survival, itemDefinitions: this.itemCatalog, stores: emptyResourceStores(storeDefinitions), catalogVersion: RESOURCE_CATALOG_VERSION, siteId: world.scoutLocation.siteId, revision: 0, inventory: { ...startingResourceInventory(), equipment: freshEquipment() }, sources: RESOURCE_SOURCES, location: safeLocation(world) }
+    this.snapshot = freshResourceSave(world, storeDefinitions, this.itemCatalog, this.survival, this.hazards)
     try {
       validateResourceLedger(this.snapshot, RESOURCE_SOURCES, this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
       this.persisted = storage.getItem(RESOURCE_SAVE_KEY)
@@ -403,32 +118,13 @@ export class ResourceSession {
     return Object.fromEntries(Object.entries(this.snapshot.sources).map(([id, source]) => [id, definitions[id]!.remainingGrams - source.remainingGrams]).filter(([, grams]) => grams !== 0))
   }
   private syncDeposits(): void {
-    const world = this.world, binding = world.scoutLocation.binding
-    const player = world.entities.find(e => e.id === PLAYER_ID)!
-    const landing = binding ? surfaceRegion(world.scoutLocation.surface, world.scoutLocation.surface.definition) : null
-    const chart = player.anchor.chart ?? landing
-    const centre = chart && player.anchor.frame === 'planet:fixture'
-      ? surfaceRegion(localToSurface(chart, relativeM(player.anchor.point, ORIGIN).slice(0, 2) as [number, number]), chart.definition) : landing
-    const key = centre ? `${centre.definition.digest}:${centre.id}` : ''
-    if (key !== this.depositKey) {
-      this.depositKey = key
-      this.deposits = centre ? depositNeighborhood(centre).flatMap(regionDeposits) : []
-    }
-    // Ship exclusion is a visit overlay: it never rekeys or changes initial mass.
-    const entities = this.deposits.map(p => {
-      const e = p.entity
-      if (world.frames.surface || !landing) return e
-      const location = localToSurface(e.anchor.chart!, e.anchor.point.offsetM.slice(0, 2) as [number, number])
-      return { ...e, anchor: { ...e.anchor, chart: landing, point: point2(...surfaceToLocal(location, landing)) } }
-    }).filter(e => {
-      const [x, y] = rotate2(relativeAnchor(e.anchor, { frame: 'ship:scout', point: ORIGIN }, world.frames), -world.frames.ship.angle)
-      return Math.abs(x) > 6 || Math.abs(y) > 10
-    })
-    this.world = { ...world, entities: [...world.entities.filter(e => !isDepositId(e.id)), ...entities] }
+    const next = synchronizeDeposits(this.world, this.depositKey, this.deposits)
+    this.world = next.world
+    this.depositKey = next.key
+    this.deposits = next.deposits
   }
   private captureSites(sites: SiteStates): SiteStates {
-    const location = this.world.scoutLocation
-    return location.binding ? { ...sites, [location.siteId]: captureSite(resolveSurface(location.surface), this.world.entities.filter(e => !isDepositId(e.id))) } : sites
+    return captureResourceSites(this.world, sites)
   }
   private commit(next: ResourceSave): boolean {
     if (this.error) return false
@@ -467,129 +163,36 @@ export class ResourceSession {
     }
   }
   scoutCommandDenial(revision = this.snapshot.revision, cockpitSession = this.world.cockpit, actorId = LOCAL_PLAYER, takeoff = true): string | null {
-    if (this.error) return this.error
-    if (revision !== this.snapshot.revision) return 'Expedition changed. Retry with the current revision.'
-    if (this.world.entities.some(e => (e.id === PLAYER_ID || e.layer === 'people') && e.anchor.frame !== 'ship:scout')) return 'All occupants must board the Scout before launch.'
-    if (cockpitSession !== this.world.cockpit) return 'Cockpit session expired. Re-enter the cockpit.'
-    if (!this.world.cockpit.powered) return 'Cockpit has no power.'
-    if (!this.world.cockpit.enabled || this.world.player.mode !== 'seated' || !controlsCockpit(this.world.cockpit, actorId)) return 'An authorized owner must pilot from the cockpit seat.'
-    if (!survivalPolicy(this.survival).canWork) return 'Pilot cannot work in the current survival condition.'
-    if (this.activeSourceId !== null) return 'Stop gathering before starting a Scout maneuver.'
-    return takeoff ? takeoffDenial(this.world.scoutLocation) : null
+    return resourceScoutCommands.scoutCommandDenial(this, revision, cockpitSession, actorId, takeoff)
   }
-  /** Read-only publication for both target telemetry and physical admission. */
   bodyDefinition(bodyId: string) {
-    const plan = this.world.scoutLocation.landing
-    if (plan?.surface.bodyId === bodyId) return planetDefinition(bodyId, plan.surface.definition)
-    const saved = Object.values(this.snapshot.sites).find(s => s.address.bodyId === bodyId)
-    return saved ? planetDefinition(bodyId, saved.address.definition) : geologicalDefinition(bodyId)
+    return resourceScoutCommands.bodyDefinition(this, bodyId)
   }
-  /** Physical frame owns safety; a door or empty Core never changes interior sampling. */
   currentEnvironment(world = this.world) {
-    const player = world.entities.find(e => e.id === PLAYER_ID)!
-    if (player.anchor.frame === 'ship:scout') return SCOUT_SAFE_ENVIRONMENT
-    const chart = player.anchor.chart ?? surfaceRegion(world.scoutLocation.surface, world.scoutLocation.surface.definition)
-    return this.environmentAt(localToSurface(chart, relativeM(player.anchor.point, ORIGIN).slice(0, 2) as [number, number]))
+    return resourceScoutCommands.currentEnvironment(this, world)
   }
-  /** Raw world-domain inputs. Scanner authorization belongs to the presentation consumer (#921). */
   environmentAt(location: SurfaceLocation) {
-    return samplePlanetEnvironment(location, this.bodyDefinition(location.bodyId), this.snapshot.environmentPublication)
+    return resourceScoutCommands.environmentAt(this, location)
   }
   environmentSummary(bodyId: string) {
-    return bodyEnvironmentSummary(bodyId, this.bodyDefinition(bodyId), this.snapshot.environmentPublication)
+    return resourceScoutCommands.environmentSummary(this, bodyId)
   }
-  /** Approved controlled migration: absent ref is legacy v1. A body's first
-   * binding wins for the whole save, preventing seams between visited regions. */
-  private bindLandingRevision(action: ScoutAction): ScoutAction {
-    if (action.kind !== 'begin-landing') return action
-    const body = SAMPLE_BODIES.find(b => b.id === action.bodyId)
-    if (!body) return action
-    const surface = scoutLandingSurface(this.world.scoutLocation, action, body)
-    const saved = Object.values(this.snapshot.sites).find(s => s.address.bodyId === body.id)
-    if (!saved) return action
-    const { definition: _reference, ...coordinates } = surface
-    return { ...action, surface: { ...coordinates, ...(saved.address.definition ? { definition: saved.address.definition } : {}) } }
-  }
-  /** Read-only admission uses the command's domain/site validation, including saved obstacles. */
   scoutActionDenial(action: ScoutAction, revision = this.snapshot.revision, cockpitSession = this.world.cockpit, actorId = LOCAL_PLAYER): string | null {
-    const denial = this.scoutCommandDenial(revision, cockpitSession, actorId, action.kind === 'begin-takeoff')
-    if (denial) return denial
-    try {
-      this.previewScoutAction(action)
-      return null
-    } catch (error) { return error instanceof Error ? error.message : 'Scout transition rejected.' }
-  }
-  private previewScoutAction(action: ScoutAction) {
-    const location = this.world.scoutLocation
-    const sites = this.captureSites(this.snapshot.sites)
-    const next = transitionScout(location, this.bindLandingRevision(action))
-    if (action.kind === 'begin-landing' || action.kind === 'begin-takeoff') {
-      const site = resolveSurface(action.kind === 'begin-takeoff' ? location.surface : next.surface)
-      validateSurfaceClearance(site, siteEntities(site, sites[site.id]))
-    }
-    return next
+    return resourceScoutCommands.scoutActionDenial(this, action, revision, cockpitSession, actorId)
   }
   landingPreview(bodyId: string): { denial: string | null; surface?: SurfaceLocation } {
-    const location = this.world.scoutLocation
-    const site = location.landing?.surface ?? (location.binding ? location.surface : undefined)
-    const surface = site?.bodyId === bodyId ? site : undefined
-    const denial = this.scoutCommandDenial(this.snapshot.revision, this.world.cockpit, LOCAL_PLAYER, false)
-    if (denial) return { denial, surface }
-    try {
-      return { denial: null, surface: this.previewScoutAction({ kind: 'begin-landing', bodyId }).surface }
-    } catch (error) {
-      return { denial: error instanceof Error ? error.message : 'Scout transition rejected.', surface }
-    }
+    return resourceScoutCommands.landingPreview(this, bodyId)
   }
-  /** Explicit commands are revision-bound and authorized against the live seat. */
   transitionScout(action: ScoutAction, revision: number, cockpitSession: CockpitState, actorId = LOCAL_PLAYER): boolean {
-    const deny = (reason: string) => { this.feedback = reason; return false }
-    const admission = this.scoutActionDenial(action, revision, cockpitSession, actorId)
-    if (admission) return deny(admission)
-    const previous = this.world, location = this.world.scoutLocation, before = { ...location }
-    try {
-      const sites = this.captureSites(this.snapshot.sites)
-      if (action.kind === 'begin-takeoff') validateSurfaceClearance(resolveSurface(location.surface), siteEntities(resolveSurface(location.surface), sites[location.siteId]))
-      const next = transitionScout(location, this.bindLandingRevision(action))
-      if (action.kind === 'begin-landing') validateSurfaceClearance(resolveSurface(next.surface), siteEntities(resolveSurface(next.surface), sites[next.siteId]))
-      this.cancel()
-      Object.assign(location, next)
-      this.world = materializeSite(synchronizeScout(this.world), sites)
-      this.syncDeposits()
-      if (!this.commit({ ...this.snapshot, sites })) { Object.assign(location, before); this.world = previous; return false }
-      this.feedback = ''
-      this.world = { ...this.world, feedback: `Scout: ${location.ship.mode}.` }
-      return true
-    } catch (error) { Object.assign(location, before); this.world = previous; this.feedback = error instanceof Error ? error.message : 'Scout transition rejected.'; return false }
+    return resourceScoutCommands.transitionScout(this, next => this.commit(next), () => this.syncDeposits(), action, revision, cockpitSession, actorId)
   }
-  /** The real E/mouse door action uses the same atomic save as flight. */
   toggleBoardingDoor(revision: number): boolean {
-    if (this.error || this.survival.health === 0) return false
-    if (revision !== this.snapshot.revision) { this.feedback = 'Expedition changed. Retry with the current revision.'; return false }
-    const previous = this.world, location = previous.scoutLocation, before = location.boardingDoor
-    const next = toggleDoor(previous)
-    if (next.scoutLocation.boardingDoor === before) { this.feedback = next.feedback; return false }
-    location.boardingDoor = next.scoutLocation.boardingDoor
-    this.world = { ...next, scoutLocation: location }
-    if (!this.commit(this.snapshot)) { location.boardingDoor = before; this.world = previous; return false }
-    this.activeSourceId = null
-    this.feedback = next.feedback
-    return true
+    return resourceScoutCommands.toggleBoardingDoor(this, next => this.commit(next), revision)
   }
   /** Future environment adapter boundary. Sources are sampled, never restored as live planet data. */
   /** Domain adapter for #920 UI. Revalidate physical admission and carry/storage capacity at publication. */
   changeEquipment(command: GearCommand, revision: number): boolean {
-    if (this.error || !survivalPolicy(this.survival).canWork) return false
-    try {
-      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw Error('Stale equipment revision')
-      const before = this.snapshot.inventory.equipment!
-      const equipment = applyGearCommand(before, command)
-      const denial = gearCommandDenial(this.world, before, equipment)
-      if (denial) throw Error(denial)
-      const inventory = { ...this.snapshot.inventory, equipment }
-      resourceInventoryUsage(inventory, RESOURCE_CATALOG, this.itemCatalog)
-      return this.commit({ ...this.snapshot, inventory, survival: this.survival, hazards: this.hazards })
-    } catch (error) { this.feedback = (error as Error).message; return false }
+    return resourceInventoryCommands.changeEquipment(this, next => this.commit(next), command, revision)
   }
   setHazardSources(sources: readonly HazardSource[]): void {
     hazardRates(sources)
@@ -597,122 +200,42 @@ export class ResourceSession {
   }
   /** Explicit module declaration boundary; production has no caller or default equipment. */
   addProtection(module: Omit<ProtectionModule, 'remaining'>): boolean {
-    if (this.error || this.survival.health === 0 || this.hazards.modules.some(m => m.id === module.id)) return false
-    const hazards = validateHazards({ ...this.hazards, modules: [...this.hazards.modules, { ...module, remaining: '1000/1' }] })
-    return this.commit({ ...this.snapshot, survival: this.survival, hazards })
+    return resourceInventoryCommands.addProtection(this, next => this.commit(next), module)
   }
   /** Domain rejection leaves the current save usable; storage failure blocks writes. */
   transfer(request: ResourceTransfer): boolean {
-    if (this.error || this.survival.health === 0) return false
-    try {
-      const sourceId = request.from.kind === 'source' ? request.from.id : null
-      if (sourceId !== null && (!this.world.scoutLocation.binding || !this.world.entities.some(e => e.id === sourceId && e.source))) throw Error('Source is unavailable at this surface site.')
-      const next = transferResource(this.snapshot, request, sourceDefinitions(this.snapshot.sources), this.storeDefinitions, RESOURCE_CATALOG, this.itemCatalog)
-      return this.commit({ ...this.snapshot, ...next, hazards: this.hazards, survival: this.survival })
-    } catch (error) {
-      this.feedback = error instanceof Error ? error.message : 'Invalid transfer'
-      return false
-    }
+    return resourceInventoryCommands.transfer(this, next => this.commit(next), this.storeDefinitions, request)
   }
-  private benchAdmission(revision:number):void {
-    if(this.error||!survivalPolicy(this.survival).canWork)throw Error(this.error||'Unable to work')
-    if(!Number.isSafeInteger(revision)||revision!==this.snapshot.revision)throw Error('Stale bench revision')
-    const player=this.world.entities.find(e=>e.id===PLAYER_ID), target=this.world.entities.find(e=>e.id===BENCH_ID)
-    if(!player||!target||player.anchor.frame!=='ship:scout'||this.world.cockpit.view!=='world'||this.world.player.mode==='seated'||!interactionInReach(player.anchor,target,this.world.frames))throw Error('Approach the Gear Crafting Bench inside Scout')
+  depositBenchInput(resourceId:string, grams:number, revision:number): boolean {
+    return resourceMachineCommands.depositBenchInput(this, resourceId, grams, revision)
   }
-  depositBenchInput(resourceId:string,grams:number,revision:number):boolean {
-    try{this.benchAdmission(revision);return this.transfer({revision,from:{kind:'player'},to:{kind:'store',id:BENCH_INPUT_ID},resourceId,grams})}catch(e){this.feedback=(e as Error).message;return false}
+  withdrawBenchInput(resourceId:string, grams:number, revision:number): boolean {
+    return resourceMachineCommands.withdrawBenchInput(this, resourceId, grams, revision)
   }
-  withdrawBenchInput(resourceId:string,grams:number,revision:number):boolean {
-    try{this.benchAdmission(revision);return this.transfer({revision,from:{kind:'store',id:BENCH_INPUT_ID},to:{kind:'player'},resourceId,grams})}catch(e){this.feedback=(e as Error).message;return false}
+  startBench(recipeId:string, revision:number): boolean {
+    return resourceMachineCommands.startBench(this, next => this.commit(next), recipeId, revision)
   }
-  startBench(recipeId:string,revision:number):boolean {
-    try{
-      this.benchAdmission(revision)
-      const b=this.snapshot.bench,r=Object.hasOwn(GEAR_RECIPES,recipeId)?GEAR_RECIPES[recipeId]:null,input=this.snapshot.stores[BENCH_INPUT_ID]!
-      if(!r)throw Error('Unknown bench recipe')
-      if(b.job||b.tray)throw Error('Bench job or output tray occupied')
-      const quantities={...input.quantities}
-      for(const id of ['mineral','biomass'] as const){if((quantities[id]??0)<r[id])throw Error('Insufficient bench ingredients');const n=(quantities[id]??0)-r[id];if(n)quantities[id]=n;else delete quantities[id]}
-      return this.commit({...this.snapshot,stores:{...this.snapshot.stores,[BENCH_INPUT_ID]:{...input,quantities}},bench:{...b,started:b.started+1,job:{id:b.started+1,recipeId,remainingTicks:r.ticks,powerPaused:false}}})
-    }catch(e){this.feedback=(e as Error).message;return false}
+  startSuitRepair(suitId:string, amount:string, revision:number): boolean {
+    return resourceMachineCommands.startSuitRepair(this, next => this.commit(next), suitId, amount, revision)
   }
-  startSuitRepair(suitId:string,amount:string,revision:number):boolean {
-    try{
-      this.benchAdmission(revision)
-      const b=this.snapshot.bench,e=this.snapshot.inventory.equipment!,suit=e.instances.find(g=>g.id===suitId)
-      if(b.job||b.tray)throw Error('Bench job or output tray occupied')
-      if(!suit||GEAR_DEFINITIONS[suit.definitionId]!.kind!=='suit'||suit.location.kind!=='inventory')throw Error('Carry an unequipped suit to the bench')
-      const repair={suitId,amount,initial:suit.remaining};validateRepair(repair)
-      const input=this.snapshot.stores[BENCH_INPUT_ID]!,grams=repairGrams(repair),quantities={...input.quantities}
-      if((quantities.mineral??0)<grams)throw Error('Insufficient unreserved mineral for repair')
-      quantities.mineral=(quantities.mineral??0)-grams;if(!quantities.mineral)delete quantities.mineral
-      const equipment=validateEquipment({...e,instances:e.instances.map(g=>g.id===suitId?{...g,location:{kind:'bench'}}:g)})
-      return this.commit({...this.snapshot,inventory:{...this.snapshot.inventory,equipment},stores:{...this.snapshot.stores,[BENCH_INPUT_ID]:{...input,quantities}},bench:{...b,started:b.started+1,job:{id:b.started+1,recipeId:'repair',repair,remainingTicks:Math.ceil(repairCost(repair)/BENCH_WATTS),powerPaused:false}}})
-    }catch(e){this.feedback=(e as Error).message;return false}
-  }
-  claimBench(jobId:number,revision:number):boolean {
-    try{
-      this.benchAdmission(revision)
-      const b=this.snapshot.bench,t=b.tray,e=this.snapshot.inventory.equipment!
-      if(!t||jobId!==t.jobId)throw Error('Stale bench claim')
-      if(t.repair){
-        const inventory={...this.snapshot.inventory,equipment:validateEquipment({...e,instances:e.instances.map(g=>g.id===t.repair!.suitId?{...g,location:{kind:'inventory'}}:g)})}
-        resourceInventoryUsage(inventory,RESOURCE_CATALOG,this.itemCatalog)
-        return this.commit({...this.snapshot,inventory,bench:{...b,tray:null,repairs:b.repairs!.map(r=>r.jobId===jobId?{...r,claimed:true}:r)}})
-      }
-      const gearId=`gear:${e.generation}:bench-${jobId}`
-      const inventory={...this.snapshot.inventory,equipment:validateEquipment({...e,instances:[...e.instances,{id:gearId,definitionId:t.recipeId,remaining:'1000/1',location:{kind:'inventory'}}]})}
-      resourceInventoryUsage(inventory,RESOURCE_CATALOG,this.itemCatalog)
-      return this.commit({...this.snapshot,inventory,bench:{...b,tray:null,claims:[...b.claims,{jobId,gearId,recipeId:t.recipeId}]}})
-    }catch(e){this.feedback=(e as Error).message;return false}
+  claimBench(jobId:number, revision:number): boolean {
+    return resourceMachineCommands.claimBench(this, next => this.commit(next), jobId, revision)
   }
   depositFabricatorInput(resourceId: string, grams: number, revision: number): boolean {
-    return this.transfer({ revision, from: { kind: 'player' }, to: { kind: 'store', id: FABRICATOR_INPUT_ID }, resourceId, grams })
+    return resourceMachineCommands.depositFabricatorInput(this, resourceId, grams, revision)
   }
   withdrawFabricatorInput(resourceId: string, grams: number, revision: number): boolean {
-    return this.transfer({ revision, from: { kind: 'store', id: FABRICATOR_INPUT_ID }, to: { kind: 'player' }, resourceId, grams })
+    return resourceMachineCommands.withdrawFabricatorInput(this, resourceId, grams, revision)
   }
-  /** Domain API for E06's reachable console. No arbitrary recipe or item grants. */
   startFabricator(recipeId: string, revision: number): boolean {
-    if (this.error || !survivalPolicy(this.survival).canWork) return false
-    try {
-      if (revision !== this.snapshot.revision || !Number.isSafeInteger(revision)) throw Error('Stale Fabricator revision')
-      const f = this.snapshot.fabricator, input = this.snapshot.stores[FABRICATOR_INPUT_ID]
-      const item = this.itemCatalog[MARKER_KIT_ID]
-      if (recipeId !== FABRICATOR_RECIPE_ID || !item || item.gramsPerItem !== FABRICATOR_GRAMS || item.stackSize !== 1) throw Error('Unknown Fabricator recipe')
-      if (f.job || f.tray) throw Error('Fabricator job or tray occupied')
-      if (!input || (input.quantities.mineral ?? 0) < FABRICATOR_GRAMS) throw Error('Insufficient Fabricator ingredients')
-      const quantities: Record<string, number> = { ...input.quantities, mineral: input.quantities.mineral! - FABRICATOR_GRAMS }
-      if (!quantities.mineral) delete quantities.mineral
-      const id = f.started + 1
-      return this.commit({ ...this.snapshot, stores: { ...this.snapshot.stores, [FABRICATOR_INPUT_ID]: { ...input, quantities } }, fabricator: { ...f, started: id, job: { id, recipeId: FABRICATOR_RECIPE_ID, reservedGrams: FABRICATOR_GRAMS, remainingTicks: FABRICATOR_TICKS, powerPaused: false } } })
-    } catch (error) { this.feedback = error instanceof Error ? error.message : 'Invalid Fabricator start'; return false }
+    return resourceMachineCommands.startFabricator(this, next => this.commit(next), recipeId, revision)
   }
   claimFabricator(jobId: number, revision: number): boolean {
-    if (this.error || !survivalPolicy(this.survival).canWork) return false
-    try {
-      const f = this.snapshot.fabricator
-      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision || !f.tray || f.tray.jobId !== jobId) throw Error('Stale Fabricator claim')
-      const inventory = addCountItem(this.snapshot.inventory, MARKER_KIT_ID, 1, RESOURCE_CATALOG, this.itemCatalog)
-      return this.commit({ ...this.snapshot, inventory, fabricator: { ...f, claimed: jobId, tray: null } })
-    } catch (error) { this.feedback = error instanceof Error ? error.message : 'Invalid Fabricator claim'; return false }
+    return resourceMachineCommands.claimFabricator(this, next => this.commit(next), jobId, revision)
   }
   /** Generic adapter boundary for future item producers/consumers. No auto-equip or player grants. */
   changeItem(action: 'add' | 'remove', id: string, count: number, revision: number): boolean {
-    if (this.error || this.survival.health === 0) return false
-    try {
-      if (!Number.isSafeInteger(revision) || revision !== this.snapshot.revision) throw new RangeError('Stale item revision')
-      if (id === MARKER_KIT_ID) throw Error('Manufactured items require a Fabricator transaction')
-      if (action !== 'add' && action !== 'remove') throw new RangeError('Unknown item action')
-      const inventory = (action === 'add' ? addCountItem : removeCountItem)(this.snapshot.inventory, id, count, RESOURCE_CATALOG, this.itemCatalog)
-      const saved = this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival, inventory })
-      if (saved) this.feedback = `Saved: ${action === 'add' ? 'added' : 'removed'} ${count} × ${this.itemCatalog[id]!.name ?? id}.`
-      return saved
-    } catch (error) {
-      this.feedback = error instanceof Error ? error.message : 'Invalid item transaction'
-      return false
-    }
+    return resourceInventoryCommands.changeItem(this, next => this.commit(next), action, id, count, revision)
   }
   /** Explicit exact grams, with the same atomic save and stale-revision guard as mining. */
   deposit(resourceId: string, grams: number, revision: number): boolean {
@@ -730,12 +253,7 @@ export class ResourceSession {
   }
   /** Explicit terminal-only fresh character. The world ledger and depletion survive. */
   freshRun(): boolean {
-    if (this.error || this.survival.health !== 0) return false
-    const next = freshSurvival(this.now())
-    if (!this.commit({ ...this.snapshot, inventory: { ...this.snapshot.inventory, equipment: { ...freshEquipment(this.snapshot.inventory.equipment!.generation + 1), instances: [...freshEquipment(this.snapshot.inventory.equipment!.generation + 1).instances, ...this.snapshot.inventory.equipment!.instances.filter(g=>g.location.kind==='bench'||g.location.kind==='installed'&&this.snapshot.inventory.equipment!.instances.some(s=>s.id===(g.location as {suitId:string}).suitId&&s.location.kind==='bench'))] } }, hazards: { ...this.hazards, exposure: freshHazards().exposure }, survival: next })) return false
-    this.survival = next
-    this.equipped = false
-    return true
+    return resourceInventoryCommands.freshRun(this, next => this.commit(next), () => this.now())
   }
   payload() {
     return resourceLedgerMass(this.snapshot, this.world.frames.ship.id,
@@ -745,8 +263,7 @@ export class ResourceSession {
     if (serialize(this.captureSites(this.snapshot.sites)) !== serialize(this.snapshot.sites) || serialize(captureScout(this.world.scoutLocation)) !== serialize(this.snapshot.scout) || serialize(this.miningWork) !== serialize(this.snapshot.miningWork) || serialize(safeLocation(this.world)) !== serialize(this.snapshot.location) || serialize(this.survival) !== serialize(this.snapshot.survival) || serialize(this.hazards) !== serialize(this.snapshot.hazards)) this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival })
   }
   upgrade(capacityGrams: number, capacitySlots: number): boolean {
-    if (this.error || this.survival.health === 0) return false
-    return this.commit({ ...this.snapshot, hazards: this.hazards, survival: this.survival, inventory: increaseResourceInventoryCapacity(this.snapshot.inventory, capacityGrams, capacitySlots, RESOURCE_CATALOG, this.itemCatalog) })
+    return resourceInventoryCommands.upgrade(this, next => this.commit(next), capacityGrams, capacitySlots)
   }
   cancel(message = 'Gathering stopped. Completed grams are saved.'): void {
     const wasGathering = this.activeSourceId !== null
@@ -788,122 +305,16 @@ export class ResourceSession {
   /** One consumer receipt per committed world tick; no UI-owned energy timer. */
   corePowerTick: number | null = null
   corePower: CorePowerResult = { status: 'idle', consumer: 'idle', drawnJ60: 0, generatedJ: 0, convertedGrams: {} }
+  private readonly tickControl: ResourceTickControl = {
+    sources: () => this.sources,
+    miningWork: () => this.miningWork,
+    checkpointTick: () => this.checkpointTick,
+    checkpointAt: tick => { this.checkpointTick = tick },
+    commit: next => this.commit(next),
+    syncDeposits: () => this.syncDeposits(),
+    blocked: id => this.blocked(id),
+  }
   advance(next: TopDownState, power: CorePowerRequest = { watts: 0 }): TopDownState {
-    this.corePowerTick = null
-    this.corePower = { status: 'idle', consumer: 'idle', drawnJ60: 0, generatedJ: 0, convertedGrams: {} }
-
-    if (!Number.isSafeInteger(next.tick) || next.tick < this.world.tick) return this.world
-    const elapsed = next.tick - this.world.tick, wasWalking = this.world.player.mode === 'walking'
-    if (this.error || this.survival.health === 0) return this.world
-    // The same per-tick ordering applies to batched callers and foreground RAF.
-    if (elapsed > 1) {
-      for (let tick = this.world.tick + 1; tick <= next.tick && !this.error && this.survival.health > 0; tick++) this.advance({ ...next, tick }, power)
-      return this.world
-    }
-    // Reject malformed consumer commands before advancing any session owner.
-    if(power.paused !== undefined && typeof power.paused !== 'boolean')throw Error('Invalid Core pause')
-    // H01 order: convert once, then pay Fabricator before bench from one reserve.
-    const machine = elapsed > 0 && next.tick > this.snapshot.core.tick ? stepCoreEnergy(this.snapshot.core,this.snapshot.stores[SCOUT_CORE_FUEL_ID]?.quantities??{},{watts:0}) : null
-    let fabricatorPaid=0,benchPaid=0,otherPaid=0
-    if(machine){
-      let reserve=machine.core.reserveJ60
-      const pay=(watts:number,paused=false)=>{if(!Number.isSafeInteger(watts)||watts<0||watts>machine.core.capacityJ*60)throw Error('Invalid Core power request');if(paused||watts>reserve)return 0;reserve-=watts;return watts}
-      if(this.snapshot.fabricator.job)fabricatorPaid=pay(FABRICATOR_WATTS)
-      if(this.snapshot.bench.job)benchPaid=pay(benchTickCost(this.snapshot.bench.job))
-      if(!this.snapshot.fabricator.job&&!this.snapshot.bench.job)otherPaid=pay(power.watts,power.paused)
-      const drawn=fabricatorPaid+benchPaid+otherPaid
-      machine.core={...machine.core,tick:next.tick,reserveJ60:reserve,spentJ60:machine.core.spentJ60+drawn}
-      machine.result={...machine.result,drawnJ60:drawn,consumer:drawn?'powered':this.snapshot.fabricator.job||this.snapshot.bench.job||power.watts?'insufficient-power':'idle'}
-    }
-    const fabricator=machine?stepFabricator(this.snapshot.fabricator,fabricatorPaid+otherPaid):this.snapshot.fabricator
-    const bench=machine?stepBench(this.snapshot.bench,benchPaid):this.snapshot.bench
-    const workUnits = survivalPolicy(this.survival).miningUnits
-    const previousWorld = this.world
-    const environment = this.currentEnvironment(next)
-    const live = this.sources === null
-    const rates = hazardRates(this.sources ?? [
-      { id: 'planet:temperature', type: 'temperature', temperatureC: environment.temperatureC },
-      { id: 'planet:radiation', type: 'radiation', intensity: environment.radiationHpPerSecond },
-      { id: 'planet:poison', type: 'poison', intensity: environment.toxicityHpPerSecond },
-    ])
-    const equipment = this.snapshot.inventory.equipment!
-    const modules = live ? functioningEquipment(equipment).map(g => ({ id: g.id, type: GEAR_DEFINITIONS[g.definitionId]!.hazard!, protection: GEAR_DEFINITIONS[g.definitionId]!.protection, remaining: g.remaining })) : this.hazards.modules
-    const needsHazards = Object.values(rates).some(v => v[0] > 0n) || Object.values(this.hazards.exposure).some(v => v !== '0/1')
-    let worn = modules
-    this.hazardEvents = []
-    this.survival = advanceSurvival(this.survival, elapsed, needsHazards ? survival => {
-      const result = stepHazards({ ...this.hazards, modules: worn }, rates, survival)
-      worn = result.state.modules
-      this.hazards = live ? { ...result.state, modules: this.hazards.modules } : result.state
-      this.hazardEvents.push(...result.events)
-      return result.events.some(e => e.damage !== '0/1')
-    } : undefined)
-    let inventory = live ? { ...this.snapshot.inventory, equipment: { ...equipment, instances: equipment.instances.map(g => {
-      const changed = worn.find(m => m.id === g.id)
-      return changed ? { ...g, remaining: changed.remaining, location: changed.remaining === '0/1' ? { kind: 'destroyed' as const } : g.location } : g
-    }) } } : this.snapshot.inventory
-    if(bench.tray?.repair&&!this.snapshot.bench.tray){
-      const repair=bench.tray.repair
-      inventory={...inventory,equipment:validateEquipment({...inventory.equipment!,instances:inventory.equipment!.instances.map(g=>g.id===repair.suitId?{...g,remaining:q.encode(q.add(q.decode(repair.initial),q.decode(repair.amount)))}:g)})}
-    }
-    this.world = (next.frames.surface?.source ?? next.frames) === next.scoutLocation.frames ? next
-      : next.frames.ship === next.scoutLocation.frames.ship ? { ...next, frames: next.scoutLocation.frames }
-      : materializeSite(synchronizeScout(next), this.snapshot.sites)
-    this.walkingFix = updateWalkingFix(previousWorld, this.world, this.walkingFix)
-    this.syncDeposits()
-    // A verified touchdown returns the pilot to the existing ship-local interior.
-    // A power interruption keeps its seated/world semantics instead.
-    const touchdown = previousWorld.frames.ship.parent === null && this.world.scoutLocation.binding !== null
-    if (touchdown && this.world.cockpit.view === 'radar') {
-      this.world = leaveCockpit(this.world)
-      this.feedback = 'Touchdown verified. Open the aft door to explore this surface site.'
-    }
-    if (touchdown && !machine) {
-      this.checkpoint()
-      if (this.error) { this.world = previousWorld; return this.world }
-    }
-    // Publish hazard progress only after the whole health/exposure/budget transaction is durable.
-    const machineChanged = machine && (machine.core.spentJ60 !== this.snapshot.core.spentJ60 || machine.core.reserveJ60 !== this.snapshot.core.reserveJ60 || machine.core.conversionBudgetJ60 !== this.snapshot.core.conversionBudgetJ60)
-    if (elapsed > 0 && (needsHazards || machineChanged || touchdown || JSON.stringify(bench) !== JSON.stringify(this.snapshot.bench) || JSON.stringify(fabricator) !== JSON.stringify(this.snapshot.fabricator))) {
-      const convertedGrams = { ...this.snapshot.convertedGrams }
-      for (const [id, grams] of Object.entries(machine?.result.convertedGrams ?? {})) convertedGrams[id] = (convertedGrams[id] ?? 0) + grams
-      const fuel = this.snapshot.stores[SCOUT_CORE_FUEL_ID]
-      const machines = machine ? { core: machine.core, convertedGrams, ...(fuel ? { stores: { ...this.snapshot.stores, [SCOUT_CORE_FUEL_ID]: { ...fuel, quantities: machine.quantities } } } : {}) } : {}
-      if (!this.commit({ ...this.snapshot, ...machines, fabricator, bench, inventory, survival: this.survival, hazards: this.hazards })) { this.world = previousWorld; return this.world }
-    }
-    if(elapsed>0)this.environmentDamageHpPerSecond=q.number(this.hazardEvents.reduce((total,e)=>q.add(total,q.mul(q.decode(e.damage),q.decimal(60))),q.ZERO))
-    if (machine) { this.corePower = machine.result; this.corePowerTick = next.tick }
-    if (!survivalPolicy(this.survival).canWork) {
-      this.cancel('Exhausted: gathering and piloting unavailable.')
-      if (this.world.player.mode === 'seated') this.world = leaveCockpit(this.world)
-    }
-    if (this.survival.health === 0) { this.world = { ...this.world, player: { ...this.world.player, mode: 'standing', targetId: null } }; this.checkpoint(); return this.world }
-    const id = this.activeSourceId
-    if (id) {
-      const target = next.entities.find(e => e.id === id), player = next.entities.find(e => e.id === PLAYER_ID)!
-      if (!target || next.player.mode !== 'interacting' || next.player.targetId !== id || next.cockpit.view !== 'world' || !interactionInReach(player.anchor, target, next.frames)) this.cancel('Gathering interrupted. Partial work saved for this source.')
-      else {
-        if (elapsed > 0) this.miningWork[id] = (this.miningWork[id] ?? 0) + elapsed * workUnits
-        while (this.activeSourceId && (this.miningWork[id] ?? 0) >= 960) {
-          const source = this.snapshot.sources[id]!, inventory = this.snapshot.inventory
-          const used = resourceInventoryUsage(inventory, RESOURCE_CATALOG, this.itemCatalog)
-          const grams = inventory.quantities[source.resourceId] || used.slots < inventory.capacitySlots
-            ? Math.min(1000, source.remainingGrams, inventory.capacityGrams - used.grams) : 0
-          // Debit work before the same atomic replacement that credits grams.
-          this.miningWork[id] -= 960
-          if (!this.miningWork[id]) delete this.miningWork[id]
-          if (grams && this.transfer({ revision: this.snapshot.revision, from: { kind: 'source', id }, to: { kind: 'player' }, resourceId: source.resourceId, grams })) {
-            this.feedback = `Gathered ${grams / 1000} kg · ${RESOURCE_CATALOG[source.resourceId as keyof typeof RESOURCE_CATALOG].name}. Saved.`
-          } else if (grams) this.cancel('Gathering transaction rejected.')
-          const blocked = this.blocked(id)
-          if (blocked) { this.cancel(); this.feedback = blocked }
-        }
-      }
-    }
-    if (wasWalking && next.player.mode !== 'walking' || next.tick - this.checkpointTick >= 60) {
-      this.checkpoint()
-      this.checkpointTick = next.tick
-    }
-    return this.world
+    return advanceResourceSession(this, this.tickControl, next, power)
   }
 }
